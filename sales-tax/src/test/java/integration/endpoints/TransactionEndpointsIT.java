@@ -5,12 +5,10 @@ import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
-import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.transaction.TransactionStatusDto;
-import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
@@ -29,9 +27,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -78,7 +73,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 //                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
 //                .post()
 //                .uri(uriBuilder -> uriBuilder
-//                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state + "/date/" + LocalDateTime.now().toLocalDate())
+//                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state + "/date/10103453")
 //                        .build())
 //                .accept(MediaType.APPLICATION_JSON)
 //                .exchange()
@@ -476,7 +471,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withInternalTimestamps(new TimestampsDto("", "2021-10-10T07:00:00"))
                 .withSource("");
         Set expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR,
+                "Timestamps.createdDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR,
                 "source " + StringErrorMessages.SINGLE_DIGIT_ERROR));
 
         // Then

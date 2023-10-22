@@ -31,6 +31,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -668,9 +669,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingRouter.getSalesTaxTrackingByStateRouterFunction(nullSalesTaxTrackingHandler);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () ->
+                salesTaxTrackingRouter.getSalesTaxTrackingByStateRouterFunction(nullSalesTaxTrackingHandler));
 
         // Then
         assertEquals("salesTaxTrackingHandler is marked non-null but is null", nullPointerException.getMessage());
@@ -745,6 +745,20 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         webTestClient
                 .mutateWith(csrf())
                 .put()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "wrong/url").build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void postAny_InvalidUrl_Returns404() {
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
                 .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "wrong/url").build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -897,6 +911,200 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .exchange()
                 .expectStatus().isCreated().expectBody(SalesTaxTrackingDto.class)
                 .isEqualTo(givenSalesTaxTrackingDto);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_ReturnsSalesTaxTracking_Returns200() {
+        // Given
+        LocalDate localDate = LocalDate.now();
+        String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto resultedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
+
+        // When
+        when(salesTaxTrackingFacade.refreshNexusSummary(stateName, localDate)).thenReturn(Mono.just(salesTaxTracking));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + stateName)
+                        .queryParam("date", localDate)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk().expectBody(SalesTaxTrackingDto.class)
+                .isEqualTo(resultedSalesTaxTracking);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_FacadeReturnsEmpty_Returns404NotFound() {
+        // Given
+        LocalDate localDate = LocalDate.now();
+        String stateName = salesTaxTrackingDto.state().name();
+
+        // When
+        when(salesTaxTrackingFacade.refreshNexusSummary(stateName, localDate)).thenReturn(Mono.empty());
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + stateName)
+                        .queryParam("date", localDate)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_DateNotInFormat_Returns400() {
+        // Given
+        LocalDate localDate = LocalDate.now();
+        String stateName = salesTaxTrackingDto.state().name();
+
+        // When
+        when(salesTaxTrackingFacade.refreshNexusSummary(stateName, localDate)).thenReturn(Mono.just(salesTaxTracking));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + stateName)
+                        .queryParam("date", localDate + "$")
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals("[date must be in the format yyyy-mm-dd]",map.get("message")));;
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_NoDateInAsQueryParam_Returns400() {
+        // Given
+        LocalDate localDate = LocalDate.now();
+        String stateName = salesTaxTrackingDto.state().name();
+
+        // When
+        when(salesTaxTrackingFacade.refreshNexusSummary(stateName, localDate)).thenReturn(Mono.just(salesTaxTracking));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + stateName)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals("[date must be in the format yyyy-mm-dd]",map.get("message")));
+    }
+
+    @Test
+    @Override
+    public void refreshByStateAndDate_UnauthenticatedUser_Returns401() {
+        // Given
+        LocalDate localDate = LocalDate.now();
+        String stateName = salesTaxTrackingDto.state().name();
+
+        // When
+        when(salesTaxTrackingFacade.refreshNexusSummary(stateName, localDate)).thenReturn(Mono.just(salesTaxTracking));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + stateName)
+                        .queryParam("date", localDate)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_UserWithoutCSRFToken_Returns403() {
+        // Given
+        LocalDate localDate = LocalDate.now();
+        String stateName = salesTaxTrackingDto.state().name();
+
+        // When
+        when(salesTaxTrackingFacade.refreshNexusSummary(stateName, localDate)).thenReturn(Mono.just(salesTaxTracking));
+
+        // Then
+        webTestClient
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + stateName)
+                        .queryParam("date", localDate)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_InternalServerError_Returns500() {
+        // Given
+        LocalDate localDate = LocalDate.now();
+        String stateName = salesTaxTrackingDto.state().name();
+
+        // When
+        when(salesTaxTrackingFacade.refreshNexusSummary(stateName, localDate)).thenReturn(Mono.error(RuntimeException::new));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + stateName)
+                        .queryParam("date", localDate)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_NullHandler_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () ->
+                salesTaxTrackingRouter.refreshNexusSummaryByDateRouterFunction(nullSalesTaxTrackingHandler));
+
+        // Then
+        assertEquals("salesTaxTrackingHandler is marked non-null but is null", nullPointerException.getMessage());
+
     }
 
     @Test

@@ -68,19 +68,22 @@ public class SalesTaxTrackingFacade {
                 ? nexusService.recalculationOfNexusSummaryIfRequired(salesTaxTracking,
                 nexusService.getNexusSummaryDate(salesTaxTracking, LocalDateTime.now())
                         .flatMap(dateRangeSummary -> nexusService.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, dateRangeSummary)))
-                : Mono.just(salesTaxTracking) ;
+                : Mono.just(salesTaxTracking);
     }
 
     public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull String state, @NonNull LocalDate refreshDate) {
-            return salesTaxTrackingService.findByState(state)
-                    .flatMap(salesTaxTrackingService::addClientAndStateDetails)
-                    .flatMap(salesTaxTracking -> nexusService.getTransactionsQueryByNexusCalculation(salesTaxTracking.getNexusStateRule(), salesTaxTracking.getClientTracking(), refreshDate)
-                            .flatMapMany(transactionService::getTransactionsByQuery)
-                            .flatMap(transaction -> customerService.findByComplytId(transaction.getCustomerId())
-                                    .map(transaction::withCustomer))
-                            .collectList()
-                        .flatMap(transactions -> nexusService.refreshNexusSummary(salesTaxTracking, transactions, refreshDate))
-                        .flatMap(salesTaxTrackingService::save));
+        return salesTaxTrackingService.findByState(state)
+                .flatMap(foundSalesTaxTracking -> nexusService.hasNexus(foundSalesTaxTracking)
+                        .flatMap(salesTaxTrackingWithNexusInfo -> !salesTaxTrackingWithNexusInfo.isHasNexus()
+                                ? salesTaxTrackingService.addClientAndStateDetails(salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
+                                .flatMap(salesTaxTracking -> nexusService.getTransactionsQueryByNexusCalculation(salesTaxTracking.getNexusStateRule(), salesTaxTracking.getClientTracking(), refreshDate)
+                                        .flatMapMany(transactionService::getTransactionsByQuery)
+                                        .flatMap(transaction -> customerService.findByComplytId(transaction.getCustomerId())
+                                                .map(transaction::withCustomer))
+                                        .collectList()
+                                        .flatMap(transactions -> nexusService.refreshNexusSummary(salesTaxTracking, transactions, refreshDate))
+                                        .flatMap(salesTaxTrackingService::save))
+                                : Mono.just(foundSalesTaxTracking)));
     }
 
 }

@@ -380,7 +380,6 @@ public class UnitTestUtilities {
                 new PhysicalNexusTrackerDto(false, localDateTime),
                 new EconomicNexusTrackerDto(false, localDateTime),
                 Map.of(),
-                Map.of(),
                 createNexusStateRuleDto(),
                 createClientTrackingDto(),
                 localDateTime,

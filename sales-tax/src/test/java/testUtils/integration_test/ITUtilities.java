@@ -1,19 +1,17 @@
 package testUtils.integration_test;
 
-import com.complyt.domain.nexus.enums.TimeFrame;
-import com.complyt.domain.transaction.Address;
-import com.complyt.domain.transaction.TransactionFilingStatus;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.InformationComponent;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
+import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.TransactionFilingStatus;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
-import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.transaction.*;
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -45,7 +43,7 @@ public interface ITUtilities {
         return new SalesTaxTrackingDto(null, state, "comment", true,
                 new PhysicalNexusTrackerDto(false, LocalDateTime.now()),
                 new EconomicNexusTrackerDto(false, LocalDateTime.now()),
-                null,null,null,null,
+                null, null, null,
                 LocalDateTime.now(), false, LocalDateTime.now(), FilingFrequencyDto.MONTHLY);
     }
 
@@ -140,10 +138,10 @@ public interface ITUtilities {
                 .issuer("https://localhost")
                 .claim("tenant_id", "it_tenant")
                 .claim("scope", "create:customer delete:customer read:customer " +
-                        "update:customer create:transaction read:transaction " +
-                        "update:transaction delete:transaction read:state " +
-                        "create:exemption update:exemption delete:exemption " +
-                        "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
+                                "update:customer create:transaction read:transaction " +
+                                "update:transaction delete:transaction read:state " +
+                                "create:exemption update:exemption delete:exemption " +
+                                "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
     }
 
     static Address createAddressInCalifornia() {
@@ -170,17 +168,17 @@ public interface ITUtilities {
     }
 
     static ClientTrackingDto stubClientTrackingDto() {
-        return new ClientTrackingDto( new NexusDto(LocalDateTime.parse("2015-06-01T00:00")) , "it_tenant");
+        return new ClientTrackingDto(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), "it_tenant");
     }
 
     static NexusStateRuleDto stubAlabamaNexusStateRuleDto() {
         return new NexusStateRuleDto(true,
                 new StateDto("AL", "01", "Alabama"),
-                List.of(TaxableCategoryDto.TAXABLE,TaxableCategoryDto.NOT_TAXABLE),
-                List.of(TangibleCategoryDto.INTANGIBLE,TangibleCategoryDto.TANGIBLE),
+                List.of(TaxableCategoryDto.TAXABLE, TaxableCategoryDto.NOT_TAXABLE),
+                List.of(TangibleCategoryDto.INTANGIBLE, TangibleCategoryDto.TANGIBLE),
                 List.of(CustomerTypeDto.RETAIL),
                 TimeFrameDto.PREVIOUS_TWELVE_MONTHS,
                 new NexusThresholdDto(BigDecimal.valueOf(250000), 0, DefinitionDto.AMOUNT),
-                null);
+                LocalDateTime.of(1970,1,1,0,0,0));
     }
 }

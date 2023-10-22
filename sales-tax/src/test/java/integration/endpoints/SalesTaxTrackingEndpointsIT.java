@@ -26,14 +26,15 @@ import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -46,6 +47,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     private final StateDto existingState = new StateDto("AZ", "04", "Arizona");
     private final StateDto newState = new StateDto("AL", "01", "Alabama");
+    private final StateDto stateWithNexus = new StateDto("TX", "48", "Texas");
+    private final StateDto stateWithOldRule = new StateDto("Kaedwen", "101", "KD");
     @MockBean
     TenantResolver tenantResolver;
     @Autowired
@@ -59,6 +62,106 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_Exists_Returns200WithSummaryAndNewNexusRule() {
+        LocalDate localDate = LocalDate.now();
+        LocalDate summaryDate = localDate.isAfter(localDate.withDayOfMonth(1).withMonth(6))
+                ? LocalDate.of(localDate.getYear() + 1, 6, 1)
+                : LocalDate.of(localDate.getYear(), 6, 1);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + stateWithOldRule.name())
+                        .queryParam("date", localDate)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> {
+                    assertNotNull(salesTaxTrackingDto.nexusCalculationSummaries().get(summaryDate));
+                    assertEquals(
+                            LocalDateTime.of(2022, 1, 1, 0, 0, 0, 0),
+                            salesTaxTrackingDto.nexusStateRule().appliedDate());
+                });
+
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_ExistsAndHasNexus_Returns200NoSummary() {
+        LocalDate localDate = LocalDate.now();
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + stateWithNexus.name())
+                        .queryParam("date", localDate)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> assertNull(salesTaxTrackingDto.nexusCalculationSummaries().get(localDate)));
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_DoesntExists_Returns404NotFound() {
+        String state = "Redenia";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state)
+                        .queryParam("date", LocalDate.now())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_DoesNotPassValidation_Returns400() {
+        String state = "Redenia";
+        String badDate = "4323/200/23";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state)
+                        .queryParam("date", badDate)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals("[date " + DtoErrorMessages.LOCALDATE_FORMAT_ERROR + "]", map.get("message")));
     }
 
     @Order(2)
@@ -238,7 +341,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .value(resultSalesTaxTrackingDto -> assertEquals(
                         salesTaxTrackingDto
                                 .withComplytId(resultSalesTaxTrackingDto.complytId())
-                                .withTransactionNexusSummaries(Map.of())
                                 .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
                                 .withClientTracking(ITUtilities.stubClientTrackingDto())
                                 .withNexusStateRule(ITUtilities.stubAlabamaNexusStateRuleDto()),
@@ -270,7 +372,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                         salesTaxTrackingDto.
                                 withComplytId(resultSalesTaxTrackingDto.complytId())
                                 .withComment("a new comment")
-                                .withTransactionNexusSummaries(Map.of())
                                 .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
                                 .withClientTracking(ITUtilities.stubClientTrackingDto())
                                 .withNexusStateRule(ITUtilities.stubAlabamaNexusStateRuleDto()),

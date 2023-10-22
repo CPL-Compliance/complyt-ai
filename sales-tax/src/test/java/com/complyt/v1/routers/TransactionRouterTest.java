@@ -2391,7 +2391,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
+                "Timestamps.updatedDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR);
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -2450,7 +2450,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
+                "Timestamps.createdDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR);
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -2509,7 +2509,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
+                "Timestamps.createdDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR);
 
         // When + Then
         webTestClient
@@ -2570,7 +2570,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
+                "Timestamps.updatedDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR);
 
         // When + Then
         webTestClient
@@ -2732,7 +2732,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
+                "Timestamps.updatedDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR);
 
         // When + Then
         webTestClient
@@ -2997,7 +2997,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
+                "Timestamps.createdDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR);
 
         // When + Then
         webTestClient
@@ -3058,7 +3058,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
+                "Timestamps.updatedDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR);
 
         // When + Then
         webTestClient
@@ -3277,7 +3277,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
+                "Timestamps.updatedDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR);
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -3340,7 +3340,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
+                "Timestamps.createdDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR);
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -3403,7 +3403,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR
+                "Timestamps.createdDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR
         );
         // When + Then
         webTestClient
@@ -3467,7 +3467,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR
+                "Timestamps.updatedDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR
         );
         // When + Then
         webTestClient
@@ -3599,7 +3599,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR
+                "Timestamps.createdDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR
         );
         // When + Then
         webTestClient
@@ -3663,7 +3663,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR
+                "Timestamps.updatedDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR
         );
         // When + Then
         webTestClient
@@ -3931,7 +3931,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
+                "Timestamps.createdDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR);
 
         // When + Then
         webTestClient
@@ -3996,7 +3996,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
+                "Timestamps.updatedDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR);
 
         // When + Then
         webTestClient

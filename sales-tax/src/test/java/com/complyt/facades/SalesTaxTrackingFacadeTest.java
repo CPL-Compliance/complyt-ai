@@ -2,6 +2,7 @@ package com.complyt.facades;
 
 import com.complyt.domain.State;
 import com.complyt.domain.customer.Customer;
+import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.TransactionNexusSummary;
@@ -42,9 +43,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class SalesTaxTrackingFacadeTest {
 
+    private final DateRange dateRange = new DateRangeStrategy(TimeFrame.PREVIOUS_TWELVE_MONTHS, LocalDateTime.now(), LocalDateTime.now()).getDateRange();
     @InjectMocks
     SalesTaxTrackingFacade salesTaxTrackingFacade;
-
     @Mock
     SalesTaxTrackingService salesTaxTrackingService;
     @Mock
@@ -55,8 +56,6 @@ public class SalesTaxTrackingFacadeTest {
     NexusService nexusService;
     UnitTestUtilities testUtilities;
     private SalesTaxTracking salesTaxTracking;
-
-    private final DateRange dateRange = new DateRangeStrategy(TimeFrame.PREVIOUS_TWELVE_MONTHS, LocalDateTime.now(), LocalDateTime.now()).getDateRange();
 
     @BeforeEach
     void setUp() {
@@ -123,6 +122,7 @@ public class SalesTaxTrackingFacadeTest {
 
         // When
         when(salesTaxTrackingService.findByState(salesTaxTracking.getState().getName())).thenReturn(Mono.just(salesTaxTrackingWithId));
+        when(nexusService.hasNexus(salesTaxTrackingWithId)).thenReturn(Mono.just(new SalesTaxTrackingWithNexusInfo(salesTaxTrackingWithId, false)));
         when(salesTaxTrackingService.addClientAndStateDetails(salesTaxTrackingWithId)).thenReturn(Mono.just(salesTaxTrackingWithId));
         when(nexusService.getTransactionsQueryByNexusCalculation(salesTaxTrackingWithId.getNexusStateRule(), salesTaxTrackingWithId.getClientTracking(), referenceDate)).thenReturn(Mono.just(query));
         when(transactionService.getTransactionsByQuery(query)).thenReturn(Flux.just(transaction));
@@ -134,6 +134,22 @@ public class SalesTaxTrackingFacadeTest {
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithSummary).verifyComplete();
+    }
+
+    @Test
+    void refreshNexusSummary_HasNexus_ReturnsSalesTaxTrackingFromDB() {
+        // Given
+        SalesTaxTracking salesTaxTrackingWithId = salesTaxTracking.withId(UUID.randomUUID().toString());
+        LocalDate referenceDate = LocalDate.now();
+
+        // When
+        when(salesTaxTrackingService.findByState(salesTaxTracking.getState().getName())).thenReturn(Mono.just(salesTaxTrackingWithId));
+        when(nexusService.hasNexus(salesTaxTrackingWithId)).thenReturn(Mono.just(new SalesTaxTrackingWithNexusInfo(salesTaxTrackingWithId, true)));
+
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.refreshNexusSummary(salesTaxTracking.getState().getName(), referenceDate);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithId).verifyComplete();
     }
 
     @Test
@@ -282,7 +298,7 @@ public class SalesTaxTrackingFacadeTest {
         assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
     }
 
- @Test
+    @Test
     void refresh_NullDatePassed_ThrowsException() {
         // Given
         LocalDate date = null;

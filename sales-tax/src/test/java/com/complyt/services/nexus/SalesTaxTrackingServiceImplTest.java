@@ -244,7 +244,7 @@ public class SalesTaxTrackingServiceImplTest {
         String state = newSalesTaxTracking.getState().getName();
 
         // When
-        when(nexusStateRuleRepository.findByState(newSalesTaxTracking.getState().getName())).thenReturn(Mono.just(nexusStateRule));
+        when(nexusStateRuleRepository.findMostRecentByState(newSalesTaxTracking.getState().getName())).thenReturn(Mono.just(nexusStateRule));
         when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
         when(salesTaxTrackingRepository.findByState(state)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingRepository.save(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
@@ -324,7 +324,7 @@ public class SalesTaxTrackingServiceImplTest {
         // When
         when(complytIdHandler.insertComplytIdToNew(salesTaxTracking)).thenReturn(salesTaxTracking.withComplytId(complytId));
         when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
-        when(nexusStateRuleRepository.findByState(salesTaxTracking.getState().getName())).thenReturn(Mono.just(nexusStateRule));
+        when(nexusStateRuleRepository.findMostRecentByState(salesTaxTracking.getState().getName())).thenReturn(Mono.just(nexusStateRule));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.injectDataToNewSalesTaxTracking(salesTaxTracking);
 
         // Then

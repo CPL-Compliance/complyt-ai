@@ -18,7 +18,8 @@ public interface DtoErrorMessages {
 
     String NON_PARTIAL_ERROR_SUFFIX = "in a non partial address"; // Appended to other errors messages
 
-    String DATE_FORMAT_ERROR = "is in an illegal format - " +
-                               "For date/time fields please provide a " + FieldsDescriptions.TIMESTAMP_FORMAT;
+    String ISO8601_FORMAT_ERROR = "is in an illegal format - " +
+                                  "For date/time fields please provide a " + FieldsDescriptions.TIMESTAMP_FORMAT;
 
+    String LOCALDATE_FORMAT_ERROR = "must be in the format yyyy-mm-dd";
 }

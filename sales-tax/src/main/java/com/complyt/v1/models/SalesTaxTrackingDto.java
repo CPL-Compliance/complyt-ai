@@ -27,7 +27,6 @@ public record SalesTaxTrackingDto(
         boolean enforcesSalesTax,
         @Valid @NotNull(message = "physicalNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR) PhysicalNexusTrackerDto physicalNexusTracker,
         @Valid @NotNull(message = "economicNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR) EconomicNexusTrackerDto economicNexusTracker,
-        Map<UUID, @Valid TransactionNexusSummaryDto> transactionNexusSummaries,
         Map<LocalDate, @Valid NexusCalculationSummaryDto> nexusCalculationSummaries,
         @Valid NexusStateRuleDto nexusStateRule,
         @Valid ClientTrackingDto clientTracking,

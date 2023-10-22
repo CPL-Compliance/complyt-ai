@@ -56,20 +56,20 @@ public class SalesTaxTrackingRouter {
         return RouterFunctions.route(getSalesTaxTrackingRoute, salesTaxTrackingHandler::upsert);
     }
 
-    @Bean
-//    @refreshNexusSummaryApiInfo
-    public RouterFunction<ServerResponse> refreshNexusSummaryRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
-        RequestPredicate refreshNexusSummaryRoute = RequestPredicates
-                .POST(BASE_URL + "/refresh/state/{state}")
-                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
-
-        return RouterFunctions.route(refreshNexusSummaryRoute, salesTaxTrackingHandler::refreshNexusSummary);
-    }
+//    @Bean
+////    @refreshNexusSummaryApiInfo
+//    public RouterFunction<ServerResponse> refreshNexusSummaryRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
+//        RequestPredicate refreshNexusSummaryRoute = RequestPredicates
+//                .POST(BASE_URL + "/refresh/state/{state}")
+//                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+//
+//        return RouterFunctions.route(refreshNexusSummaryRoute, salesTaxTrackingHandler::refreshNexusSummary);
+//    }
     @Bean
 //    @refreshNexusSummaryByDateApiInfo
     public RouterFunction<ServerResponse> refreshNexusSummaryByDateRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
         RequestPredicate refreshNexusSummaryByDateRoute = RequestPredicates
-                .POST(BASE_URL + "/refresh/state/{state}/date/{date}")
+                .POST(BASE_URL + "/refresh/state/{state}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(refreshNexusSummaryByDateRoute, salesTaxTrackingHandler::refreshNexusSummaryByDate);

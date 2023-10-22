@@ -80,7 +80,8 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
                 .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state + "/date/" + referenceDate.toLocalDate())
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state)
+                        .queryParam("date", referenceDate.toLocalDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

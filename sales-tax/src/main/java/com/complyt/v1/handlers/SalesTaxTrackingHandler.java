@@ -6,8 +6,10 @@ import com.complyt.security.permissions.sales_tax_tracking.NexusReadPermission;
 import com.complyt.security.permissions.sales_tax_tracking.NexusUpdatePermission;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
+import com.complyt.v1.mappers.DateWrapperToLocalDateMapper;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.models.SalesTaxTrackingDto;
+import com.complyt.v1.models.nexus.DateWrapperDto;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,8 +24,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Component
@@ -38,6 +38,8 @@ public class SalesTaxTrackingHandler {
     @NonNull
     ValidationHandler<SalesTaxTrackingDto, SpringValidatorAdapter> salesTaxTrackingDtoValidationHandler;
 
+    @NonNull
+    ValidationHandler<DateWrapperDto, SpringValidatorAdapter> dateWrapperDtoValidationHandler;
 
     @NexusReadPermission
     public Mono<ServerResponse> getOne(ServerRequest serverRequest) {
@@ -93,25 +95,18 @@ public class SalesTaxTrackingHandler {
     }
 
     @NexusUpdatePermission
-    public Mono<ServerResponse> refreshNexusSummary(ServerRequest serverRequest) {
-        String state = serverRequest.pathVariable("state");
-        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
-
-        return ContextLogger.observeCtx(logStr, log::info).then(
-                salesTaxTrackingFacade.refreshNexusSummary(state, LocalDate.now())
-                        .flatMap(salesTaxTracking -> ServerResponse.ok().bodyValue(
-                                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking))));
-    }
-
-    @NexusUpdatePermission
     public Mono<ServerResponse> refreshNexusSummaryByDate(ServerRequest serverRequest) {
         String state = serverRequest.pathVariable("state");
-        LocalDate date = LocalDate.parse(serverRequest.pathVariable("date"));
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        return ContextLogger.observeCtx(logStr, log::info).then(
-                salesTaxTrackingFacade.refreshNexusSummary(state, date)
-                        .flatMap(salesTaxTracking -> ServerResponse.ok().bodyValue(
-                                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking))));
+
+        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info).then(
+                dateWrapperDtoValidationHandler.validate(serverRequest)
+                        .map(DateWrapperToLocalDateMapper.INSTANCE::dateWrapperToLocalDate).flatMap(date ->
+                                salesTaxTrackingFacade.refreshNexusSummary(state, date)
+                                        .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
+                                        .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new))));
+
+        return ServerResponse.ok().body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
     }
 }

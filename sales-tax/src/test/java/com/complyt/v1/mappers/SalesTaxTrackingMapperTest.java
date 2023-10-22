@@ -6,15 +6,13 @@ import com.complyt.domain.nexus.TransactionNexusSummary;
 import com.complyt.domain.transaction.TransactionType;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
-import com.complyt.v1.models.nexus.TransactionNexusSummaryDto;
-import com.complyt.v1.models.transaction.TransactionTypeDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class SalesTaxTrackingMapperTest {
 
     private SalesTaxTracking salesTaxTracking;
-    private SalesTaxTracking salesTaxTrackingNoTenantNorId;
+    private SalesTaxTracking salesTaxTrackingWithWhatsExposedToDto;
     private SalesTaxTrackingDto salesTaxTrackingDto;
     private LocalDateTime localDateTime;
     private UnitTestUtilities testUtilities;
@@ -38,14 +36,13 @@ public class SalesTaxTrackingMapperTest {
         salesTaxTracking = testUtilities.createSalesTaxTracking(UUID.randomUUID().toString())
                 .withNexusCalculationSummaries(Map.of(localDateTime.toLocalDate(), new NexusCalculationSummary(1, BigDecimal.valueOf(1200))))
                 .withTransactionNexusSummaries(Map.of(transactionId, new TransactionNexusSummary(BigDecimal.valueOf(1200), localDateTime, TransactionType.INVOICE)));
-        salesTaxTrackingNoTenantNorId = salesTaxTracking
+        salesTaxTrackingWithWhatsExposedToDto = salesTaxTracking
                 .withTenantId(null).withId(null).withComplytId(salesTaxTracking.getComplytId())
                 .withClientTracking(salesTaxTracking.getClientTracking().withTenantId(null).withId(null))
-                .withNexusStateRule(salesTaxTracking.getNexusStateRule().withId(null));
+                .withNexusStateRule(salesTaxTracking.getNexusStateRule().withId(null))
+                .withTransactionNexusSummaries(new HashMap<>());
         salesTaxTrackingDto = testUtilities.createSalesTaxTrackingDto().withComplytId(salesTaxTracking.getComplytId())
-                .withNexusCalculationSummaries(Map.of(localDateTime.toLocalDate(), new NexusCalculationSummaryDto(1, BigDecimal.valueOf(1200))))
-                .withTransactionNexusSummaries(Map.of(transactionId, new TransactionNexusSummaryDto(BigDecimal.valueOf(1200), localDateTime, TransactionTypeDto.INVOICE)));
-        ;
+                .withNexusCalculationSummaries(Map.of(localDateTime.toLocalDate(), new NexusCalculationSummaryDto(1, BigDecimal.valueOf(1200))));
     }
 
     @Test
@@ -63,7 +60,7 @@ public class SalesTaxTrackingMapperTest {
         SalesTaxTracking salesTaxTrackingResult = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto);
 
         // Then
-        assertEquals(salesTaxTrackingNoTenantNorId, salesTaxTrackingResult);
+        assertEquals(salesTaxTrackingWithWhatsExposedToDto, salesTaxTrackingResult);
     }
 
     @Test
