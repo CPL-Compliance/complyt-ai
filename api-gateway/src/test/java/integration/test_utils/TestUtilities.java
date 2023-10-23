@@ -174,4 +174,8 @@ public class TestUtilities {
                 "    \"clientSecret\": \"QWE$#@\"\n" +
                 "}";
     }
+
+    public static String tokenJsonExample() {
+        return "{\"apiKey\": \"" + API_KEY + "\"}";
+    }
 }
