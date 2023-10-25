@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class FastTaxGetBestMatchWebClientWrapperTest {
     @InjectMocks
-    FastTaxGetBestMatchWebClientWrapper fastTaxWebClientWrapper;
+    FastTaxGetBestMatchWebClientWrapper fastTaxGetBestMatchWebClientWrapper;
 
     @InjectMocks
     FastTaxGetBestMatchWebClientWrapper anotherFastTaxGetBestMatchWebClientWrapper;
@@ -53,7 +53,7 @@ public class FastTaxGetBestMatchWebClientWrapperTest {
         when(fastTaxGetBestMatchWebClientWrapperProperties.getPath()).thenReturn("path");
         when(fastTaxGetBestMatchWebClientWrapperProperties.getKey()).thenReturn(new Pair<>("key", "test-value"));
 
-        fastTaxWebClientWrapper = new FastTaxGetBestMatchWebClientWrapper(webClient,
+        fastTaxGetBestMatchWebClientWrapper = new FastTaxGetBestMatchWebClientWrapper(webClient,
                 fastTaxGetBestMatchWebClientWrapperProperties.getScheme(),
                 fastTaxGetBestMatchWebClientWrapperProperties.getHost(),
                 fastTaxGetBestMatchWebClientWrapperProperties.getPath(),
@@ -68,13 +68,13 @@ public class FastTaxGetBestMatchWebClientWrapperTest {
 
     @Test
     void equals_EqualAddressValues_Equal() {
-        assertTrue(fastTaxWebClientWrapper.equals(anotherFastTaxGetBestMatchWebClientWrapper) && anotherFastTaxGetBestMatchWebClientWrapper.equals(fastTaxWebClientWrapper));
+        assertTrue(fastTaxGetBestMatchWebClientWrapper.equals(anotherFastTaxGetBestMatchWebClientWrapper) && anotherFastTaxGetBestMatchWebClientWrapper.equals(fastTaxGetBestMatchWebClientWrapper));
     }
 
 
     @Test
     void hashCode_IdenticalAddresses_Equal() {
-        assertEquals(fastTaxWebClientWrapper.hashCode(), anotherFastTaxGetBestMatchWebClientWrapper.hashCode());
+        assertEquals(fastTaxGetBestMatchWebClientWrapper.hashCode(), anotherFastTaxGetBestMatchWebClientWrapper.hashCode());
     }
 
     @Test
@@ -90,7 +90,7 @@ public class FastTaxGetBestMatchWebClientWrapperTest {
         when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
         when(responseSpecMock.bodyToMono(ArgumentMatchers.<Class<FastTaxGetBestMatchData>>notNull())).thenReturn(Mono.just(fastTaxGetBestMatchData));
 
-        Mono<SalesTaxData> salesTaxDataMono = fastTaxWebClientWrapper.findByAddress(address);
+        Mono<SalesTaxData> salesTaxDataMono = fastTaxGetBestMatchWebClientWrapper.findByAddress(address);
 
         // Then
         StepVerifier.create(salesTaxDataMono).expectNext(fastTaxGetBestMatchData).verifyComplete();
