@@ -34,7 +34,7 @@ class WebClientWrapperPropertiesConfigTest {
         String licenseKey = "License Key";
         WebClientWrapperProperties expectedFastTaxWebClientWrapper = new WebClientWrapperProperties("https",
                 "ws.serviceobjects.com",
-                "FT/web.svc/json/GetTaxInfoByCityCounty",
+                "FT/web.svc/json/GetTaxInfoByCityCountyState",
                 new Pair<>("licensekey", licenseKey));
 
         WebClientWrapperProperties actualFastTaxGetByCityCountyStateWebClientWrapper = webClientWrapperPropertiesConfig.fastTaxGetByCityCountyStateWebClientWrapperProperties(licenseKey);
