@@ -14,11 +14,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class SalesTaxWebClientWrapperConfig {
 
     @Autowired
-    @Qualifier("fastTaxGetBestMatchWebClientWrapperProperties")
     private WebClientWrapperProperties fastTaxGetBestMatchWebClientWrapperProperties;
 
     @Autowired
-    @Qualifier("fastTaxGetByCityCountyStateWebClientWrapperProperties")
     private WebClientWrapperProperties fastTaxGetByCityCountyStateWebClientWrapperProperties;
 
     @Autowired

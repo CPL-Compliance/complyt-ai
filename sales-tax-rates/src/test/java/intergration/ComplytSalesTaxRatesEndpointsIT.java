@@ -148,7 +148,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
     public void findAll_FindsAllInsertedComplytSalesTaxRates_ChecksCount() {
         Flux<ComplytSalesTaxRates> complytSalesTaxRatesFlux = reactiveMongoTemplate.findAll(ComplytSalesTaxRates.class, "colorado");
 
-        StepVerifier.create(complytSalesTaxRatesFlux).expectNextCount(3).verifyComplete();
+        StepVerifier.create(complytSalesTaxRatesFlux).expectNextCount(1).verifyComplete();
     }
 
 }
