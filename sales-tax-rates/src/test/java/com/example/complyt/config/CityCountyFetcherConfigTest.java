@@ -1,6 +1,7 @@
 package com.example.complyt.config;
 
 import com.complyt.business.data_fetcher.FastTaxGetBestMatchCityCountyFetcher;
+import com.complyt.business.data_fetcher.FastTaxGetByCityCountyFetcher;
 import com.complyt.business.data_fetcher.TaxJarCityCountyFetcher;
 import com.complyt.business.data_fetcher.ZipTaxCityCountyFetcher;
 import com.complyt.config.CityCountyAddressFetcherConfig;
@@ -19,12 +20,24 @@ public class CityCountyFetcherConfigTest {
     }
 
     @Test
-    void fastTaxCityCountyAddressFetcher_SalesTaxWebClientWrapper_ReturnedTransactionFastTaxCityCountyAddressFetcher() {
+    void fastTaxGetBestMatchCityCountyAddressFetcher_SalesTaxWebClientWrapper_ReturnedFastTaxCityCountyAddressFetcher() {
         // Given
         FastTaxGetBestMatchCityCountyFetcher expectedFastTaxGetBestMatchCityCountyAddressFetcher = new FastTaxGetBestMatchCityCountyFetcher();
 
         // When
         FastTaxGetBestMatchCityCountyFetcher actualFastTaxGetBestMatchCityCountyAddressFetcher = cityCountyAddressFetcherConfig.fastTaxGetBestMatchCityCountyAddressFetcher();
+
+        // Then
+        assertEquals(expectedFastTaxGetBestMatchCityCountyAddressFetcher, actualFastTaxGetBestMatchCityCountyAddressFetcher);
+    }
+
+    @Test
+    void fastTaxGetByCityCountyStateCityCountyFetcher_SalesTaxWebClientWrapper_ReturnedFastTaxGetByCityCountyStateAddressFetcher() {
+        // Given
+        FastTaxGetByCityCountyFetcher expectedFastTaxGetBestMatchCityCountyAddressFetcher = new FastTaxGetByCityCountyFetcher();
+
+        // When
+        FastTaxGetByCityCountyFetcher actualFastTaxGetBestMatchCityCountyAddressFetcher = cityCountyAddressFetcherConfig.fastTaxGetByCityCountyAddressFetcher();
 
         // Then
         assertEquals(expectedFastTaxGetBestMatchCityCountyAddressFetcher, actualFastTaxGetBestMatchCityCountyAddressFetcher);
