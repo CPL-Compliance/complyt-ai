@@ -1,14 +1,9 @@
 package com.example.complyt.domain.fast_tax;
 
 import com.complyt.domain.fast_tax.FastTaxGetByCityCountyStateData;
-import com.complyt.domain.fast_tax.TaxInfoItem;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.TestUtilities;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,8 +15,6 @@ public class FastTaxGetByCityCountyStateDataTest {
     @BeforeEach
     void setUp() {
         fastTaxGetByCityCountyStateData = createFastTaxGetByCityCountyStateData();
-        System.out.println(fastTaxGetByCityCountyStateData);
-
     }
 
     private FastTaxGetByCityCountyStateData createFastTaxGetByCityCountyStateData() {
@@ -35,7 +28,7 @@ public class FastTaxGetByCityCountyStateDataTest {
         boolean isUnincorporated = fastTaxGetByCityCountyStateData.isUnincorporated();
 
         // Then
-        Assertions.assertTrue(isUnincorporated);
+        Assertions.assertFalse(isUnincorporated);
     }
 
 

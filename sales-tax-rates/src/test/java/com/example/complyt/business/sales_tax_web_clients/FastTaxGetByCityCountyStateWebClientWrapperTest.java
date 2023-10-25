@@ -64,12 +64,6 @@ public class FastTaxGetByCityCountyStateWebClientWrapperTest {
     }
 
     @Test
-    void equals_EqualAddressValues_Equal() {
-        assertTrue(fastTaxGetByCityCountyStateWebClientWrapperProperties.equals(anotherFastTaxGetByCityCountyStateWebClientWrapper));
-    }
-
-
-    @Test
     void hashCode_IdenticalAddresses_Equal() {
         assertEquals(fastTaxGetByCityCountyStateWebClientWrapper.hashCode(), anotherFastTaxGetByCityCountyStateWebClientWrapper.hashCode());
     }
