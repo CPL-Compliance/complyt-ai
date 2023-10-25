@@ -5,6 +5,9 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 
 @Component
-public interface QueryParamsExtractor<T> {
-    Mono<T> extract(ServerRequest serverRequest);
+public class QueryParamsExtractorEmpty<T> implements QueryParamsExtractor<T> {
+    @Override
+    public Mono<T> extract(ServerRequest serverRequest) {
+        return Mono.empty();
+    }
 }
