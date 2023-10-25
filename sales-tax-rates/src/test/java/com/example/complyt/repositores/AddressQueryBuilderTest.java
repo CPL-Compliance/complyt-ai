@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import testUtils.TestUtilities;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -17,15 +19,16 @@ public class AddressQueryBuilderTest {
 
     QueryBuilder<Address> addressQueryBuilder;
 
-    Address fullAddress;
-
+    Address fullAddressNoCountyAddress;
+    Address fullAddresswithCountyAddress;
     Address partialAddress;
 
     @BeforeEach
     void setUp() {
         addressQueryBuilder = new AddressQueryBuilder();
-        fullAddress = TestUtilities.createAddressInCalifornia();
-        partialAddress = fullAddress
+        fullAddressNoCountyAddress = TestUtilities.createAddressInCalifornia();
+        fullAddresswithCountyAddress = fullAddressNoCountyAddress.withCounty("county");
+        partialAddress = fullAddressNoCountyAddress
                 .withPartial(true)
                 .withCity(null)
                 .withStreet(null);
@@ -44,15 +47,18 @@ public class AddressQueryBuilderTest {
     }
 
     @Test
-    void build_FullyAddressPassed_ReturnsFullyAddressQuery() {
+    void build_AddressPassed_ReturnsQuery() {
         // Given
-        Query expectedQuery = Query.query(Criteria
-                .where("address.city").regex(fullAddress.city(), "i")
-                .and("address.street").regex(fullAddress.street(), "i")
-                .and("address.zip").is(fullAddress.zip()));
+        Query expectedQuery = Query.query(Criteria.where("address.zip").is(fullAddressNoCountyAddress.zip()));
+        Optional.ofNullable(fullAddressNoCountyAddress.city())
+                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("address.city").regex(value, "i")));
+        Optional.ofNullable(fullAddressNoCountyAddress.street())
+                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("address.street").regex(value, "i")));
+        Optional.ofNullable(fullAddressNoCountyAddress.county())
+                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("address.county").regex(value, "i")));
 
         // When
-        Query actualQuery = addressQueryBuilder.build(fullAddress);
+        Query actualQuery = addressQueryBuilder.build(fullAddressNoCountyAddress);
 
         // Then
         Assertions.assertEquals(expectedQuery, actualQuery);
