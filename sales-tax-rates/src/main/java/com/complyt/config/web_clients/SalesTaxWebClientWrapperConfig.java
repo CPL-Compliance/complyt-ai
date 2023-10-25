@@ -16,7 +16,7 @@ public class SalesTaxWebClientWrapperConfig {
     private WebClientWrapperProperties fastTaxGetBestMatchWebClientWrapperProperties;
 
     @Autowired
-    private WebClientWrapperProperties fastTaxGetByCityCountyWebClientWrapperProperties;
+    private WebClientWrapperProperties fastTaxGetByCityCountyStateWebClientWrapperProperties;
 
     @Autowired
     private WebClientWrapperProperties zipTaxWebClientWrapperProperties;
@@ -41,10 +41,10 @@ public class SalesTaxWebClientWrapperConfig {
     @Bean("getByCityCountyWebClientWrapper")
     public FastTaxGetByCityCountyStateWebClientWrapper fastTaxGetByCityCountyWebClientWrapper(WebClient webClient) {
         return new FastTaxGetByCityCountyStateWebClientWrapper(webClient,
-                fastTaxGetByCityCountyWebClientWrapperProperties.getScheme(),
-                fastTaxGetByCityCountyWebClientWrapperProperties.getHost(),
-                fastTaxGetByCityCountyWebClientWrapperProperties.getPath(),
-                fastTaxGetByCityCountyWebClientWrapperProperties.getKey());
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getScheme(),
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getHost(),
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getPath(),
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getKey());
     }
 
     @Profile({"zipTax"})

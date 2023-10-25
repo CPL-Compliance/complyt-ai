@@ -37,7 +37,7 @@ class WebClientWrapperPropertiesConfigTest {
                 "FT/web.svc/json/GetTaxInfoByCityCounty",
                 new Pair<>("licensekey", licenseKey));
 
-        WebClientWrapperProperties actualFastTaxGetByCityCountyStateWebClientWrapper = webClientWrapperPropertiesConfig.fastTaxGetByCityCountyWebClientWrapperProperties(licenseKey);
+        WebClientWrapperProperties actualFastTaxGetByCityCountyStateWebClientWrapper = webClientWrapperPropertiesConfig.fastTaxGetByCityCountyStateWebClientWrapperProperties(licenseKey);
 
         assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxGetByCityCountyStateWebClientWrapper);
     }

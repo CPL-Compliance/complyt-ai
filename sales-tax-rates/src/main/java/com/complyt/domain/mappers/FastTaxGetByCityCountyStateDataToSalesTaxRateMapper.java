@@ -11,9 +11,9 @@ import org.mapstruct.factory.Mappers;
 import java.math.BigDecimal;
 
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
-public interface FastTaxGetByCityCountyDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
+public interface FastTaxGetByCityCountyStateDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
 
-    FastTaxGetByCityCountyDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(FastTaxGetByCityCountyDataToSalesTaxRateMapper.class);
+    FastTaxGetByCityCountyStateDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(FastTaxGetByCityCountyStateDataToSalesTaxRateMapper.class);
 
     @Mapping(target = "ratesMetaData.cityDistrictRate", source = "cityDistrictRate")
     @Mapping(target = "ratesMetaData.countyDistrictRate", source = "countyDistrictRate")

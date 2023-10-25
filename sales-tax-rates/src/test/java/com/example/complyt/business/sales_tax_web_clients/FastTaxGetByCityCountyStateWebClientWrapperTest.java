@@ -30,10 +30,8 @@ import static org.mockito.Mockito.when;
 public class FastTaxGetByCityCountyStateWebClientWrapperTest {
     @InjectMocks
     FastTaxGetByCityCountyStateWebClientWrapper fastTaxGetByCityCountyStateWebClientWrapper;
-
     @InjectMocks
     FastTaxGetByCityCountyStateWebClientWrapper anotherFastTaxGetByCityCountyStateWebClientWrapper;
-
     @Mock
     WebClient webClient;
     @Mock
@@ -65,10 +63,10 @@ public class FastTaxGetByCityCountyStateWebClientWrapperTest {
                 fastTaxGetByCityCountyStateWebClientWrapperProperties.getKey());
     }
 
-//    @Test
-//    void equals_EqualAddressValues_Equal() {
-//        assertTrue(fastTaxGetByCityCountyStateWebClientWrapperProperties.equals(anotherFastTaxGetByCityCountyStateWebClientWrapper));
-//    }
+    @Test
+    void equals_EqualAddressValues_Equal() {
+        assertTrue(fastTaxGetByCityCountyStateWebClientWrapperProperties.equals(anotherFastTaxGetByCityCountyStateWebClientWrapper));
+    }
 
 
     @Test
