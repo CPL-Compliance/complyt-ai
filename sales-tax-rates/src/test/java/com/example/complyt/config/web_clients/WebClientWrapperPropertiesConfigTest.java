@@ -16,18 +16,31 @@ class WebClientWrapperPropertiesConfigTest {
         webClientWrapperPropertiesConfig = new WebClientWrapperPropertiesConfig();
     }
 
-//    @Test
-//    void fastTaxGetBestMatchWebClientWrapperProperties_createFastTaxWebClientWrapperProperties_getFastTaxWebClientWrapperProperties() {
-//        String licenseKey = "License Key";
-//        WebClientWrapperProperties expectedFastTaxWebClientWrapper = new WebClientWrapperProperties("https",
-//                "ws.serviceobjects.com",
-//                "FT/web.svc/json/GetBestMatch",
-//                new Pair<>("licensekey", licenseKey));
-//
-//        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.fastTaxGetBestMatchWebClientWrapperProperties(licenseKey);
-//
-//        assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
-//    }
+    @Test
+    void fastTaxGetBestMatchWebClientWrapperProperties_createFastTaxWebClientWrapperProperties_getFastTaxWebClientWrapperProperties() {
+        String licenseKey = "License Key";
+        WebClientWrapperProperties expectedFastTaxWebClientWrapper = new WebClientWrapperProperties("https",
+                "ws.serviceobjects.com",
+                "FT/web.svc/json/GetBestMatch",
+                new Pair<>("licensekey", licenseKey));
+
+        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.fastTaxGetBestMatchWebClientWrapperProperties(licenseKey);
+
+        assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
+    }
+
+    @Test
+    void fastTaxGetByCityCountyStateWebClientWrapperProperties_createFastTaxWebClientWrapperProperties_getFastTaxWebClientWrapperProperties() {
+        String licenseKey = "License Key";
+        WebClientWrapperProperties expectedFastTaxWebClientWrapper = new WebClientWrapperProperties("https",
+                "ws.serviceobjects.com",
+                "FT/web.svc/json/GetTaxInfoByCityCounty",
+                new Pair<>("licensekey", licenseKey));
+
+        WebClientWrapperProperties actualFastTaxGetByCityCountyStateWebClientWrapper = webClientWrapperPropertiesConfig.fastTaxGetByCityCountyWebClientWrapperProperties(licenseKey);
+
+        assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxGetByCityCountyStateWebClientWrapper);
+    }
 
     @Test
     void zipTaxWebClientWrapperProperties_createZipTaxWebClientWrapperProperties_getZipTaxWebClientWrapperProperties() {

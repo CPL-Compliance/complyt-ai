@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @EqualsAndHashCode
-@AllArgsConstructor
 @Generated
 @Component
 public class TaxJarCityCountyFetcher implements CityCountyFetcher {

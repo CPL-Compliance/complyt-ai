@@ -2,7 +2,7 @@ package com.complyt.business.sales_tax_web_clients;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.SalesTaxData;
-import com.complyt.domain.fast_tax.FastTaxGetByCityCountyData;
+import com.complyt.domain.fast_tax.FastTaxGetByCityCountyStateData;
 import lombok.EqualsAndHashCode;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;
@@ -14,9 +14,9 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 
 @EqualsAndHashCode
-public class FastTaxGetByCityCountyWebClientWrapper extends SalesTaxWebClientWrapperBase {
+public class FastTaxGetByCityCountyStateWebClientWrapper extends SalesTaxWebClientWrapperBase {
 
-    public FastTaxGetByCityCountyWebClientWrapper(WebClient webClient, String scheme, String host, String path, Pair<String, String> licenseKey) {
+    public FastTaxGetByCityCountyStateWebClientWrapper(WebClient webClient, String scheme, String host, String path, Pair<String, String> licenseKey) {
         super(webClient, scheme, host, path, licenseKey);
     }
 
@@ -28,7 +28,7 @@ public class FastTaxGetByCityCountyWebClientWrapper extends SalesTaxWebClientWra
                 .uri(uri)
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve()
-                .bodyToMono(FastTaxGetByCityCountyData.class)
+                .bodyToMono(FastTaxGetByCityCountyStateData.class)
                 .cast(SalesTaxData.class);
     }
 

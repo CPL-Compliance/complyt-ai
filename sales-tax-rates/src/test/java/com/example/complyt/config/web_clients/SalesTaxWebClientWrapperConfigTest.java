@@ -1,9 +1,6 @@
 package com.example.complyt.config.web_clients;
 
-import com.complyt.business.sales_tax_web_clients.FastTaxGetBestMatchWebClientWrapper;
-import com.complyt.business.sales_tax_web_clients.StubFastTaxWebClientWrapper;
-import com.complyt.business.sales_tax_web_clients.TaxJarWebClientWrapper;
-import com.complyt.business.sales_tax_web_clients.ZipTaxWebClientWrapper;
+import com.complyt.business.sales_tax_web_clients.*;
 import com.complyt.config.web_clients.SalesTaxWebClientWrapperConfig;
 import com.complyt.config.web_clients.WebClientWrapperProperties;
 import org.javatuples.Pair;
@@ -32,6 +29,9 @@ public class SalesTaxWebClientWrapperConfigTest {
     @Mock
     WebClientWrapperProperties fastTaxGetBestMatchWebClientWrapperProperties;
 
+    @Mock
+    WebClientWrapperProperties fastTaxGetByCityCountyStateWebClientWrapperProperties;
+
     @Test
     void zipTaxWebClientWrapper_CreateInstance_ReturnInstance() {
         when(zipTaxWebClientWrapperProperties.getScheme()).thenReturn("scheme");
@@ -52,7 +52,7 @@ public class SalesTaxWebClientWrapperConfigTest {
     }
 
     @Test
-    void fastTaxWebClientWrapper_SetInstance_ReturnInstance() {
+    void fastTaxGetBestMatchWebClientWrapper_SetInstance_ReturnInstance() {
         when(fastTaxGetBestMatchWebClientWrapperProperties.getScheme()).thenReturn("scheme");
         when(fastTaxGetBestMatchWebClientWrapperProperties.getHost()).thenReturn("host");
         when(fastTaxGetBestMatchWebClientWrapperProperties.getPath()).thenReturn("path");
@@ -69,6 +69,26 @@ public class SalesTaxWebClientWrapperConfigTest {
                 salesTaxWebClientWrapperConfig.fastTaxGetBestMatchWebClientWrapper(webClient);
 
         assertEquals(expectedFastTaxGetBestMatchWebClientWrapper, actualFastTaxGetBestMatchWebClientWrapper);
+    }
+
+    @Test
+    void fastTaxGetByCityCountyStateWebClientWrapper_SetInstance_ReturnInstance() {
+        when(fastTaxGetByCityCountyStateWebClientWrapperProperties.getScheme()).thenReturn("scheme");
+        when(fastTaxGetByCityCountyStateWebClientWrapperProperties.getHost()).thenReturn("host");
+        when(fastTaxGetByCityCountyStateWebClientWrapperProperties.getPath()).thenReturn("path");
+        when(fastTaxGetByCityCountyStateWebClientWrapperProperties.getKey()).thenReturn(new Pair<>("key", "test-value"));
+
+
+        FastTaxGetByCityCountyStateWebClientWrapper expectedFastTaxGetBestMatchWebClientWrapper = new FastTaxGetByCityCountyStateWebClientWrapper(webClient,
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getScheme(),
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getScheme(),
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getPath(),
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getKey());
+
+        FastTaxGetByCityCountyStateWebClientWrapper actualFastTaxGetByCityCountyStateWebClientWrapper =
+                salesTaxWebClientWrapperConfig.fastTaxGetByCityCountyWebClientWrapper(webClient);
+
+        assertEquals(expectedFastTaxGetBestMatchWebClientWrapper, actualFastTaxGetByCityCountyStateWebClientWrapper);
     }
 
     @Test

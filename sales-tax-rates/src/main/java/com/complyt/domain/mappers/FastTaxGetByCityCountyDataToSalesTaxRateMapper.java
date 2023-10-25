@@ -2,7 +2,7 @@ package com.complyt.domain.mappers;
 
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.SalesTaxRates;
-import com.complyt.domain.fast_tax.FastTaxGetByCityCountyData;
+import com.complyt.domain.fast_tax.FastTaxGetByCityCountyStateData;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;
@@ -21,17 +21,17 @@ public interface FastTaxGetByCityCountyDataToSalesTaxRateMapper extends SalesTax
     @Mapping(target = "taxRate", source = "totalTaxRate")
     @Mapping(target = "countyRate", source = "countyRate")
     @Mapping(target = "stateRate", source = "stateRate")
-    @Mapping(expression = "java(toCombinedDistrictRate(fastTaxGetByCityCountyData))", target = "combinedDistrictRate")
-    SalesTaxRates map(FastTaxGetByCityCountyData fastTaxGetByCityCountyData);
+    @Mapping(expression = "java(toCombinedDistrictRate(fastTaxGetByCityCountyStateData))", target = "combinedDistrictRate")
+    SalesTaxRates map(FastTaxGetByCityCountyStateData fastTaxGetByCityCountyStateData);
 
-    default BigDecimal toCombinedDistrictRate(FastTaxGetByCityCountyData fastTaxGetByCityCountyData) {
-        return new BigDecimal(fastTaxGetByCityCountyData.getCityDistrictRate()).add(new BigDecimal(fastTaxGetByCityCountyData.getCountyDistrictRate()));
+    default BigDecimal toCombinedDistrictRate(FastTaxGetByCityCountyStateData fastTaxGetByCityCountyStateData) {
+        return new BigDecimal(fastTaxGetByCityCountyStateData.getCityDistrictRate()).add(new BigDecimal(fastTaxGetByCityCountyStateData.getCountyDistrictRate()));
     }
 
     @Override
     default SalesTaxRates map(SalesTaxData salesTaxData) {
-        FastTaxGetByCityCountyData fastTaxGetByCityCountyData = ((FastTaxGetByCityCountyData) salesTaxData);
+        FastTaxGetByCityCountyStateData fastTaxGetByCityCountyStateData = ((FastTaxGetByCityCountyStateData) salesTaxData);
 
-        return map(fastTaxGetByCityCountyData);
+        return map(fastTaxGetByCityCountyStateData);
     }
 }

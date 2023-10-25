@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class FastTaxCityCountyFetcherTest {
+class FastTaxGetBestMatchCityCountyFetcherTest {
 
     private FastTaxGetBestMatchCityCountyFetcher fastTaxGetBestMatchCityCountyFetcher;
 

@@ -3,7 +3,6 @@ package com.complyt.config.web_clients;
 import com.complyt.business.sales_tax_web_clients.*;
 import com.taxjar.Taxjar;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,8 +39,8 @@ public class SalesTaxWebClientWrapperConfig {
 
     @Profile({"fastTax"})
     @Bean("getByCityCountyWebClientWrapper")
-    public FastTaxGetByCityCountyWebClientWrapper fastTaxGetByCityCountyWebClientWrapper(WebClient webClient) {
-        return new FastTaxGetByCityCountyWebClientWrapper(webClient,
+    public FastTaxGetByCityCountyStateWebClientWrapper fastTaxGetByCityCountyWebClientWrapper(WebClient webClient) {
+        return new FastTaxGetByCityCountyStateWebClientWrapper(webClient,
                 fastTaxGetByCityCountyWebClientWrapperProperties.getScheme(),
                 fastTaxGetByCityCountyWebClientWrapperProperties.getHost(),
                 fastTaxGetByCityCountyWebClientWrapperProperties.getPath(),
