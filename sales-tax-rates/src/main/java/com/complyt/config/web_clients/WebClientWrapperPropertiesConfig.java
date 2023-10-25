@@ -27,7 +27,7 @@ public class WebClientWrapperPropertiesConfig {
         return WebClientWrapperProperties.builder()
                 .scheme("https")
                 .host("ws.serviceobjects.com")
-                .path("FT/web.svc/json/GetTaxInfoByCityCounty")
+                .path("FT/web.svc/json/GetTaxInfoByCityCountyState")
                 .key(new Pair<>("licensekey", licenseKey)).build();
     }
 
