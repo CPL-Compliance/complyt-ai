@@ -21,6 +21,7 @@
 
     <name>authentication</name>
     <description>This is the Authentication service of Complyt</description>
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>17</java.version>
