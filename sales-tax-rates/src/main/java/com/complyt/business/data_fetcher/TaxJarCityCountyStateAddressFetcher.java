@@ -1,7 +1,7 @@
 package com.complyt.business.data_fetcher;
 
 import com.complyt.annotations.Generated;
-import com.complyt.domain.CityCountyState;
+import com.complyt.domain.CityCountyStateWrapper;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.taxjar.TaxJarData;
 import lombok.AllArgsConstructor;
@@ -17,11 +17,11 @@ import reactor.core.publisher.Mono;
 public class TaxJarCityCountyStateAddressFetcher implements CityCountyStateAddressFetcher {
 
     @Override
-    public Mono<CityCountyState> fetch(@NonNull SalesTaxData salesTaxData) {
+    public Mono<CityCountyStateWrapper> fetch(@NonNull SalesTaxData salesTaxData) {
         TaxJarData taxJarData = (TaxJarData) salesTaxData;
-        CityCountyState cityCountyState = new CityCountyState(taxJarData.getRate().getCity(), taxJarData.getRate().getCounty(), taxJarData.getRate().getState());
+        CityCountyStateWrapper cityCountyStateWrapper = new CityCountyStateWrapper(taxJarData.getRate().getCity(), taxJarData.getRate().getCounty(), taxJarData.getRate().getState());
 
-        return Mono.just(cityCountyState);
+        return Mono.just(cityCountyStateWrapper);
     }
 
 }

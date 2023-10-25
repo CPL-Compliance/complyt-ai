@@ -29,7 +29,7 @@ public class AddressQueryBuilder implements QueryBuilder<Address> {
     }
 
     public static Query buildPartialAddressQuery(Address address) {
-        Query query = Query.query(Criteria.where("address.zip").regex(address.zip(), "i"));
+        Query query = Query.query(Criteria.where("address.zip").is(address.zip()));
         Optional.ofNullable(address.city())
                 .ifPresent(value -> query.addCriteria(Criteria.where("address.city").regex(value, "i")));
         Optional.ofNullable(address.street())
@@ -41,10 +41,15 @@ public class AddressQueryBuilder implements QueryBuilder<Address> {
     }
 
     public static Query buildFullAddressQuery(Address address) {
-        return Query.query(Criteria
+        Query query = Query.query(Criteria
                 .where("address.city").regex(address.city(), "i")
                 .and("address.street").regex(address.street(), "i")
-                .and("address.zip").regex(address.zip(), "i"));
+                .and("address.zip").is(address.zip()));
+
+        Optional.ofNullable(address.county())
+                .ifPresent(value -> query.addCriteria(Criteria.where("address.county").regex(value, "i")));
+
+        return query;
     }
 
 }

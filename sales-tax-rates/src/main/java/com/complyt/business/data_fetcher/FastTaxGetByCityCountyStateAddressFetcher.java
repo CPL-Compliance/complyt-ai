@@ -1,6 +1,6 @@
 package com.complyt.business.data_fetcher;
 
-import com.complyt.domain.CityCountyState;
+import com.complyt.domain.CityCountyStateWrapper;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.fast_tax.FastTaxGetByCityCountyStateData;
 import lombok.NonNull;
@@ -11,10 +11,10 @@ import reactor.core.publisher.Mono;
 public class FastTaxGetByCityCountyStateAddressFetcher implements CityCountyStateAddressFetcher {
 
     @Override
-    public Mono<CityCountyState> fetch(@NonNull SalesTaxData salesTaxData) {
+    public Mono<CityCountyStateWrapper> fetch(@NonNull SalesTaxData salesTaxData) {
         FastTaxGetByCityCountyStateData fastTaxGetByCityCountyStateData = (FastTaxGetByCityCountyStateData) salesTaxData;
-        CityCountyState cityCountyState = new CityCountyState(fastTaxGetByCityCountyStateData.getCity(), fastTaxGetByCityCountyStateData.getCounty(), fastTaxGetByCityCountyStateData.getStateAbbreviation());
+        CityCountyStateWrapper cityCountyStateWrapper = new CityCountyStateWrapper(fastTaxGetByCityCountyStateData.getCity(), fastTaxGetByCityCountyStateData.getCounty(), fastTaxGetByCityCountyStateData.getStateAbbreviation());
 
-        return Mono.just(cityCountyState);
+        return Mono.just(cityCountyStateWrapper);
     }
 }

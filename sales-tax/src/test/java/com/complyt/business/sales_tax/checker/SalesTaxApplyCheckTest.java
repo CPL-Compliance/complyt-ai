@@ -1,9 +1,9 @@
 package com.complyt.business.sales_tax.checker;
 
-import com.complyt.domain.transaction.Transaction;
-import com.complyt.domain.transaction.TransactionType;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.timestamps.Timestamps;
+import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.TransactionType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

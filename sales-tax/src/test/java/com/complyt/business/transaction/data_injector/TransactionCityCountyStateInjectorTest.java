@@ -1,12 +1,9 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.domain.transaction.Address;
-import com.complyt.domain.transaction.Item;
-import com.complyt.domain.transaction.Transaction;
-import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;
+import com.complyt.domain.transaction.*;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,16 +17,16 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TransactionCountyInjectorTest {
+class TransactionCityCountyStateInjectorTest {
 
-    TransactionCountyInjector transactionAddressInjector;
+    TransactionCityCountyStateInjector transactionCityCountyStateInjector;
 
     Transaction transaction;
 
     @BeforeEach
     void setUp() {
         transaction = createTransaction();
-        transactionAddressInjector = new TransactionCountyInjector(transaction);
+        transactionCityCountyStateInjector = new TransactionCityCountyStateInjector(transaction);
     }
 
     private Transaction createTransaction() {
@@ -59,9 +56,9 @@ class TransactionCountyInjectorTest {
     }
 
     @Test
-    void defaultConstructor_Transaction_ReturnTransactionCountyInjector() {
+    void defaultConstructor_Transaction_ReturnTransactionCityCountyStateInjector() {
         // Given + When
-        TransactionCountyInjector injector = new TransactionCountyInjector(transaction);
+        TransactionCityCountyStateInjector injector = new TransactionCityCountyStateInjector(transaction);
 
         // Then
         assertEquals(transaction, injector.transaction());
@@ -72,9 +69,10 @@ class TransactionCountyInjectorTest {
         // Given
         Address address = transaction.getShippingAddress().withCounty("New County");
         Transaction expectedTransition = transaction.withShippingAddress(address);
+        CityCountyStateWrapper cityCountyStateWrapper = new CityCountyStateWrapper(address.city(), address.county(), address.state());
 
         // When
-        Mono<Transaction> transactionMono = transactionAddressInjector.inject(address.county());
+        Mono<Transaction> transactionMono = transactionCityCountyStateInjector.inject(cityCountyStateWrapper);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(expectedTransition).verifyComplete();

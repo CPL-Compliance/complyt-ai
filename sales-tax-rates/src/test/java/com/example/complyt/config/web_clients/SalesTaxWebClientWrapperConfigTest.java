@@ -66,7 +66,7 @@ public class SalesTaxWebClientWrapperConfigTest {
                 fastTaxGetBestMatchWebClientWrapperProperties.getKey());
 
         FastTaxGetBestMatchWebClientWrapper actualFastTaxGetBestMatchWebClientWrapper =
-                salesTaxWebClientWrapperConfig.fastTaxWebClientWrapper(webClient);
+                salesTaxWebClientWrapperConfig.fastTaxGetBestMatchWebClientWrapper(webClient);
 
         assertEquals(expectedFastTaxGetBestMatchWebClientWrapper, actualFastTaxGetBestMatchWebClientWrapper);
     }

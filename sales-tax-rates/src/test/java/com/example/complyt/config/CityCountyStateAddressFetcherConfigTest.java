@@ -24,7 +24,7 @@ public class CityCountyStateAddressFetcherConfigTest {
         FastTaxGetBestMatchCityCountyStateAddressFetcher expectedFastTaxGetBestMatchCityCountyStateAddressFetcher = new FastTaxGetBestMatchCityCountyStateAddressFetcher();
 
         // When
-        FastTaxGetBestMatchCityCountyStateAddressFetcher actualFastTaxGetBestMatchCityCountyStateAddressFetcher = cityCountyStateAddressFetcherConfig.fastTaxAddressFetcher();
+        FastTaxGetBestMatchCityCountyStateAddressFetcher actualFastTaxGetBestMatchCityCountyStateAddressFetcher = cityCountyStateAddressFetcherConfig.fastTaxGetBestMatchCityCountyStateAddressFetcher();
 
         // Then
         assertEquals(expectedFastTaxGetBestMatchCityCountyStateAddressFetcher, actualFastTaxGetBestMatchCityCountyStateAddressFetcher);

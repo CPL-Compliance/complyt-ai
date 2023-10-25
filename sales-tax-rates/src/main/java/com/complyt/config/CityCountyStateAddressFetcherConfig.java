@@ -7,24 +7,22 @@ import com.complyt.business.data_fetcher.ZipTaxCityCountyStateAddressFetcher;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
 @AllArgsConstructor
 public class CityCountyStateAddressFetcherConfig {
 
-    @Primary
-    @Profile({"fastTax"})
-    @Bean("cityCountyStateAddressFetcher")
-    public FastTaxGetByCityCountyStateAddressFetcher fastTaxCityCountyStateAddressFetcher() {
-        return new FastTaxGetByCityCountyStateAddressFetcher();
+    @Profile({"fastTax", "stubFastTax", "default"})
+    @Bean("getBestMatchCityCountyStateAddressFetcher")
+    public FastTaxGetBestMatchCityCountyStateAddressFetcher fastTaxGetBestMatchCityCountyStateAddressFetcher() {
+        return new FastTaxGetBestMatchCityCountyStateAddressFetcher();
     }
 
-    @Profile({"fastTax", "stubFastTax", "default"})
-    @Bean("cityCountyStateAddressFetcher")
-    public FastTaxGetBestMatchCityCountyStateAddressFetcher fastTaxAddressFetcher() {
-        return new FastTaxGetBestMatchCityCountyStateAddressFetcher();
+    @Profile({"fastTax"})
+    @Bean("getByCityCountyStateFetcher")
+    public FastTaxGetByCityCountyStateAddressFetcher fastTaxGetByCityCountyStateAddressFetcher() {
+        return new FastTaxGetByCityCountyStateAddressFetcher();
     }
 
     @Profile({"zipTax"})

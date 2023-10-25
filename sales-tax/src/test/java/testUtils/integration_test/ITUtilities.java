@@ -1,17 +1,16 @@
 package testUtils.integration_test;
 
-import com.complyt.domain.transaction.Address;
-import com.complyt.domain.transaction.TransactionFilingStatus;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.InformationComponent;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
+import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.TransactionFilingStatus;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
-import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.transaction.*;
 import org.springframework.security.oauth2.jwt.Jwt;
 

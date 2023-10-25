@@ -1,10 +1,10 @@
 package com.complyt.utils.filter;
 
+import com.complyt.domain.customer.CustomerType;
+import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.domain.transaction.TransactionType;
-import com.complyt.domain.customer.CustomerType;
-import com.complyt.domain.nexus.NexusStateRule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

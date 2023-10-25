@@ -60,7 +60,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
     void findByAddress_ComplytSalesTaxRatesNotFoundInDB_SavesNewComplytSalesTaxRates() {
         // Given
         Address califoniaAddress = TestUtilities.createAddressInCalifornia();
-        CityCountyState cityCountyState = TestUtilities.createCityCountyStateInCalifornia();
+        CityCountyStateWrapper cityCountyStateWrapper = TestUtilities.createCityCountyStateInCalifornia();
         String collectionName = StatesMap.statesToCollections.get(califoniaAddress.state());
         SalesTaxRates californiaRates = TestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates expectedComplytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
@@ -70,7 +70,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
         // When
         when(complytSalesTaxRatesRepository.findByAddress(califoniaAddress, collectionName)).thenReturn(Mono.empty());
         when(salesTaxWebClientWrapper.findByAddress(califoniaAddress)).thenReturn(Mono.just(fastTaxGetBestMatchData));
-        when(cityCountyStateAddressFetcher.fetch(fastTaxGetBestMatchData)).thenReturn(Mono.just(cityCountyState));
+        when(cityCountyStateAddressFetcher.fetch(fastTaxGetBestMatchData)).thenReturn(Mono.just(cityCountyStateWrapper));
         when(complytSalesTaxRatesRepository.save(any(), any())).thenReturn(Mono.just(expectedComplytSalesTaxRates));
         when(salesTaxDataToSalesTaxRate.map(fastTaxGetBestMatchData)).thenReturn(Mono.just(californiaRates));
 

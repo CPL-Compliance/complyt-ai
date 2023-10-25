@@ -1,7 +1,7 @@
 package testUtils;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.CityCountyState;
+import com.complyt.domain.CityCountyStateWrapper;
 import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
@@ -31,8 +31,8 @@ public interface TestUtilities {
         return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
-    static CityCountyState createCityCountyStateInCalifornia() {
-        return new CityCountyState("Fresno", "Fresno", "CA");
+    static CityCountyStateWrapper createCityCountyStateInCalifornia() {
+        return new CityCountyStateWrapper("Fresno", "Fresno", "CA");
     }
 
     static AddressDto createAddressDtoInCalifornia() {

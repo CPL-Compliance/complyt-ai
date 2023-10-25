@@ -3,7 +3,7 @@ package com.complyt.services;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
-import com.complyt.business.transaction.CountyProvider;
+import com.complyt.business.transaction.CityCountyStateProvider;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
@@ -38,7 +38,7 @@ public class TransactionServiceImpl implements TransactionService {
     TransactionAmountsCollector<Transaction> transactionItemsAmountsCollector;
 
     @NonNull
-    CountyProvider countyProvider;
+    CityCountyStateProvider cityCountyStateProvider;
 
     @NonNull
     private ComplytIdHandler<Transaction> complytIdHandler;
@@ -96,7 +96,7 @@ public class TransactionServiceImpl implements TransactionService {
     private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
         return productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transaction)
                 .map(transactionItemsAmountsCollector::collect)
-                .flatMap(countyProvider::provide);
+                .flatMap(cityCountyStateProvider::provide);
     }
 
     @Deprecated

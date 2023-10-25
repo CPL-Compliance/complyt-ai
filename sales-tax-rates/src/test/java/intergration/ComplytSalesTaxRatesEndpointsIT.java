@@ -85,8 +85,8 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
     @WithMockUser
     public void findByAddress_SecondAddressToInsert_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
         // Given
-        AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withCity("cityOfSecondAddress");
-        AddressDto addressWithCounty = stubFastTaxAddress.withCounty("Arapahoe");
+        AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto();
+        AddressDto expectedAddress = stubFastTaxAddress.withCounty("Arapahoe").withCity("Englewood").withState("CO");
         SalesTaxRatesDto stubFastTaxSalesTaxRates = TestUtilities.createStubFastTaxSalesTaxRatesDto();
 
         // When + Then
@@ -105,7 +105,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
                 .expectStatus().isOk()
                 .expectBody(ComplytSalesTaxRatesDto.class)
                 .value(addressWithSalesTaxRatesDto -> {
-                    assertEquals(addressWithSalesTaxRatesDto.address(), addressWithCounty);
+                    assertEquals(addressWithSalesTaxRatesDto.address(), expectedAddress);
                     assertEquals(addressWithSalesTaxRatesDto.salesTaxRates(), stubFastTaxSalesTaxRates);
                 });
     }
@@ -115,9 +115,10 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
     @WithMockUser
     public void findByAddress_ThirdAddressToInsert_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
         // Given
-        AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withCity("cityOfThirdAddress");
-        AddressDto addressWithCounty = stubFastTaxAddress.withCounty("Arapahoe");
         SalesTaxRatesDto stubFastTaxSalesTaxRates = TestUtilities.createStubFastTaxSalesTaxRatesDto();
+        AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto();
+
+        AddressDto expectedAddress = stubFastTaxAddress.withCounty("Arapahoe").withCity("Englewood").withState("CO");
 
         // When + Then
         webTestClient
@@ -135,7 +136,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
                 .expectStatus().isOk()
                 .expectBody(ComplytSalesTaxRatesDto.class)
                 .value(complytSalesTaxRatesDto -> {
-                    assertEquals(complytSalesTaxRatesDto.address(), addressWithCounty);
+                    assertEquals(complytSalesTaxRatesDto.address(), expectedAddress);
                     assertEquals(complytSalesTaxRatesDto.salesTaxRates(), stubFastTaxSalesTaxRates);
                 });
     }

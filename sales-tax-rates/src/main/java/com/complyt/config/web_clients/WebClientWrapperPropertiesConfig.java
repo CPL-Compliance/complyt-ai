@@ -10,18 +10,7 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class WebClientWrapperPropertiesConfig {
 
-
     @Primary
-    @Profile("fastTax")
-    @Bean("fastTaxGetByCityCountyStateWebClientWrapperProperties")
-    public WebClientWrapperProperties fastTaxGetByCityCountyStateWebClientWrapperProperties(@Value("${fast-tax-api-key}") String licenseKey) {
-        return WebClientWrapperProperties.builder()
-                .scheme("https")
-                .host("ws.serviceobjects.com")
-                .path("FT/web.svc/json/GetTaxInfoByCityCountyState")
-                .key(new Pair<>("licensekey", licenseKey)).build();
-    }
-
     @Profile("fastTax")
     @Bean("fastTaxGetBestMatchWebClientWrapperProperties")
     public WebClientWrapperProperties fastTaxGetBestMatchWebClientWrapperProperties(@Value("${fast-tax-api-key}") String licenseKey) {
@@ -29,6 +18,16 @@ public class WebClientWrapperPropertiesConfig {
                 .scheme("https")
                 .host("ws.serviceobjects.com")
                 .path("FT/web.svc/json/GetBestMatch")
+                .key(new Pair<>("licensekey", licenseKey)).build();
+    }
+
+    @Profile("fastTax")
+    @Bean("fastTaxGetByCityCountyStateWebClientWrapperProperties")
+    public WebClientWrapperProperties fastTaxGetByCityCountyStateWebClientWrapperProperties(@Value("${fast-tax-api-key}") String licenseKey) {
+        return WebClientWrapperProperties.builder()
+                .scheme("https")
+                .host("ws.serviceobjects.com")
+                .path("FT/web.svc/json/GetTaxInfoByCityCountyState")
                 .key(new Pair<>("licensekey", licenseKey)).build();
     }
 

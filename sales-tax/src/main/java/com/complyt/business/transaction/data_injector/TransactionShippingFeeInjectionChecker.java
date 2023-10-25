@@ -1,7 +1,7 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
+import com.complyt.domain.transaction.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

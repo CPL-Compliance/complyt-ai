@@ -23,29 +23,32 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
     ComplytSalesTaxRatesRepository complytSalesTaxRatesRepository;
 
     @NonNull
-    SalesTaxWebClientWrapper salesTaxWebClientWrapper;
+    SalesTaxWebClientWrapper getBestMatchWebClientWrapper;
+
+    @NonNull
+    SalesTaxWebClientWrapper getByCityCountyStateWebClientWrapper;
 
     @NonNull
     SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
 
     @NonNull
-    CityCountyStateAddressFetcher cityCountyStateAddressFetcher;
+    CityCountyStateAddressFetcher getBestMatchCityCountyStateAddressFetcher;
 
     @Override
     public Mono<ComplytSalesTaxRates> findByAddress(@NonNull Address address) {
         String collection = StatesMap.statesToCollections.get(address.state());
 
         return complytSalesTaxRatesRepository.findByAddress(address, collection)
-                .switchIfEmpty(Mono.defer(() -> salesTaxWebClientWrapper.findByAddress(address)
+                .switchIfEmpty(Mono.defer(() -> getBestMatchWebClientWrapper.findByAddress(address)
                         .flatMap(salesTaxData -> setBeforeSave(address, salesTaxData))
                         .flatMap(complytSalesTaxRates -> save(complytSalesTaxRates, collection))));
     }
 
     private Mono<ComplytSalesTaxRates> setBeforeSave(Address address, SalesTaxData salesTaxData) {
-        return cityCountyStateAddressFetcher.fetch(salesTaxData)
-                .flatMap(cityCountyState -> salesTaxDataToSalesTaxRate.map(salesTaxData)
+        return getBestMatchCityCountyStateAddressFetcher.fetch(salesTaxData)
+                .flatMap(cityCountyStateWrapper -> salesTaxDataToSalesTaxRate.map(salesTaxData)
                         .map(salesTaxRates -> {
-                            Address modifiedAddress = address.withCity(cityCountyState.city()).withCounty(cityCountyState.county()).withState(cityCountyState.state());
+                            Address modifiedAddress = address.withCity(cityCountyStateWrapper.city()).withCounty(cityCountyStateWrapper.county()).withState(cityCountyStateWrapper.state());
                             return new ComplytSalesTaxRates(null, modifiedAddress, salesTaxRates, LocalDateTime.now(), LocalDateTime.now().plusMonths(2));
                         }));
     }

@@ -1,7 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
 import com.complyt.domain.State;
-import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -10,6 +9,7 @@ import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.utils.filter.TransactionsFilterByNexusRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

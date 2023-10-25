@@ -13,16 +13,16 @@ import org.springframework.context.annotation.Profile;
 public class MappersConfig {
 
     @Primary
-    @Profile({"fastTax"})
-    @Bean("salesTaxDataToSalesTaxRateMapper")
-    public FastTaxGetByCityCountyStateDataToSalesTaxRateMapper fastTaxGetByCityCountyStateDataToSalesTaxRateMapper() {
-        return FastTaxGetByCityCountyStateDataToSalesTaxRateMapper.INSTANCE;
-    }
-
     @Profile({"fastTax", "stubFastTax", "default"})
     @Bean("salesTaxDataToSalesTaxRateMapper")
     public FastTaxGetBestMatchDataToSalesTaxRateMapper fastTaxGetBestMatchDataGetBestMatchToSalesTaxRateMapper() {
         return FastTaxGetBestMatchDataToSalesTaxRateMapper.INSTANCE;
+    }
+
+    @Profile({"fastTax"})
+    @Bean("salesTaxDataToSalesTaxRateMapper")
+    public FastTaxGetByCityCountyStateDataToSalesTaxRateMapper fastTaxGetByCityCountyStateDataToSalesTaxRateMapper() {
+        return FastTaxGetByCityCountyStateDataToSalesTaxRateMapper.INSTANCE;
     }
 
     @Profile({"zipTax"})
