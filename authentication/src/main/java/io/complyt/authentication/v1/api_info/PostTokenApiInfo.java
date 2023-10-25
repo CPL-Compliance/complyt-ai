@@ -1,12 +1,12 @@
 package io.complyt.authentication.v1.api_info;
 
+import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.TokenDto;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springdoc.core.annotations.RouterOperation;
 import org.springdoc.core.annotations.RouterOperations;
@@ -28,13 +28,17 @@ import java.lang.annotation.Target;
                         description = "Get access token by API key",
                         operationId = "post",
                         tags = "token",
-                        parameters = {
-                                @Parameter(in = ParameterIn.QUERY,
-                                        name = "api_key",
-                                        description = "API Key",
-                                        examples = @ExampleObject(value = PostTokenApiInfo.apiKeyExample,
-                                                name = PostTokenApiInfo.apiKeyExample))
-                        },
+                        requestBody =
+                        @RequestBody(
+                                description = "Transaction to add",
+                                required = true,
+                                content = @Content(
+                                        schema = @Schema(implementation = ApiKeyDto.class, required = true),
+                                        examples = {
+                                                @ExampleObject(value = io.complyt.authentication.v1.api_info
+                                                        .PostTokenApiInfo.apiKeyBody)
+                                        })
+                        ),
                         responses = {
                                 @ApiResponse(
                                         responseCode = "200",
@@ -57,7 +61,7 @@ import java.lang.annotation.Target;
                         }))
 })
 public @interface PostTokenApiInfo {
-    String apiKeyExample = "e2019b6f-a8c1-415c-b8b0-3fd6725c9a67-e25f4d90-1051-44f7-89fb-4c6097af7748";
+    String apiKeyBody = "{\"apiKey\": \"e2019b6f-a8c1-415c-b8b0-3fd6725c9a67-e25f4d90-1051-44f7-89fb-4c6097af7748\"}";
 
     String tokenDtoResponse = "{\n" +
             "    \"accessToken\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InJ0RU1OdWRnTWx5aTJtMzVLSnJQRSJ9." +
