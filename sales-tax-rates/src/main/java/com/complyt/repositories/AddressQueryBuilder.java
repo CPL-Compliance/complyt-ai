@@ -18,8 +18,6 @@ public class AddressQueryBuilder implements QueryBuilder<Address> {
                 .ifPresent(value -> query.addCriteria(Criteria.where("address.city").regex(value, "i")));
         Optional.ofNullable(address.street())
                 .ifPresent(value -> query.addCriteria(Criteria.where("address.street").regex(value, "i")));
-        Optional.ofNullable(address.county())
-                .ifPresent(value -> query.addCriteria(Criteria.where("address.county").regex(value, "i")));
 
         return query;
     }

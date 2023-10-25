@@ -4,7 +4,7 @@ import com.complyt.business.data_fetcher.FastTaxGetBestMatchCityCountyFetcher;
 import com.complyt.business.data_fetcher.FastTaxGetByCityCountyFetcher;
 import com.complyt.business.data_fetcher.TaxJarCityCountyFetcher;
 import com.complyt.business.data_fetcher.ZipTaxCityCountyFetcher;
-import com.complyt.config.CityCountyAddressFetcherConfig;
+import com.complyt.config.CityCountyFetcherConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,11 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CityCountyFetcherConfigTest {
 
-    CityCountyAddressFetcherConfig cityCountyAddressFetcherConfig;
+    CityCountyFetcherConfig cityCountyFetcherConfig;
 
     @BeforeEach
     void setup() {
-        cityCountyAddressFetcherConfig = new CityCountyAddressFetcherConfig();
+        cityCountyFetcherConfig = new CityCountyFetcherConfig();
     }
 
     @Test
@@ -25,7 +25,7 @@ public class CityCountyFetcherConfigTest {
         FastTaxGetBestMatchCityCountyFetcher expectedFastTaxGetBestMatchCityCountyAddressFetcher = new FastTaxGetBestMatchCityCountyFetcher();
 
         // When
-        FastTaxGetBestMatchCityCountyFetcher actualFastTaxGetBestMatchCityCountyAddressFetcher = cityCountyAddressFetcherConfig.fastTaxGetBestMatchCityCountyAddressFetcher();
+        FastTaxGetBestMatchCityCountyFetcher actualFastTaxGetBestMatchCityCountyAddressFetcher = cityCountyFetcherConfig.fastTaxGetBestMatchCityCountyAddressFetcher();
 
         // Then
         assertEquals(expectedFastTaxGetBestMatchCityCountyAddressFetcher, actualFastTaxGetBestMatchCityCountyAddressFetcher);
@@ -37,7 +37,7 @@ public class CityCountyFetcherConfigTest {
         FastTaxGetByCityCountyFetcher expectedFastTaxGetBestMatchCityCountyAddressFetcher = new FastTaxGetByCityCountyFetcher();
 
         // When
-        FastTaxGetByCityCountyFetcher actualFastTaxGetBestMatchCityCountyAddressFetcher = cityCountyAddressFetcherConfig.fastTaxGetByCityCountyAddressFetcher();
+        FastTaxGetByCityCountyFetcher actualFastTaxGetBestMatchCityCountyAddressFetcher = cityCountyFetcherConfig.fastTaxGetByCityCountyAddressFetcher();
 
         // Then
         assertEquals(expectedFastTaxGetBestMatchCityCountyAddressFetcher, actualFastTaxGetBestMatchCityCountyAddressFetcher);
@@ -49,7 +49,7 @@ public class CityCountyFetcherConfigTest {
         ZipTaxCityCountyFetcher expectedZipTaxCityCountyAddressFetcher = new ZipTaxCityCountyFetcher();
 
         // When
-        ZipTaxCityCountyFetcher actualZipTaxCityCountyAddressFetcher = cityCountyAddressFetcherConfig.zipTaxAddressFetcher();
+        ZipTaxCityCountyFetcher actualZipTaxCityCountyAddressFetcher = cityCountyFetcherConfig.zipTaxAddressFetcher();
 
         // Then
         assertEquals(expectedZipTaxCityCountyAddressFetcher, actualZipTaxCityCountyAddressFetcher);
@@ -61,7 +61,7 @@ public class CityCountyFetcherConfigTest {
         TaxJarCityCountyFetcher expectedTaxJarCityCountyAddressFetcher = new TaxJarCityCountyFetcher();
 
         // When
-        TaxJarCityCountyFetcher actualTaxJarCityCountyAddressFetcher = cityCountyAddressFetcherConfig.taxJarCityCountyAddressFetcher();
+        TaxJarCityCountyFetcher actualTaxJarCityCountyAddressFetcher = cityCountyFetcherConfig.taxJarCityCountyAddressFetcher();
 
         // Then
         assertEquals(expectedTaxJarCityCountyAddressFetcher, actualTaxJarCityCountyAddressFetcher);

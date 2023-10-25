@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 @AllArgsConstructor
-public class CityCountyAddressFetcherConfig {
+public class CityCountyFetcherConfig {
 
     @Profile({"fastTax", "stubFastTax", "default"})
     @Bean("getBestMatchCityCountyFetcher")

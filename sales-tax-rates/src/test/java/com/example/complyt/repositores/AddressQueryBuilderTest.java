@@ -54,8 +54,6 @@ public class AddressQueryBuilderTest {
                 .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("address.city").regex(value, "i")));
         Optional.ofNullable(fullAddressNoCountyAddress.street())
                 .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("address.street").regex(value, "i")));
-        Optional.ofNullable(fullAddressNoCountyAddress.county())
-                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("address.county").regex(value, "i")));
 
         // When
         Query actualQuery = addressQueryBuilder.build(fullAddressNoCountyAddress);
