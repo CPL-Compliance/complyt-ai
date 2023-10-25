@@ -41,7 +41,7 @@ class FastTaxGetByCityCountyStateDataToSalesTaxRateMapperTest {
     @Test
     void map_NullFastTaxGetByCityCountyStateData_ReturnNull() {
         // Given + When
-        SalesTaxRates actualSalesTaxRate = FastTaxGetByCityCountyStateDataToSalesTaxRateMapper.INSTANCE.map((FastTaxGetByCityCountyStateData) null);
+        SalesTaxRates actualSalesTaxRate = FastTaxGetByCityCountyStateDataToSalesTaxRateMapper.INSTANCE.map( null);
 
         // Then
         assertNull(actualSalesTaxRate);

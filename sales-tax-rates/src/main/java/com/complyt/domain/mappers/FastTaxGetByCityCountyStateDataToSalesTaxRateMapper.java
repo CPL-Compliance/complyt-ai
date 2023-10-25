@@ -28,10 +28,4 @@ public interface FastTaxGetByCityCountyStateDataToSalesTaxRateMapper extends Sal
         return new BigDecimal(fastTaxGetByCityCountyStateData.getCityDistrictRate()).add(new BigDecimal(fastTaxGetByCityCountyStateData.getCountyDistrictRate()));
     }
 
-    @Override
-    default SalesTaxRates map(SalesTaxData salesTaxData) {
-        FastTaxGetByCityCountyStateData fastTaxGetByCityCountyStateData = ((FastTaxGetByCityCountyStateData) salesTaxData);
-
-        return map(fastTaxGetByCityCountyStateData);
-    }
 }
