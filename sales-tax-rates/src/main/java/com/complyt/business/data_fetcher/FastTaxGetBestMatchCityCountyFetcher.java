@@ -1,6 +1,6 @@
 package com.complyt.business.data_fetcher;
 
-import com.complyt.domain.CityCountyStateWrapper;
+import com.complyt.domain.CityCountyWrapper;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
@@ -13,14 +13,14 @@ import reactor.core.publisher.Mono;
 @EqualsAndHashCode
 @AllArgsConstructor
 @Component
-public class FastTaxGetBestMatchCityCountyStateAddressFetcher implements CityCountyStateAddressFetcher {
+public class FastTaxGetBestMatchCityCountyFetcher implements CityCountyFetcher {
 
     @Override
-    public Mono<CityCountyStateWrapper> fetch(@NonNull SalesTaxData salesTaxData) {
+    public Mono<CityCountyWrapper> fetch(@NonNull SalesTaxData salesTaxData) {
         FastTaxGetBestMatchData fastTaxGetBestMatchData = (FastTaxGetBestMatchData) salesTaxData;
         TaxInfoItem taxInfoItem = fastTaxGetBestMatchData.getTaxInfoItems().get(0);
-        CityCountyStateWrapper cityCountyStateWrapper = new CityCountyStateWrapper(taxInfoItem.city(), taxInfoItem.county(), taxInfoItem.stateAbbreviation());
+        CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(taxInfoItem.city(), taxInfoItem.county());
 
-        return Mono.just(cityCountyStateWrapper);
+        return Mono.just(cityCountyWrapper);
     }
 }

@@ -1,6 +1,6 @@
 package com.example.complyt.services;
 
-import com.complyt.business.data_fetcher.CityCountyStateAddressFetcher;
+import com.complyt.business.data_fetcher.CityCountyFetcher;
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.*;
@@ -37,7 +37,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
     SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
 
     @Mock
-    CityCountyStateAddressFetcher cityCountyStateAddressFetcher;
+    CityCountyFetcher cityCountyFetcher;
 
 
     @Test
@@ -60,7 +60,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
     void findByAddress_ComplytSalesTaxRatesNotFoundInDB_SavesNewComplytSalesTaxRates() {
         // Given
         Address califoniaAddress = TestUtilities.createAddressInCalifornia();
-        CityCountyStateWrapper cityCountyStateWrapper = TestUtilities.createCityCountyStateInCalifornia();
+        CityCountyWrapper cityCountyWrapper = TestUtilities.createCityCountyInCalifornia();
         String collectionName = StatesMap.statesToCollections.get(califoniaAddress.state());
         SalesTaxRates californiaRates = TestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates expectedComplytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
@@ -70,7 +70,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
         // When
         when(complytSalesTaxRatesRepository.findByAddress(califoniaAddress, collectionName)).thenReturn(Mono.empty());
         when(salesTaxWebClientWrapper.findByAddress(califoniaAddress)).thenReturn(Mono.just(fastTaxGetBestMatchData));
-        when(cityCountyStateAddressFetcher.fetch(fastTaxGetBestMatchData)).thenReturn(Mono.just(cityCountyStateWrapper));
+        when(cityCountyFetcher.fetch(fastTaxGetBestMatchData)).thenReturn(Mono.just(cityCountyWrapper));
         when(complytSalesTaxRatesRepository.save(any(), any())).thenReturn(Mono.just(expectedComplytSalesTaxRates));
         when(salesTaxDataToSalesTaxRate.map(fastTaxGetBestMatchData)).thenReturn(Mono.just(californiaRates));
 

@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
-public class FastTaxGetByCityCountyStateData implements SalesTaxData {
+public class FastTaxGetByCityCountyData implements SalesTaxData {
 
     String city;
     String county;

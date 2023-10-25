@@ -1,6 +1,6 @@
 package com.complyt.business.data_fetcher;
 
-import com.complyt.domain.CityCountyStateWrapper;
+import com.complyt.domain.CityCountyWrapper;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.domain.zip_tax.ZipTaxData;
@@ -13,14 +13,14 @@ import reactor.core.publisher.Mono;
 @EqualsAndHashCode
 @AllArgsConstructor
 @Component
-public class ZipTaxCityCountyStateAddressFetcher implements CityCountyStateAddressFetcher {
+public class ZipTaxCityCountyFetcher implements CityCountyFetcher {
 
     @Override
-    public Mono<CityCountyStateWrapper> fetch(@NonNull SalesTaxData salesTaxData) {
+    public Mono<CityCountyWrapper> fetch(@NonNull SalesTaxData salesTaxData) {
         ZipTaxData zipTaxData = (ZipTaxData) salesTaxData;
         Result result = zipTaxData.getResults().get(0);
-        CityCountyStateWrapper cityCountyStateWrapper = new CityCountyStateWrapper(result.geoCity(), result.geoCounty(), result.geoState());
+        CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(result.geoCity(), result.geoCounty());
 
-        return Mono.just(cityCountyStateWrapper);
+        return Mono.just(cityCountyWrapper);
     }
 }

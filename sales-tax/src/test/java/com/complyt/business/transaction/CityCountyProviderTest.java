@@ -1,7 +1,7 @@
 package com.complyt.business.transaction;
 
-import com.complyt.business.transaction.data_fetcher.CityCountyStateFetcher;
-import com.complyt.domain.transaction.CityCountyStateWrapper;
+import com.complyt.business.transaction.data_fetcher.CityCountyFetcher;
+import com.complyt.domain.transaction.CityCountyWrapper;
 import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,13 +23,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class CityCountyStateProviderTest {
+public class CityCountyProviderTest {
 
     @InjectMocks
-    CityCountyStateProvider cityCountyStateProvider;
+    CityCountyProvider cityCountyProvider;
 
     @Mock
-    CityCountyStateFetcher addressFetcher;
+    CityCountyFetcher addressFetcher;
 
     UnitTestUtilities testUtilities;
 
@@ -43,10 +43,10 @@ public class CityCountyStateProviderTest {
     void provide_GetsAddressAndInjectsIt_ReturnsTransaction() {
         // Given
         Transaction transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
-        CityCountyStateWrapper cityCountyStateWrapper = new CityCountyStateWrapper(transaction.getShippingAddress().city(), transaction.getShippingAddress().county(), transaction.getShippingAddress().state());
+        CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(transaction.getShippingAddress().city(), transaction.getShippingAddress().county());
         // When
-        when(addressFetcher.fetch(transaction.getShippingAddress())).thenReturn(Mono.just(cityCountyStateWrapper));
-        Mono<Transaction> transactionMono = cityCountyStateProvider.provide(transaction);
+        when(addressFetcher.fetch(transaction.getShippingAddress())).thenReturn(Mono.just(cityCountyWrapper));
+        Mono<Transaction> transactionMono = cityCountyProvider.provide(transaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();

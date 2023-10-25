@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.data_fetcher.CityCountyStateAddressFetcher;
+import com.complyt.business.data_fetcher.CityCountyFetcher;
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
@@ -26,13 +26,13 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
     SalesTaxWebClientWrapper getBestMatchWebClientWrapper;
 
     @NonNull
-    SalesTaxWebClientWrapper getByCityCountyStateWebClientWrapper;
+    SalesTaxWebClientWrapper getByCityCountyWebClientWrapper;
 
     @NonNull
     SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
 
     @NonNull
-    CityCountyStateAddressFetcher getBestMatchCityCountyStateAddressFetcher;
+    CityCountyFetcher getBestMatchCityCountyFetcher;
 
     @Override
     public Mono<ComplytSalesTaxRates> findByAddress(@NonNull Address address) {
@@ -45,10 +45,10 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
     }
 
     private Mono<ComplytSalesTaxRates> setBeforeSave(Address address, SalesTaxData salesTaxData) {
-        return getBestMatchCityCountyStateAddressFetcher.fetch(salesTaxData)
-                .flatMap(cityCountyStateWrapper -> salesTaxDataToSalesTaxRate.map(salesTaxData)
+        return getBestMatchCityCountyFetcher.fetch(salesTaxData)
+                .flatMap(cityCountyWrapper -> salesTaxDataToSalesTaxRate.map(salesTaxData)
                         .map(salesTaxRates -> {
-                            Address modifiedAddress = address.withCity(cityCountyStateWrapper.city()).withCounty(cityCountyStateWrapper.county()).withState(cityCountyStateWrapper.state());
+                            Address modifiedAddress = address.withCity(cityCountyWrapper.city()).withCounty(cityCountyWrapper.county());
                             return new ComplytSalesTaxRates(null, modifiedAddress, salesTaxRates, LocalDateTime.now(), LocalDateTime.now().plusMonths(2));
                         }));
     }

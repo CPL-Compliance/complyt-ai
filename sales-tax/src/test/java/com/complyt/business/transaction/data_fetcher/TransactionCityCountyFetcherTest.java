@@ -3,7 +3,7 @@ package com.complyt.business.transaction.data_fetcher;
 import com.complyt.business.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.transaction.Address;
-import com.complyt.domain.transaction.CityCountyStateWrapper;
+import com.complyt.domain.transaction.CityCountyWrapper;
 import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,10 +21,10 @@ import java.util.UUID;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class TransactionCityCountyStateFetcherTest {
+class TransactionCityCountyFetcherTest {
 
     @InjectMocks
-    private TransactionCityCountyStateFetcher transactionCityCountyStateFetcher;
+    private TransactionCityCountyFetcher transactionCityCountyFetcher;
     @Mock
     StubComplytSalesTaxRatesClientWrapper salesTaxWebClientWrapper;
     UnitTestUtilities testUtilities;
@@ -44,14 +44,14 @@ class TransactionCityCountyStateFetcherTest {
                 .withAddress(addressWithCounty);
 
 
-        CityCountyStateWrapper cityCountyStateWrapper = new CityCountyStateWrapper(complytSalesTaxRates.address().city(), addressWithCounty.county(), complytSalesTaxRates.address().state());
+        CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(complytSalesTaxRates.address().city(), addressWithCounty.county());
 
         // When
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(complytSalesTaxRates));
-        Mono<CityCountyStateWrapper> cityCountyStateWrapperMono = transactionCityCountyStateFetcher.fetch(transaction.getShippingAddress());
+        Mono<CityCountyWrapper> cityCountyWrapperMono = transactionCityCountyFetcher.fetch(transaction.getShippingAddress());
 
         // Then
-        StepVerifier.create(cityCountyStateWrapperMono).expectNext(cityCountyStateWrapper).verifyComplete();
+        StepVerifier.create(cityCountyWrapperMono).expectNext(cityCountyWrapper).verifyComplete();
     }
 
 }

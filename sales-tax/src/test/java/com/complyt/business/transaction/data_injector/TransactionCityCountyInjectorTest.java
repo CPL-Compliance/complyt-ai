@@ -17,16 +17,16 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TransactionCityCountyStateInjectorTest {
+class TransactionCityCountyInjectorTest {
 
-    TransactionCityCountyStateInjector transactionCityCountyStateInjector;
+    TransactionCityCountyInjector transactionCityCountyInjector;
 
     Transaction transaction;
 
     @BeforeEach
     void setUp() {
         transaction = createTransaction();
-        transactionCityCountyStateInjector = new TransactionCityCountyStateInjector(transaction);
+        transactionCityCountyInjector = new TransactionCityCountyInjector(transaction);
     }
 
     private Transaction createTransaction() {
@@ -56,9 +56,9 @@ class TransactionCityCountyStateInjectorTest {
     }
 
     @Test
-    void defaultConstructor_Transaction_ReturnTransactionCityCountyStateInjector() {
+    void defaultConstructor_Transaction_ReturnTransactionCityCountyInjector() {
         // Given + When
-        TransactionCityCountyStateInjector injector = new TransactionCityCountyStateInjector(transaction);
+        TransactionCityCountyInjector injector = new TransactionCityCountyInjector(transaction);
 
         // Then
         assertEquals(transaction, injector.transaction());
@@ -69,10 +69,10 @@ class TransactionCityCountyStateInjectorTest {
         // Given
         Address address = transaction.getShippingAddress().withCounty("New County");
         Transaction expectedTransition = transaction.withShippingAddress(address);
-        CityCountyStateWrapper cityCountyStateWrapper = new CityCountyStateWrapper(address.city(), address.county(), address.state());
+        CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(address.city(), address.county());
 
         // When
-        Mono<Transaction> transactionMono = transactionCityCountyStateInjector.inject(cityCountyStateWrapper);
+        Mono<Transaction> transactionMono = transactionCityCountyInjector.inject(cityCountyWrapper);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(expectedTransition).verifyComplete();

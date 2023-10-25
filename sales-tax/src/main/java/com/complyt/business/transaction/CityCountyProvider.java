@@ -1,7 +1,7 @@
 package com.complyt.business.transaction;
 
-import com.complyt.business.transaction.data_fetcher.CityCountyStateFetcher;
-import com.complyt.business.transaction.data_injector.TransactionCityCountyStateInjector;
+import com.complyt.business.transaction.data_fetcher.CityCountyFetcher;
+import com.complyt.business.transaction.data_injector.TransactionCityCountyInjector;
 import com.complyt.domain.transaction.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -12,13 +12,13 @@ import reactor.core.publisher.Mono;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class CityCountyStateProvider implements SalesTaxDataProvider<Transaction> {
+public class CityCountyProvider implements SalesTaxDataProvider<Transaction> {
 
     @NonNull
-    private CityCountyStateFetcher addressFetcher;
+    private CityCountyFetcher addressFetcher;
 
     public Mono<Transaction> provide(Transaction transaction) {
         return addressFetcher.fetch(transaction.getShippingAddress())
-                .flatMap(cityCountyStateWrapper -> new TransactionCityCountyStateInjector(transaction).inject(cityCountyStateWrapper));
+                .flatMap(cityCountyWrapper -> new TransactionCityCountyInjector(transaction).inject(cityCountyWrapper));
     }
 }

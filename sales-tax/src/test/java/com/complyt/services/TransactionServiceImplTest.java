@@ -3,7 +3,7 @@ package com.complyt.services;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
-import com.complyt.business.transaction.CityCountyStateProvider;
+import com.complyt.business.transaction.CityCountyProvider;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.enums.TangibleCategory;
@@ -49,7 +49,7 @@ class TransactionServiceImplTest {
     ProductClassificationServiceImpl productClassificationService;
 
     @Mock
-    CityCountyStateProvider cityCountyStateProvider;
+    CityCountyProvider cityCountyProvider;
 
     @Mock
     ComplytIdHandler<Transaction> transactionComplytIdHandler;
@@ -347,7 +347,7 @@ class TransactionServiceImplTest {
         // When
         when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)).thenReturn(Mono.just(transactionWithProductClassification));
-        when(cityCountyStateProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
+        when(cityCountyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
         when(transactionAmountsCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transaction);
@@ -385,7 +385,7 @@ class TransactionServiceImplTest {
 
         // When
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(newTransaction)).thenReturn(Mono.just(transactionWithProductClassification));
-        when(cityCountyStateProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
+        when(cityCountyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
         when(transactionAmountsCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
         Mono<Transaction> transactionMono = transactionService.injectDataToModifiedTransaction(newTransaction, transactionWithCustomer);
 
