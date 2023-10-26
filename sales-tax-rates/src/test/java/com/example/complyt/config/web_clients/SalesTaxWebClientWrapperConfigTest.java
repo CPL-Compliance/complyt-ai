@@ -46,7 +46,7 @@ public class SalesTaxWebClientWrapperConfigTest {
                 zipTaxWebClientWrapperProperties.getKey());
 
         ZipTaxWebClientWrapper actualZipTaxWebClientWrapper =
-                salesTaxWebClientWrapperConfig.zipTaxWebClientWrapper(webClient);
+                salesTaxWebClientWrapperConfig.zipTaxWebClientWrapper(webClient, zipTaxWebClientWrapperProperties);
 
         assertEquals(expectedZipTaxWebClientWrapper, actualZipTaxWebClientWrapper);
     }
@@ -66,7 +66,7 @@ public class SalesTaxWebClientWrapperConfigTest {
                 fastTaxGetBestMatchWebClientWrapperProperties.getKey());
 
         FastTaxGetBestMatchWebClientWrapper actualFastTaxGetBestMatchWebClientWrapper =
-                salesTaxWebClientWrapperConfig.fastTaxGetBestMatchWebClientWrapper(webClient);
+                salesTaxWebClientWrapperConfig.fastTaxGetBestMatchWebClientWrapper(webClient, fastTaxGetBestMatchWebClientWrapperProperties);
 
         assertEquals(expectedFastTaxGetBestMatchWebClientWrapper, actualFastTaxGetBestMatchWebClientWrapper);
     }
@@ -86,7 +86,7 @@ public class SalesTaxWebClientWrapperConfigTest {
                 fastTaxGetByCityCountyStateWebClientWrapperProperties.getKey());
 
         FastTaxGetByCityCountyStateWebClientWrapper actualFastTaxGetByCityCountyStateWebClientWrapper =
-                salesTaxWebClientWrapperConfig.fastTaxGetTaxInfoByCityCountyStateWebClientWrapper(webClient);
+                salesTaxWebClientWrapperConfig.fastTaxGetTaxInfoByCityCountyStateWebClientWrapper(webClient, fastTaxGetByCityCountyStateWebClientWrapperProperties);
 
         assertEquals(expectedFastTaxGetBestMatchWebClientWrapper, actualFastTaxGetByCityCountyStateWebClientWrapper);
     }

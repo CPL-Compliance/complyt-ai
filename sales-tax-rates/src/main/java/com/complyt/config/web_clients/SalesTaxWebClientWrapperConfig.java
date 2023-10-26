@@ -12,24 +12,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class SalesTaxWebClientWrapperConfig {
 
-    @Autowired
-    private WebClientWrapperProperties fastTaxGetBestMatchWebClientWrapperProperties;
-
-    @Autowired
-    private WebClientWrapperProperties fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties;
-
-    @Autowired
-    private WebClientWrapperProperties zipTaxWebClientWrapperProperties;
-
-    @Autowired
-    private WebClientWrapperProperties stubFastTaxWebClientWrapperProperties;
-
-    @Autowired
-    private WebClientWrapperProperties taxJarWebClientWrapperProperties;
-
     @Profile({"fastTax"})
     @Bean("getBestMatchWebClientWrapper")
-    public FastTaxGetBestMatchWebClientWrapper fastTaxGetBestMatchWebClientWrapper(WebClient webClient) {
+    public FastTaxGetBestMatchWebClientWrapper fastTaxGetBestMatchWebClientWrapper(WebClient webClient, @Autowired WebClientWrapperProperties fastTaxGetBestMatchWebClientWrapperProperties) {
         return new FastTaxGetBestMatchWebClientWrapper(webClient,
                 fastTaxGetBestMatchWebClientWrapperProperties.getScheme(),
                 fastTaxGetBestMatchWebClientWrapperProperties.getHost(),
@@ -45,7 +30,7 @@ public class SalesTaxWebClientWrapperConfig {
 
     @Profile({"zipTax"})
     @Bean("getBestMatchWebClientWrapper")
-    public ZipTaxWebClientWrapper zipTaxWebClientWrapper(WebClient webClient) {
+    public ZipTaxWebClientWrapper zipTaxWebClientWrapper(WebClient webClient, @Autowired WebClientWrapperProperties zipTaxWebClientWrapperProperties) {
         return new ZipTaxWebClientWrapper(webClient,
                 zipTaxWebClientWrapperProperties.getScheme(),
                 zipTaxWebClientWrapperProperties.getHost(),
@@ -62,7 +47,7 @@ public class SalesTaxWebClientWrapperConfig {
 
     @Profile({"fastTax"})
     @Bean("getTaxInfoByCityCountyStateWebClientWrapper")
-    public FastTaxGetByCityCountyStateWebClientWrapper fastTaxGetTaxInfoByCityCountyStateWebClientWrapper(WebClient webClient) {
+    public FastTaxGetByCityCountyStateWebClientWrapper fastTaxGetTaxInfoByCityCountyStateWebClientWrapper(WebClient webClient, @Autowired WebClientWrapperProperties fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties) {
         return new FastTaxGetByCityCountyStateWebClientWrapper(webClient,
                 fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties.getScheme(),
                 fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties.getHost(),

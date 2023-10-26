@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class WebClientWrapperPropertiesConfig {
 
-    @Primary
     @Profile("fastTax")
     @Bean("fastTaxGetBestMatchWebClientWrapperProperties")
     public WebClientWrapperProperties fastTaxGetBestMatchWebClientWrapperProperties(@Value("${fast-tax-api-key}") String licenseKey) {
