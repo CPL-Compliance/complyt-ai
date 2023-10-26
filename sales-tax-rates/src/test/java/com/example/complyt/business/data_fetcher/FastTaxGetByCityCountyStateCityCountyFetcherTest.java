@@ -1,6 +1,6 @@
 package com.example.complyt.business.data_fetcher;
 
-import com.complyt.business.data_fetcher.FastTaxGetByCityCountyFetcher;
+import com.complyt.business.data_fetcher.FastTaxGetTaxInfoByCityCountyStateCityCountyFetcher;
 import com.complyt.domain.CityCountyWrapper;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.fast_tax.FastTaxGetByCityCountyStateData;
@@ -19,11 +19,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FastTaxGetByCityCountyStateCityCountyFetcherTest {
 
-    private FastTaxGetByCityCountyFetcher fastTaxGetByCityCountyFetcher;
+    private FastTaxGetTaxInfoByCityCountyStateCityCountyFetcher fastTaxGetTaxInfoByCityCountyStateCityCountyFetcher;
 
     @BeforeEach
     void setUp() {
-        fastTaxGetByCityCountyFetcher = new FastTaxGetByCityCountyFetcher();
+        fastTaxGetTaxInfoByCityCountyStateCityCountyFetcher = new FastTaxGetTaxInfoByCityCountyStateCityCountyFetcher();
     }
 
 
@@ -35,7 +35,7 @@ class FastTaxGetByCityCountyStateCityCountyFetcherTest {
         CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(fastTaxGetByCityCountyStateData.getCity(), fastTaxGetByCityCountyStateData.getCounty());
 
         // When
-        Mono<CityCountyWrapper> cityCountyWrapperMono = fastTaxGetByCityCountyFetcher.fetch(fastTaxGetByCityCountyStateData);
+        Mono<CityCountyWrapper> cityCountyWrapperMono = fastTaxGetTaxInfoByCityCountyStateCityCountyFetcher.fetch(fastTaxGetByCityCountyStateData);
 
         // Then
         StepVerifier.create(cityCountyWrapperMono).expectNext(cityCountyWrapper).verifyComplete();
@@ -48,7 +48,7 @@ class FastTaxGetByCityCountyStateCityCountyFetcherTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            fastTaxGetByCityCountyFetcher.fetch(nullSalesTaxData);
+            fastTaxGetTaxInfoByCityCountyStateCityCountyFetcher.fetch(nullSalesTaxData);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxData " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
@@ -57,10 +57,10 @@ class FastTaxGetByCityCountyStateCityCountyFetcherTest {
     @Test
     void equals_SameFastTaxCityCountyFetcher_ReturnsTrue() {
         // Given
-        FastTaxGetByCityCountyFetcher givenFastTaxCityCountyAddressFetcher = new FastTaxGetByCityCountyFetcher();
+        FastTaxGetTaxInfoByCityCountyStateCityCountyFetcher givenFastTaxCityCountyAddressFetcher = new FastTaxGetTaxInfoByCityCountyStateCityCountyFetcher();
 
         // When
-        boolean isEquals = fastTaxGetByCityCountyFetcher.equals(givenFastTaxCityCountyAddressFetcher);
+        boolean isEquals = fastTaxGetTaxInfoByCityCountyStateCityCountyFetcher.equals(givenFastTaxCityCountyAddressFetcher);
 
         // Then
         assertTrue(isEquals);

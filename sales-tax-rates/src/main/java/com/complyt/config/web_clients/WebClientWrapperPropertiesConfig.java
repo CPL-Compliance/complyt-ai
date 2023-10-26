@@ -22,8 +22,8 @@ public class WebClientWrapperPropertiesConfig {
     }
 
     @Profile("fastTax")
-    @Bean("fastTaxGetByCityCountyStateWebClientWrapperProperties")
-    public WebClientWrapperProperties fastTaxGetByCityCountyStateWebClientWrapperProperties(@Value("${fast-tax-api-key}") String licenseKey) {
+    @Bean("fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties")
+    public WebClientWrapperProperties fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties(@Value("${fast-tax-api-key}") String licenseKey) {
         return WebClientWrapperProperties.builder()
                 .scheme("https")
                 .host("ws.serviceobjects.com")

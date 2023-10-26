@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 @EqualsAndHashCode
-public class FastTaxGetByCityCountyFetcher implements CityCountyFetcher {
+public class FastTaxGetTaxInfoByCityCountyStateCityCountyFetcher implements CityCountyFetcher {
 
     @Override
     public Mono<CityCountyWrapper> fetch(@NonNull SalesTaxData salesTaxData) {

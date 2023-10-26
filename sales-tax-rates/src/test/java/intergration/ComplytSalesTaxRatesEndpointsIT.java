@@ -74,9 +74,9 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ComplytSalesTaxRatesDto.class)
-                .value(addressWithSalesTaxRatesDto -> {
-                    assertEquals(addressWithCounty, addressWithSalesTaxRatesDto.address());
-                    assertEquals(stubFastTaxSalesTaxRates, addressWithSalesTaxRatesDto.salesTaxRates());
+                .value(complytSalesTaxRatesDto -> {
+                    assertEquals(addressWithCounty, complytSalesTaxRatesDto.address());
+                    assertEquals(stubFastTaxSalesTaxRates, complytSalesTaxRatesDto.salesTaxRates());
                 });
     }
 
@@ -86,7 +86,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
     public void findByAddress_SecondAddressToInsert_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
         // Given
         AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto();
-        AddressDto expectedAddress = stubFastTaxAddress.withCounty("Arapahoe").withCity("Englewood").withState("CO");
+        AddressDto expectedAddress = stubFastTaxAddress.withStreet("4th Avenue").withCounty("Arapahoe");
         SalesTaxRatesDto stubFastTaxSalesTaxRates = TestUtilities.createStubFastTaxSalesTaxRatesDto();
 
         // When + Then
@@ -95,9 +95,9 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
                 .uri(uriBuilder -> uriBuilder
                         .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", stubFastTaxAddress.country())
-                        .queryParam("state", stubFastTaxAddress.state())
+                        .queryParam("state", expectedAddress.state())
                         .queryParam("city", stubFastTaxAddress.city())
-                        .queryParam("street", stubFastTaxAddress.street())
+                        .queryParam("street", expectedAddress.street())
                         .queryParam("zip", stubFastTaxAddress.zip())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -118,7 +118,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
         SalesTaxRatesDto stubFastTaxSalesTaxRates = TestUtilities.createStubFastTaxSalesTaxRatesDto();
         AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto();
 
-        AddressDto expectedAddress = stubFastTaxAddress.withCounty("Arapahoe").withCity("Englewood").withState("CO");
+        AddressDto expectedAddress = stubFastTaxAddress.withStreet("5th Avenue").withCounty("Arapahoe");
 
         // When + Then
         webTestClient
@@ -126,9 +126,9 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
                 .uri(uriBuilder -> uriBuilder
                         .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", stubFastTaxAddress.country())
-                        .queryParam("state", stubFastTaxAddress.state())
+                        .queryParam("state", expectedAddress.state())
                         .queryParam("city", stubFastTaxAddress.city())
-                        .queryParam("street", stubFastTaxAddress.street())
+                        .queryParam("street", expectedAddress.street())
                         .queryParam("zip", stubFastTaxAddress.zip())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -148,7 +148,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
     public void findAll_FindsAllInsertedComplytSalesTaxRates_ChecksCount() {
         Flux<ComplytSalesTaxRates> complytSalesTaxRatesFlux = reactiveMongoTemplate.findAll(ComplytSalesTaxRates.class, "colorado");
 
-        StepVerifier.create(complytSalesTaxRatesFlux).expectNextCount(1).verifyComplete();
+        StepVerifier.create(complytSalesTaxRatesFlux).expectNextCount(3).verifyComplete();
     }
 
 }

@@ -16,7 +16,7 @@ public class SalesTaxWebClientWrapperConfig {
     private WebClientWrapperProperties fastTaxGetBestMatchWebClientWrapperProperties;
 
     @Autowired
-    private WebClientWrapperProperties fastTaxGetByCityCountyStateWebClientWrapperProperties;
+    private WebClientWrapperProperties fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties;
 
     @Autowired
     private WebClientWrapperProperties zipTaxWebClientWrapperProperties;
@@ -37,18 +37,14 @@ public class SalesTaxWebClientWrapperConfig {
                 fastTaxGetBestMatchWebClientWrapperProperties.getKey());
     }
 
-    @Profile({"fastTax"})
-    @Bean("getByCityCountyWebClientWrapper")
-    public FastTaxGetByCityCountyStateWebClientWrapper fastTaxGetByCityCountyWebClientWrapper(WebClient webClient) {
-        return new FastTaxGetByCityCountyStateWebClientWrapper(webClient,
-                fastTaxGetByCityCountyStateWebClientWrapperProperties.getScheme(),
-                fastTaxGetByCityCountyStateWebClientWrapperProperties.getHost(),
-                fastTaxGetByCityCountyStateWebClientWrapperProperties.getPath(),
-                fastTaxGetByCityCountyStateWebClientWrapperProperties.getKey());
+    @Profile({"stubFastTax", "default"})
+    @Bean("getBestMatchWebClientWrapper")
+    public StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper(WebClient webClient) {
+        return new StubFastTaxWebClientWrapper();
     }
 
     @Profile({"zipTax"})
-    @Bean("salesTaxWebClientWrapper")
+    @Bean("getBestMatchWebClientWrapper")
     public ZipTaxWebClientWrapper zipTaxWebClientWrapper(WebClient webClient) {
         return new ZipTaxWebClientWrapper(webClient,
                 zipTaxWebClientWrapperProperties.getScheme(),
@@ -57,17 +53,21 @@ public class SalesTaxWebClientWrapperConfig {
                 zipTaxWebClientWrapperProperties.getKey());
     }
 
-    @Profile({"stubFastTax", "default"})
-    @Bean("salesTaxWebClientWrapper")
-    public StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper(WebClient webClient) {
-        return new StubFastTaxWebClientWrapper();
-    }
-
     @Profile({"taxJar"})
-    @Bean("salesTaxWebClientWrapper")
+    @Bean("getBestMatchWebClientWrapper")
     public TaxJarWebClientWrapper taxJarWebClientWrapper(@Value("${tax-jar-api-token}") String apiToken) {
         Taxjar client = new Taxjar(apiToken);
         return new TaxJarWebClientWrapper(client);
+    }
+
+    @Profile({"fastTax"})
+    @Bean("getTaxInfoByCityCountyStateWebClientWrapper")
+    public FastTaxGetByCityCountyStateWebClientWrapper fastTaxGetTaxInfoByCityCountyStateWebClientWrapper(WebClient webClient) {
+        return new FastTaxGetByCityCountyStateWebClientWrapper(webClient,
+                fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties.getScheme(),
+                fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties.getHost(),
+                fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties.getPath(),
+                fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties.getKey());
     }
 
 }

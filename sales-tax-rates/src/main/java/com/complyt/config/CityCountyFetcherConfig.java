@@ -1,7 +1,7 @@
 package com.complyt.config;
 
 import com.complyt.business.data_fetcher.FastTaxGetBestMatchCityCountyFetcher;
-import com.complyt.business.data_fetcher.FastTaxGetByCityCountyFetcher;
+import com.complyt.business.data_fetcher.FastTaxGetTaxInfoByCityCountyStateCityCountyFetcher;
 import com.complyt.business.data_fetcher.TaxJarCityCountyFetcher;
 import com.complyt.business.data_fetcher.ZipTaxCityCountyFetcher;
 import lombok.AllArgsConstructor;
@@ -13,26 +13,26 @@ import org.springframework.context.annotation.Profile;
 @AllArgsConstructor
 public class CityCountyFetcherConfig {
 
+    @Profile({"fastTax"})
+    @Bean("getTaxInfoByCityCountyStateCityCountyFetcher")
+    public FastTaxGetTaxInfoByCityCountyStateCityCountyFetcher fastTaxGetByCityCountyAddressFetcher() {
+        return new FastTaxGetTaxInfoByCityCountyStateCityCountyFetcher();
+    }
+
     @Profile({"fastTax", "stubFastTax", "default"})
-    @Bean("getBestMatchCityCountyFetcher")
+    @Bean("cityCountyFetcher")
     public FastTaxGetBestMatchCityCountyFetcher fastTaxGetBestMatchCityCountyAddressFetcher() {
         return new FastTaxGetBestMatchCityCountyFetcher();
     }
 
-    @Profile({"fastTax"})
-    @Bean("getByCityCountyFetcher")
-    public FastTaxGetByCityCountyFetcher fastTaxGetByCityCountyAddressFetcher() {
-        return new FastTaxGetByCityCountyFetcher();
-    }
-
     @Profile({"zipTax"})
-    @Bean("cityCountyAddressFetcher")
+    @Bean("cityCountyFetcher")
     public ZipTaxCityCountyFetcher zipTaxAddressFetcher() {
         return new ZipTaxCityCountyFetcher();
     }
 
     @Profile({"taxJar"})
-    @Bean("cityCountyAddressFetcher")
+    @Bean("cityCountyFetcher")
     public TaxJarCityCountyFetcher taxJarCityCountyAddressFetcher() {
         return new TaxJarCityCountyFetcher();
     }

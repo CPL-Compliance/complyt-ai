@@ -26,13 +26,13 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
     SalesTaxWebClientWrapper getBestMatchWebClientWrapper;
 
     @NonNull
-    SalesTaxWebClientWrapper getByCityCountyWebClientWrapper;
+    SalesTaxWebClientWrapper getTaxInfoByCityCountyStateWebClientWrapper;
 
     @NonNull
     SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
 
     @NonNull
-    CityCountyFetcher getBestMatchCityCountyFetcher;
+    CityCountyFetcher cityCountyFetcher;
 
     @Override
     public Mono<ComplytSalesTaxRates> findByAddress(@NonNull Address address) {
@@ -45,7 +45,7 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
     }
 
     private Mono<ComplytSalesTaxRates> setBeforeSave(Address address, SalesTaxData salesTaxData) {
-        return getBestMatchCityCountyFetcher.fetch(salesTaxData)
+        return cityCountyFetcher.fetch(salesTaxData)
                 .flatMap(cityCountyWrapper -> salesTaxDataToSalesTaxRate.map(salesTaxData)
                         .map(salesTaxRates -> {
                             Address modifiedAddress = address.withCity(cityCountyWrapper.city()).withCounty(cityCountyWrapper.county());

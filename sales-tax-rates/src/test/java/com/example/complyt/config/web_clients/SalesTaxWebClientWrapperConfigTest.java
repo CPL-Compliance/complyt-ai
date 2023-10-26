@@ -86,7 +86,7 @@ public class SalesTaxWebClientWrapperConfigTest {
                 fastTaxGetByCityCountyStateWebClientWrapperProperties.getKey());
 
         FastTaxGetByCityCountyStateWebClientWrapper actualFastTaxGetByCityCountyStateWebClientWrapper =
-                salesTaxWebClientWrapperConfig.fastTaxGetByCityCountyWebClientWrapper(webClient);
+                salesTaxWebClientWrapperConfig.fastTaxGetTaxInfoByCityCountyStateWebClientWrapper(webClient);
 
         assertEquals(expectedFastTaxGetBestMatchWebClientWrapper, actualFastTaxGetByCityCountyStateWebClientWrapper);
     }
