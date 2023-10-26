@@ -25,6 +25,8 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
     @NonNull
     SalesTaxWebClientWrapper getBestMatchWebClientWrapper;
 
+    /* in case of running with any profile other than fastTax, the same bean
+       as getTaxInfoByCityCountyStateWebClientWrapper will be injected */
     @NonNull
     SalesTaxWebClientWrapper getTaxInfoByCityCountyStateWebClientWrapper;
 
