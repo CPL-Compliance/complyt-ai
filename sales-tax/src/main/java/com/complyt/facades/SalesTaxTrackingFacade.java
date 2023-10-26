@@ -52,7 +52,6 @@ public class SalesTaxTrackingFacade {
 
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
         return salesTaxTrackingService.checkSalesTaxTrackingNotHavingComplytId(salesTaxTracking)
-                .flatMap(salesTaxTrackingService::addClientAndStateDetails)
                 .flatMap(salesTaxTrackingService::injectDataToNewSalesTaxTracking)
                 .flatMap(salesTaxTrackingService::save)
                 .flatMap(recalculateCurrentNexusSummaryIfNeeded());
