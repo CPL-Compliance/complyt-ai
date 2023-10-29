@@ -1,9 +1,9 @@
 package com.example.complyt.business.data_fetcher;
 
-import com.complyt.business.data_fetcher.FastTaxCountyFetcher;
-import com.complyt.domain.Address;
+import com.complyt.business.data_fetcher.FastTaxGetBestMatchCityCountyFetcher;
+import com.complyt.domain.CityCountyWrapper;
 import com.complyt.domain.SalesTaxData;
-import com.complyt.domain.fast_tax.FastTaxData;
+import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,13 +21,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class FastTaxCountyFetcherTest {
+class FastTaxGetBestMatchCityCountyFetcherTest {
 
-    private FastTaxCountyFetcher fastTaxCountyFetcher;
+    private FastTaxGetBestMatchCityCountyFetcher fastTaxGetBestMatchCityCountyFetcher;
 
     @BeforeEach
     void setUp() {
-        fastTaxCountyFetcher = new FastTaxCountyFetcher();
+        fastTaxGetBestMatchCityCountyFetcher = new FastTaxGetBestMatchCityCountyFetcher();
     }
 
     private TaxInfoItem createTaxInfoItem() {
@@ -35,21 +35,20 @@ class FastTaxCountyFetcherTest {
     }
 
     @Test
-    void fetch_FetchesCounty_ReturnsCounty() {
+    void fetch_FetchesCityCounty_ReturnsCounty() {
         // Given
         TaxInfoItem taxInfoItem = createTaxInfoItem();
         List<TaxInfoItem> taxInfoItems = new ArrayList<>() {{
             add(taxInfoItem);
         }};
-        FastTaxData fastTaxData = new FastTaxData("0", taxInfoItems, "1");
-        Address addressNoCounty = TestUtilities.createAddressInCalifornia();
-        Address addressWithInjectedCounty = addressNoCounty.withCounty(fastTaxData.getTaxInfoItems().get(0).county());
+        FastTaxGetBestMatchData fastTaxGetBestMatchData = new FastTaxGetBestMatchData("0", taxInfoItems, "1");
+        CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(taxInfoItem.city(), taxInfoItem.county());
 
         // When
-        Mono<String> countyMono = fastTaxCountyFetcher.fetch(fastTaxData);
+        Mono<CityCountyWrapper> cityCountyWrapperMono = fastTaxGetBestMatchCityCountyFetcher.fetch(fastTaxGetBestMatchData);
 
         // Then
-        StepVerifier.create(countyMono).expectNext(addressWithInjectedCounty.county()).verifyComplete();
+        StepVerifier.create(cityCountyWrapperMono).expectNext(cityCountyWrapper).verifyComplete();
     }
 
     @Test
@@ -59,19 +58,19 @@ class FastTaxCountyFetcherTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            fastTaxCountyFetcher.fetch(nullSalesTaxData);
+            fastTaxGetBestMatchCityCountyFetcher.fetch(nullSalesTaxData);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxData " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
 
     @Test
-    void equals_SameFastTaxCountyFetcher_ReturnsTrue() {
+    void equals_SameFastTaxCityCountyFetcher_ReturnsTrue() {
         // Given
-        FastTaxCountyFetcher givenFastTaxCountyFetcher = new FastTaxCountyFetcher();
+        FastTaxGetBestMatchCityCountyFetcher givenFastTaxCityCountyAddressFetcher = new FastTaxGetBestMatchCityCountyFetcher();
 
         // When
-        boolean isEquals = fastTaxCountyFetcher.equals(givenFastTaxCountyFetcher);
+        boolean isEquals = fastTaxGetBestMatchCityCountyFetcher.equals(givenFastTaxCityCountyAddressFetcher);
 
         // Then
         assertTrue(isEquals);

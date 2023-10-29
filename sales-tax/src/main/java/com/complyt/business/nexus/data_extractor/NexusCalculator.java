@@ -1,8 +1,8 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.utils.filter.TransactionsFilterByNexusRules;
 import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;

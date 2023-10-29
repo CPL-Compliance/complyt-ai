@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.data_fetcher.CountyFetcher;
+import com.complyt.business.data_fetcher.CityCountyFetcher;
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
@@ -23,30 +23,35 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
     ComplytSalesTaxRatesRepository complytSalesTaxRatesRepository;
 
     @NonNull
-    SalesTaxWebClientWrapper salesTaxWebClientWrapper;
+    SalesTaxWebClientWrapper getBestMatchWebClientWrapper;
+
+    /* in case of running with any profile other than fastTax, the same bean
+       as getTaxInfoByCityCountyStateWebClientWrapper will be injected */
+    @NonNull
+    SalesTaxWebClientWrapper getTaxInfoByCityCountyStateWebClientWrapper;
 
     @NonNull
     SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
 
     @NonNull
-    CountyFetcher countyFetcher;
+    CityCountyFetcher cityCountyFetcher;
 
     @Override
     public Mono<ComplytSalesTaxRates> findByAddress(@NonNull Address address) {
         String collection = StatesMap.statesToCollections.get(address.state());
 
         return complytSalesTaxRatesRepository.findByAddress(address, collection)
-                .switchIfEmpty(Mono.defer(() -> salesTaxWebClientWrapper.findByAddress(address)
+                .switchIfEmpty(Mono.defer(() -> getBestMatchWebClientWrapper.findByAddress(address)
                         .flatMap(salesTaxData -> setBeforeSave(address, salesTaxData))
                         .flatMap(complytSalesTaxRates -> save(complytSalesTaxRates, collection))));
     }
 
     private Mono<ComplytSalesTaxRates> setBeforeSave(Address address, SalesTaxData salesTaxData) {
-        return countyFetcher.fetch(salesTaxData)
-                .flatMap(county -> salesTaxDataToSalesTaxRate.map(salesTaxData)
+        return cityCountyFetcher.fetch(salesTaxData)
+                .flatMap(cityCountyWrapper -> salesTaxDataToSalesTaxRate.map(salesTaxData)
                         .map(salesTaxRates -> {
-                            Address addressWithCounty = address.withCounty(county);
-                            return new ComplytSalesTaxRates(null, addressWithCounty, salesTaxRates, LocalDateTime.now(), LocalDateTime.now().plusWeeks(2));
+                            Address modifiedAddress = address.withCity(cityCountyWrapper.city()).withCounty(cityCountyWrapper.county());
+                            return new ComplytSalesTaxRates(null, modifiedAddress, salesTaxRates, LocalDateTime.now(), LocalDateTime.now().plusMonths(2));
                         }));
     }
 

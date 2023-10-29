@@ -1,10 +1,10 @@
 package com.complyt.business.sales_tax.checker;
 
-import com.complyt.domain.customer.exemption.ExemptionStatus;
-import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.customer.exemption.ExemptionType;
 import com.complyt.domain.customer.exemption.ValidationDates;
+import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

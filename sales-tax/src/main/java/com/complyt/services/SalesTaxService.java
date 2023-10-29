@@ -1,8 +1,8 @@
 package com.complyt.services;
 
-import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.transaction.Transaction;
 import lombok.NonNull;
 import reactor.core.publisher.Mono;
 

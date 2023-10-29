@@ -1,9 +1,9 @@
 package com.complyt.facades;
 
-import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
+import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;

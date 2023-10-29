@@ -1,6 +1,5 @@
 package com.complyt.domain.transaction;
 
-import com.complyt.domain.transaction.Address;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

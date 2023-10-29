@@ -1,11 +1,11 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.domain.transaction.ShippingFee;
-import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
+import com.complyt.domain.transaction.ShippingFee;
+import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;

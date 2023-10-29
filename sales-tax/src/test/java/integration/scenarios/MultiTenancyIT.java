@@ -5,8 +5,8 @@ import com.complyt.business.sales_tax.sales_tax_web_clients.ComplytSalesTaxRates
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.routers.CustomerRouter;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;

@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -22,10 +23,10 @@ import java.math.BigDecimal;
 public class SalesTaxDataToSalesTaxRate {
 
     @NonNull
-    SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRateMapper;
+    SalesTaxDataToSalesTaxRateMapper getBestMatchDataToSalesTaxRateMapper;
 
     public Mono<SalesTaxRates> map(@NonNull SalesTaxData salesTaxData) {
-        SalesTaxRates salesTaxRates = salesTaxDataToSalesTaxRateMapper.map(salesTaxData);
+        SalesTaxRates salesTaxRates = getBestMatchDataToSalesTaxRateMapper.map(salesTaxData);
 
         if (salesTaxData.isUnincorporated()) {
             return ContextLogger.observeCtx("Unincorporated Address - Setting City and City District Rates to 0 ", log::debug)

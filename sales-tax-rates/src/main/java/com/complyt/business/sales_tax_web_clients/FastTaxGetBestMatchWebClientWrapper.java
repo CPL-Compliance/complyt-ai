@@ -2,7 +2,7 @@ package com.complyt.business.sales_tax_web_clients;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.SalesTaxData;
-import com.complyt.domain.fast_tax.FastTaxData;
+import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
 import lombok.EqualsAndHashCode;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;
@@ -14,9 +14,9 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 
 @EqualsAndHashCode
-public class FastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase {
+public class FastTaxGetBestMatchWebClientWrapper extends SalesTaxWebClientWrapperBase {
 
-    public FastTaxWebClientWrapper(WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {
+    public FastTaxGetBestMatchWebClientWrapper(WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {
         super(webClient, scheme, host, path, key);
     }
 
@@ -29,7 +29,7 @@ public class FastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase {
                 .uri(uri)
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve()
-                .bodyToMono(FastTaxData.class)
+                .bodyToMono(FastTaxGetBestMatchData.class)
                 .cast(SalesTaxData.class);
     }
 

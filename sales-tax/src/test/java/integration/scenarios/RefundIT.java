@@ -2,7 +2,9 @@ package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
-import com.complyt.v1.models.*;
+import com.complyt.v1.models.PhysicalNexusTrackerDto;
+import com.complyt.v1.models.SalesTaxTrackingDto;
+import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;

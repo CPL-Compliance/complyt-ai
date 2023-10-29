@@ -1,7 +1,7 @@
 package com.example.complyt.business.data_fetcher;
 
-import com.complyt.business.data_fetcher.ZipTaxCountyFetcher;
-import com.complyt.domain.Address;
+import com.complyt.business.data_fetcher.ZipTaxCityCountyFetcher;
+import com.complyt.domain.CityCountyWrapper;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.domain.zip_tax.ZipTaxData;
@@ -19,30 +19,33 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class ZipTaxCountyFetcherTest {
+class ZipTaxCityCountyFetcherTest {
 
-    private ZipTaxCountyFetcher zipTaxCountyFetcher;
+    private ZipTaxCityCountyFetcher zipTaxCityCountyFetcher;
 
     @BeforeEach
     void setUp() {
-        zipTaxCountyFetcher = new ZipTaxCountyFetcher();
+        zipTaxCityCountyFetcher = new ZipTaxCityCountyFetcher();
     }
 
     @Test
-    void fetch_FetchesCounty_ReturnsCounty() {
+    void fetch_FetchesCityCounty_ReturnsCounty() {
         // Given
         Result result = TestUtilities.createResult();
         List<Result> results = new ArrayList<>() {{
             add(result);
         }};
         ZipTaxData zipTaxData = new ZipTaxData("version", 0, results);
-        Address addressNoCounty = TestUtilities.createAddressInCalifornia();
-        Address addressWithInjectedCounty = addressNoCounty.withCounty(zipTaxData.getResults().get(0).geoCounty());
 
-        Mono<String> countyMono = zipTaxCountyFetcher.fetch(zipTaxData);
+        CityCountyWrapper expectedCityCountyWrapper = new CityCountyWrapper(
+                zipTaxData.getResults().get(0).geoCity(),
+                zipTaxData.getResults().get(0).geoCounty());
+
+
+                Mono < CityCountyWrapper > cityCountyWrapperMono = zipTaxCityCountyFetcher.fetch(zipTaxData);
 
         // Then
-        StepVerifier.create(countyMono).expectNext(addressWithInjectedCounty.county()).verifyComplete();
+        StepVerifier.create(cityCountyWrapperMono).expectNext(expectedCityCountyWrapper).verifyComplete();
     }
 
     @Test
@@ -52,19 +55,19 @@ class ZipTaxCountyFetcherTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            zipTaxCountyFetcher.fetch(nullSalesTaxData);
+            zipTaxCityCountyFetcher.fetch(nullSalesTaxData);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxData " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
 
     @Test
-    void equals_SameZipTaxCountyFetcher_ReturnsTrue() {
+    void equals_SameZipTaxCityCountyFetcher_ReturnsTrue() {
         // Given
-        ZipTaxCountyFetcher givenZipTaxCountyFetcher = new ZipTaxCountyFetcher();
+        ZipTaxCityCountyFetcher givenZipTaxCityCountyAddressFetcher = new ZipTaxCityCountyFetcher();
 
         // When
-        boolean isEquals = zipTaxCountyFetcher.equals(givenZipTaxCountyFetcher);
+        boolean isEquals = zipTaxCityCountyFetcher.equals(givenZipTaxCityCountyAddressFetcher);
 
         // Then
         assertTrue(isEquals);

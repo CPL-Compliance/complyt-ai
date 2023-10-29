@@ -1,6 +1,6 @@
 package com.example.complyt.business.data_fetcher;
 
-import com.complyt.business.data_fetcher.TaxJarCountyFetcher;
+import com.complyt.business.data_fetcher.TaxJarCityCountyFetcher;
 import com.complyt.domain.SalesTaxData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,13 +8,13 @@ import testUtils.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TaxJarCountyFetcherTest {
+public class TaxJarCityCountyFetcherTest {
 
-    private TaxJarCountyFetcher taxJarCountyFetcher;
+    private TaxJarCityCountyFetcher taxJarCityCountyFetcher;
 
     @BeforeEach
     void setUp() {
-        taxJarCountyFetcher = new TaxJarCountyFetcher();
+        taxJarCityCountyFetcher = new TaxJarCityCountyFetcher();
     }
 
     @Test
@@ -23,18 +23,18 @@ public class TaxJarCountyFetcherTest {
         SalesTaxData nullSalesTaxData = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> taxJarCountyFetcher.fetch(nullSalesTaxData));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> taxJarCityCountyFetcher.fetch(nullSalesTaxData));
 
         assertEquals(nullPointerException.getMessage(), "salesTaxData " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
 
     @Test
-    void equals_SameTaxJarCountyFetcher_ReturnsTrue() {
+    void equals_SameTaxJarCityCountyFetcher_ReturnsTrue() {
         // Given
-        TaxJarCountyFetcher givenTaxJarCountyFetcher = new TaxJarCountyFetcher();
+        TaxJarCityCountyFetcher givenTaxJarCityCountyAddressFetcher = new TaxJarCityCountyFetcher();
 
         // When
-        boolean isEquals = taxJarCountyFetcher.equals(givenTaxJarCountyFetcher);
+        boolean isEquals = taxJarCityCountyFetcher.equals(givenTaxJarCityCountyAddressFetcher);
 
         // Then
         assertTrue(isEquals);

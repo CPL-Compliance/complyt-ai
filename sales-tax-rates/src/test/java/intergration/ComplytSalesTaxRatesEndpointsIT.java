@@ -74,9 +74,9 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ComplytSalesTaxRatesDto.class)
-                .value(addressWithSalesTaxRatesDto -> {
-                    assertEquals(addressWithCounty, addressWithSalesTaxRatesDto.address());
-                    assertEquals(stubFastTaxSalesTaxRates, addressWithSalesTaxRatesDto.salesTaxRates());
+                .value(complytSalesTaxRatesDto -> {
+                    assertEquals(addressWithCounty, complytSalesTaxRatesDto.address());
+                    assertEquals(stubFastTaxSalesTaxRates, complytSalesTaxRatesDto.salesTaxRates());
                 });
     }
 
@@ -85,8 +85,8 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
     @WithMockUser
     public void findByAddress_SecondAddressToInsert_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
         // Given
-        AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withCity("cityOfSecondAddress");
-        AddressDto addressWithCounty = stubFastTaxAddress.withCounty("Arapahoe");
+        AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto();
+        AddressDto expectedAddress = stubFastTaxAddress.withStreet("4th Avenue").withCounty("Arapahoe");
         SalesTaxRatesDto stubFastTaxSalesTaxRates = TestUtilities.createStubFastTaxSalesTaxRatesDto();
 
         // When + Then
@@ -95,9 +95,9 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
                 .uri(uriBuilder -> uriBuilder
                         .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", stubFastTaxAddress.country())
-                        .queryParam("state", stubFastTaxAddress.state())
+                        .queryParam("state", expectedAddress.state())
                         .queryParam("city", stubFastTaxAddress.city())
-                        .queryParam("street", stubFastTaxAddress.street())
+                        .queryParam("street", expectedAddress.street())
                         .queryParam("zip", stubFastTaxAddress.zip())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -105,7 +105,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
                 .expectStatus().isOk()
                 .expectBody(ComplytSalesTaxRatesDto.class)
                 .value(addressWithSalesTaxRatesDto -> {
-                    assertEquals(addressWithSalesTaxRatesDto.address(), addressWithCounty);
+                    assertEquals(addressWithSalesTaxRatesDto.address(), expectedAddress);
                     assertEquals(addressWithSalesTaxRatesDto.salesTaxRates(), stubFastTaxSalesTaxRates);
                 });
     }
@@ -115,9 +115,10 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
     @WithMockUser
     public void findByAddress_ThirdAddressToInsert_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
         // Given
-        AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withCity("cityOfThirdAddress");
-        AddressDto addressWithCounty = stubFastTaxAddress.withCounty("Arapahoe");
         SalesTaxRatesDto stubFastTaxSalesTaxRates = TestUtilities.createStubFastTaxSalesTaxRatesDto();
+        AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto();
+
+        AddressDto expectedAddress = stubFastTaxAddress.withStreet("5th Avenue").withCounty("Arapahoe");
 
         // When + Then
         webTestClient
@@ -125,9 +126,9 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
                 .uri(uriBuilder -> uriBuilder
                         .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", stubFastTaxAddress.country())
-                        .queryParam("state", stubFastTaxAddress.state())
+                        .queryParam("state", expectedAddress.state())
                         .queryParam("city", stubFastTaxAddress.city())
-                        .queryParam("street", stubFastTaxAddress.street())
+                        .queryParam("street", expectedAddress.street())
                         .queryParam("zip", stubFastTaxAddress.zip())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -135,7 +136,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
                 .expectStatus().isOk()
                 .expectBody(ComplytSalesTaxRatesDto.class)
                 .value(complytSalesTaxRatesDto -> {
-                    assertEquals(complytSalesTaxRatesDto.address(), addressWithCounty);
+                    assertEquals(complytSalesTaxRatesDto.address(), expectedAddress);
                     assertEquals(complytSalesTaxRatesDto.salesTaxRates(), stubFastTaxSalesTaxRates);
                 });
     }

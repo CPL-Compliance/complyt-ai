@@ -1,15 +1,15 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.domain.transaction.Address;
-import com.complyt.domain.transaction.Item;
-import com.complyt.domain.transaction.Transaction;
-import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
+import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.TransactionStatus;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

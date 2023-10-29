@@ -17,16 +17,29 @@ class WebClientWrapperPropertiesConfigTest {
     }
 
     @Test
-    void fastTaxWebClientWrapperProperties_createFastTaxWebClientWrapperProperties_getFastTaxWebClientWrapperProperties() {
+    void fastTaxGetBestMatchWebClientWrapperProperties_createFastTaxWebClientWrapperProperties_getFastTaxWebClientWrapperProperties() {
         String licenseKey = "License Key";
         WebClientWrapperProperties expectedFastTaxWebClientWrapper = new WebClientWrapperProperties("https",
                 "ws.serviceobjects.com",
                 "FT/web.svc/json/GetBestMatch",
                 new Pair<>("licensekey", licenseKey));
 
-        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.fastTaxWebClientWrapperProperties(licenseKey);
+        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.fastTaxGetBestMatchWebClientWrapperProperties(licenseKey);
 
         assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
+    }
+
+    @Test
+    void fastTaxGetByCityCountyStateWebClientWrapperProperties_createFastTaxWebClientWrapperProperties_getFastTaxWebClientWrapperProperties() {
+        String licenseKey = "License Key";
+        WebClientWrapperProperties expectedFastTaxWebClientWrapper = new WebClientWrapperProperties("https",
+                "ws.serviceobjects.com",
+                "FT/web.svc/json/GetTaxInfoByCityCountyState",
+                new Pair<>("licensekey", licenseKey));
+
+        WebClientWrapperProperties actualFastTaxGetByCityCountyStateWebClientWrapper = webClientWrapperPropertiesConfig.fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties(licenseKey);
+
+        assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxGetByCityCountyStateWebClientWrapper);
     }
 
     @Test

@@ -1,13 +1,10 @@
 package com.example.complyt.services;
 
-import com.complyt.business.data_fetcher.CountyFetcher;
+import com.complyt.business.data_fetcher.CityCountyFetcher;
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.domain.Address;
-import com.complyt.domain.ComplytSalesTaxRates;
-import com.complyt.domain.SalesTaxRates;
-import com.complyt.domain.StatesMap;
-import com.complyt.domain.fast_tax.FastTaxData;
+import com.complyt.domain.*;
+import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
 import com.complyt.repositories.ComplytSalesTaxRatesRepository;
 import com.complyt.services.ComplytSalesTaxRatesServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -40,7 +37,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
     SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
 
     @Mock
-    CountyFetcher countyFetcher;
+    CityCountyFetcher cityCountyFetcher;
 
 
     @Test
@@ -63,19 +60,19 @@ public class ComplytSalesTaxRatesServiceImplTest {
     void findByAddress_ComplytSalesTaxRatesNotFoundInDB_SavesNewComplytSalesTaxRates() {
         // Given
         Address califoniaAddress = TestUtilities.createAddressInCalifornia();
-        Address californiaAddressWithCounty = califoniaAddress.withCounty("Fresno");
+        CityCountyWrapper cityCountyWrapper = TestUtilities.createCityCountyInCalifornia();
         String collectionName = StatesMap.statesToCollections.get(califoniaAddress.state());
         SalesTaxRates californiaRates = TestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates expectedComplytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
 
-        FastTaxData fastTaxData = TestUtilities.createFastTaxData();
+        FastTaxGetBestMatchData fastTaxGetBestMatchData = TestUtilities.createFastTaxGetBestMatchData();
 
         // When
         when(complytSalesTaxRatesRepository.findByAddress(califoniaAddress, collectionName)).thenReturn(Mono.empty());
-        when(salesTaxWebClientWrapper.findByAddress(califoniaAddress)).thenReturn(Mono.just(fastTaxData));
-        when(countyFetcher.fetch(fastTaxData)).thenReturn(Mono.just(californiaAddressWithCounty.county()));
+        when(salesTaxWebClientWrapper.findByAddress(califoniaAddress)).thenReturn(Mono.just(fastTaxGetBestMatchData));
+        when(cityCountyFetcher.fetch(fastTaxGetBestMatchData)).thenReturn(Mono.just(cityCountyWrapper));
         when(complytSalesTaxRatesRepository.save(any(), any())).thenReturn(Mono.just(expectedComplytSalesTaxRates));
-        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(Mono.just(californiaRates));
+        when(salesTaxDataToSalesTaxRate.map(fastTaxGetBestMatchData)).thenReturn(Mono.just(californiaRates));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesService.findByAddress(califoniaAddress);
 
