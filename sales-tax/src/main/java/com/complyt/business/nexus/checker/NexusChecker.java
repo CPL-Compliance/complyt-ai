@@ -1,8 +1,8 @@
 package com.complyt.business.nexus.checker;
 
 import com.complyt.domain.nexus.NexusCalculationSummary;
-import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.utils.factory.DateRange;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -28,18 +28,19 @@ public class NexusChecker {
 
     public boolean hasNexus(@NonNull SalesTaxTracking salesTaxTracking) {
         boolean hasNexus = salesTaxEnforcementChecker.check(salesTaxTracking) &&
-                (physicalNexusChecker.check(salesTaxTracking) || economicNexusChecker.check(salesTaxTracking));
+                           (physicalNexusChecker.check(salesTaxTracking) || economicNexusChecker.check(salesTaxTracking));
         log.debug("Checking if client has nexus in state : " + salesTaxTracking.getState().getAbbreviation()
-                + " Has given a result of : " + hasNexus);
+                  + " Has given a result of : " + hasNexus);
 
         return hasNexus;
     }
 
-    public boolean passedThreshold(@NonNull NexusCalculationSummary calculationSummary, @NonNull NexusStateRule stateRule) {
-        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(calculationSummary, stateRule);
-        boolean passedThreshold = nexusThresholdChecker.check(summaryAndRule);
-        log.debug("Checking if client passed nexus' threshold in state : " + stateRule.state().getAbbreviation()
-                + " Has given a result of : " + passedThreshold);
+    public boolean passedThreshold(@NonNull SalesTaxTracking salesTaxTracking, @NonNull DateRange dateRange) {
+        NexusCalculationSummary nexusCalculationSummary = salesTaxTracking.getNexusCalculationSummaries().get(dateRange.getEnd().toLocalDate());
+        if (nexusCalculationSummary == null) return false;
+        boolean passedThreshold = nexusThresholdChecker.check(new Pair<>(nexusCalculationSummary, salesTaxTracking.getNexusStateRule()));
+        log.debug("Checking if client passed nexus' threshold in state : " + salesTaxTracking.getNexusStateRule().state().getAbbreviation()
+                  + " Has given a result of : " + passedThreshold);
 
         return passedThreshold;
     }

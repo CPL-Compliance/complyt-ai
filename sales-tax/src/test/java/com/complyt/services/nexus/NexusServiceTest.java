@@ -105,7 +105,7 @@ class NexusServiceTest {
         when(nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusCalculator.subtractTransactionFromNexusSummary(transaction.getComplytId(), salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusCalculator.addTransactionToNexusSummary(transaction, salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTrackingAfterCalculation));
-        when(nexusChecker.passedThreshold(summary, salesTaxTracking.getNexusStateRule())).thenReturn(false);
+        when(nexusChecker.passedThreshold(salesTaxTrackingAfterCalculation, summaryDate)).thenReturn(false);
 
         Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.upsertToNexusTracking(transaction, salesTaxTracking);
 
@@ -132,7 +132,7 @@ class NexusServiceTest {
         when(nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusCalculator.subtractTransactionFromNexusSummary(transaction.getComplytId(), salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusCalculator.addTransactionToNexusSummary(transaction, salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTrackingAfterCalculation));
-        when(nexusChecker.passedThreshold(summary, salesTaxTracking.getNexusStateRule())).thenReturn(true);
+        when(nexusChecker.passedThreshold(salesTaxTrackingAfterCalculation, summaryDate)).thenReturn(true);
         when(applicationDateCreator.create(salesTaxTracking.getNexusStateRule().timeFrame(), referenceDate)).thenReturn(referenceDate);
 
         Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.upsertToNexusTracking(transaction, salesTaxTracking);
@@ -162,7 +162,7 @@ class NexusServiceTest {
         when(nexusChecker.hasNexus(givenSalesTaxTracking)).thenReturn(false);
         when(nexusCalculator.subtractTransactionFromNexusSummary(transaction.getComplytId(), givenSalesTaxTracking, summaryDate)).thenReturn(Mono.just(givenSalesTaxTracking));
         when(nexusCalculator.addTransactionToNexusSummary(transaction, givenSalesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTrackingAfterCalculation));
-        when(nexusChecker.passedThreshold(summary, givenSalesTaxTracking.getNexusStateRule())).thenReturn(true);
+        when(nexusChecker.passedThreshold(salesTaxTrackingAfterCalculation, summaryDate)).thenReturn(true);
         when(applicationDateCreator.create(givenSalesTaxTracking.getNexusStateRule().timeFrame(), referenceDate)).thenReturn(referenceDate);
 
         Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.upsertToNexusTracking(transaction, givenSalesTaxTracking);
@@ -258,18 +258,6 @@ class NexusServiceTest {
 
         // Then
         assertTrue(isSalesTaxRequired);
-    }
-
-    @Test
-    void isSalesTaxTrackingCalculationRequired_StateDoesNotEnforceSalesTax_ReturnsFalse() {
-        // Given
-        SalesTaxTracking salesTaxTrackingNoSalesTaxEnforcement = salesTaxTracking.withEnforcesSalesTax(false);
-
-        // When
-        boolean isSalesTaxRequired = nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTrackingNoSalesTaxEnforcement);
-
-        // Then
-        assertFalse(isSalesTaxRequired);
     }
  @Test
     void isSalesTaxTrackingCalculationRequired_CustomerTypeNotInStateRule_ReturnsFalse() {

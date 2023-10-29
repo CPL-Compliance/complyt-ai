@@ -2,6 +2,7 @@ package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
+import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.transaction.TransactionDto;
@@ -71,6 +72,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
 
     @Order(0)
     @Test
+    @Override
     @WithMockUser
     public void refreshSalesTaxTrackingByStateAndDate_CheckEconomicNexusNotPassed_Returns200() {
         String state = "CT";
@@ -166,6 +168,8 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(receivedSalesTaxTracking -> {
+                    receivedSalesTaxTracking.nexusCalculationSummaries().values().forEach(nexusCalculationSummaryDto ->
+                            assertEquals(BigDecimal.valueOf(2100000), nexusCalculationSummaryDto.amount()));
                     assertFalse(receivedSalesTaxTracking.economicNexusTracker().established());
                     assertFalse(receivedSalesTaxTracking.approved());
                 });
@@ -219,6 +223,8 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(receivedSalesTaxTracking -> {
                     assertTrue(receivedSalesTaxTracking.economicNexusTracker().established());
+                    receivedSalesTaxTracking.nexusCalculationSummaries().values().forEach(nexusCalculationSummaryDto ->
+                            assertEquals(BigDecimal.valueOf(2340000), nexusCalculationSummaryDto.amount()));
                     assertEquals(receivedSalesTaxTracking.economicNexusTracker().establishedDate(), LocalDateTime.parse(referenceDate.toString()));
                     assertEquals(receivedSalesTaxTracking.appliedDate(), LocalDateTime.parse("2020-10-01T00:00"));
 

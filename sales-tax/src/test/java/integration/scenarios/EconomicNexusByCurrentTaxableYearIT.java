@@ -2,6 +2,7 @@ package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
+import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.transaction.TransactionDto;
@@ -27,6 +28,7 @@ import testUtils.integration_test.templates.economic_nexus.EconomicNexusOnlyTaxa
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -70,6 +72,7 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
 
     @Order(0)
     @Test
+    @Override
     @WithMockUser
     public void refreshSalesTaxTrackingByStateAndDate_CheckEconomicNexusNotPassed_Returns200() {
         String state = "CA";
@@ -158,6 +161,7 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(receivedSalesTaxTracking -> {
+                    assertEquals(BigDecimal.valueOf(450010), receivedSalesTaxTracking.nexusCalculationSummaries().get(LocalDate.of(2022,6,1)).amount());
                     assertFalse(receivedSalesTaxTracking.economicNexusTracker().established());
                     assertFalse(receivedSalesTaxTracking.approved());
                 });
@@ -206,6 +210,7 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(receivedSalesTaxTracking -> {
                     assertTrue(receivedSalesTaxTracking.economicNexusTracker().established());
+                            assertEquals(BigDecimal.valueOf(510010), receivedSalesTaxTracking.nexusCalculationSummaries().get(LocalDate.of(2022,6,1)).amount());
                     assertEquals(receivedSalesTaxTracking.economicNexusTracker().establishedDate(), LocalDateTime.parse(referenceDate.toString()));
                     assertEquals(receivedSalesTaxTracking.appliedDate(), LocalDateTime.parse(referenceDate.toString()));
 
