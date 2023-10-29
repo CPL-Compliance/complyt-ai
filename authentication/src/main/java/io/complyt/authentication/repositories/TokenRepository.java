@@ -30,6 +30,6 @@ public class TokenRepository {
 
     public Mono<Token> save(final @NonNull Token token) {
         return ContextLogger.observeCtx("Saving token: " + token, log::info)
-                .then(reactiveMongoTemplate.save(token).log());
+                .then(reactiveMongoTemplate.save(token));
     }
 }
