@@ -16,7 +16,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,8 +69,7 @@ public class NexusCalculator {
     }
 
     private Mono<SalesTaxTracking> insertNewNexusCalculationSummary(SalesTaxTracking salesTaxTracking, DateRange summaryDateRange, NexusCalculationSummary nexusCalculationSummary) {
-        return Mono.justOrEmpty(salesTaxTracking.getNexusCalculationSummaries())
-                .defaultIfEmpty(new HashMap<>())
+        return Mono.just(salesTaxTracking.getNexusCalculationSummaries())
                 .map(map -> {
                     map.put(summaryDateRange.getEnd().toLocalDate(), nexusCalculationSummary);
                     return salesTaxTracking.withNexusCalculationSummaries(map);
@@ -79,10 +77,11 @@ public class NexusCalculator {
     }
 
     private Mono<TransactionNexusSummary> insertNewTransactionNexusSummary(SalesTaxTracking salesTaxTracking, UUID transactionId, TransactionNexusSummary transactionNexusSummary) {
-        return Mono.justOrEmpty(salesTaxTracking.getTransactionNexusSummaries())
-                .defaultIfEmpty(new HashMap<>())
-                .mapNotNull(map -> map.put(transactionId, transactionNexusSummary))
-                .thenReturn(transactionNexusSummary);
+        return Mono.just(salesTaxTracking.getTransactionNexusSummaries())
+                .map(map -> {
+                    map.put(transactionId, transactionNexusSummary);
+                    return transactionNexusSummary;
+                });
     }
 
     public Mono<SalesTaxTracking> calculateNexusSummaryFromTransactionSummaries(SalesTaxTracking salesTaxTracking, DateRange summaryDateRange) {
