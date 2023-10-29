@@ -20,14 +20,14 @@ public class AddressQueryBuilderTest {
     QueryBuilder<Address> addressQueryBuilder;
 
     Address fullAddressNoCountyAddress;
-    Address fullAddresswithCountyAddress;
+    Address fullAddressWithCountyAddress;
     Address partialAddress;
 
     @BeforeEach
     void setUp() {
         addressQueryBuilder = new AddressQueryBuilder();
         fullAddressNoCountyAddress = TestUtilities.createAddressInCalifornia();
-        fullAddresswithCountyAddress = fullAddressNoCountyAddress.withCounty("county");
+        fullAddressWithCountyAddress = fullAddressNoCountyAddress.withCounty("county");
         partialAddress = fullAddressNoCountyAddress
                 .withPartial(true)
                 .withCity(null)
@@ -57,6 +57,24 @@ public class AddressQueryBuilderTest {
 
         // When
         Query actualQuery = addressQueryBuilder.build(fullAddressNoCountyAddress);
+
+        // Then
+        Assertions.assertEquals(expectedQuery, actualQuery);
+    }
+
+    @Test
+    void build_FullAddressWithCountyPassed_ReturnsQuery() {
+        // Given
+        Query expectedQuery = Query.query(Criteria.where("address.zip").is(fullAddressNoCountyAddress.zip()));
+        Optional.ofNullable(fullAddressWithCountyAddress.city())
+                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("address.city").regex(value, "i")));
+        Optional.ofNullable(fullAddressWithCountyAddress.street())
+                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("address.street").regex(value, "i")));
+        Optional.ofNullable(fullAddressWithCountyAddress.county())
+                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("address.county").regex(value, "i")));
+
+        // When
+        Query actualQuery = addressQueryBuilder.build(fullAddressWithCountyAddress);
 
         // Then
         Assertions.assertEquals(expectedQuery, actualQuery);
