@@ -72,10 +72,10 @@ public class NexusService {
 
     private Mono<SalesTaxTracking> getSalesTaxTrackingReadyForRecalculation(SalesTaxTracking salesTaxTracking) {
         return Mono.just(salesTaxTracking
-                .withTransactionNexusSummaries(salesTaxTracking.getTransactionNexusSummaries() != null
-                        ? salesTaxTracking.getTransactionNexusSummaries() : new HashMap<>())
-                .withNexusCalculationSummaries(salesTaxTracking.getNexusCalculationSummaries() != null
-                        ? salesTaxTracking.getNexusCalculationSummaries() : new HashMap<>()));
+                .withTransactionNexusSummaries(salesTaxTracking.getTransactionNexusSummaries() == null
+                        ? new HashMap<>() : salesTaxTracking.getTransactionNexusSummaries())
+                .withNexusCalculationSummaries(salesTaxTracking.getNexusCalculationSummaries() == null
+                        ? new HashMap<>() : salesTaxTracking.getNexusCalculationSummaries()));
     }
 
     public Mono<SalesTaxTracking> calculateNexusSummaryFromTransactionSummaries(@NonNull SalesTaxTracking salesTaxTracking, @NonNull DateRange summaryDateRange) {

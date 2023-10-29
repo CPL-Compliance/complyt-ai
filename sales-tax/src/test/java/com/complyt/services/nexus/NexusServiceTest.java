@@ -160,7 +160,6 @@ class NexusServiceTest {
 
         // When
         when(nexusChecker.hasNexus(givenSalesTaxTracking)).thenReturn(false);
-        when(nexusCalculator.calculateNexusSummaryFromTransactionSummaries(givenSalesTaxTracking, summaryDate)).thenReturn(Mono.just(givenSalesTaxTracking));
         when(nexusCalculator.subtractTransactionFromNexusSummary(transaction.getComplytId(), givenSalesTaxTracking, summaryDate)).thenReturn(Mono.just(givenSalesTaxTracking));
         when(nexusCalculator.addTransactionToNexusSummary(transaction, givenSalesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTrackingAfterCalculation));
         when(nexusChecker.passedThreshold(summary, givenSalesTaxTracking.getNexusStateRule())).thenReturn(true);
