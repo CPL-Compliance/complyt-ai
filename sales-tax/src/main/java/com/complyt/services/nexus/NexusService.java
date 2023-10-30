@@ -53,6 +53,7 @@ public class NexusService {
     }
 
     public Mono<SalesTaxTracking> economicNexusQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull LocalDateTime referenceDate) {
+
         EconomicNexusTracker newTracker = new EconomicNexusTracker(true, referenceDate);
         LocalDateTime appliedDate = applicationDateCreator.create(salesTaxTracking.getNexusStateRule().timeFrame(), referenceDate);
 
@@ -117,7 +118,7 @@ public class NexusService {
                 referenceDate).getDateRange());
     }
 
-    public Mono<SalesTaxTracking> removeFromNexusTracking(Transaction cancelledTransaction, SalesTaxTracking salesTaxTracking) {
+    public Mono<SalesTaxTracking> removeFromNexusTracking(@NonNull Transaction cancelledTransaction, @NonNull SalesTaxTracking salesTaxTracking) {
         return getNexusSummaryDate(salesTaxTracking, cancelledTransaction.getExternalTimestamps().getCreatedDate())
                 .flatMap(summaryDateRange -> getSalesTaxTrackingReadyForRecalculation(salesTaxTracking)
                 .flatMap(salesTaxTrackingReadyForCalculation -> recalculationOfNexusSummaryIfRequired(salesTaxTrackingReadyForCalculation, calculateNexusSummaryFromTransactionSummaries(salesTaxTrackingReadyForCalculation, summaryDateRange))

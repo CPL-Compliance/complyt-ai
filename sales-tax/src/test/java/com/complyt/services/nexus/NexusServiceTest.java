@@ -3,6 +3,7 @@ package com.complyt.services.nexus;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
+import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.*;
 import com.complyt.domain.nexus.enums.TimeFrame;
@@ -172,6 +173,84 @@ class NexusServiceTest {
     }
 
     @Test
+    void upsertToNexusTracking_UpdatedTransactionNoLongerInNexusCalculation_NexusTrackingChanges() {
+        // Given
+        NexusStateRule nexusStateRule = testUtilities.createNexusStateRule("rule1").withCustomerTypes(List.of(CustomerType.MARKETPLACE));
+        UUID complytId = transaction.getComplytId();
+        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate();
+        DateRange summaryDate = nexusService.getNexusSummaryDate(salesTaxTracking, referenceDate).block();
+
+        NexusCalculationSummary nexusCalculationSummary = new NexusCalculationSummary(1, BigDecimal.ONE);
+        TransactionNexusSummary transactionNexusSummary = new TransactionNexusSummary(BigDecimal.ONE, referenceDate, TransactionType.INVOICE);
+
+        SalesTaxTracking givenSalesTaxTracking = salesTaxTracking.withNexusStateRule(nexusStateRule)
+                .withNexusCalculationSummaries(Map.of(summaryDate.getEnd().toLocalDate(), nexusCalculationSummary))
+                .withTransactionNexusSummaries(Map.of(complytId, transactionNexusSummary));
+
+        SalesTaxTracking salesTaxTrackingAfterCalculation = givenSalesTaxTracking
+                .withNexusCalculationSummaries(Map.of(summaryDate.getEnd().toLocalDate(), new NexusCalculationSummary(0, BigDecimal.ZERO)))
+                .withTransactionNexusSummaries(Map.of());
+
+
+        // When
+        when(nexusCalculator.calculateNexusSummaryFromTransactionSummaries(givenSalesTaxTracking, summaryDate)).thenReturn(Mono.just(givenSalesTaxTracking));
+        when(nexusCalculator.subtractTransactionFromNexusSummary(complytId, givenSalesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTrackingAfterCalculation));
+        when(nexusChecker.passedThreshold(salesTaxTrackingAfterCalculation, summaryDate)).thenReturn(false);
+
+        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.upsertToNexusTracking(transaction, givenSalesTaxTracking);
+
+        // Then
+        StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTrackingAfterCalculation).verifyComplete();
+    }
+
+    @Test
+    void removeFromNexusTracking_NewTransactionNexusNotInCalculation_NoChangeInSalesTaxTracking() {
+        // Given
+        NexusStateRule nexusStateRule = testUtilities.createNexusStateRule("rule1").withTimeFrame(TimeFrame.CURRENT_CALENDER_YEAR);
+        SalesTaxTracking givenSalesTaxTracking = salesTaxTracking
+                .withNexusStateRule(nexusStateRule)
+                .withNexusCalculationSummaries(null)
+                .withTransactionNexusSummaries(null);
+
+        DateRange summaryDate = nexusService.getNexusSummaryDate(givenSalesTaxTracking, transaction.getExternalTimestamps().getCreatedDate()).block();
+
+        SalesTaxTracking salesTaxTrackingAfterPreparation = givenSalesTaxTracking
+                .withNexusCalculationSummaries(Map.of())
+                .withTransactionNexusSummaries(Map.of());
+
+        // When
+        when(nexusCalculator.subtractTransactionFromNexusSummary(transaction.getComplytId(), salesTaxTrackingAfterPreparation, summaryDate)).thenReturn(Mono.just(salesTaxTrackingAfterPreparation));
+        when(nexusChecker.passedThreshold(salesTaxTrackingAfterPreparation, summaryDate)).thenReturn(false);
+
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.removeFromNexusTracking(transaction, givenSalesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingAfterPreparation).verifyComplete();
+    }
+
+    @Test
+    void removeFromNexusTracking_ExistingTransactionNexusWithNegativeAmountAndPassedNexus_NexusTrackingChanges() {
+        // Given
+        UUID complytId = transaction.getComplytId();
+        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate();
+        DateRange summaryDate = nexusService.getNexusSummaryDate(salesTaxTracking, referenceDate).block();
+
+        SalesTaxTracking expectedSalesTaxTracking = salesTaxTracking.withEconomicNexusTracker(new EconomicNexusTracker(true, referenceDate))
+                .withAppliedDate(referenceDate);
+
+        // When
+        when(nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
+        when(nexusCalculator.subtractTransactionFromNexusSummary(complytId, salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
+        when(nexusChecker.passedThreshold(salesTaxTracking, summaryDate)).thenReturn(true);
+        when(applicationDateCreator.create(salesTaxTracking.getNexusStateRule().timeFrame(), referenceDate)).thenReturn(referenceDate);
+
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.removeFromNexusTracking(transaction, salesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(expectedSalesTaxTracking).verifyComplete();
+    }
+
+    @Test
     void getTransactionsQueryByNexusCalculation_QueryBuilderReturnsQuery_ReturnsQuery() {
         // Given
         LocalDate referenceDate = LocalDate.now();
@@ -223,7 +302,6 @@ class NexusServiceTest {
 
         // When
         when(nexusChecker.hasNexus(salesTaxTracking)).thenReturn(true);
-//        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
         Mono<SalesTaxTrackingWithNexusInfo> salesTaxTrackingDecoratorMono = nexusService.hasNexus(salesTaxTracking);
 
         // Then
@@ -259,7 +337,8 @@ class NexusServiceTest {
         // Then
         assertTrue(isSalesTaxRequired);
     }
- @Test
+
+    @Test
     void isSalesTaxTrackingCalculationRequired_CustomerTypeNotInStateRule_ReturnsFalse() {
         // Given
         SalesTaxTracking salesTaxTrackingWithNoCustomerTypesInStateRule = salesTaxTracking
@@ -294,7 +373,8 @@ class NexusServiceTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
     }
- @Test
+
+    @Test
     void getTransactionsQueryByNexusCalculation_NullStateRulePassed_ThrowsException() {
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
@@ -304,7 +384,7 @@ class NexusServiceTest {
         assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
     }
 
- @Test
+    @Test
     void getTransactionsQueryByNexusCalculation_NullClientTrackingPassed_ThrowsException() {
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
@@ -314,7 +394,7 @@ class NexusServiceTest {
         assertEquals(nullPointerException.getMessage(), "clientTracking is marked non-null but is null");
     }
 
- @Test
+    @Test
     void getTransactionsQueryByNexusCalculation_NullReferenceDatePassed_ThrowsException() {
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
@@ -471,5 +551,25 @@ class NexusServiceTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void removeFromNexusTracking_NullSalesTaxTrackingPassed_ThrowsException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.removeFromNexusTracking(transaction, null));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void removeFromNexusTracking_NullTransactionPassed_ThrowsException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.removeFromNexusTracking(null, salesTaxTracking));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "cancelledTransaction is marked non-null but is null");
     }
 }

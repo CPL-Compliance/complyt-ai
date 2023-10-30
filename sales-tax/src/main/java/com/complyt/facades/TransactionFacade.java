@@ -61,12 +61,13 @@ public class TransactionFacade {
     }
 
     private Mono<Transaction> saveAndHandleNexusTrackingCalculation(Transaction transaction, SalesTaxTracking salesTaxTracking) {
-        return salesTaxTracking.isEnforcesSalesTax()
-                ? transactionService.save(transaction)
-                .flatMap(savedTransaction -> nexusService.upsertToNexusTracking(savedTransaction, salesTaxTracking)
+        return transactionService.save(transaction.withCustomer(null))
+                .map(savedTransaction -> savedTransaction.withCustomer(transaction.getCustomer()))
+                .flatMap(savedTransaction -> salesTaxTracking.isEnforcesSalesTax()
+                        ? nexusService.upsertToNexusTracking(savedTransaction, salesTaxTracking)
                         .flatMap(salesTaxTrackingService::save)
-                        .thenReturn(savedTransaction))
-                : transactionService.save(transaction);
+                        .thenReturn(savedTransaction)
+                        : Mono.just(savedTransaction));
     }
 
     public Mono<Transaction> updateIfModified(@NonNull String externalId, @NonNull String source, @NonNull Transaction newTransaction, @NonNull Transaction originalTransaction) {

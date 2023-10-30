@@ -117,6 +117,15 @@ public class NexusCheckerTest {
     }
 
     @Test
+    void passedThreshold_NoNexusCalculationSummaryAtDateRange_ReturnsFalse() {
+        // When
+        boolean passedThreshold = nexusChecker.passedThreshold(salesTaxTracking, DateRange.Factory.newPreviousTwelveMonths(LocalDateTime.now()));
+
+        // Then
+        Assertions.assertFalse(passedThreshold);
+    }
+
+    @Test
     void hasNexus_NullTrackingPassed_ThrowsException() {
         // Given
         SalesTaxTracking nullSalesTaxTracking = null;
