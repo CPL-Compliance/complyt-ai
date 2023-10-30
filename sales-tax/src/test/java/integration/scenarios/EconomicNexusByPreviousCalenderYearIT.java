@@ -91,10 +91,13 @@ public class EconomicNexusByPreviousCalenderYearIT extends TestContainersInitial
                 .value(salesTaxTrackingDto -> LOGGER.info(String.valueOf(salesTaxTrackingDto)));
     }
 
+    @Order(1)
+    @Test
     @Override
+    @WithMockUser
     public void upsertTransaction_ChangedCustomerToOneNotIncludedInNexusCalculation_Returns200() {
         // Given
-        String externalId = "10024";
+        String externalId = "10026";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withUnitPrice(new BigDecimal(10000)).withQuantity(new BigDecimal(9)).withTotalPrice(new BigDecimal(90000)))
                 .withShippingAddress(referenceAddress)
@@ -128,6 +131,44 @@ public class EconomicNexusByPreviousCalenderYearIT extends TestContainersInitial
                 .expectStatus().isOk()
                 .expectBody(TransactionDto.class)
                 .value(receivedTransaction -> assertNull(receivedTransaction.salesTax()));
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertTransaction_SavedThenDeletedWithoutPassingNexus_Returns200() {
+        // Given
+        String externalId = "10027";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withUnitPrice(new BigDecimal(10000)).withQuantity(new BigDecimal(9)).withTotalPrice(new BigDecimal(90000)))
+                .withShippingAddress(referenceAddress)
+                .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(receivedTransaction -> assertNull(receivedTransaction.salesTax()));
+
+
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNoContent();
     }
 
     @Order(1)

@@ -5,8 +5,8 @@ import com.complyt.business.sales_tax.sales_tax_web_clients.ComplytSalesTaxRates
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.routers.CustomerRouter;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
@@ -489,41 +489,4 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                 .exchange()
                 .expectStatus().isNotFound();
     }
-
-//    @Order(7)
-//    @Test
-//    @Override
-//    public void putTransaction_ClientTrackingNotExistingForTenant_Returns404() {
-//        // Given
-//        String externalId = "10002";
-//        String customerExternalId = "1586";
-//
-//        // Then
-//        webTestClient
-//                .mutateWith(differentTenantMutator)
-//                .get()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + customerExternalId)
-//                        .build())
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody(CustomerDto.class)
-//                .value(customerDto -> {
-//
-//                    TransactionDto transactionDto = ITUtilities.stubTransactionDto(externalId, customerDto.complytId());
-//
-//                    webTestClient
-//                            .mutateWith(csrf())
-//                            .mutateWith(differentTenantMutator)
-//                            .put()
-//                            .uri(uriBuilder -> uriBuilder
-//                                    .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-//                                    .build())
-//                            .accept(MediaType.APPLICATION_JSON)
-//                            .bodyValue(transactionDto)
-//                            .exchange()
-//                            .expectStatus().isNotFound();
-//                });
-//    }
 }

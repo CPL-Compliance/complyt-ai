@@ -94,7 +94,7 @@ public class TransactionFacade {
     private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, String source, Transaction transaction, SalesTaxTracking salesTaxTracking) {
         return salesTaxTracking.isEnforcesSalesTax()
                 ? transactionService.update(externalId, source, transaction)
-                .flatMap(updatedTransaction -> nexusService.upsertToNexusTracking(updatedTransaction, salesTaxTracking)
+                .flatMap(updatedTransaction -> nexusService.upsertToNexusTracking(updatedTransaction.withCustomer(transaction.getCustomer()), salesTaxTracking)
                         .flatMap(salesTaxTrackingService::save)
                         .thenReturn(updatedTransaction))
                 : transactionService.update(externalId, source, transaction);
@@ -128,7 +128,11 @@ public class TransactionFacade {
     public Mono<Transaction> markAsCancelled(String externalId, String source) {
         return transactionService.markAsCancelled(externalId, source)
                 .flatMap(transaction -> getCustomerByTransaction(transaction)
-                        .map(transaction::withCustomer));
+                        .map(transaction::withCustomer))
+                .flatMap(transaction -> salesTaxTrackingService.findByState(transaction.getShippingAddress().state())
+                        .flatMap(salesTaxTracking -> nexusService.removeFromNexusTracking(transaction, salesTaxTracking))
+                        .flatMap(salesTaxTrackingService::save)
+                        .thenReturn(transaction));
     }
 
     public Mono<Customer> getCustomerByTransaction(Transaction transaction) {

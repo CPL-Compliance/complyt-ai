@@ -432,10 +432,14 @@ public class TransactionFacadeTest {
         // Given
         String externalId = transaction.getExternalId();
         Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
+        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking("13134");
 
         // When
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.markAsCancelled(externalId, source)).thenReturn(Mono.just(cancelledTransaction));
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        when(salesTaxTrackingService.findByState(cancelledTransaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
+        when(nexusService.removeFromNexusTracking(cancelledTransaction.withCustomer(customer), salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingService.save(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
         Mono<Transaction> transactionWithCancelledStatus = transactionFacade.markAsCancelled(externalId, source);
 
         // Then
