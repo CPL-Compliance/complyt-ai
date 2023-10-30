@@ -1,9 +1,10 @@
 package com.complyt.business.transaction.data_fetcher;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
-import com.complyt.domain.transaction.Address;
-import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
+import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.CityCountyWrapper;
+import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,10 +21,10 @@ import java.util.UUID;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class TransactionCountyFetcherTest {
+class TransactionCityCountyFetcherTest {
 
     @InjectMocks
-    private TransactionCountyFetcher transactionCountyFetcher;
+    private TransactionCityCountyFetcher transactionCityCountyFetcher;
     @Mock
     StubComplytSalesTaxRatesClientWrapper salesTaxWebClientWrapper;
     UnitTestUtilities testUtilities;
@@ -42,16 +43,15 @@ class TransactionCountyFetcherTest {
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates()
                 .withAddress(addressWithCounty);
 
-        Transaction transactionWithInjectedCounty = transaction
-                .withShippingAddress(transaction.getShippingAddress()
-                        .withCounty(addressWithCounty.county()));
+
+        CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(complytSalesTaxRates.address().city(), addressWithCounty.county());
 
         // When
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(complytSalesTaxRates));
-        Mono<String> countyMono = transactionCountyFetcher.fetch(transaction.getShippingAddress());
+        Mono<CityCountyWrapper> cityCountyWrapperMono = transactionCityCountyFetcher.fetch(transaction.getShippingAddress());
 
         // Then
-        StepVerifier.create(countyMono).expectNext(transactionWithInjectedCounty.getShippingAddress().county()).verifyComplete();
+        StepVerifier.create(cityCountyWrapperMono).expectNext(cityCountyWrapper).verifyComplete();
     }
 
 }

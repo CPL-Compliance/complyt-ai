@@ -1,12 +1,8 @@
 package com.example.complyt.config.web_clients;
 
-import com.complyt.business.sales_tax_web_clients.FastTaxWebClientWrapper;
-import com.complyt.business.sales_tax_web_clients.StubFastTaxWebClientWrapper;
-import com.complyt.business.sales_tax_web_clients.TaxJarWebClientWrapper;
-import com.complyt.business.sales_tax_web_clients.ZipTaxWebClientWrapper;
+import com.complyt.business.sales_tax_web_clients.*;
 import com.complyt.config.web_clients.SalesTaxWebClientWrapperConfig;
 import com.complyt.config.web_clients.WebClientWrapperProperties;
-import com.taxjar.Taxjar;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +27,10 @@ public class SalesTaxWebClientWrapperConfigTest {
     WebClientWrapperProperties zipTaxWebClientWrapperProperties;
 
     @Mock
-    WebClientWrapperProperties fastTaxWebClientWrapperProperties;
+    WebClientWrapperProperties fastTaxGetBestMatchWebClientWrapperProperties;
+
+    @Mock
+    WebClientWrapperProperties fastTaxGetByCityCountyStateWebClientWrapperProperties;
 
     @Test
     void zipTaxWebClientWrapper_CreateInstance_ReturnInstance() {
@@ -47,29 +46,49 @@ public class SalesTaxWebClientWrapperConfigTest {
                 zipTaxWebClientWrapperProperties.getKey());
 
         ZipTaxWebClientWrapper actualZipTaxWebClientWrapper =
-                salesTaxWebClientWrapperConfig.zipTaxWebClientWrapper(webClient);
+                salesTaxWebClientWrapperConfig.zipTaxWebClientWrapper(webClient, zipTaxWebClientWrapperProperties);
 
         assertEquals(expectedZipTaxWebClientWrapper, actualZipTaxWebClientWrapper);
     }
 
     @Test
-    void fastTaxWebClientWrapper_SetInstance_ReturnInstance() {
-        when(fastTaxWebClientWrapperProperties.getScheme()).thenReturn("scheme");
-        when(fastTaxWebClientWrapperProperties.getHost()).thenReturn("host");
-        when(fastTaxWebClientWrapperProperties.getPath()).thenReturn("path");
-        when(fastTaxWebClientWrapperProperties.getKey()).thenReturn(new Pair<>("key", "test-value"));
+    void fastTaxGetBestMatchWebClientWrapper_SetInstance_ReturnInstance() {
+        when(fastTaxGetBestMatchWebClientWrapperProperties.getScheme()).thenReturn("scheme");
+        when(fastTaxGetBestMatchWebClientWrapperProperties.getHost()).thenReturn("host");
+        when(fastTaxGetBestMatchWebClientWrapperProperties.getPath()).thenReturn("path");
+        when(fastTaxGetBestMatchWebClientWrapperProperties.getKey()).thenReturn(new Pair<>("key", "test-value"));
 
 
-        FastTaxWebClientWrapper expectedFastTaxWebClientWrapper = new FastTaxWebClientWrapper(webClient,
-                fastTaxWebClientWrapperProperties.getScheme(),
-                fastTaxWebClientWrapperProperties.getScheme(),
-                fastTaxWebClientWrapperProperties.getPath(),
-                fastTaxWebClientWrapperProperties.getKey());
+        FastTaxGetBestMatchWebClientWrapper expectedFastTaxGetBestMatchWebClientWrapper = new FastTaxGetBestMatchWebClientWrapper(webClient,
+                fastTaxGetBestMatchWebClientWrapperProperties.getScheme(),
+                fastTaxGetBestMatchWebClientWrapperProperties.getScheme(),
+                fastTaxGetBestMatchWebClientWrapperProperties.getPath(),
+                fastTaxGetBestMatchWebClientWrapperProperties.getKey());
 
-        FastTaxWebClientWrapper actualFastTaxWebClientWrapper =
-                salesTaxWebClientWrapperConfig.fastTaxWebClientWrapper(webClient);
+        FastTaxGetBestMatchWebClientWrapper actualFastTaxGetBestMatchWebClientWrapper =
+                salesTaxWebClientWrapperConfig.fastTaxGetBestMatchWebClientWrapper(webClient, fastTaxGetBestMatchWebClientWrapperProperties);
 
-        assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
+        assertEquals(expectedFastTaxGetBestMatchWebClientWrapper, actualFastTaxGetBestMatchWebClientWrapper);
+    }
+
+    @Test
+    void fastTaxGetByCityCountyStateWebClientWrapper_SetInstance_ReturnInstance() {
+        when(fastTaxGetByCityCountyStateWebClientWrapperProperties.getScheme()).thenReturn("scheme");
+        when(fastTaxGetByCityCountyStateWebClientWrapperProperties.getHost()).thenReturn("host");
+        when(fastTaxGetByCityCountyStateWebClientWrapperProperties.getPath()).thenReturn("path");
+        when(fastTaxGetByCityCountyStateWebClientWrapperProperties.getKey()).thenReturn(new Pair<>("key", "test-value"));
+
+
+        FastTaxGetByCityCountyStateWebClientWrapper expectedFastTaxGetBestMatchWebClientWrapper = new FastTaxGetByCityCountyStateWebClientWrapper(webClient,
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getScheme(),
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getScheme(),
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getPath(),
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getKey());
+
+        FastTaxGetByCityCountyStateWebClientWrapper actualFastTaxGetByCityCountyStateWebClientWrapper =
+                salesTaxWebClientWrapperConfig.fastTaxGetTaxInfoByCityCountyStateWebClientWrapper(webClient, fastTaxGetByCityCountyStateWebClientWrapperProperties);
+
+        assertEquals(expectedFastTaxGetBestMatchWebClientWrapper, actualFastTaxGetByCityCountyStateWebClientWrapper);
     }
 
     @Test

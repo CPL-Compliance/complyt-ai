@@ -1,8 +1,8 @@
 package com.complyt.business.sales_tax.checker;
 
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionType;
-import com.complyt.domain.nexus.SalesTaxTracking;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

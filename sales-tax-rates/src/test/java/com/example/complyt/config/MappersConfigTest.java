@@ -1,7 +1,8 @@
 package com.example.complyt.config;
 
 import com.complyt.config.MappersConfig;
-import com.complyt.domain.mappers.FastTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.FastTaxGetBestMatchDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.FastTaxGetByCityCountyStateDataToSalesTaxRateMapper;
 import com.complyt.domain.mappers.TaxJarDataToSalesTaxRateMapper;
 import com.complyt.domain.mappers.ZipTaxDataToSalesTaxRateMapper;
 import org.junit.jupiter.api.Assertions;
@@ -19,16 +20,29 @@ public class MappersConfigTest {
     MappersConfig mappersConfig;
 
     @Test
-    void fastTaxDataToSalesTaxRateMapper_CreatesFastTaxDataToSalesTaxRateMapper_ReturnFastTaxDataToSalesTaxRateMapper() {
+    void fastTaxGetBestMatchDataToSalesTaxRateMapper_CreatesFastTaxGetBestMatchDataToSalesTaxRateMapper_ReturnFastTaxGetBestMatchDataToSalesTaxRateMapper() {
         // Given
-        FastTaxDataToSalesTaxRateMapper fastTaxDataToSalesTaxRateMapper = FastTaxDataToSalesTaxRateMapper.INSTANCE;
+        FastTaxGetBestMatchDataToSalesTaxRateMapper fastTaxGetBestMatchDataToSalesTaxRateMapper = FastTaxGetBestMatchDataToSalesTaxRateMapper.INSTANCE;
 
         // When
-        FastTaxDataToSalesTaxRateMapper secondFastTaxDataToSalesTaxRateMapper = mappersConfig.fastTaxDataToSalesTaxRateMapper();
+        FastTaxGetBestMatchDataToSalesTaxRateMapper secondfastTaxGetBestMatchDataGetBestMatchToSalesTaxRateMapper = mappersConfig.fastTaxGetBestMatchDataGetBestMatchToSalesTaxRateMapper();
 
         // Then
-        Assertions.assertEquals(fastTaxDataToSalesTaxRateMapper, secondFastTaxDataToSalesTaxRateMapper);
+        Assertions.assertEquals(fastTaxGetBestMatchDataToSalesTaxRateMapper, secondfastTaxGetBestMatchDataGetBestMatchToSalesTaxRateMapper);
     }
+
+    @Test
+    void fastTaxGetByCityCountyStateDataToSalesTaxRateMapper_CreatesFastTaxGetByCityCountyStateDataToSalesTaxRateMapper_ReturnFastTaxGetByCityCountyStateDataToSalesTaxRateMapper() {
+        // Given
+        FastTaxGetByCityCountyStateDataToSalesTaxRateMapper fastTaxGetByCityCountyStateDataToSalesTaxRateMapper = FastTaxGetByCityCountyStateDataToSalesTaxRateMapper.INSTANCE;
+
+        // When
+        FastTaxGetByCityCountyStateDataToSalesTaxRateMapper secondFastTaxGetByCityCountyStateDataToSalesTaxRateMapper = mappersConfig.fastTaxGetByCityCountyDataToSalesTaxRateMapper();
+
+        // Then
+        Assertions.assertEquals(fastTaxGetByCityCountyStateDataToSalesTaxRateMapper, secondFastTaxGetByCityCountyStateDataToSalesTaxRateMapper);
+    }
+
 
     @Test
     void zipTaxDataToSalesTaxRateMapper_CreatesZipTaxDataToSalesTaxRateMapper_ReturnZipTaxDataToSalesTaxRateMapper() {

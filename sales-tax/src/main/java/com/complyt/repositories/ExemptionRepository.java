@@ -3,7 +3,6 @@ package com.complyt.repositories;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
-import com.mongodb.client.result.DeleteResult;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

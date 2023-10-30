@@ -1,9 +1,6 @@
 package com.complyt.config.web_clients;
 
-import com.complyt.business.sales_tax_web_clients.FastTaxWebClientWrapper;
-import com.complyt.business.sales_tax_web_clients.StubFastTaxWebClientWrapper;
-import com.complyt.business.sales_tax_web_clients.TaxJarWebClientWrapper;
-import com.complyt.business.sales_tax_web_clients.ZipTaxWebClientWrapper;
+import com.complyt.business.sales_tax_web_clients.*;
 import com.taxjar.Taxjar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,31 +12,25 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class SalesTaxWebClientWrapperConfig {
 
-    @Autowired
-    private WebClientWrapperProperties fastTaxWebClientWrapperProperties;
-
-    @Autowired
-    private WebClientWrapperProperties zipTaxWebClientWrapperProperties;
-
-    @Autowired
-    private WebClientWrapperProperties stubFastTaxWebClientWrapperProperties;
-
-    @Autowired
-    private WebClientWrapperProperties taxJarWebClientWrapperProperties;
-
     @Profile({"fastTax"})
-    @Bean("salesTaxWebClientWrapper")
-    public FastTaxWebClientWrapper fastTaxWebClientWrapper(WebClient webClient) {
-        return new FastTaxWebClientWrapper(webClient,
-                fastTaxWebClientWrapperProperties.getScheme(),
-                fastTaxWebClientWrapperProperties.getHost(),
-                fastTaxWebClientWrapperProperties.getPath(),
-                fastTaxWebClientWrapperProperties.getKey());
+    @Bean("getBestMatchWebClientWrapper")
+    public FastTaxGetBestMatchWebClientWrapper fastTaxGetBestMatchWebClientWrapper(WebClient webClient, @Autowired WebClientWrapperProperties fastTaxGetBestMatchWebClientWrapperProperties) {
+        return new FastTaxGetBestMatchWebClientWrapper(webClient,
+                fastTaxGetBestMatchWebClientWrapperProperties.getScheme(),
+                fastTaxGetBestMatchWebClientWrapperProperties.getHost(),
+                fastTaxGetBestMatchWebClientWrapperProperties.getPath(),
+                fastTaxGetBestMatchWebClientWrapperProperties.getKey());
+    }
+
+    @Profile({"stubFastTax", "default"})
+    @Bean("getBestMatchWebClientWrapper")
+    public StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper(WebClient webClient) {
+        return new StubFastTaxWebClientWrapper();
     }
 
     @Profile({"zipTax"})
-    @Bean("salesTaxWebClientWrapper")
-    public ZipTaxWebClientWrapper zipTaxWebClientWrapper(WebClient webClient) {
+    @Bean("getBestMatchWebClientWrapper")
+    public ZipTaxWebClientWrapper zipTaxWebClientWrapper(WebClient webClient, @Autowired WebClientWrapperProperties zipTaxWebClientWrapperProperties) {
         return new ZipTaxWebClientWrapper(webClient,
                 zipTaxWebClientWrapperProperties.getScheme(),
                 zipTaxWebClientWrapperProperties.getHost(),
@@ -47,17 +38,21 @@ public class SalesTaxWebClientWrapperConfig {
                 zipTaxWebClientWrapperProperties.getKey());
     }
 
-    @Profile({"stubFastTax", "default"})
-    @Bean("salesTaxWebClientWrapper")
-    public StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper(WebClient webClient) {
-        return new StubFastTaxWebClientWrapper();
-    }
-
     @Profile({"taxJar"})
-    @Bean("salesTaxWebClientWrapper")
+    @Bean("getBestMatchWebClientWrapper")
     public TaxJarWebClientWrapper taxJarWebClientWrapper(@Value("${tax-jar-api-token}") String apiToken) {
         Taxjar client = new Taxjar(apiToken);
         return new TaxJarWebClientWrapper(client);
+    }
+
+    @Profile({"fastTax"})
+    @Bean("getTaxInfoByCityCountyStateWebClientWrapper")
+    public FastTaxGetByCityCountyStateWebClientWrapper fastTaxGetTaxInfoByCityCountyStateWebClientWrapper(WebClient webClient, @Autowired WebClientWrapperProperties fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties) {
+        return new FastTaxGetByCityCountyStateWebClientWrapper(webClient,
+                fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties.getScheme(),
+                fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties.getHost(),
+                fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties.getPath(),
+                fastTaxGetTaxInfoByCityCountyStateWebClientWrapperProperties.getKey());
     }
 
 }

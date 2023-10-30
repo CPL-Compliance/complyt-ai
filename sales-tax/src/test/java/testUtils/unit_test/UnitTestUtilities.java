@@ -1,6 +1,8 @@
 package testUtils.unit_test;
 
-import com.complyt.domain.*;
+import com.complyt.domain.FilingFrequency;
+import com.complyt.domain.State;
+import com.complyt.domain.Taxable;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.customer.exemption.*;

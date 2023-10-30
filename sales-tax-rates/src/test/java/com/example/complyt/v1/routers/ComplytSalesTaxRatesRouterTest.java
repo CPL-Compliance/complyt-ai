@@ -15,8 +15,6 @@ import com.complyt.v1.mappers.AddressMapper;
 import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ComplytSalesTaxRatesDto;
-import com.complyt.v1.model.RatesMetaDataDto;
-import com.complyt.v1.model.SalesTaxRatesDto;
 import com.complyt.v1.router.ComplytSalesTaxRatesRouter;
 import com.complyt.v1.validators.query_params.AddressDtoQueryParamsExtractor;
 import com.example.complyt.config.SecurityConfig;

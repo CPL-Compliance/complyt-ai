@@ -1,6 +1,5 @@
 package com.complyt.business.nexus.checker.qualification_check;
 
-import com.complyt.domain.transaction.Item;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -9,6 +8,7 @@ import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
+import com.complyt.domain.transaction.Item;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

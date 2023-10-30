@@ -1,10 +1,9 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.State;
-import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.security.TenantResolver;
-import com.mongodb.client.result.DeleteResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

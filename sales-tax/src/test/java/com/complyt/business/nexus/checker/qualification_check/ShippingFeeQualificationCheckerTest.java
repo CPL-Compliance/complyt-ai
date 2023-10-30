@@ -1,6 +1,5 @@
 package com.complyt.business.nexus.checker.qualification_check;
 
-import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -12,6 +11,7 @@ import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.domain.transaction.ShippingFee;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

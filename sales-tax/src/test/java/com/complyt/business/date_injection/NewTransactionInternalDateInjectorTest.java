@@ -1,13 +1,13 @@
 package com.complyt.business.date_injection;
 
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRates;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,9 +1,10 @@
 package testUtils;
 
 import com.complyt.domain.Address;
+import com.complyt.domain.CityCountyWrapper;
 import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.domain.SalesTaxRates;
-import com.complyt.domain.fast_tax.FastTaxData;
+import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.v1.model.AddressDto;
@@ -30,6 +31,10 @@ public interface TestUtilities {
         return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
+    static CityCountyWrapper createCityCountyInCalifornia() {
+        return new CityCountyWrapper("Fresno", "Fresno");
+    }
+
     static AddressDto createAddressDtoInCalifornia() {
         return new AddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
@@ -52,11 +57,11 @@ public interface TestUtilities {
                 .and("address.zip").is(address.zip()));
     }
 
-    static FastTaxData createFastTaxData() {
+    static FastTaxGetBestMatchData createFastTaxGetBestMatchData() {
         String matchLevel = "Address";
         TaxInfoItem taxInfoItem = new TaxInfoItem("Fresno", "0.00375", "0", "Fresno", "0.00725", "0.0125", null, "", "", "0", "CA", "California", "0.06", "0.0835", "LABOR/FREIGHT/SERVICES", "93711-5508");
         List<TaxInfoItem> taxInfoItems = List.of(taxInfoItem);
-        return new FastTaxData(matchLevel, taxInfoItems, "1");
+        return new FastTaxGetBestMatchData(matchLevel, taxInfoItems, "1");
     }
 
     static AddressDto createStubFastTaxAddressDto() {
@@ -84,7 +89,7 @@ public interface TestUtilities {
         BigDecimal cityDistrictRate = BigDecimal.ZERO;
         BigDecimal countyDistrictRate = new BigDecimal("0.029");
         RatesMetaDataDto ratesMetaDataDto = new RatesMetaDataDto(cityDistrictRate, countyDistrictRate);
-        return new SalesTaxRatesDto(new BigDecimal("0.0"),new BigDecimal("0.0"), new BigDecimal("0.011"), new BigDecimal("0.04"), cityDistrictRate.add(countyDistrictRate), ratesMetaDataDto);
+        return new SalesTaxRatesDto(new BigDecimal("0.0"), new BigDecimal("0.0"), new BigDecimal("0.011"), new BigDecimal("0.04"), cityDistrictRate.add(countyDistrictRate), ratesMetaDataDto);
     }
 
     static String stringWithLength(int length) {

@@ -2,9 +2,9 @@ package com.example.complyt.domain.mappers;
 
 import com.complyt.domain.RatesMetaData;
 import com.complyt.domain.SalesTaxRates;
-import com.complyt.domain.fast_tax.FastTaxData;
+import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
-import com.complyt.domain.mappers.FastTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.FastTaxGetBestMatchDataToSalesTaxRateMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,8 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class)
-class FastTaxDataToSalesTaxRateMapperTest {
-    private FastTaxData fastTaxData;
+class FastTaxGetBestMatchDataGetBestMatchToSalesTaxRateMapperTest {
+    private FastTaxGetBestMatchData fastTaxGetBestMatchData;
     private TaxInfoItem taxInfoItem;
 
     @BeforeEach
@@ -27,7 +27,7 @@ class FastTaxDataToSalesTaxRateMapperTest {
                 null, null, null, null, null, null, "0",
                 "0", null, null);
 
-        fastTaxData = new FastTaxData("street", Collections.singletonList(taxInfoItem), "1");
+        fastTaxGetBestMatchData = new FastTaxGetBestMatchData("street", Collections.singletonList(taxInfoItem), "1");
     }
 
     @Test
@@ -38,21 +38,21 @@ class FastTaxDataToSalesTaxRateMapperTest {
                 .withRatesMetaData(ratesMetaData);
 
         // When
-        SalesTaxRates actualSalesTaxRates = FastTaxDataToSalesTaxRateMapper.INSTANCE.map(taxInfoItem);
+        SalesTaxRates actualSalesTaxRates = FastTaxGetBestMatchDataToSalesTaxRateMapper.INSTANCE.map(taxInfoItem);
 
         // Then
         assertEquals(expectedSalesTaxRates, actualSalesTaxRates);
     }
 
     @Test
-    void map_FastTaxData_ReturnSalesTaxRate() {
+    void map_FastTaxGetBestMatchData_ReturnSalesTaxRate() {
         // Given + When
         RatesMetaData ratesMetaData = new RatesMetaData(new BigDecimal(taxInfoItem.cityDistrictRate()), new BigDecimal(taxInfoItem.cityDistrictRate()));
         SalesTaxRates expectedSalesTaxRates = SalesTaxRates.zeroSalesTaxRates()
                 .withRatesMetaData(ratesMetaData);
 
         // When
-        SalesTaxRates actualSalesTaxRates = FastTaxDataToSalesTaxRateMapper.INSTANCE.map(fastTaxData);
+        SalesTaxRates actualSalesTaxRates = FastTaxGetBestMatchDataToSalesTaxRateMapper.INSTANCE.map(fastTaxGetBestMatchData);
 
         // Then
         assertEquals(expectedSalesTaxRates, actualSalesTaxRates);
@@ -61,7 +61,7 @@ class FastTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_nullTaxInfoItem_ReturnNull() {
         // Given + When
-        SalesTaxRates actualSalesTaxRate = FastTaxDataToSalesTaxRateMapper.INSTANCE.map((TaxInfoItem) null);
+        SalesTaxRates actualSalesTaxRate = FastTaxGetBestMatchDataToSalesTaxRateMapper.INSTANCE.map((TaxInfoItem) null);
 
         // Then
         assertNull(actualSalesTaxRate);

@@ -1,13 +1,13 @@
 package com.complyt.business.nexus.checker;
 
 import com.complyt.business.nexus.checker.qualification_check.QualificationChecker;
-import com.complyt.domain.transaction.Item;
-import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.Taxable;
-import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.ShippingFee;
+import com.complyt.domain.transaction.Transaction;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
