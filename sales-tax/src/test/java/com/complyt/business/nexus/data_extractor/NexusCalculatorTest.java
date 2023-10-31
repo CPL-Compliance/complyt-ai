@@ -352,4 +352,22 @@ public class NexusCalculatorTest {
         // Then
         assertEquals("summaryDateRange is marked non-null but is null", exception.getMessage());
     }
+
+    @Test
+    void calculateNexusSummaryFromTransactionSummaries_NullDateRange_ReturnsNullException() {
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, null));
+
+        // Then
+        assertEquals("summaryDateRange is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void calculateNexusSummaryFromTransactionSummaries_NullSalesTaxTracking_ReturnsNullException() {
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> nexusCalculator.calculateNexusSummaryFromTransactionSummaries(null, dateRange));
+
+        // Then
+        assertEquals("salesTaxTracking is marked non-null but is null", exception.getMessage());
+    }
 }
