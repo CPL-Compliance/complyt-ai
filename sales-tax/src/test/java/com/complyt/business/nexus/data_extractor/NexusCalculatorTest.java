@@ -7,6 +7,7 @@ import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionType;
 import com.complyt.utils.factory.DateRange;
 import com.complyt.utils.filter.TransactionsFilterByNexusRules;
+import com.complyt.utils.filter.TransactionsNexusSummariesFilterByDateRange;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,14 +33,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class NexusCalculatorTest {
 
-    @InjectMocks
-    private NexusCalculator nexusCalculator;
-    @Mock
-    private TransactionsFilterByNexusRules transactionsFilterByNexusRules;
-    @Mock
-    private NexusTransactionSummaryCalculator nexusTransactionSummaryCalculator;
-
-
     private final DateRange dateRange = DateRange.Factory.newYearFromSeptember(LocalDateTime.now());
     private final UnitTestUtilities unitTestUtilities = new UnitTestUtilities(LocalDateTime.now(), "tenant");
     private final SalesTaxTracking salesTaxTracking = unitTestUtilities.createSalesTaxTracking("id2");
@@ -47,37 +40,44 @@ public class NexusCalculatorTest {
     private final Transaction transaction2 = unitTestUtilities.createTransaction("id");
     private final Transaction transaction3 = unitTestUtilities.createTransaction("id");
     private final TransactionNexusSummary transactionNexusSummary = unitTestUtilities.createTransactionNexusSummary();
+    @InjectMocks
+    private NexusCalculator nexusCalculator;
+    @Mock
+    private TransactionsFilterByNexusRules transactionsFilterByNexusRules;
+    @Mock
+    private TransactionsNexusSummariesFilterByDateRange transactionsNexusSummariesFilterByDateRange;
+    @Mock
+    private NexusTransactionSummaryCalculator nexusTransactionSummaryCalculator;
 
     @Test
-    void calculateNexusSummary_3TransactionsCalculatedOutOf5_ReturnsSummary() {
+    void calculateTransactionNexusSummaries_3TransactionsCalculatedOutOf5_ReturnsSummary() {
         // Given
         List<Transaction> transactions = List.of(
                 transaction1, transaction2, transaction3, transaction1, transaction1);
         List<Transaction> filteredTransactions = List.of(
                 transaction1, transaction2, transaction3);
-        NexusCalculationSummary nexusCalculationSummary = new NexusCalculationSummary(3, BigDecimal.valueOf(3600));
-
 
         // When
         when(transactionsFilterByNexusRules.filter(transactions, salesTaxTracking.getNexusStateRule())).thenReturn(filteredTransactions);
         when(nexusTransactionSummaryCalculator.extract(transaction1, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.just(transactionNexusSummary));
         when(nexusTransactionSummaryCalculator.extract(transaction2, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.just(transactionNexusSummary));
         when(nexusTransactionSummaryCalculator.extract(transaction3, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.just(transactionNexusSummary));
-        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateNexusSummary(transactions, salesTaxTracking, dateRange);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateTransactionNexusSummaries(transactions, salesTaxTracking, dateRange);
 
         // Then
-        StepVerifier.create(salesTaxTrackingMono).consumeNextWith(recievedSalesTaxTracking ->
-                        Assertions.assertEquals(nexusCalculationSummary, recievedSalesTaxTracking.getNexusCalculationSummaries().get(dateRange.getEnd().toLocalDate())))
-                .verifyComplete();
+        StepVerifier.create(salesTaxTrackingMono).consumeNextWith(recievedSalesTaxTracking -> {
+            recievedSalesTaxTracking.getTransactionNexusSummaries().values()
+                    .forEach(recievedTransactionNexusSummary -> assertEquals(transactionNexusSummary, recievedTransactionNexusSummary));
+            assertEquals(3, recievedSalesTaxTracking.getTransactionNexusSummaries().keySet().size());
+        }).verifyComplete();
     }
 
     @Test
-    void calculateNexusSummary_OneTransactionIsRefund_ReturnsSummary() {
+    void calculateTransactionNexusSummaries_OneTransactionIsRefund_ReturnsSummary() {
         // Given
         Transaction refundTransaction = transaction3.withTransactionType(TransactionType.REFUND);
         List<Transaction> transactions = List.of(
                 transaction1, transaction2, refundTransaction);
-        NexusCalculationSummary nexusCalculationSummary = new NexusCalculationSummary(2, BigDecimal.valueOf(1200));
 
 
         // When
@@ -85,16 +85,19 @@ public class NexusCalculatorTest {
         when(nexusTransactionSummaryCalculator.extract(transaction1, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.just(transactionNexusSummary));
         when(nexusTransactionSummaryCalculator.extract(transaction2, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.just(transactionNexusSummary));
         when(nexusTransactionSummaryCalculator.extract(refundTransaction, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.just(transactionNexusSummary.withTransactionType(TransactionType.REFUND)));
-        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateNexusSummary(transactions, salesTaxTracking, dateRange);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateTransactionNexusSummaries(transactions, salesTaxTracking, dateRange);
 
         // Then
-        StepVerifier.create(salesTaxTrackingMono).consumeNextWith(recievedSalesTaxTracking ->
-                        Assertions.assertEquals(recievedSalesTaxTracking.getNexusCalculationSummaries().get(dateRange.getEnd().toLocalDate()), nexusCalculationSummary))
-                .verifyComplete();
+        StepVerifier.create(salesTaxTrackingMono).consumeNextWith(recievedSalesTaxTracking -> {
+            assertEquals(transactionNexusSummary, recievedSalesTaxTracking.getTransactionNexusSummaries().get(transaction1.getComplytId()));
+            assertEquals(transactionNexusSummary, recievedSalesTaxTracking.getTransactionNexusSummaries().get(transaction2.getComplytId()));
+            assertEquals(transactionNexusSummary.withTransactionType(TransactionType.REFUND), recievedSalesTaxTracking.getTransactionNexusSummaries().get(refundTransaction.getComplytId()));
+            assertEquals(3, recievedSalesTaxTracking.getTransactionNexusSummaries().keySet().size());
+        }).verifyComplete();
     }
 
     @Test
-    void calculateNexusSummary_AllTransactionsFiltered_ReturnsSummaryOf0() {
+    void calculateTransactionNexusSummaries_AllTransactionsFiltered_ReturnsSummaryOf0() {
         // Given
         List<Transaction> transactions = List.of(
                 transaction1, transaction2, transaction3);
@@ -103,20 +106,18 @@ public class NexusCalculatorTest {
 
         // When
         when(transactionsFilterByNexusRules.filter(transactions, salesTaxTracking.getNexusStateRule())).thenReturn(List.of());
-        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateNexusSummary(transactions, salesTaxTracking, dateRange);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateTransactionNexusSummaries(transactions, salesTaxTracking, dateRange);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).consumeNextWith(recievedSalesTaxTracking ->
-                        Assertions.assertEquals(nexusCalculationSummary, recievedSalesTaxTracking.getNexusCalculationSummaries().get(dateRange.getEnd().toLocalDate())))
-                .verifyComplete();
+                assertTrue(recievedSalesTaxTracking.getTransactionNexusSummaries().isEmpty()));
     }
 
     @Test
-    void calculateNexusSummary_SummaryCalculatorReturnsEmptyForAllTransactions_ReturnsSummaryOf0() {
+    void calculateTransactionNexusSummaries_ReturnsEmptyForAllTransactions_ReturnsSummaryOf0() {
         // Given
         List<Transaction> transactions = List.of(
                 transaction1, transaction2, transaction3);
-        NexusCalculationSummary nexusCalculationSummary = new NexusCalculationSummary(0, BigDecimal.valueOf(0));
 
 
         // When
@@ -124,14 +125,11 @@ public class NexusCalculatorTest {
         when(nexusTransactionSummaryCalculator.extract(transaction1, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.empty());
         when(nexusTransactionSummaryCalculator.extract(transaction2, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.empty());
         when(nexusTransactionSummaryCalculator.extract(transaction3, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.empty());
-        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateNexusSummary(transactions, salesTaxTracking, dateRange);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateTransactionNexusSummaries(transactions, salesTaxTracking, dateRange);
 
         // Then
-        StepVerifier.create(salesTaxTrackingMono).consumeNextWith(recievedSalesTaxTracking -> {
-                    assertNull(recievedSalesTaxTracking.getTransactionNexusSummaries().get(transaction1.getExternalTimestamps().getCreatedDate()));
-                    Assertions.assertEquals(nexusCalculationSummary, recievedSalesTaxTracking.getNexusCalculationSummaries().get(dateRange.getEnd().toLocalDate()));
-                })
-                .verifyComplete();
+        StepVerifier.create(salesTaxTrackingMono).consumeNextWith(recievedSalesTaxTracking ->
+                assertTrue(recievedSalesTaxTracking.getTransactionNexusSummaries().isEmpty())).verifyComplete();
     }
 
     @Test
@@ -160,7 +158,7 @@ public class NexusCalculatorTest {
     @Test
     void addTransactionToNexusSummary_RefundWithItemsIncluded_ReturnsSummaryWithAddedTransaction() {
         // Given
-        TransactionNexusSummary transactionNexusSummary = unitTestUtilities.createTransactionNexusSummary();
+        TransactionNexusSummary transactionNexusSummary = unitTestUtilities.createTransactionNexusSummary().withTransactionType(TransactionType.REFUND);
         NexusCalculationSummary expectedNexusCalculationSummary = new NexusCalculationSummary(0, transactionNexusSummary.relevantAmount().negate());
         Transaction refundTransaction = transaction1.withTransactionType(TransactionType.REFUND);
 
@@ -299,10 +297,13 @@ public class NexusCalculatorTest {
                 UUID.randomUUID(), unitTestUtilities.createTransactionNexusSummary().withExternalCreatedDate(dateRange.getStart().minusNanos(1)),
                 UUID.randomUUID(), unitTestUtilities.createTransactionNexusSummary().withTransactionType(TransactionType.REFUND));
 
-        NexusCalculationSummary expectedNexusCalculationSummary = new NexusCalculationSummary(3, BigDecimal.valueOf(2400));
+        List<TransactionNexusSummary> transactionNexusSummariesList = transactionNexusSummaries.values().stream().toList();
+
+        NexusCalculationSummary expectedNexusCalculationSummary = new NexusCalculationSummary(5, BigDecimal.valueOf(4800));
         SalesTaxTracking givenSalesTaxTracking = salesTaxTracking.withTransactionNexusSummaries(transactionNexusSummaries);
 
         // When
+        when(transactionsNexusSummariesFilterByDateRange.filter(transactionNexusSummariesList, dateRange)).thenReturn(transactionNexusSummariesList);
         Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateNexusSummaryFromTransactionSummaries(givenSalesTaxTracking, dateRange);
 
         // Then
@@ -326,27 +327,27 @@ public class NexusCalculatorTest {
     }
 
     @Test
-    void calculateNexusSummary_NullTransactionsList_ReturnsNullException() {
+    void calculateTransactionNexusSummaries_NullTransactionsList_ReturnsNullException() {
         // When
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> nexusCalculator.calculateNexusSummary(null, salesTaxTracking, dateRange));
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> nexusCalculator.calculateTransactionNexusSummaries(null, salesTaxTracking, dateRange));
 
         // Then
         assertEquals("transactions is marked non-null but is null", exception.getMessage());
     }
 
     @Test
-    void calculateNexusSummary_NullSalesTaxTracking_ReturnsNullException() {
+    void calculateTransactionNexusSummaries_NullSalesTaxTracking_ReturnsNullException() {
         // When
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> nexusCalculator.calculateNexusSummary(List.of(transaction1), null, dateRange));
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> nexusCalculator.calculateTransactionNexusSummaries(List.of(transaction1), null, dateRange));
 
         // Then
         assertEquals("salesTaxTracking is marked non-null but is null", exception.getMessage());
     }
 
     @Test
-    void calculateNexusSummary_NullDateRange_ReturnsNullException() {
+    void calculateTransactionNexusSummaries_NullDateRange_ReturnsNullException() {
         // When
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> nexusCalculator.calculateNexusSummary(List.of(transaction1), salesTaxTracking, null));
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> nexusCalculator.calculateTransactionNexusSummaries(List.of(transaction1), salesTaxTracking, null));
 
         // Then
         assertEquals("summaryDateRange is marked non-null but is null", exception.getMessage());

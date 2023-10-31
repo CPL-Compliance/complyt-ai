@@ -3,7 +3,7 @@ package com.complyt.v1.validators;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.exceptions.types.MissingBodyApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
-import com.complyt.v1.validators.query_params.CustomerBodyExtractor;
+import com.complyt.v1.validators.custom_body.CustomBodyExtractor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -31,7 +31,7 @@ public class ValidationHandler<T, U extends Validator> {
     DataConflictChecksProvider<T> dataConflictChecksProvider;
 
     @NonNull
-    CustomerBodyExtractor<T> customerBodyExtractor;
+    CustomBodyExtractor<T> customBodyExtractor;
 
     private Mono<T> onValidationErrors(Errors errors) {
         return Mono.error(new ObjectNotValidApiException(errors));
@@ -39,7 +39,7 @@ public class ValidationHandler<T, U extends Validator> {
 
 
     private Mono<T> validateRequestBody(final ServerRequest request) {
-        return customerBodyExtractor.extract(request)
+        return customBodyExtractor.extract(request)
                 .switchIfEmpty(request.bodyToMono(validationClass))
                 .flatMap(body -> {
                     Errors errors = new BeanPropertyBindingResult(body, validationClass.getName());

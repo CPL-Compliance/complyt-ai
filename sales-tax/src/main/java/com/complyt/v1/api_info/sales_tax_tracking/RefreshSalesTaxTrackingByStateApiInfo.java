@@ -23,18 +23,23 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @RouterOperations({
         @RouterOperation(
-                method = RequestMethod.GET,
+                method = RequestMethod.POST,
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "Get Sales tax tracking By Source",
-                        operationId = "getAllSalesTaxTrackingByState",
+                        description = "Refresh Sales tax tracking by state",
+                        operationId = "refreshSalesTaxTrackingByState",
                         parameters = {
+                                @Parameter(in = ParameterIn.QUERY,
+                                        name = "date",
+                                        description = "a date to refresh by",
+                                        examples = @ExampleObject(value = RefreshSalesTaxTrackingByStateApiInfo.dateExample,
+                                                name = RefreshSalesTaxTrackingByStateApiInfo.dateExample)),
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "state",
-                                        description = "Sales tax tracking State",
-                                        examples = @ExampleObject(value = GetSalesTaxTrackingByStateApiInfo.stateExample,
-                                                name = GetSalesTaxTrackingByStateApiInfo.stateExample))
+                                        description = "State",
+                                        examples = @ExampleObject(value = RefreshSalesTaxTrackingByStateApiInfo.stateExample,
+                                                name = RefreshSalesTaxTrackingByStateApiInfo.stateExample))
                         },
                         tags = "salesTaxTracking",
                         responses = {
@@ -46,7 +51,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = SalesTaxTrackingDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = GetSalesTaxTrackingByStateApiInfo.salesTaxTrackingExample)
+                                                                @ExampleObject(value = RefreshSalesTaxTrackingByStateApiInfo.returnedSalesTaxTrackingsExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -62,19 +67,18 @@ import java.lang.annotation.Target;
                                         description = "Forbidden"
                                 ),
                                 @ApiResponse(
-                                        responseCode = "404",
-                                        description = "salesTaxTracking Not Found"
-                                ),
-                                @ApiResponse(
                                         responseCode = "500",
                                         description = "Internal Error"
                                 )
                         }))
 })
-public @interface GetSalesTaxTrackingByStateApiInfo {
+public @interface RefreshSalesTaxTrackingByStateApiInfo {
 
     String stateExample = "California";
-    String salesTaxTrackingExample = """
+
+    String dateExample = "2024-01-01";
+
+    String returnedSalesTaxTrackingsExample = """
             {
                  "complytId": "679cab51-7d88-41a6-b587-3eceecdd9524",
                  "comment": "this is a nexus tracking",
@@ -135,5 +139,5 @@ public @interface GetSalesTaxTrackingByStateApiInfo {
                  "approvalDate": "2015-06-22T13:57:00",
                  "filingFrequency": "MONTHLY"
              }
-             """;
+            """;
 }

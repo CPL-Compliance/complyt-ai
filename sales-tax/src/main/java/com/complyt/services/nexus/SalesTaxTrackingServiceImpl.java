@@ -71,8 +71,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return clientTrackingRepository.findClient()
                 .map(salesTaxTracking::withClientTracking)
                 .flatMap(salesTaxTrackingWithClient -> nexusStateRuleRepository.findMostRecentByState(salesTaxTracking.getState().getName())
-                        .map(salesTaxTrackingWithClient::withNexusStateRule)
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())))
+                        .map(salesTaxTrackingWithClient::withNexusStateRule))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 

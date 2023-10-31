@@ -67,7 +67,8 @@ public class NexusService {
     public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull SalesTaxTracking salesTaxTracking, @NonNull List<Transaction> transactionList, @NonNull LocalDate refreshDate) {
         return getSalesTaxTrackingReadyForRecalculation(salesTaxTracking)
                 .flatMap(salesTaxTrackingReadyForRefresh -> getNexusSummaryDate(salesTaxTracking, LocalDateTime.of(refreshDate, LocalTime.of(23, 59, 59)))
-                        .flatMap(summaryDateRange -> nexusCalculator.calculateNexusSummary(transactionList, salesTaxTrackingReadyForRefresh, summaryDateRange)));
+                        .flatMap(summaryDateRange -> nexusCalculator.calculateTransactionNexusSummaries(transactionList, salesTaxTrackingReadyForRefresh, summaryDateRange)
+                                .flatMap(salesTaxTrackingWithTransactionSummaries ->  nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTrackingWithTransactionSummaries, summaryDateRange))));
     }
 
     private Mono<SalesTaxTracking> getSalesTaxTrackingReadyForRecalculation(SalesTaxTracking salesTaxTracking) {

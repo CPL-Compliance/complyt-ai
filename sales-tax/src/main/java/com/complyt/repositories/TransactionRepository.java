@@ -115,20 +115,4 @@ public class TransactionRepository {
                             .thenMany(reactiveMongoTemplate.find(updatedQuery, Transaction.class));
                 });
     }
-
-//    public Flux<Transaction> getWithCustomer(Query query) {
-//        return tenantResolver.resolve()
-//                .flatMapMany(tenantId -> {
-//                    Query updatedQuery = query.addCriteria(Criteria.where("tenantId").is(tenantId));
-//                    AggregationOperation aggregationOperation = Aggregation.lookup("customer", "customerId", "complytId", "customer");
-//                    AggregationOperation match = Aggregation.match(Criteria.where("tenantId").is(tenantId));
-//
-//                    TypedAggregation<Transaction> aggregation = Aggregation.newAggregation(Transaction.class,
-//                            match, aggregationOperation, Aggregation.unwind("customer"));
-//
-//                    return ContextLogger.observeCtx("builtAggregation: " + aggregation, log::info)
-//                            .thenMany(reactiveMongoTemplate.aggregate(aggregation, Transaction.class));
-//                });
-//    }
-
 }

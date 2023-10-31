@@ -10,8 +10,8 @@ import com.complyt.v1.models.nexus.DateWrapperDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.DataConflictChecksProvider;
 import com.complyt.v1.validators.ValidationHandler;
-import com.complyt.v1.validators.query_params.CustomerBodyExtractorEmpty;
-import com.complyt.v1.validators.query_params.DateWrapperDtoCustomerBodyExtractor;
+import com.complyt.v1.validators.custom_body.CustomBodyExtractorEmpty;
+import com.complyt.v1.validators.custom_body.DateWrapperDtoCustomBodyExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +29,7 @@ public class ValidatorConfig {
                         "source", CustomerDto.SOURCE_CONFLICT_CHECK,
                         "externalId", CustomerDto.EXTERNAL_ID_CONFLICT_CHECK),
                         null),
-                new CustomerBodyExtractorEmpty<>());
+                new CustomBodyExtractorEmpty<>());
     }
 
     @Bean
@@ -39,7 +39,7 @@ public class ValidatorConfig {
                         "source", TransactionDto.SOURCE_CONFLICT_CHECK,
                         "externalId", TransactionDto.EXTERNAL_ID_CONFLICT_CHECK),
                         BodyCheckConfig.TRANSACTION_BODY_CHECK),
-                new CustomerBodyExtractorEmpty<>());
+                new CustomBodyExtractorEmpty<>());
     }
 
     @Bean
@@ -48,7 +48,7 @@ public class ValidatorConfig {
                 new DataConflictChecksProvider(Map.of(
                         "complytId", ComplytIdCheckable.COMPLYT_ID_CONFLICT_CHECK),
                         null),
-                new CustomerBodyExtractorEmpty<>());
+                new CustomBodyExtractorEmpty<>());
     }
 
     @Bean
@@ -56,14 +56,14 @@ public class ValidatorConfig {
         return new ValidationHandler<>(SalesTaxTrackingDto.class, springValidatorAdapter,
                 new DataConflictChecksProvider(Map.of(
                         "state", StateCheckable.STATE_CONFLICT_CHECK),
-                        null), new CustomerBodyExtractorEmpty<>());
+                        null), new CustomBodyExtractorEmpty<>());
     }
 
     @Bean
     ValidationHandler<DateWrapperDto, SpringValidatorAdapter> dateWrapperDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
         return new ValidationHandler<>(DateWrapperDto.class, springValidatorAdapter,
                 new DataConflictChecksProvider(Map.of(),
-                        null), new DateWrapperDtoCustomerBodyExtractor());
+                        null), new DateWrapperDtoCustomBodyExtractor());
     }
 
     @Bean
@@ -71,6 +71,6 @@ public class ValidatorConfig {
         return new ValidationHandler<>(ExemptionWrapperDto.class, springValidatorAdapter,
                 new DataConflictChecksProvider(Map.of(),
                         null),
-                new CustomerBodyExtractorEmpty<>());
+                new CustomBodyExtractorEmpty<>());
     }
 }

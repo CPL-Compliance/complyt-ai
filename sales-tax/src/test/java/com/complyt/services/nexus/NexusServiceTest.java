@@ -288,7 +288,8 @@ class NexusServiceTest {
         DateRange dateRange = new DateRangeStrategy(salesTaxTracking.getNexusStateRule().timeFrame(),
                 salesTaxTracking.getClientTracking().getNexus().getTaxableDate(),
                 LocalDateTime.of(referenceDate, LocalTime.of(23, 59, 59))).getDateRange();
-        when(nexusCalculator.calculateNexusSummary(transactions, salesTaxTracking, dateRange)).thenReturn(Mono.just(expectedSalesTaxTracking));
+        when(nexusCalculator.calculateTransactionNexusSummaries(transactions, salesTaxTracking, dateRange)).thenReturn(Mono.just(expectedSalesTaxTracking));
+        when(nexusCalculator.calculateNexusSummaryFromTransactionSummaries(expectedSalesTaxTracking, dateRange)).thenReturn(Mono.just(expectedSalesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.refreshNexusSummary(salesTaxTracking, transactions, referenceDate);
 
         // Then

@@ -45,7 +45,7 @@ public class SalesTaxTrackingFacade {
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull SalesTaxTracking originalSalesTaxTracking) {
         return salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, originalSalesTaxTracking)
                 .flatMap(salesTaxTrackingService::addClientAndStateDetails)
-                .flatMap(checkedSalesTaxTracking -> salesTaxTrackingService.insertSummariesFromOriginal(checkedSalesTaxTracking, originalSalesTaxTracking))
+                .flatMap(salesTaxTrackingWithClientAndStateDetails -> salesTaxTrackingService.insertSummariesFromOriginal(salesTaxTrackingWithClientAndStateDetails, originalSalesTaxTracking))
                 .flatMap(salesTaxTrackingService::update)
                 .flatMap(recalculateCurrentNexusSummaryIfNeeded());
     }
@@ -72,7 +72,7 @@ public class SalesTaxTrackingFacade {
 
     public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull String state, @NonNull LocalDate refreshDate) {
         return salesTaxTrackingService.findByState(state)
-                .flatMap(foundSalesTaxTracking -> nexusService.hasNexus(foundSalesTaxTracking)
+                .flatMap(extractedSalesTaxTracking -> nexusService.hasNexus(extractedSalesTaxTracking)
                         .flatMap(salesTaxTrackingWithNexusInfo -> !salesTaxTrackingWithNexusInfo.isHasNexus()
                                 ? salesTaxTrackingService.addClientAndStateDetails(salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
                                 .flatMap(salesTaxTracking -> nexusService.getTransactionsQueryByNexusCalculation(salesTaxTracking.getNexusStateRule(), salesTaxTracking.getClientTracking(), refreshDate)
@@ -82,7 +82,7 @@ public class SalesTaxTrackingFacade {
                                         .collectList()
                                         .flatMap(transactions -> nexusService.refreshNexusSummary(salesTaxTracking, transactions, refreshDate))
                                         .flatMap(salesTaxTrackingService::save))
-                                : Mono.just(foundSalesTaxTracking)));
+                                : Mono.just(extractedSalesTaxTracking)));
     }
 
 }
