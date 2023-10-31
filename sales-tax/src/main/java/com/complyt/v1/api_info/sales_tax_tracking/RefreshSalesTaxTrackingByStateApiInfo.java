@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "Refresh Sales tax tracking by state",
+                        description = "Refresh Sales tax tracking by state and date",
                         operationId = "refreshSalesTaxTrackingByState",
                         parameters = {
                                 @Parameter(in = ParameterIn.QUERY,
