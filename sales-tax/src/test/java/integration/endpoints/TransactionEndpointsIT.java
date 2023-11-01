@@ -53,81 +53,12 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
-//        registry.add("spring.data.mongodb.uri", () -> "mongodb://localhost:27017/sales_tax");
     }
 
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
     }
-
-//    @Order(1)
-//    @Test
-//    @WithMockUser
-//    public void refreshTest() {
-//        String state = "MN";
-//
-//        // Then
-//        webTestClient
-//                .mutateWith(csrf())
-//                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
-//                .post()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state + "/date/10103453")
-//                        .build())
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk().expectBody(SalesTaxTrackingDto.class)
-//                .value(salesTaxTrackingDto -> {
-//                    LOGGER.info(String.valueOf(salesTaxTrackingDto));
-//                });
-//
-//    }
-
-//    @Order(1)
-//    @Test
-//    @WithMockUser
-//    public void refreshTest2() {
-//
-//        webTestClient
-//                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
-//                .get()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(SalesTaxTrackingRouter.BASE_URL)
-//                        .build())
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk().expectBodyList(SalesTaxTrackingDto.class)
-//                .value(salesTaxTrackingDtoList -> {
-//                    List<LocalDate> localDateList = List.of(
-//                            LocalDate.of(2020, 9, 30),
-//                            LocalDate.of(2021, 9, 30),
-//                            LocalDate.of(2022, 9, 30),
-//                            LocalDate.of(2023, 9, 30));
-//                    for (LocalDate localDate : localDateList) {
-//                        for (SalesTaxTrackingDto salesTaxTrackingDto : salesTaxTrackingDtoList) {
-//                            String state = salesTaxTrackingDto.state().abbreviation();
-//
-//                            webTestClient
-//                                    .mutateWith(csrf())
-//                                    .mutate().responseTimeout(Duration.ofMinutes(2)).build()
-//                                    .post()
-//                                    .uri(uriBuilder -> uriBuilder
-//                                            .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state + "/date/" + localDate)
-//                                            .build())
-//                                    .accept(MediaType.APPLICATION_JSON)
-//                                    .exchange()
-//                                    .expectStatus().isOk().expectBody(SalesTaxTrackingDto.class)
-//                                    .value(givebSalesTaxTrackingDto -> {
-//                                        LOGGER.info(String.valueOf(givebSalesTaxTrackingDto));
-//                                    });
-//                        }
-//                    }
-//                });
-//
-//        while (true) ;
-//    }
-
 
     @Order(2)
     @Test
