@@ -22,6 +22,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -64,7 +65,7 @@ class NexusStateRuleServiceImplTest {
         NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(1000), 2, Definition.AMOUNT_OR_COUNT);
 
         return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
-                TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold);
+                TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold, LocalDateTime.now());
     }
 
     @Test
@@ -91,7 +92,7 @@ class NexusStateRuleServiceImplTest {
     @Test
     void findById_FindsStateRule_ReturnsStateRule() {
         // Given
-        String id = nexusStateRule.getId();
+        String id = nexusStateRule.id();
 
         // When
         when(nexusStateRuleRepository.findById(id)).thenReturn(Mono.just(nexusStateRule));
@@ -137,9 +138,9 @@ class NexusStateRuleServiceImplTest {
 
     @Test
     void findByState_FindsRule_ReturnsRule() {
-        when(nexusStateRuleRepository.findByState(nexusStateRule.getState().getAbbreviation())).thenReturn(Mono.just(nexusStateRule));
+        when(nexusStateRuleRepository.findByState(nexusStateRule.state().getAbbreviation())).thenReturn(Mono.just(nexusStateRule));
 
-        Mono<NexusStateRule> result = nexusStateRuleServiceImpl.findByState(nexusStateRule.getState().getAbbreviation());
+        Mono<NexusStateRule> result = nexusStateRuleServiceImpl.findByState(nexusStateRule.state().getAbbreviation());
 
         StepVerifier.create(result).expectNext(nexusStateRule).verifyComplete();
     }

@@ -24,7 +24,5 @@ public interface MultiTenancyITTemplate {
 
     void putTransaction_SalesTaxTrackingOfShippingAddressExistInAnotherTenant_Returns404();
 
-    void putSalesTaxTracking_SalesTaxTrackingWithStateRuleOfTaxableYear_Returns201();
-
-    void putTransaction_ClientTrackingNotExistingForTenant_Returns404();
+    void putSalesTaxTracking_ClientTrackingNotFoundForTenant_Returns404NoClientTracking();
 }

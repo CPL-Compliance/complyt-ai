@@ -15,6 +15,10 @@ public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, S
 
     Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking);
 
+    Mono<SalesTaxTracking> upsertWithoutNexusSummaryIfNeeded(@NonNull SalesTaxTracking salesTaxTracking);
+
+    Mono<SalesTaxTracking> addClientAndStateDetails(@NonNull SalesTaxTracking salesTaxTracking);
+
     Mono<SalesTaxTracking> findByState(@NonNull String state);
 
     Mono<SalesTaxTracking> findByComplytId(@NonNull UUID complytId);
@@ -23,12 +27,13 @@ public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, S
 
     Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull NexusStateRule stateRule, @NonNull LocalDateTime referenceDate);
 
-    Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull String state);
-
     Mono<SalesTaxTracking> injectDataToNewSalesTaxTracking(@NonNull SalesTaxTracking SalesTaxTracking);
 
     Mono<SalesTaxTracking> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final SalesTaxTracking modifiedSalesTaxTracking, @NonNull final SalesTaxTracking originalSalesTaxTracking);
 
+    Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking);
+
     Mono<SalesTaxTracking> checkSalesTaxTrackingNotHavingComplytId(@NonNull final SalesTaxTracking newSalesTaxTracking);
 
+    Mono<SalesTaxTracking> insertSummariesFromOriginal(@NonNull final SalesTaxTracking checkedSalesTaxTracking, @NonNull final SalesTaxTracking originalSalesTaxTracking);
 }

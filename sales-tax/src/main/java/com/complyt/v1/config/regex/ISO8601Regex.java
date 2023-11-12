@@ -1,4 +1,4 @@
-package com.complyt.utils.regex;
+package com.complyt.v1.config.regex;
 
 /*
 Holds a const regular expression to check if datetime is in correct ISO8601 format

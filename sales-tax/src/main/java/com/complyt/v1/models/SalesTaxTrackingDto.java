@@ -4,13 +4,17 @@ import com.complyt.v1.api_info.FieldsDescriptions;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.checkables.StateCheckable;
+import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
+import com.complyt.v1.models.nexus.NexusStateRuleDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.With;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @With
@@ -22,6 +26,9 @@ public record SalesTaxTrackingDto(
         boolean enforcesSalesTax,
         @Valid @NotNull(message = "physicalNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR) PhysicalNexusTrackerDto physicalNexusTracker,
         @Valid @NotNull(message = "economicNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR) EconomicNexusTrackerDto economicNexusTracker,
+        Map<LocalDate, @Valid NexusCalculationSummaryDto> nexusCalculationSummaries,
+        @Valid NexusStateRuleDto nexusStateRule,
+        @Valid ClientTrackingDto clientTracking,
         LocalDateTime appliedDate, boolean approved, LocalDateTime approvalDate,
         @Schema(description = FieldsDescriptions.FILING_FREQUENCY) FilingFrequencyDto filingFrequency)
         implements StateCheckable {

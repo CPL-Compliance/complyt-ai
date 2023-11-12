@@ -16,10 +16,10 @@ public class QualificationChecker {
             return false;
         }
 
-        boolean containsTaxable = nexusStateRule.getTaxableCategories().contains(taxAble.getTaxableCategory());
-        boolean containsTangible = nexusStateRule.getTangibleCategories().contains(taxAble.getTangibleCategory());
+        boolean containsTaxable = nexusStateRule.taxableCategories().contains(taxAble.getTaxableCategory());
+        boolean containsTangible = nexusStateRule.tangibleCategories().contains(taxAble.getTangibleCategory());
         log.debug("Taxable item with tax code : " + taxAble.getTaxCode() + ", contains taxable: " + containsTangible + ", "
-                + "contains tangible: " + containsTangible);
+                  + "contains tangible: " + containsTangible);
 
         return containsTaxable && containsTangible;
     }

@@ -1,11 +1,9 @@
 package com.complyt.business.nexus.checker;
 
-import com.complyt.domain.State;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
-import com.complyt.domain.nexus.NexusThreshold;
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.nexus.enums.Definition;
+import com.complyt.utils.factory.DateRange;
 import org.bson.types.ObjectId;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Assertions;
@@ -47,23 +45,18 @@ public class NexusCheckerTest {
     NexusThresholdChecker nexusThresholdChecker;
 
     SalesTaxTracking salesTaxTracking;
+
+    DateRange dateRange;
     NexusCalculationSummary nexusCalculationSummary;
-    NexusStateRule nexusStateRule;
     UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
+        dateRange = DateRange.Factory.newCurrentCalenderYear(LocalDateTime.now());
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTracking = testUtilities.createSalesTaxTracking(new ObjectId().toString());
         nexusCalculationSummary = createNexusCalculationSummary();
-        nexusStateRule = createNexusStateRule();
-    }
-
-    private NexusStateRule createNexusStateRule() {
-        NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(10), 10000, Definition.AMOUNT_OR_COUNT);
-        State state = new State("CA", "02", "California");
-        return new NexusStateRule(UUID.randomUUID().toString(), true, state, null, null, null,
-                null, nexusThreshold);
+        salesTaxTracking.getNexusCalculationSummaries().put(dateRange.getEnd().toLocalDate(), nexusCalculationSummary);
     }
 
     private NexusCalculationSummary createNexusCalculationSummary() {
@@ -124,6 +117,15 @@ public class NexusCheckerTest {
     }
 
     @Test
+    void passedThreshold_NoNexusCalculationSummaryAtDateRange_ReturnsFalse() {
+        // When
+        boolean passedThreshold = nexusChecker.passedThreshold(salesTaxTracking, DateRange.Factory.newPreviousTwelveMonths(LocalDateTime.now()));
+
+        // Then
+        Assertions.assertFalse(passedThreshold);
+    }
+
+    @Test
     void hasNexus_NullTrackingPassed_ThrowsException() {
         // Given
         SalesTaxTracking nullSalesTaxTracking = null;
@@ -138,11 +140,11 @@ public class NexusCheckerTest {
     @Test
     void passedThreshold_SummaryPassedThreshold_ReturnsTrue() {
         // Given
-        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(nexusCalculationSummary, nexusStateRule);
+        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(nexusCalculationSummary, salesTaxTracking.getNexusStateRule());
 
         // When
         when(nexusThresholdChecker.check(summaryAndRule)).thenReturn(true);
-        boolean passedThreshold = nexusChecker.passedThreshold(nexusCalculationSummary, nexusStateRule);
+        boolean passedThreshold = nexusChecker.passedThreshold(salesTaxTracking, dateRange);
 
         // Then
         assertTrue(passedThreshold);
@@ -151,11 +153,11 @@ public class NexusCheckerTest {
     @Test
     void passedThreshold_SummaryDoesNotPassedThreshold_ReturnsFalse() {
         // Given
-        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(nexusCalculationSummary, nexusStateRule);
+        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(nexusCalculationSummary, salesTaxTracking.getNexusStateRule());
 
         // When
         when(nexusThresholdChecker.check(summaryAndRule)).thenReturn(false);
-        boolean passedThreshold = nexusChecker.passedThreshold(nexusCalculationSummary, nexusStateRule);
+        boolean passedThreshold = nexusChecker.passedThreshold(salesTaxTracking, dateRange);
 
         // Then
         assertFalse(passedThreshold);
@@ -164,29 +166,29 @@ public class NexusCheckerTest {
     @Test
     void hasNexus_NullSummaryPassed_ThrowsException() {
         // Given
-        NexusCalculationSummary nullCalculationSummary = null;
+        SalesTaxTracking salesTaxTracking = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusChecker.passedThreshold(nullCalculationSummary, nexusStateRule);
+            nexusChecker.passedThreshold(salesTaxTracking, dateRange);
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "calculationSummary is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
     }
 
     @Test
     void passedThreshold_NullStateRulePassed_ThrowsException() {
         // Given
-        NexusStateRule nullStateRule = null;
+        DateRange dateRange = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusChecker.passedThreshold(nexusCalculationSummary, nullStateRule);
+            nexusChecker.passedThreshold(salesTaxTracking, dateRange);
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "stateRule is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "dateRange is marked non-null but is null");
     }
 
 }

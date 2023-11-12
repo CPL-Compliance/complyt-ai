@@ -1,5 +1,6 @@
 package com.complyt.domain.nexus;
 
+import com.complyt.domain.ClientTracking;
 import com.complyt.domain.FilingFrequency;
 import com.complyt.domain.State;
 import com.complyt.domain.properties.ComplytIdProperty;
@@ -8,7 +9,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -28,6 +31,10 @@ public class SalesTaxTracking implements ComplytIdProperty {
     boolean enforcesSalesTax;
     PhysicalNexusTracker physicalNexusTracker;
     EconomicNexusTracker economicNexusTracker;
+    NexusStateRule nexusStateRule;
+    ClientTracking clientTracking;
+    Map<LocalDate, NexusCalculationSummary> nexusCalculationSummaries;
+    Map<UUID, TransactionNexusSummary> transactionNexusSummaries;
     LocalDateTime appliedDate;
     boolean approved;
     LocalDateTime approvalDate;

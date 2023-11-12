@@ -1,9 +1,6 @@
 package com.complyt.utils.factory;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.ToString;
-import lombok.With;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -16,6 +13,7 @@ import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 @Getter
 @ToString
 @With
+@EqualsAndHashCode
 public class DateRange {
 
     private final LocalDateTime start;
@@ -84,11 +82,7 @@ public class DateRange {
             LocalDateTime startDate, endDate;
 
             // from october 1st to december 31st
-            if (referenceDate.compareTo(firstOfOctober) < 0) {
-                startDate = firstOfOctober.minusYears(1);
-            } else {
-                startDate = firstOfOctober;
-            }
+            startDate = referenceDate.isBefore(firstOfOctober) ? firstOfOctober.minusYears(1) : firstOfOctober;
 
             endDate = startDate.plusYears(1);
             return new DateRange(startDate, endDate);
@@ -99,11 +93,7 @@ public class DateRange {
             LocalDateTime taxableDateWithSameYearAsReferenceDate = taxableDate.withYear(referenceDate.getYear());
             int minusYears;
 
-            if (referenceDate.compareTo(taxableDateWithSameYearAsReferenceDate) > 0) {
-                minusYears = 0;
-            } else {
-                minusYears = 1;
-            }
+            minusYears = referenceDate.isAfter(taxableDateWithSameYearAsReferenceDate) ? 0 : 1;
 
             startDate = referenceDate
                     .minusYears(minusYears)

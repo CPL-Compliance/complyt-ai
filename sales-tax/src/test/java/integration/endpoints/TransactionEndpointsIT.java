@@ -46,9 +46,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     private WebTestClient webTestClient;
 
     // Given
-    private UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
-    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "85034", false);
-    private String source = "1";
+    private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "85034", false);
+    private final String source = "1";
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -59,7 +59,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
     }
-
 
     @Order(2)
     @Test
@@ -403,7 +402,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withInternalTimestamps(new TimestampsDto("", "2021-10-10T07:00:00"))
                 .withSource("");
         Set expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR,
+                "Timestamps.createdDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR,
                 "source " + StringErrorMessages.SINGLE_DIGIT_ERROR));
 
         // Then

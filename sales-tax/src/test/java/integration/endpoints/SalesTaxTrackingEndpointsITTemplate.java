@@ -10,4 +10,13 @@ public interface SalesTaxTrackingEndpointsITTemplate extends
         GetByStateITTemplate,
         GetByComplytIdITTemplate,
         GetAllITTemplate {
+
+    // Refresh By State And date
+    void refreshByStateAndDate_Exists_Returns200WithSummaryAndNewNexusRule();
+
+    void refreshByStateAndDate_ExistsAndHasNexus_Returns200NoSummary();
+
+    void refreshByStateAndDate_DoesntExists_Returns404NotFound();
+
+    void refreshByStateAndDate_DoesNotPassValidation_Returns400();
 }

@@ -8,6 +8,7 @@ import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
 import com.complyt.services.nexus.NexusService;
+import com.complyt.services.nexus.SalesTaxTrackingService;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -35,17 +36,23 @@ public class TransactionFacade {
     private SalesTaxService salesTaxService;
 
     @NonNull
+    @Qualifier("salesTaxTrackingServiceImpl")
+    private SalesTaxTrackingService salesTaxTrackingService;
+
+    @NonNull
     private NexusService nexusService;
 
     public Mono<Transaction> saveTransaction(Transaction transaction) {
         return transactionService.checkTransactionNotHavingComplytId(transaction)
                 .flatMap(checkedTransaction -> getCustomerByTransaction(transaction)
                         .flatMap(customer -> transactionService.injectDataToNewTransaction(checkedTransaction)
-                                .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
-                                        .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
-                                                handleSalesTaxCalculationAndSave(setTransaction, salesTaxTrackingWithNexusInfo, customer) :
-                                                saveAndHandleNexusTrackingCalculation(setTransaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()))
-                                        .map(savedTransaction -> savedTransaction.withCustomer(customer)))));
+                                .flatMap(setTransaction -> salesTaxTrackingService.findByState(setTransaction.getShippingAddress().state())
+                                        .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking)
+                                                .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus()
+                                                        ? handleSalesTaxCalculationAndSave(setTransaction, salesTaxTrackingWithNexusInfo, customer)
+                                                        : saveAndHandleNexusTrackingCalculation(setTransaction.withCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking()))
+                                                .map(savedTransaction -> savedTransaction.withCustomer(customer))))))
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 
     private Mono<Transaction> handleSalesTaxCalculationAndSave(Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo, Customer customer) {
@@ -54,9 +61,13 @@ public class TransactionFacade {
     }
 
     private Mono<Transaction> saveAndHandleNexusTrackingCalculation(Transaction transaction, SalesTaxTracking salesTaxTracking) {
-        return nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTracking) ? transactionService.save(transaction)
-                .flatMap(savedTransaction -> nexusService.calculateNexusTracking(savedTransaction)
-                        .thenReturn(savedTransaction)) : transactionService.save(transaction);
+        return transactionService.save(transaction.withCustomer(null))
+                .map(savedTransaction -> savedTransaction.withCustomer(transaction.getCustomer()))
+                .flatMap(savedTransaction -> salesTaxTracking.isEnforcesSalesTax()
+                        ? nexusService.upsertToNexusTracking(savedTransaction, salesTaxTracking)
+                        .flatMap(salesTaxTrackingService::save)
+                        .thenReturn(savedTransaction)
+                        : Mono.just(savedTransaction));
     }
 
     public Mono<Transaction> updateIfModified(@NonNull String externalId, @NonNull String source, @NonNull Transaction newTransaction, @NonNull Transaction originalTransaction) {
@@ -68,11 +79,12 @@ public class TransactionFacade {
         return transactionService.checkComplytIdOfModifiedEqualsToOriginal(modifiedTransaction, originalTransaction)
                 .flatMap(checkedModifiedTransaction -> getCustomerByTransaction(modifiedTransaction)
                         .flatMap(customer -> transactionService.injectDataToModifiedTransaction(checkedModifiedTransaction, originalTransaction)
-                                .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
-                                        .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
-                                                handleSalesTaxCalculationAndUpdate(externalId, source, setTransaction, salesTaxTrackingWithNexusInfo, customer) :
-                                                updateAndHandleNexusTrackingCalculation(externalId, source, setTransaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()))
-                                        .map(receivedTransaction -> receivedTransaction.withCustomer(customer)))));
+                                .flatMap(setTransaction -> salesTaxTrackingService.findByState(setTransaction.getShippingAddress().state())
+                                        .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking)
+                                                .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
+                                                        handleSalesTaxCalculationAndUpdate(externalId, source, setTransaction, salesTaxTrackingWithNexusInfo, customer) :
+                                                        updateAndHandleNexusTrackingCalculation(externalId, source, setTransaction.withCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking()))
+                                                .map(receivedTransaction -> receivedTransaction.withCustomer(customer))))));
     }
 
     private Mono<Transaction> handleSalesTaxCalculationAndUpdate(String externalId, String source, Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo, Customer customer) {
@@ -81,40 +93,47 @@ public class TransactionFacade {
     }
 
     private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, String source, Transaction transaction, SalesTaxTracking salesTaxTracking) {
-        return nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTracking) ? transactionService.update(externalId, source, transaction)
-                .flatMap(updatedTransaction -> nexusService.calculateNexusTracking(updatedTransaction)
-                        .thenReturn(updatedTransaction)) : transactionService.update(externalId, source, transaction);
+        return salesTaxTracking.isEnforcesSalesTax()
+                ? transactionService.update(externalId, source, transaction)
+                .flatMap(updatedTransaction -> nexusService.upsertToNexusTracking(updatedTransaction.withCustomer(transaction.getCustomer()), salesTaxTracking)
+                        .flatMap(salesTaxTrackingService::save)
+                        .thenReturn(updatedTransaction))
+                : transactionService.update(externalId, source, transaction);
     }
 
     public Mono<Transaction> findByExternalIdAndSource(String externalId, String source) {
         return transactionService.findByExternalIdAndSource(externalId, source)
                 .flatMap(transaction -> getCustomerByTransaction(transaction)
-                        .map(customer -> transaction.withCustomer(customer)));
+                        .map(transaction::withCustomer));
     }
 
     public Mono<Transaction> findByComplytId(@NonNull UUID complytId) {
         return transactionService.findByComplytId(complytId)
                 .flatMap(transaction -> getCustomerByTransaction(transaction)
-                        .map(customer -> transaction.withCustomer(customer)));
+                        .map(transaction::withCustomer));
     }
 
     public Flux<Transaction> getAll() {
         return transactionService.findAll()
                 .flatMap(transaction -> getCustomerByTransaction(transaction)
-                        .map(customer -> transaction.withCustomer(customer)));
+                        .map(transaction::withCustomer));
     }
 
     public Flux<Transaction> getAllBySource(String source) {
 
         return transactionService.findAllBySource(source)
                 .flatMap(transaction -> getCustomerByTransaction(transaction)
-                        .map(customer -> transaction.withCustomer(customer)));
+                        .map(transaction::withCustomer));
     }
 
     public Mono<Transaction> markAsCancelled(String externalId, String source) {
         return transactionService.markAsCancelled(externalId, source)
                 .flatMap(transaction -> getCustomerByTransaction(transaction)
-                        .map(customer -> transaction.withCustomer(customer)));
+                        .map(transaction::withCustomer))
+                .flatMap(transaction -> salesTaxTrackingService.findByState(transaction.getShippingAddress().state())
+                        .flatMap(salesTaxTracking -> nexusService.removeFromNexusTracking(transaction, salesTaxTracking))
+                        .flatMap(salesTaxTrackingService::save)
+                        .thenReturn(transaction));
     }
 
     public Mono<Customer> getCustomerByTransaction(Transaction transaction) {

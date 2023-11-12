@@ -2,6 +2,8 @@ package testUtils.integration_test.templates.economic_nexus;
 
 public interface EconomicNexusITTemplate {
 
+    void refreshSalesTaxTrackingByStateAndDate_CheckEconomicNexusNotPassed_Returns200();
+
     void upsertTransaction_NewAndDoesntPassedEconomicNexus_Returns201();
 
     void getSalesTaxTracking_CheckEconomicNexusNotPassed_Returns200();

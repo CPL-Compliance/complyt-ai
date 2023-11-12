@@ -6,6 +6,7 @@ import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.transaction.TransactionTypeDto;
@@ -183,7 +184,11 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
                 .expectStatus()
                 .isOk()
                 .expectBody(SalesTaxTrackingDto.class)
-                .value(salesTaxTrackingDto -> assertFalse(salesTaxTrackingDto.economicNexusTracker().established()));
+                .value(receivedSalesTaxTracking -> {
+                    receivedSalesTaxTracking.nexusCalculationSummaries().values().forEach(nexusCalculationSummaryDto ->
+                            assertEquals(BigDecimal.valueOf(80000), nexusCalculationSummaryDto.amount()));
+                    assertFalse(receivedSalesTaxTracking.economicNexusTracker().established());
+                });
 
     }
 

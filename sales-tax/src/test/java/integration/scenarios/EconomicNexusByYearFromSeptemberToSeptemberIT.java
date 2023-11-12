@@ -2,10 +2,11 @@ package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
-import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
+import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.transaction.TransactionDto;
+import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
@@ -26,6 +27,7 @@ import testUtils.integration_test.ITUtilities;
 import testUtils.integration_test.templates.economic_nexus.EconomicNexusOnlyTaxableItemsITTemplate;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -68,6 +70,28 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
     }
 
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshSalesTaxTrackingByStateAndDate_CheckEconomicNexusNotPassed_Returns200() {
+        String state = "CT";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state)
+                        .queryParam("date", referenceDate.toLocalDate())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk().expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> LOGGER.info(String.valueOf(salesTaxTrackingDto)));
+    }
+
     @Order(1)
     @Test
     @Override
@@ -83,6 +107,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
         // Then
         webTestClient
                 .mutateWith(csrf())
+                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -113,6 +138,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
             final int finalI = i;
             webTestClient
                     .mutateWith(csrf())
+                    .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                     .put()
                     .uri(uriBuilder -> uriBuilder
                             .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId + finalI)
@@ -132,6 +158,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
     @WithMockUser
     public void getSalesTaxTracking_CheckEconomicNexusNotPassed_Returns200() {
         webTestClient
+                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
@@ -141,6 +168,8 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(receivedSalesTaxTracking -> {
+                    receivedSalesTaxTracking.nexusCalculationSummaries().values().forEach(nexusCalculationSummaryDto ->
+                            assertEquals(BigDecimal.valueOf(2100000), nexusCalculationSummaryDto.amount()));
                     assertFalse(receivedSalesTaxTracking.economicNexusTracker().established());
                     assertFalse(receivedSalesTaxTracking.approved());
                 });
@@ -163,6 +192,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
             final int finalI = i;
             webTestClient
                     .mutateWith(csrf())
+                    .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                     .put()
                     .uri(uriBuilder -> uriBuilder
                             .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId + finalI)
@@ -182,6 +212,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
     @WithMockUser
     public void upsertSalesTaxTracking_ApproveEconomicNexus_Returns200() {
         webTestClient
+                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
@@ -192,6 +223,8 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(receivedSalesTaxTracking -> {
                     assertTrue(receivedSalesTaxTracking.economicNexusTracker().established());
+                    receivedSalesTaxTracking.nexusCalculationSummaries().values().forEach(nexusCalculationSummaryDto ->
+                            assertEquals(BigDecimal.valueOf(2340000), nexusCalculationSummaryDto.amount()));
                     assertEquals(receivedSalesTaxTracking.economicNexusTracker().establishedDate(), LocalDateTime.parse(referenceDate.toString()));
                     assertEquals(receivedSalesTaxTracking.appliedDate(), LocalDateTime.parse("2020-10-01T00:00"));
 

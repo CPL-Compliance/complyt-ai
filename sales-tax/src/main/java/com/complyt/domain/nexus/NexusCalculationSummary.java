@@ -1,20 +1,35 @@
 package com.complyt.domain.nexus;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.With;
 
 import java.math.BigDecimal;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
 @With
-@ToString
-public class NexusCalculationSummary {
-    private long count;
-    private BigDecimal amount;
-
-    public final BigDecimal getAmount() {
+public record NexusCalculationSummary(long count, BigDecimal amount) {
+    @Override
+    public BigDecimal amount() {
         return amount != null ? amount : BigDecimal.ZERO;
     }
 
+    @Getter
+    public static class Builder {
+        private long count = 0;
+        private BigDecimal amount = BigDecimal.ZERO;
+
+        public NexusCalculationSummary.Builder setCount(long count) {
+            this.count = count;
+            return this;
+        }
+
+        public NexusCalculationSummary.Builder setAmount(BigDecimal amount) {
+            this.amount = amount;
+            return this;
+        }
+
+        public NexusCalculationSummary build() {
+            return new NexusCalculationSummary(count, amount);
+        }
+
+    }
 }

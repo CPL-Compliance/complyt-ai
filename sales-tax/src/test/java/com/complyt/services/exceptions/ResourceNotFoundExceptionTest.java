@@ -3,8 +3,7 @@ package com.complyt.services.exceptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ResourceNotFoundExceptionTest {
 
@@ -23,7 +22,7 @@ class ResourceNotFoundExceptionTest {
         });
 
         // Then
-        assertEquals(null, actualException.getMessage());
+        assertNull(actualException.getMessage());
     }
 
     @Test

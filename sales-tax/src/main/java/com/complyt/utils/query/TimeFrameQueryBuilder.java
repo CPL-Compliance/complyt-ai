@@ -4,9 +4,7 @@ import com.complyt.domain.Nexus;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.utils.factory.DateRange;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -26,50 +24,16 @@ public class TimeFrameQueryBuilder implements QueryBuilder<DateRange> {
     }
 
     public Query buildNexusTimeFrame(@NonNull Nexus nexusInfo, @NonNull NexusStateRule nexusStateRule, @NonNull LocalDateTime referenceDate) {
-        TimeFrame timeFrame = nexusStateRule.getTimeFrame();
+        TimeFrame timeFrame = nexusStateRule.timeFrame();
         LocalDateTime taxableDate = nexusInfo.getTaxableDate();
 
         DateRangeStrategy dateRangeStrategy = new DateRangeStrategy(timeFrame, taxableDate, referenceDate);
         DateRange dateRange = dateRangeStrategy.getDateRange();
 
         log.debug("Building new nexus Date range object, start date : " + dateRange.getStart() +
-                " , end date : " + dateRange.getEnd());
+                  " , end date : " + dateRange.getEnd());
 
         return build(dateRange);
     }
 }
 
-@Getter
-@ToString
-class DateRangeStrategy {
-    private DateRange dateRange;
-
-    public DateRangeStrategy(TimeFrame timeFrame, LocalDateTime taxableDate, LocalDateTime referenceDate) {
-        setUpDateRange(timeFrame, taxableDate, referenceDate);
-    }
-
-    private void setUpDateRange(TimeFrame timeFrame, LocalDateTime taxableDate, LocalDateTime referenceDate) {
-        switch (timeFrame) {
-            case PREVIOUS_CALENDER_YEAR:
-                dateRange = DateRange.Factory.newPreviousCalenderYear(referenceDate);
-                break;
-
-            case CURRENT_CALENDER_YEAR:
-                dateRange = DateRange.Factory.newCurrentCalenderYear(referenceDate);
-                break;
-
-            case PREVIOUS_TWELVE_MONTHS:
-                dateRange = DateRange.Factory.newPreviousTwelveMonths(referenceDate);
-                break;
-
-            case YEAR_FROM_SEPTEMBER_TO_SEPTEMBER:
-                dateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
-                break;
-
-            //CURRENT_TAXABLE_YEAR
-            default:
-                dateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
-                break;
-        }
-    }
-}

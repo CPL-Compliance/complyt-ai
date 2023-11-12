@@ -1,8 +1,6 @@
 package testUtils.unit_test;
 
-import com.complyt.domain.FilingFrequency;
-import com.complyt.domain.State;
-import com.complyt.domain.Taxable;
+import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.customer.exemption.*;
@@ -23,6 +21,7 @@ import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.*;
+import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
@@ -38,16 +37,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UnitTestUtilities {
 
-    LocalDateTime localDateTime;
-    String tenantId;
-
-    UUID customerIdOtherDomains;
-
-    String certificateId;
-
-    String source;
-
     static ResourceBundle validationMessages = ResourceBundle.getBundle("org.hibernate.validator.ValidationMessages", Locale.getDefault());
+    public final String tenantId;
+    LocalDateTime localDateTime;
+    UUID customerIdOtherDomains;
+    String certificateId;
+    String source;
 
     public UnitTestUtilities(LocalDateTime localDateTime, String tenantId) {
         this.localDateTime = localDateTime;
@@ -83,6 +78,53 @@ public class UnitTestUtilities {
         MandatoryAddressDto address = createAddressDtoInCalifornia();
         SalesTaxRatesDto salesTaxRates = createCaliforniaSalesTaxRatesDto();
         return new ComplytSalesTaxRatesDto(address, salesTaxRates);
+    }
+
+    public static boolean stringPassedRegex(String input, Pattern pattern) {
+        Matcher matcher = pattern.matcher(input);
+        return matcher.matches();
+    }
+
+    public static List<State> createStateList() {
+        return new ArrayList<>() {{
+            add(new State("California", "04", "CA"));
+            add(new State("New York", "05", "NY"));
+            add(new State("Arizona", "06", "AZ"));
+        }};
+    }
+
+    public static List<StateDto> createStateListDto() {
+        return new ArrayList<>() {{
+            add(new StateDto("California", "04", "CA"));
+            add(new StateDto("New York", "05", "NY"));
+            add(new StateDto("Arizona", "06", "AZ"));
+        }};
+    }
+
+    public static List<Exemption> createExemptionsListFromWrapper(ExemptionWrapper exemptionWrapper) {
+        List<Exemption> exemptionList = new ArrayList<>();
+        for (State state : exemptionWrapper.states()) {
+            exemptionList.add(exemptionWrapper.exemption().withState(state));
+        }
+
+        return exemptionList;
+    }
+
+    public static List<ExemptionDto> createExemptionsDtoListFromWrapper(ExemptionWrapperDto exemptionWrapper) {
+        List<ExemptionDto> exemptionList = new ArrayList<>();
+        for (StateDto state : exemptionWrapper.states()) {
+            exemptionList.add(exemptionWrapper.exemption().withState(state));
+        }
+
+        return exemptionList;
+    }
+
+    public static String extractStringFromJakartaProperties(String property) {
+        return validationMessages.getString(property);
+    }
+
+    public TransactionNexusSummary createTransactionNexusSummary() {
+        return new TransactionNexusSummary(BigDecimal.valueOf(1200), localDateTime, TransactionType.INVOICE);
     }
 
     public void checkErrorMessages(LinkedHashMap map, Set<String> expectedErrors) {
@@ -283,7 +325,27 @@ public class UnitTestUtilities {
         NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(1000), 2, Definition.AMOUNT_OR_COUNT);
 
         return new NexusStateRule(id, true, state, taxableCategories, tangibleCategories, customerTypes,
-                TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold);
+                TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold, localDateTime);
+    }
+
+    public NexusStateRuleDto createNexusStateRuleDto() {
+        StateDto state = new StateDto("CA", "02", "California");
+
+        List<TaxableCategoryDto> taxableCategories = new ArrayList<>() {{
+            add(TaxableCategoryDto.TAXABLE);
+        }};
+
+        List<TangibleCategoryDto> tangibleCategories = new ArrayList<>() {{
+            add(TangibleCategoryDto.TANGIBLE);
+        }};
+
+        List<CustomerTypeDto> customerTypes = new ArrayList<>() {{
+            add(CustomerTypeDto.RETAIL);
+        }};
+
+        NexusThresholdDto nexusThreshold = new NexusThresholdDto(new BigDecimal(1000), 2, DefinitionDto.AMOUNT_OR_COUNT);
+
+        return new NexusStateRuleDto(true, state, taxableCategories, tangibleCategories, customerTypes, TimeFrameDto.PREVIOUS_TWELVE_MONTHS, nexusThreshold, localDateTime);
     }
 
     public List<Taxable> createTaxables(Transaction transaction) {
@@ -297,9 +359,18 @@ public class UnitTestUtilities {
         return new SalesTaxTracking(UUID.randomUUID(), id, state,
                 tenantId, "comment", true,
                 new PhysicalNexusTracker(false, localDateTime),
-                new EconomicNexusTracker(false, localDateTime), localDateTime,
+                new EconomicNexusTracker(false, localDateTime),
+                createNexusStateRule(id + "nsr"),
+                createClientTracking(tenantId),
+                new HashMap<>(),
+                new HashMap<>(),
+                localDateTime,
                 true, localDateTime,
                 FilingFrequency.MONTHLY);
+    }
+
+    public ClientTracking createClientTracking(String tenantId) {
+        return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope");
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
@@ -307,11 +378,19 @@ public class UnitTestUtilities {
         SalesTaxTrackingDto salesTaxTrackingDto = new SalesTaxTrackingDto(UUID.randomUUID(), state,
                 "comment", true,
                 new PhysicalNexusTrackerDto(false, localDateTime),
-                new EconomicNexusTrackerDto(false, localDateTime), localDateTime,
+                new EconomicNexusTrackerDto(false, localDateTime),
+                Map.of(),
+                createNexusStateRuleDto(),
+                createClientTrackingDto(),
+                localDateTime,
                 true, localDateTime,
                 FilingFrequencyDto.MONTHLY);
 
         return salesTaxTrackingDto;
+    }
+
+    public ClientTrackingDto createClientTrackingDto() {
+        return new ClientTrackingDto(new NexusDto(localDateTime), "client dope");
     }
 
     public Result createResult() {
@@ -340,49 +419,6 @@ public class UnitTestUtilities {
 
     public ValidationDatesDto createValidationDatesDto() {
         return new ValidationDatesDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
-    }
-
-    public static boolean stringPassedRegex(String input, Pattern pattern) {
-        Matcher matcher = pattern.matcher(input);
-        return matcher.matches();
-    }
-
-    public static List<State> createStateList() {
-        return new ArrayList<>() {{
-            add(new State("California", "04", "CA"));
-            add(new State("New York", "05", "NY"));
-            add(new State("Arizona", "06", "AZ"));
-        }};
-    }
-
-    public static List<StateDto> createStateListDto() {
-        return new ArrayList<>() {{
-            add(new StateDto("California", "04", "CA"));
-            add(new StateDto("New York", "05", "NY"));
-            add(new StateDto("Arizona", "06", "AZ"));
-        }};
-    }
-
-    public static List<Exemption> createExemptionsListFromWrapper(ExemptionWrapper exemptionWrapper) {
-        List<Exemption> exemptionList = new ArrayList<>();
-        for (State state : exemptionWrapper.states()) {
-            exemptionList.add(exemptionWrapper.exemption().withState(state));
-        }
-
-        return exemptionList;
-    }
-
-    public static List<ExemptionDto> createExemptionsDtoListFromWrapper(ExemptionWrapperDto exemptionWrapper) {
-        List<ExemptionDto> exemptionList = new ArrayList<>();
-        for (StateDto state : exemptionWrapper.states()) {
-            exemptionList.add(exemptionWrapper.exemption().withState(state));
-        }
-
-        return exemptionList;
-    }
-
-    public static String extractStringFromJakartaProperties(String property) {
-        return validationMessages.getString(property);
     }
 
 

@@ -19,6 +19,8 @@ public interface SalesTaxTrackingRouterTestTemplate extends
 
     void putAny_InvalidUrl_Returns404();
 
+    void postAny_InvalidUrl_Returns404();
+
     // Validation::PhysicalNexusTracker
     void upsert_NullPhysicalNexusTrackerDto_Returns400ValidationError();
 
@@ -31,5 +33,25 @@ public interface SalesTaxTrackingRouterTestTemplate extends
 
     // Validation: Comment
     void upsert_LengthGreaterThen200Comment_Returns400ValidationError();
+
     void upsert_NewWithBlankComment_Returns201();
+
+    //     Refresh By State And Date
+    void refreshByStateAndDate_ReturnsSalesTaxTracking_Returns200();
+
+    void refreshByStateAndDate_FacadeReturnsEmpty_Returns404NotFound();
+
+    void refreshByStateAndDate_DateNotInFormat_Returns400();
+
+    void refreshByStateAndDate_NoDateInAsQueryParam_Returns400();
+
+    void refreshByStateAndDate_UnauthenticatedUser_Returns401();
+
+    void refreshByStateAndDate_UserWithoutAuthorities_Returns403();
+
+    void refreshByStateAndDate_UserWithoutCSRFToken_Returns403();
+
+    void refreshByStateAndDate_InternalServerError_Returns500();
+
+    void refreshByStateAndDate_NullHandler_ThrowsNullPointerException();
 }

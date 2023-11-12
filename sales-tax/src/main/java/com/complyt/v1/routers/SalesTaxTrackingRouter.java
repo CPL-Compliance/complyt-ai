@@ -1,9 +1,6 @@
 package com.complyt.v1.routers;
 
-import com.complyt.v1.api_info.sales_tax_tracking.GetAllSalesTaxtrackingApiInfo;
-import com.complyt.v1.api_info.sales_tax_tracking.GetSalesTaxTrackingByComplytIdApiInfo;
-import com.complyt.v1.api_info.sales_tax_tracking.GetSalesTaxTrackingByStateApiInfo;
-import com.complyt.v1.api_info.sales_tax_tracking.UpsertSalesTaxTrackingByStateApiInfo;
+import com.complyt.v1.api_info.sales_tax_tracking.*;
 import com.complyt.v1.handlers.SalesTaxTrackingHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +51,15 @@ public class SalesTaxTrackingRouter {
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(getSalesTaxTrackingRoute, salesTaxTrackingHandler::upsert);
+    }
+    @Bean
+    @RefreshSalesTaxTrackingByStateApiInfo
+    public RouterFunction<ServerResponse> refreshNexusSummaryByDateRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
+        RequestPredicate refreshNexusSummaryByDateRoute = RequestPredicates
+                .POST(BASE_URL + "/refresh/state/{state}")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(refreshNexusSummaryByDateRoute, salesTaxTrackingHandler::refreshNexusSummaryByDate);
     }
 
 }

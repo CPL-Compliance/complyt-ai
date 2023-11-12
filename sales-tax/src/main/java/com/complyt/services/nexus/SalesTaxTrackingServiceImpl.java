@@ -5,8 +5,12 @@ import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.nexus.enums.TimeFrame;
+import com.complyt.repositories.ClientTrackingRepository;
+import com.complyt.repositories.NexusStateRuleRepository;
 import com.complyt.repositories.SalesTaxTrackingRepository;
 import com.complyt.utils.observability.ContextLogger;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -18,6 +22,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -32,7 +38,14 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @NonNull
     ApplicationDateCreator applicationDateCreator;
 
-    @NonNull ComplytIdHandler<SalesTaxTracking> complytIdHandler;
+    @NonNull
+    ComplytIdHandler<SalesTaxTracking> complytIdHandler;
+
+    @NonNull
+    ClientTrackingRepository clientTrackingRepository;
+
+    @NonNull
+    NexusStateRuleRepository nexusStateRuleRepository;
 
     @Override
     public Mono<SalesTaxTracking> findById(@NonNull String id) {
@@ -41,7 +54,25 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
-        return salesTaxTrackingRepository.save(salesTaxTracking);
+        return upsertWithoutNexusSummaryIfNeeded(salesTaxTracking);
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> upsertWithoutNexusSummaryIfNeeded(@NonNull SalesTaxTracking salesTaxTracking) {
+        return Mono.just(salesTaxTracking.getNexusStateRule().timeFrame().equals(TimeFrame.PREVIOUS_TWELVE_MONTHS)
+                        ? salesTaxTracking.withNexusCalculationSummaries(Map.of())
+                        : salesTaxTracking)
+                .flatMap(salesTaxTrackingRepository::save)
+                .map(upsertedSalesTaxTracking -> upsertedSalesTaxTracking.withNexusCalculationSummaries(salesTaxTracking.getNexusCalculationSummaries()));
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> addClientAndStateDetails(@NonNull SalesTaxTracking salesTaxTracking) {
+        return clientTrackingRepository.findClient()
+                .map(salesTaxTracking::withClientTracking)
+                .flatMap(salesTaxTrackingWithClient -> nexusStateRuleRepository.findMostRecentByState(salesTaxTracking.getState().getName())
+                        .map(salesTaxTrackingWithClient::withNexusStateRule))
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 
     @Override
@@ -59,10 +90,11 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return salesTaxTrackingRepository.findAll();
     }
 
+    @Deprecated
     @Override
     public Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull NexusStateRule stateRule, @NonNull LocalDateTime referenceDate) {
         EconomicNexusTracker newTracker = new EconomicNexusTracker(true, referenceDate);
-        LocalDateTime appliedDate = applicationDateCreator.create(stateRule.getTimeFrame(), referenceDate);
+        LocalDateTime appliedDate = applicationDateCreator.create(stateRule.timeFrame(), referenceDate);
 
         SalesTaxTracking modifiedTracking = salesTaxTracking
                 .withEconomicNexusTracker(newTracker)
@@ -73,29 +105,38 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     @Override
-    public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull String state) {
-        return salesTaxTrackingRepository.findByState(state)
-                .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with state " + state)))
-                .map(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
-                .flatMap(salesTaxTrackingRepository::save);
+    public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking) {
+        return salesTaxTrackingRepository.findByState(salesTaxTracking.getState().getName())
+                .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with state " + salesTaxTracking.getState().getName())))
+                .flatMap(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
+                .flatMap(this::upsertWithoutNexusSummaryIfNeeded);
     }
 
-    private Function<SalesTaxTracking, SalesTaxTracking> createFunctionUpdateSalesTaxTracking(SalesTaxTracking salesTaxTracking) {
+    private Function<SalesTaxTracking, Mono<SalesTaxTracking>> createFunctionUpdateSalesTaxTracking(SalesTaxTracking salesTaxTracking) {
         return salesTaxTrackingInfo ->
-                new SalesTaxTracking(
-                        salesTaxTrackingInfo.getComplytId(), salesTaxTrackingInfo.getId(), salesTaxTracking.getState(),
-                        salesTaxTrackingInfo.getTenantId(), salesTaxTracking.getComment(),
-                        salesTaxTracking.isEnforcesSalesTax(),
-                        salesTaxTracking.getPhysicalNexusTracker(), salesTaxTracking.getEconomicNexusTracker(),
-                        salesTaxTracking.getAppliedDate(), salesTaxTracking.isApproved(),
-                        salesTaxTracking.getApprovalDate(),
-                        salesTaxTracking.getFilingFrequency()
-                );
+                addClientAndStateDetails(salesTaxTracking)
+                        .map(salesTaxTrackingWithDetails -> new SalesTaxTracking(
+                                salesTaxTrackingInfo.getComplytId(), salesTaxTrackingInfo.getId(), salesTaxTrackingWithDetails.getState(),
+                                salesTaxTrackingInfo.getTenantId(), salesTaxTrackingWithDetails.getComment(),
+                                salesTaxTrackingWithDetails.isEnforcesSalesTax(),
+                                salesTaxTrackingWithDetails.getPhysicalNexusTracker(), salesTaxTrackingWithDetails.getEconomicNexusTracker(),
+                                salesTaxTrackingWithDetails.getNexusStateRule(), salesTaxTrackingWithDetails.getClientTracking(),
+                                salesTaxTrackingWithDetails.getNexusCalculationSummaries(), salesTaxTrackingWithDetails.getTransactionNexusSummaries(),
+                                salesTaxTrackingWithDetails.getAppliedDate(), salesTaxTrackingWithDetails.isApproved(),
+                                salesTaxTrackingWithDetails.getApprovalDate(),
+                                salesTaxTrackingWithDetails.getFilingFrequency()));
     }
 
     @Override
     public Mono<SalesTaxTracking> checkSalesTaxTrackingNotHavingComplytId(@NonNull final SalesTaxTracking newSalesTaxTracking) {
         return complytIdHandler.checkNewDontHaveComplytId(newSalesTaxTracking);
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> insertSummariesFromOriginal(@NonNull final SalesTaxTracking checkedSalesTaxTracking, @NonNull final SalesTaxTracking originalSalesTaxTracking) {
+        return Mono.just(checkedSalesTaxTracking
+                .withTransactionNexusSummaries(originalSalesTaxTracking.getTransactionNexusSummaries() == null ? new HashMap<>() : originalSalesTaxTracking.getTransactionNexusSummaries())
+                .withNexusCalculationSummaries(originalSalesTaxTracking.getNexusCalculationSummaries() == null ? new HashMap<>() : originalSalesTaxTracking.getNexusCalculationSummaries()));
     }
 
     @Override
@@ -105,6 +146,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> injectDataToNewSalesTaxTracking(@NonNull SalesTaxTracking salesTaxTracking) {
-        return Mono.just(salesTaxTracking).map(complytIdHandler::insertComplytIdToNew);
+        return addClientAndStateDetails(salesTaxTracking)
+                .map(complytIdHandler::insertComplytIdToNew);
     }
 }

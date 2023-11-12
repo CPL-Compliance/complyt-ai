@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -23,7 +24,7 @@ public class TransactionsFilterByNexusRules implements ListFilter<Transaction, N
 
     private boolean isNexusCalculationRequiredForTransaction(NexusStateRule nexusStateRule, Transaction transaction) {
         CustomerType customerType = transaction.getCustomer().getCustomerType();
-        boolean customerTypeDoesNotExistInRule = !nexusStateRule.getCustomerTypes().contains(customerType);
+        boolean customerTypeDoesNotExistInRule = !nexusStateRule.customerTypes().contains(customerType);
         if (customerTypeDoesNotExistInRule) {
             log.debug("Customer of type " + customerType + " does not exist in state rule's customer types, transaction does not count in calculation");
             return false;

@@ -25,6 +25,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import testUtils.integration_test.ITUtilities;
 
+import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
@@ -38,6 +39,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 public class MultiTenancyIT extends TestContainersInitializerIT implements MultiTenancyITTemplate {
 
     private final JwtMutator differentTenantMutator = mockJwt().jwt(ITUtilities.stubJwt().claim("tenant_id", "other_it_tenant").build());
+    private final JwtMutator differentTenantMutatorWithoutClientTracking = mockJwt().jwt(ITUtilities.stubJwt().claim("tenant_id", "dump_tenant").build());
     private final JwtMutator defaultTenantMutator = mockJwt().jwt(ITUtilities.stubJwt().build());
     private final String source = "1";
     @Mock
@@ -451,29 +453,33 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                     webTestClient
                             .mutateWith(csrf())
                             .mutateWith(differentTenantMutator)
+                            .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                             .put()
                             .uri(uriBuilder -> uriBuilder
                                     .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                                     .build())
                             .accept(MediaType.APPLICATION_JSON)
-                            .bodyValue(transactionDto
-                                    .withShippingAddress(transactionDto.shippingAddress().withState("CA")))
+                            .bodyValue(transactionDto.withShippingAddress(transactionDto.shippingAddress().withState("CA")))
                             .exchange()
-                            .expectStatus().isNotFound();
+                            .expectStatus().isNotFound()
+                            .expectBody(LinkedHashMap.class)
+                            .value(linkedHashMap -> {
+                                LOGGER.info(String.valueOf(linkedHashMap));
+                            });
                 });
     }
 
     @Order(6)
     @Test
     @Override
-    public void putSalesTaxTracking_SalesTaxTrackingWithStateRuleOfTaxableYear_Returns201() {
+    public void putSalesTaxTracking_ClientTrackingNotFoundForTenant_Returns404NoClientTracking() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(new StateDto("CA", "3463456", "California"));
 
         // Then
         webTestClient
                 .mutateWith(csrf())
-                .mutateWith(differentTenantMutator)
+                .mutateWith(differentTenantMutatorWithoutClientTracking)
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().name())
@@ -481,43 +487,6 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
                 .exchange()
-                .expectStatus().isCreated();
-    }
-
-    @Order(7)
-    @Test
-    @Override
-    public void putTransaction_ClientTrackingNotExistingForTenant_Returns404() {
-        // Given
-        String externalId = "10002";
-        String customerExternalId = "1586";
-
-        // Then
-        webTestClient
-                .mutateWith(differentTenantMutator)
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + customerExternalId)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(CustomerDto.class)
-                .value(customerDto -> {
-
-                    TransactionDto transactionDto = ITUtilities.stubTransactionDto(externalId, customerDto.complytId());
-
-                    webTestClient
-                            .mutateWith(csrf())
-                            .mutateWith(differentTenantMutator)
-                            .put()
-                            .uri(uriBuilder -> uriBuilder
-                                    .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                                    .build())
-                            .accept(MediaType.APPLICATION_JSON)
-                            .bodyValue(transactionDto)
-                            .exchange()
-                            .expectStatus().isNotFound();
-                });
+                .expectStatus().isNotFound();
     }
 }

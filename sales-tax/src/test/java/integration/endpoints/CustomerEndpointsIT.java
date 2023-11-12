@@ -45,7 +45,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     private WebTestClient webTestClient;
 
     // Given
-    private String source = "1";
+    private final String source = "1";
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.http.MediaType;
 
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -366,13 +367,69 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     public void put_InsufficientScopes_Returns403() {
         WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/dummy")
+                        .build())
+                .headers(headers -> headers.setBearerAuth(TOKEN_NO_SCOPES))
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Order(4)
+    @Test
+    @Override
+    public void refresh_EverythingExists_Returns200WithSummary() {
+        // Given
+        String existingStateAbbreviation = "CA";
+        LocalDate now = LocalDate.now();
+        LocalDate summaryDate = now.isAfter(now.withDayOfMonth(1).withMonth(6))
+                ? LocalDate.of(now.getYear() + 1, 6, 1)
+                : LocalDate.of(now.getYear(), 6, 1);
+
+        // Then
+        WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + existingStateAbbreviation)
+                        .queryParam("date", now)
                         .build())
                 .headers(headers -> {
-                    headers.setBearerAuth(TOKEN_NO_SCOPES);
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
                 })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.state.abbreviation").isEqualTo(existingStateAbbreviation)
+                .jsonPath("$.nexusCalculationSummaries['%s'].amount".formatted(summaryDate)).isEqualTo(0)
+                .jsonPath("$.nexusCalculationSummaries['%s'].count".formatted(summaryDate)).isEqualTo(0);
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    public void post_NoAccessToken_Returns401() {
+        WEB_TEST_CLIENT
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/refresh/state/dummy")
+                        .build())
+                .headers(headers -> headers.setContentType(MediaType.APPLICATION_JSON))
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    public void post_InsufficientScopes_Returns403() {
+        WEB_TEST_CLIENT
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/refresh/state/dummy")
+                        .build())
+                .headers(headers -> headers.setBearerAuth(TOKEN_NO_SCOPES))
                 .exchange()
                 .expectStatus().isForbidden();
     }

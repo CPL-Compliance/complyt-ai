@@ -2,10 +2,11 @@ package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
-import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
+import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.transaction.TransactionDto;
+import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
@@ -26,6 +27,8 @@ import testUtils.integration_test.ITUtilities;
 import testUtils.integration_test.templates.economic_nexus.EconomicNexusOnlyTaxableItemsITTemplate;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -65,6 +68,28 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshSalesTaxTrackingByStateAndDate_CheckEconomicNexusNotPassed_Returns200() {
+        String state = "CA";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state)
+                        .queryParam("date", referenceDate.toLocalDate())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk().expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> LOGGER.info(String.valueOf(salesTaxTrackingDto)));
     }
 
     @Order(1)
@@ -136,6 +161,7 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(receivedSalesTaxTracking -> {
+                    assertEquals(BigDecimal.valueOf(450010), receivedSalesTaxTracking.nexusCalculationSummaries().get(LocalDate.of(2022,6,1)).amount());
                     assertFalse(receivedSalesTaxTracking.economicNexusTracker().established());
                     assertFalse(receivedSalesTaxTracking.approved());
                 });
@@ -184,6 +210,7 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(receivedSalesTaxTracking -> {
                     assertTrue(receivedSalesTaxTracking.economicNexusTracker().established());
+                            assertEquals(BigDecimal.valueOf(510010), receivedSalesTaxTracking.nexusCalculationSummaries().get(LocalDate.of(2022,6,1)).amount());
                     assertEquals(receivedSalesTaxTracking.economicNexusTracker().establishedDate(), LocalDateTime.parse(referenceDate.toString()));
                     assertEquals(receivedSalesTaxTracking.appliedDate(), LocalDateTime.parse(referenceDate.toString()));
 

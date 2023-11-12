@@ -10,6 +10,7 @@ import com.complyt.domain.transaction.TransactionFilingStatus;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
+import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -42,6 +43,7 @@ public interface ITUtilities {
         return new SalesTaxTrackingDto(null, state, "comment", true,
                 new PhysicalNexusTrackerDto(false, LocalDateTime.now()),
                 new EconomicNexusTrackerDto(false, LocalDateTime.now()),
+                null, null, null,
                 LocalDateTime.now(), false, LocalDateTime.now(), FilingFrequencyDto.MONTHLY);
     }
 
@@ -136,13 +138,13 @@ public interface ITUtilities {
                 .issuer("https://localhost")
                 .claim("tenant_id", "it_tenant")
                 .claim("scope", "create:customer delete:customer read:customer " +
-                        "update:customer create:transaction read:transaction " +
-                        "update:transaction delete:transaction read:state " +
-                        "create:exemption update:exemption delete:exemption " +
-                        "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
+                                "update:customer create:transaction read:transaction " +
+                                "update:transaction delete:transaction read:state " +
+                                "create:exemption update:exemption delete:exemption " +
+                                "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
     }
 
-    public static Address createAddressInCalifornia() {
+    static Address createAddressInCalifornia() {
         return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
@@ -163,5 +165,20 @@ public interface ITUtilities {
         SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
         LocalDateTime now = LocalDateTime.now();
         return new ComplytSalesTaxRates(address, salesTaxRates);
+    }
+
+    static ClientTrackingDto stubClientTrackingDto() {
+        return new ClientTrackingDto(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), "it_tenant");
+    }
+
+    static NexusStateRuleDto stubAlabamaNexusStateRuleDto() {
+        return new NexusStateRuleDto(true,
+                new StateDto("AL", "01", "Alabama"),
+                List.of(TaxableCategoryDto.TAXABLE, TaxableCategoryDto.NOT_TAXABLE),
+                List.of(TangibleCategoryDto.INTANGIBLE, TangibleCategoryDto.TANGIBLE),
+                List.of(CustomerTypeDto.RETAIL),
+                TimeFrameDto.PREVIOUS_TWELVE_MONTHS,
+                new NexusThresholdDto(BigDecimal.valueOf(250000), 0, DefinitionDto.AMOUNT),
+                LocalDateTime.of(1970,1,1,0,0,0));
     }
 }

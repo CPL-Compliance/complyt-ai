@@ -2,16 +2,17 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
+import com.complyt.domain.ClientTracking;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.CustomerType;
-import com.complyt.domain.nexus.EconomicNexusTracker;
-import com.complyt.domain.nexus.NexusStateRule;
-import com.complyt.domain.nexus.NexusThreshold;
-import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.nexus.*;
 import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
+import com.complyt.domain.transaction.TransactionType;
+import com.complyt.repositories.ClientTrackingRepository;
+import com.complyt.repositories.NexusStateRuleRepository;
 import com.complyt.repositories.SalesTaxTrackingRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,10 +28,9 @@ import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,6 +45,10 @@ public class SalesTaxTrackingServiceImplTest {
 
     @Mock
     SalesTaxTrackingRepository salesTaxTrackingRepository;
+    @Mock
+    ClientTrackingRepository clientTrackingRepository;
+    @Mock
+    NexusStateRuleRepository nexusStateRuleRepository;
 
     @Mock
     ApplicationDateCreator applicationDateCreator;
@@ -54,12 +58,17 @@ public class SalesTaxTrackingServiceImplTest {
 
     SalesTaxTracking salesTaxTracking;
 
+    ClientTracking clientTracking;
+
     UnitTestUtilities testUtilities;
+    private NexusStateRule nexusStateRule;
 
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTracking = testUtilities.createSalesTaxTracking(new ObjectId().toString());
+        clientTracking = salesTaxTracking.getClientTracking();
+        nexusStateRule = salesTaxTracking.getNexusStateRule();
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {
@@ -84,7 +93,7 @@ public class SalesTaxTrackingServiceImplTest {
         NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(1000), 2, Definition.AMOUNT_OR_COUNT);
 
         return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
-                TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold);
+                TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold, LocalDateTime.now());
     }
 
     @Test
@@ -115,17 +124,45 @@ public class SalesTaxTrackingServiceImplTest {
     }
 
     @Test
-    void save_SavesSalesTaxTracking_ReturnsSalesTaxTracking() {
+    void save_SavesSalesTaxTrackingWithoutNexusSummary_ReturnsSalesTaxTracking() {
         // Given
-        SalesTaxTracking salesTaxTrackingNoId = salesTaxTracking.withId(null);
+        SalesTaxTracking givenSalesTaxTracking = salesTaxTracking
+                .withNexusStateRule(salesTaxTracking.getNexusStateRule().withTimeFrame(TimeFrame.PREVIOUS_TWELVE_MONTHS))
+                .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummary(3, BigDecimal.valueOf(3405.5))))
+                .withId(null);
+        SalesTaxTracking salesTaxTrackingWithNoSummary = givenSalesTaxTracking
+                .withNexusCalculationSummaries(Map.of());
+        SalesTaxTracking savedSalesTaxTracking = salesTaxTrackingWithNoSummary
+                .withId("newId");
+        SalesTaxTracking expectedSalesTaxTracking = savedSalesTaxTracking
+                .withNexusCalculationSummaries(givenSalesTaxTracking.getNexusCalculationSummaries());
 
         // When
-        when(salesTaxTrackingRepository.save(salesTaxTrackingNoId)).thenReturn(Mono.just(salesTaxTracking));
-        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.save(salesTaxTrackingNoId);
+        when(salesTaxTrackingRepository.save(salesTaxTrackingWithNoSummary)).thenReturn(Mono.just(savedSalesTaxTracking));
+        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.save(givenSalesTaxTracking);
 
         // Then
-        StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
+        StepVerifier.create(actualSalesTaxTracking).expectNext(expectedSalesTaxTracking).verifyComplete();
     }
+
+    @Test
+    void save_SavesSalesTaxTrackingWithNexusSummary_ReturnsSalesTaxTracking() {
+        // Given
+        SalesTaxTracking givenSalesTaxTracking = salesTaxTracking
+                .withNexusStateRule(salesTaxTracking.getNexusStateRule().withTimeFrame(TimeFrame.CURRENT_CALENDER_YEAR))
+                .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummary(3, BigDecimal.valueOf(3405.5))))
+                .withId(null);
+        SalesTaxTracking savedSalesTaxTracking = givenSalesTaxTracking
+                .withId("newId");
+
+        // When
+        when(salesTaxTrackingRepository.save(givenSalesTaxTracking)).thenReturn(Mono.just(savedSalesTaxTracking));
+        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.save(givenSalesTaxTracking);
+
+        // Then
+        StepVerifier.create(actualSalesTaxTracking).expectNext(savedSalesTaxTracking).verifyComplete();
+    }
+
 
     @Test
     void save_NullSalesTaxTrackingPassed_ThrowsException() {
@@ -192,7 +229,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         when(salesTaxTrackingRepository.save(any())).thenReturn(Mono.just(salesTaxTrackingWithNexusEstablished));
-        when(applicationDateCreator.create(stateRule.getTimeFrame(), referenceDate)).thenReturn(LocalDateTime.now());
+        when(applicationDateCreator.create(stateRule.timeFrame(), referenceDate)).thenReturn(LocalDateTime.now());
         Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking, stateRule, referenceDate);
 
         // Then
@@ -207,9 +244,11 @@ public class SalesTaxTrackingServiceImplTest {
         String state = newSalesTaxTracking.getState().getName();
 
         // When
+        when(nexusStateRuleRepository.findMostRecentByState(newSalesTaxTracking.getState().getName())).thenReturn(Mono.just(nexusStateRule));
+        when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
         when(salesTaxTrackingRepository.findByState(state)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingRepository.save(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(newSalesTaxTracking, state);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(newSalesTaxTracking);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(newSalesTaxTracking).verifyComplete();
@@ -284,10 +323,54 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         when(complytIdHandler.insertComplytIdToNew(salesTaxTracking)).thenReturn(salesTaxTracking.withComplytId(complytId));
+        when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
+        when(nexusStateRuleRepository.findMostRecentByState(salesTaxTracking.getState().getName())).thenReturn(Mono.just(nexusStateRule));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.injectDataToNewSalesTaxTracking(salesTaxTracking);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking.withComplytId(complytId)).verifyComplete();
+    }
+
+    @Test
+    void insertSummariesFromOriginal_OriginalHaveSummaries_ReturnsNewWithSummaries() {
+        // Given
+        SalesTaxTracking originalSalesTaxTracking = salesTaxTracking
+                .withNexusCalculationSummaries(Map.of(LocalDate.now(),
+                        new NexusCalculationSummary(1, BigDecimal.valueOf(15000))))
+                .withTransactionNexusSummaries(Map.of(UUID.randomUUID(),
+                        new TransactionNexusSummary(BigDecimal.valueOf(15000), LocalDateTime.now(), TransactionType.INVOICE)));
+
+        SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComment("new");
+
+        SalesTaxTracking expectedSalesTaxTracking = newSalesTaxTracking
+                .withNexusCalculationSummaries(originalSalesTaxTracking.getNexusCalculationSummaries())
+                .withTransactionNexusSummaries(originalSalesTaxTracking.getTransactionNexusSummaries());
+
+        // When
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.insertSummariesFromOriginal(newSalesTaxTracking, originalSalesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(expectedSalesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void insertSummariesFromOriginal_OriginalDoesNotHaveSummaries_ReturnsNewWithEmptyMaps() {
+        // Given
+        SalesTaxTracking originalSalesTaxTracking = salesTaxTracking
+                .withNexusCalculationSummaries(null)
+                .withTransactionNexusSummaries(null);
+
+        SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComment("new");
+
+        SalesTaxTracking expectedSalesTaxTracking = newSalesTaxTracking
+                .withNexusCalculationSummaries(new HashMap<>())
+                .withTransactionNexusSummaries(new HashMap<>());
+
+        // When
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.insertSummariesFromOriginal(newSalesTaxTracking, originalSalesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(expectedSalesTaxTracking).verifyComplete();
     }
 
     @Test
@@ -297,7 +380,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         when(salesTaxTrackingRepository.findByState(state)).thenReturn(Mono.empty());
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(salesTaxTracking, state);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(salesTaxTracking);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectError().verify();
@@ -307,11 +390,10 @@ public class SalesTaxTrackingServiceImplTest {
     void update_NullSalesTaxTrackingPassed_ThrowsException() {
         // Given
         SalesTaxTracking nullSalesTaxTracking = null;
-        String state = salesTaxTracking.getState().getName();
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.update(nullSalesTaxTracking, state);
+            salesTaxTrackingService.update(nullSalesTaxTracking);
         });
 
         // Then
@@ -319,17 +401,59 @@ public class SalesTaxTrackingServiceImplTest {
     }
 
     @Test
-    void update_NullStatePassed_ThrowsException() {
+    void upsertWithoutNexusSummaryIfNeeded_NullSalesTaxTrackingPassed_ThrowsException() {
         // Given
-        String nullState = null;
+        SalesTaxTracking nullSalesTaxTracking = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.update(salesTaxTracking, nullState);
+            salesTaxTrackingService.upsertWithoutNexusSummaryIfNeeded(nullSalesTaxTracking);
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void addClientAndStateDetails_NullSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.addClientAndStateDetails(nullSalesTaxTracking);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void insertSummariesFromOriginal_NullNewSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.insertSummariesFromOriginal(nullSalesTaxTracking, salesTaxTracking);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "checkedSalesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void insertSummariesFromOriginal_NullOriginalSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.insertSummariesFromOriginal(salesTaxTracking, nullSalesTaxTracking);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "originalSalesTaxTracking is marked non-null but is null");
     }
 
     @Test

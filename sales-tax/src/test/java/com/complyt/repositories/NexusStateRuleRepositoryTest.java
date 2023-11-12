@@ -9,7 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -25,7 +28,10 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +56,7 @@ public class NexusStateRuleRepositoryTest {
     @Test
     void findById_FindsStateRule_ReturnsStateRule() {
         // Given
-        String id = nexusStateRule.getId();
+        String id = nexusStateRule.id();
 
         // When
         when(reactiveMongoTemplate.findById(id, NexusStateRule.class)).thenReturn(Mono.just(nexusStateRule));
@@ -76,7 +82,7 @@ public class NexusStateRuleRepositoryTest {
     @Test
     void findByState_FindsRule_ReturnsRule() {
         // Given
-        String state = nexusStateRule.getState().getAbbreviation();
+        String state = nexusStateRule.state().getAbbreviation();
         Criteria stateSearchCriteria = new Criteria()
                 .orOperator(Criteria.where("state.abbreviation").is(state),
                         Criteria.where("state.name").is(state));
@@ -90,6 +96,20 @@ public class NexusStateRuleRepositoryTest {
         StepVerifier.create(actualStateRule).expectNext(nexusStateRule).verifyComplete();
     }
 
+    @Test
+    void findMostRecentByState_Finds2Rule_ReturnsFirstRule() {
+        // Given
+        NexusStateRule mostRecentNexusStateRule = nexusStateRule.withAppliedDate(LocalDateTime.now()).withEnforcesSalesTax(false);
+        String state = nexusStateRule.state().getAbbreviation();
+
+        // When
+        when(reactiveMongoTemplate.aggregate(any(), eq(NexusStateRule.class))).thenReturn(Flux.just(mostRecentNexusStateRule, nexusStateRule));
+        Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.findMostRecentByState(state);
+
+        // Then
+        StepVerifier.create(actualStateRule).expectNext(mostRecentNexusStateRule).verifyComplete();
+    }
+
     @SuppressWarnings("ConstantConditions")
     @Test
     void findByState_NullStatePassed_ThrowsException() {
@@ -98,6 +118,18 @@ public class NexusStateRuleRepositoryTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> nexusStateRuleRepository.findByState(nullStateAbbreviation));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
+    }
+
+    @Test
+    void findMostRecentByState_NullStatePassed_ThrowsException() {
+        // Given
+        String nullStateAbbreviation = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> nexusStateRuleRepository.findMostRecentByState(nullStateAbbreviation));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");

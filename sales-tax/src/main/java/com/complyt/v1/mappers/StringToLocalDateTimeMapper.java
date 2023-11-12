@@ -59,6 +59,6 @@ public interface StringToLocalDateTimeMapper {
         } catch (Exception e) {
             log.debug("Date has been received in invalid format : " + dateAsString);
         }
-        throw new ParseException("Failed on parsing string to LocalDateTime  " + DtoErrorMessages.DATE_FORMAT_ERROR, 0);
+        throw new ParseException("Failed on parsing string to LocalDateTime  " + DtoErrorMessages.ISO8601_FORMAT_ERROR, 0);
     }
 }

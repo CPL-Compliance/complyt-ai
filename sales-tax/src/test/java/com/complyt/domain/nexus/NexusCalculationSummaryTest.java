@@ -1,5 +1,6 @@
 package com.complyt.domain.nexus;
 
+import com.complyt.domain.nexus.enums.Definition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,8 +25,8 @@ class NexusCalculationSummaryTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "NexusCalculationSummary(count=" + nexusCalculationSummary.getCount() +
-                ", amount=" + nexusCalculationSummary.getAmount() + ")";
+        String expectedString = "NexusCalculationSummary[count=" + nexusCalculationSummary.count() +
+                ", amount=" + nexusCalculationSummary.amount() + "]";
 
         // When
         String actualString = nexusCalculationSummary.toString();
@@ -52,7 +53,7 @@ class NexusCalculationSummaryTest {
         NexusCalculationSummary nexusCalculationSummaryWithNullManualTaxRate = nexusCalculationSummary.withAmount(null);
 
         // When
-        BigDecimal actualTotalPrice = nexusCalculationSummaryWithNullManualTaxRate.getAmount();
+        BigDecimal actualTotalPrice = nexusCalculationSummaryWithNullManualTaxRate.amount();
 
         // Then
         assertEquals(BigDecimal.ZERO, actualTotalPrice);
@@ -64,7 +65,7 @@ class NexusCalculationSummaryTest {
         NexusCalculationSummary nexusCalculationSummaryWithManualTaxRateOf10 = nexusCalculationSummary.withAmount(new BigDecimal("10"));
 
         // When
-        BigDecimal actualTotalPrice = nexusCalculationSummaryWithManualTaxRateOf10.getAmount();
+        BigDecimal actualTotalPrice = nexusCalculationSummaryWithManualTaxRateOf10.amount();
 
         // Then
         assertEquals(new BigDecimal("10"), actualTotalPrice);

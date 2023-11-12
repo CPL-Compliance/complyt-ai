@@ -75,7 +75,54 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         String externalId = "10071";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(2000), null, null,
+                        new BigDecimal(60000), null, null,
+                        "C?S1", null, null))
+                .withShippingAddress(referenceAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRates()));
+    }
+
+    @Override
+    public void upsertTransaction_UpdateToHaveNoShippingFees_Returns200NoTaxes() {
+        String externalId = "10071";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingFee(null)
+                .withShippingAddress(referenceAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRates()));
+    }
+
+    @Override
+    public void upsertTransaction_ShippingFeesNotPassingEconomicNexusAfterPreviousSubtraction_Returns200NoTaxes() {
+        //Given (C?S1 Tangible)
+        String externalId = "10072";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
+                        new BigDecimal(60000), null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -101,10 +148,10 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
     public void upsertTransaction_ShippingFeesNotTangibleAndNotAddedToThresholdCalculation_Returns200NoTaxes() {
 
         //Given (C6S1 Intangible)
-        String externalId = "10072";
+        String externalId = "10073";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(85000), null, null,
+                        new BigDecimal(35000), null, null,
                         "C6S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -148,10 +195,10 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
     public void upsertTransaction_ShippingFeesPassingEconomicNexus_Returns200NoTaxes() {
 
         //Given (C?S1 Tangible)
-        String externalId = "10073";
+        String externalId = "10074";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(85000), null, null,
+                        new BigDecimal(35000), null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -211,7 +258,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
     @WithMockUser
     public void upsertTransaction_ShippingFeesAfterNexusPassed_Returns200WithTaxes() {
         //Given (C?S1 Tangible)
-        String externalId = "10074";
+        String externalId = "10075";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
                         new BigDecimal(10000), null, null,
@@ -242,7 +289,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
     @WithMockUser
     public void upsertTransaction_ShippingFeesNotTaxableAfterNexusPassed_Returns200NoTaxes() {
         //Given (C7S1 Nontaxable)
-        String externalId = "10075";
+        String externalId = "10076";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
                         new BigDecimal(10000), null, null,
@@ -273,7 +320,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
     @WithMockUser
     public void upsertTransaction_ShippingFeesWithManualSalesTaxRate_Returns200WithManualTaxes() {
         //Given (C?S1 Tangible)
-        String externalId = "10076";
+        String externalId = "10077";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withUnitPrice(new BigDecimal(10)).withTotalPrice(new BigDecimal(10)))
                 .withShippingFee(new ShippingFeeDto(true, new BigDecimal("0.15"),

@@ -23,7 +23,7 @@ public class NexusTransactionsSearchQueryBuilder {
         Query timeFrameQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, nexusStateRule, referenceDate);
         return timeFrameQuery
                 .addCriteria(new Criteria().orOperator(
-                        Criteria.where("shippingAddress.state").is(nexusStateRule.getState().getAbbreviation())
-                        , Criteria.where("shippingAddress.state").is(nexusStateRule.getState().getName())));
+                        Criteria.where("shippingAddress.state").is(nexusStateRule.state().getAbbreviation())
+                        , Criteria.where("shippingAddress.state").is(nexusStateRule.state().getName())));
     }
 }

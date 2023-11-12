@@ -42,7 +42,7 @@ class ThresholdStrategy {
     }
 
     private void setIsNexusExceeded() {
-        Definition definition = stateRule.getNexusThreshold().getDefinition();
+        Definition definition = stateRule.nexusThreshold().getDefinition();
         log.debug("Checking if nexus has been exceeded, threshold definition : " + definition);
 
         switch (definition) {
@@ -56,12 +56,12 @@ class ThresholdStrategy {
 
     // Method that checks if passed nexus threshold by amount
     public boolean exceededAmount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
-        return nexusCalculationSummary.getAmount().compareTo(nexusStateRule.getNexusThreshold().getAmount()) >= 0;
+        return nexusCalculationSummary.amount().compareTo(nexusStateRule.nexusThreshold().getAmount()) >= 0;
     }
 
     // Method that checks if passed nexus threshold by count
     public boolean exceededCount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
-        return nexusCalculationSummary.getCount() >= nexusStateRule.getNexusThreshold().getCount();
+        return nexusCalculationSummary.count() >= nexusStateRule.nexusThreshold().getCount();
     }
 
     // Method that checks if passed nexus threshold by amount and count
