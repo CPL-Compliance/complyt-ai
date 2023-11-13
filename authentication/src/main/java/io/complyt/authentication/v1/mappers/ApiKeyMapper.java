@@ -2,7 +2,6 @@ package io.complyt.authentication.v1.mappers;
 
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.v1.models.ApiKeyDto;
-import lombok.NonNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;

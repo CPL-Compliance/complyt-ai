@@ -11,7 +11,8 @@ public class TestUtilities {
     public static final String API_KEY_BASE_URL = "/v1/api_key";
     public static final String SECRET_KEY_BASE_URL = "/v1/secret_key";
     public static final String NON_EXISTING_COMPLYT_ID = "11111111-1111-1111-1111-111111111111";
-    public static final String API_KEY = "479719ff-e1f6-4dbd-9619-5c78fa41f929-0518f0fb-80d6-446b-8943-d93d8a768b33";
+    public static final String CLIENT_ID = "479719ff-e1f6-4dbd-9619-5c78fa41f929";
+    public static final String CLIENT_SECRET = "0518f0fb-80d6-446b-8943-d93d8a768b33";
 
 
     public static String unvalidatedSalesTaxTrackingJsonExample(String stateName, String stateAbbreviation) {
@@ -176,6 +177,10 @@ public class TestUtilities {
     }
 
     public static String tokenJsonExample() {
-        return "{\"apiKey\": \"" + API_KEY + "\"}";
+        return "{\n" +
+                "    \"clientId\":\"" + CLIENT_ID + "\",\n" +
+                "    \"clientSecret\":\"" + CLIENT_SECRET + "\"\n" +
+                "}";
     }
+
 }

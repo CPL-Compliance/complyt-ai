@@ -5,7 +5,6 @@ import integration.test_utils.TestUtilities;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
-
 public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     @Test
     public void authentication_apiKey_post_clientCredentialsExists_Returns201() {
@@ -22,7 +21,8 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
-                .jsonPath("$.apiKey").exists();
+                .jsonPath("$.clientId").exists()
+                .jsonPath("$.clientSecret").exists();
     }
 
     @Test
