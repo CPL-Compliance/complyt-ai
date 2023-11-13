@@ -768,23 +768,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Then
         assertEquals("exemptionHandler is marked non-null but is null", nullPointerException.getMessage());
     }
-
-    @Test
-    @Override
-    @WithMockUser
-    public void create_NullHandler_ThrowsNullPointerException() {
-        // Given
-        ExemptionHandler nullExemptionHandler = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            exemptionRouter.createRouterFunction(nullExemptionHandler);
-        });
-
-        // Then
-        assertEquals("exemptionHandler is marked non-null but is null", nullPointerException.getMessage());
-    }
-
+    
     @Test
     @Override
     @WithMockUser
