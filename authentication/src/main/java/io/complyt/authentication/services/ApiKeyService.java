@@ -9,11 +9,8 @@ import org.springframework.stereotype.Service;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Service
 public class ApiKeyService {
-    public String generate(){
-        return ApiKeyGenerator.generate();
-    }
 
-    public ApiKey generatefromString(String apiKey){
-        return new ApiKey(apiKey);
+    public ApiKey generate() {
+        return ApiKeyGenerator.generate();
     }
 }

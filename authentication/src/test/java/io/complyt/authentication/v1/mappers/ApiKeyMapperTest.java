@@ -27,14 +27,4 @@ class ApiKeyMapperTest {
         assertEquals(apiKey, actualApiKey);
     }
 
-    @Test
-    void apiKeyDtoToApiKey_apiKeyDtoIsNull_throwsNullException() {
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            ApiKeyMapper.INSTANCE.apiKeyDtoToApiKey(null);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "apiKeyDto is marked non-null but is null");
-    }
 }

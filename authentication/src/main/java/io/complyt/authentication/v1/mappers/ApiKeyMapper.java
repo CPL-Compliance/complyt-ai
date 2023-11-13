@@ -11,7 +11,7 @@ import org.mapstruct.factory.Mappers;
 public interface ApiKeyMapper {
     ApiKeyMapper INSTANCE = Mappers.getMapper(ApiKeyMapper.class);
 
-    default ApiKey apiKeyDtoToApiKey(@NonNull ApiKeyDto apiKeyDto){
-        return new ApiKey(apiKeyDto.apiKey());
-    }
+    ApiKey apiKeyDtoToApiKey(ApiKeyDto apiKeyDto);
+
+    ApiKeyDto apiKeyToApiKeyDto(ApiKey apiKey);
 }

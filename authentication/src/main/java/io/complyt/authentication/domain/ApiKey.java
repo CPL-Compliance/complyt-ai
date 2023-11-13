@@ -20,17 +20,18 @@ public class ApiKey {
     String clientSecret;
 
     @NonNull
-    public static final String API_KEY_REGEXP = "^((?:[^-]+-){4}[^-]+)-((?:[^-]+-){4}[^-]+)$";
+    public static final String API_KEY_REGEXP = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89aAbB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$";
 
-    public ApiKey(@NonNull String apiKey) {
+    public ApiKey(@NonNull String clientId, @NonNull String clientSecret) {
         Pattern pattern = Pattern.compile(API_KEY_REGEXP);
-        Matcher matcher = pattern.matcher(apiKey);
+        Matcher idMatcher = pattern.matcher(clientId);
+        Matcher secretMatcher = pattern.matcher(clientSecret);
 
-        if (!matcher.matches()) {
+        if (!idMatcher.matches() || !secretMatcher.matches()) {
             throw new IllegalArgumentException("Invalid API key format");
         }
 
-        clientId = matcher.group(1);
-        clientSecret = matcher.group(2);
+        this.clientId = idMatcher.group(0);
+        this.clientSecret = secretMatcher.group(0);
     }
 }

@@ -1,12 +1,14 @@
 package io.complyt.authentication.v1.routers;
 
 import io.complyt.authentication.config.ApiExceptionConfig;
+import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.facades.ApiKeyFacade;
 import io.complyt.authentication.repositories.exceptions.OperationFailedException;
 import io.complyt.authentication.v1.exceptions.GlobalErrorAttributes;
 import io.complyt.authentication.v1.exceptions.GlobalExceptionHandler;
 import io.complyt.authentication.v1.handlers.ApiKeyHandler;
+import io.complyt.authentication.v1.mappers.ApiKeyMapper;
 import io.complyt.authentication.v1.mappers.CredentialsMapper;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
@@ -60,10 +62,11 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     @Override
     public void post_Exists_Returns201() {
         // Given
-        ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
+        ApiKey apiKey = TestUtilities.createApiKey();
+        ApiKeyDto apiKeyDto = ApiKeyMapper.INSTANCE.apiKeyToApiKeyDto(apiKey);
 
         // When
-        when(apiKeyFacade.saveCredentials(credentials)).thenReturn(Mono.just(apiKeyDto.apiKey()));
+        when(apiKeyFacade.saveCredentials(credentials)).thenReturn(Mono.just(apiKey));
 
         // Then
         webTestClient

@@ -21,9 +21,8 @@ public class ApiKeyFacade {
     @NonNull
     ApiKeyService apiKeyService;
 
-    public Mono<String> saveCredentials(@NonNull final Credentials credentials) {
-        String apiKeyStr = apiKeyService.generate();
-        ApiKey apiKey = apiKeyService.generatefromString(apiKeyStr);
-        return credentialsService.saveCredentials(credentials, apiKey).thenReturn(apiKeyStr);
+    public Mono<ApiKey> saveCredentials(@NonNull final Credentials credentials) {
+        ApiKey apiKey = apiKeyService.generate();
+        return credentialsService.saveCredentials(credentials, apiKey).thenReturn(apiKey);
     }
 }

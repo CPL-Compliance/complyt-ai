@@ -9,8 +9,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 @Schema(name = "ApiKey", description = FieldsDescriptions.API_KEY)
-public record ApiKeyDto(@NotNull(message = "ApiKey.apiKey " + DtoErrorMessages.NOT_NULL_ERROR)
-                        @NotBlank(message = "ApiKey.apiKey " + DtoErrorMessages.NOT_NULL_BLANK)
-                        @Pattern(regexp = ApiKey.API_KEY_REGEXP,
-                                message = "Invalid API key format") String apiKey) {
+public record ApiKeyDto(@NotNull(message = "ApiKey.clientId " + DtoErrorMessages.NOT_NULL_ERROR)
+                        @NotBlank(message = "ApiKey.clientId " + DtoErrorMessages.NOT_NULL_BLANK)
+                        @Pattern(regexp = ApiKey.API_KEY_REGEXP) String clientId,
+                        @NotNull(message = "ApiKey.clientSecret " + DtoErrorMessages.NOT_NULL_ERROR)
+                        @NotBlank(message = "ApiKey.clientSecret " + DtoErrorMessages.NOT_NULL_BLANK)
+                        @Pattern(regexp = ApiKey.API_KEY_REGEXP) String clientSecret) {
 }
