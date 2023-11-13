@@ -768,7 +768,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Then
         assertEquals("exemptionHandler is marked non-null but is null", nullPointerException.getMessage());
     }
-    
+
     @Test
     @Override
     @WithMockUser
