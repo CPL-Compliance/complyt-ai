@@ -31,7 +31,7 @@ public class ApiKey {
             throw new IllegalArgumentException("Invalid API key format");
         }
 
-        this.clientId = clientIdMatcher.group(0);
-        this.clientSecret = clientSecretMatcher.group(0);
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
     }
 }
