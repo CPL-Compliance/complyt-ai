@@ -25,7 +25,7 @@ class ApiKeyServiceTest {
     @Test
     void generate_returnsApiKeyInStringFormat() {
         try (MockedStatic<ApiKeyGenerator> utilities = Mockito.mockStatic(ApiKeyGenerator.class)) {
-            ApiKey apiKey = new ApiKey(TestUtilities.apiKeyIdStr, TestUtilities.apiKeySecretStr);
+            ApiKey apiKey = new ApiKey(TestUtilities.apiKeyClientIdStr, TestUtilities.apiKeyClientSecretStr);
             utilities.when(ApiKeyGenerator::generate).thenReturn(apiKey);
             assertEquals(apiKey, apiKeyService.generate());
         }

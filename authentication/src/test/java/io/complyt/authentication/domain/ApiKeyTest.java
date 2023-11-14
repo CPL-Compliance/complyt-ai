@@ -29,7 +29,7 @@ class ApiKeyTest {
     void createApiKey_clientIdInputIsNull_throwNullPointerException() {
         // When
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            new ApiKey(null, TestUtilities.apiKeyIdStr);
+            new ApiKey(null, TestUtilities.apiKeyClientIdStr);
         });
 
         // Then
@@ -40,7 +40,7 @@ class ApiKeyTest {
     void createApiKey_clientSecretInputIsNull_throwNullPointerException() {
         // When
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            new ApiKey(TestUtilities.apiKeySecretStr, null);
+            new ApiKey(TestUtilities.apiKeyClientSecretStr, null);
         });
 
         // Then

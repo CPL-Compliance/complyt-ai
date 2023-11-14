@@ -108,7 +108,7 @@ class ValidationHandlerTest {
     }
 
     @Test
-    void handle_missingApiKeyId_throwsError() {
+    void handle_missingApiKeyClientId_throwsError() {
         // Given
         ApiKeyDto apiKeyDto = new ApiKeyDto("", "3572db2e-486b-480a-995b-2e4d2b9104fa");
 
@@ -121,7 +121,7 @@ class ValidationHandlerTest {
     }
 
     @Test
-    void handle_missingApiKeySecret_throwsError() {
+    void handle_missingApiKeyClientSecret_throwsError() {
         // Given
         ApiKeyDto apiKeyDto = new ApiKeyDto("3572db2e-486b-480a-995b-2e4d2b9104fa", "");
 
@@ -136,7 +136,7 @@ class ValidationHandlerTest {
     @Test
     void handle_invalidFormatApiKey_throwsError() {
         // Given
-        ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.invalidApiKeyIdStr, TestUtilities.invalidApiKeySecretStr);
+        ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.invalidApiKeyClientIdStr, TestUtilities.invalidApiKeyClientSecretStr);
 
         // When
         when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.just(apiKeyDto));

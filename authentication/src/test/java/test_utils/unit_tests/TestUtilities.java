@@ -18,10 +18,10 @@ import java.util.UUID;
 public class TestUtilities {
     String tenantId = UUID.randomUUID().toString();
 
-    public static String apiKeyIdStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1ec";
-    public static String apiKeySecretStr = "3572db2e-486b-480a-995b-2e4d2b9104fa";
-    public static String invalidApiKeyIdStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1e";
-    public static String invalidApiKeySecretStr = "3572db2e-486b-480a-995b-";
+    public static String apiKeyClientIdStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1ec";
+    public static String apiKeyClientSecretStr = "3572db2e-486b-480a-995b-2e4d2b9104fa";
+    public static String invalidApiKeyClientIdStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1e";
+    public static String invalidApiKeyClientSecretStr = "3572db2e-486b-480a-995b-";
 
     static String accessToken = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InJ0RU1OdWRnTWx5aTJtMzVLSnJQRSJ9." +
             "eyJ0ZW5hbnRfaWQiOiJvcmdfU3R0QWNCa0s3YjMydzdrQSIsImlzcyI6Imh0dHBzOi8vZGV2ZWxvcG1lbnQtY29tcGx5dC51cy5" +
@@ -55,7 +55,7 @@ public class TestUtilities {
     }
 
     public static Token createInputToken() {
-        return createInputToken(apiKeyIdStr);
+        return createInputToken(apiKeyClientIdStr);
     }
 
     public static Token createInputToken(String apiKey) {
@@ -90,11 +90,11 @@ public class TestUtilities {
     }
 
     public static ApiKey createApiKey() {
-        return new ApiKey(apiKeyIdStr, apiKeySecretStr);
+        return new ApiKey(apiKeyClientIdStr, apiKeyClientSecretStr);
     }
 
     public static ApiKeyDto createApiKeyDto() {
-        return new ApiKeyDto(apiKeyIdStr, apiKeySecretStr);
+        return new ApiKeyDto(apiKeyClientIdStr, apiKeyClientSecretStr);
     }
 
     public static Token createToken() {

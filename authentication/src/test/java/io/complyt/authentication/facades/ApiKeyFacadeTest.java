@@ -42,9 +42,9 @@ class ApiKeyFacadeTest {
 
     @Test
     void saveCredentials_validCredentials_returnApiKey() {
-        String expectedApiKeyIdStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1ec";
-        String expectedApiKeySecretStr = "3572db2e-486b-480a-995b-2e4d2b9104fa";
-        ApiKey expectedApiKey = new ApiKey(expectedApiKeyIdStr, expectedApiKeySecretStr);
+        String expectedApiKeyClientIdStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1ec";
+        String expectedApiKeyClientSecretStr = "3572db2e-486b-480a-995b-2e4d2b9104fa";
+        ApiKey expectedApiKey = new ApiKey(expectedApiKeyClientIdStr, expectedApiKeyClientSecretStr);
 
         // When
         when(apiKeyService.generate()).thenReturn(expectedApiKey);

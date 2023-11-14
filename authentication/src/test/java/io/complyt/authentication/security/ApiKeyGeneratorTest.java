@@ -24,7 +24,7 @@ class ApiKeyGeneratorTest {
     void generate_badClientIdFormat_throwsIllegalArgumentException() {
         // When
         IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> {
-            new ApiKey("cf77c3eba1ec-3572db2e-486b-480a-995bb", TestUtilities.apiKeySecretStr);
+            new ApiKey("cf77c3eba1ec-3572db2e-486b-480a-995bb", TestUtilities.apiKeyClientSecretStr);
         });
 
         // Then
@@ -35,7 +35,7 @@ class ApiKeyGeneratorTest {
     void generate_badClientSecretFormat_throwsIllegalArgumentException() {
         // When
         IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> {
-            new ApiKey(TestUtilities.apiKeyIdStr,"cf77c3eba1ec-3572db2e-486b-480a-995b-");
+            new ApiKey(TestUtilities.apiKeyClientIdStr,"cf77c3eba1ec-3572db2e-486b-480a-995b-");
         });
 
         // Then

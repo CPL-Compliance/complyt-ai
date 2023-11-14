@@ -212,7 +212,7 @@ class TokenRouterMonoTest implements PostOkRouterMonoTest, PostRouterTestSecurit
     @Test
     @WithMockUser
     public void post_invalidApiKeyFormat_return400() {
-        ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.invalidApiKeyIdStr, TestUtilities.invalidApiKeySecretStr);
+        ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.invalidApiKeyClientIdStr, TestUtilities.invalidApiKeyClientSecretStr);
 
         // Then
         webTestClient
@@ -229,7 +229,7 @@ class TokenRouterMonoTest implements PostOkRouterMonoTest, PostRouterTestSecurit
 
     @Test
     @WithMockUser
-    public void post_apiKeyIdValueIsMissing_Returns400() {
+    public void post_apiKeyClientIdValueIsMissing_Returns400() {
         ApiKeyDto apiKeyDto = new ApiKeyDto("", "3572db2e-486b-480a-995b-2e4d2b9104fa");
 
         webTestClient
@@ -246,7 +246,7 @@ class TokenRouterMonoTest implements PostOkRouterMonoTest, PostRouterTestSecurit
 
     @Test
     @WithMockUser
-    public void post_apiKeySecretValueIsMissing_Returns400() {
+    public void post_apiKeyClientSecretValueIsMissing_Returns400() {
         ApiKeyDto apiKeyDto = new ApiKeyDto("3572db2e-486b-480a-995b-2e4d2b9104fa", "");
 
         webTestClient

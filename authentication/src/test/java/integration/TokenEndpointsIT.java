@@ -64,7 +64,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
     @Test
     @WithMockUser
     public void postApiKey_apiKeyExistsButDoesntHaveToken_ReturnsAccessTokenWithExpirationDateTimeLessThenNowPlusExpiresIn() {
-        ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.apiKeyId, TestUtilities.apiKeySecret);
+        ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.apiKeyClientId, TestUtilities.apiKeyClientSecret);
 
         webTestClient
                 .mutateWith(csrf())
