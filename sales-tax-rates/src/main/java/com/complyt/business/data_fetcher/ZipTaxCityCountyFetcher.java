@@ -4,7 +4,6 @@ import com.complyt.domain.CityCountyWrapper;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.domain.zip_tax.ZipTaxData;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;

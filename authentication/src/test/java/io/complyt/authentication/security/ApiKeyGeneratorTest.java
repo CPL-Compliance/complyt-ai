@@ -17,7 +17,7 @@ class ApiKeyGeneratorTest {
     void generate_none_validApiKey() {
         ApiKey apiKey = ApiKeyGenerator.generate();
         System.out.println(apiKey);
-        new ApiKey(apiKey.getClientId(), apiKey.getClientSecret());
+        new ApiKey(apiKey.clientId(), apiKey.clientSecret());
     }
 
     @Test

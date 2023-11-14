@@ -42,8 +42,8 @@ public class CredentialsService {
     String audience;
 
     public Mono<Credentials> getCredentialsByApiKey(final @NonNull ApiKey apiKey) {
-        return credentialsRepository.findByComplytClientId(apiKey.getClientId())
-                .filter(credentials -> passwordEncoder.matches(apiKey.getClientSecret(),
+        return credentialsRepository.findByComplytClientId(apiKey.clientId())
+                .filter(credentials -> passwordEncoder.matches(apiKey.clientSecret(),
                         credentials.getComplytClientSecret()))
                 .switchIfEmpty(Mono.empty()).flatMap(this::decrypt);
     }
@@ -65,7 +65,7 @@ public class CredentialsService {
             throw new RuntimeException("Failed to encrypt credentials.");
         }
 
-        String clientSecret = apiKey.getClientSecret();
+        String clientSecret = apiKey.clientSecret();
         String clientSecretEncoded = passwordEncoder.encode(clientSecret);
 
         return createEncryptedCredentials(apiKey, clientIdEncryptedData, clientSecretEncryptedData,
@@ -107,7 +107,7 @@ public class CredentialsService {
                 .clientIdIv(clientIdEncryptedData.iv())
                 .clientSecret(clientSecretEncryptedData.cipherText())
                 .clientSecretIv(clientSecretEncryptedData.iv()).audience(audience).grantType(grantType)
-                .complytClientId(apiKey.getClientId())
+                .complytClientId(apiKey.clientId())
                 .complytClientSecret(clientSecretEncoded).build();
     }
 }

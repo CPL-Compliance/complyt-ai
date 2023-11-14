@@ -1,6 +1,5 @@
 package com.complyt.domain.nexus;
 
-import com.complyt.domain.nexus.enums.Definition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

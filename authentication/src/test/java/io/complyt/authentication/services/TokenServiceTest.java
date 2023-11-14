@@ -379,8 +379,8 @@ class TokenServiceTest {
         Token encryptedToken = TestUtilities.createEncryptedToken(token, accessTokenEncryptedData, scopeEncryptedData);
 
         // When
-        when(tokenRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.just(encryptedToken));
-        when(passwordEncoder.matches(apiKey.getClientSecret(), encryptedToken.getComplytClientSecret()))
+        when(tokenRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(encryptedToken));
+        when(passwordEncoder.matches(apiKey.clientSecret(), encryptedToken.getComplytClientSecret()))
                 .thenReturn(true);
 
         when(cryptoAesCbcPkcs5Padding.decrypt(accessTokenEncryptedData)).thenReturn(accessTokenPlainText);
@@ -398,7 +398,7 @@ class TokenServiceTest {
         ApiKey apiKey = TestUtilities.createApiKey();
 
         // When
-        when(tokenRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.empty());
+        when(tokenRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.empty());
 
         // Then
         Mono<Token> tokenMono = tokenService.findByApiKey(apiKey);
@@ -423,8 +423,8 @@ class TokenServiceTest {
         Token encryptedToken = TestUtilities.createEncryptedToken(token, accessTokenEncryptedData, scopeEncryptedData);
 
         // When
-        when(tokenRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.just(encryptedToken));
-        when(passwordEncoder.matches(apiKey.getClientSecret(), encryptedToken.getComplytClientSecret()))
+        when(tokenRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(encryptedToken));
+        when(passwordEncoder.matches(apiKey.clientSecret(), encryptedToken.getComplytClientSecret()))
                 .thenReturn(false);
 
         // Then

@@ -39,8 +39,8 @@ public class TokenService {
     int tokenExpirationSafeWindowSec;
 
     public Mono<Token> findByApiKey(final @NonNull ApiKey apiKey) {
-        return tokenRepository.findByComplytClientId(apiKey.getClientId())
-                .filter(token -> passwordEncoder.matches(apiKey.getClientSecret(), token.getComplytClientSecret()))
+        return tokenRepository.findByComplytClientId(apiKey.clientId())
+                .filter(token -> passwordEncoder.matches(apiKey.clientSecret(), token.getComplytClientSecret()))
                 .map(this::decryptToken);
     }
 

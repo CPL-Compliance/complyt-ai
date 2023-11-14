@@ -1,6 +1,9 @@
 package com.complyt.v1.routers;
 
-import com.complyt.v1.api_info.exemption.*;
+import com.complyt.v1.api_info.exemption.DeleteExemptionByComplytIdApiInfo;
+import com.complyt.v1.api_info.exemption.GetAllExemptionsApiInfo;
+import com.complyt.v1.api_info.exemption.GetExemptionByComplytIdApiInfo;
+import com.complyt.v1.api_info.exemption.PutExemptionApiInfo;
 import com.complyt.v1.handlers.ExemptionHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;

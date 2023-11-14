@@ -56,8 +56,8 @@ class CredentialsServiceTest {
         ApiKey apiKey = TestUtilities.createApiKey();
 
         // When
-        when(credentialsRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.just(credentials));
-        when(passwordEncoder.matches(apiKey.getClientSecret(), credentials.getComplytClientSecret()))
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
                 .thenReturn(false);
 
         // Then
@@ -71,7 +71,7 @@ class CredentialsServiceTest {
         ApiKey apiKey = TestUtilities.createApiKey();
 
         // When
-        when(credentialsRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.empty());
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.empty());
 
         // Then
         Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKey(apiKey);
@@ -88,8 +88,8 @@ class CredentialsServiceTest {
         Credentials decryptedCreds = TestUtilities.createDecryptedCreds(credentials);
 
         // When
-        when(credentialsRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.just(credentials));
-        when(passwordEncoder.matches(apiKey.getClientSecret(), credentials.getComplytClientSecret()))
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
                 .thenReturn(true);
         when(cryptoAesCbcPkcs5Padding.decrypt(new EncryptedData(credentials.getClientIdIv(),
                 credentials.getClientId()))).thenReturn(credentials.getClientId());
@@ -110,8 +110,8 @@ class CredentialsServiceTest {
         Credentials credentials = TestUtilities.createCredentials();
 
         // When
-        when(credentialsRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.just(credentials));
-        when(passwordEncoder.matches(apiKey.getClientSecret(), credentials.getComplytClientSecret()))
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
                 .thenReturn(true);
         when(cryptoAesCbcPkcs5Padding.decrypt(new EncryptedData(credentials.getClientIdIv(),
                 credentials.getClientId()))).thenThrow(new BadPaddingException("Error"));
@@ -131,8 +131,8 @@ class CredentialsServiceTest {
         Credentials credentials = TestUtilities.createCredentials();
 
         // When
-        when(credentialsRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.just(credentials));
-        when(passwordEncoder.matches(apiKey.getClientSecret(), credentials.getComplytClientSecret()))
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
                 .thenReturn(true);
         when(cryptoAesCbcPkcs5Padding.decrypt(new EncryptedData(credentials.getClientIdIv(),
                 credentials.getClientId()))).thenThrow(new IllegalBlockSizeException("Error"));
@@ -152,8 +152,8 @@ class CredentialsServiceTest {
         Credentials credentials = TestUtilities.createCredentials();
 
         // When
-        when(credentialsRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.just(credentials));
-        when(passwordEncoder.matches(apiKey.getClientSecret(), credentials.getComplytClientSecret()))
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
                 .thenReturn(true);
         when(cryptoAesCbcPkcs5Padding.decrypt(new EncryptedData(credentials.getClientIdIv(),
                 credentials.getClientId()))).thenThrow(new InvalidAlgorithmParameterException("Error"));
@@ -173,8 +173,8 @@ class CredentialsServiceTest {
         Credentials credentials = TestUtilities.createCredentials();
 
         // When
-        when(credentialsRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.just(credentials));
-        when(passwordEncoder.matches(apiKey.getClientSecret(), credentials.getComplytClientSecret()))
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
                 .thenReturn(true);
         when(cryptoAesCbcPkcs5Padding.decrypt(new EncryptedData(credentials.getClientIdIv(),
                 credentials.getClientId()))).thenThrow(new InvalidKeyException("Error"));
@@ -194,8 +194,8 @@ class CredentialsServiceTest {
         Credentials credentials = TestUtilities.createCredentials();
 
         // When
-        when(credentialsRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.just(credentials));
-        when(passwordEncoder.matches(apiKey.getClientSecret(), credentials.getComplytClientSecret()))
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
                 .thenReturn(true);
         when(cryptoAesCbcPkcs5Padding.decrypt(new EncryptedData(credentials.getClientIdIv(),
                 credentials.getClientId()))).thenThrow(new NoSuchPaddingException("Error"));
@@ -215,8 +215,8 @@ class CredentialsServiceTest {
         Credentials credentials = TestUtilities.createCredentials();
 
         // When
-        when(credentialsRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.just(credentials));
-        when(passwordEncoder.matches(apiKey.getClientSecret(), credentials.getComplytClientSecret()))
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
                 .thenReturn(true);
         when(cryptoAesCbcPkcs5Padding.decrypt(new EncryptedData(credentials.getClientIdIv(),
                 credentials.getClientId()))).thenThrow(new NoSuchAlgorithmException("Error"));
@@ -244,7 +244,7 @@ class CredentialsServiceTest {
         // When
         when(cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientId())).thenReturn(clientIdEncryptedData);
         when(cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientSecret())).thenReturn(clientSecretEncryptedData);
-        when(passwordEncoder.encode(apiKey.getClientSecret())).thenReturn("encoded");
+        when(passwordEncoder.encode(apiKey.clientSecret())).thenReturn("encoded");
         when(credentialsRepository.save(encryptedCredentials)).thenReturn(Mono.just(encryptedCredentials));
 
         // Then

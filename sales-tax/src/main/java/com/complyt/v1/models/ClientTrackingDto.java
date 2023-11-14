@@ -1,6 +1,5 @@
 package com.complyt.v1.models;
 
-import com.complyt.domain.Nexus;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.nexus.NexusDto;
 import jakarta.validation.constraints.Size;

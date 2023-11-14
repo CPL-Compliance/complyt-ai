@@ -153,7 +153,7 @@ public class TestUtilities {
                 .clientIdIv(clientIdEncryptedData.iv())
                 .clientSecret(clientSecretEncryptedData.cipherText())
                 .clientSecretIv(clientSecretEncryptedData.iv()).audience("audience").grantType("grantType")
-                .complytClientId(apiKey.getClientId())
+                .complytClientId(apiKey.clientId())
                 .complytClientSecret(clientSecretEncoded).build();
     }
 

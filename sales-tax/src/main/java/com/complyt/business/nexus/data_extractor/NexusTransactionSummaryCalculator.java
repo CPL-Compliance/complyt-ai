@@ -1,6 +1,5 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.nexus.checker.ItemsNexusStateRuleQualificationChecker;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.TransactionNexusSummary;
 import com.complyt.domain.transaction.Transaction;
@@ -9,8 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.math.BigDecimal;
 
 @Component
 @AllArgsConstructor

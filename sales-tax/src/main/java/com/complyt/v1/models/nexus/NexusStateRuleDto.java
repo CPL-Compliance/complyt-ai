@@ -1,6 +1,5 @@
 package com.complyt.v1.models.nexus;
 
-import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.TangibleCategoryDto;
 import com.complyt.v1.models.TaxableCategoryDto;
