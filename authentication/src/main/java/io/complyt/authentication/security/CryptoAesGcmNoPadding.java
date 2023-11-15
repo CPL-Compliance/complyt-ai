@@ -25,23 +25,18 @@ public class CryptoAesGcmNoPadding implements Crypto {
             NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException {
 
-        // Generate IV (Initialization Vector)
         byte[] iv = new byte[12];
         SecureRandom secureRandom = new SecureRandom();
         secureRandom.nextBytes(iv);
 
-        // Create GCMParameterSpec
         GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(128, iv);
 
-        // Create Cipher instance for AES/GCM/NoPadding
         Cipher cipher = Cipher.getInstance(algorithm);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, gcmParameterSpec);
 
-        // Encrypt the data
         byte[] cipherText = cipher.doFinal(plainText.getBytes());
         String cipherTextStr = Base64.getEncoder().encodeToString(cipherText);
 
-        // Encode the result in Base64
         return new EncryptedData(Base64.getEncoder().encodeToString(iv), cipherTextStr);
     }
 
@@ -49,19 +44,13 @@ public class CryptoAesGcmNoPadding implements Crypto {
             BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, NoSuchPaddingException,
             NoSuchAlgorithmException {
 
-        // Decode the Base64 encoded input
-
-        // Create GCMParameterSpec
         GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(128, Base64.getDecoder().decode(encryptedData.iv()));
 
-        // Create Cipher instance for AES/GCM/NoPadding
         Cipher cipher = Cipher.getInstance(algorithm);
         cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmParameterSpec);
 
-        // Decrypt the data
         byte[] plainText = cipher.doFinal(Base64.getDecoder().decode(encryptedData.cipherText()));
 
-        // Convert decrypted bytes to string
         return new String(plainText);
     }
 
