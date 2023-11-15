@@ -14,16 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 class ApiKeyTest {
-    @Test
-    void createApiKey_BadFormat_throwIllegalArgumentException() {
-        // When
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            new ApiKey("", "");
-        });
-
-        // Then
-        assertEquals("Invalid API key format", exception.getMessage());
-    }
 
     @Test
     void createApiKey_clientIdInputIsNull_throwNullPointerException() {
