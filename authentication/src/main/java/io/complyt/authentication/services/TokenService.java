@@ -34,7 +34,7 @@ public class TokenService {
     PasswordEncoder passwordEncoder;
 
     @NonNull
-    Crypto cryptoAesCbcPkcs5Padding;
+    Crypto cryptoAesGcmNoPadding;
 
     int tokenExpirationSafeWindowSec;
 
@@ -65,8 +65,8 @@ public class TokenService {
         String scope;
         String accessToken;
         try {
-            scope = cryptoAesCbcPkcs5Padding.decrypt(scopeEncryptedData);
-            accessToken = cryptoAesCbcPkcs5Padding.decrypt(accessTokenEncryptedData);
+            scope = cryptoAesGcmNoPadding.decrypt(scopeEncryptedData);
+            accessToken = cryptoAesGcmNoPadding.decrypt(accessTokenEncryptedData);
         } catch (IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException |
                  InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Failed to decrypt data");
@@ -81,8 +81,8 @@ public class TokenService {
         EncryptedData scopeEncryptedData;
 
         try {
-            accessTokenEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken());
-            scopeEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(token.getScope());
+            accessTokenEncryptedData = cryptoAesGcmNoPadding.encrypt(token.getAccessToken());
+            scopeEncryptedData = cryptoAesGcmNoPadding.encrypt(token.getScope());
         } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException |
                  InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             throw new RuntimeException(e);

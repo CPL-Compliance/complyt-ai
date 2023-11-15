@@ -46,13 +46,13 @@ class TokenServiceTest {
     PasswordEncoder passwordEncoder;
 
     @Mock
-    Crypto cryptoAesCbcPkcs5Padding;
+    Crypto cryptoAesGcmNoPadding;
 
     final int tokenExpirationSafeWindowSec = 10;
 
     @BeforeEach
     void setUp() {
-        tokenService = new TokenService(tokenRepository, passwordEncoder, cryptoAesCbcPkcs5Padding,
+        tokenService = new TokenService(tokenRepository, passwordEncoder, cryptoAesGcmNoPadding,
                 tokenExpirationSafeWindowSec);
     }
 
@@ -71,10 +71,10 @@ class TokenServiceTest {
         encryptedToken = encryptedToken.withExpireAt(createDocumentExpirationDateTime(encryptedToken.getExpiresIn()));
 
         // When
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
-        when(cryptoAesCbcPkcs5Padding.decrypt(accessTokenEncryptedData)).thenReturn(accessTokenPlainText);
-        when(cryptoAesCbcPkcs5Padding.decrypt(scopeEncryptedData)).thenReturn(scopePlainText);
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(cryptoAesGcmNoPadding.decrypt(accessTokenEncryptedData)).thenReturn(accessTokenPlainText);
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenReturn(scopePlainText);
         when(tokenRepository.save(any())).thenReturn(Mono.just(encryptedToken));
 
         // Then
@@ -112,10 +112,10 @@ class TokenServiceTest {
                 "scopeCipherText");
 
         // When
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
-        when(cryptoAesCbcPkcs5Padding.decrypt(accessTokenEncryptedData)).thenReturn(accessTokenPlainText);
-        when(cryptoAesCbcPkcs5Padding.decrypt(scopeEncryptedData)).thenReturn(scopePlainText);
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(cryptoAesGcmNoPadding.decrypt(accessTokenEncryptedData)).thenReturn(accessTokenPlainText);
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenReturn(scopePlainText);
         when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
 
         // Then
@@ -134,7 +134,7 @@ class TokenServiceTest {
         Token token = TestUtilities.createToken();
 
         // When
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken()))
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken()))
                 .thenThrow(new NoSuchAlgorithmException("Error"));
 
         // Then
@@ -151,7 +151,7 @@ class TokenServiceTest {
         Token token = TestUtilities.createToken();
 
         // When
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken())).thenThrow(new BadPaddingException("Error"));
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenThrow(new BadPaddingException("Error"));
 
         // Then
         Mono<Token> tokenMono = tokenService.saveToken(token);
@@ -167,7 +167,7 @@ class TokenServiceTest {
         Token token = TestUtilities.createToken();
 
         // When
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken()))
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken()))
                 .thenThrow(new IllegalBlockSizeException("Error"));
 
         // Then
@@ -184,7 +184,7 @@ class TokenServiceTest {
         Token token = TestUtilities.createToken();
 
         // When
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken()))
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken()))
                 .thenThrow(new InvalidAlgorithmParameterException("Error"));
 
         // Then
@@ -201,7 +201,7 @@ class TokenServiceTest {
         Token token = TestUtilities.createToken();
 
         // When
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken())).thenThrow(new InvalidKeyException("Error"));
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenThrow(new InvalidKeyException("Error"));
 
         // Then
         Mono<Token> tokenMono = tokenService.saveToken(token);
@@ -217,7 +217,7 @@ class TokenServiceTest {
         Token token = TestUtilities.createToken();
 
         // When
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken())).thenThrow(new NoSuchPaddingException("Error"));
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenThrow(new NoSuchPaddingException("Error"));
 
         // Then
         Mono<Token> tokenMono = tokenService.saveToken(token);
@@ -236,10 +236,10 @@ class TokenServiceTest {
         EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
 
         // When
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
         when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
-        when(cryptoAesCbcPkcs5Padding.decrypt(scopeEncryptedData)).thenThrow(new NoSuchAlgorithmException("Error"));
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new NoSuchAlgorithmException("Error"));
 
         // Then
         Mono<Token> tokenMono = tokenService.saveToken(token);
@@ -258,10 +258,10 @@ class TokenServiceTest {
         EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
 
         // When
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
         when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
-        when(cryptoAesCbcPkcs5Padding.decrypt(scopeEncryptedData)).thenThrow(new BadPaddingException("Error"));
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new BadPaddingException("Error"));
 
         // Then
         Mono<Token> tokenMono = tokenService.saveToken(token);
@@ -280,10 +280,10 @@ class TokenServiceTest {
         EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
 
         // When
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
         when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
-        when(cryptoAesCbcPkcs5Padding.decrypt(scopeEncryptedData)).thenThrow(new IllegalBlockSizeException("Error"));
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new IllegalBlockSizeException("Error"));
 
         // Then
         Mono<Token> tokenMono = tokenService.saveToken(token);
@@ -302,10 +302,10 @@ class TokenServiceTest {
         EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
 
         // When
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
         when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
-        when(cryptoAesCbcPkcs5Padding.decrypt(scopeEncryptedData))
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData))
                 .thenThrow(new InvalidAlgorithmParameterException("Error"));
 
         // Then
@@ -325,10 +325,10 @@ class TokenServiceTest {
         EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
 
         // When
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
         when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
-        when(cryptoAesCbcPkcs5Padding.decrypt(scopeEncryptedData)).thenThrow(new InvalidKeyException("Error"));
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new InvalidKeyException("Error"));
 
         // Then
         Mono<Token> tokenMono = tokenService.saveToken(token);
@@ -347,10 +347,10 @@ class TokenServiceTest {
         EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
 
         // When
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
-        when(cryptoAesCbcPkcs5Padding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
         when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
-        when(cryptoAesCbcPkcs5Padding.decrypt(scopeEncryptedData)).thenThrow(new NoSuchPaddingException("Error"));
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new NoSuchPaddingException("Error"));
 
         // Then
         Mono<Token> tokenMono = tokenService.saveToken(token);
@@ -383,8 +383,8 @@ class TokenServiceTest {
         when(passwordEncoder.matches(apiKey.clientSecret(), encryptedToken.getComplytClientSecret()))
                 .thenReturn(true);
 
-        when(cryptoAesCbcPkcs5Padding.decrypt(accessTokenEncryptedData)).thenReturn(accessTokenPlainText);
-        when(cryptoAesCbcPkcs5Padding.decrypt(scopeEncryptedData)).thenReturn(scopePlainText);
+        when(cryptoAesGcmNoPadding.decrypt(accessTokenEncryptedData)).thenReturn(accessTokenPlainText);
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenReturn(scopePlainText);
 
         // Then
         Mono<Token> tokenMono = tokenService.findByApiKey(apiKey);

@@ -33,7 +33,7 @@ public class CredentialsService {
     PasswordEncoder passwordEncoder;
 
     @NonNull
-    Crypto cryptoAesCbcPkcs5Padding;
+    Crypto cryptoAesGcmNoPadding;
 
     @NonNull
     String grantType;
@@ -58,8 +58,8 @@ public class CredentialsService {
         EncryptedData clientSecretEncryptedData;
 
         try {
-            clientIdEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientId());
-            clientSecretEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientSecret());
+            clientIdEncryptedData = cryptoAesGcmNoPadding.encrypt(credentials.getClientId());
+            clientSecretEncryptedData = cryptoAesGcmNoPadding.encrypt(credentials.getClientSecret());
         } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException |
                  InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             throw new RuntimeException("Failed to encrypt credentials.");
@@ -81,8 +81,8 @@ public class CredentialsService {
         String clientSecret;
 
         try {
-            clientId = cryptoAesCbcPkcs5Padding.decrypt(encryptedClientId);
-            clientSecret = cryptoAesCbcPkcs5Padding.decrypt(encryptedClientSecret);
+            clientId = cryptoAesGcmNoPadding.decrypt(encryptedClientId);
+            clientSecret = cryptoAesGcmNoPadding.decrypt(encryptedClientSecret);
         } catch (IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException |
                  InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Failed to decrypt credentials.");

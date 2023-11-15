@@ -16,20 +16,20 @@ public class ServicesConfig {
     @Bean
     CredentialsService credentialsService(@NonNull CredentialsRepository credentialsRepository,
                                           @NonNull PasswordEncoder passwordEncoder,
-                                          @NonNull Crypto cryptoAesCbcPkcs5Padding,
+                                          @NonNull Crypto cryptoAesGcmNoPadding,
                                           @NonNull @Value("${authorization.grant-type}") String grantType,
                                           @NonNull @Value("${authorization.audience}") String audience) {
-        return new CredentialsService(credentialsRepository, passwordEncoder, cryptoAesCbcPkcs5Padding, grantType,
+        return new CredentialsService(credentialsRepository, passwordEncoder, cryptoAesGcmNoPadding, grantType,
                 audience);
     }
 
     @Bean
     TokenService tokenService(@NonNull TokenRepository tokenRepository,
                               @NonNull PasswordEncoder passwordEncoder,
-                              @NonNull Crypto cryptoAesCbcPkcs5Padding,
+                              @NonNull Crypto cryptoAesGcmNoPadding,
                               @Value("${token-service.token-expiration-safe-window-sec}")
                               int tokenExpirationSafeWindowSec) {
-        return new TokenService(tokenRepository, passwordEncoder, cryptoAesCbcPkcs5Padding,
+        return new TokenService(tokenRepository, passwordEncoder, cryptoAesGcmNoPadding,
                 tokenExpirationSafeWindowSec);
     }
 }

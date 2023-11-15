@@ -17,13 +17,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-class CryptoAesCbcPkcs5PaddingTest {
-    Crypto cryptoAesCbcPkcs5Padding;
+class CryptoAesGcmNoPaddingTest {
+    Crypto cryptoAesGcmNoPadding;
 
     @BeforeEach
     void setUp() {
         String secretKeyStr = "cWrkCbX1JKCiWYFDx9DsHKqdn38QK5o3";
-        cryptoAesCbcPkcs5Padding = (new CryptoConfig()).cryptoAesCbcPkcs5Padding(secretKeyStr);
+        cryptoAesGcmNoPadding = (new CryptoConfig()).cryptoAesGcmNoPadding(secretKeyStr);
     }
 
     @Test
@@ -34,8 +34,8 @@ class CryptoAesCbcPkcs5PaddingTest {
         String input = "This is an input text";
 
         // When
-        EncryptedData encryptedData = cryptoAesCbcPkcs5Padding.encrypt(input);
-        String decrypted = cryptoAesCbcPkcs5Padding.decrypt(encryptedData);
+        EncryptedData encryptedData = cryptoAesGcmNoPadding.encrypt(input);
+        String decrypted = cryptoAesGcmNoPadding.decrypt(encryptedData);
 
         // Then
         assertEquals(input, decrypted);
@@ -45,7 +45,7 @@ class CryptoAesCbcPkcs5PaddingTest {
     void encrypt_plainTextIsNull_throwsNullPointerException() {
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            cryptoAesCbcPkcs5Padding.encrypt(null);
+            cryptoAesGcmNoPadding.encrypt(null);
         });
 
         // Then
@@ -56,7 +56,7 @@ class CryptoAesCbcPkcs5PaddingTest {
     void decrypt_encryptedDataIsNull_throwsNullPointerException() {
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            cryptoAesCbcPkcs5Padding.decrypt(null);
+            cryptoAesGcmNoPadding.decrypt(null);
         });
 
         // Then
