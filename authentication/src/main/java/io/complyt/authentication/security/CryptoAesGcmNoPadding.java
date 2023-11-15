@@ -22,7 +22,7 @@ public class CryptoAesGcmNoPadding implements Crypto {
     @NonNull
     SecretKey secretKey;
 
-    public @NonNull EncryptedData encrypt(String plainText) throws NoSuchPaddingException,
+    public @NonNull EncryptedData encrypt(final @NonNull String plainText) throws NoSuchPaddingException,
             NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException {
 
@@ -46,7 +46,7 @@ public class CryptoAesGcmNoPadding implements Crypto {
         return new EncryptedData(Base64.getEncoder().encodeToString(iv), cipherTextStr);
     }
 
-    public @NonNull String decrypt(EncryptedData encryptedData) throws IllegalBlockSizeException,
+    public @NonNull String decrypt(final @NonNull EncryptedData encryptedData) throws IllegalBlockSizeException,
             BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, NoSuchPaddingException,
             NoSuchAlgorithmException {
 

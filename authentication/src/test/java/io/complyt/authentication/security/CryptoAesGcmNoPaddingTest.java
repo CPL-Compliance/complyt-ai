@@ -60,6 +60,6 @@ class CryptoAesGcmNoPaddingTest {
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "encryptedData is marked non-null but is null");
+        assertEquals("encryptedData is marked non-null but is null", nullPointerException.getMessage());
     }
 }

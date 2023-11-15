@@ -1,6 +1,7 @@
 package test_utils.integration_tests;
 
 public class TestUtilities {
-    public static String apiKeyClientId = "479719ff-e1f6-4dbd-9619-5c78fa41f929";
-    public static String apiKeyClientSecret = "0518f0fb-80d6-446b-8943-d93d8a768b33";
+    public static String apiKeyClientId = "78fd4034-53af-4144-b2da-27ac31cdf45c";
+    public static String apiKeyClientSecret = "3d446591-d839-4906-97fe-85e1b51df0c8";
+
 }
