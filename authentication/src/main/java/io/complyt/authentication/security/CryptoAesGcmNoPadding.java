@@ -1,6 +1,5 @@
 package io.complyt.authentication.security;
 
-
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -66,36 +65,4 @@ public class CryptoAesGcmNoPadding implements Crypto {
         return new String(plainText);
     }
 
-//    public @NonNull EncryptedData encrypt(final @NonNull String plainText) throws InvalidAlgorithmParameterException,
-//            InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchPaddingException,
-//            NoSuchAlgorithmException {
-//        IvParameterSpec ivParameterSpec = generateIv();
-//
-//        Cipher cipher = Cipher.getInstance(algorithm);
-//        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
-//        byte[] cipherText = cipher.doFinal(plainText.getBytes());
-//        String cipherTextStr = Base64.getEncoder().encodeToString(cipherText);
-//
-//        return new EncryptedData(Base64.getEncoder().encodeToString(ivParameterSpec.getIV()), cipherTextStr);
-//    }
-//
-//    public @NonNull String decrypt(final @NonNull EncryptedData encryptedData) throws IllegalBlockSizeException,
-//            BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException,
-//            NoSuchPaddingException, NoSuchAlgorithmException {
-//        IvParameterSpec ivParameterSpec = new IvParameterSpec(Base64.getDecoder().decode(encryptedData.iv()));
-//
-//        Cipher cipher = Cipher.getInstance(algorithm);
-//        cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
-//
-//        byte[] plainText = cipher.doFinal(Base64.getDecoder().decode(encryptedData.cipherText()));
-//
-//        return new String(plainText);
-//    }
-//
-//    private IvParameterSpec generateIv() {
-//        byte[] iv = new byte[16];
-//        (new SecureRandom()).nextBytes(iv);
-//
-//        return new IvParameterSpec(iv);
-//    }
 }
