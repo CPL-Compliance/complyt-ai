@@ -25,11 +25,7 @@ public class CryptoAesGcmNoPadding implements Crypto {
             NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException {
 
-        byte[] iv = new byte[12];
-        SecureRandom secureRandom = new SecureRandom();
-        secureRandom.nextBytes(iv);
-
-        GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(128, iv);
+        GCMParameterSpec gcmParameterSpec = generateIv();
 
         Cipher cipher = Cipher.getInstance(algorithm);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, gcmParameterSpec);
@@ -37,7 +33,7 @@ public class CryptoAesGcmNoPadding implements Crypto {
         byte[] cipherText = cipher.doFinal(plainText.getBytes());
         String cipherTextStr = Base64.getEncoder().encodeToString(cipherText);
 
-        return new EncryptedData(Base64.getEncoder().encodeToString(iv), cipherTextStr);
+        return new EncryptedData(Base64.getEncoder().encodeToString(gcmParameterSpec.getIV()), cipherTextStr);
     }
 
     public @NonNull String decrypt(final @NonNull EncryptedData encryptedData) throws IllegalBlockSizeException,
@@ -52,6 +48,13 @@ public class CryptoAesGcmNoPadding implements Crypto {
         byte[] plainText = cipher.doFinal(Base64.getDecoder().decode(encryptedData.cipherText()));
 
         return new String(plainText);
+    }
+
+    private GCMParameterSpec generateIv() {
+        byte[] iv = new byte[12];
+        (new SecureRandom()).nextBytes(iv);
+
+        return new GCMParameterSpec(128, iv);
     }
 
 }
