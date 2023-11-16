@@ -64,8 +64,8 @@ public @interface PostTokenApiInfo {
 
     String apiKeyBody = """
             {
-                "clientId": "dfa10df9-c47f-4177-a057-3ebd31ea6673",
-                "clientSecret": "14390aa1-cabb-44d2-a96c-efcfc2c2bb5c"\s
+                "clientId": "bce87cba-1756-417f-942c-23930e9f7b1c",
+                "clientSecret": "b4332d97-97a4-46d8-887a-0e8b4bea161b"\s
             }""";
 
     String tokenDtoResponse = """
