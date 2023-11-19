@@ -1,7 +1,7 @@
 package io.complyt.authentication.config;
 
 import io.complyt.authentication.security.Crypto;
-import io.complyt.authentication.security.CryptoAesCbcPkcs5Padding;
+import io.complyt.authentication.security.CryptoAesGcmNoPadding;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,11 +13,11 @@ import java.util.Base64;
 @Configuration
 public class CryptoConfig {
 
-    @Bean("cryptoAesCbcPkcs5Padding")
-    public Crypto cryptoAesCbcPkcs5Padding(@Value("${crypto.secret-key}") String secretKeyStr) {
+    @Bean("cryptoAesGcmNoPadding")
+    public Crypto cryptoAesGcmNoPadding(@Value("${crypto.secret-key}") String secretKeyStr) {
         SecretKey secretKey = convertStringToSecretKey(secretKeyStr);
 
-        return new CryptoAesCbcPkcs5Padding(secretKey);
+        return new CryptoAesGcmNoPadding(secretKey);
     }
 
     private SecretKey convertStringToSecretKey(String secretKeyStr) {

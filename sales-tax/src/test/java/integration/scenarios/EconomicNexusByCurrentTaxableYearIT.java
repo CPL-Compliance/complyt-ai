@@ -2,11 +2,10 @@ package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
-import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
-import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.transaction.MandatoryAddressDto;
+import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;

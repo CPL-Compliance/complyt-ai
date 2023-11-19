@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import test_utils.unit_tests.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,25 +14,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 class ApiKeyTest {
+
     @Test
-    void createApiKey_BadFormat_throwIllegalArgumentException() {
+    void createApiKey_clientIdInputIsNull_throwNullPointerException() {
         // When
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            new ApiKey("");
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            new ApiKey(null, TestUtilities.apiKeyClientIdStr);
         });
 
         // Then
-        assertEquals("Invalid API key format", exception.getMessage());
+        assertEquals("clientId is marked non-null but is null", exception.getMessage());
     }
 
     @Test
-    void createApiKey_inputIsNull_throwNullPointerException() {
+    void createApiKey_clientSecretInputIsNull_throwNullPointerException() {
         // When
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            new ApiKey(null);
+            new ApiKey(TestUtilities.apiKeyClientSecretStr, null);
         });
 
         // Then
-        assertEquals("apiKey is marked non-null but is null", exception.getMessage());
+        assertEquals("clientSecret is marked non-null but is null", exception.getMessage());
     }
 }

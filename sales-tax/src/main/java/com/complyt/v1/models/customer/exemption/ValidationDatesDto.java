@@ -1,8 +1,8 @@
 package com.complyt.v1.models.customer.exemption;
 
-import com.complyt.v1.config.regex.ISO8601Regex;
 import com.complyt.v1.api_info.FieldsDescriptions;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.regex.ISO8601Regex;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

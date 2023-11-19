@@ -33,7 +33,7 @@ public class CredentialsService {
     PasswordEncoder passwordEncoder;
 
     @NonNull
-    Crypto cryptoAesCbcPkcs5Padding;
+    Crypto cryptoAesGcmNoPadding;
 
     @NonNull
     String grantType;
@@ -42,8 +42,8 @@ public class CredentialsService {
     String audience;
 
     public Mono<Credentials> getCredentialsByApiKey(final @NonNull ApiKey apiKey) {
-        return credentialsRepository.findByComplytClientId(apiKey.getClientId())
-                .filter(credentials -> passwordEncoder.matches(apiKey.getClientSecret(),
+        return credentialsRepository.findByComplytClientId(apiKey.clientId())
+                .filter(credentials -> passwordEncoder.matches(apiKey.clientSecret(),
                         credentials.getComplytClientSecret()))
                 .switchIfEmpty(Mono.empty()).flatMap(this::decrypt);
     }
@@ -58,14 +58,14 @@ public class CredentialsService {
         EncryptedData clientSecretEncryptedData;
 
         try {
-            clientIdEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientId());
-            clientSecretEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientSecret());
+            clientIdEncryptedData = cryptoAesGcmNoPadding.encrypt(credentials.getClientId());
+            clientSecretEncryptedData = cryptoAesGcmNoPadding.encrypt(credentials.getClientSecret());
         } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException |
                  InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             throw new RuntimeException("Failed to encrypt credentials.");
         }
 
-        String clientSecret = apiKey.getClientSecret();
+        String clientSecret = apiKey.clientSecret();
         String clientSecretEncoded = passwordEncoder.encode(clientSecret);
 
         return createEncryptedCredentials(apiKey, clientIdEncryptedData, clientSecretEncryptedData,
@@ -81,8 +81,8 @@ public class CredentialsService {
         String clientSecret;
 
         try {
-            clientId = cryptoAesCbcPkcs5Padding.decrypt(encryptedClientId);
-            clientSecret = cryptoAesCbcPkcs5Padding.decrypt(encryptedClientSecret);
+            clientId = cryptoAesGcmNoPadding.decrypt(encryptedClientId);
+            clientSecret = cryptoAesGcmNoPadding.decrypt(encryptedClientSecret);
         } catch (IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException |
                  InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Failed to decrypt credentials.");
@@ -107,7 +107,7 @@ public class CredentialsService {
                 .clientIdIv(clientIdEncryptedData.iv())
                 .clientSecret(clientSecretEncryptedData.cipherText())
                 .clientSecretIv(clientSecretEncryptedData.iv()).audience(audience).grantType(grantType)
-                .complytClientId(apiKey.getClientId())
+                .complytClientId(apiKey.clientId())
                 .complytClientSecret(clientSecretEncoded).build();
     }
 }

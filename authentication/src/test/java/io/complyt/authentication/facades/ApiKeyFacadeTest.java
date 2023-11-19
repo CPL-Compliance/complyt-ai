@@ -42,18 +42,18 @@ class ApiKeyFacadeTest {
 
     @Test
     void saveCredentials_validCredentials_returnApiKey() {
-        String expectedApiKeyStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1ec-3572db2e-486b-480a-995b-2e4d2b9104fa";
-        ApiKey expectedApiKey = new ApiKey(expectedApiKeyStr);
+        String expectedApiKeyClientIdStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1ec";
+        String expectedApiKeyClientSecretStr = "3572db2e-486b-480a-995b-2e4d2b9104fa";
+        ApiKey expectedApiKey = new ApiKey(expectedApiKeyClientIdStr, expectedApiKeyClientSecretStr);
 
         // When
-        when(apiKeyService.generate()).thenReturn(expectedApiKeyStr);
-        when(apiKeyService.generatefromString(expectedApiKeyStr)).thenReturn(expectedApiKey);
+        when(apiKeyService.generate()).thenReturn(expectedApiKey);
         when(credentialsService.saveCredentials(credentials, expectedApiKey)).thenReturn(Mono.just(credentials));
 
-        Mono<String> actualApiKey = apiKeyFacade.saveCredentials(credentials);
+        Mono<ApiKey> actualApiKey = apiKeyFacade.saveCredentials(credentials);
 
         StepVerifier.create(actualApiKey)
-                .expectNext(expectedApiKeyStr)
+                .expectNext(expectedApiKey)
                 .verifyComplete();
     }
 

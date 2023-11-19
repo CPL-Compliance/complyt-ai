@@ -108,9 +108,22 @@ class ValidationHandlerTest {
     }
 
     @Test
-    void handle_missingApiKey_throwsError() {
+    void handle_missingApiKeyClientId_throwsError() {
         // Given
-        ApiKeyDto apiKeyDto = new ApiKeyDto("");
+        ApiKeyDto apiKeyDto = new ApiKeyDto("", "3572db2e-486b-480a-995b-2e4d2b9104fa");
+
+        // When
+        when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.just(apiKeyDto));
+        Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
+
+        // Then
+        StepVerifier.create(apiKeyDtoMono).expectError().verify();
+    }
+
+    @Test
+    void handle_missingApiKeyClientSecret_throwsError() {
+        // Given
+        ApiKeyDto apiKeyDto = new ApiKeyDto("3572db2e-486b-480a-995b-2e4d2b9104fa", "");
 
         // When
         when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.just(apiKeyDto));
@@ -123,7 +136,7 @@ class ValidationHandlerTest {
     @Test
     void handle_invalidFormatApiKey_throwsError() {
         // Given
-        ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.invalidApiKeyStr);
+        ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.invalidApiKeyClientIdStr, TestUtilities.invalidApiKeyClientSecretStr);
 
         // When
         when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.just(apiKeyDto));

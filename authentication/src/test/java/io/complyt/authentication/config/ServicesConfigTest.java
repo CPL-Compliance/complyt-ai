@@ -32,16 +32,16 @@ class ServicesConfigTest {
         // Given
         CredentialsRepository credentialsRepository = mock(CredentialsRepository.class);
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
         String grantType = "Grant Type";
         String issuerUri = "Issuer Uri";
 
         // When
         CredentialsService expectedCredentialsService = new CredentialsService(credentialsRepository,
-                passwordEncoder, cryptoAesCbcPkcs5Padding, grantType, issuerUri);
+                passwordEncoder, cryptoAesGcmNoPadding, grantType, issuerUri);
 
         CredentialsService actualCredentialsService = servicesConfig.credentialsService(credentialsRepository,
-                passwordEncoder, cryptoAesCbcPkcs5Padding, grantType, issuerUri);
+                passwordEncoder, cryptoAesGcmNoPadding, grantType, issuerUri);
 
         // Then
         assertEquals(expectedCredentialsService, actualCredentialsService);
@@ -53,15 +53,15 @@ class ServicesConfigTest {
         // Given
         TokenRepository tokenRepository = mock(TokenRepository.class);
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
         int tokenExpirationSafeWindowSec = 10;
 
         // When
         TokenService expectedTokenService = new TokenService(tokenRepository, passwordEncoder,
-                cryptoAesCbcPkcs5Padding, tokenExpirationSafeWindowSec);
+                cryptoAesGcmNoPadding, tokenExpirationSafeWindowSec);
 
         TokenService actualTokenService = servicesConfig.tokenService(tokenRepository, passwordEncoder,
-                cryptoAesCbcPkcs5Padding, tokenExpirationSafeWindowSec);
+                cryptoAesGcmNoPadding, tokenExpirationSafeWindowSec);
 
         // Then
         assertEquals(expectedTokenService, actualTokenService);
@@ -72,13 +72,13 @@ class ServicesConfigTest {
         // Given
         TokenRepository tokenRepository = mock(TokenRepository.class);
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
         int tokenExpirationSafeWindowSec = 10;
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             servicesConfig.tokenService(null, passwordEncoder,
-                    cryptoAesCbcPkcs5Padding, tokenExpirationSafeWindowSec);
+                    cryptoAesGcmNoPadding, tokenExpirationSafeWindowSec);
         });
 
         assertEquals(nullPointerException.getMessage(), "tokenRepository is marked non-null but is null");
@@ -89,24 +89,24 @@ class ServicesConfigTest {
         // Given
         TokenRepository tokenRepository = mock(TokenRepository.class);
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
         int tokenExpirationSafeWindowSec = 10;
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             servicesConfig.tokenService(tokenRepository, null,
-                    cryptoAesCbcPkcs5Padding, tokenExpirationSafeWindowSec);
+                    cryptoAesGcmNoPadding, tokenExpirationSafeWindowSec);
         });
 
         assertEquals(nullPointerException.getMessage(), "passwordEncoder is marked non-null but is null");
     }
 
     @Test
-    void tokenService_cryptoAesCbcPkcs5PaddingIsNull_throwsNullException() {
+    void tokenService_cryptoAescryptoAesGcmNoPaddingPkcs5PaddingIsNull_throwsNullException() {
         // Given
         TokenRepository tokenRepository = mock(TokenRepository.class);
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
         int tokenExpirationSafeWindowSec = 10;
 
         // Then
@@ -115,20 +115,20 @@ class ServicesConfigTest {
                     null, tokenExpirationSafeWindowSec);
         });
 
-        assertEquals(nullPointerException.getMessage(), "cryptoAesCbcPkcs5Padding is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "cryptoAesGcmNoPadding is marked non-null but is null");
     }
 
     @Test
     void credentialsService_credentialsRepositoryIsNull_throwsNullException() {
         // Given
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
         String grantType = "Grant Type";
         String audience = "audience";
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            servicesConfig.credentialsService(null, passwordEncoder, cryptoAesCbcPkcs5Padding,
+            servicesConfig.credentialsService(null, passwordEncoder, cryptoAesGcmNoPadding,
                     grantType, audience);
         });
 
@@ -139,13 +139,13 @@ class ServicesConfigTest {
     void credentialsService_passwordEncoderIsNull_throwsNullException() {
         // Given
         CredentialsRepository credentialsRepository = mock(CredentialsRepository.class);
-        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
         String grantType = "Grant Type";
         String audience = "audience";
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            servicesConfig.credentialsService(credentialsRepository, null, cryptoAesCbcPkcs5Padding,
+            servicesConfig.credentialsService(credentialsRepository, null, cryptoAesGcmNoPadding,
                     grantType, audience);
         });
 
@@ -153,7 +153,7 @@ class ServicesConfigTest {
     }
 
     @Test
-    void credentialsService_cryptoAesCbcPkcs5PaddingIsNull_throwsNullException() {
+    void credentialsService_cryptoAesGcmNoPaddingIsNull_throwsNullException() {
         // Given
         CredentialsRepository credentialsRepository = mock(CredentialsRepository.class);
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
@@ -166,7 +166,7 @@ class ServicesConfigTest {
                     grantType, audience);
         });
 
-        assertEquals(nullPointerException.getMessage(), "cryptoAesCbcPkcs5Padding " +
+        assertEquals(nullPointerException.getMessage(), "cryptoAesGcmNoPadding " +
                 "is marked non-null but is null");
     }
 
@@ -175,12 +175,12 @@ class ServicesConfigTest {
         // Given
         CredentialsRepository credentialsRepository = mock(CredentialsRepository.class);
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
         String audience = "audience";
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            servicesConfig.credentialsService(credentialsRepository, passwordEncoder, cryptoAesCbcPkcs5Padding,
+            servicesConfig.credentialsService(credentialsRepository, passwordEncoder, cryptoAesGcmNoPadding,
                     null, audience);
         });
 
@@ -192,12 +192,12 @@ class ServicesConfigTest {
         // Given
         CredentialsRepository credentialsRepository = mock(CredentialsRepository.class);
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
         String grantType = "Grant Type";
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            servicesConfig.credentialsService(credentialsRepository, passwordEncoder, cryptoAesCbcPkcs5Padding,
+            servicesConfig.credentialsService(credentialsRepository, passwordEncoder, cryptoAesGcmNoPadding,
                     grantType, null);
         });
 

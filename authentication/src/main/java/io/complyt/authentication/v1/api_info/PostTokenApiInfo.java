@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
                         tags = "token",
                         requestBody =
                         @RequestBody(
-                                description = "Transaction to add",
+                                description = "Api-Key parameters",
                                 required = true,
                                 content = @Content(
                                         schema = @Schema(implementation = ApiKeyDto.class, required = true),
@@ -61,27 +61,20 @@ import java.lang.annotation.Target;
                         }))
 })
 public @interface PostTokenApiInfo {
-    String apiKeyBody = "{\"apiKey\": \"e2019b6f-a8c1-415c-b8b0-3fd6725c9a67-e25f4d90-1051-44f7-89fb-4c6097af7748\"}";
 
-    String tokenDtoResponse = "{\n" +
-            "    \"accessToken\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InJ0RU1OdWRnTWx5aTJtMzVLSnJQRSJ9." +
-            "eyJ0ZW5hbnRfaWQiOiJvcmdfU3R0QWNCa0s3YjMydzdrQSIsImlzcyI6Imh0dHBzOi8vZGV2ZWxvcG1lbnQtY29tcGx5dC51cy5hdXR" +
-            "oMC5jb20vIiwic3ViIjoiOGZsQmcxd2NqbmhYbkFVSEdGREw2QWJTMmZHSHZGM2hAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vc2FsZXM" +
-            "tdGF4LXNlcnZpY2UvIiwiaWF0IjoxNjkzMzA4MTc4LCJleHAiOjE2OTMzOTQ1NzgsImF6cCI6IjhmbEJnMXdjam5oWG5BVUhHRkRMN" +
-            "kFiUzJmR0h2RjNoIiwic2NvcGUiOiJjcmVhdGU6Y3VzdG9tZXIgZGVsZXRlOmN1c3RvbWVyIHJlYWQ6Y3VzdG9tZXIgdXBkYXRlOm" +
-            "N1c3RvbWVyIGNyZWF0ZTp0cmFuc2FjdGlvbiByZWFkOnRyYW5zYWN0aW9uIHVwZGF0ZTp0cmFuc2FjdGlvbiBkZWxldGU6dHJhbnN" +
-            "hY3Rpb24gcmVhZDpzdGF0ZSBjcmVhdGU6ZXhlbXB0aW9uIHVwZGF0ZTpleGVtcHRpb24gZGVsZXRlOmV4ZW1wdGlvbiByZWFkOmV4" +
-            "ZW1wdGlvbiBjcmVhdGU6bmV4dXMgcmVhZDpuZXh1cyBkZWxldGU6bmV4dXMgdXBkYXRlOm5leHVzIHJlYWQ6bGluayByZWFkOnNhb" +
-            "GVzX3RheF9yYXRlcyIsImd0eSI6ImNsaWVudC1jcmVkZW50aWFscyJ9.Q-oMSzMnumCBAzj8Y2vV2OE3Mma0gCrLgSDqq1wAEmY7" +
-            "riBiWoTNukWMZHAnpL8Ig7jcbaSrP5hL1n1TwWfZmfkcmLtd0vnsb9Ss-F8XZ9Hl4FmJCvdh7BQEYwxjhFmtOIGbDNze-rLYYpxc" +
-            "YmYSqZJxJx9cuJ7SYXk2Qa1c9EDxTNskX6tjTFK8vT7V6RIrRUg7a5fLrUmWbGT0aV--8XhcZqvDKMMwQ1lXU9Mh0gcQZ7axgCAQ" +
-            "0zJkg09YHYisvDaIkpUMfIfdJrz2Oh200EAYbxOV9tdn6j_oEFHbalgnWn2wcMDOfSoDERIXbkRqKkU_IKqzor-UfAILB5cGfQ\",\n" +
-            "    \"scope\": \"create:customer delete:customer read:customer update:customer create:transaction read" +
-            ":transaction update:transaction delete:transaction read:state create:exemption update:exemption" +
-            " delete:exemption read:exemption create:nexus read:nexus delete:nexus update:nexus read:link " +
-            "read:sales_tax_rates\",\n" +
-            "    \"expiresIn\": 86400,\n" +
-            "    \"tokenType\": \"Bearer\",\n" +
-            "    \"expireAt\": \"2023-08-30T11:22:48.411272\"\n" +
-            "}";
+    String apiKeyBody = """
+            {
+                "clientId": "bce87cba-1756-417f-942c-23930e9f7b1c",
+                "clientSecret": "b4332d97-97a4-46d8-887a-0e8b4bea161b"\s
+            }""";
+
+    String tokenDtoResponse = """
+            {
+                "accessToken": "stub_access_token",
+                "scope": "read:stub create:stub delete:stub update:stub",
+                "expiresIn": 86400,
+                "tokenType": "Bearer",
+                "expireAt": "2023-08-30T11:22:48.411272"
+            }""";
+
 }

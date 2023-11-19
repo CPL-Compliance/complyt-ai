@@ -45,7 +45,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
     @Test
     @WithMockUser
     public void postApiKey_apiKeyNotExists_Returns404() {
-        ApiKeyDto apiKeyDto = new ApiKeyDto("e2019b6f-a8c1-415c-b8b0-3fd6725c9a67-e25f4d90-1051-44f7-89fb-4c6097af7747");
+        ApiKeyDto apiKeyDto = new ApiKeyDto("e2019b6f-a8c1-415c-b8b0-3fd6725c9a67", "e25f4d90-1051-44f7-89fb-4c6097af7747");
 
         webTestClient
                 .mutateWith(csrf())
@@ -64,7 +64,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
     @Test
     @WithMockUser
     public void postApiKey_apiKeyExistsButDoesntHaveToken_ReturnsAccessTokenWithExpirationDateTimeLessThenNowPlusExpiresIn() {
-        ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.apiKey);
+        ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.apiKeyClientId, TestUtilities.apiKeyClientSecret);
 
         webTestClient
                 .mutateWith(csrf())

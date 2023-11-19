@@ -3,7 +3,6 @@ package integration.services.authentication;
 import integration.TestContainersInitializerIT;
 import integration.test_utils.TestUtilities;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.http.MediaType;
 
 public class TokenEndpointsIT extends TestContainersInitializerIT {

@@ -4,6 +4,7 @@ import io.complyt.authentication.facades.ApiKeyFacade;
 import io.complyt.authentication.security.permissions.api_key.ApiKeyCreatePermission;
 import io.complyt.authentication.utils.observability.ContextLogger;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
+import io.complyt.authentication.v1.mappers.ApiKeyMapper;
 import io.complyt.authentication.v1.mappers.CredentialsMapper;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
@@ -41,7 +42,7 @@ public class ApiKeyHandler {
                 .then(credentialsDtoValidationHandler.handle(serverRequest))
                 .map(CredentialsMapper.INSTANCE::credentialsDtoTocredentials)
                 .flatMap(apiKeyFacade::saveCredentials)
-                .map(ApiKeyDto::new)
+                .map(ApiKeyMapper.INSTANCE::apiKeyToApiKeyDto)
                 .flatMap(apiKeyDto -> ContextLogger.observeCtx("<-- Returned Body: " + apiKeyDto.toString(), log::info).thenReturn(apiKeyDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 

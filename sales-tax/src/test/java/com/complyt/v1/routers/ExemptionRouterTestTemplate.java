@@ -90,5 +90,4 @@ public interface ExemptionRouterTestTemplate extends
 
     void create_NullExemptionPassed_Returns400();
 
-    void create_NullHandler_ThrowsNullPointerException();
 }

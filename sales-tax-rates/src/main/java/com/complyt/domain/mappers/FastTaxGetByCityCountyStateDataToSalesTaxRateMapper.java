@@ -1,6 +1,5 @@
 package com.complyt.domain.mappers;
 
-import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.fast_tax.FastTaxGetByCityCountyStateData;
 import org.mapstruct.Mapper;

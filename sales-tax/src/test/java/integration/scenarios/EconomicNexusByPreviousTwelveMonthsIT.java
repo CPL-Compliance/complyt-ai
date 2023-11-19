@@ -3,11 +3,10 @@ package integration.scenarios;
 import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.EconomicNexusTrackerDto;
-import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
-import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.transaction.MandatoryAddressDto;
+import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
@@ -29,7 +28,6 @@ import testUtils.integration_test.templates.economic_nexus.EconomicNexusByAmount
 
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
