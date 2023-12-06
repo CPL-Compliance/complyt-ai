@@ -73,7 +73,6 @@ public class SalesTaxTrackingRepository {
                 });
     }
 
-
     public Flux<SalesTaxTracking> findAll(int offset, int limit) {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
