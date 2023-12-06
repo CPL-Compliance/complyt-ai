@@ -558,6 +558,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // When
         when(exemptionFacade.findAll()).thenReturn(Flux.fromIterable(exemptions));
 
+        
         // Then
         webTestClient
                 .mutateWith(csrf())
