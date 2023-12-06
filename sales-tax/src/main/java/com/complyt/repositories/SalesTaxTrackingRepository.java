@@ -65,7 +65,7 @@ public class SalesTaxTrackingRepository {
     public Mono<SalesTaxTracking> findById(String id) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
-                    Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
+                     Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
 
                     return ContextLogger.observeCtx("Searching for a sales tax tracking with ID "
                                     + id + " and tenant ID " + tenantId, log::info)
@@ -73,12 +73,12 @@ public class SalesTaxTrackingRepository {
                 });
     }
 
+
     public Flux<SalesTaxTracking> findAll(int offset, int limit) {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId))
-                            .with(Sort.by(Sort.Direction.ASC, "_id"))
-                            .skip(offset).limit(limit);
+                            .with(Sort.by(Sort.Direction.ASC, "_id")).skip(offset).limit(limit);
 
                     return ContextLogger.observeCtx("Searching for all sales tax tracking with tenant ID " + tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, SalesTaxTracking.class));
