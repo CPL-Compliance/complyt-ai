@@ -25,7 +25,7 @@ public class ComplytSalesTaxRatesRepository {
     public Mono<ComplytSalesTaxRates> findByAddress(@NonNull Address address, @NonNull String collection) {
         Query query = addressQueryBuilder.build(address);
 
-        return ContextLogger.observeCtx("Searching for rates in " + collection + ", by address: " + query, log::info)
+        return ContextLogger.observeCtx("Searching for rates in " + collection + ", by requestAddress: " + query, log::info)
                 .then(reactiveMongoTemplate.findOne(query, ComplytSalesTaxRates.class, collection));
     }
 

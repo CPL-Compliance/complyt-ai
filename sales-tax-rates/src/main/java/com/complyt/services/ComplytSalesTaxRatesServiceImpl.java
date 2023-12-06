@@ -50,8 +50,11 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
         return cityCountyFetcher.fetch(salesTaxData)
                 .flatMap(cityCountyWrapper -> salesTaxDataToSalesTaxRate.map(salesTaxData)
                         .map(salesTaxRates -> {
-                            Address modifiedAddress = address.withCity(cityCountyWrapper.city()).withCounty(cityCountyWrapper.county());
-                            return new ComplytSalesTaxRates(null, modifiedAddress, salesTaxRates, LocalDateTime.now(), LocalDateTime.now().plusMonths(2));
+                            Address modifiedAddress = address.withCity(cityCountyWrapper.city())
+                                    .withCounty(cityCountyWrapper.county());
+
+                            return new ComplytSalesTaxRates(null, modifiedAddress, address, salesTaxRates,
+                                    LocalDateTime.now(), LocalDateTime.now().plusMonths(2));
                         }));
     }
 

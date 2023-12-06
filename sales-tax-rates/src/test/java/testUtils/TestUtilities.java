@@ -47,7 +47,7 @@ public interface TestUtilities {
         Address address = createAddressInCalifornia();
         SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
         LocalDateTime now = LocalDateTime.now();
-        return new ComplytSalesTaxRates(UUID.randomUUID().toString(), address, salesTaxRates, now, now.plusMinutes(1));
+        return new ComplytSalesTaxRates(UUID.randomUUID().toString(), address, address, salesTaxRates, now, now.plusMinutes(1));
     }
 
     static Query createAddressSearchQuery(Address address) {

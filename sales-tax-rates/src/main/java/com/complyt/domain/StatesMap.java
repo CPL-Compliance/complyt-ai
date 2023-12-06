@@ -101,6 +101,9 @@ public interface StatesMap {
         put("Virginia", CollectionsNames.VIRGINIA);
         put("WA", CollectionsNames.WASHINGTON);
         put("Washington", CollectionsNames.WASHINGTON);
+        put("Washington DC", CollectionsNames.DISTRICT_OF_COLOMBIA);
+        put("Washington D.C", CollectionsNames.DISTRICT_OF_COLOMBIA);
+        put("Washington D.C.", CollectionsNames.DISTRICT_OF_COLOMBIA);
         put("WV", CollectionsNames.WEST_VIRGINIA);
         put("West Virginia", CollectionsNames.WEST_VIRGINIA);
         put("WI", CollectionsNames.WISCONSIN);
