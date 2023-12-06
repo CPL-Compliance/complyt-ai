@@ -37,7 +37,7 @@ public class AddressQueryBuilderTest {
     @Test
     void build_PartialAddressPassed_ReturnsPartialAddressQuery() {
         // Given
-        Query expectedQuery = Query.query(Criteria.where("address.zip").is(partialAddress.zip()));
+        Query expectedQuery = Query.query(Criteria.where("requestAddress.zip").is(partialAddress.zip()));
 
         // When
         Query actualQuery = addressQueryBuilder.build(partialAddress);
@@ -49,11 +49,11 @@ public class AddressQueryBuilderTest {
     @Test
     void build_AddressPassed_ReturnsQuery() {
         // Given
-        Query expectedQuery = Query.query(Criteria.where("address.zip").is(fullAddressNoCountyAddress.zip()));
+        Query expectedQuery = Query.query(Criteria.where("requestAddress.zip").is(fullAddressNoCountyAddress.zip()));
         Optional.ofNullable(fullAddressNoCountyAddress.city())
-                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("address.city").regex(value, "i")));
+                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("requestAddress.city").regex(value, "i")));
         Optional.ofNullable(fullAddressNoCountyAddress.street())
-                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("address.street").regex(value, "i")));
+                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("requestAddress.street").regex(value, "i")));
 
         // When
         Query actualQuery = addressQueryBuilder.build(fullAddressNoCountyAddress);
@@ -65,13 +65,13 @@ public class AddressQueryBuilderTest {
     @Test
     void build_FullAddressWithCountyPassed_ReturnsQuery() {
         // Given
-        Query expectedQuery = Query.query(Criteria.where("address.zip").is(fullAddressNoCountyAddress.zip()));
+        Query expectedQuery = Query.query(Criteria.where("requestAddress.zip").is(fullAddressNoCountyAddress.zip()));
         Optional.ofNullable(fullAddressWithCountyAddress.city())
-                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("address.city").regex(value, "i")));
+                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("requestAddress.city").regex(value, "i")));
         Optional.ofNullable(fullAddressWithCountyAddress.street())
-                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("address.street").regex(value, "i")));
+                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("requestAddress.street").regex(value, "i")));
         Optional.ofNullable(fullAddressWithCountyAddress.county())
-                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("address.county").regex(value, "i")));
+                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("requestAddress.county").regex(value, "i")));
 
         // When
         Query actualQuery = addressQueryBuilder.build(fullAddressWithCountyAddress);
