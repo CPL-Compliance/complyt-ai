@@ -211,7 +211,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         }};
 
         // When
-        when(transactionFacade.getAll()).thenReturn(Flux.just(firstTransaction, secondTransaction));
+        when(transactionFacade.getAll(offSet, limit)).thenReturn(Flux.just(firstTransaction, secondTransaction));
 
         // Then
         webTestClient
@@ -234,7 +234,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
 
         // When
-        when(transactionFacade.getAll()).thenReturn(Flux.empty());
+        when(transactionFacade.getAll(offSet, limit)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -253,7 +253,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     public void getAll_UnauthenticatedUser_Returns401() {
         // When
-        when(transactionFacade.getAll()).thenReturn(Flux.empty());
+        when(transactionFacade.getAll(offSet, limit)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -278,7 +278,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // Given + When
-        when(transactionFacade.getAll()).thenReturn(Flux.error(new OperationFailedException()));
+        when(transactionFacade.getAll(offSet, limit)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient

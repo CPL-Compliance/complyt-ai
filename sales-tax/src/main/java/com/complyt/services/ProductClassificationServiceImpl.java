@@ -29,7 +29,7 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     }
 
     @Override
-    public Flux<ProductClassification> findAll() {
+    public Flux<ProductClassification> findAll(int offSet, int limit) {
         return productClassificationRepository.findAll();
     }
 

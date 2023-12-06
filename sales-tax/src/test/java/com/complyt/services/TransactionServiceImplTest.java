@@ -144,8 +144,8 @@ class TransactionServiceImplTest {
         Transaction secondTransaction = transaction.withExternalId(externalId);
 
         //When
-        when(transactionRepository.findAll()).thenReturn(Flux.just(transaction, secondTransaction));
-        Flux<Transaction> transactionFlux = transactionService.findAll();
+        when(transactionRepository.findAll(offSet, limit)).thenReturn(Flux.just(transaction, secondTransaction));
+        Flux<Transaction> transactionFlux = transactionService.findAll(offSet, limit);
 
         //Then
         StepVerifier.create(transactionFlux).expectNext(transaction, secondTransaction).verifyComplete();
@@ -268,8 +268,8 @@ class TransactionServiceImplTest {
         }};
 
         // When
-        when(transactionRepository.findAll()).thenReturn(Flux.fromIterable(transactions));
-        Flux<Transaction> transactionFlux = transactionService.findAll();
+        when(transactionRepository.findAll(offSet, limit)).thenReturn(Flux.fromIterable(transactions));
+        Flux<Transaction> transactionFlux = transactionService.findAll(offSet, limit);
 
         // Then
         StepVerifier.create(transactionFlux).expectNext(transaction, anotherTransactionWithSameClientId).verifyComplete();

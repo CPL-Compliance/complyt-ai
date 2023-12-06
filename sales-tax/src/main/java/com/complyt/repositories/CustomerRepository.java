@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -49,10 +50,13 @@ public class CustomerRepository {
                 });
     }
 
-    public Flux<Customer> findAll() {
+    public Flux<Customer> findAll(int offset, int limit) {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
-                    Query query = Query.query(Criteria.where("tenantId").is(tenantId));
+                    Query query = Query.query(Criteria.where("tenantId").is(tenantId))
+                            .with(Sort.by(Sort.Direction.ASC, "_id"))
+                            .skip(offset).
+                            limit(limit);
 
                     return ContextLogger.observeCtx("Searching for customers with tenant ID " + tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Customer.class));

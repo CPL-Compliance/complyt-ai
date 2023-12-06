@@ -2,6 +2,7 @@ package com.complyt.v1.handlers;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
+import com.complyt.repositories.RepositoryConstant;
 import com.complyt.security.permissions.sales_tax_tracking.NexusReadPermission;
 import com.complyt.security.permissions.sales_tax_tracking.NexusUpdatePermission;
 import com.complyt.utils.observability.ContextLogger;
@@ -88,10 +89,14 @@ public class SalesTaxTrackingHandler {
     @NexusReadPermission
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        int offSet = Integer.parseInt(serverRequest.queryParam("offset")
+                .orElse("0"));
+        int limit = Integer.parseInt(serverRequest.queryParam("limit")
+                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE)));
 
         return ContextLogger.observeCtx(logStr, log::info).then(
                 ServerResponse.ok()
-                        .body(salesTaxTrackingFacade.findAll().map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto), SalesTaxTrackingDto.class));
+                        .body(salesTaxTrackingFacade.findAll(offSet, limit).map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto), SalesTaxTrackingDto.class));
     }
 
     @NexusUpdatePermission

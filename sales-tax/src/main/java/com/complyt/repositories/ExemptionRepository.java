@@ -6,6 +6,7 @@ import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -73,10 +74,12 @@ public class ExemptionRepository {
                 });
     }
 
-    public Flux<Exemption> findAll() {
+    public Flux<Exemption> findAll(int offset, int limit) {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
-                    Query query = Query.query(Criteria.where("tenantId").is(tenantId));
+                    Query query = Query.query(Criteria.where("tenantId").is(tenantId))
+                            .with(Sort.by(Sort.Direction.ASC, "_id"))
+                            .skip(offset).limit(limit);
 
                     return ContextLogger.observeCtx("Searching for exemptions with tenant ID " + tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Exemption.class));

@@ -1,6 +1,7 @@
 package com.complyt.v1.handlers;
 
 import com.complyt.facades.TransactionFacade;
+import com.complyt.repositories.RepositoryConstant;
 import com.complyt.security.permissions.transaction.TransactionCreatePermission;
 import com.complyt.security.permissions.transaction.TransactionDeletePermission;
 import com.complyt.security.permissions.transaction.TransactionReadPermission;
@@ -56,10 +57,15 @@ public class TransactionHandler {
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
+        int offSet = Integer.parseInt(serverRequest.queryParam("offset")
+                .orElse("0"));
+        int limit = Integer.parseInt(serverRequest.queryParam("limit")
+                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE)));
+
         Flux<TransactionDto> transactionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
-                .thenMany(transactionFacade.getAll())
+                .thenMany(transactionFacade.getAll(offSet, limit))
                 .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
-                .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto));
+                .flatMapSequential(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoFlux, TransactionDto.class);
     }

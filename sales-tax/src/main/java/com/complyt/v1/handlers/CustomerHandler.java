@@ -1,6 +1,7 @@
 package com.complyt.v1.handlers;
 
 import com.complyt.facades.CustomerFacade;
+import com.complyt.repositories.RepositoryConstant;
 import com.complyt.security.permissions.customer.CustomerReadPermission;
 import com.complyt.security.permissions.customer.CustomerUpdatePermission;
 import com.complyt.utils.observability.ContextLogger;
@@ -39,9 +40,14 @@ public class CustomerHandler {
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info).thenMany(customerfacade.getAll()
+        int offSet = Integer.parseInt(serverRequest.queryParam("offset")
+                .orElse("0"));
+        int limit = Integer.parseInt(serverRequest.queryParam("limit")
+                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE)));
+
+        Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info).thenMany(customerfacade.getAll(offSet, limit)
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
-                .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto)));
+                .flatMapSequential(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto)));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoFlux, CustomerDto.class);
     }
@@ -94,9 +100,9 @@ public class CustomerHandler {
 
     @CustomerReadPermission
     public Mono<ServerResponse> getByComplytId(ServerRequest serverRequest) {
+        //todo - when null complytId -> Send BadRequest 404 - null
         UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
-
         Mono<CustomerDto> customerDtoMono = ContextLogger.observeCtx(logStr, log::info).then(customerfacade.findByComplytId(complytId))
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
                 .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto))

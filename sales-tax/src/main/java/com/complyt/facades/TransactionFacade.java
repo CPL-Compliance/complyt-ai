@@ -13,6 +13,7 @@ import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -113,11 +114,13 @@ public class TransactionFacade {
                         .map(transaction::withCustomer));
     }
 
-    public Flux<Transaction> getAll() {
-        return transactionService.findAll()
-                .flatMap(transaction -> getCustomerByTransaction(transaction)
+
+        public Flux<Transaction> getAll(int offSet, int limit) {
+        return transactionService.findAll(offSet, limit)
+                .flatMapSequential(transaction -> getCustomerByTransaction(transaction)
                         .map(transaction::withCustomer));
     }
+
 
     public Flux<Transaction> getAllBySource(String source) {
 

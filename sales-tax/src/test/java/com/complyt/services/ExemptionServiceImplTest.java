@@ -117,7 +117,7 @@ public class ExemptionServiceImplTest {
 
         // When
         when(exemptionRepository.findAll()).thenReturn(Flux.fromIterable(exemptions));
-        Flux<Exemption> exemptionFlux = exemptionService.findAll();
+        Flux<Exemption> exemptionFlux = exemptionService.findAll(offSet, limit);
 
         // Then
         StepVerifier.create(exemptionFlux).expectNext(exemption, secondExemption).verifyComplete();

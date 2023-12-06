@@ -204,7 +204,7 @@ class CustomerRepositoryTest {
         when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.just(customer, secondCustomer));
 
         //Then
-        Flux<Customer> customerFlux = customerRepository.findAll();
+        Flux<Customer> customerFlux = customerRepository.findAll(offset, limit);
         StepVerifier.create(customerFlux).expectNext(customer, secondCustomer).verifyComplete();
     }
 

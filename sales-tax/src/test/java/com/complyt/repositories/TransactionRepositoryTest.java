@@ -161,7 +161,7 @@ class TransactionRepositoryTest {
         //When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.find(query, Transaction.class)).thenReturn(Flux.fromIterable(allTransactions));
-        Flux<Transaction> transactionFlux = transactionRepository.findAll();
+        Flux<Transaction> transactionFlux = transactionRepository.findAll(offSet, limit);
 
         //Then
         StepVerifier.create(transactionFlux).expectNext(transaction, secondTransaction).verifyComplete();

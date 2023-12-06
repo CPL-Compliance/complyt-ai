@@ -131,7 +131,7 @@ class CustomerFacadeTest {
         allCustomers.add(secondCustomer);
 
         // When
-        when(customerService.findAll()).thenReturn(Flux.fromIterable(allCustomers));
+        when(customerService.findAll(offSet, limit)).thenReturn(Flux.fromIterable(allCustomers));
         Flux<Customer> returnedCustomers = customerFacade.getAll();
 
         // Then

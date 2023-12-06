@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -120,9 +121,11 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findAllByQuery(query);
     }
 
-    public Flux<Transaction> findAll() {
-        return transactionRepository.findAll();
+
+    public Flux<Transaction> findAll(int offSet, int limit) {
+        return transactionRepository.findAll(offSet, limit);
     }
+
 
     public Flux<Transaction> findAllBySource(@NonNull final String source) {
         return transactionRepository.findAllBySource(source);

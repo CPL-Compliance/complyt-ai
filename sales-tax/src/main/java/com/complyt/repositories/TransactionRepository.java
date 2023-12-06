@@ -6,6 +6,10 @@ import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -17,16 +21,19 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort;
+
 @Repository
 @Slf4j
 @AllArgsConstructor
 public class TransactionRepository {
-
     @NonNull
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     @NonNull
     private TenantResolver tenantResolver;
+
+
 
     public Mono<Transaction> save(@NonNull Transaction transaction) {
         return tenantResolver.resolve()
@@ -58,6 +65,9 @@ public class TransactionRepository {
                 });
     }
 
+
+
+
     public Mono<Transaction> findByExternalIdAndSource(String externalId, String source) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
@@ -83,15 +93,20 @@ public class TransactionRepository {
                 });
     }
 
-    public Flux<Transaction> findAll() {
+    public Flux<Transaction> findAll(int offSet, int limit) {
+
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
-                    Query query = Query.query(Criteria.where("tenantId").is(tenantId));
+                    Query query = Query.query(Criteria.where("tenantId").is(tenantId))
+                            .with(Sort.by(Sort.Direction.ASC, "_id"))
+                            .skip(offSet)
+                            .limit(limit);
 
                     return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Transaction.class));
                 });
     }
+
 
     public Flux<Transaction> findAllBySource(String source) {
         return tenantResolver.resolve()
