@@ -95,8 +95,8 @@ public class ExemptionFacadeTest {
         }};
 
         // When
-        when(exemptionService.findAll(offSet, limit)).thenReturn(Flux.fromIterable(exemptions));
-        Flux<Exemption> exemptionFlux = exemptionFacade.findAll();
+        when(exemptionService.findAll(0, exemptions.size())).thenReturn(Flux.fromIterable(exemptions));
+        Flux<Exemption> exemptionFlux = exemptionFacade.findAll(0, exemptions.size());
 
         // Then
         StepVerifier.create(exemptionFlux).expectNext(exemption, secondExemption);

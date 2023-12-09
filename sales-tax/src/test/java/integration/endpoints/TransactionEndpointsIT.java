@@ -1,6 +1,7 @@
 package integration.endpoints;
 
 import com.complyt.SalesTaxApplication;
+import com.complyt.repositories.RepositoryConstant;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
@@ -211,7 +212,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(TransactionDto.class)
-                .value(list -> assertTrue(list.size() > 100));
+                .value(list -> assertEquals(RepositoryConstant.DEFAULT_PAGE_SIZE, list.size()));
     }
 
     @Order(2)

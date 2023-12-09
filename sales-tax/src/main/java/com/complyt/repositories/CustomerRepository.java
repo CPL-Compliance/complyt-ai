@@ -53,12 +53,9 @@ public class CustomerRepository {
     public Flux<Customer> findAll(int offset, int limit) {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
-                    Query query = Query.query(Criteria.where("tenantId").is(tenantId))
-                            .with(Sort.by(Sort.Direction.ASC, "_id"))
-                            .skip(offset).
-                            limit(limit);
+                    Query query = Query.query(Criteria.where("tenantId").is(tenantId)).skip(offset).limit(limit);
 
-                    return ContextLogger.observeCtx("Searching for customers with tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for customers with tenant ID " + tenantId + "with offset " + offset + "and limit " + limit, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Customer.class));
                 });
     }
@@ -88,7 +85,7 @@ public class CustomerRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for a customer with id of: " + id + " and tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for a customer with id of: " + id + " and tenant ID " + tenantId , log::info)
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }

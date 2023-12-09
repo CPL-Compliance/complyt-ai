@@ -4,6 +4,7 @@ import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.facades.ExemptionFacade;
+import com.complyt.repositories.RepositoryConstant;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
@@ -556,9 +557,9 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         }};
 
         // When
-        when(exemptionFacade.findAll()).thenReturn(Flux.fromIterable(exemptions));
+        when(exemptionFacade.findAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(exemptions));
 
-        
+
         // Then
         webTestClient
                 .mutateWith(csrf())
@@ -580,7 +581,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         List<ExemptionDto> exemptionDtos = new ArrayList<>();
 
         // When
-        when(exemptionFacade.findAll()).thenReturn(Flux.empty());
+        when(exemptionFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -621,7 +622,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // Given + When
-        when(exemptionFacade.findAll()).thenReturn(Flux.error(new OperationFailedException()));
+        when(exemptionFacade.findAll(0, 0)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient

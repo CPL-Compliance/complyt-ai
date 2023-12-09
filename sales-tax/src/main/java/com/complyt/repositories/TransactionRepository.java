@@ -93,16 +93,13 @@ public class TransactionRepository {
                 });
     }
 
-    public Flux<Transaction> findAll(int offSet, int limit) {
+    public Flux<Transaction> findAll(int offset, int limit) {
 
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
-                    Query query = Query.query(Criteria.where("tenantId").is(tenantId))
-                            .with(Sort.by(Sort.Direction.ASC, "_id"))
-                            .skip(offSet)
-                            .limit(limit);
+                    Query query = Query.query(Criteria.where("tenantId").is(tenantId)).skip(offset).limit(limit);
 
-                    return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId + "with offset " + offset + "and limit " + limit, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Transaction.class));
                 });
     }

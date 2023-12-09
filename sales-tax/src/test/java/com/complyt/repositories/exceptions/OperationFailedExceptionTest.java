@@ -1,5 +1,6 @@
 package com.complyt.repositories.exceptions;
 
+import com.complyt.repositories.RepositoryConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +27,11 @@ class OperationFailedExceptionTest {
     }
 
     @Test
+    void constant_defaultValue_VALID() {
+        assertEquals(25, RepositoryConstant.DEFAULT_PAGE_SIZE);
+    }
+
+    @Test
     void constructor_WithNewMessage_ExceptionThrown() {
         // Given + When
         OperationFailedException actualException = assertThrows(OperationFailedException.class, () -> {
@@ -35,6 +41,7 @@ class OperationFailedExceptionTest {
         // Then
         assertEquals("this is an operation failed exception", actualException.getMessage());
     }
+
 
     @Test
     void constructor_WithNewMessageAndThrowableDetails_ExceptionThrown() {

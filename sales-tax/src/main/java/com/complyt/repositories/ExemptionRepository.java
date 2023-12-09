@@ -78,10 +78,9 @@ public class ExemptionRepository {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId))
-                            .with(Sort.by(Sort.Direction.ASC, "_id"))
                             .skip(offset).limit(limit);
 
-                    return ContextLogger.observeCtx("Searching for exemptions with tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for exemptions with tenant ID " + tenantId + "with offset " + offset + "and limit " + limit , log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Exemption.class));
                 });
     }

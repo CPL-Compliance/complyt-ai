@@ -131,8 +131,8 @@ class CustomerFacadeTest {
         allCustomers.add(secondCustomer);
 
         // When
-        when(customerService.findAll(offSet, limit)).thenReturn(Flux.fromIterable(allCustomers));
-        Flux<Customer> returnedCustomers = customerFacade.getAll();
+        when(customerService.findAll(0, allCustomers.size())).thenReturn(Flux.fromIterable(allCustomers));
+        Flux<Customer> returnedCustomers = customerFacade.getAll(0, allCustomers.size());
 
         // Then
         StepVerifier.create(returnedCustomers).expectNextCount(2).verifyComplete();

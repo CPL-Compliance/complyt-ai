@@ -193,12 +193,12 @@ public class SalesTaxTrackingFacadeTest {
         }};
 
         // When
-        when(salesTaxTrackingService.findAll(offSet, limit)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
+        when(salesTaxTrackingService.findAll(0, salesTaxTrackingList.size())).thenReturn(Flux.fromIterable(salesTaxTrackingList));
         when(nexusService.getNexusSummaryDate(eq(salesTaxTracking), any())).thenReturn(Mono.just(dateRange));
         when(nexusService.getNexusSummaryDate(eq(secondSalesTaxTracking), any())).thenReturn(Mono.just(dateRange));
         when(nexusService.recalculationOfNexusSummaryIfRequired(eq(salesTaxTracking), any())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.recalculationOfNexusSummaryIfRequired(eq(secondSalesTaxTracking), any())).thenReturn(Mono.just(secondSalesTaxTracking));
-        Flux<SalesTaxTracking> salesTaxTrackingFlux = salesTaxTrackingFacade.findAll();
+        Flux<SalesTaxTracking> salesTaxTrackingFlux = salesTaxTrackingFacade.findAll(0, salesTaxTrackingList.size());
 
 
         // Then

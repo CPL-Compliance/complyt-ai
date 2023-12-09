@@ -1,6 +1,8 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.CustomerType;
+import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.security.TenantResolver;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,10 +22,15 @@ import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -197,16 +204,51 @@ class CustomerRepositoryTest {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withId(id).withExternalId(externalId);
-        Query query = Query.query(Criteria.where("tenantId").is(tenantId));
+        int offset = 0;
+        int limit = 2;
+        Query query = Query.query(Criteria.where("tenantId").is(tenantId))
+                .skip(offset).limit(limit);
 
         //When
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
-        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.just(customer, secondCustomer));
+        when(reactiveMongoTemplate.find(eq(query), eq(Customer.class))).thenReturn(Flux.just(customer, secondCustomer));
 
         //Then
         Flux<Customer> customerFlux = customerRepository.findAll(offset, limit);
         StepVerifier.create(customerFlux).expectNext(customer, secondCustomer).verifyComplete();
     }
+
+
+    //todo make it work
+    @Test
+    void getAllCustomers_RetrievingAllCustomersByOffsetMiddleLimitLTSize_ExpectingChunkCustomers() {
+        // Given
+        int offset = 2;
+        int limit = 2;
+
+        List<Customer> customerList = IntStream.range(0, 4)
+                .mapToObj(i -> customer.withComplytId(UUID.randomUUID()).withExternalId(UUID.randomUUID().toString()))
+                .collect(Collectors.toList());
+
+        List<Customer> expectedLst = customerList.subList(offset, Math.min(offset + limit, customerList.size()));
+
+        Query query = Query.query(Criteria.where("tenantId").is(tenantId))
+                .skip(offset)
+                .limit(limit);
+
+        // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(reactiveMongoTemplate.find(eq(query), eq(Customer.class))).thenReturn(Flux.fromIterable(expectedLst));
+
+        // Then
+        Flux<Customer> customerFlux = customerRepository.findAll(offset, limit);
+        StepVerifier.create(customerFlux).expectNextSequence(expectedLst).verifyComplete();
+
+    }
+
+
+
+
 
     @Test
     void getAllCustomersBySource_RetrievingAllCustomersInSource_ExpectingTwoCustomers() {

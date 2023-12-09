@@ -3,6 +3,7 @@ package com.complyt.v1.routers;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
+import com.complyt.repositories.RepositoryConstant;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
@@ -519,7 +520,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         }};
 
         // When
-        when(salesTaxTrackingFacade.findAll()).thenReturn(Flux.fromIterable(salesTaxTrackingList));
+        when(salesTaxTrackingFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
 
         // Then
         webTestClient
@@ -541,7 +542,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         List<SalesTaxTrackingDto> salesTaxTrackingDtoList = new ArrayList<>();
 
         // When
-        when(salesTaxTrackingFacade.findAll()).thenReturn(Flux.empty());
+        when(salesTaxTrackingFacade.findAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -580,7 +581,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // When
-        when(salesTaxTrackingFacade.findAll()).thenReturn(Flux.error(new OperationFailedException()));
+        when(salesTaxTrackingFacade.findAll(0,0)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient
