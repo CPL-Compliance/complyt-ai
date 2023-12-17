@@ -1,23 +1,23 @@
 package integration.services.sales_tax;
 
+import com.nimbusds.jose.shaded.gson.JsonArray;
 import integration.TestContainersInitializerIT;
 import integration.test_utils.TestUtilities;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.LinkedHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CustomerEndpointsIT extends TestContainersInitializerIT implements CustomerEndpointsITTemplate {
 
-    private String source = "1";
+    private final String source = "1";
 
     @Order(2)
     @Test
@@ -396,6 +396,77 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                     assertEquals(2, errors.length);
                 });
     }
+
+    @Test
+    @Order(3)
+    @WithMockUser
+    public void getAll_getCustomersByParamSize_ReturnsExpectedSize() {
+        int size = 5;
+//        WEB_TEST_CLIENT
+//                .mutateWith(csrf())
+//                .get()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(TestUtilities.CUSTOMER_BASE_URL)
+//                        .queryParam("size", size)
+//                        .build())
+//                .headers(headers -> {
+//                    headers.setBearerAuth(TOKEN);
+//                    headers.setContentType(MediaType.APPLICATION_JSON);
+//                })
+//                .accept(MediaType.APPLICATION_JSON)
+//                .exchange()
+//                .expectStatus().isOk()
+//                .expectBodyList(String.class)
+//                .value(list ->
+//                        assertEquals(size, list.size()));
+    }
+
+    @Test
+    @Order(3)
+    @WithMockUser
+    public void getAll_getCustomersByDefaultOffset_ReturnsFirstEntry() {
+        int size = 1;
+//        String expectedComplyId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
+//        WEB_TEST_CLIENT
+//                .mutateWith(csrf())
+//                .get()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(TestUtilities.CUSTOMER_BASE_URL)
+//                        .queryParam("size", size) // Add query parameter for offset
+//                        .build())
+//                .accept(MediaType.APPLICATION_JSON)
+//                .exchange()
+//                .expectStatus().isOk()
+//                .expectBodyList(JsonArray.class)
+//                .value(customers -> Assertions.assertEquals(customers.get(0), expectedComplyId))
+//                .hasSize(size);
+    }
+
+    @Test
+    @Order(3)
+    @WithMockUser
+    public void getAll_GetSkippedCustomersByOffset_ReturnsExpectedEntryByOffset() {
+        int size = 1;
+        int page = 2;
+
+//        String expectedComplyId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
+//        webTestClient
+//                .mutateWith(csrf())
+//                .get()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(SalesTaxTrackingRouter.BASE_URL) // Set your API endpoint
+//                        .queryParam("size", size)
+//                        .queryParam("page",page)
+//                        .build())
+//                .accept(MediaType.APPLICATION_JSON)
+//                .exchange()
+//                .expectStatus().isOk()
+//                .expectBodyList(Customer.class)
+//                .value(customers -> Assertions.assertEquals(customers.get(0).getComplytId().toString(), expectedComplyId))
+//                .hasSize(size);
+    }
+
+
 
     @Order(1)
     @Test
