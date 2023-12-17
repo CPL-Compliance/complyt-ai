@@ -9,7 +9,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
     String expectedJwt = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InJ0RU1OdWRnTWx5aTJtMzVLSnJQRSJ9.eyJ0ZW5hbnRfaWQiOiJvcmdfU3R0QWNCa0s3YjMydzdrQSIsImlzcyI6Imh0dHBzOi8vZGV2ZWxvcG1lbnQtY29tcGx5dC51cy5hdXRoMC5jb20vIiwic3ViIjoiOGZsQmcxd2NqbmhYbkFVSEdGREw2QWJTMmZHSHZGM2hAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vc2FsZXMtdGF4LXNlcnZpY2UvIiwiaWF0IjoxNjkwMjkzNjU3LCJleHAiOjE2OTAzODAwNTcsImF6cCI6IjhmbEJnMXdjam5oWG5BVUhHRkRMNkFiUzJmR0h2RjNoIiwic2NvcGUiOiJjcmVhdGU6Y3VzdG9tZXIgZGVsZXRlOmN1c3RvbWVyIHJlYWQ6Y3VzdG9tZXIgdXBkYXRlOmN1c3RvbWVyIGNyZWF0ZTp0cmFuc2FjdGlvbiByZWFkOnRyYW5zYWN0aW9uIHVwZGF0ZTp0cmFuc2FjdGlvbiBkZWxldGU6dHJhbnNhY3Rpb24gcmVhZDpzdGF0ZSBjcmVhdGU6ZXhlbXB0aW9uIHVwZGF0ZTpleGVtcHRpb24gZGVsZXRlOmV4ZW1wdGlvbiByZWFkOmV4ZW1wdGlvbiBjcmVhdGU6bmV4dXMgcmVhZDpuZXh1cyBkZWxldGU6bmV4dXMgdXBkYXRlOm5leHVzIHJlYWQ6bGluayByZWFkOnNhbGVzX3RheF9yYXRlcyIsImd0eSI6ImNsaWVudC1jcmVkZW50aWFscyJ9.CMXw27HyIdfeSqjIBixGn47t5y8JRPcGJV7o7V3z2QmctgqxmISEt-GyvMrVHh922qI6BzBkzA0Q8fO7Z2trqtpnTMm2MBd7nAHeGzDJZpH8tc_T0mCwkkM3iagrIbVzfYgWFqxNWqaYhmpjCGSko3SigyhRqTkSRcf_2DC-xaYy7NdN9ed4Mpl6CPcIGZpWw1QGEpgH2uTnauKYUJ5pgpFNpM1lyHODV3Od-6MeRhbntgqEdyT5Kwk7aXAteeGO6Lzbjb6UX8NL_zscTK2nSNqYiTJwUR5x9rh-V9jgbQqwU-Jb-tywMiL0EAEkDUDhJT4Wt7Cjbdh9P7sk3k5Cpg";
 
     @Test
-    public void authentication_token_post_apiKeyExistsButDoesntHaveToken_ReturnsAccessToken() {
+    public void authentication_token_post_jsonTypeApiKeyExistsButDoesntHaveToken_ReturnsAccessToken() {
         WEB_TEST_CLIENT
                 .post()
                 .uri(uriBuilder -> uriBuilder
@@ -19,6 +19,22 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
                 .bodyValue(TestUtilities.tokenJsonExample())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.accessToken").isEqualTo(expectedJwt);
+    }
+    @Test
+    public void authentication_token_post_urlEncodedTypeApiKeyExistsButDoesntHaveToken_ReturnsAccessToken() {
+        WEB_TEST_CLIENT
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TOKEN_BASE_URL)
+                        .build())
+                .headers(headers -> {
+                    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                })
+                .bodyValue(TestUtilities.tokenUrlEncodedExample())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()

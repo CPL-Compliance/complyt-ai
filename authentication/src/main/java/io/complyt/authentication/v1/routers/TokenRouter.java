@@ -18,7 +18,7 @@ public class TokenRouter {
     public RouterFunction<ServerResponse> postTokenRouterFunction(@NonNull final TokenHandler tokenHandler) {
         RequestPredicate postTokenRoute = RequestPredicates
                 .POST(BASE_URL)
-                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED));
 
         return RouterFunctions.route(postTokenRoute, tokenHandler::post);
     }
