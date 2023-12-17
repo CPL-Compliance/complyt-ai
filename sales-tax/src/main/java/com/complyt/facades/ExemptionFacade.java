@@ -30,8 +30,8 @@ public class ExemptionFacade {
         return exemptionService.findByComplytId(complytId);
     }
 
-    public Flux<Exemption> findAll(int offset, int limit) {
-        return exemptionService.findAll(offset, limit);
+    public Flux<Exemption> findAll(int page, int size) {
+        return exemptionService.findAll(page, size);
     }
 
     public Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final UUID complytId) {

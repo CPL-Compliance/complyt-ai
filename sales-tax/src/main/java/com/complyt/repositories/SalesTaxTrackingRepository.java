@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -73,12 +72,12 @@ public class SalesTaxTrackingRepository {
                 });
     }
 
-    public Flux<SalesTaxTracking> findAll(int offset, int limit) {
+    public Flux<SalesTaxTracking> findAll(int page, int size) {
+        int calculatedOffset = (page - 1) * size;
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
-                    Query query = Query.query(Criteria.where("tenantId").is(tenantId)).skip(offset).limit(limit);
-
-                    return ContextLogger.observeCtx("Searching for all sales tax tracking with tenant ID " + tenantId + "with offset " + offset + "and limit " + limit, log::info)
+                    Query query = Query.query(Criteria.where("tenantId").is(tenantId)).skip(calculatedOffset).limit(size);
+                    return ContextLogger.observeCtx("Searching for all sales tax tracking with tenant ID " + tenantId + "with offset " + page + "and limit " + size, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, SalesTaxTracking.class));
                 });
     }

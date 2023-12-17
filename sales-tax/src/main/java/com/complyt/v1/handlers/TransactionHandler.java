@@ -57,13 +57,13 @@ public class TransactionHandler {
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        int offSet = Integer.parseInt(serverRequest.queryParam("offset")
+        int page = Integer.parseInt(serverRequest.queryParam("page")
                 .orElse("0"));
-        int limit = Integer.parseInt(serverRequest.queryParam("limit")
+        int size = Integer.parseInt(serverRequest.queryParam("size")
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE)));
 
         Flux<TransactionDto> transactionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
-                .thenMany(transactionFacade.getAll(offSet, limit))
+                .thenMany(transactionFacade.getAll(page, size))
                 .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
                 .flatMapSequential(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto));
 

@@ -89,14 +89,14 @@ public class SalesTaxTrackingHandler {
     @NexusReadPermission
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
-        int offSet = Integer.parseInt(serverRequest.queryParam("offset")
+        int page = Integer.parseInt(serverRequest.queryParam("page")
                 .orElse("0"));
-        int limit = Integer.parseInt(serverRequest.queryParam("limit")
+        int size = Integer.parseInt(serverRequest.queryParam("size")
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE)));
 
         return ContextLogger.observeCtx(logStr, log::info).then(
                 ServerResponse.ok()
-                        .body(salesTaxTrackingFacade.findAll(offSet, limit).map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto), SalesTaxTrackingDto.class));
+                        .body(salesTaxTrackingFacade.findAll(page, size).map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto), SalesTaxTrackingDto.class));
     }
 
     @NexusUpdatePermission

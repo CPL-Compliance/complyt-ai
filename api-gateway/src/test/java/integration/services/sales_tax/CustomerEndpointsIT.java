@@ -3,15 +3,13 @@ package integration.services.sales_tax;
 import com.nimbusds.jose.shaded.gson.JsonArray;
 import integration.TestContainersInitializerIT;
 import integration.test_utils.TestUtilities;
+import integration.test_utils.templates.endpoints.RepositoryConstant;
 import org.junit.jupiter.api.*;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-
 import java.util.LinkedHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -397,77 +395,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 });
     }
 
-    @Test
-    @Order(3)
-    @WithMockUser
-    public void getAll_getCustomersByParamSize_ReturnsExpectedSize() {
-        int size = 5;
-//        WEB_TEST_CLIENT
-//                .mutateWith(csrf())
-//                .get()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TestUtilities.CUSTOMER_BASE_URL)
-//                        .queryParam("size", size)
-//                        .build())
-//                .headers(headers -> {
-//                    headers.setBearerAuth(TOKEN);
-//                    headers.setContentType(MediaType.APPLICATION_JSON);
-//                })
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBodyList(String.class)
-//                .value(list ->
-//                        assertEquals(size, list.size()));
-    }
-
-    @Test
-    @Order(3)
-    @WithMockUser
-    public void getAll_getCustomersByDefaultOffset_ReturnsFirstEntry() {
-        int size = 1;
-//        String expectedComplyId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
-//        WEB_TEST_CLIENT
-//                .mutateWith(csrf())
-//                .get()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TestUtilities.CUSTOMER_BASE_URL)
-//                        .queryParam("size", size) // Add query parameter for offset
-//                        .build())
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBodyList(JsonArray.class)
-//                .value(customers -> Assertions.assertEquals(customers.get(0), expectedComplyId))
-//                .hasSize(size);
-    }
-
-    @Test
-    @Order(3)
-    @WithMockUser
-    public void getAll_GetSkippedCustomersByOffset_ReturnsExpectedEntryByOffset() {
-        int size = 1;
-        int page = 2;
-
-//        String expectedComplyId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
-//        webTestClient
-//                .mutateWith(csrf())
-//                .get()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(SalesTaxTrackingRouter.BASE_URL) // Set your API endpoint
-//                        .queryParam("size", size)
-//                        .queryParam("page",page)
-//                        .build())
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBodyList(Customer.class)
-//                .value(customers -> Assertions.assertEquals(customers.get(0).getComplytId().toString(), expectedComplyId))
-//                .hasSize(size);
-    }
-
-
-
     @Order(1)
     @Test
     @Override
@@ -551,4 +478,73 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .exchange()
                 .expectStatus().isForbidden();
     }
+
+
+    @Test
+    @Override
+    public void getAll_GetByParamSize_ReturnsExpectedSize() {
+        int size = 1;
+        int page = 1;
+        String expectedComplyId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
+
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL)
+                        .queryParam("size", size)
+                        .queryParam("page", page)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(customer -> assertEquals(customer.get(0).get("complytId"), expectedComplyId));
+    }
+
+    @Override
+    public void getAll_GetByParamPage_ReturnsExpectedPage() {
+        int size = 1;
+        int page = 2;
+        String expectedComplyId = "9ff0912a-2d60-4e8a-a6ba-1a9e7385338e";
+
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL)
+                        .queryParam("size", size)
+                        .queryParam("page", page)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(customer -> assertEquals(customer.get(0).get("complytId"), expectedComplyId));
+    }
+
+    @Override
+    public void getAll_GetByDefaultsSizeAndPage_ReturnsExpectedEntries() {
+        String expectedComplyId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
+
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(customer -> assertEquals(customer.get(0).get("complytId"), expectedComplyId))
+                .value(customerLst -> assertTrue(customerLst.size() <= RepositoryConstant.DEFAULT_SIZE));
+    }
+
 }

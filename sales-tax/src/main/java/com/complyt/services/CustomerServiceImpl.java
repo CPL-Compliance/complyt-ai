@@ -89,8 +89,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Flux<Customer> findAll(int offset, int limit) {
-        return customerRepository.findAll(offset, limit);
+    public Flux<Customer> findAll(int page, int size) {
+        return customerRepository.findAll(page, size);
     }
 
     @Override

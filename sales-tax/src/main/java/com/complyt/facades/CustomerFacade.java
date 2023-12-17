@@ -43,8 +43,8 @@ public class CustomerFacade {
         return customerService.findByComplytId(complytId);
     }
 
-    public Flux<Customer> getAll(int offset, int limit) {
-        return customerService.findAll(offset, limit);
+    public Flux<Customer> getAll(int page, int size) {
+        return customerService.findAll(page, size);
     }
 
     public Flux<Customer> getAllBySource(String source) {

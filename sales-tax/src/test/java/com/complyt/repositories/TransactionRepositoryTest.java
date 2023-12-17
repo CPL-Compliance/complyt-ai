@@ -28,6 +28,7 @@ import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.calls;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -152,6 +153,10 @@ class TransactionRepositoryTest {
     @Test
     void findAll_twoTransactionsMatch_returnsTwoTransactions() {
         // Given
+        int page = 1;
+        int size = 2;
+        int calculatedOffset = 0;
+
         String externalId = UUID.randomUUID().toString();
         UUID customerId = UUID.randomUUID();
         Transaction secondTransaction = transaction.withExternalId(externalId).withCustomerId(customerId);
@@ -160,44 +165,69 @@ class TransactionRepositoryTest {
             add(secondTransaction);
         }};
 
-        int offset = 0;
-        int limit = allTransactions.size();
 
         Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()))
-                .skip(offset).limit(limit);
+                .skip(calculatedOffset).limit(size);
 
         //When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.find(query, Transaction.class)).thenReturn(Flux.fromIterable(allTransactions));
-        Flux<Transaction> transactionFlux = transactionRepository.findAll(offset, limit);
+        Flux<Transaction> transactionFlux = transactionRepository.findAll(page, size);
 
         //Then
         StepVerifier.create(transactionFlux).expectNext(transaction, secondTransaction).verifyComplete();
     }
 
     @Test
-    void findAll_SkipTransactionsMatchOffsetOne_returnsOneTransactions() {
+    void findAll_TransactionsByOffsetAndLimit_ExpectingChunkOfTransactions() {
         // Given
+        int page = 2;
+        int size = 2;
+        int calculatedOffset = (page - 1) * size;
+
+        List<Transaction> transactionList = IntStream.range(0, 4)
+                .mapToObj(i -> transaction.withComplytId(UUID.randomUUID()).withId(UUID.randomUUID().toString()))
+                .collect(Collectors.toList());
+
+        // Creating the expected list (list of 2-4 transaction objects)
+        List<Transaction> expectedList = transactionList.subList(calculatedOffset, Math.min(calculatedOffset + size, transactionList.size()));
+
+        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()))
+                .skip(calculatedOffset)
+                .limit(size);
+
+        // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
+        when(reactiveMongoTemplate.find(eq(query), eq(Transaction.class))).thenReturn(Flux.fromIterable(expectedList));
+
+        // Then
+        Flux<Transaction> transactionFlux = transactionRepository.findAll(page, size);
+        StepVerifier.create(transactionFlux).expectNextSequence(expectedList).verifyComplete();
+    }
+
+    @Test
+    void findAll_NoTransactionReturnedOffsetZeroLimitEqSize_EmptyFluxReturned() {
+        // Given
+        int page = 1;
+        int size = 1;
+        int calculatedOffset = 0;
+
         String externalId = UUID.randomUUID().toString();
         UUID customerId = UUID.randomUUID();
         Transaction secondTransaction = transaction.withExternalId(externalId).withCustomerId(customerId);
-        List<Transaction> allTransactions = new ArrayList<>() {{
-            add(transaction);
-            add(secondTransaction);
-        }};
-        int offset = 1;
-        int limit = 1;
+
         Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()))
-                .skip(offset).limit(limit);
+                .skip(calculatedOffset).limit(size);
 
         //When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.find(query, Transaction.class)).thenReturn(Flux.just(secondTransaction));
-        Flux<Transaction> transactionFlux = transactionRepository.findAll(offset, limit);
+        Flux<Transaction> transactionFlux = transactionRepository.findAll(page, size);
 
         //Then
         StepVerifier.create(transactionFlux).expectNext(secondTransaction).verifyComplete();
     }
+
 
     @Test
     void findAllByQuery_twoTransactionsMatch_returnsTwoTransactions() {
@@ -224,32 +254,6 @@ class TransactionRepositoryTest {
         StepVerifier.create(transactionFlux).expectNext(transaction, secondTransaction).verifyComplete();
     }
 
-
-    @Test
-    void findAll_TransactionsByOffsetAndLimit_ExpectingChunkOfTransactions() {
-        // Given
-        int offset = 2;
-        int limit = 2;
-
-        List<Transaction> transactionList = IntStream.range(0, 4)
-                .mapToObj(i -> transaction.withComplytId(UUID.randomUUID()).withId(UUID.randomUUID().toString()))
-                .collect(Collectors.toList());
-
-        // Creating the expected list (list of 2-4 transaction objects)
-        List<Transaction> expectedList = transactionList.subList(offset, Math.min(offset + limit, transactionList.size()));
-
-        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()))
-                .skip(offset)
-                .limit(limit);
-
-        // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
-        when(reactiveMongoTemplate.find(eq(query), eq(Transaction.class))).thenReturn(Flux.fromIterable(expectedList));
-
-        // Then
-        Flux<Transaction> transactionFlux = transactionRepository.findAll(offset, limit);
-        StepVerifier.create(transactionFlux).expectNextSequence(expectedList).verifyComplete();
-    }
 
     @Test
     void getAllTransactionsBySource_RetrievingAllTransactionsInSource_ExpectingTwoTransactions() {

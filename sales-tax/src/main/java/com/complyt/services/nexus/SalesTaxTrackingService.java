@@ -23,7 +23,7 @@ public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, S
 
     Mono<SalesTaxTracking> findByComplytId(@NonNull UUID complytId);
 
-    Flux<SalesTaxTracking> findAll(int offset, int limit);
+    Flux<SalesTaxTracking> findAll(int page, int size);
 
     Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull NexusStateRule stateRule, @NonNull LocalDateTime referenceDate);
 

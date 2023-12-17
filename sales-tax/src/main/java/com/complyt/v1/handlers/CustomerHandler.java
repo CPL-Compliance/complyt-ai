@@ -40,12 +40,12 @@ public class CustomerHandler {
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        int offSet = Integer.parseInt(serverRequest.queryParam("offset")
+        int page = Integer.parseInt(serverRequest.queryParam("page")
                 .orElse("0"));
-        int limit = Integer.parseInt(serverRequest.queryParam("limit")
+        int size = Integer.parseInt(serverRequest.queryParam("size")
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE)));
 
-        Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info).thenMany(customerfacade.getAll(offSet, limit)
+        Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info).thenMany(customerfacade.getAll(page, size)
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
                 .flatMapSequential(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto)));
 
@@ -100,7 +100,6 @@ public class CustomerHandler {
 
     @CustomerReadPermission
     public Mono<ServerResponse> getByComplytId(ServerRequest serverRequest) {
-        //todo - when null complytId -> Send BadRequest 404 - null
         UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
         Mono<CustomerDto> customerDtoMono = ContextLogger.observeCtx(logStr, log::info).then(customerfacade.findByComplytId(complytId))

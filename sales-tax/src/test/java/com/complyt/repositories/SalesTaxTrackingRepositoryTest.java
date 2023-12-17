@@ -1,6 +1,7 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.State;
+import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.security.TenantResolver;
 import org.junit.jupiter.api.BeforeEach;
@@ -128,28 +129,6 @@ public class SalesTaxTrackingRepositoryTest {
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
     }
 
-    @Test
-    void findAll_FindsTwoSalesTaxTracking_ReturnsTwoSalesTaxTracking() {
-        // given
-        List<SalesTaxTracking> salesTaxTrackingList = new ArrayList<>() {{
-            add(salesTaxTracking);
-
-        }};
-
-        int offset = 0;
-        int limit = salesTaxTrackingList.size();
-        Query query = Query.query(Criteria.where("tenantId").is(salesTaxTracking.getTenantId()))
-                .skip(offset).limit(limit);
-
-        // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
-        when(reactiveMongoTemplate.find(query, SalesTaxTracking.class)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
-
-        // Then
-        Flux<SalesTaxTracking> salesTaxTrackingFlux = salesTaxTrackingRepository.findAll(offset, limit);
-
-        StepVerifier.create(salesTaxTrackingFlux).expectNext(salesTaxTracking).verifyComplete();
-    }
 
     @Test
     void findByComplytId_IdDoesNotExist_ReturnsEmpty() {
@@ -167,31 +146,108 @@ public class SalesTaxTrackingRepositoryTest {
         StepVerifier.create(monoSalesTaxTracking).verifyComplete();
     }
 
-    @Test
-    void findAll_SalesTaxTrackingByOffsetAndLimit_ExpectingChunkOfSalesTaxTracking() {
-        // Given
-        int offset = 2;
-        int limit = 2;
 
-        List<SalesTaxTracking> salesTaxTrackingList = IntStream.range(0, 4)
-                .mapToObj(i ->  salesTaxTracking.withComplytId(UUID.randomUUID()).withId(UUID.randomUUID().toString()))
+    @Test
+    void findAll_FindsTwoSalesTaxTrackingPageZeroLimitEqSize_ReturnsTwoExemptions() {
+        // Given
+        int page = 1;
+        int size = 2;
+        int calculatedOffset = 0;
+
+        SalesTaxTracking secondSTR = salesTaxTracking.withComplytId(UUID.randomUUID()).withId(UUID.randomUUID().toString());
+
+        List<SalesTaxTracking> salesTaxTracking = new ArrayList<>() {{
+            add(SalesTaxTrackingRepositoryTest.this.salesTaxTracking);
+            add(secondSTR);
+        }};
+
+        Query query = Query.query(Criteria.where("tenantId").is(this.salesTaxTracking.getTenantId()))
+                .skip(calculatedOffset)
+                .limit(size);
+
+        // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(this.salesTaxTracking.getTenantId()));
+        when(reactiveMongoTemplate.find(eq(query), eq(SalesTaxTracking.class)))
+                .thenReturn(Flux.fromIterable(salesTaxTracking));
+        // Then
+        Flux<SalesTaxTracking> exemptionFlux = salesTaxTrackingRepository.findAll(page, size);
+        StepVerifier.create(exemptionFlux).expectNext(this.salesTaxTracking, secondSTR).verifyComplete();
+    }
+
+    @Test
+    void findAll_FindsTwoSalesTaxTracking_ReturnsTwoSalesTaxTracking() {
+        // given
+        int page = 2;
+        int size = 2;
+        int calculatedOffset = (page - 1) * size;
+
+        List<SalesTaxTracking> exemptionList = IntStream.range(0, 4)
+                .mapToObj(i -> salesTaxTracking.withComplytId(UUID.randomUUID()).withId(UUID.randomUUID().toString()))
                 .collect(Collectors.toList());
 
-        // Creating the expected list (list of 2-4 sales tax tracking objects)
-        List<SalesTaxTracking> expectedList = salesTaxTrackingList.subList(offset, Math.min(offset + limit, salesTaxTrackingList.size()));
+        // Creating the expected list (list of 2-4 exemptions)
+        List<SalesTaxTracking> expectedList = exemptionList.subList(calculatedOffset, Math.min(calculatedOffset + size, exemptionList.size()));
 
         Query query = Query.query(Criteria.where("tenantId").is(salesTaxTracking.getTenantId()))
-                .skip(offset)
-                .limit(limit);
+                .skip(calculatedOffset)
+                .limit(size);
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
         when(reactiveMongoTemplate.find(eq(query), eq(SalesTaxTracking.class))).thenReturn(Flux.fromIterable(expectedList));
 
         // Then
-        Flux<SalesTaxTracking> salesTaxTrackingFlux = salesTaxTrackingRepository.findAll(offset, limit);
+        Flux<SalesTaxTracking> exemptionFlux = salesTaxTrackingRepository.findAll(page, size);
+        StepVerifier.create(exemptionFlux).expectNextSequence(expectedList).verifyComplete();
+    }
+
+    @Test
+    void findAll_NoExemptionReturnedOffsetZeroLimitEqSize_EmptyFluxReturned() {
+        // Given
+        int page = 1;
+        int size = 1;
+        int CalculatedOffset = 0;
+
+        Query query = Query.query(Criteria.where("tenantId").is(salesTaxTracking.getTenantId()))
+                .skip(CalculatedOffset)
+                .limit(size);
+        // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
+        when(reactiveMongoTemplate.find(eq(query), eq(SalesTaxTracking.class))).thenReturn(Flux.empty());
+
+        // Then
+        Flux<SalesTaxTracking> exemptionFlux = salesTaxTrackingRepository.findAll(page, size);
+        StepVerifier.create(exemptionFlux).verifyComplete();
+    }
+
+
+    @Test
+    void findAll_SalesTaxTrackingByOffsetAndLimit_ExpectingChunkOfSalesTaxTracking() {
+        // Given
+        int page = 2;
+        int size = 2;
+        int calculatedOffset = (page - 1) * size;
+
+        List<SalesTaxTracking> salesTaxTrackingList = IntStream.range(0, 4)
+                .mapToObj(i ->  salesTaxTracking.withComplytId(UUID.randomUUID()).withId(UUID.randomUUID().toString()))
+                .collect(Collectors.toList());
+
+        // Creating the expected list (list of 2-4 sales tax tracking objects)
+        List<SalesTaxTracking> expectedList = salesTaxTrackingList.subList(page, Math.min(page + size, salesTaxTrackingList.size()));
+
+        Query query = Query.query(Criteria.where("tenantId").is(salesTaxTracking.getTenantId()))
+                .skip(calculatedOffset)
+                .limit(size);
+
+        // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
+        when(reactiveMongoTemplate.find(eq(query), eq(SalesTaxTracking.class))).thenReturn(Flux.fromIterable(expectedList));
+
+        // Then
+        Flux<SalesTaxTracking> salesTaxTrackingFlux = salesTaxTrackingRepository.findAll(page, size);
         StepVerifier.create(salesTaxTrackingFlux).expectNextSequence(expectedList).verifyComplete();
     }
+
 
     @Test
     void findByComplytId_IdExist_ReturnsSalesTaxTracking() {

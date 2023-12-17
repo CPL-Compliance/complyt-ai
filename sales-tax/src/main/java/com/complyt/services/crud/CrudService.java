@@ -9,5 +9,5 @@ public interface CrudService<T, ID> {
 
     Mono<T> findById(@NonNull final ID id);
 
-    Flux<T> findAll(int offset, int limit);
+    Flux<T> findAll(int page, int size);
 }

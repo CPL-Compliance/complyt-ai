@@ -94,12 +94,12 @@ public class ExemptionHandler {
     @ExemptionReadPermission
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
-        int offSet = Integer.parseInt(serverRequest.queryParam("offset").orElse("0"));
-        int limit = Integer.parseInt(serverRequest.queryParam("limit")
+        int page = Integer.parseInt(serverRequest.queryParam("page").orElse("0"));
+        int size = Integer.parseInt(serverRequest.queryParam("size")
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE)));
 
         Flux<ExemptionDto> exemptionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
-                .thenMany(exemptionFacade.findAll(offSet, limit))
+                .thenMany(exemptionFacade.findAll(page, size))
                 .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
                 .flatMapSequential(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto));
 

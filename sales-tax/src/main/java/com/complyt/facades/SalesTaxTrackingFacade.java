@@ -57,8 +57,8 @@ public class SalesTaxTrackingFacade {
                 .flatMap(recalculateCurrentNexusSummaryIfNeeded());
     }
 
-    public Flux<SalesTaxTracking> findAll(int offset, int limit) {
-        return salesTaxTrackingService.findAll(offset, limit)
+    public Flux<SalesTaxTracking> findAll(int page, int size) {
+        return salesTaxTrackingService.findAll(page, size)
                 .flatMapSequential(recalculateCurrentNexusSummaryIfNeeded());
     }
 

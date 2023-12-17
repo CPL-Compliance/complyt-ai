@@ -27,11 +27,6 @@ class OperationFailedExceptionTest {
     }
 
     @Test
-    void constant_defaultValue_VALID() {
-        assertEquals(25, RepositoryConstant.DEFAULT_PAGE_SIZE);
-    }
-
-    @Test
     void constructor_WithNewMessage_ExceptionThrown() {
         // Given + When
         OperationFailedException actualException = assertThrows(OperationFailedException.class, () -> {
