@@ -120,7 +120,6 @@ public class TransactionFacade {
     }
 
     public Flux<Transaction> getAllBySource(String source) {
-
         return transactionService.findAllBySource(source)
                 .flatMap(transaction -> getCustomerByTransaction(transaction)
                         .map(transaction::withCustomer));
