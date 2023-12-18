@@ -1,7 +1,7 @@
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8080/eureka/
+      defaultZone: http://localhost:8761/eureka/
     should-unregister-on-shutdown: true
     initial-instance-info-replication-interval-seconds: 1
     registry-fetch-interval-seconds: 15
@@ -43,7 +43,6 @@ spring.cloud.vault:
 spring.config.import: vault://
 
 auth0.audience: ${audience}
-
 # This property sets the issuer URI
 # for the application to interact with the Resource Server for authentication and authorization purposes
 spring.security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}

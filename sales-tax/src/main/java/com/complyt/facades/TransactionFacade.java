@@ -122,7 +122,6 @@ public class TransactionFacade {
 
 
     public Flux<Transaction> getAllBySource(String source) {
-
         return transactionService.findAllBySource(source)
                 .flatMap(transaction -> getCustomerByTransaction(transaction)
                         .map(transaction::withCustomer));
@@ -133,8 +132,9 @@ public class TransactionFacade {
                 .flatMap(transaction -> getCustomerByTransaction(transaction)
                         .map(transaction::withCustomer))
                 .flatMap(transaction -> salesTaxTrackingService.findByState(transaction.getShippingAddress().state())
-                        .flatMap(salesTaxTracking -> nexusService.removeFromNexusTracking(transaction, salesTaxTracking))
-                        .flatMap(salesTaxTrackingService::save)
+                        .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking))
+                        .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ? Mono.empty() :
+                                nexusService.removeFromNexusTracking(transaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()).flatMap(salesTaxTrackingService::save))
                         .thenReturn(transaction));
     }
 

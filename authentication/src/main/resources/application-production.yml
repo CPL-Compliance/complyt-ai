@@ -4,7 +4,7 @@ eureka:
       defaultZone: ${discovery-service-uri}
     initial-instance-info-replication-interval-seconds: 1
     should-unregister-on-shutdown: true
-    registry-fetch-interval-seconds: 15
+    registry-fetch-interval-seconds: 3
   instance:
     prefer-ip-address: true
     lease-renewal-interval-in-seconds: 30
@@ -14,7 +14,7 @@ eureka:
 # https://cloud.spring.io/spring-cloud-vault/reference/html/
 spring.cloud.vault:
   enabled: true
-  application-name: authentication-service
+  application-name: authentication-service${ecs_cluster_name:}
   host: ${VAULT_HOST}
   port: 8200
   scheme: https

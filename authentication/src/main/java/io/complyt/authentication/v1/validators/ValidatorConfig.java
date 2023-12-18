@@ -21,8 +21,8 @@ public class ValidatorConfig {
     @Bean
     public ValidationHandler<ApiKeyDto, SpringValidatorAdapter>
     apiKeyDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter,
-                               @Autowired QueryParamsExtractor<ApiKeyDto> queryParamsExtractorEmpty) {
+                               @Autowired QueryParamsExtractor<ApiKeyDto> queryParamsExtractorCredentials) {
         return new ValidationHandler<>(ApiKeyDto.class, springValidatorAdapter,
-                queryParamsExtractorEmpty);
+                queryParamsExtractorCredentials);
     }
 }

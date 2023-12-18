@@ -1,5 +1,6 @@
 package io.complyt.authentication.business.authorization;
 
+import io.complyt.authentication.business.exceptions.ComplytAuth0Exception;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import test_utils.unit_tests.TestUtilities;
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -68,6 +70,40 @@ public class Auth0AuthorizationServerWrapperTest {
 
         // Then
         StepVerifier.create(accessTokenMono).expectNext(accessToken).verifyComplete();
+    }
+
+    @Test
+    void getAccessToken_Auth0ServiceIsUnavailable_is5RetriesExhausted() {
+        // Given
+        AccessToken accessToken = TestUtilities.createAccessToken();
+        Auth0AccessToken auth0AccessToken = TestUtilities.createAuth0AccessToken();
+        String clientId = "client ID";
+        String clientSecret = "Client Secret";
+        String audience = "Audience";
+        String grantType = "Grant Type";
+        String headerName = "Content-Type";
+        String headerValue = "application/x-www-form-urlencoded";
+
+        // When
+        when(webClient.post()).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.header(headerName, headerValue)).thenReturn(requestBodySpecMock);
+        when(requestBodySpecMock.bodyValue("client_id=" + clientId +
+                "&client_secret=" + clientSecret +
+                "&audience=" + audience +
+                "&grant_type=" + grantType)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToMono(Auth0AccessToken.class))
+                .thenReturn(Mono.error(new Exception("Retries Exception")));
+
+        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken("client ID",
+                "Client Secret", "Audience", "Grant Type");
+
+        //Then
+        StepVerifier.create(accessTokenMono)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof ComplytAuth0Exception
+                                && throwable.getMessage().equals("5 Retries Exhausted"))
+                .verify();
     }
 
     @Test

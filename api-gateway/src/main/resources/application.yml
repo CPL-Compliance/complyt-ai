@@ -261,7 +261,7 @@ spring:
       default-filters:
         - name: Retry
           args:
-            retries: 5
+            retries: 10
             series: SERVER_ERROR
             methods: GET,PUT,DELETE,POST
             # For more details on these exceptions go to ticket <tomer/com-248-gateway-retry-improvement>

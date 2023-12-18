@@ -183,4 +183,9 @@ public class TestUtilities {
                 "}";
     }
 
+    public static String tokenUrlEncodedExample() {
+        return "clientId=" + API_KEY_CLIENT_ID +
+                "&clientSecret=" + API_KEY_CLIENT_SECRET;
+    }
+
 }
