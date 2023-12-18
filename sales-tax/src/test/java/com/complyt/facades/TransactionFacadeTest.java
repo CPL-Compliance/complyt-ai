@@ -481,7 +481,7 @@ public class TransactionFacadeTest {
         String externalId = transaction.getExternalId();
         Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
         SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking("13134");
-        SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(salesTaxTracking,false);
+        SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
 
         // When
         when(transactionService.markAsCancelled(externalId, source)).thenReturn(Mono.just(cancelledTransaction));
@@ -502,7 +502,7 @@ public class TransactionFacadeTest {
         String externalId = transaction.getExternalId();
         Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
         SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking("13134");
-        SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(salesTaxTracking,true);
+        SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
 
         // When
         when(transactionService.markAsCancelled(externalId, source)).thenReturn(Mono.just(cancelledTransaction));
