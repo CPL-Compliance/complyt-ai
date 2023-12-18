@@ -8,7 +8,9 @@ public class RepositoryConstantTest {
 
     @Test
     public void checkDefaultConstant_Returns200() {
-        assertEquals(25, RepositoryConstant.DEFAULT_PAGE_SIZE);
+        int expectedPageSize = 25;
+        assertEquals(expectedPageSize, RepositoryConstant.DEFAULT_PAGE_SIZE);
     }
+
 
 }
