@@ -113,9 +113,16 @@ public class TransactionFacade {
                         .map(transaction::withCustomer));
     }
 
+<<<<<<< Updated upstream
     public Flux<Transaction> getAll() {
         return transactionService.findAll()
                 .flatMap(transaction -> getCustomerByTransaction(transaction)
+=======
+
+    public Flux<Transaction> getAll(int page, int size) {
+        return transactionService.findAll(page, size)
+                .flatMapSequential(transaction -> getCustomerByTransaction(transaction)
+>>>>>>> Stashed changes
                         .map(transaction::withCustomer));
     }
 
@@ -131,8 +138,9 @@ public class TransactionFacade {
                 .flatMap(transaction -> getCustomerByTransaction(transaction)
                         .map(transaction::withCustomer))
                 .flatMap(transaction -> salesTaxTrackingService.findByState(transaction.getShippingAddress().state())
-                        .flatMap(salesTaxTracking -> nexusService.removeFromNexusTracking(transaction, salesTaxTracking))
-                        .flatMap(salesTaxTrackingService::save)
+                        .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking))
+                        .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ? Mono.empty() :
+                                nexusService.removeFromNexusTracking(transaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()).flatMap(salesTaxTrackingService::save))
                         .thenReturn(transaction));
     }
 

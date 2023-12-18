@@ -476,18 +476,39 @@ public class TransactionFacadeTest {
     }
 
     @Test
-    void markAsCancelled_TransactionIdGiven_ChangesTransactionStatus() {
+    void markAsCancelled_TransactionIdGivenAndDidNotPassNexus_ChangesTransactionStatus() {
         // Given
         String externalId = transaction.getExternalId();
         Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
         SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking("13134");
+        SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(salesTaxTracking,false);
 
         // When
         when(transactionService.markAsCancelled(externalId, source)).thenReturn(Mono.just(cancelledTransaction));
         when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(salesTaxTrackingService.findByState(cancelledTransaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
+        when(nexusService.hasNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingWithNexusInfo));
         when(nexusService.removeFromNexusTracking(cancelledTransaction.withCustomer(customer), salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingService.save(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+        Mono<Transaction> transactionWithCancelledStatus = transactionFacade.markAsCancelled(externalId, source);
+
+        // Then
+        StepVerifier.create(transactionWithCancelledStatus).expectNext(cancelledTransaction.withCustomer(customer)).verifyComplete();
+    }
+
+    @Test
+    void markAsCancelled_TransactionIdGivenAndPassedNexus_ChangesTransactionStatus() {
+        // Given
+        String externalId = transaction.getExternalId();
+        Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
+        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking("13134");
+        SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(salesTaxTracking,true);
+
+        // When
+        when(transactionService.markAsCancelled(externalId, source)).thenReturn(Mono.just(cancelledTransaction));
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        when(salesTaxTrackingService.findByState(cancelledTransaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
+        when(nexusService.hasNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingWithNexusInfo));
         Mono<Transaction> transactionWithCancelledStatus = transactionFacade.markAsCancelled(externalId, source);
 
         // Then
