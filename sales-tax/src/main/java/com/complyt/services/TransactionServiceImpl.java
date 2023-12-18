@@ -122,8 +122,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
-    public Flux<Transaction> findAll(int offSet, int limit) {
-        return transactionRepository.findAll(offSet, limit);
+    public Flux<Transaction> findAll(int page, int size) {
+        return transactionRepository.findAll(page, size);
     }
 
 

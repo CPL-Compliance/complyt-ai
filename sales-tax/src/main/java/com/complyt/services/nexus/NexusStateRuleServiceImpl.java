@@ -28,7 +28,7 @@ public class NexusStateRuleServiceImpl implements NexusStateRuleService {
     }
 
     @Override
-    public Flux<NexusStateRule> findAll(int offSet, int limit) {
+    public Flux<NexusStateRule> findAll(int page, int limit) {
         return nexusStateRuleRepository.findAll();
     }
 

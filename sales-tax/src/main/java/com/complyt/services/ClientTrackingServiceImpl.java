@@ -39,7 +39,7 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
     }
 
     @Override
-    public Flux<ClientTracking> findAll(int offSet, int limit) {
+    public Flux<ClientTracking> findAll(int page, int size) {
         return clientTrackingRepository.findAll();
     }
 }

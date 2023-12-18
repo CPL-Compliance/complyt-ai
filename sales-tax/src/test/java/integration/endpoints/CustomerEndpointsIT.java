@@ -505,7 +505,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL)
-                        .queryParam("size", size) // Add query parameter for offset
+                        .queryParam("size", size)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

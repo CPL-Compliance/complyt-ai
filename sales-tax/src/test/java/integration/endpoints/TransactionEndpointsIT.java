@@ -662,7 +662,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL) // Set your API endpoint
-                        .queryParam("size", size) // Add query parameter for offset
+                        .queryParam("size", size)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

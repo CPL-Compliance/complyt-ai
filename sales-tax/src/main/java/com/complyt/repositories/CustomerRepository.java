@@ -54,7 +54,7 @@ public class CustomerRepository {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)).skip(calculatedOffset).limit(size);
-                    return ContextLogger.observeCtx("Searching for customers with tenant ID " + tenantId + "with pageNum " + page + "and limit " + size, log::info)
+                    return ContextLogger.observeCtx("Searching for customers with tenant ID " + tenantId + "with pageNum " + page + " and size " + size, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Customer.class));
                 });
     }
