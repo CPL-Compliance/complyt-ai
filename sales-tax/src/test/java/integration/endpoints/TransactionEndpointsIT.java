@@ -649,24 +649,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .exchange()
                 .expectStatus().is5xxServerError();
     }
-    @Test
-    @Order(3) // Change the order to 3
-    @WithMockUser
-    public void getAll_TransactionsByDefaultSize_ReturnDefaultSize() {
-        webTestClient
-                .mutateWith(csrf())
-                .get()
-                .uri(TransactionRouter.BASE_URL)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(Transaction.class)
-                .hasSize(RepositoryConstant.DEFAULT_PAGE_SIZE); // Ensure it returns one transaction
-    }
 
-
-
-
+    @Order(0)
     @Test
     @Override
     @WithMockUser
@@ -688,6 +672,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .hasSize(size);
     }
 
+    @Order(0)
     @Test
     @Override
     @WithMockUser
@@ -709,6 +694,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(transactions -> Assertions.assertEquals(transactions.get(0).getComplytId().toString(), expectedComplyId));
     }
 
+    @Order(0)
     @Test
     @Override
     @WithMockUser

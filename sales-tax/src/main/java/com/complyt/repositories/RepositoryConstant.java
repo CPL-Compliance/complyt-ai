@@ -1,5 +1,7 @@
 package com.complyt.repositories;
 
-public class RepositoryConstant {
-    public static final int DEFAULT_PAGE_SIZE = 25;
+public interface RepositoryConstant {
+    int DEFAULT_PAGE_SIZE = 25;
+    int DEFAULT_PAGE_NUM = 0;
+
 }

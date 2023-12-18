@@ -328,6 +328,4 @@ public class ExemptionRepositoryTest {
         assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
     }
 
-
-
 }

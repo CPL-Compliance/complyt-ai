@@ -475,8 +475,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 });
     }
 
-
-
+    @Order(0)
     @Test
     @WithMockUser
     @Override
@@ -499,6 +498,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .hasSize(size);
     }
 
+    @Order(0)
     @Test
     @WithMockUser
     @Override
@@ -520,11 +520,12 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isOk()
                 .expectBodyList(SalesTaxTrackingDto.class)
                 .value(salesTaxTrackingDto -> {
-                    System.out.println("abc: " + salesTaxTrackingDto);
+                    System.out.println("abc: " + salesTaxTrackingDto.get(0));
                     Assertions.assertEquals(salesTaxTrackingDto.get(0).complytId().toString(), expectedComplyId);
                 });
     }
 
+    @Order(0)
     @Test
     @WithMockUser
     @Override
@@ -543,7 +544,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectBodyList(SalesTaxTrackingDto.class)
                 .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.get(0).complytId().toString(), expectedComplyId))
                 .value(salesTaxTrackingDto -> assertTrue(salesTaxTrackingDto.size() <= RepositoryConstant.DEFAULT_PAGE_SIZE));
-                }
+
+    }
 }
 
 

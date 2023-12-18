@@ -448,6 +448,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 });
     }
 
+    @Order(0)
     @Test
     @Override
     @WithMockUser
@@ -467,6 +468,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .hasSize(size);
     }
 
+    @Order(0)
     @Test
     @Override
     @WithMockUser
@@ -491,6 +493,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
     }
 
+    @Order(0)
     @Test
     @Override
     @WithMockUser

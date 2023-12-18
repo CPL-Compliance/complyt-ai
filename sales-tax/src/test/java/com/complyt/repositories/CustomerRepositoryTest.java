@@ -223,7 +223,7 @@ class CustomerRepositoryTest {
 
 
     @Test
-    void getAllCustomers_RetrievingAllCustomersByOffsetMiddleLimitLTSize_ExpectingChunkCustomers() {
+    void findAllCustomers_RetrievingAllCustomersByOffsetMiddleLimitSize_ExpectingChunkCustomers() {
         // Given
         int page = 2;
         int limit = 2;

@@ -61,9 +61,6 @@ public class TransactionRepository {
                 });
     }
 
-
-
-
     public Mono<Transaction> findByExternalIdAndSource(String externalId, String source) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
