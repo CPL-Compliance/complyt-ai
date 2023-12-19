@@ -77,7 +77,7 @@ public class SalesTaxTrackingRepository {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)).skip(calculatedOffset).limit(size);
-                    return ContextLogger.observeCtx("Searching for all sales tax tracking with tenant ID " + tenantId + "with offset " + page + "and limit " + size, log::info)
+                    return ContextLogger.observeCtx("Searching for all sales tax tracking with tenant ID " + tenantId + "with page " + page + "and size " + size, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, SalesTaxTracking.class));
                 });
     }

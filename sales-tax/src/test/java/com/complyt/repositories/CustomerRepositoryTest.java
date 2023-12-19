@@ -226,7 +226,7 @@ class CustomerRepositoryTest {
     void findAllCustomers_RetrievingAllCustomersByOffsetMiddleLimitSize_ExpectingChunkCustomers() {
         // Given
         int page = 2;
-        int limit = 2;
+        int size = 2;
         int calculatedOffset = 2;
 
         List<Customer> customerList = IntStream.range(0, 4)
@@ -237,14 +237,14 @@ class CustomerRepositoryTest {
 
         Query query = Query.query(Criteria.where("tenantId").is(tenantId))
                 .skip(calculatedOffset)
-                .limit(limit);
+                .limit(size);
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
         when(reactiveMongoTemplate.find(eq(query), eq(Customer.class))).thenReturn(Flux.fromIterable(expectedLst));
 
         // Then
-        Flux<Customer> customerFlux = customerRepository.findAll(page, limit);
+        Flux<Customer> customerFlux = customerRepository.findAll(page, size);
         StepVerifier.create(customerFlux).expectNextSequence(expectedLst).verifyComplete();
 
     }
