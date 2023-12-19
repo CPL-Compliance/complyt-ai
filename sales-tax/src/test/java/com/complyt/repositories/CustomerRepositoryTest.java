@@ -233,7 +233,7 @@ class CustomerRepositoryTest {
                 .mapToObj(i -> customer.withComplytId(UUID.randomUUID()).withExternalId(UUID.randomUUID().toString()))
                 .collect(Collectors.toList());
 
-        List<Customer> expectedLst = customerList.subList(calculatedOffset, Math.min(calculatedOffset + limit, customerList.size()));
+        List<Customer> expectedLst = customerList.subList(calculatedOffset, Math.min(calculatedOffset + size, customerList.size()));
 
         Query query = Query.query(Criteria.where("tenantId").is(tenantId))
                 .skip(calculatedOffset)

@@ -226,7 +226,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @WithMockUser
     public void getByComplytId_Exists_Returns200() {
         // Given
-        String complytId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
+        String complytId = "6eaa133c-df9c-4f88-bba9-6dd3845c803a";
 
         // Then
         webTestClient
@@ -481,8 +481,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     public void getAll_GetByParamSize_ReturnsExpectedSize() {
         int size = 1;
+        String expectedComplyId = "6eaa133c-df9c-4f88-bba9-6dd3845c803a";
 
-        String expectedComplyId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
         webTestClient
                 .mutateWith(csrf())
                 .get()
@@ -505,8 +505,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     public void getAll_GetByParamPage_ReturnsExpectedPage() {
         int page = 2;
         int size = 1;
+        String expectedComplyId = "42b6d733-decc-4608-bfd3-d45bf868827c";
 
-        String expectedComplyId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
         webTestClient
                 .mutateWith(csrf())
                 .get()
@@ -520,7 +520,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isOk()
                 .expectBodyList(SalesTaxTrackingDto.class)
                 .value(salesTaxTrackingDto -> {
-                    System.out.println("abc: " + salesTaxTrackingDto.get(0));
                     Assertions.assertEquals(salesTaxTrackingDto.get(0).complytId().toString(), expectedComplyId);
                 });
     }
@@ -530,7 +529,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @WithMockUser
     @Override
     public void getAll_GetByDefaultsSizeAndPage_ReturnsExpectedEntries() {
-        String expectedComplyId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
+        String expectedComplyId = "6eaa133c-df9c-4f88-bba9-6dd3845c803a";
 
         webTestClient
                 .mutateWith(csrf())
