@@ -389,7 +389,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         // Then
         WEB_TEST_CLIENT
                 .get()
-                .uri(uriBuilder -> uriBuildergs
+                .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + existingStateAbbreviation)
                         .queryParam("date", now)
                         .build())
