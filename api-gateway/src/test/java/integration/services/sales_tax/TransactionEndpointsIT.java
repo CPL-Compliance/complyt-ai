@@ -577,6 +577,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().is5xxServerError();
     }
 
+    @Order(0)
     @Test
     @Override
     public void getAll_GetByParamSize_ReturnsExpectedSize() {
@@ -596,6 +597,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .hasSize(size);
     }
 
+    @Order(0)
     @Test
     @Override
     public void getAll_GetByParamPage_ReturnsExpectedPage() {
@@ -618,6 +620,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(transaction -> assertEquals(transaction.get(0).get("complytId"), expectedComplyId));
     }
 
+    @Order(0)
     @Test
     @Override
     public void getAll_GetByDefaultsSizeAndPage_ReturnsExpectedEntries() {

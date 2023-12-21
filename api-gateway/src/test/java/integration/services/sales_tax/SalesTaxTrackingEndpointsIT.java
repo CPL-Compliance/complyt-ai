@@ -62,7 +62,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     public void getByComplytId_Exists_Returns200() {
         // Given
-        String complytId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
+        String complytId = "6eaa133c-df9c-4f88-bba9-6dd3845c803a";
 
         // Then
         WEB_TEST_CLIENT
@@ -384,14 +384,12 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         // Given
         String existingStateAbbreviation = "CA";
         LocalDate now = LocalDate.now();
-        LocalDate summaryDate = now.isAfter(now.withDayOfMonth(1).withMonth(6))
-                ? LocalDate.of(now.getYear() + 1, 6, 1)
-                : LocalDate.of(now.getYear(), 6, 1);
+        LocalDate summaryDate = LocalDate.parse("2023-12-21");
 
         // Then
         WEB_TEST_CLIENT
                 .get()
-                .uri(uriBuilder -> uriBuilder
+                .uri(uriBuilder -> uriBuildergs
                         .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + existingStateAbbreviation)
                         .queryParam("date", now)
                         .build())
@@ -435,6 +433,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isForbidden();
     }
 
+    @Order(0)
     @Test
     @Override
     public void getAll_GetByParamSize_ReturnsExpectedSize() {
@@ -456,12 +455,13 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .hasSize(size);
     }
 
+    @Order(0)
     @Test
     @Override
     public void getAll_GetByParamPage_ReturnsExpectedPage() {
         int page = 2;
         int size = 1;
-        String expectedComplyId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
+        String expectedComplyId = "42b6d733-decc-4608-bfd3-d45bf868827c";
 
         WEB_TEST_CLIENT
                 .get()
@@ -480,10 +480,11 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .value(salesTaxTracking -> assertEquals(salesTaxTracking.get(0).get("complytId"), expectedComplyId));
     }
 
+    @Order(0)
     @Test
     @Override
     public void getAll_GetByDefaultsSizeAndPage_ReturnsExpectedEntries() {
-        String expectedComplyId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
+        String expectedComplyId = "6eaa133c-df9c-4f88-bba9-6dd3845c803a";
 
         WEB_TEST_CLIENT
                 .get()
