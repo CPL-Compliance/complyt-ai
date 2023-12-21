@@ -249,7 +249,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(LinkedHashMap.class)
-                .value(list -> assertEquals(25, list.size()));
+                .value(list -> assertEquals(RepositoryConstant.DEFAULT_SIZE, list.size()));
     }
 
     @Order(2)
