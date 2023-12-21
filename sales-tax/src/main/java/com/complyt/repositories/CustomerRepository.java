@@ -49,12 +49,12 @@ public class CustomerRepository {
                 });
     }
 
-    public Flux<Customer> findAll() {
+    public Flux<Customer> findAll(int page, int size) {
+        int calculatedOffset = (page - 1) * size;
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
-                    Query query = Query.query(Criteria.where("tenantId").is(tenantId));
-
-                    return ContextLogger.observeCtx("Searching for customers with tenant ID " + tenantId, log::info)
+                    Query query = Query.query(Criteria.where("tenantId").is(tenantId)).skip(calculatedOffset).limit(size);
+                    return ContextLogger.observeCtx("Searching for customers with tenant ID " + tenantId + " with page " + page + " and size " + size, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Customer.class));
                 });
     }
@@ -83,8 +83,7 @@ public class CustomerRepository {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
-
-                    return ContextLogger.observeCtx("Searching for a customer with id of: " + id + " and tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for a customer with id of: " + id + " and tenant ID " + tenantId , log::info)
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }

@@ -240,9 +240,9 @@ public class TransactionFacadeTest {
         allTransactions.add(secondTransaction);
 
         // When
-        when(transactionService.findAll()).thenReturn(Flux.fromIterable(allTransactions));
+        when(transactionService.findAll(0, allTransactions.size())).thenReturn(Flux.fromIterable(allTransactions));
         when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
-        Flux<Transaction> returnedCustomers = transactionFacade.getAll();
+        Flux<Transaction> returnedCustomers = transactionFacade.getAll(0, allTransactions.size());
 
         // Then
         StepVerifier.create(returnedCustomers).expectNextCount(2).verifyComplete();
@@ -526,9 +526,9 @@ public class TransactionFacadeTest {
         }};
 
         // When
-        when(transactionService.findAll()).thenReturn(Flux.fromIterable(transactions));
+        when(transactionService.findAll(0, transactions.size())).thenReturn(Flux.fromIterable(transactions));
         when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
-        Flux<Transaction> transactionFlux = transactionFacade.getAll();
+        Flux<Transaction> transactionFlux = transactionFacade.getAll(0, transactions.size());
 
         // Then
         StepVerifier.create(transactionFlux).expectNext(transaction.withCustomer(customer), anotherTransactionWithSameClientId.withCustomer(customer)).verifyComplete();

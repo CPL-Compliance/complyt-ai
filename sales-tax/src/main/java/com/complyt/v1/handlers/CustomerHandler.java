@@ -1,6 +1,7 @@
 package com.complyt.v1.handlers;
 
 import com.complyt.facades.CustomerFacade;
+import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.permissions.customer.CustomerReadPermission;
 import com.complyt.security.permissions.customer.CustomerUpdatePermission;
 import com.complyt.utils.observability.ContextLogger;
@@ -39,9 +40,14 @@ public class CustomerHandler {
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info).thenMany(customerfacade.getAll()
+        int page = Integer.parseInt(serverRequest.queryParam("page")
+                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM)));
+        int size = Integer.parseInt(serverRequest.queryParam("size")
+                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE)));
+
+        Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info).thenMany(customerfacade.getAll(page, size)
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
-                .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto)));
+                .flatMapSequential(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto)));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoFlux, CustomerDto.class);
     }
@@ -96,7 +102,6 @@ public class CustomerHandler {
     public Mono<ServerResponse> getByComplytId(ServerRequest serverRequest) {
         UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
-
         Mono<CustomerDto> customerDtoMono = ContextLogger.observeCtx(logStr, log::info).then(customerfacade.findByComplytId(complytId))
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
                 .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto))

@@ -213,8 +213,8 @@ public class SalesTaxTrackingServiceImplTest {
         }};
 
         // When
-        when(salesTaxTrackingRepository.findAll()).thenReturn(Flux.fromIterable(salesTaxTrackingList));
-        Flux<SalesTaxTracking> actualTrackingFlux = salesTaxTrackingService.findAll();
+        when(salesTaxTrackingRepository.findAll(0, salesTaxTrackingList.size())).thenReturn(Flux.fromIterable(salesTaxTrackingList));
+        Flux<SalesTaxTracking> actualTrackingFlux = salesTaxTrackingService.findAll(0, salesTaxTrackingList.size());
 
         // Then
         StepVerifier.create(actualTrackingFlux).expectNext(salesTaxTracking).verifyComplete();

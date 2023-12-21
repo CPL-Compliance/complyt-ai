@@ -2,6 +2,7 @@ package com.complyt.v1.routers;
 
 import com.complyt.domain.customer.Customer;
 import com.complyt.facades.CustomerFacade;
+import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
@@ -1126,7 +1127,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         }};
 
         // When
-        when(customerFacade.getAll()).thenReturn(Flux.fromIterable(allCustomers));
+        when(customerFacade.getAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(allCustomers));
 
         // Then
         webTestClient
@@ -1148,7 +1149,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         List<Customer> emptyCustomerList = new ArrayList<>();
 
         // When
-        when(customerFacade.getAll()).thenReturn(Flux.fromIterable(emptyCustomerList));
+        when(customerFacade.getAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(emptyCustomerList));
 
         // Then
         webTestClient
@@ -1169,7 +1170,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         List<Customer> emptyCustomerList = new ArrayList<>();
 
         // When
-        when(customerFacade.getAll()).thenReturn(Flux.fromIterable(emptyCustomerList));
+        when(customerFacade.getAll(0, 0)).thenReturn(Flux.fromIterable(emptyCustomerList));
 
         // Then
         webTestClient
@@ -1194,7 +1195,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // Given + When
-        when(customerFacade.getAll()).thenReturn(Flux.error(new OperationFailedException()));
+        when(customerFacade.getAll(0,0)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient

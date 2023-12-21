@@ -113,9 +113,10 @@ public class TransactionFacade {
                         .map(transaction::withCustomer));
     }
 
-    public Flux<Transaction> getAll() {
-        return transactionService.findAll()
-                .flatMap(transaction -> getCustomerByTransaction(transaction)
+
+        public Flux<Transaction> getAll(int page, int size) {
+        return transactionService.findAll(page, size)
+                .flatMapSequential(transaction -> getCustomerByTransaction(transaction)
                         .map(transaction::withCustomer));
     }
 

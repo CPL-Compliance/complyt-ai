@@ -2,6 +2,7 @@ package integration.services.sales_tax;
 
 import integration.TestContainersInitializerIT;
 import integration.test_utils.TestUtilities;
+import integration.test_utils.templates.endpoints.RepositoryConstant;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -248,7 +249,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(LinkedHashMap.class)
-                .value(list -> assertTrue(list.size() > 100));
+                .value(list -> assertEquals(RepositoryConstant.DEFAULT_SIZE, list.size()));
     }
 
     @Order(2)
@@ -575,4 +576,68 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .exchange()
                 .expectStatus().is5xxServerError();
     }
+
+    @Order(0)
+    @Test
+    @Override
+    public void getAll_GetByParamSize_ReturnsExpectedSize() {
+        int size = 1;
+
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL)
+                        .queryParam("size", size)
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .hasSize(size);
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    public void getAll_GetByParamPage_ReturnsExpectedPage() {
+        int page = 2;
+        int size = 1;
+        String expectedComplyId = "607f3926-61d3-40a4-9b3a-a6bf7c3a1d95";
+
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL)
+                        .queryParam("size", size)
+                        .queryParam("page", page)
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(transaction -> assertEquals(transaction.get(0).get("complytId"), expectedComplyId));
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    public void getAll_GetByDefaultsSizeAndPage_ReturnsExpectedEntries() {
+        String expectedComplyId = "6ee574bb-0300-4c74-9e4f-1852f234a028";
+
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL)
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(transaction -> assertEquals(transaction.get(0).get("complytId"), expectedComplyId))
+                .value(transactionLst -> assertTrue(transactionLst.size() <= RepositoryConstant.DEFAULT_SIZE));
+    }
+
 }

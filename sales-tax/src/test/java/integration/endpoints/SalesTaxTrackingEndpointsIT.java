@@ -1,6 +1,7 @@
 package integration.endpoints;
 
 import com.complyt.SalesTaxApplication;
+import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
@@ -29,10 +30,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -49,6 +47,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     private final StateDto newState = new StateDto("AL", "01", "Alabama");
     private final StateDto stateWithNexus = new StateDto("TX", "48", "Texas");
     private final StateDto stateWithOldRule = new StateDto("Kaedwen", "101", "KD");
+
     @MockBean
     TenantResolver tenantResolver;
     @Autowired
@@ -62,6 +61,25 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
+    }
+
+    @Override
+    public void upsertByState_NoBody_Returns400() {
+        // Given
+        String state = "CA";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.MISSING_BODY_ERROR, map.get("message")));
     }
 
     @Order(2)
@@ -208,7 +226,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @WithMockUser
     public void getByComplytId_Exists_Returns200() {
         // Given
-        String complytId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
+        String complytId = "6eaa133c-df9c-4f88-bba9-6dd3845c803a";
 
         // Then
         webTestClient
@@ -431,7 +449,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(new StateDto("AL", "01", null))
                 .withEconomicNexusTracker(null);
-        Set expectedErrors = Set.of(
+        Set<String> expectedErrors = Set.of(
                 "economicNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR,
                 "State.name " + DtoErrorMessages.NOT_NULL_ERROR);
 
@@ -457,22 +475,78 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 });
     }
 
+    @Order(0)
+    @Test
+    @WithMockUser
     @Override
-    public void upsertByState_NoBody_Returns400() {
-        // Given
-        String state = "CA";
+    public void getAll_GetByParamSize_ReturnsExpectedSize() {
+        int size = 1;
+        String expectedComplyId = "6eaa133c-df9c-4f88-bba9-6dd3845c803a";
 
-        // Then
         webTestClient
                 .mutateWith(csrf())
-                .put()
+                .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)
+                        .path(SalesTaxTrackingRouter.BASE_URL) // Set your API endpoint
+                        .queryParam("size", size)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody(LinkedHashMap.class)
-                .value(map -> assertEquals(GenericErrorMessages.MISSING_BODY_ERROR, map.get("message")));
+                .expectStatus().isOk()
+                .expectBodyList(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> Assertions.assertEquals(salesTaxTrackingDto.get(0).complytId().toString(), expectedComplyId))
+                .hasSize(size);
+    }
+
+    @Order(0)
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_GetByParamPage_ReturnsExpectedPage() {
+        int page = 2;
+        int size = 1;
+        String expectedComplyId = "42b6d733-decc-4608-bfd3-d45bf868827c";
+
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL) // Set your API endpoint
+                        .queryParam("size", size)
+                        .queryParam("page", page)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> {
+                    Assertions.assertEquals(salesTaxTrackingDto.get(0).complytId().toString(), expectedComplyId);
+                });
+    }
+
+    @Order(0)
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_GetByDefaultsSizeAndPage_ReturnsExpectedEntries() {
+        String expectedComplyId = "6eaa133c-df9c-4f88-bba9-6dd3845c803a";
+
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL) // Set your API endpoint
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.get(0).complytId().toString(), expectedComplyId))
+                .value(salesTaxTrackingDto -> assertTrue(salesTaxTrackingDto.size() <= RepositoryConstant.DEFAULT_PAGE_SIZE));
+
     }
 }
+
+
+
+

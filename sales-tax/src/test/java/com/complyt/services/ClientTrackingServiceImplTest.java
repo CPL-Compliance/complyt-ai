@@ -100,7 +100,7 @@ class ClientTrackingServiceImplTest {
 
         // When
         when(clientTrackingRepository.findAll()).thenReturn(trackingFlux);
-        Flux<ClientTracking> actualTrackingFlux = clientTrackingService.findAll();
+        Flux<ClientTracking> actualTrackingFlux = clientTrackingService.findAll(0, trackingList.size());
 
         // Then
         StepVerifier.create(actualTrackingFlux).expectNext(clientTracking).verifyComplete();

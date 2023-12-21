@@ -3,6 +3,7 @@ package com.complyt.v1.handlers;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.facades.ExemptionFacade;
+import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.permissions.exemption.ExemptionCreatePermission;
 import com.complyt.security.permissions.exemption.ExemptionDeletePermission;
 import com.complyt.security.permissions.exemption.ExemptionReadPermission;
@@ -93,11 +94,15 @@ public class ExemptionHandler {
     @ExemptionReadPermission
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        int page = Integer.parseInt(serverRequest.queryParam("page")
+                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM)));
+        int size = Integer.parseInt(serverRequest.queryParam("size")
+                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE)));
 
         Flux<ExemptionDto> exemptionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
-                .thenMany(exemptionFacade.findAll())
+                .thenMany(exemptionFacade.findAll(page, size))
                 .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
-                .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto));
+                .flatMapSequential(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(exemptionDtoFlux, ExemptionDto.class);
     }

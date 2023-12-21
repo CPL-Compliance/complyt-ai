@@ -130,7 +130,7 @@ class NexusStateRuleServiceImplTest {
 
         // When
         when(nexusStateRuleRepository.findAll()).thenReturn(Flux.fromIterable(nexusStateRuleList));
-        Flux<NexusStateRule> nexusStateRuleFlux = nexusStateRuleServiceImpl.findAll();
+        Flux<NexusStateRule> nexusStateRuleFlux = nexusStateRuleServiceImpl.findAll(0, nexusStateRuleList.size());
 
         // Then
         StepVerifier.create(nexusStateRuleFlux).expectNext(nexusStateRule).expectNext(secondRule).verifyComplete();

@@ -3,6 +3,7 @@ package com.complyt.v1.routers;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.facades.TransactionFacade;
+import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
@@ -211,7 +212,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         }};
 
         // When
-        when(transactionFacade.getAll()).thenReturn(Flux.just(firstTransaction, secondTransaction));
+        when(transactionFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.just(firstTransaction, secondTransaction));
 
         // Then
         webTestClient
@@ -234,7 +235,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
 
         // When
-        when(transactionFacade.getAll()).thenReturn(Flux.empty());
+        when(transactionFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -253,7 +254,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     public void getAll_UnauthenticatedUser_Returns401() {
         // When
-        when(transactionFacade.getAll()).thenReturn(Flux.empty());
+        when(transactionFacade.getAll(0, 0)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -278,7 +279,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // Given + When
-        when(transactionFacade.getAll()).thenReturn(Flux.error(new OperationFailedException()));
+        when(transactionFacade.getAll(0, 0)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient

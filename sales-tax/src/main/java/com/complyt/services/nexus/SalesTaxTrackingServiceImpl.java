@@ -86,8 +86,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     @Override
-    public Flux<SalesTaxTracking> findAll() {
-        return salesTaxTrackingRepository.findAll();
+    public Flux<SalesTaxTracking> findAll(int page, int size) {
+        return salesTaxTrackingRepository.findAll(page, size);
     }
 
     @Deprecated
