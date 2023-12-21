@@ -79,23 +79,23 @@ public class AddressQueryBuilderTest {
         // Given
         Query expectedQuery = Query.query(Criteria.where("requestAddress.zip").is(fullAddressNoCountyAddress.zip()));
 
-        Optional.ofNullable(fullAddressNoCountyAddress.city()).ifPresent(value -> {
+        Optional.ofNullable(fullAddressWithCountyAddress.city()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
             expectedQuery.addCriteria(Criteria.where("requestAddress.city").regex(escapedSearchString, "i"));
         });
 
-        Optional.ofNullable(fullAddressNoCountyAddress.street()).ifPresent(value -> {
+        Optional.ofNullable(fullAddressWithCountyAddress.street()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
             expectedQuery.addCriteria(Criteria.where("requestAddress.street").regex(escapedSearchString, "i"));
         });
 
-        Optional.ofNullable(fullAddressNoCountyAddress.county()).ifPresent(value -> {
+        Optional.ofNullable(fullAddressWithCountyAddress.county()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
             expectedQuery.addCriteria(Criteria.where("requestAddress.county").regex(escapedSearchString, "i"));
         });
 
         // When
-        Query actualQuery = addressQueryBuilder.build(fullAddressNoCountyAddress);
+        Query actualQuery = addressQueryBuilder.build(fullAddressWithCountyAddress);
 
         // Then
         Assertions.assertEquals(expectedQuery, actualQuery);
