@@ -2,7 +2,7 @@ package com.complyt.v1.handlers;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
-import com.complyt.repositories.RepositoryConstant;
+import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.permissions.sales_tax_tracking.NexusReadPermission;
 import com.complyt.security.permissions.sales_tax_tracking.NexusUpdatePermission;
 import com.complyt.utils.observability.ContextLogger;

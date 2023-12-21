@@ -1,7 +1,7 @@
 package com.complyt.v1.handlers;
 
 import com.complyt.facades.CustomerFacade;
-import com.complyt.repositories.RepositoryConstant;
+import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.permissions.customer.CustomerReadPermission;
 import com.complyt.security.permissions.customer.CustomerUpdatePermission;
 import com.complyt.utils.observability.ContextLogger;

@@ -92,7 +92,7 @@ public class TransactionRepository {
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)).skip(calculatedOffset).limit(size);
 
-                    return ContextLogger.observeCtx("Searching for transactions by tenant ID" + tenantId + "with page " + page + " and size " + size, log::info)
+                    return ContextLogger.observeCtx("Searching for transactions by tenant ID" + tenantId + " with page " + page + " and size " + size, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Transaction.class));
                 });
     }

@@ -2,7 +2,7 @@ package com.complyt.v1.routers;
 
 import com.complyt.domain.customer.Customer;
 import com.complyt.facades.CustomerFacade;
-import com.complyt.repositories.RepositoryConstant;
+import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;

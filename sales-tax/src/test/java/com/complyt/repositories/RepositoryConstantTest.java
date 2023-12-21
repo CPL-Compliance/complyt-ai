@@ -1,5 +1,6 @@
 package com.complyt.repositories;
 
+import com.complyt.repositories.Constants.RepositoryConstant;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

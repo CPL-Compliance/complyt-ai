@@ -3,7 +3,7 @@ package com.complyt.v1.handlers;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.facades.ExemptionFacade;
-import com.complyt.repositories.RepositoryConstant;
+import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.permissions.exemption.ExemptionCreatePermission;
 import com.complyt.security.permissions.exemption.ExemptionDeletePermission;
 import com.complyt.security.permissions.exemption.ExemptionReadPermission;

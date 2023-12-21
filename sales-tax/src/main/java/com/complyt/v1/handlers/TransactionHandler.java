@@ -1,7 +1,7 @@
 package com.complyt.v1.handlers;
 
 import com.complyt.facades.TransactionFacade;
-import com.complyt.repositories.RepositoryConstant;
+import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.permissions.transaction.TransactionCreatePermission;
 import com.complyt.security.permissions.transaction.TransactionDeletePermission;
 import com.complyt.security.permissions.transaction.TransactionReadPermission;
