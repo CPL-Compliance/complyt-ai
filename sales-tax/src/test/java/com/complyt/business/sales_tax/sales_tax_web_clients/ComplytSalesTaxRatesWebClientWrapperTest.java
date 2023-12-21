@@ -1,5 +1,6 @@
 package com.complyt.business.sales_tax.sales_tax_web_clients;
 
+import com.complyt.business.exceptions.ComplytSalesTaxRatesException;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.transaction.Address;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
@@ -46,6 +47,23 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
         // Then
         StepVerifier.create(complytSalesTaxRatesMono).expectNext(complytSalesTaxRates).verifyComplete();
     }
+    @Test
+    void findByAddress_invalidAddress_ReturnsObjectNotFoundApiException() {
+        // Given
+        Address address = UnitTestUtilities.createAddressInCalifornia();
+        ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
+        ComplytSalesTaxRatesDto complytSalesTaxRatesDto = ComplytSalesTaxRatesMapper.INSTANCE.complytSalesTaxRatesToComplytSalesTaxRatesDto(complytSalesTaxRates);
+
+        // When
+
+        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial()))
+                .thenReturn(Mono.error(new ObjectNotFoundApiException()));
+
+        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address);
+
+        // Then
+        StepVerifier.create(complytSalesTaxRatesMono).expectError(ObjectNotFoundApiException.class).verify();
+    }
 
     @Test
     void findByAddress_Returns500InternalError_ThrowsAnError() {
@@ -58,6 +76,23 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
 
         // Then
         StepVerifier.create(complytSalesTaxRatesMono).expectError(ObjectNotFoundApiException.class).verify();
+    }
+    @Test
+    void findByAddress_RatesServiceIsUnavailable_is10RetriesExhausted() {
+        // Given
+        Address address = UnitTestUtilities.createAddressInCalifornia();
+
+        // When
+        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial()))
+                .thenReturn(Mono.error(new ComplytSalesTaxRatesException()));
+        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address);
+
+        // Then
+        StepVerifier.create(complytSalesTaxRatesMono)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof ComplytSalesTaxRatesException
+                                && throwable.getMessage().equals("5 Retries Exhausted"))
+                .verify();
     }
 
 }

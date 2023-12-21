@@ -4,7 +4,7 @@ eureka:
       defaultZone: ${discovery-service-uri}
     should-unregister-on-shutdown: true
     initial-instance-info-replication-interval-seconds: 1
-    registry-fetch-interval-seconds: 15
+    registry-fetch-interval-seconds: 3
   instance:
     prefer-ip-address: true
     lease-renewal-interval-in-seconds: 30
@@ -63,6 +63,7 @@ logging:
     reactor:
       netty:
         http: INFO
+
 
 management:
   endpoints:

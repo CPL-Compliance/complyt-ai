@@ -162,7 +162,7 @@ public abstract class TestContainersInitializerIT {
                         .withStartupTimeout(Duration.ofSeconds(60)));
         API_GATEWAY_CONTAINER.start();
 
-        WEB_TEST_CLIENT = WebTestClient.bindToServer().baseUrl("http://localhost:" + API_GATEWAY_CONTAINER
+        WEB_TEST_CLIENT = WebTestClient.bindToServer().responseTimeout(Duration.ofSeconds(30)).baseUrl("http://localhost:" + API_GATEWAY_CONTAINER
                 .getMappedPort(8765) + "/").build();
     }
 
