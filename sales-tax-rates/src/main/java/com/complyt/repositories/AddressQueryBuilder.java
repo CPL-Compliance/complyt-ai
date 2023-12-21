@@ -18,17 +18,17 @@ public class AddressQueryBuilder implements QueryBuilder<Address> {
 
         Optional.ofNullable(address.city()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
-            query.addCriteria(Criteria.where("address.city").regex(escapedSearchString, "i"));
+            query.addCriteria(Criteria.where("requestAddress.city").regex(escapedSearchString, "i"));
         });
 
         Optional.ofNullable(address.street()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
-            query.addCriteria(Criteria.where("address.street").regex(escapedSearchString, "i"));
+            query.addCriteria(Criteria.where("requestAddress.street").regex(escapedSearchString, "i"));
         });
 
         Optional.ofNullable(address.county()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
-            query.addCriteria(Criteria.where("address.county").regex(escapedSearchString, "i"));
+            query.addCriteria(Criteria.where("requestAddress.county").regex(escapedSearchString, "i"));
         });
 
         return query;

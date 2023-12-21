@@ -54,17 +54,17 @@ public class AddressQueryBuilderTest {
 
         Optional.ofNullable(fullAddressNoCountyAddress.city()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
-            expectedQuery.addCriteria(Criteria.where("address.city").regex(escapedSearchString, "i"));
+            expectedQuery.addCriteria(Criteria.where("requestAddress.city").regex(escapedSearchString, "i"));
         });
 
         Optional.ofNullable(fullAddressNoCountyAddress.street()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
-            expectedQuery.addCriteria(Criteria.where("address.street").regex(escapedSearchString, "i"));
+            expectedQuery.addCriteria(Criteria.where("requestAddress.street").regex(escapedSearchString, "i"));
         });
 
         Optional.ofNullable(fullAddressNoCountyAddress.county()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
-            expectedQuery.addCriteria(Criteria.where("address.county").regex(escapedSearchString, "i"));
+            expectedQuery.addCriteria(Criteria.where("requestAddress.county").regex(escapedSearchString, "i"));
         });
 
         // When
@@ -81,17 +81,17 @@ public class AddressQueryBuilderTest {
 
         Optional.ofNullable(fullAddressNoCountyAddress.city()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
-            expectedQuery.addCriteria(Criteria.where("address.city").regex(escapedSearchString, "i"));
+            expectedQuery.addCriteria(Criteria.where("requestAddress.city").regex(escapedSearchString, "i"));
         });
 
         Optional.ofNullable(fullAddressNoCountyAddress.street()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
-            expectedQuery.addCriteria(Criteria.where("address.street").regex(escapedSearchString, "i"));
+            expectedQuery.addCriteria(Criteria.where("requestAddress.street").regex(escapedSearchString, "i"));
         });
 
         Optional.ofNullable(fullAddressNoCountyAddress.county()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
-            expectedQuery.addCriteria(Criteria.where("address.county").regex(escapedSearchString, "i"));
+            expectedQuery.addCriteria(Criteria.where("requestAddress.county").regex(escapedSearchString, "i"));
         });
 
         // When
