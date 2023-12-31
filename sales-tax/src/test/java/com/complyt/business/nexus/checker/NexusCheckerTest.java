@@ -19,6 +19,7 @@ import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -157,6 +158,20 @@ public class NexusCheckerTest {
 
         // When
         when(nexusThresholdChecker.check(summaryAndRule)).thenReturn(false);
+        boolean passedThreshold = nexusChecker.passedThreshold(salesTaxTracking, dateRange);
+
+        // Then
+        assertFalse(passedThreshold);
+    }
+
+    @Test
+    void passedThreshold_SummaryIsNull_ReturnsFalse() {
+        // Given
+        salesTaxTracking = salesTaxTracking.withNexusCalculationSummaries(new HashMap<>() {{
+            put(dateRange.getEnd().toLocalDate(), null);
+        }});
+
+        // When
         boolean passedThreshold = nexusChecker.passedThreshold(salesTaxTracking, dateRange);
 
         // Then
