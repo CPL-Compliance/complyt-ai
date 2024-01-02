@@ -22,4 +22,6 @@ public interface DtoErrorMessages {
                                   "For date/time fields please provide a " + FieldsDescriptions.TIMESTAMP_FORMAT;
 
     String LOCALDATE_FORMAT_ERROR = "must be in the format yyyy-mm-dd";
+
+    String COMPLYT_ID_FORMAT_ERROR = "complyt ID has to be in UUID format";
 }

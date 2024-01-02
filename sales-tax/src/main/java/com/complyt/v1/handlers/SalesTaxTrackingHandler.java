@@ -57,10 +57,12 @@ public class SalesTaxTrackingHandler {
 
     @NexusReadPermission
     public Mono<ServerResponse> getByComplytId(ServerRequest serverRequest) {
-        UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
+        String complytId = serverRequest.pathVariable("complytId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info).then(salesTaxTrackingFacade.findByComplytId(complytId))
+        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
+                .then(salesTaxTrackingDtoValidationHandler.validatePathVariable(serverRequest))
+                .flatMap(salesTaxTracings -> salesTaxTrackingFacade.findByComplytId(UUID.fromString(complytId)))
                 .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 

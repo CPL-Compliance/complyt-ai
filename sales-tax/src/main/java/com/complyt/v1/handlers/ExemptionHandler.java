@@ -47,10 +47,12 @@ public class ExemptionHandler {
 
     @ExemptionReadPermission
     public Mono<ServerResponse> findByComplytId(ServerRequest serverRequest) {
-        UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
+        String complytId = serverRequest.pathVariable("complytId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info).then(exemptionFacade.findByComplytId(complytId))
+        Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info)
+                .then(exemptionDtoValidationHandler.validatePathVariable(serverRequest))
+                .flatMap(exemptions -> exemptionFacade.findByComplytId(UUID.fromString(complytId)))
                 .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
                 .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));

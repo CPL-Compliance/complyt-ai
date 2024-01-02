@@ -1,5 +1,6 @@
 package com.complyt.v1.handlers;
 
+import ch.qos.logback.core.net.SocketConnector;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.permissions.transaction.TransactionCreatePermission;
@@ -10,6 +11,7 @@ import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.ValidationHandler;
+import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -24,6 +26,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
+import java.util.function.Predicate;
 
 @Component
 @Slf4j
@@ -86,14 +89,14 @@ public class TransactionHandler {
     @TransactionReadPermission
     public Mono<ServerResponse> getByComplytId(ServerRequest serverRequest) {
         String complytIdAsString = serverRequest.pathVariable("complytId");
-        UUID complytId = UUID.fromString(complytIdAsString);
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<TransactionDto> transactionDtoMono = ContextLogger.observeCtx(logStr, log::info)
-                .then(transactionFacade.findByComplytId(complytId))
-                .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
-                .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .then(transactionDtoValidationHandler.validatePathVariable(serverRequest))
+                .flatMap(transactions -> transactionFacade.findByComplytId(UUID.fromString(complytIdAsString))
+                        .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
+                        .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto))
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoMono, TransactionDto.class);
     }
