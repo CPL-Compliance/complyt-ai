@@ -84,7 +84,8 @@ public class CustomerHandler {
         String source = serverRequest.pathVariable("source");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<CustomerDto> customerDtoMono = ContextLogger.observeCtx(logStr, log::info).then(customerfacade.findByExternalIdAndSource(externalId, source))
+        Mono<CustomerDto> customerDtoMono = ContextLogger.observeCtx(logStr, log::info)
+                .then(customerfacade.findByExternalIdAndSource(externalId, source))
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
                 .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));

@@ -45,5 +45,5 @@ public class Transaction implements ComplytIdProperty {
     BigDecimal tangibleItemsAmount;
     BigDecimal totalItemsAmount;
     TransactionFilingStatus transactionFilingStatus;
-
+    Discount discount;
 }
