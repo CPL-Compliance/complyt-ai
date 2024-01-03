@@ -191,7 +191,8 @@ public class UnitTestUtilities {
         List<Item> items = createItems(true, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false);
-        return new Transaction(UUID.randomUUID(), id, id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
+        Discount discount = createDiscount(BigDecimal.valueOf(500), false, "description");
+        return new Transaction(UUID.randomUUID(), id, id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, discount);
     }
 
     public TransactionDto createTransactionDto(String id) {
@@ -201,8 +202,8 @@ public class UnitTestUtilities {
         List<ItemDto> items = createItemDtos(true, false);
         TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);
-
-        return new TransactionDto(UUID.randomUUID(), id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
+        DiscountDto discountDto = createDiscountDto(BigDecimal.valueOf(500), false, "description");
+        return new TransactionDto(UUID.randomUUID(), id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, discountDto);
     }
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {
@@ -257,6 +258,10 @@ public class UnitTestUtilities {
         return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
     }
 
+    public Discount createDiscount(BigDecimal discountAmount, boolean isPreTax, String discountDescription) {
+        return new Discount(discountAmount, isPreTax, discountDescription);
+    }
+
     public ShippingFee createShippingFeeWithSalesTaxRates(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
         return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, createSalesTaxRates(), "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
@@ -266,6 +271,11 @@ public class UnitTestUtilities {
         JurisdictionalSalesTaxRulesDto rules = createJurisdictionalSalesTaxRulesDto();
         return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
     }
+
+    public DiscountDto createDiscountDto(BigDecimal discountAmount, boolean isPreTax, String discountDescription) {
+        return new DiscountDto(discountAmount, isPreTax, discountDescription);
+    }
+
 
     public JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
         return new JurisdictionalSalesTaxRules("California", "CA", true,

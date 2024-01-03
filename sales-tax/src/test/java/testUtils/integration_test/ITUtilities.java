@@ -30,7 +30,7 @@ public interface ITUtilities {
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
                 null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "95220", false), customerId,
                 null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
-                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
+                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED , new DiscountDto(BigDecimal.ZERO,false, "")); //todo: fix
     }
 
     static CustomerDto stubCustomerDto(String externalId) {
