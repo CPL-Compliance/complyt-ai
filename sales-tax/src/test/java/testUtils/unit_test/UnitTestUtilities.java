@@ -191,8 +191,12 @@ public class UnitTestUtilities {
         List<Item> items = createItems(true, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false);
+        return new Transaction(UUID.randomUUID(), id, id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, null);
+    }
+
+    public Transaction createTransactionWithDiscount(String id) {
         Discount discount = createDiscount(BigDecimal.valueOf(500), false, "description");
-        return new Transaction(UUID.randomUUID(), id, id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, discount);
+        return createTransaction(id).withDiscount(discount);
     }
 
     public TransactionDto createTransactionDto(String id) {
@@ -204,6 +208,11 @@ public class UnitTestUtilities {
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);
         DiscountDto discountDto = createDiscountDto(BigDecimal.valueOf(500), false, "description");
         return new TransactionDto(UUID.randomUUID(), id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, discountDto);
+    }
+
+    public TransactionDto createTransactionDtoWithDiscount(String id) {
+        DiscountDto discountDto = createDiscountDto(BigDecimal.valueOf(500), false, "description");
+        return createTransactionDto(id).withDiscount(discountDto);
     }
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {

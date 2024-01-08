@@ -22,7 +22,7 @@ public class TransactionTest {
     void testingAmountOfPropertiesInTransaction() {
         /* In case there is a new property added, If its of type Taxable - handle rates and amount calculation for it */
         Field[] fields = Transaction.class.getDeclaredFields();
-        Assertions.assertEquals(22, fields.length);
+        Assertions.assertEquals(23, fields.length);
     }
 
     @BeforeEach
@@ -30,7 +30,7 @@ public class TransactionTest {
         localDateTime = LocalDateTime.now();
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transactionId = UUID.randomUUID().toString();
-        transaction = testUtilities.createTransaction(transactionId);
+        transaction = testUtilities.createTransactionWithDiscount(transactionId);
     }
 
     @Test
@@ -57,7 +57,8 @@ public class TransactionTest {
                 ", taxableItemsAmount=" + transaction.getTaxableItemsAmount() +
                 ", tangibleItemsAmount=" + transaction.getTangibleItemsAmount() +
                 ", totalItemsAmount=" + transaction.getTotalItemsAmount() +
-                ", transactionFilingStatus=" + transaction.getTransactionFilingStatus() + ")";
+                ", transactionFilingStatus=" + transaction.getTransactionFilingStatus() +
+                ", discount=" + transaction.getDiscount() + ")";
 
         // When
         String actualString = transaction.toString();
@@ -73,7 +74,8 @@ public class TransactionTest {
         Transaction expectedTransaction = testUtilities.createTransaction(differentId)
                 .withComplytId(transaction.getComplytId())
                 .withExternalId(transaction.getExternalId())
-                .withCustomer(transaction.getCustomer());
+                .withCustomer(transaction.getCustomer())
+                .withDiscount(transaction.getDiscount());
         // When
         Transaction actualTransaction = transaction.withId(differentId);
 
@@ -108,7 +110,8 @@ public class TransactionTest {
                 .tangibleItemsAmount(transaction.getTangibleItemsAmount())
                 .taxableItemsAmount(transaction.getTaxableItemsAmount())
                 .totalItemsAmount(transaction.getTotalItemsAmount())
-                .transactionFilingStatus(transaction.getTransactionFilingStatus()).build();
+                .transactionFilingStatus(transaction.getTransactionFilingStatus())
+                .discount(transaction.getDiscount()).build();
 
         // Then
         assertEquals(transaction, actualTransaction);

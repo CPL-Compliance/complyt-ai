@@ -9,6 +9,7 @@ import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.domain.transaction.Discount;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
@@ -27,6 +28,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -610,5 +612,96 @@ class TransactionServiceImplTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+    }
+
+
+    @Test
+    void checkAfterTaxDiscountAndHandle_NullDiscountPassed_ReturnTransactionWithoutChanges() {
+        // Given
+        Discount discount = null;
+        Transaction newTransaction = transaction.withDiscount(discount);
+
+        // When
+        Mono<Transaction> monoReceivedTransaction = transactionService.checkAfterTaxDiscountAndHandle(newTransaction);
+
+        // Then
+        StepVerifier.create(monoReceivedTransaction).expectNext(transaction).verifyComplete();
+    }
+
+
+    @Test
+    void checkAfterTaxDiscountAndHandle_BeforeTaxTrueDiscountPassed_ReturnTransactionWithoutChanges() {
+        // Given
+        Discount discount = testUtilities
+                .createDiscount(BigDecimal.valueOf(-500), true, "description");
+        Transaction newTransaction = transaction.withDiscount(discount);
+
+        // When
+        Mono<Transaction> monoReceivedTransaction = transactionService.checkAfterTaxDiscountAndHandle(newTransaction);
+
+        // Then
+        StepVerifier.create(monoReceivedTransaction).expectNext(newTransaction).verifyComplete();
+    }
+
+    @Test
+    void checkAfterTaxDiscountAndHandle_BeforeTaxFalseAndZeroAmountDiscountPassed_ReturnTransactionWithoutChanges() {
+        // Given
+        Discount discount = testUtilities
+                .createDiscount(BigDecimal.valueOf(0), false, "description");
+        Transaction newTransaction = transaction.withDiscount(discount);
+
+        // When
+        Mono<Transaction> monoReceivedTransaction = transactionService.checkAfterTaxDiscountAndHandle(newTransaction);
+
+        // Then
+        StepVerifier.create(monoReceivedTransaction).expectNext(newTransaction).verifyComplete();
+    }
+
+    @Test
+    void checkAfterTaxDiscountAndHandle_BeforeTaxFalseAndNegativeAmountDiscountPassed_ReturnTransactionNewTotalItemPrice() {
+        // Given
+        Discount discount = testUtilities
+                .createDiscount(BigDecimal.valueOf(-500), false, "description");
+        Transaction newTransaction = transaction.withDiscount(discount);
+
+        Transaction expectedTransaction = newTransaction
+                .withTotalItemsAmount(newTransaction.getTotalItemsAmount().add(discount.discountAmount()));
+
+        // When
+        Mono<Transaction> monoReceivedTransaction = transactionService.checkAfterTaxDiscountAndHandle(newTransaction);
+
+        // Then
+        StepVerifier.create(monoReceivedTransaction).expectNext(expectedTransaction).verifyComplete();
+    }
+
+    @Test
+    void checkAfterTaxDiscountAndHandle_BeforeTaxFalseAndPositiveAmountDiscountPassed_ReturnTransactionNewTotalItemPrice() {
+        // Given
+        Discount discount = testUtilities
+                .createDiscount(BigDecimal.valueOf(500), false, "description");
+        Transaction newTransaction = transaction.withDiscount(discount);
+
+        Transaction expectedTransaction = newTransaction
+                .withTotalItemsAmount(newTransaction.getTotalItemsAmount().add(discount.discountAmount()));
+
+        // When
+        Mono<Transaction> monoReceivedTransaction = transactionService.checkAfterTaxDiscountAndHandle(newTransaction);
+
+        // Then
+        StepVerifier.create(monoReceivedTransaction).expectNext(expectedTransaction).verifyComplete();
+    }
+
+
+    @Test
+    void checkAfterTaxDiscountAndHandle_NullTransactionPassed_ThrowsNullPointerException() {
+        // Given
+        transaction = null;
+
+        // When
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.checkAfterTaxDiscountAndHandle(transaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
     }
 }

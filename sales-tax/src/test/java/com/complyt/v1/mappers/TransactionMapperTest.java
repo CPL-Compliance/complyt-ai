@@ -22,7 +22,7 @@ public class TransactionMapperTest {
     @BeforeEach
     void setup() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
+        transaction = testUtilities.createTransactionWithDiscount(UUID.randomUUID().toString());
         transactionNoTenantNorId = transaction.withTenantId(null).withCustomer(transaction.getCustomer().withTenantId(null).withId(null)).withId(null);
         transactionDto = testUtilities.createTransactionDto(transaction.getId())
                 .withComplytId(transaction.getComplytId())

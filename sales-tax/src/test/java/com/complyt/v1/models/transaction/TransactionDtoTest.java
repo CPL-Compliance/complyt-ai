@@ -43,7 +43,8 @@ class TransactionDtoTest {
                 ", taxableItemsAmount=" + transactionDto.taxableItemsAmount() +
                 ", tangibleItemsAmount=" + transactionDto.tangibleItemsAmount() +
                 ", totalItemsAmount=" + transactionDto.totalItemsAmount() +
-                ", transactionFilingStatus=" + transactionDto.transactionFilingStatus() + "]";
+                ", transactionFilingStatus=" + transactionDto.transactionFilingStatus() +
+                ", discount=" + transactionDto.discount() + "]";
 
         // When
         String actualString = transactionDto.toString();
