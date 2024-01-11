@@ -17,6 +17,7 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.*;
+import com.complyt.v1.config.BodyCheckConfig;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
@@ -25,6 +26,9 @@ import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
+import com.complyt.v1.validators.body_checkers.TransactionDtoShippingAddressChecker;
+import com.complyt.v1.validators.body_checkers.TransactionTotalAmountChecker;
+import feign.Body;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -440,5 +444,12 @@ public class UnitTestUtilities {
         return new ValidationDatesDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
     }
 
+    public BodyCheckConfig createBodyCheckConfig() {
+        return new BodyCheckConfig(
+                List.of(
+                        new TransactionDtoShippingAddressChecker(),
+                        new TransactionTotalAmountChecker()
+                ));
+    }
 
 }
