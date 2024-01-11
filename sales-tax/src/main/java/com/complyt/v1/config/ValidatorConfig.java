@@ -10,6 +10,8 @@ import com.complyt.v1.models.nexus.DateWrapperDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.DataConflictChecksProvider;
 import com.complyt.v1.validators.ValidationHandler;
+import com.complyt.v1.validators.body_checkers.TransactionDtoShippingAddressChecker;
+import com.complyt.v1.validators.body_checkers.TransactionTotalAmountChecker;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractorEmpty;
 import com.complyt.v1.validators.custom_body.DateWrapperDtoCustomBodyExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -38,7 +41,10 @@ public class ValidatorConfig {
                 new DataConflictChecksProvider(Map.of(
                         "source", TransactionDto.SOURCE_CONFLICT_CHECK,
                         "externalId", TransactionDto.EXTERNAL_ID_CONFLICT_CHECK),
-                        BodyCheckConfig.TRANSACTION_BODY_CHECK),
+                        new BodyCheckConfig(List.of(
+                                new TransactionDtoShippingAddressChecker(),
+                                new TransactionTotalAmountChecker()
+                        )).transactionDtoFluxFunction()),
                 new CustomBodyExtractorEmpty<>());
     }
 

@@ -22,4 +22,6 @@ public interface DtoErrorMessages {
                                   "For date/time fields please provide a " + FieldsDescriptions.TIMESTAMP_FORMAT;
 
     String LOCALDATE_FORMAT_ERROR = "must be in the format yyyy-mm-dd";
+
+    String TOTAL_AMOUNT_AFTER_DISCOUNT_IS_BELOW_ZERO = "The transaction total amount after discount is below 0";
 }
