@@ -11,6 +11,7 @@ import com.complyt.v1.mappers.DateWrapperToLocalDateMapper;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.nexus.DateWrapperDto;
+import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.UUID;
 
 @Component
@@ -81,7 +83,7 @@ public class SalesTaxTrackingHandler {
                                     ServerResponse.status(HttpStatus.OK).bodyValue(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(updatedSalesTaxTracking)))
                             .switchIfEmpty(salesTaxTrackingFacade.save(receivedSalesTaxTracking)
                                     .flatMap(salesTaxTracking ->
-                                            ServerResponse.status(HttpStatus.CREATED).bodyValue(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking))));
+                                            ServerResponse.created(URI.create(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)).bodyValue(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking))));
                 });
     }
 
