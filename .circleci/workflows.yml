@@ -181,10 +181,10 @@ jobs:
           aws-region: AWS_DEFAULT_REGION
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
       - aws-ecs/update-service:
-          cluster-name: "production"
+          cluster-name: "complyt-prd"
           container-image-name-updates: "container=<<parameters.service_name>>-container, tag=${IMAGE_TAG}"
-          family: "<<parameters.service_name>>-task-definition"
-          service-name: "<<parameters.service_name>>-service"
+          family: "<<parameters.service_name>>-complyt-prd"
+          service-name: "<<parameters.service_name>>"
 
 
 workflows:
