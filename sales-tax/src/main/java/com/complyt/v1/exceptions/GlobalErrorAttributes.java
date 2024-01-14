@@ -45,6 +45,8 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
     private String extractMessage(HttpStatus httpStatus, Throwable error) {
         if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
             return GenericErrorMessages.INTERNAL_SERVER_ERROR;
+        } else if (httpStatus == HttpStatus.UNSUPPORTED_MEDIA_TYPE) {
+            return GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE;
         } else if (error instanceof ServerWebInputException serverWebInputException) {
             return serverWebInputException.getReason();
         } else {
