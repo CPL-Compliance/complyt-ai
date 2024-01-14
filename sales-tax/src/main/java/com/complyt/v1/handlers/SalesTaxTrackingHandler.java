@@ -73,6 +73,7 @@ public class SalesTaxTrackingHandler {
     public Mono<ServerResponse> upsert(ServerRequest serverRequest) {
         String state = serverRequest.pathVariable("state");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        String resourceURI = SalesTaxTrackingRouter.BASE_URL + "/state/" + state;
 
         return ContextLogger.observeCtx(logStr, log::info).then(salesTaxTrackingDtoValidationHandler.validate(serverRequest))
                 .flatMap(salesTaxTrackingDto -> {
@@ -83,7 +84,7 @@ public class SalesTaxTrackingHandler {
                                     ServerResponse.status(HttpStatus.OK).bodyValue(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(updatedSalesTaxTracking)))
                             .switchIfEmpty(salesTaxTrackingFacade.save(receivedSalesTaxTracking)
                                     .flatMap(salesTaxTracking ->
-                                            ServerResponse.created(URI.create(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)).bodyValue(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking))));
+                                            ServerResponse.created(URI.create(resourceURI)).bodyValue(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking))));
                 });
     }
 

@@ -71,6 +71,7 @@ public class CustomerHandler {
         String externalId = serverRequest.pathVariable("externalId");
         String source = serverRequest.pathVariable("source");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        String resourceURI = CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId;
 
         return ContextLogger.observeCtx(logStr, log::info).then(customerDtoValidationHandler.validate(serverRequest))
                 .flatMap(customerDto -> ContextLogger.observeCtx(customerDto.toString(), log::info).thenReturn(customerDto))
@@ -82,7 +83,7 @@ public class CustomerHandler {
                                                 .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info)
                                                         .thenReturn(customerDto)), CustomerDto.class)))
                                 .switchIfEmpty(customerfacade.saveCustomer(receivedCustomer).flatMap(savedCustomer ->
-                                        ServerResponse.created(URI.create(CustomerRouter.BASE_URL + "/source/" + savedCustomer.getSource() + "/externalId/" + savedCustomer.getExternalId())).contentType(MediaType.APPLICATION_JSON).body(Mono.just(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer))
+                                        ServerResponse.created(URI.create(resourceURI)).contentType(MediaType.APPLICATION_JSON).body(Mono.just(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer))
                                                 .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info)
                                                         .thenReturn(customerDto)), CustomerDto.class))));
     }
