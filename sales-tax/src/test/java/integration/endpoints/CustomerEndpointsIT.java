@@ -7,7 +7,6 @@ import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.routers.CustomerRouter;
-import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
