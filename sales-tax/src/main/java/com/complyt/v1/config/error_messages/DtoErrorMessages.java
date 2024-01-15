@@ -24,4 +24,14 @@ public interface DtoErrorMessages {
     String LOCALDATE_FORMAT_ERROR = "must be in the format yyyy-mm-dd";
 
     String COMPLYT_ID_FORMAT_ERROR = "complyt ID has to be in UUID format";
+
+    String SOURCE_FORMAT_ERROR = "source has to be in range 1-9";
+
+    String NUMERIC_FORMAT_ERROR = "parameter has to be numeric";
+
+    String NOT_NULL_UNDEFINED_ERROR = "parameter can not be null or undefined";
+
+    String STATE_FORMAT_ERROR = "invalid state provided. Please provide a valid state name or abbreviation.\";";
+
+
 }

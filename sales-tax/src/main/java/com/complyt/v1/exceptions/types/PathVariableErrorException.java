@@ -8,10 +8,6 @@ import java.util.List;
 @Generated
 public class PathVariableErrorException extends ComplytApiException {
 
-    public PathVariableErrorException() {
-        super(GenericErrorMessages.PATH_VARIABLE_DEFAULT_ERROR);
-    }
-
     public PathVariableErrorException(List<String> errorList) {
         super(errorList.toString());
     }

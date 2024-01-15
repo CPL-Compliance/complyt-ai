@@ -10,7 +10,6 @@ public interface GenericErrorMessages {
 
     String MISSING_BODY_ERROR = "The requested operation failed because no request body has been provided";
 
-    String PATH_VARIABLE_DEFAULT_ERROR = "Invalid or missing path variable encountered. Please ensure the path variable is provided and correctly formatted for the operation.";
 
 
 }

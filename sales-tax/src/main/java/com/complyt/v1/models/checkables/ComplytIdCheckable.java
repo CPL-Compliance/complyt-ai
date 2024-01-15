@@ -13,7 +13,7 @@ public interface ComplytIdCheckable {
             (complytIdCheckable, serverRequest) ->
                     Mono.just(UUID.fromString(serverRequest.pathVariable("complytId")))
                             .flatMap(complytId -> complytId.equals(complytIdCheckable.complytId()) ?
-                                    Mono.empty() : Mono.just("complytId " + Mono.just(DtoErrorMessages.CONFLICTED_WITH_URL_ERROR)));
+                                    Mono.empty() : Mono.just("complytId " + DtoErrorMessages.CONFLICTED_WITH_URL_ERROR));
 
     UUID complytId();
 }

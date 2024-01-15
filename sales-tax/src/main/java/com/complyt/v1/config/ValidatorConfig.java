@@ -9,23 +9,42 @@ import com.complyt.v1.models.customer.exemption.ExemptionWrapperDto;
 import com.complyt.v1.models.nexus.DateWrapperDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.DataConflictChecksProvider;
+import com.complyt.v1.validators.ParameterChecksProvider;
+import com.complyt.v1.validators.ShouldCallValidate;
 import com.complyt.v1.validators.ValidationHandler;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractorEmpty;
 import com.complyt.v1.validators.custom_body.DateWrapperDtoCustomBodyExtractor;
-import com.complyt.v1.validators.param_checker.ComplytIdPathVariableCheckable;
-import com.complyt.v1.validators.param_checker.PathVariableChecksProvider;
+import com.complyt.v1.validators.param_checker.ParamCheckerFunctions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 
-import java.nio.file.Path;
 import java.util.Map;
 
 @Configuration
 public class ValidatorConfig {
 
-    PathVariableChecksProvider pathChecker = new PathVariableChecksProvider(Map.of("complytId", ComplytIdPathVariableCheckable.COMPLYT_ID_CHECK));
+    ParameterChecksProvider pathVariableChecker = new ParameterChecksProvider(Map.of(
+            "complytId", ParamCheckerFunctions.UUID_CHECK,
+            "source", ParamCheckerFunctions.SOURCE_CHECK,
+            "externalId", ParamCheckerFunctions.NOT_NULL_UNDEFINED_CHECK,
+            "state", ParamCheckerFunctions.STATE_CHECK,
+            "name", ParamCheckerFunctions.NOT_NULL_UNDEFINED_CHECK));
+
+    ParameterChecksProvider queryParamChecker = new ParameterChecksProvider(Map.of(
+            "page", ParamCheckerFunctions.NUMERIC_CHECK,
+            "size", ParamCheckerFunctions.NUMERIC_CHECK));
+
+    ShouldCallValidate shouldCallValidate = new ShouldCallValidate(Map.of(
+            HttpMethod.PUT, "^/v1/transactions/source/[^/]+/externalId/[^/]+$|"
+                    + "^/v1/customers/source/[^/]+/externalId/[^/]+$|"
+                    + "^/v1/exemptions/complytId/[^/]+$|"
+                    + "^/v1/nexus/state/[^/]+$",
+            HttpMethod.POST,
+            "^/v1/nexus/refresh/state/[^/]+$|"
+                    + "^/v1/exemptions$"));
 
     @Bean
     ValidationHandler<CustomerDto, SpringValidatorAdapter> customerDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
@@ -33,9 +52,11 @@ public class ValidatorConfig {
                 new DataConflictChecksProvider(Map.of(
                         "source", CustomerDto.SOURCE_CONFLICT_CHECK,
                         "externalId", CustomerDto.EXTERNAL_ID_CONFLICT_CHECK),
-                        null),
+                                                          null),
                 new CustomBodyExtractorEmpty<>(),
-                pathChecker);
+                pathVariableChecker,
+                queryParamChecker,
+                shouldCallValidate);
     }
 
     @Bean
@@ -45,8 +66,11 @@ public class ValidatorConfig {
                         "source", TransactionDto.SOURCE_CONFLICT_CHECK,
                         "externalId", TransactionDto.EXTERNAL_ID_CONFLICT_CHECK),
                         BodyCheckConfig.TRANSACTION_BODY_CHECK),
+
                 new CustomBodyExtractorEmpty<>(),
-                pathChecker);
+                pathVariableChecker,
+                queryParamChecker,
+                shouldCallValidate);
     }
 
     @Bean
@@ -56,7 +80,9 @@ public class ValidatorConfig {
                         "complytId", ComplytIdCheckable.COMPLYT_ID_CONFLICT_CHECK),
                         null),
                 new CustomBodyExtractorEmpty<>(),
-                pathChecker);
+                pathVariableChecker,
+                queryParamChecker,
+                shouldCallValidate);
     }
 
     @Bean
@@ -65,7 +91,9 @@ public class ValidatorConfig {
                 new DataConflictChecksProvider(Map.of(
                         "state", StateCheckable.STATE_CONFLICT_CHECK),
                         null), new CustomBodyExtractorEmpty<>(),
-                pathChecker);
+                pathVariableChecker,
+                queryParamChecker,
+                shouldCallValidate);
 
     }
 
@@ -74,7 +102,9 @@ public class ValidatorConfig {
         return new ValidationHandler<>(DateWrapperDto.class, springValidatorAdapter,
                 new DataConflictChecksProvider(Map.of(),
                         null), new DateWrapperDtoCustomBodyExtractor(),
-                pathChecker);
+                pathVariableChecker,
+                queryParamChecker,
+                shouldCallValidate);
 
     }
 
@@ -84,7 +114,9 @@ public class ValidatorConfig {
                 new DataConflictChecksProvider(Map.of(),
                         null),
                 new CustomBodyExtractorEmpty<>(),
-                pathChecker);
+                pathVariableChecker,
+                queryParamChecker,
+                shouldCallValidate);
 
     }
 }

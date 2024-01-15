@@ -1,0 +1,45 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+DtoHandler -> ValidationHandler: handle
+
+
+rnote over ValidationHandler
+Handle Function
+endrnote
+
+ValidationHandler -> PathProvider: validatePath
+alt#Gold #LightBlue Successful case
+    PathProvider -> ValidationHandler: true
+else #Pink Failure
+    PathProvider -> ValidationHandler: PathVariableExcepption
+end
+
+ValidationHandler -> ParamProvider: validateParam
+alt#Gold #LightBlue Successful case
+    ParamProvider -> ValidationHandler: true
+else #Pink Failure
+    ParamProvider -> ValidationHandler: QueryParamExcepption
+end
+
+
+ValidationHandler -> ExtractDto : extractDto
+ExtractDto -> ValidationHandler: Mono.empty
+
+rnote over ValidationHandler
+validate Function
+endrnote
+
+ValidationHandler -> ConflictDataProvider : checkDataConflict
+
+alt#Gold #LightBlue Successful case
+    ConflictDataProvider -> ValidationHandler: true
+else #Pink Failure
+    ConflictDataProvider -> ValidationHandler: DataConflictExcepption
+end
+
+ValidationHandler -> DtoValidation : DtoBody
+
+@enduml

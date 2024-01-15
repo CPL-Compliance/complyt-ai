@@ -1,11 +1,7 @@
 package com.complyt.v1.validators;
 
-import com.complyt.v1.exceptions.types.ConflictedDataApiException;
-import com.complyt.v1.exceptions.types.MissingBodyApiException;
-import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
-import com.complyt.v1.exceptions.types.PathVariableErrorException;
+import com.complyt.v1.exceptions.types.*;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractor;
-import com.complyt.v1.validators.param_checker.PathVariableChecksProvider;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -18,6 +14,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
 @AllArgsConstructor
 @EqualsAndHashCode
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -29,6 +26,7 @@ public class ValidationHandler<T, U extends Validator> {
     @NonNull
     U validator;
 
+
     @NonNull
     DataConflictChecksProvider<T> dataConflictChecksProvider;
 
@@ -36,13 +34,15 @@ public class ValidationHandler<T, U extends Validator> {
     CustomBodyExtractor<T> customBodyExtractor;
 
     @NonNull
-    PathVariableChecksProvider pathVariableChecksProvider;
+    ParameterChecksProvider pathVariableChecksProvider;
 
-    private Mono<T> onValidationErrors(Errors errors) {
-        return Mono.error(new ObjectNotValidApiException(errors));
-    }
+    @NonNull
+    ParameterChecksProvider queryParamChecksProvider;
 
-    private Mono<T> validateRequestBody(final ServerRequest request) {
+    @NonNull
+    ShouldCallValidate shouldCallValidate;
+
+        private Mono<T> validateRequestBody(final ServerRequest request) {
         return customBodyExtractor.extract(request)
                 .switchIfEmpty(request.bodyToMono(validationClass))
                 .flatMap(body -> {
@@ -52,21 +52,22 @@ public class ValidationHandler<T, U extends Validator> {
                     if (errors.getAllErrors().isEmpty()) {
                         return Mono.just(body);
                     } else {
-                        return onValidationErrors(errors);
+                        return Mono.error(new ObjectNotValidApiException(errors));
                     }
                 })
                 .switchIfEmpty(Mono.error(new MissingBodyApiException()));
     }
 
     public Mono<T> handle(final ServerRequest serverRequest) {
+
         return validatePathVariable(serverRequest)
-                .then(dataConflictChecksProvider.isBodyEmpty(serverRequest)
-                                .flatMap(isEmpty -> isEmpty ? serverRequest.bodyToMono(validationClass) : validate(serverRequest))
-                );
+                .flatMap(isValidPathVariable -> validateQueryParam(serverRequest))
+                        .flatMap(isValidParams -> shouldCallValidate.apply(serverRequest) ? validate(serverRequest)
+                                : Mono.empty());
     }
 
 
-    public final Mono<T> validate(final ServerRequest serverRequest) {
+    private Mono<T> validate(final ServerRequest serverRequest) {
         return this.validateRequestBody(serverRequest)
                 .flatMap(body -> Flux.fromIterable(serverRequest.pathVariables().keySet())
                         .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)
@@ -78,12 +79,25 @@ public class ValidationHandler<T, U extends Validator> {
                                 Mono.error(new ConflictedDataApiException(errorList))));
     }
 
-    public final Mono<ServerRequest> validatePathVariable(final ServerRequest serverRequest) {
-        return Flux.fromIterable(serverRequest.pathVariables().keySet())
-                .flatMap(pathVariableChecksProvider::getPathVariableCheck)
-                .flatMap(check -> check.apply(serverRequest))
+    private Mono<Boolean> validateQueryParam(final ServerRequest serverRequest) {
+        return queryParamChecksProvider.doesParamExist(serverRequest)
+                .then(Flux.fromIterable(serverRequest.queryParams().entrySet())
+                .flatMap(entry -> Flux.fromIterable(entry.getValue())
+                        .flatMap(paramValue -> queryParamChecksProvider.getFunctionCheck(entry.getKey())
+                                .flatMapMany(check -> check.apply(paramValue))))
                 .collectList()
-                .flatMap(errorList -> errorList.isEmpty() ? Mono.just(serverRequest) :
+                .flatMap(errorList -> errorList.isEmpty() ? Mono.just(true) :
+                        Mono.error(new QueryParamErrorException(errorList))))
+                .switchIfEmpty(Mono.just(true));
+    }
+
+
+    private  Mono<Boolean> validatePathVariable(final ServerRequest serverRequest) {
+        return Flux.fromIterable(serverRequest.pathVariables().entrySet())
+                .flatMapSequential(entry -> pathVariableChecksProvider.getFunctionCheck(entry.getKey())
+                        .flatMapMany(check -> check.apply(entry.getValue())))
+                .collectList()
+                .flatMap(errorList -> errorList.isEmpty() ? Mono.just(true) :
                         Mono.error(new PathVariableErrorException(errorList)));
     }
 

@@ -10,6 +10,8 @@ import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.DateWrapperToLocalDateMapper;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.models.SalesTaxTrackingDto;
+import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.customer.exemption.ExemptionWrapperDto;
 import com.complyt.v1.models.nexus.DateWrapperDto;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -47,9 +50,11 @@ public class SalesTaxTrackingHandler {
         String state = serverRequest.pathVariable("state");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info).then(salesTaxTrackingFacade.findByState(state))
+        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
+                .then(salesTaxTrackingDtoValidationHandler.handle(serverRequest))
+                .switchIfEmpty(Mono.defer(() -> salesTaxTrackingFacade.findByState(state))
                 .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
 
@@ -61,10 +66,10 @@ public class SalesTaxTrackingHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
-                .then(salesTaxTrackingDtoValidationHandler.validatePathVariable(serverRequest))
-                .flatMap(salesTaxTracings -> salesTaxTrackingFacade.findByComplytId(UUID.fromString(complytId)))
+                .then(salesTaxTrackingDtoValidationHandler.handle(serverRequest))
+                .switchIfEmpty(Mono.defer(() -> salesTaxTrackingFacade.findByComplytId(UUID.fromString(complytId)))
                 .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
     }
@@ -74,7 +79,8 @@ public class SalesTaxTrackingHandler {
         String state = serverRequest.pathVariable("state");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        return ContextLogger.observeCtx(logStr, log::info).then(salesTaxTrackingDtoValidationHandler.validate(serverRequest))
+        return ContextLogger.observeCtx(logStr, log::info)
+                .then(salesTaxTrackingDtoValidationHandler.handle(serverRequest))
                 .flatMap(salesTaxTrackingDto -> {
                     SalesTaxTracking receivedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto);
                     return salesTaxTrackingFacade.findByState(state)
@@ -91,14 +97,18 @@ public class SalesTaxTrackingHandler {
     @NexusReadPermission
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
-        int page = Integer.parseInt(serverRequest.queryParam("page")
-                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM)));
-        int size = Integer.parseInt(serverRequest.queryParam("size")
-                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE)));
+        String page = serverRequest.queryParam("page")
+                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM));
+        String size = serverRequest.queryParam("size")
+                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE));
 
-        return ContextLogger.observeCtx(logStr, log::info).then(
-                ServerResponse.ok()
-                        .body(salesTaxTrackingFacade.findAll(page, size).map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto), SalesTaxTrackingDto.class));
+        Flux<SalesTaxTrackingDto> salesTaxTrackingDtoFlux = ContextLogger.observeCtx(logStr, log::info)
+                .thenMany(salesTaxTrackingDtoValidationHandler.handle(serverRequest))
+                .switchIfEmpty(Flux.defer(() -> salesTaxTrackingFacade.findAll(Integer.parseInt(page), Integer.parseInt(size))
+                                .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)));
+
+        return ServerResponse.ok().body(salesTaxTrackingDtoFlux, SalesTaxTrackingDto.class);
+
     }
 
     @NexusUpdatePermission
@@ -106,9 +116,8 @@ public class SalesTaxTrackingHandler {
         String state = serverRequest.pathVariable("state");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-
-        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info).then(
-                dateWrapperDtoValidationHandler.validate(serverRequest)
+        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
+                .then(dateWrapperDtoValidationHandler.handle(serverRequest)
                         .map(DateWrapperToLocalDateMapper.INSTANCE::dateWrapperToLocalDate)
                         .flatMap(date -> salesTaxTrackingFacade.refreshNexusSummary(state, date)
                                 .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)

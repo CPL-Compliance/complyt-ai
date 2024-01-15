@@ -65,7 +65,7 @@ class ValidatorConfigTest {
         when(serverRequest.pathVariable("source")).thenReturn(customerDto.source());
         when(serverRequest.pathVariable("externalId")).thenReturn("not same external id");
 
-        Mono<CustomerDto> customerDtoMono = customerDtoValidationHandler.validate(serverRequest);
+        Mono<CustomerDto> customerDtoMono = customerDtoValidationHandler.handle(serverRequest);
 
         // Then
         StepVerifier.create(customerDtoMono).expectErrorMessage(GenericErrorMessages.DATA_CONFLICT_ERROR);
@@ -86,7 +86,7 @@ class ValidatorConfigTest {
         when(serverRequest.pathVariable("source")).thenReturn(transactionDto.source());
         when(serverRequest.pathVariable("externalId")).thenReturn("not same external id");
 
-        Mono<TransactionDto> transactionDtoMono = transactionDtoValidationHandler.validate(serverRequest);
+        Mono<TransactionDto> transactionDtoMono = transactionDtoValidationHandler.handle(serverRequest);
 
         // Then
         StepVerifier.create(transactionDtoMono).expectErrorMessage(GenericErrorMessages.DATA_CONFLICT_ERROR);
@@ -105,7 +105,7 @@ class ValidatorConfigTest {
         when(serverRequest.bodyToMono(ExemptionDto.class)).thenReturn(Mono.just(exemptionDto));
         when(serverRequest.pathVariable("complytId")).thenReturn("not same external id");
 
-        Mono<ExemptionDto> exemptionDtoMono = exemptionDtoValidationHandler.validate(serverRequest);
+        Mono<ExemptionDto> exemptionDtoMono = exemptionDtoValidationHandler.handle(serverRequest);
 
         // Then
         StepVerifier.create(exemptionDtoMono).expectErrorMessage(GenericErrorMessages.DATA_CONFLICT_ERROR);
@@ -124,7 +124,7 @@ class ValidatorConfigTest {
         when(serverRequest.bodyToMono(SalesTaxTrackingDto.class)).thenReturn(Mono.just(salesTaxTrackingDto));
         when(serverRequest.pathVariable("state")).thenReturn("not same external id");
 
-        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = salesTaxTrackingDtoValidationHandler.validate(serverRequest);
+        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = salesTaxTrackingDtoValidationHandler.handle(serverRequest);
 
         // Then
         StepVerifier.create(salesTaxTrackingDtoMono).expectErrorMessage(GenericErrorMessages.DATA_CONFLICT_ERROR);

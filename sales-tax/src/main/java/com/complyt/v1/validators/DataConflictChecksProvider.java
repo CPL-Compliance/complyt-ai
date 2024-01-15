@@ -31,11 +31,4 @@ public class DataConflictChecksProvider<T> {
         return Mono.just(bodyConflictCheckFunction == null ? (body) -> Flux.empty() : bodyConflictCheckFunction);
     }
 
-    public Mono<Boolean> isBodyEmpty(ServerRequest serverRequest) {
-         return serverRequest.bodyToMono(String.class)
-                .flatMap(body ->  Mono.just(body.isEmpty()));
-    }
-
-
-
-    }
+}

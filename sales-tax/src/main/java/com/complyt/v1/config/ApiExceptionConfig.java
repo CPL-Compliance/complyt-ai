@@ -30,7 +30,8 @@ public class ApiExceptionConfig {
                 ObjectNotValidApiException.class, HttpStatus.BAD_REQUEST,
                 MissingBodyApiException.class, HttpStatus.BAD_REQUEST,
                 ConflictedDataApiException.class, HttpStatus.BAD_REQUEST,
-                PathVariableErrorException.class, HttpStatus.BAD_REQUEST
+                PathVariableErrorException.class, HttpStatus.BAD_REQUEST,
+                QueryParamErrorException.class, HttpStatus.BAD_REQUEST
         );
     }
 }
