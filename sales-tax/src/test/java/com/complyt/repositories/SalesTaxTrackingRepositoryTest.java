@@ -1,7 +1,5 @@
 package com.complyt.repositories;
 
-import com.complyt.domain.State;
-import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.security.TenantResolver;
 import org.junit.jupiter.api.BeforeEach;

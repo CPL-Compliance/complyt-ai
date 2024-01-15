@@ -10,6 +10,7 @@ import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.transaction.TransactionDto;
+import com.complyt.v1.routers.TransactionRouter;
 import com.complyt.v1.validators.ValidationHandler;
 import feign.FeignException;
 import lombok.AccessLevel;
@@ -25,6 +26,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -109,6 +111,7 @@ public class TransactionHandler {
         String externalId = serverRequest.pathVariable("externalId");
         String source = serverRequest.pathVariable("source");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        String resourceURI = TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId;
 
         return ContextLogger.observeCtx(logStr, log::info)
                 .then(transactionDtoValidationHandler.handle(serverRequest)
@@ -121,7 +124,7 @@ public class TransactionHandler {
                                                 .flatMap(savedTransaction -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class)))
                                         .switchIfEmpty(Mono.defer(() -> transactionFacade.saveTransaction(receivedTransaction)
                                                 .flatMap(savedTransaction -> ContextLogger.observeCtx("<-- Returned Body: " + savedTransaction, log::info).thenReturn(savedTransaction))
-                                                .flatMap(savedTransaction -> ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class))))));
+                                                .flatMap(savedTransaction -> ServerResponse.created(URI.create(resourceURI)).contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class))))));
     }
 
     @TransactionDeletePermission
