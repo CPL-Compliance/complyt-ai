@@ -152,4 +152,5 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .expectBody(LinkedHashMap.class)
                 .value(map -> assertEquals(GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE, map.get("message")));
     }
+    
 }
