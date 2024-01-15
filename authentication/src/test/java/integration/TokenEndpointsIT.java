@@ -1,6 +1,7 @@
 package integration;
 
 import io.complyt.authentication.AuthenticationApplication;
+import io.complyt.authentication.v1.config.error_messages.GenericErrorMessages;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.TokenDto;
 import io.complyt.authentication.v1.routers.TokenRouter;
@@ -20,7 +21,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import test_utils.integration_tests.TestUtilities;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -129,5 +132,24 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .expectBody(TokenDto.class)
                 .value(tokenDto -> assertTrue(tokenDto.expireAt().isBefore(LocalDateTime.now()
                         .plusSeconds(tokenDto.expiresIn()))));
+    }
+
+    @Order(4)
+    @Test
+    @WithMockUser
+    public void postApiKey_UnsupportedMediaType_Returns415() {
+
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("{}")
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE, map.get("message")));
     }
 }

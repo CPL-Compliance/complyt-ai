@@ -14,4 +14,5 @@ public interface UpsertByExternalIdAndSourceITTemplate {
 
     void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError();
     void upsertByExternalIdAndSource_NoBody_Returns400();
+    void upsertByExternalIdAndSource_UnsupportedMediaType_Returns415();
 }

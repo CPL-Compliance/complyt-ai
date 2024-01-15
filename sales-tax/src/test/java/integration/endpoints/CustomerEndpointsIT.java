@@ -7,7 +7,6 @@ import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.routers.CustomerRouter;
-import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -198,6 +197,28 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
+    }
+
+    @Order(3)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UnsupportedMediaType_Returns415() {
+        // Given
+        String externalId = "1001";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue("{}")
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE, map.get("message")));
     }
 
     @Order(2)
@@ -482,7 +503,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL) // Set your API endpoint
-                        .queryParam("page",page)
+                        .queryParam("page", page)
                         .queryParam("size", size)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
