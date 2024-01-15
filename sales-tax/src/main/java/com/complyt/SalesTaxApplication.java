@@ -13,9 +13,7 @@ import reactivefeign.spring.config.EnableReactiveFeignClients;
 @EnableFeignClients
 public class SalesTaxApplication implements CommandLineRunner {
 
-    public static void main(String[] args) {
-        //FUCK YOAV
-        SpringApplication.run(SalesTaxApplication.class, args);}
+    public static void main(String[] args) {SpringApplication.run(SalesTaxApplication.class, args);}
 
     @Override
     public void run(String... args) {
