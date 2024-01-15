@@ -70,6 +70,14 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
+    public void getAll_PathVariableError_Returns400() {
+
+    }
+
+
+    @Test
+    @Override
+    @WithMockUser
     public void upsertByExternalIdAndSource_DoesntExists_Returns201() {
         // Given
         String externalId = customerDto.externalId();
