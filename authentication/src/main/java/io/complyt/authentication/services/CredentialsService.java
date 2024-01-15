@@ -2,6 +2,7 @@ package io.complyt.authentication.services;
 
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
+import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import io.complyt.authentication.repositories.CredentialsRepository;
 import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
@@ -68,8 +69,10 @@ public class CredentialsService {
         String clientSecret = apiKey.clientSecret();
         String clientSecretEncoded = passwordEncoder.encode(clientSecret);
 
-        return createEncryptedCredentials(apiKey, clientIdEncryptedData, clientSecretEncryptedData,
+        Credentials encryptedCredentials = createEncryptedCredentials(apiKey, clientIdEncryptedData, clientSecretEncryptedData,
                 clientSecretEncoded);
+
+        return encryptedCredentials.withStatus(ApiKeyStatus.ACTIVE);
     }
 
     private @NonNull Mono<Credentials> decrypt(Credentials credentials) {

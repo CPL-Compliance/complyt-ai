@@ -1,5 +1,6 @@
 package io.complyt.authentication.domain;
 
+import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
@@ -24,4 +25,5 @@ public class Credentials {
     String clientSecretIv;
     String audience;
     String grantType;
+    ApiKeyStatus status;
 }
