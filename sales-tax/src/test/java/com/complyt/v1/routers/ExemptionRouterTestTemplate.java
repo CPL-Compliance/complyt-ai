@@ -29,6 +29,8 @@ public interface ExemptionRouterTestTemplate extends
     // Validations::Classification
     void upsert_NullClassification_Returns400ValidationError();
 
+    void upsert_PathVariableError_Returns400();
+
     void upsert_BlankCodeInClassification_Returns400ValidationError();
 
     void upsert_BlankDescriptionInClassification_Returns400ValidationError();

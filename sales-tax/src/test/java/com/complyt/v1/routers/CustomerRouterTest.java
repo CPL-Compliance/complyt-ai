@@ -27,6 +27,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import testUtils.unit_test.UnitTestUtilities;
@@ -65,13 +66,6 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         customerDto = testUtilities.createCustomerDto(UUID.randomUUID().toString());
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-    }
-
-    @Test
-    @Override
-    @WithMockUser
-    public void getAll_PathVariableError_Returns400() {
-
     }
 
 
@@ -835,6 +829,32 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
+    @WithUserDetails
+    public void upsertByExternalIdAndSource_PathVariableInvalid_Returns400() {
+        // Given
+        String externalId = "null";
+        String source = customerDto.source();
+        Customer newCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+        Customer originalCustomer = newCustomer.withName("originalCustomer");
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(originalCustomer));
+        when(customerFacade.saveCustomer(newCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(newCustomer, originalCustomer)).thenReturn(Mono.just(newCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(customerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Override
     @WithMockUser
     public void getByExternalIdAndSource_Exists_Returns200() {
         // Given
@@ -856,6 +876,26 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
+    @WithUserDetails
+    public void getByExternalIdAndSource_PathVariableInvalid_Returns400() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        String source = "sourceError";
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Override
     @WithMockUser
     public void getByComplytId_Exists_Returns200() {
         // Given
@@ -872,6 +912,26 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .exchange()
                 .expectStatus().isOk()
                 .equals(customerDto);
+    }
+
+    @Test
+    @Override
+    @WithUserDetails
+    public void getByComplytId_PathVariableInvalid_Returns400() {
+        // Given
+        String complytId = "uuidError";
+        UUID complytIdUUID = customerDto.complytId();
+        when(customerFacade.findByComplytId(complytIdUUID)).thenReturn(Mono.just(customer));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Test
@@ -1149,6 +1209,33 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .equals(allCustomers);
     }
 
+    @Test
+    @Override
+    @WithUserDetails
+    public void getAll_QueryParamInvalid_Returns400() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        Customer secondCustomer = customer.withId(id);
+        List<Customer> allCustomers = new ArrayList<>() {{
+            add(customer);
+            add(secondCustomer);
+        }};
+
+        // When
+        when(customerFacade.getAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(allCustomers));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("page", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
     @Override
     @Test
     @WithMockUser
@@ -1242,6 +1329,50 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .exchange()
                 .expectStatus().isOk()
                 .equals(allCustomers);
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getAllBySource_QueryParamInvalid_Returns400() {
+        /// Given
+        String source = customer.getSource();
+        List<Customer> emptyCustomerList = new ArrayList<>();
+
+        // When
+        when(customerFacade.getAllBySource(source)).thenReturn(Flux.fromIterable(emptyCustomerList));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source)
+                        .queryParam("page", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Override
+    public void getAllBySource_PathVariableInvalid_Returns400() {
+        /// Given
+        String source = customer.getSource();
+        List<Customer> emptyCustomerList = new ArrayList<>();
+        String size = "sizeError";
+
+        // When
+        when(customerFacade.getAllBySource(source)).thenReturn(Flux.fromIterable(emptyCustomerList));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "?size=" + size)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Override

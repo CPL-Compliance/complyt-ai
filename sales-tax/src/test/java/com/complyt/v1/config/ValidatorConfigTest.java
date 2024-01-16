@@ -13,6 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
@@ -58,8 +60,11 @@ class ValidatorConfigTest {
         Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", customerDto.externalId());
         pathVariables.put("source", customerDto.source());
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
 
         // When
+        when(serverRequest.queryParams()).thenReturn(queryParams);
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(CustomerDto.class)).thenReturn(Mono.just(customerDto));
         when(serverRequest.pathVariable("source")).thenReturn(customerDto.source());
@@ -79,8 +84,11 @@ class ValidatorConfigTest {
         Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", transactionDto.externalId());
         pathVariables.put("source", transactionDto.source());
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
 
         // When
+        when(serverRequest.queryParams()).thenReturn(queryParams);
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
         when(serverRequest.pathVariable("source")).thenReturn(transactionDto.source());
@@ -99,8 +107,11 @@ class ValidatorConfigTest {
         ExemptionDto exemptionDto = testUtilities.createExemptionDto();
         Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("complytId", exemptionDto.complytId().toString());
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
 
         // When
+        when(serverRequest.queryParams()).thenReturn(queryParams);
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(ExemptionDto.class)).thenReturn(Mono.just(exemptionDto));
         when(serverRequest.pathVariable("complytId")).thenReturn("not same external id");
@@ -118,8 +129,11 @@ class ValidatorConfigTest {
         SalesTaxTrackingDto salesTaxTrackingDto = testUtilities.createSalesTaxTrackingDto();
         Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("state", salesTaxTrackingDto.state().name());
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
 
         // When
+        when(serverRequest.queryParams()).thenReturn(queryParams);
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(SalesTaxTrackingDto.class)).thenReturn(Mono.just(salesTaxTrackingDto));
         when(serverRequest.pathVariable("state")).thenReturn("not same external id");

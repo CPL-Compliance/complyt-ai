@@ -40,6 +40,24 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
+    public void getAll_QueryParamInvalid_Returns400() {
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("page","null")
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
     public void getByAll_DoesntExists_Returns200EmptyList() {
         // Then
         WEB_TEST_CLIENT
@@ -78,6 +96,27 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.complytId").isEqualTo(complytId);
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void getByComplytId_PathVariableInvalid_Returns400() {
+        // Given
+        String complytId = "null";
+
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -136,6 +175,27 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.state.name").isEqualTo(existingStateName);
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void getByStateName_PathVariableInvalid_Returns400() {
+        // Given
+        String StateName = "null";
+
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + StateName)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -232,6 +292,24 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.state.name").isEqualTo("Nilfgaard");
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByState_PathVariableInvalid_Returns400() {
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/null")
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.salesTaxTrackingJsonExample("Nilfgaard", "NLF", null))
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(1)

@@ -42,7 +42,7 @@ public class ValidationHandler<T, U extends Validator> {
     @NonNull
     ShouldCallValidate shouldCallValidate;
 
-        private Mono<T> validateRequestBody(final ServerRequest request) {
+    private Mono<T> validateRequestBody(final ServerRequest request) {
         return customBodyExtractor.extract(request)
                 .switchIfEmpty(request.bodyToMono(validationClass))
                 .flatMap(body -> {
@@ -61,9 +61,8 @@ public class ValidationHandler<T, U extends Validator> {
     public Mono<T> handle(final ServerRequest serverRequest) {
 
         return validatePathVariable(serverRequest)
-                .flatMap(isValidPathVariable -> validateQueryParam(serverRequest))
-                        .flatMap(isValidParams -> shouldCallValidate.apply(serverRequest) ? validate(serverRequest)
-                                : Mono.empty());
+                .then(validateQueryParam(serverRequest))
+                .then(Mono.defer(() -> shouldCallValidate.apply(serverRequest) ? validate(serverRequest) : Mono.empty()));
     }
 
 
@@ -82,17 +81,17 @@ public class ValidationHandler<T, U extends Validator> {
     private Mono<Boolean> validateQueryParam(final ServerRequest serverRequest) {
         return queryParamChecksProvider.doesParamExist(serverRequest)
                 .then(Flux.fromIterable(serverRequest.queryParams().entrySet())
-                .flatMap(entry -> Flux.fromIterable(entry.getValue())
-                        .flatMap(paramValue -> queryParamChecksProvider.getFunctionCheck(entry.getKey())
-                                .flatMapMany(check -> check.apply(paramValue))))
-                .collectList()
-                .flatMap(errorList -> errorList.isEmpty() ? Mono.just(true) :
-                        Mono.error(new QueryParamErrorException(errorList))))
+                        .flatMap(entry -> Flux.fromIterable(entry.getValue())
+                                .flatMap(paramValue -> queryParamChecksProvider.getFunctionCheck(entry.getKey())
+                                        .flatMapMany(check -> check.apply(paramValue))))
+                        .collectList()
+                        .flatMap(errorList -> errorList.isEmpty() ? Mono.just(true) :
+                                Mono.error(new QueryParamErrorException(errorList))))
                 .switchIfEmpty(Mono.just(true));
     }
 
 
-    private  Mono<Boolean> validatePathVariable(final ServerRequest serverRequest) {
+    private Mono<Boolean> validatePathVariable(final ServerRequest serverRequest) {
         return Flux.fromIterable(serverRequest.pathVariables().entrySet())
                 .flatMapSequential(entry -> pathVariableChecksProvider.getFunctionCheck(entry.getKey())
                         .flatMapMany(check -> check.apply(entry.getValue())))

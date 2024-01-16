@@ -30,8 +30,7 @@ public class ValidatorConfig {
             "complytId", ParamCheckerFunctions.UUID_CHECK,
             "source", ParamCheckerFunctions.SOURCE_CHECK,
             "externalId", ParamCheckerFunctions.NOT_NULL_UNDEFINED_CHECK,
-            "state", ParamCheckerFunctions.STATE_CHECK,
-            "name", ParamCheckerFunctions.NOT_NULL_UNDEFINED_CHECK));
+            "state", ParamCheckerFunctions.STATE_CHECK));
 
     ParameterChecksProvider queryParamChecker = new ParameterChecksProvider(Map.of(
             "page", ParamCheckerFunctions.NUMERIC_CHECK,

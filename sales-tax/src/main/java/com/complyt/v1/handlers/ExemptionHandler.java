@@ -64,13 +64,13 @@ public class ExemptionHandler {
 
     @ExemptionUpdatePermission
     public Mono<ServerResponse> update(ServerRequest serverRequest) {
-        UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
+        String complytId = serverRequest.pathVariable("complytId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info).then(exemptionDtoValidationHandler.handle(serverRequest))
                 .flatMap(exemptionDto -> {
                     Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
-                    return exemptionFacade.update(receivedExemption, complytId);
+                    return exemptionFacade.update(receivedExemption, UUID.fromString(complytId));
                 })
                 .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
                 .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto))
@@ -112,7 +112,6 @@ public class ExemptionHandler {
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(exemptionDtoFlux, ExemptionDto.class);
     }
 
-    //todo check!!!!!
     @ExemptionDeletePermission
     public Mono<ServerResponse> delete(ServerRequest serverRequest) {
         String complytId = serverRequest.pathVariable("complytId");

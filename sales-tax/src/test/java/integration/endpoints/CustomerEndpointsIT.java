@@ -103,6 +103,46 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Test
     @Override
     @WithMockUser
+    public void getAllBySource_QueryParamInvalid_Returns400() {
+        // Given
+        String differentSource = "2";
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + differentSource)
+                        .queryParam("page", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void getAllBySource_PathVariableInvalid_Returns400() {
+        // Given
+        String sourceError = "null";
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + sourceError)
+                        .queryParam("page", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
     public void getAllBySource_DoesntExists_Returns200EmptyList() {
         // Given
         String differentSource = "9";
@@ -144,6 +184,23 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Test
     @Override
     @WithMockUser
+    public void getAll_QueryParamInvalid_Returns400() {
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("size", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
     public void getByAll_DoesntExists_Returns200EmptyList() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
 
@@ -159,6 +216,25 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .expectBodyList(CustomerDto.class)
                 .value(list ->
                         assertEquals(list.size(), 0));
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void getByAll_QueryParamInvalid_Returns400() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("page", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -183,6 +259,22 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                         assertEquals(customerDto.complytId(), UUID.fromString(complytId)));
     }
 
+    @Override
+    public void getByComplytId_PathVariableInvalid_Returns400() {
+        // Given
+        String complytId = "null";
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
     @Order(2)
     @Test
     @Override
@@ -203,25 +295,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Test
     @Override
     @WithMockUser
-    public void getByComplytId_complytIdDoesntParse_Returns500() {
-        // Given
-        String invalidComplytId = "gg";
-
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/complytId/" + invalidComplytId)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Order(2)
-    @Test
-    @Override
-    @WithMockUser
     public void getByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = "1586";
@@ -235,6 +308,22 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk();
+    }
+
+    @Override
+    public void getByExternalIdAndSource_PathVariableInvalid_Returns400() {
+        // Given
+        String externalId = "undefined";
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -318,6 +407,11 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk();
+    }
+
+    @Override
+    public void upsertByExternalIdAndSource_PathVariableError_Returns400() {
+
     }
 
     @Order(2)
@@ -481,7 +575,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL) // Set your API endpoint
-                        .queryParam("page",page)
+                        .queryParam("page", page)
                         .queryParam("size", size)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
