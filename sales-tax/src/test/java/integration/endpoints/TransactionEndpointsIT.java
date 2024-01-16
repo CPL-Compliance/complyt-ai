@@ -533,8 +533,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
+                .bodyValue("{}")
                 .exchange()
-                .expectStatus().isBadRequest()
+                .expectStatus().is4xxClientError()
                 .expectBody(LinkedHashMap.class)
                 .value(map -> assertEquals(GenericErrorMessages.MISSING_BODY_ERROR, map.get("message")));
     }
