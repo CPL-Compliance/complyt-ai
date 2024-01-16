@@ -219,7 +219,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .expectStatus().is4xxClientError()
                 .expectBody(LinkedHashMap.class)
                 .value(map -> assertEquals(GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE, map.get("message")));
-
     }
 
     @Order(2)
