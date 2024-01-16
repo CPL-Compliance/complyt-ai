@@ -259,6 +259,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
+    @WithMockUser
     public void upsertByExternalIdAndSource_UnsupportedMediaType_Returns415() {
         // Given
         String source = "1";
