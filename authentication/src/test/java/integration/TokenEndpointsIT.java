@@ -47,7 +47,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
     @Order(1)
     @Test
     @WithMockUser
-    public void postApiKey_jsonTypeApiKeyNotExists_Returns404() {
+    public void post_jsonTypeApiKeyNotExists_Returns404() {
         ApiKeyDto apiKeyDto = new ApiKeyDto("e2019b6f-a8c1-415c-b8b0-3fd6725c9a67", "e25f4d90-1051-44f7-89fb-4c6097af7747");
 
         webTestClient
@@ -68,7 +68,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
     @Order(2)
     @Test
     @WithMockUser
-    public void postApiKey_urlEncodedTypeApiKeyNotExists_Returns404() {
+    public void post_urlEncodedTypeApiKeyNotExists_Returns404() {
         String urlEncodedApiKey = "clientId=e2019b6f-a8c1-415c-b8b0-3fd6725c9a67&clientSecret=e25f4d90-1051-44f7-89fb-4c6097af7747";
 
         webTestClient
@@ -89,7 +89,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
     @Order(3)
     @Test
     @WithMockUser
-    public void postApiKey_jsonTypeApiKeyExistsButDoesntHaveToken_ReturnsAccessTokenWithExpirationDateTimeLessThenNowPlusExpiresIn() {
+    public void post_jsonTypeApiKeyExistsButDoesntHaveToken_ReturnsAccessTokenWithExpirationDateTimeLessThenNowPlusExpiresIn() {
         ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.apiKeyClientId, TestUtilities.apiKeyClientSecret);
 
         webTestClient
@@ -112,7 +112,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
     @Order(4)
     @Test
     @WithMockUser
-    public void postApiKey_urlEncodedTypeApiKeyExistsButDoesntHaveToken_ReturnsAccessTokenWithExpirationDateTimeLessThenNowPlusExpiresIn() {
+    public void post_urlEncodedTypeApiKeyExistsButDoesntHaveToken_ReturnsAccessTokenWithExpirationDateTimeLessThenNowPlusExpiresIn() {
         String urlEncodedApiKey = "clientId=" + TestUtilities.apiKeyClientId + "&clientSecret=" +
                 TestUtilities.apiKeyClientSecret;
 
