@@ -264,6 +264,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String source = "1";
         String externalId = "0";
+        
 
         // Then
         webTestClient
