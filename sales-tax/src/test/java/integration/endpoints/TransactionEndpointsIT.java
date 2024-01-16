@@ -533,15 +533,16 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
-                .bodyValue("{}")
                 .exchange()
-                .expectStatus().is4xxClientError()
+                .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
                 .value(map -> assertEquals(GenericErrorMessages.MISSING_BODY_ERROR, map.get("message")));
     }
 
-    @Override
+    @Order(3)
     @Test
+    @Override
+    @WithMockUser
     public void upsertByExternalIdAndSource_UnsupportedMediaType_Returns415() {
         // Given
         String externalId = "0";
@@ -553,7 +554,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .accept(MediaType.APPLICATION_JSON)
                 .bodyValue("{}")
                 .exchange()
                 .expectStatus().is4xxClientError()
