@@ -540,6 +540,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     }
 
     @Override
+    @Test
     public void upsertByExternalIdAndSource_UnsupportedMediaType_Returns415() {
         // Given
         String externalId = "0";
