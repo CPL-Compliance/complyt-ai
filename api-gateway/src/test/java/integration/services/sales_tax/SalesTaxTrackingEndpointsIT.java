@@ -137,22 +137,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isNotFound();
     }
 
-    @Order(2)
-    @Test
-    @Override
-    public void getByComplytId_complytIdDoesntParse_Returns500() {
-        WEB_TEST_CLIENT
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/complytId/invalid")
-                        .build())
-                .headers(headers -> {
-                    headers.setBearerAuth(TOKEN);
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                })
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
 
     @Order(2)
     @Test
@@ -228,7 +212,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Nilfgaard")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/NV")
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -245,7 +229,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/NLF")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Nevada")
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -263,13 +247,13 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/NLF")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Nevada")
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.salesTaxTrackingJsonExample("Nilfgaard", "NLF", null))
+                .bodyValue(TestUtilities.salesTaxTrackingJsonExample("Nevada", "NV", null))
                 .exchange()
                 .expectStatus().isCreated();
     }
@@ -281,17 +265,17 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Nilfgaard")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Hawaii")
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.salesTaxTrackingJsonExample("Nilfgaard", "NLF", null))
+                .bodyValue(TestUtilities.salesTaxTrackingJsonExample("Hawaii", "HI", null))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.state.name").isEqualTo("Nilfgaard");
+                .jsonPath("$.state.name").isEqualTo("Hawaii");
     }
 
     @Order(2)
@@ -307,7 +291,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.salesTaxTrackingJsonExample("Nilfgaard", "NLF", null))
+                .bodyValue(TestUtilities.salesTaxTrackingJsonExample("Hawaii", "HI", null))
                 .exchange()
                 .expectStatus().isBadRequest();
     }

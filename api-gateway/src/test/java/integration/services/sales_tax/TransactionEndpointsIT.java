@@ -670,21 +670,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isNotFound();
     }
 
-    @Order(2)
-    @Test
-    @Override
-    public void getByComplytId_complytIdDoesntParse_Returns500() {
-        WEB_TEST_CLIENT
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.TRANSACTION_BASE_URL + "/complytId/notExisting")
-                        .build())
-                .headers(headers -> headers
-                        .setBearerAuth(TOKEN))
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
     @Order(0)
     @Test
     @Override

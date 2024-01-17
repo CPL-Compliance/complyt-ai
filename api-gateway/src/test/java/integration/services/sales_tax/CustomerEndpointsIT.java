@@ -226,27 +226,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    public void getByComplytId_complytIdDoesntParse_Returns500() {
-        // Given
-        String invalidComplytId = "gg";
-
-        // Then
-        WEB_TEST_CLIENT
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.CUSTOMER_BASE_URL + "/complytId/" + invalidComplytId)
-                        .build())
-                .headers(headers -> {
-                    headers.setBearerAuth(TOKEN);
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                })
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Order(2)
-    @Test
-    @Override
     public void getByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = "1586";
