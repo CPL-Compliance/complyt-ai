@@ -26,7 +26,6 @@ public class ValidationHandler<T, U extends Validator> {
     @NonNull
     U validator;
 
-
     @NonNull
     DataConflictChecksProvider<T> dataConflictChecksProvider;
 
@@ -41,6 +40,13 @@ public class ValidationHandler<T, U extends Validator> {
 
     @NonNull
     ShouldCallValidate shouldCallValidate;
+
+    public Mono<T> handle(final ServerRequest serverRequest) {
+
+        return validatePathVariable(serverRequest)
+                .then(validateQueryParam(serverRequest))
+                .then(Mono.defer(() -> shouldCallValidate.apply(serverRequest) ? validate(serverRequest) : Mono.empty()));
+    }
 
     private Mono<T> validateRequestBody(final ServerRequest request) {
         return customBodyExtractor.extract(request)
@@ -57,14 +63,6 @@ public class ValidationHandler<T, U extends Validator> {
                 })
                 .switchIfEmpty(Mono.error(new MissingBodyApiException()));
     }
-
-    public Mono<T> handle(final ServerRequest serverRequest) {
-
-        return validatePathVariable(serverRequest)
-                .then(validateQueryParam(serverRequest))
-                .then(Mono.defer(() -> shouldCallValidate.apply(serverRequest) ? validate(serverRequest) : Mono.empty()));
-    }
-
 
     private Mono<T> validate(final ServerRequest serverRequest) {
         return this.validateRequestBody(serverRequest)

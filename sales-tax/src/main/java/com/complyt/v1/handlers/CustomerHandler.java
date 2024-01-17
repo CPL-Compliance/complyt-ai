@@ -38,9 +38,7 @@ public class CustomerHandler {
     @NonNull
     ValidationHandler<CustomerDto, SpringValidatorAdapter> customerDtoValidationHandler;
 
-
-
-        @CustomerReadPermission
+    @CustomerReadPermission
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
@@ -72,7 +70,6 @@ public class CustomerHandler {
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoFlux, CustomerDto.class);
     }
 
-
     @CustomerUpdatePermission
     public Mono<ServerResponse> upsert(ServerRequest serverRequest) {
         String externalId = serverRequest.pathVariable("externalId");
@@ -96,7 +93,6 @@ public class CustomerHandler {
                                                         .thenReturn(customerDto)), CustomerDto.class))));
     }
 
-
     @CustomerReadPermission
     public Mono<ServerResponse> getByComplytId(ServerRequest serverRequest) {
         String complytId = serverRequest.pathVariable("complytId");
@@ -113,7 +109,6 @@ public class CustomerHandler {
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
     }
 
-
     @CustomerReadPermission
     public Mono<ServerResponse> getByExternalIdAndSource(ServerRequest serverRequest) {
         String externalId = serverRequest.pathVariable("externalId");
@@ -129,7 +124,6 @@ public class CustomerHandler {
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
     }
-
 
     @CustomerReadPermission
     public Mono<ServerResponse> getByName(ServerRequest serverRequest) {
