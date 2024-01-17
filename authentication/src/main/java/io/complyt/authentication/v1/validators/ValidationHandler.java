@@ -27,8 +27,6 @@ public class ValidationHandler<T, U extends Validator> {
     @NonNull
     QueryParamsExtractor<T> queryParamsExtractor;
 
-
-
     /**
      * @param serverRequest
      * @return
