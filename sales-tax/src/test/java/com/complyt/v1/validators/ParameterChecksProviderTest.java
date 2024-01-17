@@ -96,5 +96,12 @@ class ParameterChecksProviderTest {
         functionCheck.subscribe(Assertions::assertNotNull);
     }
 
+    @Test
+    void getCheck_Null_Variable_ReturnsNullPointerException() {
+        // When
+        Exception nullPointerException = assertThrows(NullPointerException.class, () -> parameterChecksProvider.getFunctionCheck(null));
 
+        // Then
+        assertEquals("pathVariable is marked non-null but is null", nullPointerException.getMessage());
+    }
 }
