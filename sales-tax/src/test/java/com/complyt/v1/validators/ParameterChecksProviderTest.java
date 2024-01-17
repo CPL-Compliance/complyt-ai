@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +25,6 @@ class ParameterChecksProviderTest {
 
     @BeforeEach
     void setUp() {
-        // Set up the ParameterChecksProvider instance with some test data
         Map<String, Function<String, Mono<String>>> paramChecksMap = new HashMap<>();
         paramChecksMap.put("param1", param -> Mono.just("Param1: " + param));
         paramChecksMap.put("param2", param -> Mono.just("Param2: " + param));
@@ -53,6 +53,15 @@ class ParameterChecksProviderTest {
     }
 
     @Test
+    void getCheck_NotVariableCheckFound_ReturnsDefaultCheck() {
+        // Given + When
+        Mono<String> booleanMono = parameterChecksProvider.getFunctionCheck("externalId").flatMap(check -> check.apply(null));
+
+        // Then
+        StepVerifier.create(booleanMono).expectNextCount(0).verifyComplete();
+    }
+
+    @Test
     void doesParamExist_existingParam_shouldReturnTrue() {
         when(serverRequest.queryParam("param1")).thenReturn("value".describeConstable());
 
@@ -68,5 +77,24 @@ class ParameterChecksProviderTest {
         Mono<Boolean> doesExist = parameterChecksProvider.doesParamExist(serverRequest);
         assertFalse(doesExist.blockOptional().orElse(true));
     }
+
+    @Test
+    void getFunctionCheck_emptyParamName_shouldReturnEmptyFunction() {
+        Mono<Function<String, Mono<String>>> functionCheck = parameterChecksProvider.getFunctionCheck("");
+        assertNotNull(functionCheck);
+        functionCheck.subscribe(check -> {
+            assertNotNull(check);
+            assertTrue(check.apply("testParam").blockOptional().isEmpty());
+        });
+    }
+
+    @Test
+    void getFunctionCheck_caseInsensitiveParamName_shouldReturnFunction() {
+        String paramName = "PARAM1";
+        Mono<Function<String, Mono<String>>> functionCheck = parameterChecksProvider.getFunctionCheck(paramName);
+        assertNotNull(functionCheck);
+        functionCheck.subscribe(Assertions::assertNotNull);
+    }
+
 
 }
