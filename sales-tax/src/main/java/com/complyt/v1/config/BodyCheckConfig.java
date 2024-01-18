@@ -22,7 +22,7 @@ public class BodyCheckConfig {
         return transactionDto ->
                 dtoBodyCheckersList.stream()
                                 .map(dtoBodyChecker -> dtoBodyChecker.check(transactionDto))
-                        .reduce(Flux.empty(), (result, element) -> result.concatWith(element));
+                        .reduce(Flux.empty(), (resultFlux, element) -> resultFlux.concatWith(element));
 
     }
 }

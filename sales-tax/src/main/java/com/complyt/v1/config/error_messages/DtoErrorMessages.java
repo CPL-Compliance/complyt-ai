@@ -24,4 +24,6 @@ public interface DtoErrorMessages {
     String LOCALDATE_FORMAT_ERROR = "must be in the format yyyy-mm-dd";
 
     String TOTAL_AMOUNT_AFTER_DISCOUNT_IS_BELOW_ZERO = "The transaction total amount after discount is below 0";
+
+    String ONE_OF_THE_ITEMS_IS_UNALIGNED = "At least one of the item's total price isn't matching the quantity multiply bt the unit Price";
 }

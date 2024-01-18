@@ -8,10 +8,7 @@ import com.complyt.v1.models.TangibleCategoryDto;
 import com.complyt.v1.models.TaxableCategoryDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.With;
 
 import java.math.BigDecimal;
@@ -19,9 +16,12 @@ import java.math.BigDecimal;
 @With
 @Schema(name = "Item")
 public record ItemDto(
-        @PositiveOrZero(message = "Item.unitPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal unitPrice,
+
+//        @PositiveOrZero(message = "Item.unitPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal unitPrice,
+        @NotNull BigDecimal unitPrice,
         @PositiveOrZero(message = "Item.quantity " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal quantity,
-        @PositiveOrZero(message = "Item.totalPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal totalPrice,
+//        @PositiveOrZero(message = "Item.totalPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal totalPrice,
+        @NotNull BigDecimal totalPrice,
         String description,
         @NotNull(message = "Item.name " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "Item.name " + StringErrorMessages.MINMAX_256_ERROR) String name,
         @NotNull(message = "Item.taxCode " + DtoErrorMessages.NOT_NULL_ERROR) @Size(max = 256, message = "Item.taxCode " + StringErrorMessages.MINMAX_256_ERROR) String taxCode,

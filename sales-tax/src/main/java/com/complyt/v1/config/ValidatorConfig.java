@@ -10,6 +10,7 @@ import com.complyt.v1.models.nexus.DateWrapperDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.DataConflictChecksProvider;
 import com.complyt.v1.validators.ValidationHandler;
+import com.complyt.v1.validators.body_checkers.ItemsTotalPriceChecker;
 import com.complyt.v1.validators.body_checkers.TransactionDtoShippingAddressChecker;
 import com.complyt.v1.validators.body_checkers.TransactionTotalAmountChecker;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractorEmpty;
@@ -43,7 +44,8 @@ public class ValidatorConfig {
                         "externalId", TransactionDto.EXTERNAL_ID_CONFLICT_CHECK),
                         new BodyCheckConfig(List.of(
                                 new TransactionDtoShippingAddressChecker(),
-                                new TransactionTotalAmountChecker()
+                                new TransactionTotalAmountChecker(),
+                                new ItemsTotalPriceChecker()
                         )).transactionDtoFluxFunction()),
                 new CustomBodyExtractorEmpty<>());
     }
