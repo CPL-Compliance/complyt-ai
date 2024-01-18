@@ -31,7 +31,7 @@ public interface DtoErrorMessages {
 
     String SIZE_FORMAT_ERROR = "size has to be numeric";
 
-    String EXTERNAL_ID_NOT_NULL_ERROR = "parameter can not be null or undefined";
+    String EXTERNAL_ID_NOT_NULL_ERROR = "externalId can not be null or undefined";
 
     String STATE_FORMAT_ERROR = "invalid state provided. Please provide a valid state name or abbreviation.\";";
 
