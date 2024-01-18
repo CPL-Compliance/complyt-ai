@@ -554,7 +554,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue("{}")
+                .contentType(MediaType.TEXT_PLAIN)
+                .bodyValue("Unsupported data")
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody(LinkedHashMap.class)

@@ -273,8 +273,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue("{}")
+                .contentType(MediaType.TEXT_PLAIN)
+                .bodyValue("Unsupported data")
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody(LinkedHashMap.class)

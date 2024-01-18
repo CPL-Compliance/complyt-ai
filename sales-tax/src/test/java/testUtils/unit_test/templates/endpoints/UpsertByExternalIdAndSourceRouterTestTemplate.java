@@ -1,5 +1,6 @@
 package testUtils.unit_test.templates.endpoints;
 
+
 public interface UpsertByExternalIdAndSourceRouterTestTemplate {
     void upsertByExternalIdAndSource_Exists_Returns200();
 

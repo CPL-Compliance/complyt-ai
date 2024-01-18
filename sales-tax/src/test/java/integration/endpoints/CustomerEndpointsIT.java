@@ -214,7 +214,8 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue("{}")
+                .contentType(MediaType.TEXT_PLAIN)
+                .bodyValue("Unsupported data")
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody(LinkedHashMap.class)

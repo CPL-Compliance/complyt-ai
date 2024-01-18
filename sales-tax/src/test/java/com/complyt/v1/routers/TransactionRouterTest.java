@@ -165,8 +165,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue("{}")
+                .contentType(MediaType.TEXT_PLAIN)
+                .bodyValue("Unsupported data")
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody(LinkedHashMap.class)
