@@ -9,8 +9,10 @@ import java.util.function.Function;
 public interface ParamCheckerFunctions  {
     Function<String, Mono<String>> UUID_CHECK = ParameterCheckableDefault.createParamCheckerFunction(UUID_REGEX.expression, DtoErrorMessages.COMPLYT_ID_FORMAT_ERROR);
     Function<String, Mono<String>> SOURCE_CHECK = ParameterCheckableDefault.createParamCheckerFunction(SourceRegex.expression, DtoErrorMessages.SOURCE_FORMAT_ERROR);
-    Function<String, Mono<String>> NUMERIC_CHECK = ParameterCheckableDefault.createParamCheckerFunction(NumericRegex.expression, DtoErrorMessages.NUMERIC_FORMAT_ERROR);
-    Function<String, Mono<String>> NOT_NULL_UNDEFINED_CHECK = ParameterCheckableDefault.createParamCheckerFunction(NotNullUndefinedRegex.expression, DtoErrorMessages.NOT_NULL_UNDEFINED_ERROR);
+    Function<String, Mono<String>> PAGE_CHECK = ParameterCheckableDefault.createParamCheckerFunction(NumericRegex.expression, DtoErrorMessages.PAGE_FORMAT_ERROR);
+    Function<String, Mono<String>> SIZE_CHECK = ParameterCheckableDefault.createParamCheckerFunction(NumericRegex.expression, DtoErrorMessages.SIZE_FORMAT_ERROR);
+
+    Function<String, Mono<String>> EXTERNAL_ID_NOT_NULL_CHECK = ParameterCheckableDefault.createParamCheckerFunction(NotNullUndefinedRegex.expression, DtoErrorMessages.EXTERNAL_ID_NOT_NULL_ERROR);
     Function<String, Mono<String>> STATE_CHECK = ParameterCheckableDefault.createParamCheckerFunction(StateRegex.expression, DtoErrorMessages.STATE_FORMAT_ERROR);
 
 }

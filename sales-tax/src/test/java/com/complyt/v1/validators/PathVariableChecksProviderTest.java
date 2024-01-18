@@ -26,7 +26,7 @@ public class PathVariableChecksProviderTest {
     @BeforeEach
     void setup() {
         parameterChecksProvider = new ParameterChecksProvider(Map.of(
-                "param", ParamCheckerFunctions.NUMERIC_CHECK));
+                "param", ParamCheckerFunctions.PAGE_CHECK));
         serverRequest = mock(ServerRequest.class);
     }
 
@@ -37,7 +37,7 @@ public class PathVariableChecksProviderTest {
         Mono<Function<String, Mono<String>>> result = parameterChecksProvider.getFunctionCheck(paramName);
 
         // Then
-        StepVerifier.create(result).expectNext(ParamCheckerFunctions.NUMERIC_CHECK).verifyComplete();
+        StepVerifier.create(result).expectNext(ParamCheckerFunctions.PAGE_CHECK).verifyComplete();
     }
 
     @Test

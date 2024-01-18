@@ -29,12 +29,12 @@ public class ValidatorConfig {
     ParameterChecksProvider pathVariableChecker = new ParameterChecksProvider(Map.of(
             "complytId", ParamCheckerFunctions.UUID_CHECK,
             "source", ParamCheckerFunctions.SOURCE_CHECK,
-            "externalId", ParamCheckerFunctions.NOT_NULL_UNDEFINED_CHECK,
+            "externalId", ParamCheckerFunctions.EXTERNAL_ID_NOT_NULL_CHECK,
             "state", ParamCheckerFunctions.STATE_CHECK));
 
     ParameterChecksProvider queryParamChecker = new ParameterChecksProvider(Map.of(
-            "page", ParamCheckerFunctions.NUMERIC_CHECK,
-            "size", ParamCheckerFunctions.NUMERIC_CHECK));
+            "page", ParamCheckerFunctions.PAGE_CHECK,
+            "size", ParamCheckerFunctions.SIZE_CHECK));
 
     ShouldCallValidate shouldCallValidate = new ShouldCallValidate(Map.of(
             HttpMethod.PUT, "^/v1/transactions/source/[^/]+/externalId/[^/]+$|"

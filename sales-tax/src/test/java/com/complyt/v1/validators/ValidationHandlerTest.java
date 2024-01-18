@@ -89,7 +89,7 @@ class ValidationHandlerTest {
         queryParams.add("page", "1");
         when(serverRequest.queryParams()).thenReturn(queryParams);
         when(paramChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
-        when(paramChecksProvider.getFunctionCheck("page")).thenReturn(Mono.just(ParamCheckerFunctions.NUMERIC_CHECK));
+        when(paramChecksProvider.getFunctionCheck("page")).thenReturn(Mono.just(ParamCheckerFunctions.PAGE_CHECK));
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.method()).thenReturn(HttpMethod.GET);
         when(serverRequest.path()).thenReturn("/v1/transactions/source/someSource/externalId/someExternalId");
@@ -112,7 +112,7 @@ class ValidationHandlerTest {
 
         // When
         when(serverRequest.queryParams()).thenReturn(queryParams);
-        when(paramChecksProvider.getFunctionCheck("page")).thenReturn(Mono.just(ParamCheckerFunctions.NUMERIC_CHECK));
+        when(paramChecksProvider.getFunctionCheck("page")).thenReturn(Mono.just(ParamCheckerFunctions.PAGE_CHECK));
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.method()).thenReturn(HttpMethod.GET);
         when(serverRequest.path()).thenReturn("/v1/transactions/source/someSource/externalId/someExternalId");
@@ -187,7 +187,7 @@ class ValidationHandlerTest {
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.queryParams()).thenReturn(queryParams);
         when(serverRequest.queryParam("page")).thenReturn("null".describeConstable());
-        when(paramChecksProvider.getFunctionCheck("page")).thenReturn(Mono.just(ParamCheckerFunctions.NUMERIC_CHECK));
+        when(paramChecksProvider.getFunctionCheck("page")).thenReturn(Mono.just(ParamCheckerFunctions.PAGE_CHECK));
         when(serverRequest.method()).thenReturn(HttpMethod.PUT);
         when(serverRequest.path()).thenReturn("/v1/transactions/source/someSource/externalId/someExternalId");
         when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
@@ -214,7 +214,7 @@ class ValidationHandlerTest {
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.pathVariable("externalId")).thenReturn("null");
         when(serverRequest.pathVariable("source")).thenReturn(transactionDto.source());
-        when(paramChecksProvider.getFunctionCheck("externalId")).thenReturn(Mono.just(ParamCheckerFunctions.NOT_NULL_UNDEFINED_CHECK));
+        when(paramChecksProvider.getFunctionCheck("externalId")).thenReturn(Mono.just(ParamCheckerFunctions.EXTERNAL_ID_NOT_NULL_CHECK));
         when(paramChecksProvider.getFunctionCheck("source")).thenReturn(Mono.just(ParamCheckerFunctions.SOURCE_CHECK));
         when(dataConflictChecksProvider.getPathVariableCheck("externalId")).thenReturn(Mono.just(TransactionDto.EXTERNAL_ID_CONFLICT_CHECK));
         when(dataConflictChecksProvider.getPathVariableCheck("source")).thenReturn(Mono.just(TransactionDto.SOURCE_CONFLICT_CHECK));
@@ -245,7 +245,7 @@ class ValidationHandlerTest {
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.pathVariable("externalId")).thenReturn(transactionDto.externalId());
         when(serverRequest.pathVariable("source")).thenReturn(transactionDto.source());
-        when(paramChecksProvider.getFunctionCheck("externalId")).thenReturn(Mono.just(ParamCheckerFunctions.NOT_NULL_UNDEFINED_CHECK));
+        when(paramChecksProvider.getFunctionCheck("externalId")).thenReturn(Mono.just(ParamCheckerFunctions.EXTERNAL_ID_NOT_NULL_CHECK));
         when(paramChecksProvider.getFunctionCheck("source")).thenReturn(Mono.just(ParamCheckerFunctions.SOURCE_CHECK));
         when(dataConflictChecksProvider.getPathVariableCheck("externalId")).thenReturn(Mono.just(TransactionDto.EXTERNAL_ID_CONFLICT_CHECK));
         when(dataConflictChecksProvider.getPathVariableCheck("source")).thenReturn(Mono.just(TransactionDto.SOURCE_CONFLICT_CHECK));
@@ -275,7 +275,7 @@ class ValidationHandlerTest {
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.pathVariable("externalId")).thenReturn(differentExternalId);
         when(serverRequest.pathVariable("source")).thenReturn(transactionDto.source());
-        when(paramChecksProvider.getFunctionCheck("externalId")).thenReturn(Mono.just(ParamCheckerFunctions.NOT_NULL_UNDEFINED_CHECK));
+        when(paramChecksProvider.getFunctionCheck("externalId")).thenReturn(Mono.just(ParamCheckerFunctions.EXTERNAL_ID_NOT_NULL_CHECK));
         when(paramChecksProvider.getFunctionCheck("source")).thenReturn(Mono.just(ParamCheckerFunctions.SOURCE_CHECK));
         when(serverRequest.queryParams()).thenReturn(queryParams);
         when(serverRequest.method()).thenReturn(HttpMethod.PUT);
@@ -305,7 +305,7 @@ class ValidationHandlerTest {
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.pathVariable("externalId")).thenReturn(transactionDto.externalId());
         when(serverRequest.pathVariable("source")).thenReturn(transactionDto.source());
-        when(paramChecksProvider.getFunctionCheck("externalId")).thenReturn(Mono.just(ParamCheckerFunctions.NOT_NULL_UNDEFINED_CHECK));
+        when(paramChecksProvider.getFunctionCheck("externalId")).thenReturn(Mono.just(ParamCheckerFunctions.EXTERNAL_ID_NOT_NULL_CHECK));
         when(paramChecksProvider.getFunctionCheck("source")).thenReturn(Mono.just(ParamCheckerFunctions.SOURCE_CHECK));
         when(serverRequest.method()).thenReturn(HttpMethod.PUT);
         when(serverRequest.path()).thenReturn("/v1/transactions/source/someSource/externalId/someExternalId");

@@ -54,10 +54,10 @@ public class ParamCheckerFunctionsTest {
     }
 
     @Test
-    public void numericCheck_ValidNumeric_ReturnsMonoEmpty() {
+    public void pageCheck_ValidNumeric_ReturnsMonoEmpty() {
         // Given & When
         String validNumeric = "123";
-        Mono<String> result = ParamCheckerFunctions.NUMERIC_CHECK.apply(validNumeric);
+        Mono<String> result = ParamCheckerFunctions.PAGE_CHECK.apply(validNumeric);
 
         // Then
         StepVerifier.create(result)
@@ -65,22 +65,22 @@ public class ParamCheckerFunctionsTest {
     }
 
     @Test
-    public void numericCheck_InvalidNumeric_ReturnsErrorMessage() {
+    public void pageCheck_InvalidNumeric_ReturnsErrorMessage() {
         // Given & When
         String invalidNumeric = "abc";
-        Mono<String> result = ParamCheckerFunctions.NUMERIC_CHECK.apply(invalidNumeric);
+        Mono<String> result = ParamCheckerFunctions.PAGE_CHECK.apply(invalidNumeric);
 
         // Then
         StepVerifier.create(result)
-                .expectNext(DtoErrorMessages.NUMERIC_FORMAT_ERROR)
+                .expectNext(DtoErrorMessages.PAGE_FORMAT_ERROR)
                 .verifyComplete();
     }
 
     @Test
-    public void notNullUndefinedCheck_NotNullUndefined_ReturnsMonoEmpty() {
+    public void externalIdNotNullCheck_NotNullUndefined_ReturnsMonoEmpty() {
         // Given & When
         String notNullUndefined = "validParam";
-        Mono<String> result = ParamCheckerFunctions.NOT_NULL_UNDEFINED_CHECK.apply(notNullUndefined);
+        Mono<String> result = ParamCheckerFunctions.EXTERNAL_ID_NOT_NULL_CHECK.apply(notNullUndefined);
 
         // Then
         StepVerifier.create(result)
@@ -88,26 +88,26 @@ public class ParamCheckerFunctionsTest {
     }
 
     @Test
-    public void notNullUndefinedCheck_Null_ReturnsErrorMessage() {
+    public void externalIdNotNullCheck_Null_ReturnsErrorMessage() {
         // Given & When
         String notNullUndefined = "null";
-        Mono<String> result = ParamCheckerFunctions.NOT_NULL_UNDEFINED_CHECK.apply(notNullUndefined);
+        Mono<String> result = ParamCheckerFunctions.EXTERNAL_ID_NOT_NULL_CHECK.apply(notNullUndefined);
 
         // Then
         StepVerifier.create(result)
-                .expectNext(DtoErrorMessages.NOT_NULL_UNDEFINED_ERROR)
+                .expectNext(DtoErrorMessages.EXTERNAL_ID_NOT_NULL_ERROR)
                 .verifyComplete();
     }
 
     @Test
-    public void notNullUndefinedCheck_Undefined_ReturnsErrorMessage() {
+    public void externalIdNotNullCheck_Undefined_ReturnsErrorMessage() {
         // Given & When
         String notNullUndefined = "undefined";
-        Mono<String> result = ParamCheckerFunctions.NOT_NULL_UNDEFINED_CHECK.apply(notNullUndefined);
+        Mono<String> result = ParamCheckerFunctions.EXTERNAL_ID_NOT_NULL_CHECK.apply(notNullUndefined);
 
         // Then
         StepVerifier.create(result)
-                .expectNext(DtoErrorMessages.NOT_NULL_UNDEFINED_ERROR)
+                .expectNext(DtoErrorMessages.EXTERNAL_ID_NOT_NULL_ERROR)
                 .verifyComplete();
     }
 

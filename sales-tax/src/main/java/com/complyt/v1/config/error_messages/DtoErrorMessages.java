@@ -27,9 +27,11 @@ public interface DtoErrorMessages {
 
     String SOURCE_FORMAT_ERROR = "source has to be in range 1-9";
 
-    String NUMERIC_FORMAT_ERROR = "parameter has to be numeric";
+    String PAGE_FORMAT_ERROR = "page has to be numeric";
 
-    String NOT_NULL_UNDEFINED_ERROR = "parameter can not be null or undefined";
+    String SIZE_FORMAT_ERROR = "size has to be numeric";
+
+    String EXTERNAL_ID_NOT_NULL_ERROR = "parameter can not be null or undefined";
 
     String STATE_FORMAT_ERROR = "invalid state provided. Please provide a valid state name or abbreviation.\";";
 
