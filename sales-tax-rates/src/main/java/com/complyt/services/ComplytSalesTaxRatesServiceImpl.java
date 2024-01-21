@@ -49,8 +49,10 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
 
     private Mono<ComplytSalesTaxRates> modifyAddressIncasOfBlanks(ComplytSalesTaxRates complytSalesTaxRates) {
         Address address = complytSalesTaxRates.address();
-        return complytSalesTaxRates.address().city().isBlank() ?
-                Mono.just(complytSalesTaxRates.withAddress(address.withCity(complytSalesTaxRates.requestAddress().city()))) :
+        Address requestAddress = complytSalesTaxRates.requestAddress();
+
+        return address.city().isBlank() && !requestAddress.city().isBlank() ?
+                Mono.just(complytSalesTaxRates.withAddress(address.withCity(requestAddress.city()))) :
                 Mono.just(complytSalesTaxRates);
     }
 
