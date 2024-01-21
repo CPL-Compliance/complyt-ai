@@ -57,6 +57,27 @@ public class ComplytSalesTaxRatesServiceImplTest {
     }
 
     @Test
+    void findByAddress_FindsComplytSalesTaxRatesWithBlankCity_ReturnsComplytSalesTaxRatesWithRequestAddressCity() {
+        // Given
+        Address califoniaAddress = TestUtilities.createAddressInCalifornia();
+        Address californiaAddressWithBlankCity = califoniaAddress.withCity("");
+        String collectionName = StatesMap.statesToCollections.get(califoniaAddress.state());
+
+        ComplytSalesTaxRates complytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates()
+                .withAddress(californiaAddressWithBlankCity);
+
+        ComplytSalesTaxRates expectedComplytSalesTaxRates = complytSalesTaxRates
+                .withAddress(califoniaAddress);
+
+        // When
+        when(complytSalesTaxRatesRepository.findByAddress(califoniaAddress, collectionName)).thenReturn(Mono.just(complytSalesTaxRates));
+        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesService.findByAddress(califoniaAddress);
+
+        // Then
+        StepVerifier.create(complytSalesTaxRatesMono).expectNext(expectedComplytSalesTaxRates).verifyComplete();
+    }
+
+    @Test
     void findByAddress_ComplytSalesTaxRatesNotFoundInDB_SavesNewComplytSalesTaxRates() {
         // Given
         Address califoniaAddress = TestUtilities.createAddressInCalifornia();
