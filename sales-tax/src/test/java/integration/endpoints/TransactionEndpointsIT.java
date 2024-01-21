@@ -467,7 +467,22 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Override
     public void upsertByExternalIdAndSource_PathVariableError_Returns400() {
+        //Given
+        String nullExternalId = "null";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(nullExternalId, customerId)
+                .withShippingAddress(referenceAddress);
 
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + nullExternalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)

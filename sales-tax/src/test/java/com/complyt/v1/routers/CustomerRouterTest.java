@@ -856,11 +856,11 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithUserDetails
     public void upsertByExternalIdAndSource_PathVariableInvalid_Returns400() {
         // Given
-        String externalId = "null";
+        String nullExternalId = "null";
         String source = customerDto.source();
         Customer newCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         Customer originalCustomer = newCustomer.withName("originalCustomer");
-        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(originalCustomer));
+        when(customerFacade.findByExternalIdAndSource(nullExternalId, source)).thenReturn(Mono.just(originalCustomer));
         when(customerFacade.saveCustomer(newCustomer)).thenReturn(Mono.empty());
         when(customerFacade.updateIfModified(newCustomer, originalCustomer)).thenReturn(Mono.just(newCustomer));
 
@@ -869,7 +869,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + nullExternalId)
                         .build())
                 .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)

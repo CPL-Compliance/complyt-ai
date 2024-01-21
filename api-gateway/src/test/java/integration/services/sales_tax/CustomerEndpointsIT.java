@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CustomerEndpointsIT extends TestContainersInitializerIT implements CustomerEndpointsITTemplate {
 
     private final String source = "1";
-    private final String sourceError = "null";
+    private final String nullString = "null";
 
     @Order(2)
     @Test
@@ -33,7 +33,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + differentSource)
-                        .queryParam("page", "null")
+                        .queryParam("page", nullString)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -50,7 +50,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + sourceError)
+                        .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + nullString)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -136,7 +136,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.CUSTOMER_BASE_URL)
-                        .queryParam("page", "null")
+                        .queryParam("page", nullString)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);

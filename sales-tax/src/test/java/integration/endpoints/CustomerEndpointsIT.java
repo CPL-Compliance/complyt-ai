@@ -434,7 +434,21 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
     @Override
     public void upsertByExternalIdAndSource_PathVariableError_Returns400() {
+        // Given
+        String nullExternalId = "null";
+        CustomerDto customerDto = ITUtilities.stubCustomerDto(nullExternalId);
 
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + nullExternalId)
+                        .build())
+                .bodyValue(customerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
