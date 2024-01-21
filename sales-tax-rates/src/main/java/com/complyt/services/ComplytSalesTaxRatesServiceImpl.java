@@ -43,7 +43,15 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
         return complytSalesTaxRatesRepository.findByAddress(address, collection)
                 .switchIfEmpty(Mono.defer(() -> getBestMatchWebClientWrapper.findByAddress(address)
                         .flatMap(salesTaxData -> setBeforeSave(address, salesTaxData))
-                        .flatMap(complytSalesTaxRates -> save(complytSalesTaxRates, collection))));
+                        .flatMap(complytSalesTaxRates -> save(complytSalesTaxRates, collection))))
+                .flatMap(this::modifyAddressIncasOfBlanks);
+    }
+
+    private Mono<ComplytSalesTaxRates> modifyAddressIncasOfBlanks(ComplytSalesTaxRates complytSalesTaxRates) {
+        Address address = complytSalesTaxRates.address();
+        return complytSalesTaxRates.address().city().isBlank() ?
+                Mono.just(complytSalesTaxRates.withAddress(address.withCity(complytSalesTaxRates.requestAddress().city()))) :
+                Mono.just(complytSalesTaxRates);
     }
 
     private Mono<ComplytSalesTaxRates> setBeforeSave(Address address, SalesTaxData salesTaxData) {
