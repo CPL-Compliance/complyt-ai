@@ -5,6 +5,7 @@ import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.facades.TokenFacade;
 import io.complyt.authentication.repositories.exceptions.OperationFailedException;
+import io.complyt.authentication.v1.config.error_messages.GenericErrorMessages;
 import io.complyt.authentication.v1.exceptions.GlobalErrorAttributes;
 import io.complyt.authentication.v1.exceptions.GlobalExceptionHandler;
 import io.complyt.authentication.v1.handlers.TokenHandler;
@@ -28,6 +29,8 @@ import test_utils.unit_tests.TestUtilities;
 import test_utils.unit_tests.templates.PostOkRouterMonoTest;
 import test_utils.unit_tests.templates.PostRouterTestSecurityTemplate;
 
+import java.util.LinkedHashMap;
+
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,7 +41,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @ContextConfiguration(classes = {TokenRouter.class, TokenHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class, GlobalErrorAttributes.class, GlobalExceptionHandler.class,
         QueryParamsExtractorEmpty.class})
-class TokenRouterMonoTest implements PostOkRouterMonoTest, PostRouterTestSecurityTemplate {
+class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTemplate {
 
     @Autowired
     TokenRouter tokenRouter;
@@ -169,6 +172,26 @@ class TokenRouterMonoTest implements PostOkRouterMonoTest, PostRouterTestSecurit
 
         // Then
         assertEquals("tokenHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void post_UnsupportedMediaType_Returns415() {
+
+        // Given + When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("{}")
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE, map.get("message")));
     }
 
     @Test

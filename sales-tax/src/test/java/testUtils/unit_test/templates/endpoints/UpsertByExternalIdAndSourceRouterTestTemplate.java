@@ -1,5 +1,6 @@
 package testUtils.unit_test.templates.endpoints;
 
+
 public interface UpsertByExternalIdAndSourceRouterTestTemplate {
     void upsertByExternalIdAndSource_Exists_Returns200();
 
@@ -36,5 +37,7 @@ public interface UpsertByExternalIdAndSourceRouterTestTemplate {
     void upsertByExternalIdAndSource_NullHandler_ThrowsNullPointerException();
 
     void upsertByExternalIdAndSource_NoBody_Returns400();
+
+    void upsertByExternalIdAndSource_UnsupportedMediaType_Returns415();
 }
 

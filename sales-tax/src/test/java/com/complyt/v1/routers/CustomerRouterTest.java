@@ -260,6 +260,30 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Override
     @Test
     @WithMockUser
+    public void upsertByExternalIdAndSource_UnsupportedMediaType_Returns415() {
+        // Given
+        String source = "1";
+        String externalId = "0";
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .contentType(MediaType.TEXT_PLAIN)
+                .bodyValue("Unsupported data")
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE, map.get("message")));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
     public void upsertByExternalIdAndSource_BlankSource_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -396,22 +420,22 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"complytId\": \"" + invalidComplytId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"externalTimestamps\":  {" +
-                           "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"," +
-                           "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
-                           "}}")
+                        "    \"complytId\": \"" + invalidComplytId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"," +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1127,7 +1151,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         }};
 
         // When
-        when(customerFacade.getAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(allCustomers));
+        when(customerFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(allCustomers));
 
         // Then
         webTestClient
@@ -1149,7 +1173,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         List<Customer> emptyCustomerList = new ArrayList<>();
 
         // When
-        when(customerFacade.getAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(emptyCustomerList));
+        when(customerFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(emptyCustomerList));
 
         // Then
         webTestClient
@@ -1195,7 +1219,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // Given + When
-        when(customerFacade.getAll(0,0)).thenReturn(Flux.error(new OperationFailedException()));
+        when(customerFacade.getAll(0, 0)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient
@@ -1417,18 +1441,18 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\"\n" +
-                           "}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\"\n" +
+                        "}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1451,20 +1475,20 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"externalTimestamps\":  {" +
-                           "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
-                           "}}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1490,20 +1514,20 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"externalTimestamps\":  {" +
-                           "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"" +
-                           "}}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1531,21 +1555,21 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"externalTimestamps\":  {" +
-                           "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"," +
-                           "\"updatedDate\":  \"" + timestampWithLengthOf257 + "\"" +
-                           "}}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"," +
+                        "\"updatedDate\":  \"" + timestampWithLengthOf257 + "\"" +
+                        "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1572,21 +1596,21 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"externalTimestamps\":  {" +
-                           "\"createdDate\":  \"" + invalidTimestamp + "\", " +
-                           "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
-                           "}\n}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"createdDate\":  \"" + invalidTimestamp + "\", " +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1615,21 +1639,21 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "  \"externalTimestamps\":  {" +
-                           "       \"createdDate\":  \"2023-02-29\", \n" +
-                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
-                           "}\n}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "  \"externalTimestamps\":  {" +
+                        "       \"createdDate\":  \"2023-02-29\", \n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1656,21 +1680,21 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"externalTimestamps\":  {\n" +
-                           "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                           "           \"updatedDate\":  \"2023-02-29T08:00:00.000Z\" \n" +
-                           "   }\n}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-02-29T08:00:00.000Z\" \n" +
+                        "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1771,21 +1795,21 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"externalTimestamps\":  {\n" +
-                           "           \"createdDate\":  \"2023-01-24T08:00:00.0000000000Z\",\n" +
-                           "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
-                           "   }\n}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.0000000000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
+                        "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1812,21 +1836,21 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"externalTimestamps\":  {\n" +
-                           "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                           "           \"updatedDate\":  \"2023-01-24T08:00:00.0000000000Z\" \n" +
-                           "   }\n}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.0000000000Z\" \n" +
+                        "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2075,21 +2099,21 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"externalTimestamps\":  {\n" +
-                           "           \"createdDate\":  \"2023-01-24T08:00:00.000 + 18:01\",\n" +
-                           "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
-                           "   }\n}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000 + 18:01\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
+                        "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2116,21 +2140,21 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"externalTimestamps\":  {\n" +
-                           "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                           "           \"updatedDate\":  \"2023-01-24T08:00:00.000 + 18:01\" \n" +
-                           "   }\n}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000 + 18:01\" \n" +
+                        "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2194,24 +2218,24 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"externalTimestamps\":  {\n" +
-                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                           "   },\n" +
-                           "    \"internalTimestamps\":  {" +
-                           "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
-                           "}}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
+                        "    \"internalTimestamps\":  {" +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2236,24 +2260,24 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"externalTimestamps\":  {\n" +
-                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                           "   },\n" +
-                           "    \"internalTimestamps\":  {" +
-                           "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"" +
-                           "}}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
+                        "    \"internalTimestamps\":  {" +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2277,25 +2301,25 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"externalTimestamps\":  {\n" +
-                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                           "   },\n" +
-                           "    \"internalTimestamps\":  {" +
-                           "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"," +
-                           "\"updatedDate\":  \"" + invalidTimestamp + "\"" +
-                           "}}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
+                        "    \"internalTimestamps\":  {" +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"," +
+                        "\"updatedDate\":  \"" + invalidTimestamp + "\"" +
+                        "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2325,25 +2349,25 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"externalTimestamps\":  {\n" +
-                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                           "   },\n" +
-                           "    \"internalTimestamps\":  {" +
-                           "\"createdDate\":  \"" + invalidTimestamp + "\", " +
-                           "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
-                           "}\n}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
+                        "    \"internalTimestamps\":  {" +
+                        "\"createdDate\":  \"" + invalidTimestamp + "\", " +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2369,25 +2393,25 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "  \"internalTimestamps\":  {" +
-                           "       \"createdDate\":  \"2023-02-29\", \n" +
-                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
-                           "},\n" +
-                           "  \"externalTimestamps\":  {" +
-                           "       \"createdDate\":  \"2023-02-28\", \n" +
-                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
-                           "}\n}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "  \"internalTimestamps\":  {" +
+                        "       \"createdDate\":  \"2023-02-29\", \n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "},\n" +
+                        "  \"externalTimestamps\":  {" +
+                        "       \"createdDate\":  \"2023-02-28\", \n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2414,25 +2438,25 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "  \"internalTimestamps\":  {" +
-                           "       \"createdDate\":  \"2023-02-28\", \n" +
-                           "       \"updatedDate\":  \"2023-02-29T08:00:00.000Z\"" +
-                           "},\n" +
-                           "  \"externalTimestamps\":  {" +
-                           "       \"createdDate\":  \"2023-02-28\", \n" +
-                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
-                           "}\n}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "  \"internalTimestamps\":  {" +
+                        "       \"createdDate\":  \"2023-02-28\", \n" +
+                        "       \"updatedDate\":  \"2023-02-29T08:00:00.000Z\"" +
+                        "},\n" +
+                        "  \"externalTimestamps\":  {" +
+                        "       \"createdDate\":  \"2023-02-28\", \n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2533,25 +2557,25 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"internalTimestamps\":  {\n" +
-                           "           \"createdDate\":  \"2023-01-24T08:00:00.00000000000Z\",\n" +
-                           "           \"updatedDate\":  \"2023-01-24T08:00:00.000\" \n" +
-                           "   },\n" +
-                           "    \"externalTimestamps\":  {\n" +
-                           "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                           "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
-                           "   }\n}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.00000000000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000\" \n" +
+                        "   },\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
+                        "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2578,25 +2602,25 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"internalTimestamps\":  {\n" +
-                           "           \"createdDate\":  \"2023-01-24T08:00:00\",\n" +
-                           "           \"updatedDate\":  \"2023-01-24T08:00:00.0000000000\" \n" +
-                           "   },\n" +
-                           "    \"externalTimestamps\":  {\n" +
-                           "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                           "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
-                           "   }\n}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.0000000000\" \n" +
+                        "   },\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
+                        "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2845,25 +2869,25 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"internalTimestamps\":  {\n" +
-                           "           \"createdDate\":  \"2023-01-24T08:00:00.000+18:01\",\n" +
-                           "           \"updatedDate\":  \"2023-01-24T08:00:00.000\" \n" +
-                           "   },\n" +
-                           "    \"externalTimestamps\":  {\n" +
-                           "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                           "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
-                           "   }\n}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000+18:01\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000\" \n" +
+                        "   },\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
+                        "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2890,25 +2914,25 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                           "    \"source\": \"" + source + "\",\n" +
-                           "    \"name\": \"name\",\n" +
-                           "    \"address\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"customerType\": \"RETAIL\",\n" +
-                           "    \"internalTimestamps\":  {\n" +
-                           "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                           "           \"updatedDate\":  \"2023-01-24T08:00:00.000+18:01\" \n" +
-                           "   },\n" +
-                           "    \"externalTimestamps\":  {\n" +
-                           "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                           "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
-                           "   }\n}")
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000+18:01\" \n" +
+                        "   },\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
+                        "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
