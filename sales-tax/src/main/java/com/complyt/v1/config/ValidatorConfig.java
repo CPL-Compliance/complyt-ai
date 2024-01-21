@@ -41,8 +41,7 @@ public class ValidatorConfig {
                     + "^/v1/customers/source/[^/]+/externalId/[^/]+$|"
                     + "^/v1/exemptions/complytId/[^/]+$|"
                     + "^/v1/nexus/state/[^/]+$",
-            HttpMethod.POST,
-            "^/v1/nexus/refresh/state/[^/]+$|"
+            HttpMethod.POST, "^/v1/nexus/refresh/state/[^/]+$|"
                     + "^/v1/exemptions$"));
 
     @Bean
