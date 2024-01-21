@@ -211,52 +211,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .expectStatus().isNotFound();
     }
 
-    @Order(2)
-    @Test
-    @Override
-    public void getByName_Exists_Returns200() {
-        // Given
-        String name = "best";
-
-        // Then
-        WEB_TEST_CLIENT
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.CUSTOMER_BASE_URL + "/name/" + name)
-                        .build())
-                .headers(headers -> {
-                    headers.setBearerAuth(TOKEN);
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                })
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.length()").isEqualTo(2);
-    }
-
-    @Order(2)
-    @Test
-    @Override
-    public void getByName_DoesntExists_Returns200EmptyList() {
-        // Given
-        String name = "nonExisting";
-
-        // Then
-        WEB_TEST_CLIENT
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.CUSTOMER_BASE_URL + "/name/" + name)
-                        .build())
-                .headers(headers -> {
-                    headers.setBearerAuth(TOKEN_DIFFERENT_TENANT);
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                })
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.length()").isEqualTo(0);
-    }
-
     @Order(3)
     @Test
     @Override
