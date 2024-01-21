@@ -19,4 +19,5 @@ public class FastTaxGetTaxInfoByCityCountyStateCityCountyFetcher implements City
 
         return Mono.just(cityCountyWrapper);
     }
+    
 }
