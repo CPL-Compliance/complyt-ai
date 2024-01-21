@@ -16,6 +16,5 @@ public class SalesTaxApplication implements CommandLineRunner {
     public static void main(String[] args) {SpringApplication.run(SalesTaxApplication.class, args);}
 
     @Override
-    public void run(String... args) {
-    }
+    public void run(String... args) {}
 }
