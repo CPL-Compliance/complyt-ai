@@ -103,13 +103,13 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     public void getByComplytId_PathVariableInvalid_Returns400() {
         // Given
-        String complytId = "null";
+        String nullComplytId = "null";
 
         // Then
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/complytId/" + complytId)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/complytId/" + nullComplytId)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
