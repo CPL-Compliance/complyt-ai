@@ -171,6 +171,30 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UnsupportedMediaType_Returns415() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .contentType(MediaType.TEXT_PLAIN)
+                .bodyValue("Unsupported data")
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE, map.get("message")));
+    }
+
+    @Test
+    @Override
     public void getByExternalIdAndSource_UnauthenticatedUser_Returns401() {
         // Given
         String externalId = transactionDto.externalId();

@@ -15,4 +15,6 @@ public interface UpsertByStateITTemplate {
     void upsertByState_DoesntPassValidation_Returns400CValidationError();
 
     void upsertByState_NoBody_Returns400();
+
+    void upsertByState_UnsupportedMediaType_Returns415();
 }
