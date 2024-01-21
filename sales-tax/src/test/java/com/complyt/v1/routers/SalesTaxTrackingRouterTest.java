@@ -141,14 +141,14 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
         UUID complytId = expectedSalesTaxTrackingDto.complytId();
-        String complytIdError = "null";
+        String nullComplytId = "null";
 
         when(salesTaxTrackingFacade.findByComplytId(complytId)).thenReturn(Mono.just(salesTaxTracking));
 
         webTestClient
                 .mutateWith(csrf())
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/complytId/" + complytIdError).build())
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/complytId/" + nullComplytId).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest();
