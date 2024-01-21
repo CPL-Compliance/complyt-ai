@@ -5,6 +5,7 @@ import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.facades.ApiKeyFacade;
 import io.complyt.authentication.repositories.exceptions.OperationFailedException;
+import io.complyt.authentication.v1.config.error_messages.GenericErrorMessages;
 import io.complyt.authentication.v1.exceptions.GlobalErrorAttributes;
 import io.complyt.authentication.v1.exceptions.GlobalExceptionHandler;
 import io.complyt.authentication.v1.handlers.ApiKeyHandler;
@@ -27,6 +28,8 @@ import reactor.core.publisher.Mono;
 import test_utils.unit_tests.TestUtilities;
 import test_utils.unit_tests.templates.PostCreatedRouterMonoTest;
 import test_utils.unit_tests.templates.PostRouterTestSecurityTemplate;
+
+import java.util.LinkedHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -136,6 +139,24 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
         // Then
         assertEquals("apiKeyHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Override
+    @WithMockUser
+    @Test
+    public void post_UnsupportedMediaType_Returns415() {
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue("{}")
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE, map.get("message")));
     }
 
     @Test
