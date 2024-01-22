@@ -195,13 +195,19 @@ public class UnitTestUtilities {
         List<Item> items = createItems(true, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false);
-        return new Transaction(UUID.randomUUID(), id, id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, null);
+
+        return new Transaction(UUID.randomUUID(), id, id, source,
+                documentName, items, billingAddress, shippingAddress,
+                customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()),
+                null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
+                TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
+                BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
     }
 
-    public Transaction createTransactionWithDiscount(String id) {
-        Discount discount = createDiscount(BigDecimal.valueOf(500), false, "description");
-        return createTransaction(id).withDiscount(discount);
-    }
+//    public Transaction createTransactionWithDiscount(String id) {
+//        Discount discount = createDiscount(BigDecimal.valueOf(500), false, "description");
+//        return createTransaction(id).withDiscount(discount);
+//    } //todo: fix
 
     public TransactionDto createTransactionDto(String id) {
         String documentName = "INVUS1000";
@@ -210,14 +216,19 @@ public class UnitTestUtilities {
         List<ItemDto> items = createItemDtos(true, false);
         TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);
-        DiscountDto discountDto = createDiscountDto(BigDecimal.valueOf(500), false, "description");
-        return new TransactionDto(UUID.randomUUID(), id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, discountDto);
+//        DiscountDto discountDto = createDiscountDto(BigDecimal.valueOf(500), false, "description");     // todo: fix
+        return new TransactionDto(UUID.randomUUID(), id, source, documentName,
+                items, billingAddress, shippingAddress, customerIdOtherDomains,
+                createCustomerDto(customerIdOtherDomains.toString()), null,
+                TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE,
+                shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO,
+                BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
     }
 
-    public TransactionDto createTransactionDtoWithDiscount(String id) {
-        DiscountDto discountDto = createDiscountDto(BigDecimal.valueOf(500), false, "description");
-        return createTransactionDto(id).withDiscount(discountDto);
-    }
+//    public TransactionDto createTransactionDtoWithDiscount(String id) {
+//        DiscountDto discountDto = createDiscountDto(BigDecimal.valueOf(500), false, "description");
+//        return createTransactionDto(id).withDiscount(discountDto);
+//    } //todo: fix
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
@@ -271,9 +282,9 @@ public class UnitTestUtilities {
         return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
     }
 
-    public Discount createDiscount(BigDecimal discountAmount, boolean isPreTax, String discountDescription) {
-        return new Discount(discountAmount, isPreTax, discountDescription);
-    }
+//    public Discount createDiscount(BigDecimal discountAmount, boolean isPreTax, String discountDescription) {
+//        return new Discount(discountAmount, isPreTax, discountDescription);
+//    }
 
     public ShippingFee createShippingFeeWithSalesTaxRates(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
@@ -285,9 +296,9 @@ public class UnitTestUtilities {
         return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
     }
 
-    public DiscountDto createDiscountDto(BigDecimal discountAmount, boolean isPreTax, String discountDescription) {
-        return new DiscountDto(discountAmount, isPreTax, discountDescription);
-    }
+//    public DiscountDto createDiscountDto(BigDecimal discountAmount, boolean isPreTax, String discountDescription) {
+//        return new DiscountDto(discountAmount, isPreTax, discountDescription);
+//    }
 
 
     public JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
