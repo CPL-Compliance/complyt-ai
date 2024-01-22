@@ -19,6 +19,46 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CustomerEndpointsIT extends TestContainersInitializerIT implements CustomerEndpointsITTemplate {
 
     private final String source = "1";
+    private final String nullString = "null";
+
+    @Order(2)
+    @Test
+    @Override
+    public void getAllBySource_QueryParamInvalid_Returns400() {
+        // Given
+        String differentSource = "2";
+
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + differentSource)
+                        .queryParam("page", nullString)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void getAllBySource_PathVariableInvalid_Returns400() {
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + nullString)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
 
     @Order(2)
     @Test
@@ -91,6 +131,24 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
+    public void getAll_QueryParamInvalid_Returns400() {
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL)
+                        .queryParam("page", nullString)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
     public void getByAll_DoesntExists_Returns200EmptyList() {
         WEB_TEST_CLIENT
                 .get()
@@ -133,6 +191,23 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
+    public void getByComplytId_PathVariableInvalid_Returns400() {
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL + "/complytId/null")
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
     public void getByComplytId_DoesntExists_Returns404() {
         // Then
         WEB_TEST_CLIENT
@@ -146,27 +221,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 })
                 .exchange()
                 .expectStatus().isNotFound();
-    }
-
-    @Order(2)
-    @Test
-    @Override
-    public void getByComplytId_complytIdDoesntParse_Returns500() {
-        // Given
-        String invalidComplytId = "gg";
-
-        // Then
-        WEB_TEST_CLIENT
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.CUSTOMER_BASE_URL + "/complytId/" + invalidComplytId)
-                        .build())
-                .headers(headers -> {
-                    headers.setBearerAuth(TOKEN);
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                })
-                .exchange()
-                .expectStatus().is5xxServerError();
     }
 
     @Order(2)
@@ -188,6 +242,27 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 })
                 .exchange()
                 .expectStatus().isOk();
+    }
+
+        @Order(2)
+        @Test
+        @Override
+        public void getByExternalIdAndSource_PathVariableInvalid_Returns400() {
+            // Given
+            String externalId = "null";
+
+            // Then
+            WEB_TEST_CLIENT
+                    .get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                            .build())
+                    .headers(headers -> {
+                        headers.setBearerAuth(TOKEN);
+                        headers.setContentType(MediaType.APPLICATION_JSON);
+                    })
+                    .exchange()
+                    .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -231,6 +306,28 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 })
                 .exchange()
                 .expectStatus().isOk();
+    }
+
+    @Order(3)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_PathVariableInvalid_Returns400() {
+        // Given
+        String externalId = "null";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.customerJsonExample(externalId, null))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)

@@ -204,6 +204,37 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
+    public void getAllBySource_QueryParamInvalid_Returns400() {
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/1")
+                        .queryParam("page","null")
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void getAllBySource_PathVariableInvalid_Returns400() {
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/null")
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
     public void getAllBySource_Exists_Returns200() {
         WEB_TEST_CLIENT
                 .get()
@@ -255,6 +286,22 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
+    public void getAll_QueryParamInvalid_Returns400() {
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL)
+                        .queryParam("size","null")
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
     public void getByAll_DoesntExists_Returns200EmptyList() {
 
         // Then
@@ -297,6 +344,26 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
+    public void getByExternalIdAndSource_PathVariableInvalid_Returns400() {
+        //Given
+        String externalId = "null";
+        UUID complytId = UUID.fromString("a6469aaf-e838-41df-8106-6a8927917985"); // complytId of existing transaction
+
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
     public void getByExternalIdAndSource_DoesntExists_Returns404() {
         WEB_TEST_CLIENT
                 .get()
@@ -329,6 +396,28 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
                 .exchange()
                 .expectStatus().isOk();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_PathVariableInvalid_Returns400() {
+        //Given
+        String externalId = "undefined";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -546,6 +635,25 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isOk();
     }
 
+    @Order(2)
+    @Test
+    @Override
+    public void getByComplytId_PathVariableInvalid_Returns400() {
+        // Given
+        String complytId = "null";
+
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
     @Order(3)
     @Test
     @Override
@@ -560,21 +668,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                         .setBearerAuth(TOKEN))
                 .exchange()
                 .expectStatus().isNotFound();
-    }
-
-    @Order(2)
-    @Test
-    @Override
-    public void getByComplytId_complytIdDoesntParse_Returns500() {
-        WEB_TEST_CLIENT
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.TRANSACTION_BASE_URL + "/complytId/notExisting")
-                        .build())
-                .headers(headers -> headers
-                        .setBearerAuth(TOKEN))
-                .exchange()
-                .expectStatus().is5xxServerError();
     }
 
     @Order(0)

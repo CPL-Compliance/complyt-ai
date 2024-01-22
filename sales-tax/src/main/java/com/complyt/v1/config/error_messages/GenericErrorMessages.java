@@ -9,4 +9,6 @@ public interface GenericErrorMessages {
 
     String MISSING_BODY_ERROR = "The requested operation failed because no request body has been provided";
     String UNSUPPORTED_MEDIA_TYPE = "415 Unsupported Media Type";
+
 }
+

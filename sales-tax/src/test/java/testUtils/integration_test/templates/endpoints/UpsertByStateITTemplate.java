@@ -4,6 +4,8 @@ public interface UpsertByStateITTemplate {
 
     void upsertByState_Exists_Returns200();
 
+    void upsertByState_PathVariableInvalid_Returns400();
+
     void upsertByState_DoesntExists_Returns201();
 
     void upsertByState_DoesntExistsWithComplytId_Returns400ConflictedData();

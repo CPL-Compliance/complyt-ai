@@ -3,6 +3,10 @@ package testUtils.unit_test.templates.endpoints;
 public interface GetAllBySourceRouterTestTemplate {
     void getAllBySource_Exists_Returns200WithList();
 
+    void getAllBySource_QueryParamInvalid_Returns400();
+
+    void getAllBySource_PathVariableInvalid_Returns400();
+
     void getAllBySource_EmptyCollection_Returns200WithEmptyList();
 
     void getAllBySource_UnauthenticatedUser_Returns401();

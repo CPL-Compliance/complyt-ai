@@ -3,6 +3,8 @@ package testUtils.unit_test.templates.endpoints;
 public interface DeleteByExternalIdAndSourceRouterTestTemplate {
     void deleteByExternalIdAndSource_Exists_Returns204();
 
+    void deleteByExternalIdAndSource_PathVariableInvalid_Returns400();
+
     void deleteByExternalIdAndSource_DoesntExists_Returns404();
 
     void deleteByExternalIdAndSource_UnauthenticatedUser_Returns401();

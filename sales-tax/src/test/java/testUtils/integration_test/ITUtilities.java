@@ -22,7 +22,7 @@ import java.util.UUID;
 
 public interface ITUtilities {
 
-    String NON_EXISTING_COMPLYT_ID = "1111111-1111-1111-1111-111111111111";
+    String NON_EXISTING_COMPLYT_ID = "d18068f0-6d98-4b0d-ba19-4536f0b4173a";
 
     // if no items provided, puts a default stub
     static TransactionDto stubTransactionDto(String externalId, UUID customerId, ItemDto... items) {

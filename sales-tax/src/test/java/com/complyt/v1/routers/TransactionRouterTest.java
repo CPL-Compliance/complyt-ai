@@ -103,6 +103,26 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .value(transactionItem -> transactionItem, equalTo(transactionDto));
     }
 
+    @Test
+    @Override
+    @WithMockUser
+    public void getByExternalIdAndSource_PathVariableInvalid_Returns400() {
+        // Given
+        String externalId = "null";
+        String source = transactionDto.source();
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
     @Override
     @Test
     @WithMockUser
@@ -254,6 +274,37 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
+    public void getAll_QueryParamInvalid_Returns400() {
+        // Given
+        String firstId = UUID.randomUUID().toString();
+        String secondId = UUID.randomUUID().toString();
+        TransactionDto transactionNoId = transactionDto.withExternalId(firstId);
+        TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
+        Transaction firstTransaction = transaction.withExternalId(firstId);
+        Transaction secondTransaction = transaction.withExternalId(secondId);
+        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>() {{
+            add(transactionNoId);
+            add(secondTransactionNoId);
+        }};
+
+        // When
+        when(transactionFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.just(firstTransaction, secondTransaction));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("page", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         // Given
         List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
@@ -351,6 +402,64 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
+    public void getAllBySource_QueryParamInvalid_Returns400() {
+        // Given
+        String firstId = UUID.randomUUID().toString();
+        String secondId = UUID.randomUUID().toString();
+        TransactionDto transactionNoId = transactionDto.withExternalId(firstId);
+        TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
+        Transaction firstTransaction = transaction.withExternalId(firstId);
+        Transaction secondTransaction = transaction.withExternalId(secondId);
+        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>() {{
+            add(transactionNoId);
+            add(secondTransactionNoId);
+        }};
+
+        // When
+        when(transactionFacade.getAllBySource(source)).thenReturn(Flux.just(firstTransaction, secondTransaction));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source)
+                        .queryParam("size", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAllBySource_PathVariableInvalid_Returns400() {
+        // Given
+        String firstId = UUID.randomUUID().toString();
+        String secondId = UUID.randomUUID().toString();
+        TransactionDto transactionNoId = transactionDto.withExternalId(firstId);
+        TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
+        Transaction firstTransaction = transaction.withExternalId(firstId);
+        Transaction secondTransaction = transaction.withExternalId(secondId);
+        String sourceError = "null";
+
+        // When
+        when(transactionFacade.getAllBySource(source)).thenReturn(Flux.just(firstTransaction, secondTransaction));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + sourceError)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
     public void getAllBySource_EmptyCollection_Returns200WithEmptyList() {
         // Given
         List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
@@ -438,6 +547,26 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .expectStatus().isOk()
                 .expectBody(TransactionDto.class)
                 .value(transactionItem -> transactionItem, equalTo(transactionDto));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getByComplytId_PathVariableInvalid_Returns400() {
+        // Given
+        UUID complytId = transaction.getComplytId();
+        String complytIdError = "null";
+        when(transactionFacade.findByComplytId(complytId)).thenReturn(Mono.just(transaction));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/complytId/" + complytIdError)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Test
@@ -934,6 +1063,33 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .value(returnedTransaction -> returnedTransaction, equalTo(transactionDto));
     }
 
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_PathVariableInvalid_Returns400() {
+        // Given
+        String externalId = transactionDto.externalId();
+        Transaction mappedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
+        Transaction updatedTransaction = mappedTransaction.withId(transaction.getId());
+        String sourceError = "null";
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(mappedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, mappedTransaction, transaction)).thenReturn(Mono.just(updatedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + sourceError + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(transactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
     @Override
     @Test
     @WithMockUser
@@ -953,6 +1109,28 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNoContent();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void deleteByExternalIdAndSource_PathVariableInvalid_Returns400() {
+        // Given
+        Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
+        String externalId = transactionDto.externalId();
+        String sourceError = "null";
+
+        // When + Then
+        when(transactionFacade.markAsCancelled(externalId, source)).thenReturn(Mono.just(cancelledTransaction));
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + sourceError + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Test

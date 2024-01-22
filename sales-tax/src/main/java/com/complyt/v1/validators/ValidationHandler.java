@@ -1,8 +1,6 @@
 package com.complyt.v1.validators;
 
-import com.complyt.v1.exceptions.types.ConflictedDataApiException;
-import com.complyt.v1.exceptions.types.MissingBodyApiException;
-import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
+import com.complyt.v1.exceptions.types.*;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,6 +13,7 @@ import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -33,10 +32,21 @@ public class ValidationHandler<T, U extends Validator> {
     @NonNull
     CustomBodyExtractor<T> customBodyExtractor;
 
-    private Mono<T> onValidationErrors(Errors errors) {
-        return Mono.error(new ObjectNotValidApiException(errors));
-    }
+    @NonNull
+    ParameterChecksProvider pathVariableChecksProvider;
 
+    @NonNull
+    ParameterChecksProvider queryParamChecksProvider;
+
+    @NonNull
+    ShouldCallValidate shouldCallValidate;
+
+    public Mono<T> handle(final ServerRequest serverRequest) {
+
+        return validatePathVariable(serverRequest)
+                .then(validateQueryParam(serverRequest))
+                .then(Mono.defer(() -> shouldCallValidate.apply(serverRequest) ? validate(serverRequest) : Mono.empty()));
+    }
 
     private Mono<T> validateRequestBody(final ServerRequest request) {
         return customBodyExtractor.extract(request)
@@ -48,13 +58,13 @@ public class ValidationHandler<T, U extends Validator> {
                     if (errors.getAllErrors().isEmpty()) {
                         return Mono.just(body);
                     } else {
-                        return onValidationErrors(errors);
+                        return Mono.error(new ObjectNotValidApiException(errors));
                     }
                 })
                 .switchIfEmpty(Mono.error(new MissingBodyApiException()));
     }
 
-    public final Mono<T> validate(final ServerRequest serverRequest) {
+    private Mono<T> validate(final ServerRequest serverRequest) {
         return this.validateRequestBody(serverRequest)
                 .flatMap(body -> Flux.fromIterable(serverRequest.pathVariables().keySet())
                         .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)
@@ -65,4 +75,28 @@ public class ValidationHandler<T, U extends Validator> {
                         .flatMap(errorList -> errorList.isEmpty() ? Mono.just(body) :
                                 Mono.error(new ConflictedDataApiException(errorList))));
     }
+
+    private Mono<Boolean> validateQueryParam(final ServerRequest serverRequest) {
+        return queryParamChecksProvider.doesParamExist(serverRequest)
+                .then(Flux.fromIterable(serverRequest.queryParams().entrySet())
+                        .flatMap(entry -> Flux.fromIterable(entry.getValue())
+                                .flatMap(paramValue -> queryParamChecksProvider.getFunctionCheck(entry.getKey())
+                                        .flatMapMany(check -> check.apply(paramValue))))
+                        .collectList()
+                        .flatMap(errorList -> errorList.isEmpty() ? Mono.just(true) :
+                                Mono.error(new QueryParamErrorException(errorList))))
+                .switchIfEmpty(Mono.just(true));
+    }
+
+
+    private Mono<Boolean> validatePathVariable(final ServerRequest serverRequest) {
+        return Flux.fromIterable(serverRequest.pathVariables().entrySet())
+                .flatMapSequential(entry -> pathVariableChecksProvider.getFunctionCheck(entry.getKey())
+                        .flatMapMany(check -> check.apply(entry.getValue())))
+                .collectList()
+                .flatMap(errorList -> errorList.isEmpty() ? Mono.just(true) :
+                        Mono.error(new PathVariableErrorException(errorList)));
+    }
+
+
 }

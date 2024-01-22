@@ -3,6 +3,8 @@ package testUtils.unit_test.templates.endpoints;
 public interface UpsertByComplytIdRouterTestTemplate {
     void upsertByComplytId_Exists_Returns200();
 
+    void upsertByComplytId_PathVariableInvalid_Returns400();
+
     void upsertByComplytId_DoesntExists_Returns404();
 
     void upsertByComplytId_CoupleValidationsFailure_Returns400WithErrorList();

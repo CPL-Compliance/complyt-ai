@@ -22,4 +22,18 @@ public interface DtoErrorMessages {
                                   "For date/time fields please provide a " + FieldsDescriptions.TIMESTAMP_FORMAT;
 
     String LOCALDATE_FORMAT_ERROR = "must be in the format yyyy-mm-dd";
+
+    String COMPLYT_ID_FORMAT_ERROR = "complyt ID has to be in UUID format";
+
+    String SOURCE_FORMAT_ERROR = "source has to be in range 1-9";
+
+    String PAGE_FORMAT_ERROR = "page has to be numeric";
+
+    String SIZE_FORMAT_ERROR = "size has to be numeric";
+
+    String EXTERNAL_ID_NOT_NULL_ERROR = "externalId can not be null or undefined";
+
+    String STATE_FORMAT_ERROR = "invalid state provided. Please provide a valid state name or abbreviation.\";";
+
+
 }

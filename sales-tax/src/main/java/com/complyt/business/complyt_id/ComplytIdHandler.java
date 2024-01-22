@@ -12,6 +12,7 @@ import java.util.UUID;
 
 @Component
 public class ComplytIdHandler<T extends ComplytIdProperty> {
+
     public Mono<T> checkComplytIdOfUpdatedEqualsToOld(@NonNull T newEntity, @NonNull T oldEntity) {
         return newEntity.getComplytId() == null || newEntity.getComplytId().equals(oldEntity.getComplytId()) ?
                 Mono.just(newEntity) : Mono.error(new ConflictedDataApiException(List.of(DtoErrorMessages.COMPLYT_ID_CANNOT_BE_UPDATED_ERROR)));

@@ -49,7 +49,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     private final StateDto existingState = new StateDto("AZ", "04", "Arizona");
     private final StateDto newState = new StateDto("AL", "01", "Alabama");
     private final StateDto stateWithNexus = new StateDto("TX", "48", "Texas");
-    private final StateDto stateWithOldRule = new StateDto("Kaedwen", "101", "KD");
+    private final StateDto stateWithOldRule = new StateDto("HI", "101", "Hawaii");
 
     @MockBean
     TenantResolver tenantResolver;
@@ -165,7 +165,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     @WithMockUser
     public void refreshByStateAndDate_DoesntExists_Returns404NotFound() {
-        String state = "Redenia";
+        String state = "DE";
 
         // Then
         webTestClient
@@ -186,7 +186,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     @WithMockUser
     public void refreshByStateAndDate_DoesNotPassValidation_Returns400() {
-        String state = "Redenia";
+        String state = "DE";
         String badDate = "4323/200/23";
 
         // Then
@@ -226,6 +226,22 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     @WithMockUser
+    public void getAll_QueryParamInvalid_Returns400() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("page", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
     public void getByAll_DoesntExists_Returns200EmptyList() {
         // Given
         when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
@@ -241,6 +257,26 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isOk()
                 .expectBodyList(SalesTaxTrackingDto.class)
                 .value(list -> assertEquals(list.size(), 0));
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void getByAll_QueryParamInvalid_Returns400() {
+        // Given
+        when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("size", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -268,6 +304,22 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     @WithMockUser
+    public void getByComplytId_PathVariableInvalid_Returns400() {
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/complytId/" + "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
     public void getByComplytId_DoesntExists_Returns404() {
         // Then
         webTestClient
@@ -278,21 +330,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
-    }
-
-    @Order(2)
-    @Test
-    @Override
-    @WithMockUser
-    public void getByComplytId_complytIdDoesntParse_Returns500() {
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/complytId/invalid")
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is5xxServerError();
     }
 
     @Order(2)
@@ -310,6 +347,21 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.state().name(), existingState.name()));
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void getByStateName_PathVariableInvalid_Returns400() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -418,6 +470,27 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                                 .withNexusStateRule(ITUtilities.stubAlabamaNexusStateRuleDto()),
                         resultSalesTaxTrackingDto)
                 );
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_PathVariableInvalid_Returns400() {
+        // Given
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState).withComment("a new comment");
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/null" )
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(1)

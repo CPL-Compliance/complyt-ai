@@ -6,6 +6,8 @@ public interface UpsertByExternalIdAndSourceITTemplate extends PutITTemplate {
 
     void upsertByExternalIdAndSource_Exists_Returns200();
 
+    void upsertByExternalIdAndSource_PathVariableInvalid_Returns400();
+
     void upsertByExternalIdAndSource_DoesntExists_Returns201();
 
     void upsertByExternalIdAndSource_DoesntExistsWithComplytId_Returns400ConflictedData();
