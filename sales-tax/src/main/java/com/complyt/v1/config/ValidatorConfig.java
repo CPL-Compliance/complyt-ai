@@ -34,7 +34,8 @@ public class ValidatorConfig {
 
     ParameterChecksProvider queryParamChecker = new ParameterChecksProvider(Map.of(
             "page", ParamCheckerFunctions.PAGE_CHECK,
-            "size", ParamCheckerFunctions.SIZE_CHECK));
+            "size", ParamCheckerFunctions.SIZE_CHECK,
+            "date", ParamCheckerFunctions.DATE_CHECK));
 
     ShouldCallValidate shouldCallValidate = new ShouldCallValidate(Map.of(
             HttpMethod.PUT, "^/v1/transactions/source/[^/]+/externalId/[^/]+$|"

@@ -133,4 +133,28 @@ public class ParamCheckerFunctionsTest {
                 .expectNext(DtoErrorMessages.STATE_FORMAT_ERROR)
                 .verifyComplete();
     }
+
+    @Test
+    public void dateCheck_InvalidFormat_ReturnsErrorMessage() {
+        // Given
+        String invalidDate = "invalidDate";
+        String errorMessage = "date must be in the format yyyy-mm-dd";
+        Mono<String> result = ParamCheckerFunctions.DATE_CHECK.apply(invalidDate);
+
+        // Then
+        StepVerifier.create(result)
+                .expectNext(errorMessage)
+                .verifyComplete();
+    }
+
+    @Test
+    public void dateCheck_ValidFormat_ReturnsEmptyMono() {
+        // Given
+        String validDate = "2022-01-21";
+        Mono<String> result = ParamCheckerFunctions.DATE_CHECK.apply(validDate);
+
+        // Then
+        StepVerifier.create(result)
+                .verifyComplete();
+    }
 }
