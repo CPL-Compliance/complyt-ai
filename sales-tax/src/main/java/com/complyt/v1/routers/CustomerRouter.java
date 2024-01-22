@@ -63,13 +63,4 @@ public class CustomerRouter {
         return RouterFunctions.route(getCustomerRoute, customerHandler::getByComplytId);
     }
 
-    @Bean
-    @GetCustomerByNameApiInfo
-    public RouterFunction<ServerResponse> getCustomerByNameRouterFunction(@NonNull final CustomerHandler customerHandler) {
-        RequestPredicate getCustomerRoute = RequestPredicates
-                .GET(BASE_URL + "/name/{name}")
-                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
-
-        return RouterFunctions.route(getCustomerRoute, customerHandler::getByName);
-    }
 }
