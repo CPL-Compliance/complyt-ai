@@ -240,6 +240,11 @@ public class UnitTestUtilities {
         }};
     }
 
+    public Item createItemWithNegativePrice(boolean withJurisdictionalRules, boolean withTangibleCategory) {
+        return new Item(new BigDecimal(-2000), new BigDecimal(4), new BigDecimal(-8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+                null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE);
+    }
+
     public List<Item> createItemsWithSalesTaxRate(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
             add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
@@ -267,6 +272,11 @@ public class UnitTestUtilities {
                     null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
 
         }};
+    }
+
+    public ItemDto createItemDtoWithNegativeAmount(boolean withJurisdictionalRules, boolean withTangibleCategory) {
+            return new ItemDto(new BigDecimal(-2000), new BigDecimal(4), new BigDecimal(-8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+                    null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE);
     }
 
     public SalesTaxRates createSalesTaxRates() {
