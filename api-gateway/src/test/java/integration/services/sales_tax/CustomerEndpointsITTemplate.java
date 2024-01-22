@@ -6,7 +6,6 @@ public interface CustomerEndpointsITTemplate extends
         UpsertByExternalIdAndSourceITTemplate,
         GetByExternalIdAndSourceITTemplate,
         GetByComplytIdITTemplate,
-        GetByNameITTemplate,
         GetAllITTemplate,
         GetAllBySourceTTemplate {
 }

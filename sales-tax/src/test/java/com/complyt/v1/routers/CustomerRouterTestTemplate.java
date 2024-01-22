@@ -7,7 +7,6 @@ import testUtils.unit_test.templates.validations.InternalTimestampsValidationTes
 public interface CustomerRouterTestTemplate extends
         GetByExternalIdAndSourceRouterTestTemplate,
         GetByComplytIdRouterTestTemplate,
-        GetByNameRouterTestTemplate,
         GetAllRouterTestTemplate,
         GetAllBySourceRouterTestTemplate,
         // Validation::ExternalId, Source, ComplytId

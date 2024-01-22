@@ -1110,105 +1110,6 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Test
     @Override
     @WithUserDetails
-    public void getByName_Exists_Returns200WithList() {
-        // Given
-        String name = "name";
-        List<Customer> customersFoundByName = new ArrayList<>() {{
-            add(customer);
-        }};
-
-        // WHen
-        when(customerFacade.findByName(name)).thenReturn(Flux.fromIterable(customersFoundByName));
-
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/name/" + name)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .equals(customersFoundByName);
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void getByName_EmptyCollection_Returns200WithEmptyList() {
-        // Given
-        String name = "name";
-        List<Customer> emptyCustomerList = new ArrayList<>();
-
-        // When
-        when(customerFacade.findByName(name)).thenReturn(Flux.empty());
-
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/name/" + name)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .equals(emptyCustomerList);
-    }
-
-    @Override
-    @Test
-    public void getByName_UnauthenticatedUser_Returns401() {
-        // Given
-        String name = "name";
-        List<Customer> customersFoundByName = new ArrayList<>() {{
-            add(customer);
-        }};
-
-        // When
-        when(customerFacade.findByName(name)).thenReturn(Flux.fromIterable(customersFoundByName));
-
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/name/" + name)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isUnauthorized();
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void getByName_UserWithoutAuthorities_Returns403() {
-        // ???
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void getByName_InternalServerError_Returns500() {
-        // Given
-        String name = "name";
-
-        // When
-        when(customerFacade.findByName(name)).thenReturn(Flux.error(new OperationFailedException()));
-
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/name/" + name)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Test
-    @Override
-    @WithUserDetails
     public void getAll_Exists_Returns200WithList() {
         // Given
         String id = UUID.randomUUID().toString();
@@ -1525,21 +1426,6 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // When
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
             customerRouter.getCustomerByComplytIdRouterFunction(nullCustomerHandler);
-        });
-
-        // Then
-        assertEquals("customerHandler is marked non-null but is null", exception.getMessage());
-    }
-
-    @Test
-    public void getByName_NullHandler_ThrowsNullPointerException() {
-        // Given
-        CustomerHandler nullCustomerHandler = null;
-        CustomerRouter customerRouter = new CustomerRouter();
-
-        // When
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            customerRouter.getCustomerByNameRouterFunction(nullCustomerHandler);
         });
 
         // Then

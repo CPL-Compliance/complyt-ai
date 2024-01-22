@@ -124,17 +124,4 @@ public class CustomerHandler {
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
     }
-
-    @CustomerReadPermission
-    public Mono<ServerResponse> getByName(ServerRequest serverRequest) {
-        String name = serverRequest.pathVariable("name");
-        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
-
-        Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info)
-                    .thenMany(customerfacade.findByName(name)
-                    .map(CustomerMapper.INSTANCE::customerToCustomerDto)
-                    .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto)));
-
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoFlux, CustomerDto.class);
-    }
 }

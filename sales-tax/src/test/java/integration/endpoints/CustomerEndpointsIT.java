@@ -368,48 +368,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .expectStatus().isNotFound();
     }
 
-    @Order(2)
-    @Test
-    @Override
-    @WithMockUser
-    public void getByName_Exists_Returns200() {
-        // Given
-        String name = "best";
-
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/name/" + name)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(CustomerDto.class)
-                .value(list -> assertTrue(list.size() > 0));
-    }
-
-    @Order(2)
-    @Test
-    @Override
-    @WithMockUser
-    public void getByName_DoesntExists_Returns200EmptyList() {
-        // Given
-        String name = "nonExisting";
-
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/name/" + name)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(CustomerDto.class)
-                .value(list -> assertEquals(list.size(), 0));
-    }
-
     @Order(3)
     @Test
     @Override
