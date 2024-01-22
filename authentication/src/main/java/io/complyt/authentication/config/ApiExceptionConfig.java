@@ -1,6 +1,7 @@
 package io.complyt.authentication.config;
 
 import io.complyt.authentication.annotations.Generated;
+import io.complyt.authentication.v1.exceptions.types.ApiKeyNotValidException;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotValidApiException;
 import org.springframework.boot.autoconfigure.web.WebProperties;
@@ -28,7 +29,8 @@ public class ApiExceptionConfig {
     public Map<Class<? extends Exception>, HttpStatus> exceptionToStatusCode() {
         return Map.of(
                 ObjectNotFoundApiException.class, HttpStatus.NOT_FOUND,
-                ObjectNotValidApiException.class, HttpStatus.BAD_REQUEST
+                ObjectNotValidApiException.class, HttpStatus.BAD_REQUEST,
+                ApiKeyNotValidException.class, HttpStatus.NOT_FOUND
         );
     }
 }

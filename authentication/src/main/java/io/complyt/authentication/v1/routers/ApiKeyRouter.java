@@ -19,4 +19,13 @@ public class ApiKeyRouter {
 
         return RouterFunctions.route(postApiKeyRoute, apiKeyHandler::post);
     }
+
+    @Bean
+    public RouterFunction<ServerResponse> deleteCredentialsRouterFunction(@NonNull final ApiKeyHandler apiKeyHandler) {
+        RequestPredicate postApiKeyRoute = RequestPredicates
+                .DELETE(BASE_URL)
+                .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED));
+
+        return RouterFunctions.route(postApiKeyRoute, apiKeyHandler::delete);
+    }
 }

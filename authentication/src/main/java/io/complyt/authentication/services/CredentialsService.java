@@ -6,6 +6,7 @@ import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import io.complyt.authentication.repositories.CredentialsRepository;
 import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
+import io.complyt.authentication.v1.exceptions.types.ApiKeyNotValidException;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -42,12 +43,24 @@ public class CredentialsService {
     @NonNull
     String audience;
 
+    public Mono<Credentials> getCredentialsByApiKeyAndDecrypt(final @NonNull ApiKey apiKey) {
+        return getCredentialsByApiKey(apiKey)
+                .filter(credentials -> credentials.getStatus().equals(ApiKeyStatus.ACTIVE))
+                .switchIfEmpty(Mono.empty())
+                .flatMap(this::decrypt);
+    }
+
     public Mono<Credentials> getCredentialsByApiKey(final @NonNull ApiKey apiKey) {
         return credentialsRepository.findByComplytClientId(apiKey.clientId())
                 .filter(credentials -> passwordEncoder.matches(apiKey.clientSecret(),
                         credentials.getComplytClientSecret()))
-                .switchIfEmpty(Mono.empty()).flatMap(this::decrypt);
+                .switchIfEmpty(Mono.error(new ApiKeyNotValidException()));
     }
+
+    public Mono<Credentials> markAsCancelled(final @NonNull ApiKey apiKey) {
+        return credentialsRepository.markAsCancelled(apiKey.clientId());
+    }
+
 
     public Mono<Credentials> saveCredentials(@NonNull Credentials credentials, @NonNull ApiKey apiKey) {
         return Mono.fromSupplier(() -> prepareCredentialsForSave(credentials, apiKey))

@@ -29,9 +29,12 @@ public class ApiKeyHandler {
     @NonNull
     ApiKeyFacade apiKeyFacade;
 
-
     @NonNull
     ValidationHandler<CredentialsDto, SpringValidatorAdapter> credentialsDtoValidationHandler;
+
+    @NonNull
+    ValidationHandler<ApiKeyDto, SpringValidatorAdapter> apiKeyDtoValidationHandler;
+
 
     @ApiKeyCreatePermission
     public Mono<ServerResponse> post(@NonNull ServerRequest serverRequest) {
@@ -48,4 +51,20 @@ public class ApiKeyHandler {
 
         return ServerResponse.created(serverRequest.uri()).body(value, TokenDto.class);
     }
+
+    public Mono<ServerResponse> delete(@NonNull ServerRequest serverRequest) {
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(),
+                serverRequest.path());
+
+        return ContextLogger.observeCtx(logStr, log::info)
+                .then(apiKeyDtoValidationHandler.handle(serverRequest))
+                .map(ApiKeyMapper.INSTANCE::apiKeyDtoToApiKey)
+                .flatMap(apiKeyFacade::markAsCancelled)
+                .then(ServerResponse.noContent().build())
+                .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code "
+                        + serverResponse.statusCode(), log::info).thenReturn(serverResponse));
+//                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+
+    }
+
 }
