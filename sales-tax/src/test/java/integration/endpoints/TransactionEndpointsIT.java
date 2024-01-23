@@ -6,6 +6,7 @@ import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.transaction.TransactionStatusDto;
@@ -27,7 +28,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.IntUnaryOperator;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -629,6 +632,33 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_CustomerIsNotExemptBecauseExemptionIsCancelled_ReturnsTaxableTransaction() {
         String externalId = "ThirdNonExistingIdForExemptionChecks";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_OneItemIsNegativeAmount_ReturnsTaxableTransaction() {
+        String externalId = "ThirdNonExistingIdForExemptionChecks";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto(),
+                        ITUtilities.stubItemDto().withUnitPrice(BigDecimal.valueOf(-100)).withTotalPrice(BigDecimal.valueOf(-100)))
                 .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 

@@ -121,6 +121,48 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isOk();
     }
 
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_ConflictingTransactionAmountIsNegative_Returns400ConflictedData() {
+        // Given
+        String externalId = "10005";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionItemIsNotAligned(externalId, customerId, null, true, null))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Override
+    public void upsertByExternalIdAndSource_ConflictingTransactionItemTotalIsNotAligned_Returns400ConflictedData() {
+        // Given
+        String externalId = "10005";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionTotalIsNegative(externalId, customerId, null, true, null))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
     @Override
     public void put_NoAccessToken_Returns401() {
         WEB_TEST_CLIENT
