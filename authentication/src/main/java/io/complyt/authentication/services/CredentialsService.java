@@ -62,12 +62,12 @@ public class CredentialsService {
     }
 
 
-    public Mono<Credentials> saveCredentials(@NonNull Credentials credentials, @NonNull ApiKey apiKey) {
-        return Mono.fromSupplier(() -> prepareCredentialsForSave(credentials, apiKey))
+    public Mono<Credentials> saveCredentials(@NonNull Credentials credentials, @NonNull ApiKey apiKey, @NonNull String tenantId, @NonNull String name) {
+        return Mono.fromSupplier(() -> prepareCredentialsForSave(credentials, apiKey, tenantId, name))
                 .flatMap(credentialsRepository::save);
     }
 
-    private Credentials prepareCredentialsForSave(Credentials credentials, ApiKey apiKey) {
+    private Credentials prepareCredentialsForSave(Credentials credentials, ApiKey apiKey, String tenantId, String name) {
         EncryptedData clientIdEncryptedData;
         EncryptedData clientSecretEncryptedData;
 
@@ -83,7 +83,7 @@ public class CredentialsService {
         String clientSecretEncoded = passwordEncoder.encode(clientSecret);
 
         Credentials encryptedCredentials = createEncryptedCredentials(apiKey, clientIdEncryptedData, clientSecretEncryptedData,
-                clientSecretEncoded);
+                clientSecretEncoded, tenantId, name);
 
         return encryptedCredentials.withStatus(ApiKeyStatus.ACTIVE);
     }
@@ -118,12 +118,14 @@ public class CredentialsService {
 
     private Credentials createEncryptedCredentials(ApiKey apiKey, EncryptedData clientIdEncryptedData,
                                                    EncryptedData clientSecretEncryptedData,
-                                                   String clientSecretEncoded) {
+                                                   String clientSecretEncoded, String tenantId, String name) {
         return Credentials.builder().clientId(clientIdEncryptedData.cipherText())
                 .clientIdIv(clientIdEncryptedData.iv())
                 .clientSecret(clientSecretEncryptedData.cipherText())
                 .clientSecretIv(clientSecretEncryptedData.iv()).audience(audience).grantType(grantType)
                 .complytClientId(apiKey.clientId())
+                .tenantId(tenantId)
+                .name(name)
                 .complytClientSecret(clientSecretEncoded).build();
     }
 }

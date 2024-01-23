@@ -17,7 +17,7 @@ public class WebClientConfig {
 
     @Bean
     public WebClient webClient(WebClient.Builder webClientBuilder,
-                               @NonNull @Value("${authorization.authorization-server-url}") String serverUrl) {
+                               @NonNull @Value("${authorization.authorization-server-base-url}") String serverUrl) {
         return webClientBuilder.clientConnector(
                         new ReactorClientHttpConnector(
                                 HttpClient.create()

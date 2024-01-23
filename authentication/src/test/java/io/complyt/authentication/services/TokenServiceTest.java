@@ -387,7 +387,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenReturn(scopePlainText);
 
         // Then
-        Mono<Token> tokenMono = tokenService.findByApiKey(apiKey);
+        Mono<Token> tokenMono = tokenService.findByApiKeyAndDecrypt(apiKey);
 
         StepVerifier.create(tokenMono).expectNext(token).verifyComplete();
     }
@@ -401,7 +401,7 @@ class TokenServiceTest {
         when(tokenRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.empty());
 
         // Then
-        Mono<Token> tokenMono = tokenService.findByApiKey(apiKey);
+        Mono<Token> tokenMono = tokenService.findByApiKeyAndDecrypt(apiKey);
 
         StepVerifier.create(tokenMono).verifyComplete();
     }
@@ -428,7 +428,7 @@ class TokenServiceTest {
                 .thenReturn(false);
 
         // Then
-        Mono<Token> tokenMono = tokenService.findByApiKey(apiKey);
+        Mono<Token> tokenMono = tokenService.findByApiKeyAndDecrypt(apiKey);
 
         StepVerifier.create(tokenMono).verifyComplete();
     }
@@ -436,7 +436,7 @@ class TokenServiceTest {
     @Test
     void findByApiKey_apiKeyIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            tokenService.findByApiKey(null);
+            tokenService.findByApiKeyAndDecrypt(null);
         });
 
         assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");

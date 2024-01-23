@@ -25,5 +25,7 @@ public class Credentials {
     String clientSecretIv;
     String audience;
     String grantType;
+    String tenantId;
+    String name;
     ApiKeyStatus status;
 }

@@ -58,7 +58,7 @@ class TokenFacadeTest {
         token = TestUtilities.createOutputToken();
 
         // When
-        when(tokenService.findByApiKey(any())).thenReturn(Mono.just(token));
+        when(tokenService.findByApiKeyAndDecrypt(any())).thenReturn(Mono.just(token));
 
         // Then
         Mono<Token> actualtokenMono = tokenFacade.getToken(apiKey);
@@ -73,8 +73,8 @@ class TokenFacadeTest {
         Token somethingElseToken = token.withAccessToken("Something else");
 
         // When
-        when(tokenService.findByApiKey(any())).thenReturn(Mono.empty());
-        when(credentialsService.getCredentialsByApiKey(any())).thenReturn(Mono.just(credentials));
+        when(tokenService.findByApiKeyAndDecrypt(any())).thenReturn(Mono.empty());
+        when(credentialsService.getCredentialsByApiKeyAndDecrypt(any())).thenReturn(Mono.just(credentials));
         when(authorizationService.getToken(any())).thenReturn(Mono.just(somethingElseToken));
         when(tokenService.saveToken(any())).thenReturn(Mono.just(somethingElseToken));
 

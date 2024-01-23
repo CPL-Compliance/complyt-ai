@@ -61,7 +61,7 @@ class CredentialsServiceTest {
                 .thenReturn(false);
 
         // Then
-        Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKey(apiKey);
+        Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
         StepVerifier.create(credentialsByApiKeyMono).verifyComplete();
     }
 
@@ -74,7 +74,7 @@ class CredentialsServiceTest {
         when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.empty());
 
         // Then
-        Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKey(apiKey);
+        Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
         StepVerifier.create(credentialsByApiKeyMono).verifyComplete();
     }
 
@@ -97,7 +97,7 @@ class CredentialsServiceTest {
                 credentials.getClientSecret()))).thenReturn(credentials.getClientSecret());
 
         // Then
-        Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKey(apiKey);
+        Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
         StepVerifier.create(credentialsByApiKeyMono).expectNext(decryptedCreds).verifyComplete();
     }
 
@@ -117,7 +117,7 @@ class CredentialsServiceTest {
                 credentials.getClientId()))).thenThrow(new BadPaddingException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.getCredentialsByApiKey(apiKey);
+        Mono<Credentials> credentialsMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -138,7 +138,7 @@ class CredentialsServiceTest {
                 credentials.getClientId()))).thenThrow(new IllegalBlockSizeException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.getCredentialsByApiKey(apiKey);
+        Mono<Credentials> credentialsMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -159,7 +159,7 @@ class CredentialsServiceTest {
                 credentials.getClientId()))).thenThrow(new InvalidAlgorithmParameterException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.getCredentialsByApiKey(apiKey);
+        Mono<Credentials> credentialsMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -180,7 +180,7 @@ class CredentialsServiceTest {
                 credentials.getClientId()))).thenThrow(new InvalidKeyException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.getCredentialsByApiKey(apiKey);
+        Mono<Credentials> credentialsMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -201,7 +201,7 @@ class CredentialsServiceTest {
                 credentials.getClientId()))).thenThrow(new NoSuchPaddingException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.getCredentialsByApiKey(apiKey);
+        Mono<Credentials> credentialsMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -222,7 +222,7 @@ class CredentialsServiceTest {
                 credentials.getClientId()))).thenThrow(new NoSuchAlgorithmException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.getCredentialsByApiKey(apiKey);
+        Mono<Credentials> credentialsMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -364,7 +364,7 @@ class CredentialsServiceTest {
     @Test
     void getCredentialsByApiKey_apiKeyIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            credentialsService.getCredentialsByApiKey(null);
+            credentialsService.getCredentialsByApiKeyAndDecrypt(null);
         });
 
         assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");

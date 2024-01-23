@@ -5,6 +5,7 @@ import io.complyt.authentication.business.authorization.Auth0AccessToken;
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.Token;
+import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import io.complyt.authentication.security.EncryptedData;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
@@ -86,7 +87,7 @@ public class TestUtilities {
     public static Credentials createCredentials() {
         return new Credentials("id", "complytClientId", "complytClientSecret",
                 "ClientID", "ClientSecret", "Audience", "GrantType",
-                "audience", "Grant Type");
+                "audience", "Grant Type", ApiKeyStatus.ACTIVE);
     }
 
     public static ApiKey createApiKey() {

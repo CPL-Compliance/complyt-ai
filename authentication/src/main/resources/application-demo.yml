@@ -71,4 +71,5 @@ authorization:
   issuer-uri: ${issuer-uri}
   grant-type: ${grant-type}
   audience: ${audience}
-  authorization-server-url: ${authorization-server-url}
+  authorization-server-base-url: ${authorization-server-base-url}
+  management-audience: ${management-audience}

@@ -1,5 +1,6 @@
 package io.complyt.authentication.business.authorization;
 
+import io.swagger.v3.core.util.Json;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -19,4 +20,21 @@ public class StubAuth0AuthorizationServerWrapper implements AuthorizationServerW
                                             @NonNull String audience, @NonNull String grantType) {
         return Mono.just(new AccessToken(accessToken, scope, expiresIn, tokenType));
     }
+
+    @Override
+    public Mono<Auth0Client> removeApiKeyFromClient(@NonNull String clientName, @NonNull String clientId, @NonNull String tenantId) {
+        return null;
+    }
+
+    @Override
+    public Mono<AccessToken> getManagementAccessToken(@NonNull String clientId, @NonNull String clientSecret, @NonNull String audience, @NonNull String grantType) {
+        return null;
+    }
+
+    @Override
+    public Mono<Auth0Client> getTenantIdAndClientNameFromAuth0(@NonNull String clientId, @NonNull AccessToken accessToken) {
+        return null;
+    }
+
+
 }
