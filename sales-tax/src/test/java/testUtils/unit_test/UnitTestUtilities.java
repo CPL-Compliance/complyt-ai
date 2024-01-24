@@ -26,6 +26,7 @@ import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
+import com.complyt.v1.validators.body_checkers.ItemsAlignmentChecker;
 import com.complyt.v1.validators.body_checkers.TransactionDtoShippingAddressChecker;
 import com.complyt.v1.validators.body_checkers.TransactionTotalAmountChecker;
 import feign.Body;
@@ -281,10 +282,6 @@ public class UnitTestUtilities {
         return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
     }
 
-//    public Discount createDiscount(BigDecimal discountAmount, boolean isPreTax, String discountDescription) {
-//        return new Discount(discountAmount, isPreTax, discountDescription);
-//    }
-
     public ShippingFee createShippingFeeWithSalesTaxRates(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
         return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, createSalesTaxRates(), "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
@@ -294,11 +291,6 @@ public class UnitTestUtilities {
         JurisdictionalSalesTaxRulesDto rules = createJurisdictionalSalesTaxRulesDto();
         return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
     }
-
-//    public DiscountDto createDiscountDto(BigDecimal discountAmount, boolean isPreTax, String discountDescription) {
-//        return new DiscountDto(discountAmount, isPreTax, discountDescription);
-//    }
-
 
     public JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
         return new JurisdictionalSalesTaxRules("California", "CA", true,
@@ -458,7 +450,8 @@ public class UnitTestUtilities {
         return new BodyCheckConfig(
                 List.of(
                         new TransactionDtoShippingAddressChecker(),
-                        new TransactionTotalAmountChecker()
+                        new TransactionTotalAmountChecker(),
+                        new ItemsAlignmentChecker()
                 ));
     }
 

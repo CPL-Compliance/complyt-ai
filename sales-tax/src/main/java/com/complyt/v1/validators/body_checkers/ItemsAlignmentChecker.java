@@ -8,7 +8,6 @@ import reactor.core.publisher.Flux;
 public class ItemsAlignmentChecker implements DtoBodyChecker<TransactionDto> {
     @Override
     public Flux<String> check(TransactionDto transactionDto) {
-
         return transactionDto.items().stream()
                 .map(this::checkItemAlignment)
                 .reduce(true, Boolean::logicalAnd) ?

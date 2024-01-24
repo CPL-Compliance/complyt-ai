@@ -55,7 +55,7 @@ public class ValidatorConfig {
                 new DataConflictChecksProvider(Map.of(
                         "source", CustomerDto.SOURCE_CONFLICT_CHECK,
                         "externalId", CustomerDto.EXTERNAL_ID_CONFLICT_CHECK),
-                                                          null),
+                        null),
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,
                 queryParamChecker,
@@ -70,8 +70,8 @@ public class ValidatorConfig {
                         "externalId", TransactionDto.EXTERNAL_ID_CONFLICT_CHECK),
                         new BodyCheckConfig(List.of(
                                 new TransactionDtoShippingAddressChecker(),
-                                new TransactionTotalAmountChecker(),
-                                new ItemsAlignmentChecker()
+                                new ItemsAlignmentChecker(),
+                                new TransactionTotalAmountChecker()
                         )).transactionDtoFluxFunction()),
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,
