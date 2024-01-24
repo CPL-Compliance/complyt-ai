@@ -16,8 +16,6 @@ import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ComplytSalesTaxRatesDto;
 import com.complyt.v1.router.ComplytSalesTaxRatesRouter;
-import com.complyt.v1.validators.ParameterChecksProvider;
-import com.complyt.v1.validators.ShouldCallValidate;
 import com.complyt.v1.validators.query_params.AddressDtoQueryParamsExtractor;
 import com.example.complyt.config.SecurityConfig;
 import org.junit.jupiter.api.Test;
@@ -586,10 +584,10 @@ public class ComplytSalesTaxRatesRouterTest {
     @WithMockUser
     public void findByAddress_LengthGreaterThen200Street_Returns400ValidationError() {
         // Given
-        String countyWithLength101 = TestUtilities.stringWithLength(201);
+        String streetWithLength101 = TestUtilities.stringWithLength(201);
 
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
-                .withStreet(countyWithLength101);
+                .withStreet(streetWithLength101);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.street " + StringErrorMessages.MAX_200_ERROR));
 
         // When + Then
