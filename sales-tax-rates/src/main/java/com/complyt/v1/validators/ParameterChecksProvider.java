@@ -1,6 +1,5 @@
 package com.complyt.v1.validators;
 
-import com.complyt.v1.validators.param_checker.ParameterCheckableDefault;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

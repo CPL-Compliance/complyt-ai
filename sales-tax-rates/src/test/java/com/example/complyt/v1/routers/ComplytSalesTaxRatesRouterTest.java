@@ -16,6 +16,8 @@ import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ComplytSalesTaxRatesDto;
 import com.complyt.v1.router.ComplytSalesTaxRatesRouter;
+import com.complyt.v1.validators.ParameterChecksProvider;
+import com.complyt.v1.validators.ShouldCallValidate;
 import com.complyt.v1.validators.query_params.AddressDtoQueryParamsExtractor;
 import com.example.complyt.config.SecurityConfig;
 import org.junit.jupiter.api.Test;
@@ -544,7 +546,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressDto.city())
                         .queryParam("state", addressDto.state())
                         .queryParam("street", addressDto.street())
-                        .queryParam("county", addressDto.county())
+//                        .queryParam("county", addressDto.county())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -557,7 +559,6 @@ public class ComplytSalesTaxRatesRouterTest {
     public void findByAddress_LengthGreaterThen100County_Returns400ValidationError() {
         // Given
         String countyWithLength101 = TestUtilities.stringWithLength(101);
-        ;
 
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
                 .withCounty(countyWithLength101);
@@ -585,10 +586,10 @@ public class ComplytSalesTaxRatesRouterTest {
     @WithMockUser
     public void findByAddress_LengthGreaterThen200Street_Returns400ValidationError() {
         // Given
-        String streetWithLength101 = TestUtilities.stringWithLength(201);
+        String countyWithLength101 = TestUtilities.stringWithLength(201);
 
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
-                .withStreet(streetWithLength101);
+                .withStreet(countyWithLength101);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.street " + StringErrorMessages.MAX_200_ERROR));
 
         // When + Then
@@ -601,7 +602,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressDto.city())
                         .queryParam("state", addressDto.state())
                         .queryParam("street", addressDto.street())
-                        .queryParam("county", addressDto.county())
+//                        .queryParam("county", addressDto.county())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -628,8 +629,8 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("zip", addressDto.zip())
                         .queryParam("city", addressDto.city())
                         .queryParam("state", addressDto.state())
-                        .queryParam("street", addressDto.street())
-                        .queryParam("county", addressDto.county())
+                        .queryParam("street", addressDto.county())
+                        .queryParam("county", "addressDto.county()")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

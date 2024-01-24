@@ -38,7 +38,7 @@ public class ComplytSalesTaxRatesHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<ComplytSalesTaxRatesDto> complytSalesTaxRatesDto = ContextLogger.observeCtx(logStr, log::info)
-                .then(addressDtoValidationHandler.validate(serverRequest))
+                .then(addressDtoValidationHandler.handle(serverRequest))
                 .map(AddressMapper.INSTANCE::addressDtoToAddress)
                 .flatMap(complytSalesTaxRatesFacadeFacade::findByAddress)
                 .map(ComplytSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesToComplytSalesTaxRates)
