@@ -98,7 +98,7 @@ public interface TransactionRouterTestTemplate extends
 
     void upsert_EmptyItemsList_Returns400ValidationError();
 
-    void upsert_ItemWithQuantityAndAmountThatDoesNotEqualToTotalAmount_Returns400DataConflict();
+    void upsert_ItemWithQuantityAndAmountThatDoesNotHaveTheSameSignAsToTotalAmount_Returns400DataConflict();
 
     void upsert_TotalItemsAmountIsNegative_Returns400DataConflict();
 

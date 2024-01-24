@@ -19,7 +19,6 @@ public class TotalItemsAmountCalculator implements AmountCalculator<List<Taxable
         }
         log.debug("Total Items price calculated: " + amount);
 
-
         return amount;
     }
 }
