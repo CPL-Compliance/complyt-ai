@@ -4,9 +4,8 @@ import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-public class ItemsTotalPriceChecker implements DtoBodyChecker<TransactionDto> {
+public class ItemsAlignmentChecker implements DtoBodyChecker<TransactionDto> {
     @Override
     public Flux<String> check(TransactionDto transactionDto) {
 
@@ -18,7 +17,7 @@ public class ItemsTotalPriceChecker implements DtoBodyChecker<TransactionDto> {
     }
 
     private boolean checkItemAlignment(ItemDto itemDto) {
-        return itemDto.totalPrice()
-                .compareTo(itemDto.unitPrice().multiply(itemDto.quantity())) == 0;
+        return itemDto.totalPrice().signum() == itemDto.unitPrice().multiply(itemDto.quantity()).signum();
     }
+
 }

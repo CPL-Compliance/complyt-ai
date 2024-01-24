@@ -10,7 +10,7 @@ import com.complyt.v1.models.nexus.DateWrapperDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.DataConflictChecksProvider;
 import com.complyt.v1.validators.ValidationHandler;
-import com.complyt.v1.validators.body_checkers.ItemsTotalPriceChecker;
+import com.complyt.v1.validators.body_checkers.ItemsAlignmentChecker;
 import com.complyt.v1.validators.body_checkers.TransactionDtoShippingAddressChecker;
 import com.complyt.v1.validators.body_checkers.TransactionTotalAmountChecker;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractorEmpty;
@@ -45,7 +45,7 @@ public class ValidatorConfig {
                         new BodyCheckConfig(List.of(
                                 new TransactionDtoShippingAddressChecker(),
                                 new TransactionTotalAmountChecker(),
-                                new ItemsTotalPriceChecker()
+                                new ItemsAlignmentChecker()
                         )).transactionDtoFluxFunction()),
                 new CustomBodyExtractorEmpty<>());
     }

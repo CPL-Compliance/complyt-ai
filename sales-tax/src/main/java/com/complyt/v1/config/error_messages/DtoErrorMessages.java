@@ -25,5 +25,5 @@ public interface DtoErrorMessages {
 
     String TOTAL_AMOUNT_AFTER_DISCOUNT_IS_BELOW_ZERO = "The transaction total amount after discount is below 0";
 
-    String ONE_OF_THE_ITEMS_IS_UNALIGNED = "At least one of the item's total price isn't matching the quantity multiply bt the unit Price";
+    String ONE_OF_THE_ITEMS_IS_UNALIGNED = "At least one of the item's total price hasn't the same sign as the amount (one is negative and one is positive)";
 }

@@ -655,7 +655,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_OneItemIsNegativeAmount_ReturnsTaxableTransaction() {
-        String externalId = "ThirdNonExistingIdForExemptionChecks";
+        String externalId = "NonExistingIdNegativeAmount";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto(),
                         ITUtilities.stubItemDto().withUnitPrice(BigDecimal.valueOf(-100)).withTotalPrice(BigDecimal.valueOf(-100)))
@@ -676,5 +676,4 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
     }
-
 }
