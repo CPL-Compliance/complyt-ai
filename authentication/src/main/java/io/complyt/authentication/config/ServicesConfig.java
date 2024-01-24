@@ -40,8 +40,7 @@ public class ServicesConfig {
 
     @Bean
     AuthorizationService authorizationService(@Qualifier("authorizationServerWrapper") @NonNull AuthorizationServerWrapper auth0AuthorizationServerWrapper,
-                                              @NonNull @Value("${authorization.management-audience}") String audience,
-                                              @NonNull @Value("${authorization.grant-type}") String grantType) {
-        return new AuthorizationService(auth0AuthorizationServerWrapper, audience, grantType);
+                                              @NonNull Crypto cryptoAesGcmNoPadding) {
+        return new AuthorizationService(auth0AuthorizationServerWrapper, cryptoAesGcmNoPadding);
     }
 }

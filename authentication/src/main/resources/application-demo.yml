@@ -73,3 +73,5 @@ authorization:
   audience: ${audience}
   authorization-server-base-url: ${authorization-server-base-url}
   management-audience: ${management-audience}
+  admin-client-id: ${admin-client-id}
+  admin-client-secret: ${admin-client-secret}

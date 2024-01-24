@@ -9,10 +9,9 @@ public interface AuthorizationServerWrapper {
                                      final @NonNull String audience, final @NonNull String grantType);
 
     public Mono<Auth0Client> removeApiKeyFromClient(final @NonNull String clientName, final @NonNull String clientId,
-                                                    final @NonNull String tenantId);
+                                                    final @NonNull String tenantId, @NonNull String accessToken);
 
-    public Mono<AccessToken> getManagementAccessToken(final @NonNull String clientId, final @NonNull String clientSecret,
-                                                      final @NonNull String audience, final @NonNull String grantType);
+    public Mono<AccessToken> getManagementAccessToken();
 
-    public Mono<Auth0Client> getTenantIdAndClientNameFromAuth0(final @NonNull String clientId, @NonNull AccessToken accessToken);
+    public Mono<Auth0Client> getTenantIdAndClientNameFromAuth0(final @NonNull String clientId, @NonNull String accessToken);
 }

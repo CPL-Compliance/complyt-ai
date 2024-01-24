@@ -18,6 +18,9 @@ import reactor.util.retry.Retry;
 
 import java.time.Duration;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -25,6 +28,70 @@ import java.time.Duration;
 public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapper {
     @NonNull
     WebClient webClient;
+
+    @NonNull
+    String managementAudience;
+
+    @NonNull
+    String grantType;
+
+    @NonNull
+    String adminId;
+
+    @NonNull
+    String adminSecret;
+
+    public Mono<Auth0Client> removeApiKeyFromClient(final @NonNull String clientName, final @NonNull String clientId,
+                                                    final @NonNull String tenantId, final @NonNull String accessToken) {
+
+        String json = "{ \"name\": \"" + clientName +
+                "\", \"client_metadata\": { \"tenant_id\": \"" + tenantId +
+                "\", \"clientId\": null, \"clientSecret\": null } }";
+
+        return ContextLogger.observeCtx("Removing Auth0 Api-Key", log::info)
+                .then(webClient.patch()
+                        .uri("/api/v2/clients/" + clientId)
+                        .header("Content-Type", "application/json")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .bodyValue(json)
+                        .retrieve()
+                        .bodyToMono(Auth0Client.class)
+                        .map(x->x)
+                        .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
+                                .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
+                                        new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))));
+    }
+
+//    public Mono<Auth0Client> removeApiKeyFromClient(final @NonNull String clientName, final @NonNull String clientId,
+//                                                    final @NonNull String tenantId, final @NonNull String accessToken) {
+//        String json = "{ name: " + clientName +
+//                ", client_metadata: { tenant_id: " + tenantId +
+//                ", clientId: " + null + ", clientSecret: " + null + "} }";
+//
+//        JsonNode jsonNode = objectMapper.createObjectNode()
+//                .put("name", clientName)
+//                .set("client_metadata", objectMapper.createObjectNode()
+//                        .put("tenant_id", tenantId)
+//                        .put("clientId", (String) "1")
+//                        .put("clientSecret", (String) "1"));
+//
+//
+//        return ContextLogger.observeCtx("Removing Auth0 Api-Key", log::info)
+//                .then(webClient.patch()
+//                        .uri("/api/v2/clients/" + clientId)
+//                        .header("Content-Type", "application/x-www-form-urlencoded")
+//                        .header("Authorization", "Bearer " + accessToken)
+//                        .bodyValue("client_id=" + adminId +
+//                                "&client_secret=" + adminSecret +
+//                                "&audience=" + managementAudience +
+//                                "&grant_type=" + grantType)
+//                        .retrieve()
+//                        .bodyToMono(Auth0Client.class)
+//                        .map(x->x)
+//                        .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
+//                                .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
+//                                        new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))));
+//    }
 
     @Override
     public Mono<AccessToken> getAccessToken(final @NonNull String clientId, final @NonNull String clientSecret,
@@ -39,64 +106,44 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                                 "&grant_type=" + grantType)
                         .retrieve()
                         .bodyToMono(Auth0AccessToken.class)
+                        .map(x -> x)
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
                                 .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
                                         new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted"))))
                         .map(Auth0AccessTokenToAccessToken.INSTANCE::map));
     }
 
-    public Mono<Auth0Client> removeApiKeyFromClient(final @NonNull String clientName, final @NonNull String clientId,
-                                                    final @NonNull String tenantId) {
-        String json = "{ name: " + clientName +
-                ", client_metadata: { tenant_id: " + tenantId +
-                ", clientId : " + null + ", clientId : " + null + "}}";
-
-        return ContextLogger.observeCtx("Removing Auth0 Api-Key", log::info)
-                .then(webClient.patch()
-                        .uri("/api/v2/clients/" + clientId)
-                        .header("Content-Type", "application/json")
-                        .bodyValue(json)
-                        .retrieve()
-                        .bodyToMono(Auth0Client.class)
-                        .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
-                                .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
-                                        new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))));
-//                        .map(Auth0AccessTokenToAccessToken.INSTANCE::map));
-    }
-
-    public Mono<AccessToken> getManagementAccessToken(final @NonNull String clientId, final @NonNull String clientSecret,
-                                                      final @NonNull String audience, final @NonNull String grantType) {
+    public Mono<AccessToken> getManagementAccessToken() {
 
 
         return ContextLogger.observeCtx("Getting Auth0 Management Token", log::info)
                 .then(webClient.post()
                         .uri("oauth/token")
                         .header("Content-Type", "application/x-www-form-urlencoded")
-                        .bodyValue("client_id=LidAB8xGqfzDL6pzeEH6eWmqlTEZ0gQr" +
-                                "&client_secret=y6g3jHGW0FneBg4zCnqAA2P_SEDe8UUKpvH1DcX3wkS4fCX3Bdty64zjqwhAxrQ-" +
-                                "&audience=" + audience +
+                        .bodyValue("client_id=" + adminId +
+                                "&client_secret=" +adminSecret +
+                                "&audience=" + managementAudience +
                                 "&grant_type=" + grantType)
                         .retrieve()
                         .bodyToMono(Auth0AccessToken.class)
-                        .map(x -> x)
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
                                 .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
                                         new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted"))))
                         .map(Auth0AccessTokenToAccessToken.INSTANCE::map));
     }
 
-    public Mono<Auth0Client> getTenantIdAndClientNameFromAuth0(final @NonNull String clientId, @NonNull AccessToken accessToken) {
+    public Mono<Auth0Client> getTenantIdAndClientNameFromAuth0(final @NonNull String clientId, @NonNull String accessToken) {
         return ContextLogger.observeCtx("Getting TenantId And ClientName From Auth0", log::info)
-                .then(webClient.post()
+                .then(webClient.get()
                         .uri("/api/v2/clients/" + clientId)
                         .header("Content-Type", "application/x-www-form-urlencoded")
                         .header("Authorization", "Bearer " + accessToken)
                         .retrieve()
                         .bodyToMono(Auth0Client.class)
-                        .map(x -> x)
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
                                 .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
                                         new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))));
+//                        .map(auth0Client -> new TenentIdAndNameObject(auth0Client.getClient_metadata().getTenant_id(), auth0Client.getName())));
     }
 
 }

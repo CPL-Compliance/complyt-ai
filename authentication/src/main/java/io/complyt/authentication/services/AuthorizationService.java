@@ -3,19 +3,24 @@ package io.complyt.authentication.services;
 import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.business.authorization.Auth0Client;
 import io.complyt.authentication.business.authorization.AuthorizationServerWrapper;
+import io.complyt.authentication.business.authorization.TenentIdAndNameObject;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.Token;
-import io.swagger.v3.core.util.Json;
+import io.complyt.authentication.security.Crypto;
+import io.complyt.authentication.security.EncryptedData;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -26,10 +31,7 @@ public class AuthorizationService {
     AuthorizationServerWrapper authorizationServerWrapper;
 
     @NonNull
-    String audience;
-
-    @NonNull
-    String grantType;
+    Crypto cryptoAesGcmNoPadding;
 
     public Mono<Token> getToken(@NonNull Credentials credentials) {
         return authorizationServerWrapper.getAccessToken(credentials.getClientId(), credentials.getClientSecret(),
@@ -49,16 +51,32 @@ public class AuthorizationService {
                 .build();
     }
 
-    public Mono<Token> deleteApiKey(@NonNull Credentials credentials) {
-//        return authorizationServerWrapper.removeApiKeyFromClient(credentials.getClientName(), credentials.getClientId(), credentials.getTenantId());
-        return null;
+    public Mono<Auth0Client> deleteApiKey(@NonNull Credentials credentials, @NonNull String accessToken) {
+
+        String decodedClientId;
+        EncryptedData encryptedClientId = new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
+
+        try {
+            decodedClientId = cryptoAesGcmNoPadding.decrypt(encryptedClientId);
+        } catch (IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException |
+                 InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
+            throw new RuntimeException("Failed to decrypt credentials.");
+        }
+        return authorizationServerWrapper.removeApiKeyFromClient(credentials.getName(), decodedClientId, credentials.getTenantId(), accessToken);
     }
 
 
-    public Mono<Auth0Client> getTenantIdAndClientName(@NonNull Credentials credentials) {
+    public Mono<TenentIdAndNameObject> getTenantIdAndClientName(@NonNull Credentials credentials) {
         return authorizationServerWrapper
-                .getManagementAccessToken(credentials.getClientId(), credentials.getClientSecret(), audience, grantType)
-                .flatMap(accessToken -> authorizationServerWrapper.getTenantIdAndClientNameFromAuth0(credentials.getClientId(), accessToken));
+                .getManagementAccessToken()
+                .flatMap(token -> authorizationServerWrapper.getTenantIdAndClientNameFromAuth0(credentials.getClientId(), token.accessToken()))
+                .flatMap(auth0Client -> Mono.just(new TenentIdAndNameObject(auth0Client.getClient_metadata().getTenant_id(), auth0Client.getName())));
+    }
+
+    public Mono<String> getMangementAccessToken() {
+        return authorizationServerWrapper
+                .getManagementAccessToken()
+                .map(AccessToken::accessToken);
     }
 
 

@@ -32,15 +32,16 @@ public class ApiKeyFacade {
     public Mono<ApiKey> saveCredentials(@NonNull final Credentials credentials) {
         ApiKey apiKey = apiKeyService.generate();
         return authorizationService.getTenantIdAndClientName(credentials)
-                .flatMap(auth0Client -> credentialsService.saveCredentials(credentials, apiKey, auth0Client.getClient_metadata().getTenant_id(), auth0Client.getName()).thenReturn(apiKey));
+                .flatMap(tenentIdAndNameObject -> credentialsService.saveCredentials(credentials, apiKey, tenentIdAndNameObject.getTenantId(), tenentIdAndNameObject.getName()).thenReturn(apiKey));
     }
 
     public Mono<Credentials> markAsCancelled(@NonNull final ApiKey apiKey) {
 
         return credentialsService.markAsCancelled(apiKey)
-                .flatMap(credentials -> authorizationService.deleteApiKey(credentials)
+                .flatMap(credentials -> authorizationService.getMangementAccessToken()
+                        .flatMap(accessToken -> authorizationService.deleteApiKey(credentials, accessToken)
                 .then(tokenService.deleteToken(apiKey)
-                        .thenReturn(credentials)));
+                        .thenReturn(credentials))));
     }
 
 //    public Mono<Credentials> markAsCancelled(@NonNull final ApiKey apiKey) {

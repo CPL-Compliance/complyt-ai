@@ -22,17 +22,18 @@ public class StubAuth0AuthorizationServerWrapper implements AuthorizationServerW
     }
 
     @Override
-    public Mono<Auth0Client> removeApiKeyFromClient(@NonNull String clientName, @NonNull String clientId, @NonNull String tenantId) {
+    public Mono<Auth0Client> removeApiKeyFromClient(@NonNull String clientName, @NonNull String clientId, @NonNull String tenantId, @NonNull String accessToken) {
         return null;
     }
 
     @Override
-    public Mono<AccessToken> getManagementAccessToken(@NonNull String clientId, @NonNull String clientSecret, @NonNull String audience, @NonNull String grantType) {
+    public Mono<AccessToken> getManagementAccessToken() {
         return null;
     }
 
+
     @Override
-    public Mono<Auth0Client> getTenantIdAndClientNameFromAuth0(@NonNull String clientId, @NonNull AccessToken accessToken) {
+    public Mono<Auth0Client> getTenantIdAndClientNameFromAuth0(@NonNull String clientId, @NonNull String accessToken) {
         return null;
     }
 
