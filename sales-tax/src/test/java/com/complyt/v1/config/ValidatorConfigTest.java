@@ -13,6 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
@@ -58,39 +60,45 @@ class ValidatorConfigTest {
         Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", customerDto.externalId());
         pathVariables.put("source", customerDto.source());
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
 
         // When
+        when(serverRequest.queryParams()).thenReturn(queryParams);
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(CustomerDto.class)).thenReturn(Mono.just(customerDto));
         when(serverRequest.pathVariable("source")).thenReturn(customerDto.source());
         when(serverRequest.pathVariable("externalId")).thenReturn("not same external id");
 
-        Mono<CustomerDto> customerDtoMono = customerDtoValidationHandler.validate(serverRequest);
+        Mono<CustomerDto> customerDtoMono = customerDtoValidationHandler.handle(serverRequest);
 
         // Then
         StepVerifier.create(customerDtoMono).expectErrorMessage(GenericErrorMessages.DATA_CONFLICT_ERROR);
     }
 
-//    @Test //todo: fix
-//    void transactionDtoValidationHandler_ReturnsValidationHandler() {
-//        // Given
-//        ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler = validatorConfig.transactionDtoValidationHandler(springValidatorAdapter);
-//        TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString());
-//        Map<String, String> pathVariables = new HashMap<>();
-//        pathVariables.put("externalId", transactionDto.externalId());
-//        pathVariables.put("source", transactionDto.source());
-//
-//        // When
-//        when(serverRequest.pathVariables()).thenReturn(pathVariables);
-//        when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
-//        when(serverRequest.pathVariable("source")).thenReturn(transactionDto.source());
-//        when(serverRequest.pathVariable("externalId")).thenReturn("not same external id");
-//
-//        Mono<TransactionDto> transactionDtoMono = transactionDtoValidationHandler.validate(serverRequest);
-//
-//        // Then
-//        StepVerifier.create(transactionDtoMono).expectErrorMessage(GenericErrorMessages.DATA_CONFLICT_ERROR);
-//    }
+    @Test
+    void transactionDtoValidationHandler_ReturnsValidationHandler() {
+        // Given
+        ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler = validatorConfig.transactionDtoValidationHandler(springValidatorAdapter);
+        TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString());
+        Map<String, String> pathVariables = new HashMap<>();
+        pathVariables.put("externalId", transactionDto.externalId());
+        pathVariables.put("source", transactionDto.source());
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
+
+        // When
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
+        when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
+        when(serverRequest.pathVariable("source")).thenReturn(transactionDto.source());
+        when(serverRequest.pathVariable("externalId")).thenReturn("not same external id");
+
+        Mono<TransactionDto> transactionDtoMono = transactionDtoValidationHandler.handle(serverRequest);
+
+        // Then
+        StepVerifier.create(transactionDtoMono).expectErrorMessage(GenericErrorMessages.DATA_CONFLICT_ERROR);
+    }
 
     @Test
     void exemptionDtoValidationHandler_ReturnsValidationHandler() {
@@ -99,13 +107,16 @@ class ValidatorConfigTest {
         ExemptionDto exemptionDto = testUtilities.createExemptionDto();
         Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("complytId", exemptionDto.complytId().toString());
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
 
         // When
+        when(serverRequest.queryParams()).thenReturn(queryParams);
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(ExemptionDto.class)).thenReturn(Mono.just(exemptionDto));
         when(serverRequest.pathVariable("complytId")).thenReturn("not same external id");
 
-        Mono<ExemptionDto> exemptionDtoMono = exemptionDtoValidationHandler.validate(serverRequest);
+        Mono<ExemptionDto> exemptionDtoMono = exemptionDtoValidationHandler.handle(serverRequest);
 
         // Then
         StepVerifier.create(exemptionDtoMono).expectErrorMessage(GenericErrorMessages.DATA_CONFLICT_ERROR);
@@ -118,13 +129,16 @@ class ValidatorConfigTest {
         SalesTaxTrackingDto salesTaxTrackingDto = testUtilities.createSalesTaxTrackingDto();
         Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("state", salesTaxTrackingDto.state().name());
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
 
         // When
+        when(serverRequest.queryParams()).thenReturn(queryParams);
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(SalesTaxTrackingDto.class)).thenReturn(Mono.just(salesTaxTrackingDto));
         when(serverRequest.pathVariable("state")).thenReturn("not same external id");
 
-        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = salesTaxTrackingDtoValidationHandler.validate(serverRequest);
+        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = salesTaxTrackingDtoValidationHandler.handle(serverRequest);
 
         // Then
         StepVerifier.create(salesTaxTrackingDtoMono).expectErrorMessage(GenericErrorMessages.DATA_CONFLICT_ERROR);

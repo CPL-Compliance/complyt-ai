@@ -2,13 +2,9 @@ package testUtils.unit_test.templates.validations;
 
 public interface ItemValidationTestTemplate {
 
-//    void upsert_NegativeUnitPriceInItem_Returns400ValidationError(); //todo: fix
     void upsert_NullUnitPriceInItem_Returns400ValidationError();
 
-
     void upsert_NegativeQuantityInItem_Returns400ValidationError();
-
-//    void upsert_NegativeTotalPriceInItem_Returns400ValidationError();
 
     void upsert_NullTotalPriceInItem_Returns400ValidationError();
 

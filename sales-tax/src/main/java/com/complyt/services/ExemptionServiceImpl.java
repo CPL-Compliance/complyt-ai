@@ -66,8 +66,8 @@ public class ExemptionServiceImpl implements ExemptionService {
     }
 
     @Override
-    public Flux<Exemption> findAll() {
-        return exemptionRepository.findAll();
+    public Flux<Exemption> findAll(int offSet, int page) {
+        return exemptionRepository.findAll(offSet, page);
     }
 
     @Override

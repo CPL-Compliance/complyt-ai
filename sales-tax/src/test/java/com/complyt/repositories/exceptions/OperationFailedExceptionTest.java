@@ -36,6 +36,7 @@ class OperationFailedExceptionTest {
         assertEquals("this is an operation failed exception", actualException.getMessage());
     }
 
+
     @Test
     void constructor_WithNewMessageAndThrowableDetails_ExceptionThrown() {
         // Given + When

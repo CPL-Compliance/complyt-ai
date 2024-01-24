@@ -15,4 +15,7 @@ public interface PostOkRouterMonoTest {
 
     @Test
     void post_NullHandler_ThrowsNullPointerException();
+
+    @Test
+    void post_UnsupportedMediaType_Returns415();
 }

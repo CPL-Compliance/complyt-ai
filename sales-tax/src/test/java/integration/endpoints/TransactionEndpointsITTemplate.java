@@ -25,8 +25,4 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_CustomerIsNotExemptBecauseExemptionIsCancelled_ReturnsTaxableTransaction();
 
     void upsertByExternalIdAndSource_OneItemIsNegativeAmount_ReturnsTaxableTransaction();
-
-// todo ma
-//    void upsertByExternalIdAndSource_CustomerIsNotExemptBecauseExemptionIsCancelled_ReturnsTaxableTransaction();
-
 }

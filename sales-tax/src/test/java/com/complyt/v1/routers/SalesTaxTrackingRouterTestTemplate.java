@@ -51,6 +51,8 @@ public interface SalesTaxTrackingRouterTestTemplate extends
 
     void refreshByStateAndDate_UserWithoutCSRFToken_Returns403();
 
+    void refreshByStateAndDate_PathVariableError_Returns400();
+
     void refreshByStateAndDate_InternalServerError_Returns500();
 
     void refreshByStateAndDate_NullHandler_ThrowsNullPointerException();

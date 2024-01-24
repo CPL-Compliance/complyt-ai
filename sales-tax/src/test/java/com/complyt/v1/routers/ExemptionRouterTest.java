@@ -4,6 +4,7 @@ import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.facades.ExemptionFacade;
+import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
@@ -86,6 +87,26 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .expectStatus().isOk()
                 .expectBody(ExemptionDto.class)
                 .isEqualTo(expectedExemption);
+    }
+
+    @Test
+    @Override
+    @WithUserDetails()
+    public void getByComplytId_PathVariableInvalid_Returns400() {
+        // Given
+        String complytId = "null";
+        String url = ExemptionRouter.BASE_URL + "/complytId/" + complytId;
+
+        // When
+        when(exemptionFacade.findByComplytId(exemption.getComplytId())).thenReturn(Mono.just(exemption));
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
+
+        // Then
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder.path(url).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Test
@@ -289,6 +310,30 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @Test
     @Override
     @WithUserDetails()
+    public void upsertByComplytId_PathVariableInvalid_Returns400() {
+        // Given
+        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
+        String complytId = "null";
+
+        // When
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(exemption));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .bodyValue(exemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Override
+    @WithUserDetails()
     public void upsertByComplytId_DoesntExists_Returns404() {
         // Given + When
         when(exemptionFacade.update(exemption, exemption.getComplytId())).thenReturn(Mono.empty());
@@ -376,6 +421,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> System.out.println("abc:" + map))
                 .value(map -> testUtilities.checkErrorMessages(map,
                         Set.of("complytId " + DtoErrorMessages.CONFLICTED_WITH_URL_ERROR)));
     }
@@ -556,7 +602,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         }};
 
         // When
-        when(exemptionFacade.findAll()).thenReturn(Flux.fromIterable(exemptions));
+        when(exemptionFacade.findAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(exemptions));
+
 
         // Then
         webTestClient
@@ -573,13 +620,49 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
+    @WithUserDetails()
+    public void getAll_QueryParamInvalid_Returns400() {
+        // Given
+        Exemption secondExemption = exemption.withId(UUID.randomUUID().toString())
+                .withState(new State("NY", "05", "New York"));
+        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
+        ExemptionDto secondExemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(secondExemption);
+
+        List<Exemption> exemptions = new ArrayList<>() {{
+            add(exemption);
+            add(secondExemption);
+        }};
+
+        List<ExemptionDto> exemptionDtos = new ArrayList<>() {{
+            add(exemptionDto);
+            add(secondExemptionDto);
+        }};
+
+        // When
+        when(exemptionFacade.findAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(exemptions));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL)
+                        .queryParam("page", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Override
     @WithMockUser
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         // Given
         List<ExemptionDto> exemptionDtos = new ArrayList<>();
 
         // When
-        when(exemptionFacade.findAll()).thenReturn(Flux.empty());
+        when(exemptionFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -620,7 +703,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // Given + When
-        when(exemptionFacade.findAll()).thenReturn(Flux.error(new OperationFailedException()));
+        when(exemptionFacade.findAll(0, 0)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient
@@ -651,6 +734,26 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNoContent();
+    }
+
+    @Test
+    @Override
+    @WithUserDetails()
+    public void deleteByComplytId_PathVariableInvalid_Returns400() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+        String url = ExemptionRouter.BASE_URL + "/complytId/null";
+
+        // When
+        when(exemptionFacade.markAsCancelled(complytId)).thenReturn(Mono.just(exemption));
+
+        // Then
+        webTestClient.mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder.path(url).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Test
@@ -1004,6 +1107,25 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .value(map -> {
                     assertEquals("[classification may not be null]", map.get("message"));
                 });
+    }
+
+    @Override
+    public void upsert_PathVariableError_Returns400() {
+        // Given
+        String complytIdError = "null";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytIdError)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(exemptionDto.withClassification(null)
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Test

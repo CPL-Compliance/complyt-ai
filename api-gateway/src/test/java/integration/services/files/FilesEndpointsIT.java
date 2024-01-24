@@ -71,4 +71,5 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
                 .exchange()
                 .expectStatus().isNotFound();
     }
+
 }

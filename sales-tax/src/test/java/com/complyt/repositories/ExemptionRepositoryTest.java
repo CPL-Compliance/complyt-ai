@@ -24,9 +24,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -189,36 +192,79 @@ public class ExemptionRepositoryTest {
     }
 
     @Test
-    void findAll_FindsTwoExemptions_ReturnsTwoExemptions() {
+    void findAll_FindsTwoExemptionsByPageZeroLimitEqSize_ReturnsTwoExemptions() {
         // Given
+        int page = 1;
+        int size = 2;
+        int calculatedOffset = 0;
+
         Exemption secondExemption = exemption.withId(UUID.randomUUID().toString())
                 .withState(new State("NY", "05", "New York"));
+
         List<Exemption> exemptions = new ArrayList<>() {{
             add(exemption);
             add(secondExemption);
         }};
-        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()));
+
+
+        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()))
+                .skip(calculatedOffset)
+                .limit(size);
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
-        when(reactiveMongoTemplate.find(query, Exemption.class)).thenReturn(Flux.fromIterable(exemptions));
-
+        when(reactiveMongoTemplate.find(eq(query), eq(Exemption.class)))
+                .thenReturn(Flux.fromIterable(exemptions));
         // Then
-        Flux<Exemption> exemptionFlux = exemptionRepository.findAll();
+        Flux<Exemption> exemptionFlux = exemptionRepository.findAll(page, size);
         StepVerifier.create(exemptionFlux).expectNext(exemption, secondExemption).verifyComplete();
     }
 
     @Test
-    void findAll_NoExemptionReturned_EmptyFluxReturned() {
+    void findAll_ExemptionsByOffsetAndLimit_ExpectingChunkOfExemptions() {
         // Given
-        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()));
+        int page = 2;
+        int size = 2;
+        int calculatedOffset = (page - 1) * size;
+
+        List<Exemption> exemptionList = IntStream.range(0, 4)
+                .mapToObj(i -> exemption.withComplytId(UUID.randomUUID()).withState(new State("NY", "05", "New York")))
+                .collect(Collectors.toList());
+
+        // Creating the expected list (list of 2-4 exemptions)
+        List<Exemption> expectedList = exemptionList.subList(calculatedOffset, Math.min(calculatedOffset + size, exemptionList.size()));
+
+        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()))
+                .skip(calculatedOffset)
+                .limit(size);
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
-        when(reactiveMongoTemplate.find(query, Exemption.class)).thenReturn(Flux.empty());
+        when(reactiveMongoTemplate.find(eq(query), eq(Exemption.class))).thenReturn(Flux.fromIterable(expectedList));
 
         // Then
-        Flux<Exemption> exemptionFlux = exemptionRepository.findAll();
+        Flux<Exemption> exemptionFlux = exemptionRepository.findAll(page, size);
+        StepVerifier.create(exemptionFlux).expectNextSequence(expectedList).verifyComplete();
+    }
+
+
+    @Test
+    void findAll_NoExemptionReturnedOffsetZeroLimitEqSize_EmptyFluxReturned() {
+        // Given
+        int page = 1;
+        int size = 1;
+        int calculatedOffset = 0;
+
+        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()))
+                .skip(calculatedOffset)
+                .limit(size);
+        // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
+        when(reactiveMongoTemplate.find(eq(query), eq(Exemption.class))).thenReturn(Flux.empty());
+
+
+        // Then
+        Flux<Exemption> exemptionFlux = exemptionRepository.findAll(page, size);
         StepVerifier.create(exemptionFlux).verifyComplete();
     }
 
@@ -278,4 +324,5 @@ public class ExemptionRepositoryTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
     }
+
 }

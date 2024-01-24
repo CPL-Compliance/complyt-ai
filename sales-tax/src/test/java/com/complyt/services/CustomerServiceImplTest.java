@@ -248,8 +248,8 @@ class CustomerServiceImplTest {
         Customer secondCustomer = customer.withExternalId(id);
 
         // When
-        when(customerRepository.findAll()).thenReturn(Flux.just(customer, secondCustomer));
-        Flux<Customer> customerFlux = customerServiceImpl.findAll();
+        when(customerRepository.findAll(0, 1)).thenReturn(Flux.just(customer, secondCustomer));
+        Flux<Customer> customerFlux = customerServiceImpl.findAll(0, 1);
 
         // Then
         StepVerifier.create(customerFlux).expectNext(customer, secondCustomer).verifyComplete();

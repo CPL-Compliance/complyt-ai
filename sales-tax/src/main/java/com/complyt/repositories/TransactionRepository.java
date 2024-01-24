@@ -21,12 +21,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @AllArgsConstructor
 public class TransactionRepository {
-
     @NonNull
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     @NonNull
     private TenantResolver tenantResolver;
+
+
 
     public Mono<Transaction> save(@NonNull Transaction transaction) {
         return tenantResolver.resolve()
@@ -83,15 +84,17 @@ public class TransactionRepository {
                 });
     }
 
-    public Flux<Transaction> findAll() {
+    public Flux<Transaction> findAll(int page, int size) {
+        int calculatedOffset = (page - 1) * size;
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
-                    Query query = Query.query(Criteria.where("tenantId").is(tenantId));
+                    Query query = Query.query(Criteria.where("tenantId").is(tenantId)).skip(calculatedOffset).limit(size);
 
-                    return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for transactions by tenant ID" + tenantId + " with page " + page + " and size " + size, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Transaction.class));
                 });
     }
+
 
     public Flux<Transaction> findAllBySource(String source) {
         return tenantResolver.resolve()

@@ -24,13 +24,6 @@ public class TransactionTotalAmountChecker implements DtoBodyChecker<Transaction
                 .flatMap(this::checkTransactionTotalAmountIsNotBelowZero));
     }
 
-//    private Mono<DiscountDto> checkIfDiscountExist(@NonNull TransactionDto transactionDto) {
-//        return transactionDto.discount() != null ?
-//                Mono.just(transactionDto.discount()) :
-//                Mono.empty();
-//    } //todo: remove
-
-
     // calculating the total amount and adding the discount.
     // discount is being received negatively (hence, the usage of BigDecimal.add and not BigDecimal.subtract
     // this ignores if the discount is before tax or after tax

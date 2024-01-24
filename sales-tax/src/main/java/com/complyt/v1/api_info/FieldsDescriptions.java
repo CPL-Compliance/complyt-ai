@@ -65,8 +65,6 @@ public interface FieldsDescriptions {
 
     String SHIPPING_FEE = "The shipping fee for the transaction";
 
-    //String DISCOUNT = "Discount details for the transaction"; //todo:delete
-
     // In Customer
 
     String ADDRESS_OF_CUSTOMER = "The customer's Address";

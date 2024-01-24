@@ -9,6 +9,7 @@ import io.complyt.authentication.v1.mappers.CredentialsMapper;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.models.TokenDto;
+import io.complyt.authentication.v1.routers.ApiKeyRouter;
 import io.complyt.authentication.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,8 @@ import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+
+import java.net.URI;
 
 @Component
 @Slf4j
@@ -46,6 +49,6 @@ public class ApiKeyHandler {
                 .flatMap(apiKeyDto -> ContextLogger.observeCtx("<-- Returned Body: " + apiKeyDto.toString(), log::info).thenReturn(apiKeyDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
-        return ServerResponse.created(serverRequest.uri()).body(value, TokenDto.class);
+        return ServerResponse.created(URI.create(ApiKeyRouter.BASE_URL)).body(value, TokenDto.class);
     }
 }

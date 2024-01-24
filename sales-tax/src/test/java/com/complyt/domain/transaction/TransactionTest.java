@@ -74,7 +74,7 @@ public class TransactionTest {
                 .withComplytId(transaction.getComplytId())
                 .withExternalId(transaction.getExternalId())
                 .withCustomer(transaction.getCustomer());
-//                .withDiscount(transaction.getDiscount()); //todo: fix
+
         // When
         Transaction actualTransaction = transaction.withId(differentId);
 
@@ -110,7 +110,6 @@ public class TransactionTest {
                 .taxableItemsAmount(transaction.getTaxableItemsAmount())
                 .totalItemsAmount(transaction.getTotalItemsAmount())
                 .transactionFilingStatus(transaction.getTransactionFilingStatus()).build();
-//                .discount(transaction.getDiscount()).build(); //todo: fix
 
         // Then
         assertEquals(transaction, actualTransaction);

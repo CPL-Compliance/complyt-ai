@@ -21,7 +21,7 @@ public interface CustomerService extends CrudService<Customer, String>, FindByNa
 
     Mono<Customer> findByExternalIdAndSource(String externalId, String source);
 
-    Flux<Customer> findAll();
+    Flux<Customer> findAll(int page, int size);
 
     Flux<Customer> findAllBySource(String source);
 

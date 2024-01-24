@@ -51,4 +51,5 @@ class DataConflictChecksProviderTest {
         // Then
         assertEquals("pathVariable is marked non-null but is null", nullPointerException.getMessage());
     }
+
 }

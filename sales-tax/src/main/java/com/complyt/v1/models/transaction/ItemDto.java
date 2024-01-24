@@ -18,10 +18,8 @@ import java.math.BigDecimal;
 @Schema(name = "Item")
 public record ItemDto(
 
-//        @PositiveOrZero(message = "Item.unitPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal unitPrice,
         @NotNull @Schema(description = FieldsDescriptions.UNIT_PRICE) BigDecimal unitPrice,
         @PositiveOrZero(message = "Item.quantity " + NumericErrorMessages.NOT_NEGATIVE_ERROR) @Schema(description = FieldsDescriptions.QUANTITY) BigDecimal quantity,
-//        @PositiveOrZero(message = "Item.totalPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal totalPrice,
         @NotNull @Schema(description = FieldsDescriptions.TOTAL_PRICE) BigDecimal totalPrice,
         String description,
         @NotNull(message = "Item.name " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "Item.name " + StringErrorMessages.MINMAX_256_ERROR) String name,

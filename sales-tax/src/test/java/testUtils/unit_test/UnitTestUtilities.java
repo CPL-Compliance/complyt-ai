@@ -204,11 +204,6 @@ public class UnitTestUtilities {
                 BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
     }
 
-//    public Transaction createTransactionWithDiscount(String id) {
-//        Discount discount = createDiscount(BigDecimal.valueOf(500), false, "description");
-//        return createTransaction(id).withDiscount(discount);
-//    } //todo: fix
-
     public TransactionDto createTransactionDto(String id) {
         String documentName = "INVUS1000";
         OptionalAddressDto billingAddress = new OptionalAddressDto("City", "Country", "County", "CA", "Street", "Zip", false);
@@ -216,7 +211,6 @@ public class UnitTestUtilities {
         List<ItemDto> items = createItemDtos(true, false);
         TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);
-//        DiscountDto discountDto = createDiscountDto(BigDecimal.valueOf(500), false, "description");     // todo: fix
         return new TransactionDto(UUID.randomUUID(), id, source, documentName,
                 items, billingAddress, shippingAddress, customerIdOtherDomains,
                 createCustomerDto(customerIdOtherDomains.toString()), null,
@@ -224,11 +218,6 @@ public class UnitTestUtilities {
                 shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO,
                 BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
     }
-
-//    public TransactionDto createTransactionDtoWithDiscount(String id) {
-//        DiscountDto discountDto = createDiscountDto(BigDecimal.valueOf(500), false, "description");
-//        return createTransactionDto(id).withDiscount(discountDto);
-//    } //todo: fix
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{

@@ -33,7 +33,8 @@ import java.lang.annotation.Target;
                         parameters = {
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "complytId",
-                                        description = "Sales tax tracking complyt id",
+                                        description = "The unique identifier for a customer (UUID)",
+                                        schema = @Schema(type = "string", format = "uuid"),
                                         examples = @ExampleObject(value = GetTransactionByComplytIdApiInfo.complytIdExample,
                                                 name = GetTransactionByComplytIdApiInfo.complytIdExample))
                         },

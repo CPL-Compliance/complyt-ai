@@ -127,18 +127,4 @@ public interface TransactionRouterTestTemplate extends
     void upsert_moreThan50ChartsDocumentName_Returns400();
 
     void upsert_50ChartsDocumentName_Returns200Ok();
-
-
-//    // Validation::Discount todo:fix
-//    void upsert_TransactionWithNoDiscount_Return200();
-//
-//    void upsert_TransactionWithDiscountLessThanTotalAmount_Return200();
-//
-//    void upsert_TransactionWithPositiveDiscountAmount_Return200();
-//
-//    void upsert_TransactionWithDiscountEqualsToTotalAmount_Return200();
-//
-//    void upsert_TransactionWithDiscountLargerThanTotalAmount_Return400();
-//
-//    void upsert_TransactionWithDiscountNoDiscountAmount_Return400();
 }

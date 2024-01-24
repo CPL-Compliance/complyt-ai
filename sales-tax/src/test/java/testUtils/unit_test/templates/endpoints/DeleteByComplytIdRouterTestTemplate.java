@@ -3,6 +3,8 @@ package testUtils.unit_test.templates.endpoints;
 public interface DeleteByComplytIdRouterTestTemplate {
     void deleteByComplytId_Exists_Returns204();
 
+    void deleteByComplytId_PathVariableInvalid_Returns400();
+
     void deleteByComplytId_DoesntExists_Returns404();
 
     void deleteByComplytId_UnauthenticatedUser_Returns401();

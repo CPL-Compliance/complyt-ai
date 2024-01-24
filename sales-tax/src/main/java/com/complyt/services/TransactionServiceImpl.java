@@ -53,13 +53,6 @@ public class TransactionServiceImpl implements TransactionService {
         return complytIdHandler.checkNewDontHaveComplytId(newTransaction);
     }
 
-//    @Override
-//    public Mono<Transaction> checkAfterTaxDiscountAndHandle(@NonNull Transaction transaction) {
-//        return transaction.getDiscount() != null && !transaction.getDiscount().isPreTax() ?
-//                Mono.just(transaction.withTotalItemsAmount(transaction.getTotalItemsAmount().add(transaction.getDiscount().discountAmount()))) :
-//                Mono.just(transaction);
-//    } //todo: remove
-
     @Override
     public Mono<Transaction> findByExternalIdAndSource(@NonNull String externalId, String source) {
         return transactionRepository.findByExternalIdAndSource(externalId, source);
@@ -127,9 +120,11 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findAllByQuery(query);
     }
 
-    public Flux<Transaction> findAll() {
-        return transactionRepository.findAll();
+
+    public Flux<Transaction> findAll(int page, int size) {
+        return transactionRepository.findAll(page, size);
     }
+
 
     public Flux<Transaction> findAllBySource(@NonNull final String source) {
         return transactionRepository.findAllBySource(source);
@@ -146,8 +141,7 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.getExternalTimestamps(), transaction.getTransactionType(), transaction.getShippingFee(),
                         transaction.getCreatedFrom(), transaction.getTaxableItemsAmount(),
                         transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount(),
-                        transaction.getTransactionFilingStatus() //, transaction.getDiscount() //todo: remove
-                );
+                        transaction.getTransactionFilingStatus());
     }
 
 }

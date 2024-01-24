@@ -84,7 +84,6 @@ public class TransactionFacade {
         return transactionService.checkComplytIdOfModifiedEqualsToOriginal(modifiedTransaction, originalTransaction)
                 .flatMap(checkedModifiedTransaction -> getCustomerByTransaction(modifiedTransaction)
                         .flatMap(customer -> transactionService.injectDataToModifiedTransaction(checkedModifiedTransaction, originalTransaction)
-                                //.flatMap(transactionService::checkAfterTaxDiscountAndHandle) //todo: remove
                                 .flatMap(setTransaction -> salesTaxTrackingService.findByState(setTransaction.getShippingAddress().state())
                                         .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking)
                                                 .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
@@ -119,9 +118,10 @@ public class TransactionFacade {
                         .map(transaction::withCustomer));
     }
 
-    public Flux<Transaction> getAll() {
-        return transactionService.findAll()
-                .flatMap(transaction -> getCustomerByTransaction(transaction)
+
+        public Flux<Transaction> getAll(int page, int size) {
+        return transactionService.findAll(page, size)
+                .flatMapSequential(transaction -> getCustomerByTransaction(transaction)
                         .map(transaction::withCustomer));
     }
 

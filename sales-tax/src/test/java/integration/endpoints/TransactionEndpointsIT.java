@@ -1,6 +1,8 @@
 package integration.endpoints;
 
 import com.complyt.SalesTaxApplication;
+import com.complyt.domain.transaction.Transaction;
+import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
@@ -61,6 +63,93 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    /*
+     This transaction's customer has an exemption in state PA with validation dates of:
+     fromDate: 2025-01-01, toDate: 26-01-01, therefore transaction is sales-tax exempt
+    */
+    public void upsertByExternalIdAndSource_CustomerIsExemptByStateAndDate_ReturnsNonTaxableTransaction() {
+        String externalId = "nonExistingTransactionID";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "12345", false))
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNull(transactionDto.salesTax()));
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    /*
+     This transaction's customer has an exemption in state PA with validation dates of:
+     fromDate: 2025-01-01, toDate: 26-01-01, therefore transaction is NOT sales-tax exempt
+    */
+    public void upsertByExternalIdAndSource_CustomerIsNotExemptByStateAndDate_ReturnsTaxableTransaction() {
+        String externalId = "anotherNonExistingTransactionID";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "12345", false))
+                .withExternalTimestamps(new TimestampsDto("2024-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    /*
+     This transaction's customer has an exemption in state FL with Exemption Status - CANCELLED,
+     therefore transaction is NOT sales-tax exempt
+    */
+    public void upsertByExternalIdAndSource_CustomerIsNotExemptBecauseExemptionIsCancelled_ReturnsTaxableTransaction() {
+        String externalId = "ThirdNonExistingIdForExemptionChecks";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
     }
 
     @Order(2)
@@ -187,6 +276,37 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     @WithMockUser
+    public void getAllBySource_QueryParamInvalid_Returns400() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void getAllBySource_PathVariableInvalid_Returns400() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/1")
+                        .queryParam("size", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
     public void getAllBySource_DoesntExists_Returns200EmptyList() {
         webTestClient
                 .get()
@@ -214,7 +334,23 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(TransactionDto.class)
-                .value(list -> assertTrue(list.size() > 100));
+                .value(list -> assertEquals(RepositoryConstant.DEFAULT_PAGE_SIZE, list.size()));
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_QueryParamInvalid_Returns400() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("page", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -241,6 +377,23 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     @WithMockUser
+    public void getByAll_QueryParamInvalid_Returns400() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("page", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
     public void getByExternalIdAndSource_Exists_Returns200() {
         //Given
         String externalId = "10002";
@@ -257,6 +410,24 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isOk()
                 .expectBody(TransactionDto.class)
                 .value(transaction -> assertEquals(transaction.complytId(), complytId));
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void getByExternalIdAndSource_PathVariableInvalid_Returns400() {
+        String externalId = "null";
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -295,6 +466,26 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk();
+    }
+
+    @Override
+    public void upsertByExternalIdAndSource_PathVariableError_Returns400() {
+        //Given
+        String nullExternalId = "null";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(nullExternalId, customerId)
+                .withShippingAddress(referenceAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + nullExternalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -452,6 +643,29 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(map -> assertEquals(GenericErrorMessages.MISSING_BODY_ERROR, map.get("message")));
     }
 
+    @Order(3)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UnsupportedMediaType_Returns415() {
+        // Given
+        String externalId = "0";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .contentType(MediaType.TEXT_PLAIN)
+                .bodyValue("Unsupported data")
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE, map.get("message")));
+    }
+
     @Order(4)
     @Test
     @Override
@@ -530,6 +744,26 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isOk();
     }
 
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void getByComplytId_PathVariableInvalid_Returns400() {
+        // Given
+        String complytId = "null";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
     @Order(3)
     @Test
     @Override
@@ -547,108 +781,72 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isNotFound();
     }
 
-    @Order(2)
+
+    @Order(0)
     @Test
     @Override
     @WithMockUser
-    public void getByComplytId_complytIdDoesntParse_Returns500() {
+    public void getAll_GetByParamSize_ReturnsExpectedSize() {
+        int size = 1;
+        String expectedComplyId = "6ee574bb-0300-4c74-9e4f-1852f234a028";
         webTestClient
                 .mutateWith(csrf())
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/complytId/notExisting")
+                        .path(TransactionRouter.BASE_URL) // Set your API endpoint
+                        .queryParam("size", size)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isOk()
+                .expectBodyList(Transaction.class)
+                .value(transactions -> Assertions.assertEquals(transactions.get(0).getComplytId().toString(), expectedComplyId))
+                .hasSize(size);
     }
 
     @Order(0)
     @Test
     @Override
     @WithMockUser
-    /*
-     This transaction's customer has an exemption in state PA with validation dates of:
-     fromDate: 2025-01-01, toDate: 26-01-01, therefore transaction is sales-tax exempt
-    */
-    public void upsertByExternalIdAndSource_CustomerIsExemptByStateAndDate_ReturnsNonTaxableTransaction() {
-        String externalId = "nonExistingTransactionID";
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "12345", false))
-                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+    public void getAll_GetByParamPage_ReturnsExpectedPage() {
+        int page = 2;
 
-        // Then
+        String expectedComplyId = "134c9970-15f7-41e7-84a9-43073c955566";
         webTestClient
                 .mutateWith(csrf())
-                .put()
+                .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .path(TransactionRouter.BASE_URL) // Set your API endpoint
+                        .queryParam("page",page)
                         .build())
-                .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isCreated()
-                .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertNull(transactionDto.salesTax()));
+                .expectStatus().isOk()
+                .expectBodyList(Transaction.class)
+                .value(transactions -> Assertions.assertEquals(transactions.get(0).getComplytId().toString(), expectedComplyId));
     }
 
     @Order(0)
     @Test
     @Override
     @WithMockUser
-    /*
-     This transaction's customer has an exemption in state PA with validation dates of:
-     fromDate: 2025-01-01, toDate: 26-01-01, therefore transaction is NOT sales-tax exempt
-    */
-    public void upsertByExternalIdAndSource_CustomerIsNotExemptByStateAndDate_ReturnsTaxableTransaction() {
-        String externalId = "anotherNonExistingTransactionID";
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "12345", false))
-                .withExternalTimestamps(new TimestampsDto("2024-01-02", "2025-01-02"));
+    public void getAll_GetByDefaultsSizeAndPage_ReturnsExpectedEntries() {
+        String expectedComplyId = "6ee574bb-0300-4c74-9e4f-1852f234a028";
 
-        // Then
         webTestClient
                 .mutateWith(csrf())
-                .put()
+                .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .path(TransactionRouter.BASE_URL) // Set your API endpoint
                         .build())
-                .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isCreated()
-                .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
+                .expectStatus().isOk()
+                .expectBodyList(Transaction.class)
+                .value(transactions -> Assertions.assertEquals(transactions.get(0).getComplytId().toString(), expectedComplyId))
+                .value(transactions -> Assertions.assertTrue(transactions.size() <= RepositoryConstant.DEFAULT_PAGE_SIZE));
     }
 
-    @Order(0)
-    @Test
-    @Override
-    @WithMockUser
-    /*
-     This transaction's customer has an exemption in state FL with Exemption Status - CANCELLED,
-     therefore transaction is NOT sales-tax exempt
-    */
-    public void upsertByExternalIdAndSource_CustomerIsNotExemptBecauseExemptionIsCancelled_ReturnsTaxableTransaction() {
-        String externalId = "ThirdNonExistingIdForExemptionChecks";
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
-                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
-
-        // Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build())
-                .bodyValue(givenTransaction)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
-    }
 
     @Order(0)
     @Test

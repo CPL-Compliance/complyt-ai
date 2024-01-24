@@ -2,6 +2,8 @@ package com.complyt.v1.api_info.transaction;
 
 import com.complyt.v1.models.transaction.TransactionDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,6 +26,21 @@ import java.lang.annotation.Target;
                 method = RequestMethod.GET,
                 operation =
                 @Operation(
+                        parameters = {
+                                @Parameter(
+                                        name = "page",
+                                        description = "The page number for pagination (default 0)",
+                                        in = ParameterIn.QUERY,
+                                        schema = @Schema(type = "integer", defaultValue = "0")
+                                ),
+                                @Parameter(
+                                        name = "size",
+                                        description = "The page size for pagination (default 25)",
+                                        in = ParameterIn.QUERY,
+                                        schema = @Schema(type = "integer", defaultValue = "25")
+                                )
+
+                        },
                         security = @SecurityRequirement(name = "bearerAuth"),
                         description = "Get all Transactions",
                         operationId = "getAllTransactions",

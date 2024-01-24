@@ -38,7 +38,9 @@ import java.lang.annotation.Target;
                                                 name = UpsertCustomerByExternalIdAndSourceApiInfo.externalIdExample)),
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "source",
-                                        description = "Customer Source",
+                                        description = "Transaction Source (should be [1-9])",
+                                        required = true,
+                                        schema = @Schema(type = "string", pattern = "[1-9]"),
                                         examples = @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.sourceExample,
                                                 name = UpsertCustomerByExternalIdAndSourceApiInfo.sourceExample))
                         },

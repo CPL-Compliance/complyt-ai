@@ -22,7 +22,7 @@ import java.util.UUID;
 
 public interface ITUtilities {
 
-    String NON_EXISTING_COMPLYT_ID = "1111111-1111-1111-1111-111111111111";
+    String NON_EXISTING_COMPLYT_ID = "d18068f0-6d98-4b0d-ba19-4536f0b4173a";
 
     // if no items provided, puts a default stub
     static TransactionDto stubTransactionDto(String externalId, UUID customerId, ItemDto... items) {
@@ -30,7 +30,7 @@ public interface ITUtilities {
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
                 null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "95220", false), customerId,
                 null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
-                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED); // , new DiscountDto(BigDecimal.ZERO,false, "") todo: fix
+                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
     }
 
     static CustomerDto stubCustomerDto(String externalId) {

@@ -10,7 +10,7 @@ public class TestUtilities {
     public static final String TOKEN_BASE_URL = "/v1/token";
     public static final String API_KEY_BASE_URL = "/v1/api_key";
     public static final String SECRET_KEY_BASE_URL = "/v1/secret_key";
-    public static final String NON_EXISTING_COMPLYT_ID = "11111111-1111-1111-1111-111111111111";
+    public static final String NON_EXISTING_COMPLYT_ID = "d18068f0-6d98-4b0d-ba19-4536f0b4173a";
     public static final String API_KEY_CLIENT_ID = "78fd4034-53af-4144-b2da-27ac31cdf45c";
     public static final String API_KEY_CLIENT_SECRET = "3d446591-d839-4906-97fe-85e1b51df0c8";
 

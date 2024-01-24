@@ -1,10 +1,7 @@
 package com.complyt.v1.config;
 
 import com.complyt.annotations.Generated;
-import com.complyt.v1.exceptions.types.ConflictedDataApiException;
-import com.complyt.v1.exceptions.types.MissingBodyApiException;
-import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
-import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
+import com.complyt.v1.exceptions.types.*;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +29,9 @@ public class ApiExceptionConfig {
                 ObjectNotFoundApiException.class, HttpStatus.NOT_FOUND,
                 ObjectNotValidApiException.class, HttpStatus.BAD_REQUEST,
                 MissingBodyApiException.class, HttpStatus.BAD_REQUEST,
-                ConflictedDataApiException.class, HttpStatus.BAD_REQUEST
+                ConflictedDataApiException.class, HttpStatus.BAD_REQUEST,
+                PathVariableErrorException.class, HttpStatus.BAD_REQUEST,
+                QueryParamErrorException.class, HttpStatus.BAD_REQUEST
         );
     }
 }

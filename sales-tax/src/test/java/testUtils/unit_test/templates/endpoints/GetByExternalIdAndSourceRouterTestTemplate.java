@@ -3,6 +3,7 @@ package testUtils.unit_test.templates.endpoints;
 public interface GetByExternalIdAndSourceRouterTestTemplate {
     void getByExternalIdAndSource_Exists_Returns200();
 
+    void getByExternalIdAndSource_PathVariableInvalid_Returns400();
     void getByExternalIdAndSource_DoesntExists_Returns404();
 
     void getByExternalIdAndSource_UnauthenticatedUser_Returns401();

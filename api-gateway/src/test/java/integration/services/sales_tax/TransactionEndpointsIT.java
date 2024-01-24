@@ -2,6 +2,7 @@ package integration.services.sales_tax;
 
 import integration.TestContainersInitializerIT;
 import integration.test_utils.TestUtilities;
+import integration.test_utils.templates.endpoints.RepositoryConstant;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -245,6 +246,37 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
+    public void getAllBySource_QueryParamInvalid_Returns400() {
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/1")
+                        .queryParam("page","null")
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void getAllBySource_PathVariableInvalid_Returns400() {
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/null")
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
     public void getAllBySource_Exists_Returns200() {
         WEB_TEST_CLIENT
                 .get()
@@ -290,7 +322,23 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(LinkedHashMap.class)
-                .value(list -> assertTrue(list.size() > 100));
+                .value(list -> assertEquals(RepositoryConstant.DEFAULT_SIZE, list.size()));
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void getAll_QueryParamInvalid_Returns400() {
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL)
+                        .queryParam("size","null")
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -338,6 +386,26 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
+    public void getByExternalIdAndSource_PathVariableInvalid_Returns400() {
+        //Given
+        String externalId = "null";
+        UUID complytId = UUID.fromString("a6469aaf-e838-41df-8106-6a8927917985"); // complytId of existing transaction
+
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
     public void getByExternalIdAndSource_DoesntExists_Returns404() {
         WEB_TEST_CLIENT
                 .get()
@@ -370,6 +438,28 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
                 .exchange()
                 .expectStatus().isOk();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_PathVariableInvalid_Returns400() {
+        //Given
+        String externalId = "undefined";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -587,6 +677,25 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isOk();
     }
 
+    @Order(2)
+    @Test
+    @Override
+    public void getByComplytId_PathVariableInvalid_Returns400() {
+        // Given
+        String complytId = "null";
+
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
     @Order(3)
     @Test
     @Override
@@ -603,18 +712,67 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isNotFound();
     }
 
-    @Order(2)
+    @Order(0)
     @Test
     @Override
-    public void getByComplytId_complytIdDoesntParse_Returns500() {
+    public void getAll_GetByParamSize_ReturnsExpectedSize() {
+        int size = 1;
+
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.TRANSACTION_BASE_URL + "/complytId/notExisting")
+                        .path(TestUtilities.TRANSACTION_BASE_URL)
+                        .queryParam("size", size)
                         .build())
                 .headers(headers -> headers
                         .setBearerAuth(TOKEN))
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .hasSize(size);
     }
+
+    @Order(0)
+    @Test
+    @Override
+    public void getAll_GetByParamPage_ReturnsExpectedPage() {
+        int page = 2;
+        int size = 1;
+        String expectedComplyId = "607f3926-61d3-40a4-9b3a-a6bf7c3a1d95";
+
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL)
+                        .queryParam("size", size)
+                        .queryParam("page", page)
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(transaction -> assertEquals(transaction.get(0).get("complytId"), expectedComplyId));
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    public void getAll_GetByDefaultsSizeAndPage_ReturnsExpectedEntries() {
+        String expectedComplyId = "6ee574bb-0300-4c74-9e4f-1852f234a028";
+
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL)
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(transaction -> assertEquals(transaction.get(0).get("complytId"), expectedComplyId))
+                .value(transactionLst -> assertTrue(transactionLst.size() <= RepositoryConstant.DEFAULT_SIZE));
+    }
+
 }
