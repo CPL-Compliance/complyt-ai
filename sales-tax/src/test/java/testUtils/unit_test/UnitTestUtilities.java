@@ -17,6 +17,7 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.*;
+import com.complyt.v1.config.BodyCheckConfig;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
@@ -25,6 +26,8 @@ import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
+import com.complyt.v1.validators.body_checkers.TransactionDtoShippingAddressChecker;
+import com.complyt.v1.validators.body_checkers.TransactionTotalAmountChecker;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -191,8 +194,19 @@ public class UnitTestUtilities {
         List<Item> items = createItems(true, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false);
-        return new Transaction(UUID.randomUUID(), id, id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
+
+        return new Transaction(UUID.randomUUID(), id, id, source,
+                documentName, items, billingAddress, shippingAddress,
+                customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()),
+                null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
+                TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
+                BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
     }
+
+//    public Transaction createTransactionWithDiscount(String id) {
+//        Discount discount = createDiscount(BigDecimal.valueOf(500), false, "description");
+//        return createTransaction(id).withDiscount(discount);
+//    } //todo: fix
 
     public TransactionDto createTransactionDto(String id) {
         String documentName = "INVUS1000";
@@ -201,9 +215,19 @@ public class UnitTestUtilities {
         List<ItemDto> items = createItemDtos(true, false);
         TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);
-
-        return new TransactionDto(UUID.randomUUID(), id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
+//        DiscountDto discountDto = createDiscountDto(BigDecimal.valueOf(500), false, "description");     // todo: fix
+        return new TransactionDto(UUID.randomUUID(), id, source, documentName,
+                items, billingAddress, shippingAddress, customerIdOtherDomains,
+                createCustomerDto(customerIdOtherDomains.toString()), null,
+                TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE,
+                shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO,
+                BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
     }
+
+//    public TransactionDto createTransactionDtoWithDiscount(String id) {
+//        DiscountDto discountDto = createDiscountDto(BigDecimal.valueOf(500), false, "description");
+//        return createTransactionDto(id).withDiscount(discountDto);
+//    } //todo: fix
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
@@ -213,6 +237,11 @@ public class UnitTestUtilities {
                     null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
 
         }};
+    }
+
+    public Item createItemWithNegativePrice(boolean withJurisdictionalRules, boolean withTangibleCategory) {
+        return new Item(new BigDecimal(-2000), new BigDecimal(4), new BigDecimal(-8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+                null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE);
     }
 
     public List<Item> createItemsWithSalesTaxRate(boolean withJurisdictionalRules, boolean withTangibleCategory) {
@@ -244,6 +273,11 @@ public class UnitTestUtilities {
         }};
     }
 
+    public ItemDto createItemDtoWithNegativeAmount(boolean withJurisdictionalRules, boolean withTangibleCategory) {
+            return new ItemDto(new BigDecimal(-2000), new BigDecimal(4), new BigDecimal(-8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+                    null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE);
+    }
+
     public SalesTaxRates createSalesTaxRates() {
         return new SalesTaxRates(new BigDecimal("0.1"), new BigDecimal("0.1"), new BigDecimal("0.1"), new BigDecimal("0.4"), new BigDecimal("0.1"), null);
     }
@@ -257,6 +291,10 @@ public class UnitTestUtilities {
         return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
     }
 
+//    public Discount createDiscount(BigDecimal discountAmount, boolean isPreTax, String discountDescription) {
+//        return new Discount(discountAmount, isPreTax, discountDescription);
+//    }
+
     public ShippingFee createShippingFeeWithSalesTaxRates(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
         return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, createSalesTaxRates(), "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
@@ -266,6 +304,11 @@ public class UnitTestUtilities {
         JurisdictionalSalesTaxRulesDto rules = createJurisdictionalSalesTaxRulesDto();
         return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
     }
+
+//    public DiscountDto createDiscountDto(BigDecimal discountAmount, boolean isPreTax, String discountDescription) {
+//        return new DiscountDto(discountAmount, isPreTax, discountDescription);
+//    }
+
 
     public JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
         return new JurisdictionalSalesTaxRules("California", "CA", true,
@@ -421,5 +464,12 @@ public class UnitTestUtilities {
         return new ValidationDatesDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
     }
 
+    public BodyCheckConfig createBodyCheckConfig() {
+        return new BodyCheckConfig(
+                List.of(
+                        new TransactionDtoShippingAddressChecker(),
+                        new TransactionTotalAmountChecker()
+                ));
+    }
 
 }

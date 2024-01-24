@@ -65,6 +65,8 @@ public interface FieldsDescriptions {
 
     String SHIPPING_FEE = "The shipping fee for the transaction";
 
+    //String DISCOUNT = "Discount details for the transaction"; //todo:delete
+
     // In Customer
 
     String ADDRESS_OF_CUSTOMER = "The customer's Address";
@@ -72,6 +74,7 @@ public interface FieldsDescriptions {
     String NAME_OF_CUSTOMER = "The customer's name";
 
     String CUSTOMER_TYPE = "Indicates whether the customer is 'retail'/'reseller'/'marketplace'";
+
     String EMAIL = "An (Optional) Email address associated with the customer";
 
     // In exemption
@@ -84,4 +87,11 @@ public interface FieldsDescriptions {
 
     String FILING_FREQUENCY = "Tracks the filing frequency determined by the state";
 
+    // In Item
+
+    String UNIT_PRICE = "The price of one unit, can be positive and negative";
+
+    String QUANTITY = "The quantity of the units, must be positive";
+
+    String TOTAL_PRICE = "The total price of the unit prices time the quantity, can be positive and negative";
 }

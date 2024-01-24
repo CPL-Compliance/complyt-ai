@@ -45,7 +45,8 @@ public class TransactionItemsAmountsCollector implements TransactionAmountsColle
                 transaction.getTenantId(), transaction.getInternalTimestamps(),
                 transaction.getExternalTimestamps(), transaction.getTransactionType(),
                 transaction.getShippingFee(), transaction.getCreatedFrom(),
-                taxableItemsAmount, tangibleItemsAmount, totalItemsAmount, transaction.getTransactionFilingStatus()
+                taxableItemsAmount, tangibleItemsAmount, totalItemsAmount,
+                transaction.getTransactionFilingStatus() //transaction.getDiscount() //todo: remove
         );
     }
 }

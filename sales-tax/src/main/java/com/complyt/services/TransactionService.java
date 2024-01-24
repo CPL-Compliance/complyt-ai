@@ -30,4 +30,6 @@ public interface TransactionService extends CrudService<Transaction, String> {
 
     Mono<Transaction> checkTransactionNotHavingComplytId(@NonNull final Transaction newTransaction);
 
+//    Mono<Transaction> checkAfterTaxDiscountAndHandle(@NonNull final Transaction transaction); //todo: remove
+
 }
