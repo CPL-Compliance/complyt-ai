@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import testUtils.TestUtilities;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -50,10 +51,21 @@ public class AddressQueryBuilderTest {
     void build_AddressPassed_ReturnsQuery() {
         // Given
         Query expectedQuery = Query.query(Criteria.where("requestAddress.zip").is(fullAddressNoCountyAddress.zip()));
-        Optional.ofNullable(fullAddressNoCountyAddress.city())
-                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("requestAddress.city").regex(value, "i")));
-        Optional.ofNullable(fullAddressNoCountyAddress.street())
-                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("requestAddress.street").regex(value, "i")));
+
+        Optional.ofNullable(fullAddressNoCountyAddress.city()).ifPresent(value -> {
+            String escapedSearchString = Pattern.quote(value);
+            expectedQuery.addCriteria(Criteria.where("requestAddress.city").regex(escapedSearchString, "i"));
+        });
+
+        Optional.ofNullable(fullAddressNoCountyAddress.street()).ifPresent(value -> {
+            String escapedSearchString = Pattern.quote(value);
+            expectedQuery.addCriteria(Criteria.where("requestAddress.street").regex(escapedSearchString, "i"));
+        });
+
+        Optional.ofNullable(fullAddressNoCountyAddress.county()).ifPresent(value -> {
+            String escapedSearchString = Pattern.quote(value);
+            expectedQuery.addCriteria(Criteria.where("requestAddress.county").regex(escapedSearchString, "i"));
+        });
 
         // When
         Query actualQuery = addressQueryBuilder.build(fullAddressNoCountyAddress);
@@ -62,16 +74,26 @@ public class AddressQueryBuilderTest {
         Assertions.assertEquals(expectedQuery, actualQuery);
     }
 
+
     @Test
     void build_FullAddressWithCountyPassed_ReturnsQuery() {
         // Given
         Query expectedQuery = Query.query(Criteria.where("requestAddress.zip").is(fullAddressNoCountyAddress.zip()));
-        Optional.ofNullable(fullAddressWithCountyAddress.city())
-                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("requestAddress.city").regex(value, "i")));
-        Optional.ofNullable(fullAddressWithCountyAddress.street())
-                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("requestAddress.street").regex(value, "i")));
-        Optional.ofNullable(fullAddressWithCountyAddress.county())
-                .ifPresent(value -> expectedQuery.addCriteria(Criteria.where("requestAddress.county").regex(value, "i")));
+
+        Optional.ofNullable(fullAddressWithCountyAddress.city()).ifPresent(value -> {
+            String escapedSearchString = Pattern.quote(value);
+            expectedQuery.addCriteria(Criteria.where("requestAddress.city").regex(escapedSearchString, "i"));
+        });
+
+        Optional.ofNullable(fullAddressWithCountyAddress.street()).ifPresent(value -> {
+            String escapedSearchString = Pattern.quote(value);
+            expectedQuery.addCriteria(Criteria.where("requestAddress.street").regex(escapedSearchString, "i"));
+        });
+
+        Optional.ofNullable(fullAddressWithCountyAddress.county()).ifPresent(value -> {
+            String escapedSearchString = Pattern.quote(value);
+            expectedQuery.addCriteria(Criteria.where("requestAddress.county").regex(escapedSearchString, "i"));
+        });
 
         // When
         Query actualQuery = addressQueryBuilder.build(fullAddressWithCountyAddress);

@@ -50,7 +50,6 @@ public class TransactionFacade {
         return transactionService.checkTransactionNotHavingComplytId(transaction)
                 .flatMap(checkedTransaction -> getCustomerByTransaction(transaction)
                         .flatMap(customer -> transactionService.injectDataToNewTransaction(checkedTransaction)
-//                                .flatMap(transactionService::checkAfterTaxDiscountAndHandle) //tood: remove
                                 .flatMap(setTransaction -> salesTaxTrackingService.findByState(setTransaction.getShippingAddress().state())
                                         .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking)
                                                 .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus()
