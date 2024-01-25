@@ -4,6 +4,7 @@ import com.complyt.v1.config.BodyCheckConfig;
 import com.complyt.v1.config.ValidatorConfig;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.exceptions.types.PathVariableErrorException;
+import com.complyt.v1.exceptions.types.QueryParamErrorException;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.validators.DataConflictChecksProvider;
 import com.complyt.v1.validators.ParameterChecksProvider;
@@ -27,6 +28,7 @@ import testUtils.TestUtilities;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static org.mockito.Mockito.when;
 
@@ -56,6 +58,62 @@ class ValidationHandlerTest {
     ParameterChecksProvider paramChecksProvider;
 
     BiFunction<AddressDto, ServerRequest, Mono<Boolean>> CHECK = (address, serverRequest) -> Mono.just(true);
+    Mono<Function<String, Mono<String>>> CHECK_INVALID = Mono.just((String param) -> Mono.just("error"));
+
+
+    @Test
+    public void handle_PathVariableNotValid_ReturnsPathVariableError() {
+        // Given
+        Map<String, String> pathVariables = new HashMap<>();
+        pathVariables.put("param", "invalidParam");
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
+        // When
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
+        when(serverRequest.pathVariable("param")).thenReturn("invalidParam");
+        when(paramChecksProvider.getFunctionCheck("param")).thenReturn((CHECK_INVALID));
+
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(paramChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(false));
+        when(serverRequest.method()).thenReturn(HttpMethod.GET);
+        when(serverRequest.path()).thenReturn("/v1/notFound");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(false);
+
+        Mono<AddressDto> result = addressDtoValidationHandler.handle(serverRequest);
+
+        // Then
+        StepVerifier.create(result)
+                .expectError(PathVariableErrorException.class)
+                .verify();
+    }
+
+    @Test
+    public void handle_QueryParamNotValid_ReturnsQueryParamError() {
+        // Given
+        Map<String, String> pathVariables = new HashMap<>();
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        queryParams.add("param", "invalidParam");
+
+
+        // When
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
+        when(serverRequest.pathVariable("param")).thenReturn("invalidParam");
+        when(paramChecksProvider.getFunctionCheck("param")).thenReturn((CHECK_INVALID));
+
+
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(paramChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
+        when(serverRequest.method()).thenReturn(HttpMethod.GET);
+        when(serverRequest.path()).thenReturn("/v1/notFound");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(false);
+
+        Mono<AddressDto> result = addressDtoValidationHandler.handle(serverRequest);
+
+        // Then
+        StepVerifier.create(result)
+                .expectError(QueryParamErrorException.class)
+                .verify();
+    }
 
     @Test
     public void handle_NoParamsValid_ReturnsMonoEmpty() {
