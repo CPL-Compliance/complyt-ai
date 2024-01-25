@@ -39,8 +39,8 @@ public class ServicesConfig {
     }
 
     @Bean
-    AuthorizationService authorizationService(@Qualifier("authorizationServerWrapper") @NonNull AuthorizationServerWrapper auth0AuthorizationServerWrapper,
+    AuthorizationService authorizationService(@NonNull AuthorizationServerWrapper authorizationServerWrapper,
                                               @NonNull Crypto cryptoAesGcmNoPadding) {
-        return new AuthorizationService(auth0AuthorizationServerWrapper, cryptoAesGcmNoPadding);
+        return new AuthorizationService(authorizationServerWrapper, cryptoAesGcmNoPadding);
     }
 }
