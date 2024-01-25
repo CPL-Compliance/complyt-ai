@@ -3,11 +3,12 @@ package com.complyt.v1.validators.body_checkers;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.TransactionDto;
+import lombok.NonNull;
 import reactor.core.publisher.Flux;
 
 public class ItemsAlignmentChecker implements DtoBodyChecker<TransactionDto> {
     @Override
-    public Flux<String> check(TransactionDto transactionDto) {
+    public Flux<String> check(@NonNull TransactionDto transactionDto) {
         return transactionDto.items().stream()
                 .map(this::checkItemAlignment)
                 .reduce(true, Boolean::logicalAnd) ?

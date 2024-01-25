@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.fasterxml.jackson.databind.jsonFormatVisitors.JsonValueFormat.UUID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BodyCheckConfigTest {
 
@@ -127,5 +129,19 @@ public class BodyCheckConfigTest {
 
         // error is transaction total amount is below 0 and item not aligned
         StepVerifier.create(isValid).expectNextCount(2).verifyComplete();
+    }
+
+    @Test
+    void transactionBodyCheck_SendsNullTransactionDto_huh() {
+        // Given
+        TransactionDto transactionToCheck = null;
+
+        // When + Then
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            bodyCheckConfig.transactionDtoFluxFunction().apply(transactionToCheck);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "transactionDto is marked non-null but is null");
     }
 }
