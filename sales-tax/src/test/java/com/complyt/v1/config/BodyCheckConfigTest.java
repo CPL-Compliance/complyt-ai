@@ -5,6 +5,9 @@ import com.complyt.v1.models.TangibleCategoryDto;
 import com.complyt.v1.models.TaxableCategoryDto;
 import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.TransactionDto;
+import com.complyt.v1.validators.body_checkers.ItemsAlignmentChecker;
+import com.complyt.v1.validators.body_checkers.TransactionDtoShippingAddressChecker;
+import com.complyt.v1.validators.body_checkers.TransactionTotalAmountChecker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
@@ -132,14 +135,42 @@ public class BodyCheckConfigTest {
     }
 
     @Test
-    void transactionBodyCheck_SendsNullTransactionDto_huh() {
+    void TransactionDtoShippingAddressChecker_SendsNullTransactionDto_ReturnErrorMessage() {
         // Given
         TransactionDto transactionToCheck = null;
 
         // When + Then
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            bodyCheckConfig.transactionDtoFluxFunction().apply(transactionToCheck);
+            new TransactionDtoShippingAddressChecker().check(transactionToCheck);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "transactionDto is marked non-null but is null");
+    }
+
+    @Test
+    void TransactionTotalAmountChecker_SendsNullTransactionDto_ReturnErrorMessage() {
+        // Given
+        TransactionDto transactionToCheck = null;
+
+        // When + Then
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            new TransactionTotalAmountChecker().check(transactionToCheck);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "transactionDto is marked non-null but is null");
+    }
+
+    @Test
+    void ItemsAlignmentChecker_SendsNullTransactionDto_ReturnErrorMessage() {
+        // Given
+        TransactionDto transactionToCheck = null;
+
+        // When + Then
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            new ItemsAlignmentChecker().check(transactionToCheck);
         });
 
         assertEquals(nullPointerException.getMessage(), "transactionDto is marked non-null but is null");
