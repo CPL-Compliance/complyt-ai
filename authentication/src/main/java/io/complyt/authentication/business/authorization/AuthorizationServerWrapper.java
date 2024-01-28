@@ -1,17 +1,12 @@
 package io.complyt.authentication.business.authorization;
 
-import io.swagger.v3.core.util.Json;
-import lombok.NonNull;
-import reactor.core.publisher.Mono;
+import io.complyt.authentication.business.authorization.Wrappers.AccessTokenAuthorizationServerWrapper;
+import io.complyt.authentication.business.authorization.Wrappers.ApiKeyRevocationAuthorinzationServerWrapper;
+import io.complyt.authentication.business.authorization.Wrappers.ManagementAuthorizationServerWrapper;
+import io.complyt.authentication.business.authorization.Wrappers.TenantIdAndNameAuthorizationServerWrapper;
 
-public interface AuthorizationServerWrapper {
-    Mono<AccessToken> getAccessToken(final @NonNull String clientId, final @NonNull String clientSecret,
-                                     final @NonNull String audience, final @NonNull String grantType);
 
-    public Mono<Auth0Client> removeApiKeyFromClient(final @NonNull String clientName, final @NonNull String clientId,
-                                                    final @NonNull String tenantId, @NonNull String accessToken);
+public interface AuthorizationServerWrapper extends AccessTokenAuthorizationServerWrapper, ApiKeyRevocationAuthorinzationServerWrapper,
+        ManagementAuthorizationServerWrapper, TenantIdAndNameAuthorizationServerWrapper {
 
-    public Mono<AccessToken> getManagementAccessToken();
-
-    public Mono<Auth0Client> getTenantIdAndClientNameFromAuth0(final @NonNull String clientId, @NonNull String accessToken);
 }

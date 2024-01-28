@@ -38,7 +38,8 @@ public class Auth0AuthorizationServerWrapperTest {
 
     @BeforeEach
     void setUp() {
-        auth0AuthorizationServerWrapper = new Auth0AuthorizationServerWrapper(webClient);
+        auth0AuthorizationServerWrapper = new Auth0AuthorizationServerWrapper(webClient, "Management Audience", "Grant Type",
+                "Admin Id", "Admin Secret");
     }
 
     @Test
@@ -55,6 +56,7 @@ public class Auth0AuthorizationServerWrapperTest {
 
         // When
         when(webClient.post()).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.uri("/oauth/token")).thenReturn(requestBodyUriSpecMock);
         when(requestBodyUriSpecMock.header(headerName, headerValue)).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.bodyValue("client_id=" + clientId +
                 "&client_secret=" + clientSecret +
@@ -86,6 +88,7 @@ public class Auth0AuthorizationServerWrapperTest {
 
         // When
         when(webClient.post()).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.uri("/oauth/token")).thenReturn(requestBodyUriSpecMock);
         when(requestBodyUriSpecMock.header(headerName, headerValue)).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.bodyValue("client_id=" + clientId +
                 "&client_secret=" + clientSecret +

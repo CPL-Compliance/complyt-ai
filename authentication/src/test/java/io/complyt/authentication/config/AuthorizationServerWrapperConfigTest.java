@@ -27,8 +27,10 @@ class AuthorizationServerWrapperConfigTest {
     void authorizationServerWrapper_createAuth0AuthorizationServerWrapper_getAuth0AuthorizationServerWrapper() {
         WebClient webClient = WebClient.builder().build();
 
-        Auth0AuthorizationServerWrapper expectedAuth0AuthorizationServerWrapper = new Auth0AuthorizationServerWrapper(webClient);
-        AuthorizationServerWrapper actualAuth0AuthorizationServerWrapper = authorizationServerWrapperConfig.auth0AuthorizationServerWrapper(webClient);
+        Auth0AuthorizationServerWrapper expectedAuth0AuthorizationServerWrapper = new Auth0AuthorizationServerWrapper(webClient,
+                "Management Audience", "Grant Type", "Admin Id", "Admin Secret");
+        AuthorizationServerWrapper actualAuth0AuthorizationServerWrapper = authorizationServerWrapperConfig.auth0AuthorizationServerWrapper(webClient,
+                "Management Audience", "Grant Type", "Admin Id", "Admin Secret");
 
         assertEquals(expectedAuth0AuthorizationServerWrapper, actualAuth0AuthorizationServerWrapper);
     }
@@ -45,7 +47,8 @@ class AuthorizationServerWrapperConfigTest {
     void authorizationServerWrapper_webClientIsNull_throwNullException() {
         // When
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            authorizationServerWrapperConfig.auth0AuthorizationServerWrapper(null);
+            authorizationServerWrapperConfig.auth0AuthorizationServerWrapper(null, "Management Audience", "Grant Type",
+                    "Admin Id", "Admin Secret");
         });
 
         assertEquals("webClient is marked non-null but is null", exception.getMessage());

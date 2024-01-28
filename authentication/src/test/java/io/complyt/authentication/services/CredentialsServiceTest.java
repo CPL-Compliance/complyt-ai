@@ -248,7 +248,7 @@ class CredentialsServiceTest {
         when(credentialsRepository.save(encryptedCredentials)).thenReturn(Mono.just(encryptedCredentials));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey);
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, "TenantId", "Name");
 
         StepVerifier.create(credentialsMono).expectNext(encryptedCredentials).verifyComplete();
     }
@@ -266,7 +266,7 @@ class CredentialsServiceTest {
                 .thenThrow(new NoSuchPaddingException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey);
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, "TenantId", "Name");
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -284,7 +284,7 @@ class CredentialsServiceTest {
                 .thenThrow(new NoSuchAlgorithmException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey);
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, "TenantId", "Name");
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -302,7 +302,7 @@ class CredentialsServiceTest {
                 .thenThrow(new InvalidAlgorithmParameterException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey);
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey,"TenantId", "Name");
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -320,7 +320,7 @@ class CredentialsServiceTest {
                 .thenThrow(new InvalidKeyException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey);
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey,"TenantId", "Name");
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -338,7 +338,7 @@ class CredentialsServiceTest {
                 .thenThrow(new BadPaddingException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey);
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, "TenantId", "Name");
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -356,7 +356,7 @@ class CredentialsServiceTest {
                 .thenThrow(new IllegalBlockSizeException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey);
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, "TenantId", "Name");
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -373,7 +373,7 @@ class CredentialsServiceTest {
     @Test
     void saveCredentials_apiKeyIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            credentialsService.saveCredentials(TestUtilities.createCredentials(), null);
+            credentialsService.saveCredentials(TestUtilities.createCredentials(), null, "TenantId", "Name");
         });
 
         assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
@@ -382,7 +382,7 @@ class CredentialsServiceTest {
     @Test
     void saveCredentials_credentialsIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            credentialsService.saveCredentials(null, TestUtilities.createApiKey());
+            credentialsService.saveCredentials(null, TestUtilities.createApiKey(), "TenantId", "Name");
         });
 
         assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");

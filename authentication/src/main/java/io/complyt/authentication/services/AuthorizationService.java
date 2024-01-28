@@ -1,9 +1,6 @@
 package io.complyt.authentication.services;
 
-import io.complyt.authentication.business.authorization.AccessToken;
-import io.complyt.authentication.business.authorization.Auth0Client;
-import io.complyt.authentication.business.authorization.AuthorizationServerWrapper;
-import io.complyt.authentication.business.authorization.TenentIdAndNameObject;
+import io.complyt.authentication.business.authorization.*;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.security.Crypto;
@@ -62,7 +59,7 @@ public class AuthorizationService {
                  InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Failed to decrypt credentials.");
         }
-        return authorizationServerWrapper.removeApiKeyFromClient(credentials.getName(), decodedClientId, credentials.getTenantId(), accessToken);
+        return authorizationServerWrapper.removeApiKeyFromClient(credentials.getName(), decodedClientId, credentials.getTenantId(), accessToken, null, null);
     }
 
 

@@ -1,9 +1,12 @@
 package io.complyt.authentication.facades;
 
+import io.complyt.authentication.business.authorization.TenentIdAndNameObject;
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.services.ApiKeyService;
+import io.complyt.authentication.services.AuthorizationService;
 import io.complyt.authentication.services.CredentialsService;
+import io.complyt.authentication.services.TokenService;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +36,12 @@ class ApiKeyFacadeTest {
     @Mock
     CredentialsService credentialsService;
 
+    @Mock
+    TokenService tokenService;
+
+    @Mock
+    AuthorizationService authorizationService;
+
     Credentials credentials;
 
     @BeforeEach
@@ -48,7 +57,9 @@ class ApiKeyFacadeTest {
 
         // When
         when(apiKeyService.generate()).thenReturn(expectedApiKey);
-        when(credentialsService.saveCredentials(credentials, expectedApiKey)).thenReturn(Mono.just(credentials));
+        when(authorizationService.getTenantIdAndClientName(credentials))
+                .thenReturn(Mono.just(new TenentIdAndNameObject("TenantId", "Name")));
+        when(credentialsService.saveCredentials(credentials, expectedApiKey, "TenantId", "Name")).thenReturn(Mono.just(credentials));
 
         Mono<ApiKey> actualApiKey = apiKeyFacade.saveCredentials(credentials);
 

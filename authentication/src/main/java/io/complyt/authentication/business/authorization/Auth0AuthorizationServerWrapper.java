@@ -1,25 +1,20 @@
 package io.complyt.authentication.business.authorization;
 
 import io.complyt.authentication.business.exceptions.ComplytAuth0Exception;
-import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.domain.mappers.Auth0AccessTokenToAccessToken;
 import io.complyt.authentication.utils.observability.ContextLogger;
-import io.swagger.v3.core.util.Json;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RequiredArgsConstructor
 @EqualsAndHashCode
@@ -42,11 +37,13 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
     String adminSecret;
 
     public Mono<Auth0Client> removeApiKeyFromClient(final @NonNull String clientName, final @NonNull String clientId,
-                                                    final @NonNull String tenantId, final @NonNull String accessToken) {
+                                                    final @NonNull String tenantId, final @NonNull String accessToken,
+                                                    @RequestParam(value = "newClientId", required = false) String newClientId,
+                                                    @RequestParam(value = "newClientSecret", required = false) String newClientSecret) {
 
         String json = "{ \"name\": \"" + clientName +
                 "\", \"client_metadata\": { \"tenant_id\": \"" + tenantId +
-                "\", \"clientId\": null, \"clientSecret\": null } }";
+                "\", \"clientId\": " + newClientId + ", \"clientSecret\": " + newClientSecret + " } }";
 
         return ContextLogger.observeCtx("Removing Auth0 Api-Key", log::info)
                 .then(webClient.patch()
@@ -62,37 +59,6 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                                         new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))));
     }
 
-//    public Mono<Auth0Client> removeApiKeyFromClient(final @NonNull String clientName, final @NonNull String clientId,
-//                                                    final @NonNull String tenantId, final @NonNull String accessToken) {
-//        String json = "{ name: " + clientName +
-//                ", client_metadata: { tenant_id: " + tenantId +
-//                ", clientId: " + null + ", clientSecret: " + null + "} }";
-//
-//        JsonNode jsonNode = objectMapper.createObjectNode()
-//                .put("name", clientName)
-//                .set("client_metadata", objectMapper.createObjectNode()
-//                        .put("tenant_id", tenantId)
-//                        .put("clientId", (String) "1")
-//                        .put("clientSecret", (String) "1"));
-//
-//
-//        return ContextLogger.observeCtx("Removing Auth0 Api-Key", log::info)
-//                .then(webClient.patch()
-//                        .uri("/api/v2/clients/" + clientId)
-//                        .header("Content-Type", "application/x-www-form-urlencoded")
-//                        .header("Authorization", "Bearer " + accessToken)
-//                        .bodyValue("client_id=" + adminId +
-//                                "&client_secret=" + adminSecret +
-//                                "&audience=" + managementAudience +
-//                                "&grant_type=" + grantType)
-//                        .retrieve()
-//                        .bodyToMono(Auth0Client.class)
-//                        .map(x->x)
-//                        .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
-//                                .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
-//                                        new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))));
-//    }
-
     @Override
     public Mono<AccessToken> getAccessToken(final @NonNull String clientId, final @NonNull String clientSecret,
                                             final @NonNull String audience, final @NonNull String grantType) {
@@ -106,7 +72,6 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                                 "&grant_type=" + grantType)
                         .retrieve()
                         .bodyToMono(Auth0AccessToken.class)
-                        .map(x -> x)
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
                                 .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
                                         new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted"))))
@@ -121,7 +86,7 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                         .uri("oauth/token")
                         .header("Content-Type", "application/x-www-form-urlencoded")
                         .bodyValue("client_id=" + adminId +
-                                "&client_secret=" +adminSecret +
+                                "&client_secret=" + adminSecret +
                                 "&audience=" + managementAudience +
                                 "&grant_type=" + grantType)
                         .retrieve()
@@ -143,7 +108,6 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
                                 .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
                                         new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))));
-//                        .map(auth0Client -> new TenentIdAndNameObject(auth0Client.getClient_metadata().getTenant_id(), auth0Client.getName())));
     }
 
 }

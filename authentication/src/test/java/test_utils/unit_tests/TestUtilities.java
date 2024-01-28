@@ -87,7 +87,7 @@ public class TestUtilities {
     public static Credentials createCredentials() {
         return new Credentials("id", "complytClientId", "complytClientSecret",
                 "ClientID", "ClientSecret", "Audience", "GrantType",
-                "audience", "Grant Type", ApiKeyStatus.ACTIVE);
+                "audience", "Grant Type", "TenantId", "Name", ApiKeyStatus.ACTIVE);
     }
 
     public static ApiKey createApiKey() {

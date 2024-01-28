@@ -1,10 +1,10 @@
 package io.complyt.authentication.business.authorization;
 
-import io.swagger.v3.core.util.Json;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.bind.annotation.RequestParam;
 import reactor.core.publisher.Mono;
 
 @EqualsAndHashCode
@@ -22,7 +22,8 @@ public class StubAuth0AuthorizationServerWrapper implements AuthorizationServerW
     }
 
     @Override
-    public Mono<Auth0Client> removeApiKeyFromClient(@NonNull String clientName, @NonNull String clientId, @NonNull String tenantId, @NonNull String accessToken) {
+    public Mono<Auth0Client> removeApiKeyFromClient(@NonNull String clientName, @NonNull String clientId, @NonNull String tenantId, @NonNull String accessToken, @RequestParam(value = "newClientId", required = false) String newClientId,
+                                                    @RequestParam(value = "newClientSecret", required = false) String newClientSecret) {
         return null;
     }
 
@@ -31,11 +32,8 @@ public class StubAuth0AuthorizationServerWrapper implements AuthorizationServerW
         return null;
     }
 
-
     @Override
     public Mono<Auth0Client> getTenantIdAndClientNameFromAuth0(@NonNull String clientId, @NonNull String accessToken) {
         return null;
     }
-
-
 }
