@@ -14,6 +14,7 @@ import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.mappers.ExemptionWrapperMapper;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import com.complyt.v1.models.customer.exemption.ExemptionWrapperDto;
+import com.complyt.v1.routers.ExemptionRouter;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.UUID;
 
 @Component
@@ -47,26 +49,28 @@ public class ExemptionHandler {
 
     @ExemptionReadPermission
     public Mono<ServerResponse> findByComplytId(ServerRequest serverRequest) {
-        UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
+        String complytId = serverRequest.pathVariable("complytId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info).then(exemptionFacade.findByComplytId(complytId))
-                .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
-                .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+        Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info)
+                .then(exemptionDtoValidationHandler.handle(serverRequest))
+                .switchIfEmpty(Mono.defer(() -> exemptionFacade.findByComplytId(UUID.fromString(complytId)))
+                        .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
+                        .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto))
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(exemptionDtoMono, ExemptionDto.class);
     }
 
     @ExemptionUpdatePermission
     public Mono<ServerResponse> update(ServerRequest serverRequest) {
-        UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
+        String complytId = serverRequest.pathVariable("complytId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info).then(exemptionDtoValidationHandler.validate(serverRequest))
+        Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info).then(exemptionDtoValidationHandler.handle(serverRequest))
                 .flatMap(exemptionDto -> {
                     Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
-                    return exemptionFacade.update(receivedExemption, complytId);
+                    return exemptionFacade.update(receivedExemption, UUID.fromString(complytId));
                 })
                 .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
                 .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto))
@@ -79,7 +83,7 @@ public class ExemptionHandler {
     public Mono<ServerResponse> create(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Flux<ExemptionDto> exemptionDtoFlux = ContextLogger.observeCtx(logStr, log::info).then(exemptionWrapperDtoValidationHandler.validate(serverRequest))
+        Flux<ExemptionDto> exemptionDtoFlux = ContextLogger.observeCtx(logStr, log::info).then(exemptionWrapperDtoValidationHandler.handle(serverRequest))
                 .flatMapMany(exemptionWrapperDto -> {
                     ExemptionWrapper receivedExemptionWrapper = ExemptionWrapperMapper.INSTANCE.exemptionWrapperDtoToExemptionWrapper(exemptionWrapperDto);
                     return exemptionFacade.save(receivedExemptionWrapper);
@@ -88,34 +92,41 @@ public class ExemptionHandler {
                 .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
-        return ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(exemptionDtoFlux, ExemptionDto.class);
+        return ServerResponse.created(URI.create(ExemptionRouter.BASE_URL)).contentType(MediaType.APPLICATION_JSON).body(exemptionDtoFlux, ExemptionDto.class);
     }
 
     @ExemptionReadPermission
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
-        int page = Integer.parseInt(serverRequest.queryParam("page")
-                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM)));
-        int size = Integer.parseInt(serverRequest.queryParam("size")
-                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE)));
+        String page = serverRequest.queryParam("page")
+                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM));
+        String size = serverRequest.queryParam("size")
+                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE));
 
         Flux<ExemptionDto> exemptionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
-                .thenMany(exemptionFacade.findAll(page, size))
-                .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
-                .flatMapSequential(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto));
+                .thenMany(exemptionDtoValidationHandler.handle(serverRequest))
+                .switchIfEmpty(Flux.defer(() -> exemptionFacade.findAll(Integer.parseInt(page), Integer.parseInt(size)))
+                        .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
+                        .flatMapSequential(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto)));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(exemptionDtoFlux, ExemptionDto.class);
     }
 
     @ExemptionDeletePermission
     public Mono<ServerResponse> delete(ServerRequest serverRequest) {
-        UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
+        String complytId = serverRequest.pathVariable("complytId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        return ContextLogger.observeCtx(logStr, log::info).then(exemptionFacade.markAsCancelled(complytId))
-                .flatMap(deleteResult -> ServerResponse.noContent().build())
-                .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+        Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info)
+                .then(exemptionDtoValidationHandler.handle(serverRequest))
+                .switchIfEmpty(Mono.defer(() -> exemptionFacade.markAsCancelled(UUID.fromString(complytId)))
+                    .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
+                    .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+
+        return exemptionDtoMono.switchIfEmpty(exemptionDtoMono)
+                .flatMap(response -> ServerResponse.noContent().build()
+                        .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse)));
+
     }
 
 }

@@ -96,6 +96,25 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     @Test
     @Override
     @WithMockUser
+    public void getByState_PathVariableError_Returns400() {
+        SalesTaxTrackingDto expectedSalesTaxTrackingDto =
+                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
+        String state = "NoneState";
+
+        when(salesTaxTrackingFacade.findByState(state)).thenReturn(Mono.just(salesTaxTracking));
+
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
     public void getByComplytId_Exists_Returns200() {
 
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
@@ -113,6 +132,26 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .isEqualTo(expectedSalesTaxTrackingDto);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getByComplytId_PathVariableInvalid_Returns400() {
+        SalesTaxTrackingDto expectedSalesTaxTrackingDto =
+                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
+        UUID complytId = expectedSalesTaxTrackingDto.complytId();
+        String nullComplytId = "null";
+
+        when(salesTaxTrackingFacade.findByComplytId(complytId)).thenReturn(Mono.just(salesTaxTracking));
+
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/complytId/" + nullComplytId).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Test
@@ -278,6 +317,35 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .expectStatus().isCreated()
                 .expectBody(SalesTaxTrackingDto.class)
                 .isEqualTo(expectedSalesTaxTrackingDto);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_PathVariableError_Returns400() {
+        // Given
+        SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null).withId(null).withTenantId(null);
+        String state = newSalesTaxTracking.getState().getName();
+        SalesTaxTracking salesTaxTrackingWithId = newSalesTaxTracking.withId(UUID.randomUUID().toString());
+        SalesTaxTrackingDto salesTaxTrackingDtoSent =
+                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(newSalesTaxTracking);
+        SalesTaxTrackingDto expectedSalesTaxTrackingDto =
+                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTrackingWithId);
+        String stateError = "null";
+
+        // When
+        when(salesTaxTrackingFacade.findByState(state)).thenReturn(Mono.empty());
+        when(salesTaxTrackingFacade.save(newSalesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingWithId));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateError).build())
+                .bodyValue(salesTaxTrackingDtoSent)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Test
@@ -532,6 +600,39 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .expectStatus().isOk()
                 .expectBodyList(SalesTaxTrackingDto.class)
                 .isEqualTo(salesTaxTrackingDtoList);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_QueryParamInvalid_Returns400() {
+        // Given
+        SalesTaxTracking secondSalesTaxTracking = salesTaxTracking
+                .withState(new State("NY", "05", "New York"));
+        SalesTaxTrackingDto salesTaxTrackingDto =
+                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
+        SalesTaxTrackingDto secondSalesTaxTrackingDto =
+                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(secondSalesTaxTracking);
+
+        List<SalesTaxTracking> salesTaxTrackingList = new ArrayList<>() {{
+            add(salesTaxTracking);
+            add(secondSalesTaxTracking);
+        }};
+
+        // When
+        when(salesTaxTrackingFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder ->
+                        uriBuilder.path(SalesTaxTrackingRouter.BASE_URL)
+                                .queryParam("page", "null")
+                                .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Test
@@ -1066,6 +1167,32 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isForbidden();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_PathVariableError_Returns400() {
+        // Given
+        LocalDate localDate = LocalDate.now();
+        String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto resultedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
+        String state = "null";
+
+        // When
+        when(salesTaxTrackingFacade.refreshNexusSummary(stateName, localDate)).thenReturn(Mono.just(salesTaxTracking));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state)
+                        .queryParam("date", localDate)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Test

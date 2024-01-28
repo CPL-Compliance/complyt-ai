@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springdoc.core.annotations.RouterOperation;
@@ -28,7 +29,9 @@ import java.lang.annotation.Target;
                         parameters = {
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "source",
-                                        description = "Transaction Source",
+                                        description = "Transaction Source (should be [1-9])",
+                                        required = true,
+                                        schema = @Schema(type = "string", pattern = "[1-9]"),
                                         examples = @ExampleObject(value = DeleteTransactionByExternalIdAndSourceApiInfo.sourceExample,
                                                 name = DeleteTransactionByExternalIdAndSourceApiInfo.sourceExample)),
                                 @Parameter(in = ParameterIn.PATH,

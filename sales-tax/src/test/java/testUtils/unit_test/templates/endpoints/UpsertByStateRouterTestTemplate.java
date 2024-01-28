@@ -7,6 +7,8 @@ public interface UpsertByStateRouterTestTemplate {
 
     void upsertByState_DoesntExists_Returns201();
 
+    void upsertByState_PathVariableError_Returns400();
+
     void upsertByState_CoupleValidationsFailure_Returns400WithErrorList();
 
     void upsertByState_DifferentStateInBody_Returns400ConflictedData();

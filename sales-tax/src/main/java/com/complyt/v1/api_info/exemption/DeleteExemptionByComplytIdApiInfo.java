@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springdoc.core.annotations.RouterOperation;
@@ -28,7 +29,9 @@ import java.lang.annotation.Target;
                         parameters = {
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "complytId",
-                                        description = "Exemption complyt ID",
+                                        description = "The unique identifier for a customer (UUID)",
+                                        required = true,
+                                        schema = @Schema(type = "string", format = "uuid"),
                                         examples = @ExampleObject(value = DeleteExemptionByComplytIdApiInfo.complytIdExample,
                                                 name = DeleteExemptionByComplytIdApiInfo.complytIdExample))
                         },
