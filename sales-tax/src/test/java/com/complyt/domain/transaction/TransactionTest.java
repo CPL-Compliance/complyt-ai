@@ -74,6 +74,7 @@ public class TransactionTest {
                 .withComplytId(transaction.getComplytId())
                 .withExternalId(transaction.getExternalId())
                 .withCustomer(transaction.getCustomer());
+
         // When
         Transaction actualTransaction = transaction.withId(differentId);
 
