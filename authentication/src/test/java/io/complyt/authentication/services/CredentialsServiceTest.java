@@ -2,9 +2,12 @@ package io.complyt.authentication.services;
 
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
+import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import io.complyt.authentication.repositories.CredentialsRepository;
 import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
+import io.complyt.authentication.v1.exceptions.types.ApiKeyNotValidException;
+import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +46,12 @@ class CredentialsServiceTest {
     @Mock
     Crypto cryptoAesGcmNoPadding;
 
+    @Mock
+    String grantType;
+
+    @Mock
+    String audience;
+
     @BeforeEach
     void setUp() {
         credentialsService = new CredentialsService(credentialsRepository, passwordEncoder, cryptoAesGcmNoPadding,
@@ -62,7 +71,7 @@ class CredentialsServiceTest {
 
         // Then
         Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
-        StepVerifier.create(credentialsByApiKeyMono).verifyComplete();
+        StepVerifier.create(credentialsByApiKeyMono).expectError(ApiKeyNotValidException.class).verify();
     }
 
     @Test
@@ -75,7 +84,7 @@ class CredentialsServiceTest {
 
         // Then
         Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
-        StepVerifier.create(credentialsByApiKeyMono).verifyComplete();
+        StepVerifier.create(credentialsByApiKeyMono).expectError(ApiKeyNotValidException.class).verify();
     }
 
     @Test
@@ -239,7 +248,10 @@ class CredentialsServiceTest {
                 "clientSecretCipherText");
 
         Credentials encryptedCredentials = TestUtilities.createEncryptedCredentials(apiKey, clientIdEncryptedData,
-                clientSecretEncryptedData, "encoded");
+                clientSecretEncryptedData, "encoded")
+                .withTenantId("TenantId")
+                .withName("Name")
+                .withStatus(ApiKeyStatus.ACTIVE);
 
         // When
         when(cryptoAesGcmNoPadding.encrypt(credentials.getClientId())).thenReturn(clientIdEncryptedData);

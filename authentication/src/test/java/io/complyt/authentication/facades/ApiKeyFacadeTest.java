@@ -1,6 +1,6 @@
 package io.complyt.authentication.facades;
 
-import io.complyt.authentication.business.authorization.TenentIdAndNameObject;
+import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.services.ApiKeyService;
@@ -58,7 +58,7 @@ class ApiKeyFacadeTest {
         // When
         when(apiKeyService.generate()).thenReturn(expectedApiKey);
         when(authorizationService.getTenantIdAndClientName(credentials))
-                .thenReturn(Mono.just(new TenentIdAndNameObject("TenantId", "Name")));
+                .thenReturn(Mono.just(new TenantIdAndNameObject("TenantId", "Name")));
         when(credentialsService.saveCredentials(credentials, expectedApiKey, "TenantId", "Name")).thenReturn(Mono.just(credentials));
 
         Mono<ApiKey> actualApiKey = apiKeyFacade.saveCredentials(credentials);

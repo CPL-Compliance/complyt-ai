@@ -96,4 +96,32 @@ class TokenRepositoryTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "token is marked non-null but is null");
     }
+
+    @Test
+    public void deleteByComplytClientId_complytClientIdExists_returnsTheDeletedToken() {
+        // Given
+        String complytClientId = "complytClientId";
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
+
+        // When
+        when(reactiveMongoTemplate.findAndRemove(query, Token.class)).thenReturn(Mono.just(token));
+
+        // Then
+        Mono<Token> tokenMono = tokenRepository.deleteByComplytClientId(complytClientId);
+        StepVerifier.create(tokenMono).expectNext(token).verifyComplete();
+    }
+
+    @Test
+    public void deleteByComplytClientId_tokenNotExists_returnsEmpty() {
+        // Given
+        String complytClientId = "complytClientId";
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
+
+        // When
+        when(reactiveMongoTemplate.findAndRemove(query, Token.class)).thenReturn(Mono.empty());
+
+        // Then
+        Mono<Token> tokenMono = tokenRepository.deleteByComplytClientId(complytClientId);
+        StepVerifier.create(tokenMono).verifyComplete();
+    }
 }

@@ -4,6 +4,7 @@ import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.business.authorization.AuthorizationServerWrapper;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.Token;
+import io.complyt.authentication.security.Crypto;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +29,9 @@ class AuthorizationServiceTest {
 
     @Mock
     AuthorizationServerWrapper authorizationServerWrapper;
+
+    @Mock
+    Crypto cryptoAesGcmNoPadding;
 
     @Test
     void getToken_validCredentials_returnToken() {

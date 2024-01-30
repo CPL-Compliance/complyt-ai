@@ -2,6 +2,7 @@ package io.complyt.authentication.services;
 
 import io.complyt.authentication.business.authorization.*;
 import io.complyt.authentication.domain.Credentials;
+import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
@@ -63,11 +64,10 @@ public class AuthorizationService {
     }
 
 
-    public Mono<TenentIdAndNameObject> getTenantIdAndClientName(@NonNull Credentials credentials) {
+    public Mono<TenantIdAndNameObject> getTenantIdAndClientName(@NonNull Credentials credentials) {
         return authorizationServerWrapper
                 .getManagementAccessToken()
-                .flatMap(token -> authorizationServerWrapper.getTenantIdAndClientNameFromAuth0(credentials.getClientId(), token.accessToken()))
-                .flatMap(auth0Client -> Mono.just(new TenentIdAndNameObject(auth0Client.getClient_metadata().getTenant_id(), auth0Client.getName())));
+                .flatMap(token -> authorizationServerWrapper.getTenantIdAndClientNameFromAuth0(credentials.getClientId(), token.accessToken()));
     }
 
     public Mono<String> getMangementAccessToken() {

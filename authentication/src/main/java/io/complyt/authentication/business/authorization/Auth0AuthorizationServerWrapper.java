@@ -1,6 +1,7 @@
 package io.complyt.authentication.business.authorization;
 
 import io.complyt.authentication.business.exceptions.ComplytAuth0Exception;
+import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.mappers.Auth0AccessTokenToAccessToken;
 import io.complyt.authentication.utils.observability.ContextLogger;
 import lombok.AccessLevel;
@@ -53,7 +54,6 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                         .bodyValue(json)
                         .retrieve()
                         .bodyToMono(Auth0Client.class)
-                        .map(x->x)
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
                                 .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
                                         new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))));
@@ -97,7 +97,7 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                         .map(Auth0AccessTokenToAccessToken.INSTANCE::map));
     }
 
-    public Mono<TenentIdAndNameObject> getTenantIdAndClientNameFromAuth0(final @NonNull String clientId, @NonNull String accessToken) {
+    public Mono<TenantIdAndNameObject> getTenantIdAndClientNameFromAuth0(final @NonNull String clientId, @NonNull String accessToken) {
         return ContextLogger.observeCtx("Getting TenantId And ClientName From Auth0", log::info)
                 .then(webClient.get()
                         .uri("/api/v2/clients/" + clientId)
@@ -105,10 +105,10 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                         .header("Authorization", "Bearer " + accessToken)
                         .retrieve()
                         .bodyToMono(Auth0Client.class)
+                        .map(x -> x)
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
                                 .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
                                         new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))))
-                .map(auth0Client -> new TenentIdAndNameObject(auth0Client.getClient_metadata().getTenant_id(),auth0Client.getName()));
+                .map(auth0Client -> new TenantIdAndNameObject(auth0Client.getClient_metadata().getTenant_id(), auth0Client.getName()));
     }
-
 }

@@ -13,7 +13,7 @@ crypto:
 authorization:
   grant-type: client-credentials
   audience: test
-  authorization-server-url: https://test.com
+  authorization-server-base-url: https://test.com
 
 token-service:
   token-expiration-safe-window-sec: 60

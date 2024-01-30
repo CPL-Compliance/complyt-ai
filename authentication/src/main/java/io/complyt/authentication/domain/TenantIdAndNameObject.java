@@ -1,12 +1,11 @@
-package io.complyt.authentication.business.authorization;
+package io.complyt.authentication.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.aspectj.weaver.Iterators;
 
 @AllArgsConstructor
 @Getter
-public class TenentIdAndNameObject {
+public class TenantIdAndNameObject {
     private String tenantId;
     private String name;
 }
