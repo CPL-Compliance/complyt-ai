@@ -36,4 +36,6 @@ public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, S
     Mono<SalesTaxTracking> checkSalesTaxTrackingNotHavingComplytId(@NonNull final SalesTaxTracking newSalesTaxTracking);
 
     Mono<SalesTaxTracking> insertSummariesFromOriginal(@NonNull final SalesTaxTracking checkedSalesTaxTracking, @NonNull final SalesTaxTracking originalSalesTaxTracking);
+
+    Mono<SalesTaxTracking> updateEconomicNexus(SalesTaxTracking salesTaxTracking);
 }
