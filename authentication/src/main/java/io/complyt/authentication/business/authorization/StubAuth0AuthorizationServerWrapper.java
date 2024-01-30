@@ -33,7 +33,7 @@ public class StubAuth0AuthorizationServerWrapper implements AuthorizationServerW
     }
 
     @Override
-    public Mono<Auth0Client> getTenantIdAndClientNameFromAuth0(@NonNull String clientId, @NonNull String accessToken) {
+    public Mono<TenentIdAndNameObject> getTenantIdAndClientNameFromAuth0(@NonNull String clientId, @NonNull String accessToken) {
         return null;
     }
 }

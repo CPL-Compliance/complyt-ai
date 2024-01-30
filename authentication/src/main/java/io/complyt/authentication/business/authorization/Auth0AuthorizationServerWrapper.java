@@ -97,7 +97,7 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                         .map(Auth0AccessTokenToAccessToken.INSTANCE::map));
     }
 
-    public Mono<Auth0Client> getTenantIdAndClientNameFromAuth0(final @NonNull String clientId, @NonNull String accessToken) {
+    public Mono<TenentIdAndNameObject> getTenantIdAndClientNameFromAuth0(final @NonNull String clientId, @NonNull String accessToken) {
         return ContextLogger.observeCtx("Getting TenantId And ClientName From Auth0", log::info)
                 .then(webClient.get()
                         .uri("/api/v2/clients/" + clientId)
@@ -107,7 +107,8 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                         .bodyToMono(Auth0Client.class)
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
                                 .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
-                                        new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))));
+                                        new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))))
+                .map(auth0Client -> new TenentIdAndNameObject(auth0Client.getClient_metadata().getTenant_id(),auth0Client.getName()));
     }
 
 }
