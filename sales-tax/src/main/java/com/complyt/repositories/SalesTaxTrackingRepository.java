@@ -85,10 +85,14 @@ public class SalesTaxTrackingRepository {
 
     public Mono<SalesTaxTracking> updateEconomicNexus(SalesTaxTracking salesTaxTracking) {
         Query query = new Query(Criteria.where("_id").is(salesTaxTracking.getId()));
-        Update update = new Update().set("economicNexusTracker", salesTaxTracking.getEconomicNexusTracker());
+        Update update = new Update()
+                .set("economicNexusTracker", salesTaxTracking.getEconomicNexusTracker());
+        update.set("nexusCalculationSummaries", salesTaxTracking.getNexusCalculationSummaries());
+        update.set("transactionNexusSummaries", salesTaxTracking.getTransactionNexusSummaries());
 
-        return ContextLogger.observeCtx("Updating sales tax tracking with EconomicNexusTracker " + salesTaxTracking.getEconomicNexusTracker(), log::info)
-                .then(reactiveMongoTemplate.findAndModify(query, update, SalesTaxTracking.class));
+        return ContextLogger.observeCtx("Updating sales tax tracking with query " + update, log::info)
+                .then(reactiveMongoTemplate.findAndModify(query, update, SalesTaxTracking.class))
+                .then(Mono.just(salesTaxTracking));
     }
 
 }

@@ -64,47 +64,47 @@ public class TransactionFacade {
                 .flatMap(transactionService::save);
     }
 
-    private Mono<Transaction> saveAndHandleNexusTrackingCalculation(Transaction transaction, SalesTaxTracking salesTaxTracking) {
-        return transactionService.save(transaction.withCustomer(null))
-                .map(savedTransaction -> savedTransaction.withCustomer(transaction.getCustomer()))
-                .flatMap(savedTransaction -> salesTaxTracking.isEnforcesSalesTax()
-                        ? nexusService.upsertToNexusTracking(savedTransaction, salesTaxTracking)
-                        .flatMap(salesTaxTrackingService::save)
-                        .thenReturn(savedTransaction)
-                        : Mono.just(savedTransaction));
-    }
-
 //    private Mono<Transaction> saveAndHandleNexusTrackingCalculation(Transaction transaction, SalesTaxTracking salesTaxTracking) {
 //        return transactionService.save(transaction.withCustomer(null))
 //                .map(savedTransaction -> savedTransaction.withCustomer(transaction.getCustomer()))
 //                .flatMap(savedTransaction -> salesTaxTracking.isEnforcesSalesTax()
 //                        ? nexusService.upsertToNexusTracking(savedTransaction, salesTaxTracking)
-//                        .flatMap(salesTaxTrackingAfterCalculation -> salesTaxTrackingAfterCalculation.getEconomicNexusTracker().isEstablished() ?
-//                                salesTaxTrackingService.updateEconomicNexus(salesTaxTrackingAfterCalculation) :
-//                                salesTaxTrackingService.save(salesTaxTrackingAfterCalculation))
+//                        .flatMap(salesTaxTrackingService::save)
 //                        .thenReturn(savedTransaction)
 //                        : Mono.just(savedTransaction));
 //    }
 
-    private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, String source, Transaction transaction, SalesTaxTracking salesTaxTracking) {
-        return salesTaxTracking.isEnforcesSalesTax()
-                ? transactionService.update(externalId, source, transaction)
-                .flatMap(updatedTransaction -> nexusService.upsertToNexusTracking(updatedTransaction.withCustomer(transaction.getCustomer()), salesTaxTracking)
-                        .flatMap(salesTaxTrackingService::save)
-                        .thenReturn(updatedTransaction))
-                : transactionService.update(externalId, source, transaction);
+    private Mono<Transaction> saveAndHandleNexusTrackingCalculation(Transaction transaction, SalesTaxTracking salesTaxTracking) {
+        return transactionService.save(transaction.withCustomer(null))
+                .map(savedTransaction -> savedTransaction.withCustomer(transaction.getCustomer()))
+                .flatMap(savedTransaction -> salesTaxTracking.isEnforcesSalesTax()
+                        ? nexusService.upsertToNexusTracking(savedTransaction, salesTaxTracking)
+                        .flatMap(salesTaxTrackingAfterCalculation -> salesTaxTrackingAfterCalculation.getEconomicNexusTracker().isEstablished() ?
+                                salesTaxTrackingService.updateEconomicNexus(salesTaxTrackingAfterCalculation) :
+                                salesTaxTrackingService.save(salesTaxTrackingAfterCalculation))
+                        .thenReturn(savedTransaction)
+                        : Mono.just(savedTransaction));
     }
 
 //    private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, String source, Transaction transaction, SalesTaxTracking salesTaxTracking) {
 //        return salesTaxTracking.isEnforcesSalesTax()
 //                ? transactionService.update(externalId, source, transaction)
 //                .flatMap(updatedTransaction -> nexusService.upsertToNexusTracking(updatedTransaction.withCustomer(transaction.getCustomer()), salesTaxTracking)
-//                        .flatMap(salesTaxTrackingAfterCalculation -> salesTaxTrackingAfterCalculation.getEconomicNexusTracker().isEstablished() ?
-//                                salesTaxTrackingService.updateEconomicNexus(salesTaxTrackingAfterCalculation) :
-//                                salesTaxTrackingService.save(salesTaxTrackingAfterCalculation))
+//                        .flatMap(salesTaxTrackingService::save)
 //                        .thenReturn(updatedTransaction))
 //                : transactionService.update(externalId, source, transaction);
 //    }
+
+    private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, String source, Transaction transaction, SalesTaxTracking salesTaxTracking) {
+        return salesTaxTracking.isEnforcesSalesTax()
+                ? transactionService.update(externalId, source, transaction)
+                .flatMap(updatedTransaction -> nexusService.upsertToNexusTracking(updatedTransaction.withCustomer(transaction.getCustomer()), salesTaxTracking)
+                        .flatMap(salesTaxTrackingAfterCalculation -> salesTaxTrackingAfterCalculation.getEconomicNexusTracker().isEstablished() ?
+                                salesTaxTrackingService.updateEconomicNexus(salesTaxTrackingAfterCalculation).then(salesTaxTrackingService.save(salesTaxTrackingAfterCalculation)) :
+                                salesTaxTrackingService.save(salesTaxTrackingAfterCalculation))
+                        .thenReturn(updatedTransaction))
+                : transactionService.update(externalId, source, transaction);
+    }
 
     public Mono<Transaction> updateIfModified(@NonNull String externalId, @NonNull String source, @NonNull Transaction newTransaction, @NonNull Transaction originalTransaction) {
         return originalTransaction.equals(newTransaction) ?
