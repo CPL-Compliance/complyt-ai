@@ -1,4 +1,4 @@
-package com.complyt.utils.query;
+package com.complyt.utils.update;
 
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.SalesTaxTracking;

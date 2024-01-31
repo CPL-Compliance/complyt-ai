@@ -3,7 +3,7 @@ package com.complyt.repositories;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
-import com.complyt.utils.query.SalesTaxTrackingUpdateQueryBuilder;
+import com.complyt.utils.update.SalesTaxTrackingUpdateQueryBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
