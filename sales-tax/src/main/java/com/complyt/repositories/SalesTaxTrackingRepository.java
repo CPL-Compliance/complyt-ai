@@ -2,6 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
 import lombok.AccessLevel;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -86,16 +88,18 @@ public class SalesTaxTrackingRepository {
                 });
     }
 
-    public Mono<SalesTaxTracking> updateEconomicNexus(SalesTaxTracking salesTaxTracking) {
+    public Mono<SalesTaxTracking> updateEconomicNexus(@NonNull SalesTaxTracking salesTaxTracking) {
         Query query = new Query(Criteria.where("_id").is(salesTaxTracking.getId()));
         Update update = new Update()
                 .set("economicNexusTracker", salesTaxTracking.getEconomicNexusTracker());
-        update.set("transactionNexusSummaries", salesTaxTracking.getTransactionNexusSummaries());
         update.set("appliedDate", salesTaxTracking.getAppliedDate());
 
-        Map<Long, NexusCalculationSummary> numericKeysSummaries = salesTaxTracking.getNexusCalculationSummaries().entrySet().stream()
-                .collect(Collectors.toMap(entry -> entry.getKey().toEpochDay(), Map.Entry::getValue));
-        update.set("nexusCalculationSummaries", numericKeysSummaries);
+        if (!salesTaxTracking.getNexusStateRule().timeFrame().equals(TimeFrame.PREVIOUS_TWELVE_MONTHS)) {
+            update.set("transactionNexusSummaries", salesTaxTracking.getTransactionNexusSummaries());
+            Map<String, NexusCalculationSummary> stringKeysSummaries = salesTaxTracking.getNexusCalculationSummaries().entrySet().stream()
+                    .collect(Collectors.toMap(entry -> entry.getKey().format(DateTimeFormatter.ISO_LOCAL_DATE), Map.Entry::getValue));
+            update.set("nexusCalculationSummaries", stringKeysSummaries);
+        }
 
         return ContextLogger.observeCtx("Updating sales tax tracking with query " + update, log::info)
                 .then(reactiveMongoTemplate.findAndModify(query, update, SalesTaxTracking.class))
