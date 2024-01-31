@@ -91,9 +91,10 @@ public class SalesTaxTrackingRepository {
         Query query = new Query(Criteria.where("_id").is(salesTaxTracking.getId()));
         Update update = updateQueryBuilder.build(salesTaxTracking);
 
-        return ContextLogger.observeCtx("Updating sales tax tracking Fields: " + update, log::info)
-                .then(reactiveMongoTemplate.findAndModify(query, update, SalesTaxTracking.class))
-                .then(Mono.just(salesTaxTracking));
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> ContextLogger.observeCtx("Updating sales tax tracking Fields: " + update, log::info)
+                        .then(reactiveMongoTemplate.findAndModify(query, update, SalesTaxTracking.class))
+                        .then(Mono.just(salesTaxTracking.withTenantId(tenantId))));
     }
 
 }

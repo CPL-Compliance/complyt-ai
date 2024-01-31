@@ -30,12 +30,16 @@ import com.complyt.v1.validators.body_checkers.ItemsAlignmentChecker;
 import com.complyt.v1.validators.body_checkers.TransactionDtoShippingAddressChecker;
 import com.complyt.v1.validators.body_checkers.TransactionTotalAmountChecker;
 import feign.Body;
+import lombok.NonNull;
+import org.springframework.data.mongodb.core.query.Update;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -265,8 +269,8 @@ public class UnitTestUtilities {
     }
 
     public ItemDto createItemDtoWithNegativeAmount(boolean withJurisdictionalRules, boolean withTangibleCategory) {
-            return new ItemDto(new BigDecimal(-2000), new BigDecimal(4), new BigDecimal(-8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
-                    null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE);
+        return new ItemDto(new BigDecimal(-2000), new BigDecimal(4), new BigDecimal(-8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+                null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE);
     }
 
     public SalesTaxRates createSalesTaxRates() {
@@ -453,6 +457,26 @@ public class UnitTestUtilities {
                         new TransactionTotalAmountChecker(),
                         new ItemsAlignmentChecker()
                 ));
+    }
+
+    public Update buildSalesTaxTrackingUpdate(SalesTaxTracking salesTaxTracking) {
+        Update update = buildSalesTaxTrackingUpdateOfPreviousTwelveMonths(salesTaxTracking);
+
+        update.set("transactionNexusSummaries", salesTaxTracking.getTransactionNexusSummaries());
+        Map<String, NexusCalculationSummary> stringKeysSummaries = salesTaxTracking.getNexusCalculationSummaries().entrySet().stream()
+                .collect(Collectors.toMap(entry -> entry.getKey().format(DateTimeFormatter.ISO_LOCAL_DATE), Map.Entry::getValue));
+        update.set("nexusCalculationSummaries", stringKeysSummaries);
+
+        return update;
+    }
+
+    public Update buildSalesTaxTrackingUpdateOfPreviousTwelveMonths(SalesTaxTracking salesTaxTracking) {
+        Update update = new Update();
+
+        update.set("economicNexusTracker", salesTaxTracking.getEconomicNexusTracker());
+        update.set("appliedDate", salesTaxTracking.getAppliedDate());
+
+        return update;
     }
 
 }

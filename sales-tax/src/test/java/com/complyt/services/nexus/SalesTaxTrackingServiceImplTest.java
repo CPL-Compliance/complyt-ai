@@ -163,6 +163,15 @@ public class SalesTaxTrackingServiceImplTest {
         StepVerifier.create(actualSalesTaxTracking).expectNext(savedSalesTaxTracking).verifyComplete();
     }
 
+    @Test
+    void updateEconomicNexus_UpdatesSalesTaxTracking_ReturnsSalesTaxTracking() {
+        // Given + When
+        when(salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.updateEconomicNexus(salesTaxTracking);
+
+        // Then
+        StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
+    }
 
     @Test
     void save_NullSalesTaxTrackingPassed_ThrowsException() {
