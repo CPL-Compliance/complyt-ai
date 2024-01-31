@@ -38,7 +38,7 @@ public class ApiKeyFacade {
     public Mono<Credentials> markAsCancelled(@NonNull final ApiKey apiKey) {
 
         return credentialsService.markAsCancelled(apiKey)
-                .flatMap(credentials -> authorizationService.getMangementAccessToken()
+                .flatMap(credentials -> authorizationService.getManagementAccessToken()
                         .flatMap(accessToken -> authorizationService.deleteApiKey(credentials, accessToken)
                 .then(tokenService.deleteToken(apiKey)
                         .thenReturn(credentials))));

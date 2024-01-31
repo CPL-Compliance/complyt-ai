@@ -40,14 +40,15 @@ public class TokenService {
 
 
     public Mono<Token> findByApiKeyAndDecrypt(final @NonNull ApiKey apiKey) {
-        return findByApiKey(apiKey)
+        return tokenRepository.findByComplytClientId(apiKey.clientId())
+                .filter(token -> passwordEncoder.matches(apiKey.clientSecret(), token.getComplytClientSecret()))
                 .map(this::decryptToken);
     }
 
-    public Mono<Token> findByApiKey(final @NonNull ApiKey apiKey) {
-        return tokenRepository.findByComplytClientId(apiKey.clientId())
-                .filter(token -> passwordEncoder.matches(apiKey.clientSecret(), token.getComplytClientSecret()));
-    }
+//    public Mono<Token> findByApiKey(final @NonNull ApiKey apiKey) {
+//        return tokenRepository.findByComplytClientId(apiKey.clientId())
+//                .filter(token -> passwordEncoder.matches(apiKey.clientSecret(), token.getComplytClientSecret()));
+//    }
 
     public Mono<Token> saveToken(@NonNull Token token) {
         return Mono.just(createDocumentExpirationDateTime(token.getExpiresIn()))

@@ -26,6 +26,7 @@ import javax.crypto.NoSuchPaddingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -46,36 +47,36 @@ class CredentialsServiceTest {
     @Mock
     Crypto cryptoAesGcmNoPadding;
 
-    @Mock
-    String grantType;
-
-    @Mock
-    String audience;
-
     @BeforeEach
     void setUp() {
+        String grantType = "grantType";
+        String audience = "audience";
         credentialsService = new CredentialsService(credentialsRepository, passwordEncoder, cryptoAesGcmNoPadding,
-                "grantType", "audience");
+                grantType, audience);
     }
 
     @Test
-    void getCredentialsByApiKey_failedAuthentication_returnsMonoEmpty() {
+    void test(){}
+
+    @Test
+    void getCredentialsByApiKeyAndDecrypt_credentialsExistsWithStatusCancelled_returnsMonoEmpty() {
         // Given
         Credentials credentials = TestUtilities.createCredentials();
+        Credentials cancelledCcredentials = credentials.withStatus(ApiKeyStatus.CANCELLED);
+
         ApiKey apiKey = TestUtilities.createApiKey();
 
         // When
-        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
-        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
-                .thenReturn(false);
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(cancelledCcredentials));
+        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret())).thenReturn(true);
 
         // Then
         Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
-        StepVerifier.create(credentialsByApiKeyMono).expectError(ApiKeyNotValidException.class).verify();
+        StepVerifier.create(credentialsByApiKeyMono).verifyComplete();
     }
 
     @Test
-    void getCredentialsByApiKey_noDocumentWithClientId_returnsMonoEmpty() {
+    void getCredentialsByApiKeyAndDecrypt_noDocumentWithClientId_returnsMonoEmpty() {
         // Given
         ApiKey apiKey = TestUtilities.createApiKey();
 
@@ -84,11 +85,11 @@ class CredentialsServiceTest {
 
         // Then
         Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
-        StepVerifier.create(credentialsByApiKeyMono).expectError(ApiKeyNotValidException.class).verify();
+        StepVerifier.create(credentialsByApiKeyMono).verifyComplete();
     }
 
     @Test
-    void getCredentialsByApiKey_credentialsExsits_returnsCredentials()
+    void getCredentialsByApiKeyAndDecrypt_credentialsExists_returnsCredentials()
             throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
             BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         // Given
@@ -111,7 +112,7 @@ class CredentialsServiceTest {
     }
 
     @Test
-    void getCredentialsByApiKey_decryptionThrowsBadPaddingException_throwsRuntimeException()
+    void getCredentialsByApiKeyAndDecrypt_decryptionThrowsBadPaddingException_throwsRuntimeException()
             throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
             BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         // Given
@@ -132,7 +133,7 @@ class CredentialsServiceTest {
     }
 
     @Test
-    void getCredentialsByApiKey_decryptionThrowsIllegalBlockSizeException_throwsRuntimeException()
+    void getCredentialsByApiKeyAndDecrypt_decryptionThrowsIllegalBlockSizeException_throwsRuntimeException()
             throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
             BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         // Given
@@ -153,7 +154,7 @@ class CredentialsServiceTest {
     }
 
     @Test
-    void getCredentialsByApiKey_decryptionThrowsInvalidAlgorithmParameterException_throwsRuntimeException()
+    void getCredentialsByApiKeyAndDecrypt_decryptionThrowsInvalidAlgorithmParameterException_throwsRuntimeException()
             throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
             BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         // Given
@@ -174,7 +175,7 @@ class CredentialsServiceTest {
     }
 
     @Test
-    void getCredentialsByApiKey_decryptionThrowsInvalidKeyException_throwsRuntimeException()
+    void getCredentialsByApiKeyAndDecrypt_decryptionThrowsInvalidKeyException_throwsRuntimeException()
             throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
             BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         // Given
@@ -195,7 +196,7 @@ class CredentialsServiceTest {
     }
 
     @Test
-    void getCredentialsByApiKey_decryptionThrowsNoSuchPaddingException_throwsRuntimeException()
+    void getCredentialsByApiKeyAndDecrypt_decryptionThrowsNoSuchPaddingException_throwsRuntimeException()
             throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
             BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         // Given
@@ -216,7 +217,7 @@ class CredentialsServiceTest {
     }
 
     @Test
-    void getCredentialsByApiKey_decryptionThrowsNoSuchAlgorithmException_throwsRuntimeException()
+    void getCredentialsByApiKeyAndDecrypt_decryptionThrowsNoSuchAlgorithmException_throwsRuntimeException()
             throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
             BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         // Given
@@ -243,14 +244,14 @@ class CredentialsServiceTest {
         // Given
         ApiKey apiKey = TestUtilities.createApiKey();
         Credentials credentials = TestUtilities.createCredentials();
+        String tenantId = TestUtilities.tenantId;
+        String name = TestUtilities.name;
         EncryptedData clientIdEncryptedData = new EncryptedData("clientIdIv", "clientIdCipherText");
         EncryptedData clientSecretEncryptedData = new EncryptedData("clientSecretIv",
                 "clientSecretCipherText");
 
         Credentials encryptedCredentials = TestUtilities.createEncryptedCredentials(apiKey, clientIdEncryptedData,
-                clientSecretEncryptedData, "encoded")
-                .withTenantId("TenantId")
-                .withName("Name")
+                        clientSecretEncryptedData, "encoded")
                 .withStatus(ApiKeyStatus.ACTIVE);
 
         // When
@@ -260,7 +261,7 @@ class CredentialsServiceTest {
         when(credentialsRepository.save(encryptedCredentials)).thenReturn(Mono.just(encryptedCredentials));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, "TenantId", "Name");
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, tenantId, name);
 
         StepVerifier.create(credentialsMono).expectNext(encryptedCredentials).verifyComplete();
     }
@@ -272,13 +273,15 @@ class CredentialsServiceTest {
         // Given
         ApiKey apiKey = TestUtilities.createApiKey();
         Credentials credentials = TestUtilities.createCredentials();
+        String tenantId = TestUtilities.tenantId;
+        String name = TestUtilities.name;
 
         // When
         when(cryptoAesGcmNoPadding.encrypt(credentials.getClientId()))
                 .thenThrow(new NoSuchPaddingException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, "TenantId", "Name");
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, tenantId, name);
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -290,13 +293,15 @@ class CredentialsServiceTest {
         // Given
         ApiKey apiKey = TestUtilities.createApiKey();
         Credentials credentials = TestUtilities.createCredentials();
+        String tenantId = TestUtilities.tenantId;
+        String name = TestUtilities.name;
 
         // When
         when(cryptoAesGcmNoPadding.encrypt(credentials.getClientId()))
                 .thenThrow(new NoSuchAlgorithmException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, "TenantId", "Name");
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, tenantId, name);
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -308,13 +313,15 @@ class CredentialsServiceTest {
         // Given
         ApiKey apiKey = TestUtilities.createApiKey();
         Credentials credentials = TestUtilities.createCredentials();
+        String tenantId = TestUtilities.tenantId;
+        String name = TestUtilities.name;
 
         // When
         when(cryptoAesGcmNoPadding.encrypt(credentials.getClientId()))
                 .thenThrow(new InvalidAlgorithmParameterException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey,"TenantId", "Name");
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, tenantId, name);
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -326,13 +333,15 @@ class CredentialsServiceTest {
         // Given
         ApiKey apiKey = TestUtilities.createApiKey();
         Credentials credentials = TestUtilities.createCredentials();
+        String tenantId = TestUtilities.tenantId;
+        String name = TestUtilities.name;
 
         // When
         when(cryptoAesGcmNoPadding.encrypt(credentials.getClientId()))
                 .thenThrow(new InvalidKeyException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey,"TenantId", "Name");
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, tenantId, name);
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -344,13 +353,15 @@ class CredentialsServiceTest {
         // Given
         ApiKey apiKey = TestUtilities.createApiKey();
         Credentials credentials = TestUtilities.createCredentials();
+        String tenantId = TestUtilities.tenantId;
+        String name = TestUtilities.name;
 
         // When
         when(cryptoAesGcmNoPadding.encrypt(credentials.getClientId()))
                 .thenThrow(new BadPaddingException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, "TenantId", "Name");
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, tenantId, name);
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
@@ -362,19 +373,37 @@ class CredentialsServiceTest {
         // Given
         ApiKey apiKey = TestUtilities.createApiKey();
         Credentials credentials = TestUtilities.createCredentials();
+        String tenantId = TestUtilities.tenantId;
+        String name = TestUtilities.name;
 
         // When
         when(cryptoAesGcmNoPadding.encrypt(credentials.getClientId()))
                 .thenThrow(new IllegalBlockSizeException("Error"));
 
         // Then
-        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, "TenantId", "Name");
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, tenantId, name);
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
 
     @Test
-    void getCredentialsByApiKey_apiKeyIsNull_throwsNullException() {
+    void markAsCancelled_credentialsFoundAndCancelled_returnCredentials(){
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Credentials credentials = TestUtilities.createCredentials();
+        Credentials cancelledCredentials = credentials.withStatus(ApiKeyStatus.CANCELLED);
+
+        //When
+        when(credentialsRepository.markAsCancelled(apiKey.clientId())).thenReturn(Mono.just(cancelledCredentials));
+
+        //Then
+        Mono<Credentials> credentialsMono = credentialsService.markAsCancelled(apiKey);
+        StepVerifier.create(credentialsMono).expectNext(cancelledCredentials).verifyComplete();
+
+    }
+
+    @Test
+    void getCredentialsByApiKeyAndDecrypt_apiKeyIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             credentialsService.getCredentialsByApiKeyAndDecrypt(null);
         });
@@ -384,8 +413,11 @@ class CredentialsServiceTest {
 
     @Test
     void saveCredentials_apiKeyIsNull_throwsNullException() {
+        String tenantId = TestUtilities.tenantId;
+        String name = TestUtilities.name;
+
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            credentialsService.saveCredentials(TestUtilities.createCredentials(), null, "TenantId", "Name");
+            credentialsService.saveCredentials(TestUtilities.createCredentials(), null, tenantId, name);
         });
 
         assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
@@ -393,10 +425,22 @@ class CredentialsServiceTest {
 
     @Test
     void saveCredentials_credentialsIsNull_throwsNullException() {
+        String tenantId = TestUtilities.tenantId;
+        String name = TestUtilities.name;
+
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            credentialsService.saveCredentials(null, TestUtilities.createApiKey(), "TenantId", "Name");
+            credentialsService.saveCredentials(null, TestUtilities.createApiKey(), tenantId, name);
         });
 
         assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");
+    }
+
+    @Test
+    void markAsCancelled_apiKeyIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsService.markAsCancelled(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
     }
 }

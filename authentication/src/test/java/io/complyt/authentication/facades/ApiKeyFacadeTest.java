@@ -44,6 +44,9 @@ class ApiKeyFacadeTest {
 
     Credentials credentials;
 
+    final String tenantId = TestUtilities.tenantId;
+    final String name = TestUtilities.name;
+
     @BeforeEach
     void setUp() {
         credentials = TestUtilities.createCredentials();
@@ -54,18 +57,17 @@ class ApiKeyFacadeTest {
         String expectedApiKeyClientIdStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1ec";
         String expectedApiKeyClientSecretStr = "3572db2e-486b-480a-995b-2e4d2b9104fa";
         ApiKey expectedApiKey = new ApiKey(expectedApiKeyClientIdStr, expectedApiKeyClientSecretStr);
+        TenantIdAndNameObject tenantIdAndNameObject = new TenantIdAndNameObject(tenantId, name);
 
         // When
         when(apiKeyService.generate()).thenReturn(expectedApiKey);
-        when(authorizationService.getTenantIdAndClientName(credentials))
-                .thenReturn(Mono.just(new TenantIdAndNameObject("TenantId", "Name")));
-        when(credentialsService.saveCredentials(credentials, expectedApiKey, "TenantId", "Name")).thenReturn(Mono.just(credentials));
+        when(authorizationService.getTenantIdAndClientName(credentials)).thenReturn(Mono.just(tenantIdAndNameObject));
+        when(credentialsService.saveCredentials(credentials, expectedApiKey, tenantId, name)).thenReturn(Mono.just(credentials));
 
+        // Then
         Mono<ApiKey> actualApiKey = apiKeyFacade.saveCredentials(credentials);
 
-        StepVerifier.create(actualApiKey)
-                .expectNext(expectedApiKey)
-                .verifyComplete();
+        StepVerifier.create(actualApiKey).expectNext(expectedApiKey).verifyComplete();
     }
 
     @Test

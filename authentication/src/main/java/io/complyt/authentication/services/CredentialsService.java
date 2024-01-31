@@ -44,18 +44,20 @@ public class CredentialsService {
     String audience;
 
     public Mono<Credentials> getCredentialsByApiKeyAndDecrypt(final @NonNull ApiKey apiKey) {
-        return getCredentialsByApiKey(apiKey)
+        return credentialsRepository.findByComplytClientId(apiKey.clientId())
+                .filter(credentials -> passwordEncoder.matches(apiKey.clientSecret(),
+                        credentials.getComplytClientSecret()))
                 .filter(credentials -> credentials.getStatus().equals(ApiKeyStatus.ACTIVE))
                 .switchIfEmpty(Mono.empty())
                 .flatMap(this::decrypt);
     }
 
-    public Mono<Credentials> getCredentialsByApiKey(final @NonNull ApiKey apiKey) {
-        return credentialsRepository.findByComplytClientId(apiKey.clientId())
-                .filter(credentials -> passwordEncoder.matches(apiKey.clientSecret(),
-                        credentials.getComplytClientSecret()))
-                .switchIfEmpty(Mono.error(new ApiKeyNotValidException()));
-    }
+//    public Mono<Credentials> getCredentialsByApiKey(final @NonNull ApiKey apiKey) {
+//        return credentialsRepository.findByComplytClientId(apiKey.clientId())
+//                .filter(credentials -> passwordEncoder.matches(apiKey.clientSecret(),
+//                        credentials.getComplytClientSecret()))
+//                .switchIfEmpty(Mono.error(new ApiKeyNotValidException()));
+//    }
 
     public Mono<Credentials> markAsCancelled(final @NonNull ApiKey apiKey) {
         return credentialsRepository.markAsCancelled(apiKey.clientId());

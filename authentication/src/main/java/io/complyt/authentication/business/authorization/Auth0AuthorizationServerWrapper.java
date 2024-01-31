@@ -79,8 +79,6 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
     }
 
     public Mono<AccessToken> getManagementAccessToken() {
-
-
         return ContextLogger.observeCtx("Getting Auth0 Management Token", log::info)
                 .then(webClient.post()
                         .uri("oauth/token")

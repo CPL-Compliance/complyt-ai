@@ -2,8 +2,10 @@ package test_utils.unit_tests;
 
 import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.business.authorization.Auth0AccessToken;
+import io.complyt.authentication.business.authorization.Auth0Client;
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
+import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import io.complyt.authentication.security.EncryptedData;
@@ -17,12 +19,15 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class TestUtilities {
-    String tenantId = UUID.randomUUID().toString();
+    public static String tenantId = UUID.randomUUID().toString();
 
     public static String apiKeyClientIdStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1ec";
     public static String apiKeyClientSecretStr = "3572db2e-486b-480a-995b-2e4d2b9104fa";
     public static String invalidApiKeyClientIdStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1e";
     public static String invalidApiKeyClientSecretStr = "3572db2e-486b-480a-995b-";
+
+    public static String name = "Name";
+    public static String managementToken = "managementToken";
 
     static String accessToken = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InJ0RU1OdWRnTWx5aTJtMzVLSnJQRSJ9." +
             "eyJ0ZW5hbnRfaWQiOiJvcmdfU3R0QWNCa0s3YjMydzdrQSIsImlzcyI6Imh0dHBzOi8vZGV2ZWxvcG1lbnQtY29tcGx5dC51cy5" +
@@ -80,6 +85,10 @@ public class TestUtilities {
         return new AccessToken("Access Token", "Scope", expiresIn, "Token Type");
     }
 
+    public static AccessToken createManagementAccessToken() {
+        return new AccessToken("Access Token", "Scope", expiresIn, "Token Type");
+    }
+
     public static Auth0AccessToken createAuth0AccessToken() {
         return new Auth0AccessToken("Access Token", "Scope", expiresIn, "Token Type");
     }
@@ -88,6 +97,12 @@ public class TestUtilities {
         return new Credentials("id", "complytClientId", "complytClientSecret",
                 "ClientID", "ClientSecret", "Audience", "GrantType",
                 "audience", "Grant Type", "TenantId", "Name", ApiKeyStatus.ACTIVE);
+    }
+
+    public static Auth0Client createAuth0Client() {
+        return new Auth0Client("tenant", false, false, "name", new Auth0Client.ClientMetadata("tenantId", "ClientId", "clientSecret"),
+                true, true, false, false,null, null, "clientId", true, "clientSecret",
+                null, "appType", null, true );
     }
 
     public static ApiKey createApiKey() {
@@ -155,7 +170,10 @@ public class TestUtilities {
                 .clientSecret(clientSecretEncryptedData.cipherText())
                 .clientSecretIv(clientSecretEncryptedData.iv()).audience("audience").grantType("grantType")
                 .complytClientId(apiKey.clientId())
-                .complytClientSecret(clientSecretEncoded).build();
+                .complytClientSecret(clientSecretEncoded)
+                .name("Name")
+                .tenantId(tenantId)
+                .build();
     }
 
     public static Token createEncryptedToken(@NonNull Token token, @NonNull EncryptedData accessTokenEncryptedData,
@@ -172,5 +190,11 @@ public class TestUtilities {
                 .expireAt(token.getExpireAt())
                 .createdAt(token.getCreatedAt())
                 .build();
+    }
+    public static EncryptedData createEncryptedClientId(Credentials credentials){
+        return new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
+    }
+    public static TenantIdAndNameObject createTenantIdAndNameObject(Credentials credentials){
+        return new TenantIdAndNameObject(credentials.getTenantId(), credentials.getName());
     }
 }

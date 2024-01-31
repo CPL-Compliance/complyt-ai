@@ -53,7 +53,6 @@ public class AuthorizationService {
 
         String decodedClientId;
         EncryptedData encryptedClientId = new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
-
         try {
             decodedClientId = cryptoAesGcmNoPadding.decrypt(encryptedClientId);
         } catch (IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException |
@@ -70,7 +69,7 @@ public class AuthorizationService {
                 .flatMap(token -> authorizationServerWrapper.getTenantIdAndClientNameFromAuth0(credentials.getClientId(), token.accessToken()));
     }
 
-    public Mono<String> getMangementAccessToken() {
+    public Mono<String> getManagementAccessToken() {
         return authorizationServerWrapper
                 .getManagementAccessToken()
                 .map(AccessToken::accessToken);
