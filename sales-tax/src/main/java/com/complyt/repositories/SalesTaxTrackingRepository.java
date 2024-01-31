@@ -1,5 +1,6 @@
 package com.complyt.repositories;
 
+import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
@@ -87,8 +90,12 @@ public class SalesTaxTrackingRepository {
         Query query = new Query(Criteria.where("_id").is(salesTaxTracking.getId()));
         Update update = new Update()
                 .set("economicNexusTracker", salesTaxTracking.getEconomicNexusTracker());
-        update.set("nexusCalculationSummaries", salesTaxTracking.getNexusCalculationSummaries());
         update.set("transactionNexusSummaries", salesTaxTracking.getTransactionNexusSummaries());
+        update.set("appliedDate", salesTaxTracking.getAppliedDate());
+
+        Map<Long, NexusCalculationSummary> numericKeysSummaries = salesTaxTracking.getNexusCalculationSummaries().entrySet().stream()
+                .collect(Collectors.toMap(entry -> entry.getKey().toEpochDay(), Map.Entry::getValue));
+        update.set("nexusCalculationSummaries", numericKeysSummaries);
 
         return ContextLogger.observeCtx("Updating sales tax tracking with query " + update, log::info)
                 .then(reactiveMongoTemplate.findAndModify(query, update, SalesTaxTracking.class))
