@@ -11,12 +11,9 @@ import com.complyt.services.nexus.NexusService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -64,16 +61,6 @@ public class TransactionFacade {
                 .flatMap(transactionService::save);
     }
 
-//    private Mono<Transaction> saveAndHandleNexusTrackingCalculation(Transaction transaction, SalesTaxTracking salesTaxTracking) {
-//        return transactionService.save(transaction.withCustomer(null))
-//                .map(savedTransaction -> savedTransaction.withCustomer(transaction.getCustomer()))
-//                .flatMap(savedTransaction -> salesTaxTracking.isEnforcesSalesTax()
-//                        ? nexusService.upsertToNexusTracking(savedTransaction, salesTaxTracking)
-//                        .flatMap(salesTaxTrackingService::save)
-//                        .thenReturn(savedTransaction)
-//                        : Mono.just(savedTransaction));
-//    }
-
     private Mono<Transaction> saveAndHandleNexusTrackingCalculation(Transaction transaction, SalesTaxTracking salesTaxTracking) {
         return transactionService.save(transaction.withCustomer(null))
                 .map(savedTransaction -> savedTransaction.withCustomer(transaction.getCustomer()))
@@ -85,15 +72,6 @@ public class TransactionFacade {
                         .thenReturn(savedTransaction)
                         : Mono.just(savedTransaction));
     }
-
-//    private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, String source, Transaction transaction, SalesTaxTracking salesTaxTracking) {
-//        return salesTaxTracking.isEnforcesSalesTax()
-//                ? transactionService.update(externalId, source, transaction)
-//                .flatMap(updatedTransaction -> nexusService.upsertToNexusTracking(updatedTransaction.withCustomer(transaction.getCustomer()), salesTaxTracking)
-//                        .flatMap(salesTaxTrackingService::save)
-//                        .thenReturn(updatedTransaction))
-//                : transactionService.update(externalId, source, transaction);
-//    }
 
     private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, String source, Transaction transaction, SalesTaxTracking salesTaxTracking) {
         return salesTaxTracking.isEnforcesSalesTax()

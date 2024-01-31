@@ -3,6 +3,7 @@ package com.complyt.services.nexus;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.nexus.EconomicNexusTracker;
+import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TimeFrame;
@@ -22,10 +23,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Slf4j
@@ -154,4 +157,5 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return addClientAndStateDetails(salesTaxTracking)
                 .map(complytIdHandler::insertComplytIdToNew);
     }
+
 }

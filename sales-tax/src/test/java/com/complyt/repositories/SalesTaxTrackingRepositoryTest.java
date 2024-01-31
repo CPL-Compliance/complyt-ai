@@ -2,6 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.security.TenantResolver;
+import com.complyt.utils.query.SalesTaxTrackingUpdateQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +42,9 @@ public class SalesTaxTrackingRepositoryTest {
 
     @Mock
     TenantResolver tenantResolver;
+
+    @Mock
+    SalesTaxTrackingUpdateQueryBuilder updateQueryBuilder;
 
     SalesTaxTracking salesTaxTracking;
 
