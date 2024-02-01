@@ -25,6 +25,7 @@ public class SalesTaxTrackingUpdateQueryBuilder implements UpdateBuilder<SalesTa
         if (!salesTaxTracking.getNexusStateRule().timeFrame().equals(TimeFrame.PREVIOUS_TWELVE_MONTHS)) {
             update.set("transactionNexusSummaries", salesTaxTracking.getTransactionNexusSummaries());
 
+            /* Sets each key to Java LocalDate format */
             Map<String, NexusCalculationSummary> stringKeysSummaries = salesTaxTracking.getNexusCalculationSummaries().entrySet().stream()
                     .collect(Collectors.toMap(entry -> entry.getKey().format(DateTimeFormatter.ISO_LOCAL_DATE), Map.Entry::getValue));
             update.set("nexusCalculationSummaries", stringKeysSummaries);
