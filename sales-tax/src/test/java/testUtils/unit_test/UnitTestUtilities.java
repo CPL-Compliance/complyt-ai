@@ -17,6 +17,7 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.*;
+import com.complyt.v1.config.BodyCheckConfig;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
@@ -25,6 +26,10 @@ import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
+import com.complyt.v1.validators.body_checkers.ItemsAlignmentChecker;
+import com.complyt.v1.validators.body_checkers.TransactionDtoShippingAddressChecker;
+import com.complyt.v1.validators.body_checkers.TransactionTotalAmountChecker;
+import feign.Body;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -191,7 +196,13 @@ public class UnitTestUtilities {
         List<Item> items = createItems(true, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false);
-        return new Transaction(UUID.randomUUID(), id, id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
+
+        return new Transaction(UUID.randomUUID(), id, id, source,
+                documentName, items, billingAddress, shippingAddress,
+                customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()),
+                null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
+                TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
+                BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
     }
 
     public TransactionDto createTransactionDto(String id) {
@@ -201,8 +212,12 @@ public class UnitTestUtilities {
         List<ItemDto> items = createItemDtos(true, false);
         TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);
-
-        return new TransactionDto(UUID.randomUUID(), id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
+        return new TransactionDto(UUID.randomUUID(), id, source, documentName,
+                items, billingAddress, shippingAddress, customerIdOtherDomains,
+                createCustomerDto(customerIdOtherDomains.toString()), null,
+                TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE,
+                shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO,
+                BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
     }
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {
@@ -213,6 +228,11 @@ public class UnitTestUtilities {
                     null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
 
         }};
+    }
+
+    public Item createItemWithNegativePrice(boolean withJurisdictionalRules, boolean withTangibleCategory) {
+        return new Item(new BigDecimal(-2000), new BigDecimal(4), new BigDecimal(-8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+                null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE);
     }
 
     public List<Item> createItemsWithSalesTaxRate(boolean withJurisdictionalRules, boolean withTangibleCategory) {
@@ -242,6 +262,11 @@ public class UnitTestUtilities {
                     null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
 
         }};
+    }
+
+    public ItemDto createItemDtoWithNegativeAmount(boolean withJurisdictionalRules, boolean withTangibleCategory) {
+            return new ItemDto(new BigDecimal(-2000), new BigDecimal(4), new BigDecimal(-8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+                    null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE);
     }
 
     public SalesTaxRates createSalesTaxRates() {
@@ -421,5 +446,13 @@ public class UnitTestUtilities {
         return new ValidationDatesDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
     }
 
+    public BodyCheckConfig createBodyCheckConfig() {
+        return new BodyCheckConfig(
+                List.of(
+                        new TransactionDtoShippingAddressChecker(),
+                        new TransactionTotalAmountChecker(),
+                        new ItemsAlignmentChecker()
+                ));
+    }
 
 }

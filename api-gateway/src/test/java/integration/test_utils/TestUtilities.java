@@ -190,4 +190,114 @@ public class TestUtilities {
                 "&clientSecret=" + API_KEY_CLIENT_SECRET;
     }
 
+    public static String transactionItemIsNotAligned(String externalId, String customerId, String complytId, boolean isValidated, String state) {
+        return String.format("""
+                        {
+                            %s
+                            "externalId": "%s",
+                            %s
+                            "items": [
+                                {
+                                    "unitPrice": 1000,
+                                    "quantity": 1,
+                                    "totalPrice": -1000,
+                                    "description": "string",
+                                    "name": "string",
+                                    "taxCode": "C1S1",
+                                    "manualSalesTax": true,
+                                    "manualSalesTaxRate": 0
+                                }
+                            ],
+                            "shippingAddress": {
+                                "city": "Los Angeles",
+                                "country": "US",
+                                "state": "%s",
+                                "street": "10 5th Ave",
+                                "zip": "90210",
+                                "isPartial": "false"
+                            },
+                            "customerId": "%s",
+                            "transactionStatus": "ACTIVE",
+                            "externalTimestamps": {
+                                "createdDate": "2023-02-05T12:24:43.193Z",
+                                "updatedDate": "2023-02-05T12:24:43.193Z"
+                            },
+                            %s
+                            "shippingFee": {
+                                "manualSalesTax": true,
+                                "manualSalesTaxRate": 0,
+                                "totalPrice": 0,
+                                "taxCode": "C6S1"
+                            }
+                        }
+                        """,
+                complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
+                externalId,
+                isValidated ? "\"source\": \"1\"," : "",
+                state != null ? state : "CA",
+                customerId,
+                isValidated ? "\"transactionType\": \"INVOICE\"," : ""
+        );
+    }
+
+    public static String transactionTotalIsNegative(String externalId, String customerId, String complytId, boolean isValidated, String state) {
+        return String.format("""
+                        {
+                            %s
+                            "externalId": "%s",
+                            %s
+                            "items": [
+                                {
+                                    "unitPrice": 1000,
+                                    "quantity": 1,
+                                    "totalPrice": 1000,
+                                    "description": "string",
+                                    "name": "string",
+                                    "taxCode": "C1S1",
+                                    "manualSalesTax": true,
+                                    "manualSalesTaxRate": 0
+                                },
+                                {
+                                    "unitPrice": -1100,
+                                    "quantity": 1,
+                                    "totalPrice": -1100,
+                                    "description": "string",
+                                    "name": "string",
+                                    "taxCode": "C1S1",
+                                    "manualSalesTax": true,
+                                    "manualSalesTaxRate": 0
+                                }
+                            ],
+                            "shippingAddress": {
+                                "city": "Los Angeles",
+                                "country": "US",
+                                "state": "%s",
+                                "street": "10 5th Ave",
+                                "zip": "90210",
+                                "isPartial": "false"
+                            },
+                            "customerId": "%s",
+                            "transactionStatus": "ACTIVE",
+                            "externalTimestamps": {
+                                "createdDate": "2023-02-05T12:24:43.193Z",
+                                "updatedDate": "2023-02-05T12:24:43.193Z"
+                            },
+                            %s
+                            "shippingFee": {
+                                "manualSalesTax": true,
+                                "manualSalesTaxRate": 0,
+                                "totalPrice": 0,
+                                "taxCode": "C6S1"
+                            }
+                        }
+                        """,
+                complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
+                externalId,
+                isValidated ? "\"source\": \"1\"," : "",
+                state != null ? state : "CA",
+                customerId,
+                isValidated ? "\"transactionType\": \"INVOICE\"," : ""
+        );
+    }
+
 }
