@@ -39,5 +39,5 @@ public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, S
 
     Mono<SalesTaxTracking> updateEconomicNexus(SalesTaxTracking salesTaxTracking);
 
-    public Mono<SalesTaxTracking> handleSalesTaxTrackingAfterTransactionCalculated(@NonNull SalesTaxTracking salesTaxTracking);
+    Mono<SalesTaxTracking> handleSalesTaxTrackingAfterTransactionCalculated(@NonNull SalesTaxTracking salesTaxTracking);
 }
