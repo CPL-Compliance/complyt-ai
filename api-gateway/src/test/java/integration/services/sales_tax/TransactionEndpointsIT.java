@@ -8,14 +8,11 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.http.MediaType;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
