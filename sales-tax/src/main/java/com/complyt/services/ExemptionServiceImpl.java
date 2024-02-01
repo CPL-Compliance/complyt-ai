@@ -49,8 +49,7 @@ public class ExemptionServiceImpl implements ExemptionService {
                 .flatMap(hasElement -> {
                     String logStr = "Is fully exempted: " + hasElement;
                     return ContextLogger.observeCtx(logStr, log::info).then(Mono.just(hasElement));
-                })
-                .defaultIfEmpty(false);
+                });
     }
 
     @Override
