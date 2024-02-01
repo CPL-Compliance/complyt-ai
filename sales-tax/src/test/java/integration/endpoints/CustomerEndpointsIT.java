@@ -553,7 +553,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Customer.class)
-                    .hasSize(size);
+                .hasSize(size);
     }
 
     @Order(0)
