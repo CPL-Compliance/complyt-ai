@@ -97,8 +97,7 @@ public class TransactionFacade {
         return salesTaxTracking.isEnforcesSalesTax()
                 ? transactionService.update(externalId, source, transaction)
                 .flatMap(updatedTransaction -> nexusService.upsertToNexusTracking(updatedTransaction.withCustomer(transaction.getCustomer()), salesTaxTracking)
-                        .flatMap(salesTaxTrackingAfterCalculation -> salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTrackingAfterCalculation)
-                                .thenReturn(updatedTransaction))
+                        .flatMap(salesTaxTrackingAfterCalculation -> salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTrackingAfterCalculation))
                         .thenReturn(updatedTransaction))
                 : transactionService.update(externalId, source, transaction);
     }
