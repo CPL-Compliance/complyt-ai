@@ -66,10 +66,8 @@ public class TransactionFacade {
                 .map(savedTransaction -> savedTransaction.withCustomer(transaction.getCustomer()))
                 .flatMap(savedTransaction -> salesTaxTracking.isEnforcesSalesTax()
                         ? nexusService.upsertToNexusTracking(savedTransaction, salesTaxTracking)
-                        .flatMap(salesTaxTrackingAfterCalculation -> salesTaxTrackingAfterCalculation.getEconomicNexusTracker().isEstablished() ?
-                                salesTaxTrackingService.updateEconomicNexus(salesTaxTrackingAfterCalculation) :
-                                salesTaxTrackingService.save(salesTaxTrackingAfterCalculation))
-                        .thenReturn(savedTransaction)
+                        .flatMap(salesTaxTrackingAfterCalculation -> salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionInserted(salesTaxTrackingAfterCalculation)
+                                .thenReturn(savedTransaction))
                         : Mono.just(savedTransaction));
     }
 
@@ -99,9 +97,8 @@ public class TransactionFacade {
         return salesTaxTracking.isEnforcesSalesTax()
                 ? transactionService.update(externalId, source, transaction)
                 .flatMap(updatedTransaction -> nexusService.upsertToNexusTracking(updatedTransaction.withCustomer(transaction.getCustomer()), salesTaxTracking)
-                        .flatMap(salesTaxTrackingAfterCalculation -> salesTaxTrackingAfterCalculation.getEconomicNexusTracker().isEstablished() ?
-                                salesTaxTrackingService.updateEconomicNexus(salesTaxTrackingAfterCalculation) :
-                                salesTaxTrackingService.save(salesTaxTrackingAfterCalculation))
+                        .flatMap(salesTaxTrackingAfterCalculation -> salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionInserted(salesTaxTrackingAfterCalculation)
+                                .thenReturn(updatedTransaction))
                         .thenReturn(updatedTransaction))
                 : transactionService.update(externalId, source, transaction);
     }

@@ -53,8 +53,20 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     @Override
+    public Mono<SalesTaxTracking> handleSalesTaxTrackingAfterTransactionInserted(@NonNull SalesTaxTracking salesTaxTracking) {
+        return salesTaxTracking.getEconomicNexusTracker().isEstablished() ?
+                updateEconomicNexus(salesTaxTracking) :
+                save(salesTaxTracking);
+    }
+
+    @Override
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
         return upsertWithoutNexusSummaryIfNeeded(salesTaxTracking);
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> updateEconomicNexus(SalesTaxTracking salesTaxTracking) {
+        return salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking);
     }
 
     @Override
@@ -137,11 +149,6 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return Mono.just(checkedSalesTaxTracking
                 .withTransactionNexusSummaries(originalSalesTaxTracking.getTransactionNexusSummaries() == null ? new HashMap<>() : originalSalesTaxTracking.getTransactionNexusSummaries())
                 .withNexusCalculationSummaries(originalSalesTaxTracking.getNexusCalculationSummaries() == null ? new HashMap<>() : originalSalesTaxTracking.getNexusCalculationSummaries()));
-    }
-
-    @Override
-    public Mono<SalesTaxTracking> updateEconomicNexus(SalesTaxTracking salesTaxTracking) {
-        return salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking);
     }
 
     @Override
