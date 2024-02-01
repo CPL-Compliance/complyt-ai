@@ -1,7 +1,6 @@
 package com.example.complyt.v1.validators;
 
 
-import com.complyt.v1.validators.ShouldCallValidate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;

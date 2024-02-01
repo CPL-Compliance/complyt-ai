@@ -1,6 +1,5 @@
 package com.example.complyt.v1.validators;
 
-import com.complyt.v1.validators.ParameterChecksProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

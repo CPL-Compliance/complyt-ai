@@ -544,6 +544,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressDto.city())
                         .queryParam("state", addressDto.state())
                         .queryParam("street", addressDto.street())
+                        .queryParam("county", addressDto.county())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -556,6 +557,7 @@ public class ComplytSalesTaxRatesRouterTest {
     public void findByAddress_LengthGreaterThen100County_Returns400ValidationError() {
         // Given
         String countyWithLength101 = TestUtilities.stringWithLength(101);
+        ;
 
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
                 .withCounty(countyWithLength101);
@@ -627,6 +629,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressDto.city())
                         .queryParam("state", addressDto.state())
                         .queryParam("street", addressDto.street())
+                        .queryParam("county", addressDto.county())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
