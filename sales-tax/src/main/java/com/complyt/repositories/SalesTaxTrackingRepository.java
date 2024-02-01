@@ -92,7 +92,7 @@ public class SalesTaxTrackingRepository {
         Update update = updateQueryBuilder.build(salesTaxTracking);
 
         return tenantResolver.resolve()
-                .flatMap(tenantId -> ContextLogger.observeCtx("Updating sales tax tracking Fields: " + update, log::info)
+                .flatMap(tenantId -> ContextLogger.observeCtx("Updating sales tax tracking Fields: " + update + ", With Query: " + query, log::info)
                         .then(reactiveMongoTemplate.findAndModify(query, update, SalesTaxTracking.class))
                         .then(Mono.just(salesTaxTracking.withTenantId(tenantId))));
     }
