@@ -110,6 +110,19 @@ public class ExemptionRepositoryTest implements FindFullyExemptedTestTemplate{
 
     @Override
     @Test
+    public void findFullyExempted_NullDatePassed_ThrowsException() {
+        // Given
+        String nullDate = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.findFullyExempted(transaction.getCustomerId(), .getShippingAddress().state(), nullDate));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
+    }
+
+    @Override
+    @Test
     public void findFullyExempted_ExemptionDoesNotExist_ReturnsMonoEmpty() {;
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));

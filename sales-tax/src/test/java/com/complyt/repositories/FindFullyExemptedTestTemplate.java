@@ -5,4 +5,5 @@ public interface FindFullyExemptedTestTemplate {
     void findFullyExempted_ExemptionDoesNotExist_ReturnsMonoEmpty();
     void findFullyExempted_NullStatePassed_ThrowsException();
     void findFullyExempted_NullIdPassed_ThrowsException();
+    void findFullyExempted_NullDatePassed_ThrowsException();
 }
