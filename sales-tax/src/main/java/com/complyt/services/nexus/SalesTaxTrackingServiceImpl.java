@@ -53,7 +53,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     @Override
-    public Mono<SalesTaxTracking> handleSalesTaxTrackingAfterTransactionInserted(@NonNull SalesTaxTracking salesTaxTracking) {
+    public Mono<SalesTaxTracking> handleSalesTaxTrackingAfterTransactionCalculated(@NonNull SalesTaxTracking salesTaxTracking) {
         return salesTaxTracking.getEconomicNexusTracker().isEstablished() ?
                 updateEconomicNexus(salesTaxTracking) :
                 save(salesTaxTracking);
