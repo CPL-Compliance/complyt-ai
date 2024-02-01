@@ -652,5 +652,4 @@ public class ComplytSalesTaxRatesRouterTest {
         // Then
         assertEquals("complytSalesTaxRatesHandler " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE, exception.getMessage());
     }
-
 }
