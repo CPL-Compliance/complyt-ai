@@ -2,6 +2,9 @@ package com.complyt.repositories;
 
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.customer.exemption.ExemptionStatus;
+import com.complyt.domain.customer.exemption.ExemptionType;
+import com.complyt.domain.customer.exemption.ValidationDates;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.security.TenantResolver;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +37,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-public class ExemptionRepositoryTest {
+public class ExemptionRepositoryTest implements FindFullyExemptedTestTemplate{
 
     @InjectMocks
     ExemptionRepository exemptionRepository;
@@ -48,73 +51,72 @@ public class ExemptionRepositoryTest {
     Transaction transaction;
     UnitTestUtilities testUtilities;
 
+    Query queryFindFullyExempted;
+
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         MockitoAnnotations.openMocks(this);
         exemption = testUtilities.createExemption(UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
-    }
-
-    @Test
-    void findByClientCustomerAndState_FindsExemption_ReturnsExemption() {
-        // Given
-        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId())
+        queryFindFullyExempted =  Query.query(Criteria.where("tenantId").is(transaction.getTenantId())
                         .and("customerId").is(transaction.getCustomerId()))
                 .addCriteria(new Criteria().orOperator(
                         Criteria.where("state.abbreviation").is(transaction.getShippingAddress().state()),
-                        Criteria.where("state.name").is(transaction.getShippingAddress().state())));
+                        Criteria.where("state.name").is(transaction.getShippingAddress().state())))
+                .addCriteria(Criteria.where("validationDates.fromDate").lte(transaction.getExternalTimestamps().getCreatedDate())
+                        .and("validationDates.toDate").gte(transaction.getExternalTimestamps().getCreatedDate())
+                        .and("exemptionType").is(ExemptionType.FULLY)
+                        .and("exemptionStatus").is(ExemptionStatus.ACTIVE));
+    }
 
+    @Override
+    @Test
+    public void findFullyExempted_FindsFullyExemption_ReturnsExemption() {
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
-        when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.just(exemption));
+        when(reactiveMongoTemplate.findOne(queryFindFullyExempted, Exemption.class)).thenReturn(Mono.just(exemption));
 
         // Then
-        Mono<Exemption> exemptionMono = exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), transaction.getShippingAddress().state());
+        Mono<Exemption> exemptionMono = exemptionRepository.findFullyExempted(transaction.getCustomerId(), transaction.getShippingAddress().state(), transaction.getExternalTimestamps().getCreatedDate());
         StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
     }
 
-    @SuppressWarnings("ConstantConditions")
+    @Override
     @Test
-    void findByClientCustomerAndState_NullIdPassed_ThrowsException() {
+    public void findFullyExempted_NullIdPassed_ThrowsException() {
         // Given
         UUID nullCustomerId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.findByCustomerAndState(nullCustomerId, transaction.getShippingAddress().state()));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.findFullyExempted(nullCustomerId, transaction.getShippingAddress().state(), transaction.getExternalTimestamps().getCreatedDate()));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "customerId is marked non-null but is null");
     }
 
-    @SuppressWarnings("ConstantConditions")
+    @Override
     @Test
-    void findByClientCustomerAndState_NullStatePassed_ThrowsException() {
+    public void findFullyExempted_NullStatePassed_ThrowsException() {
         // Given
         String nullState = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), nullState));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.findFullyExempted(transaction.getCustomerId(), nullState, transaction.getExternalTimestamps().getCreatedDate()));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
     }
 
+    @Override
     @Test
-    void findByClientCustomerAndState_ExemptionDoesNotExist_ReturnsMonoEmpty() {
-        // Given
-        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId())
-                        .and("customerId").is(transaction.getCustomerId()))
-                .addCriteria(new Criteria().orOperator(
-                        Criteria.where("state.abbreviation").is(transaction.getShippingAddress().state()),
-                        Criteria.where("state.name").is(transaction.getShippingAddress().state())));
-
+    public void findFullyExempted_ExemptionDoesNotExist_ReturnsMonoEmpty() {;
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
-        when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.empty());
+        when(reactiveMongoTemplate.findOne(queryFindFullyExempted, Exemption.class)).thenReturn(Mono.empty());
 
         // Then
-        Mono<Exemption> exemptionMono = exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), transaction.getShippingAddress().state());
+        Mono<Exemption> exemptionMono = exemptionRepository.findFullyExempted(transaction.getCustomerId(), transaction.getShippingAddress().state(), transaction.getExternalTimestamps().getCreatedDate());
         StepVerifier.create(exemptionMono).verifyComplete();
     }
 

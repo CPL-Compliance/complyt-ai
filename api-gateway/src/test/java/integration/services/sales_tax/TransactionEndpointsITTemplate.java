@@ -4,6 +4,7 @@ import integration.test_utils.templates.endpoints.*;
 
 public interface TransactionEndpointsITTemplate extends
         UpsertByExternalIdAndSourceITTemplate,
+        UpsertByExternalIdAndSourceWithExemptionTemplate,
         GetByExternalIdAndSourceITTemplate,
         GetByComplytIdITTemplate,
         GetAllITTemplate,
