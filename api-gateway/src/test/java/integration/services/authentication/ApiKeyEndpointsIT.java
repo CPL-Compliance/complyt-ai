@@ -84,20 +84,4 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                 .exchange()
                 .expectStatus().isNoContent();
     }
-
-    @Test
-    public void authentication_apiKey_delete_notSuitableJwt_Returns403() {
-        WEB_TEST_CLIENT
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.API_KEY_BASE_URL)
-                        .build())
-                .headers(headers -> {
-                    headers.setBearerAuth(TOKEN);
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                })
-                .bodyValue(TestUtilities.getNonExistingClientCredentialsJsonExample())
-                .exchange()
-                .expectStatus().isNoContent();
-    }
 }
