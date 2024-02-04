@@ -96,5 +96,4 @@ public class SalesTaxTrackingRepository {
                         .then(reactiveMongoTemplate.findAndModify(query, update, SalesTaxTracking.class))
                         .then(Mono.just(salesTaxTracking.withTenantId(tenantId))));
     }
-
 }
