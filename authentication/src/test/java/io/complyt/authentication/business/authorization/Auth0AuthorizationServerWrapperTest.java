@@ -81,8 +81,6 @@ public class Auth0AuthorizationServerWrapperTest {
     @Test
     void getAccessToken_Auth0ServiceIsUnavailable_is5RetriesExhausted() {
         // Given
-        AccessToken accessToken = TestUtilities.createAccessToken();
-        Auth0AccessToken auth0AccessToken = TestUtilities.createAuth0AccessToken();
         String clientId = "client ID";
         String clientSecret = "Client Secret";
         String audience = "Audience";
@@ -118,8 +116,8 @@ public class Auth0AuthorizationServerWrapperTest {
         // Given
         AccessToken accessToken = TestUtilities.createAccessToken();
         Auth0AccessToken auth0AccessToken = TestUtilities.createAuth0AccessToken();
-        String adminId = "admin ID";
-        String adminSecret = "admin Secret";
+        String adminId = "Admin Id";
+        String adminSecret = "Admin Secret";
         String audience = "Management Audience";
         String grantType = "Grant Type";
         String headerName = "Content-Type";
@@ -127,8 +125,8 @@ public class Auth0AuthorizationServerWrapperTest {
 
         // When
         when(webClient.post()).thenReturn(requestBodyUriSpecMock);
-        when(requestBodyUriSpecMock.uri("/oauth/token")).thenReturn(requestBodyUriSpecMock);
-        when(requestBodyUriSpecMock.header(headerName, headerValue)).thenReturn(requestBodySpecMock);
+        when(requestBodyUriSpecMock.uri("/oauth/token")).thenReturn(requestBodySpecMock);
+        when(requestBodySpecMock.header(headerName, headerValue)).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.bodyValue("client_id=" + adminId +
                 "&client_secret=" + adminSecret +
                 "&audience=" + audience +
@@ -138,8 +136,7 @@ public class Auth0AuthorizationServerWrapperTest {
                 .thenReturn(Mono.just(auth0AccessToken));
 
 
-        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken(adminId,
-                adminSecret, audience, grantType);
+        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getManagementAccessToken();
 
         // Then
         StepVerifier.create(accessTokenMono).expectNext(accessToken).verifyComplete();
@@ -150,8 +147,8 @@ public class Auth0AuthorizationServerWrapperTest {
         // Given
         AccessToken accessToken = TestUtilities.createAccessToken();
         Auth0AccessToken auth0AccessToken = TestUtilities.createAuth0AccessToken();
-        String adminId = "admin ID";
-        String adminSecret = "admin Secret";
+        String adminId = "Admin Id";
+        String adminSecret = "Admin Secret";
         String audience = "Management Audience";
         String grantType = "Grant Type";
         String headerName = "Content-Type";
@@ -169,8 +166,7 @@ public class Auth0AuthorizationServerWrapperTest {
         when(responseSpecMock.bodyToMono(Auth0AccessToken.class))
                 .thenReturn(Mono.error(new Exception("Retries Exception")));
 
-        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken(adminId,
-                adminSecret, audience, grantType);
+        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getManagementAccessToken();
 
         //Then
         StepVerifier.create(accessTokenMono)

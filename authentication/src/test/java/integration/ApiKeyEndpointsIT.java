@@ -77,4 +77,41 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                 .value(map -> assertEquals(GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE, map.get("message")));
     }
 
+//    @Test
+//    @WithMockUser
+//    public void delete_Exists_Returns204() {
+//        ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
+//
+//        webTestClient
+//                .mutateWith(csrf())
+//                .delete()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(ApiKeyRouter.BASE_URL)
+//                        .queryParam("clientId", apiKeyDto.clientId())
+//                        .queryParam("clientSecret", apiKeyDto.clientSecret())
+//                        .build())
+//                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+//                .exchange()
+//                .expectStatus().isNoContent();
+//    }
+//
+//    @Test
+//    @WithMockUser
+//    public void delete_NoApiKeyProvided_Returns415() {
+//
+//        webTestClient
+//                .mutateWith(csrf())
+//                .delete()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(ApiKeyRouter.BASE_URL)
+//                        .queryParam("clientId", "")
+//                        .queryParam("clientSecret", "")
+//                        .build())
+//                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+//                .exchange()
+//                .expectStatus().is4xxClientError()
+//                .expectBody(LinkedHashMap.class)
+//                .value(map -> assertEquals(GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE, map.get("message")));
+//    }
+
 }

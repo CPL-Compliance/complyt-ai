@@ -1,6 +1,7 @@
 package io.complyt.authentication.auth0_client;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.With;
 
@@ -9,6 +10,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @With
+@EqualsAndHashCode
 public class Auth0Client {
 
     private String tenant;
