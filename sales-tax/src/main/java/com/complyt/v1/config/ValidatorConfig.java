@@ -13,6 +13,7 @@ import com.complyt.v1.validators.ParameterChecksProvider;
 import com.complyt.v1.validators.ShouldCallValidate;
 import com.complyt.v1.validators.ValidationHandler;
 import com.complyt.v1.validators.body_checkers.ItemsAlignmentChecker;
+import com.complyt.v1.validators.body_checkers.NegativeItemsNotHavingDiscountChecker;
 import com.complyt.v1.validators.body_checkers.TransactionDtoShippingAddressChecker;
 import com.complyt.v1.validators.body_checkers.TransactionTotalAmountChecker;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractorEmpty;
@@ -71,7 +72,8 @@ public class ValidatorConfig {
                         new BodyCheckConfig(List.of(
                                 new TransactionDtoShippingAddressChecker(),
                                 new TransactionTotalAmountChecker(),
-                                new ItemsAlignmentChecker()
+                                new ItemsAlignmentChecker(),
+                                new NegativeItemsNotHavingDiscountChecker()
                         )).transactionDtoFluxFunction()),
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,

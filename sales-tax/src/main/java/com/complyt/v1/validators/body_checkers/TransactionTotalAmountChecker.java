@@ -5,12 +5,14 @@ import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.javatuples.Pair;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 @Component
@@ -24,21 +26,18 @@ public class TransactionTotalAmountChecker implements DtoBodyChecker<Transaction
                 .flatMap(this::checkTransactionTotalAmountIsNotBelowZero));
     }
 
-//    private Mono<DiscountDto> checkIfDiscountExist(@NonNull TransactionDto transactionDto) {
-//        return transactionDto.discount() != null ?
-//                Mono.just(transactionDto.discount()) :
-//                Mono.empty();
-//    } //todo: remove
-
-
     // calculating the total amount and adding the discount.
-    // discount is being received negatively (hence, the usage of BigDecimal.add and not BigDecimal.subtract
+    // discount is being received positively (hence, the usage of BigDecimal.subtract and not BigDecimal.add
     // this ignores if the discount is before tax or after tax
     private Function<List<ItemDto>, BigDecimal> calculateTotalItemsAmountAfterDiscount() {
         return (itemsDtoList) ->
                 itemsDtoList.stream()
                         .map(ItemDto::totalPrice)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .subtract(itemsDtoList.stream()
+                                .map(ItemDto::discount)
+                                .filter(Objects::nonNull)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     private Mono<String> checkTransactionTotalAmountIsNotBelowZero(BigDecimal transactionTotalAmount) {

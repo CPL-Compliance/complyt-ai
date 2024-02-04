@@ -53,6 +53,15 @@ public class TransactionServiceImpl implements TransactionService {
         return complytIdHandler.checkNewDontHaveComplytId(newTransaction);
     }
 
+//    todo: delete
+//    @Override
+//    public Mono<Transaction> setItemsTotalAfterDiscount(@NonNull Transaction transaction) {
+//        return Mono.just(transaction.withItems(
+//                transaction.getItems().stream()
+//                        .map(item -> )
+//        ))
+//    }
+
 //    @Override
 //    public Mono<Transaction> checkAfterTaxDiscountAndHandle(@NonNull Transaction transaction) {
 //        return transaction.getDiscount() != null && !transaction.getDiscount().isPreTax() ?
@@ -101,6 +110,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
+        //todo: TransactionDiscountCollector
+
         return productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transaction)
                 .map(transactionItemsAmountsCollector::collect)
                 .flatMap(cityCountyProvider::provide);
