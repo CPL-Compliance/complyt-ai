@@ -1,5 +1,6 @@
 package io.complyt.authentication.business.authorization;
 
+import io.complyt.authentication.auth0_client.Auth0Client;
 import io.complyt.authentication.business.exceptions.ComplytAuth0Exception;
 import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.mappers.Auth0AccessTokenToAccessToken;
@@ -37,6 +38,25 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
     @NonNull
     String adminSecret;
 
+    @Override
+    public Mono<AccessToken> getAccessToken(final @NonNull String clientId, final @NonNull String clientSecret,
+                                            final @NonNull String audience, final @NonNull String grantType) {
+        return ContextLogger.observeCtx("Getting Auth0 Token", log::info)
+                .then(webClient.post()
+                        .uri("/oauth/token")
+                        .header("Content-Type", "application/x-www-form-urlencoded")
+                        .bodyValue("client_id=" + clientId +
+                                "&client_secret=" + clientSecret +
+                                "&audience=" + audience +
+                                "&grant_type=" + grantType)
+                        .retrieve()
+                        .bodyToMono(Auth0AccessToken.class)
+                        .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
+                                .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
+                                        new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted"))))
+                        .map(Auth0AccessTokenToAccessToken.INSTANCE::map));
+    }
+
     public Mono<Auth0Client> removeApiKeyFromClient(final @NonNull String clientName, final @NonNull String clientId,
                                                     final @NonNull String tenantId, final @NonNull String accessToken,
                                                     @RequestParam(value = "newClientId", required = false) String newClientId,
@@ -57,25 +77,6 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
                                 .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
                                         new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))));
-    }
-
-    @Override
-    public Mono<AccessToken> getAccessToken(final @NonNull String clientId, final @NonNull String clientSecret,
-                                            final @NonNull String audience, final @NonNull String grantType) {
-        return ContextLogger.observeCtx("Getting Auth0 Token", log::info)
-                .then(webClient.post()
-                        .uri("/oauth/token")
-                        .header("Content-Type", "application/x-www-form-urlencoded")
-                        .bodyValue("client_id=" + clientId +
-                                "&client_secret=" + clientSecret +
-                                "&audience=" + audience +
-                                "&grant_type=" + grantType)
-                        .retrieve()
-                        .bodyToMono(Auth0AccessToken.class)
-                        .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
-                                .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
-                                        new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted"))))
-                        .map(Auth0AccessTokenToAccessToken.INSTANCE::map));
     }
 
     public Mono<AccessToken> getManagementAccessToken() {
@@ -103,7 +104,6 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                         .header("Authorization", "Bearer " + accessToken)
                         .retrieve()
                         .bodyToMono(Auth0Client.class)
-                        .map(x -> x)
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
                                 .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
                                         new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))))

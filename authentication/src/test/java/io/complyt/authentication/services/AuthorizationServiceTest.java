@@ -1,7 +1,7 @@
 package io.complyt.authentication.services;
 
 import io.complyt.authentication.business.authorization.AccessToken;
-import io.complyt.authentication.business.authorization.Auth0Client;
+import io.complyt.authentication.auth0_client.Auth0Client;
 import io.complyt.authentication.business.authorization.AuthorizationServerWrapper;
 import io.complyt.authentication.business.exceptions.ComplytAuth0Exception;
 import io.complyt.authentication.domain.Credentials;
@@ -9,7 +9,6 @@ import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
-import io.complyt.authentication.v1.exceptions.types.ApiKeyNotValidException;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -82,6 +81,19 @@ class AuthorizationServiceTest {
     }
 
     @Test
+    void getTenantIdAndClientName_failedToGetManagementAccessToken_throwError() {
+        // Given
+        Credentials credentials = TestUtilities.createCredentials();
+
+        // When
+        when(authorizationServerWrapper.getManagementAccessToken()).thenReturn(Mono.error(new ComplytAuth0Exception()));
+
+        // Then
+        Mono<TenantIdAndNameObject> managementTokenMono = authorizationService.getTenantIdAndClientName(credentials);
+        StepVerifier.create(managementTokenMono).expectError(ComplytAuth0Exception.class).verify();
+    }
+
+    @Test
     void getManagementAccessToken_validFunction_returnStringManagementAccessToken() {
         // Given
         AccessToken managementToken = TestUtilities.createManagementAccessToken();
@@ -94,10 +106,10 @@ class AuthorizationServiceTest {
         Mono<String> managementTokenMono = authorizationService.getManagementAccessToken();
         StepVerifier.create(managementTokenMono).expectNext(accessToken).verifyComplete();
     }
-    
+
 
     @Test
-    void getManagementAccessToken_failedRetrievingDataFromAuth0_throwError() {
+    void getManagementAccessToken_failedToGetManagementAccessToken_throwError() {
         // When
         when(authorizationServerWrapper.getManagementAccessToken()).thenReturn(Mono.error(new ComplytAuth0Exception()));
 

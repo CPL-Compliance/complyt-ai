@@ -41,4 +41,15 @@ class ApiKeyHandlerTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "serverRequest is marked non-null but is null");
     }
+
+    @Test
+    void delete_serverRequestIsNull_throwsNullPointerException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            apiKeyHandler.delete(null);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "serverRequest is marked non-null but is null");
+    }
 }

@@ -1,6 +1,8 @@
 package io.complyt.authentication.business.authorization;
 
+import io.complyt.authentication.auth0_client.Auth0Client;
 import io.complyt.authentication.business.exceptions.ComplytAuth0Exception;
+import io.complyt.authentication.domain.TenantIdAndNameObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +37,9 @@ public class Auth0AuthorizationServerWrapperTest {
     @Mock
     private WebClient.ResponseSpec responseSpecMock;
 
+    @Mock
+    private  WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
+
     @BeforeEach
     void setUp() {
         auth0AuthorizationServerWrapper = new Auth0AuthorizationServerWrapper(webClient, "Management Audience", "Grant Type",
@@ -66,8 +71,8 @@ public class Auth0AuthorizationServerWrapperTest {
                 .thenReturn(Mono.just(auth0AccessToken));
 
 
-        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken("client ID",
-                "Client Secret", "Audience", "Grant Type");
+        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken(clientId,
+                clientSecret, audience, grantType);
 
         // Then
         StepVerifier.create(accessTokenMono).expectNext(accessToken).verifyComplete();
@@ -97,11 +102,281 @@ public class Auth0AuthorizationServerWrapperTest {
         when(responseSpecMock.bodyToMono(Auth0AccessToken.class))
                 .thenReturn(Mono.error(new Exception("Retries Exception")));
 
-        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken("client ID",
-                "Client Secret", "Audience", "Grant Type");
+        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken(clientId,
+                clientSecret, audience, grantType);
 
         //Then
         StepVerifier.create(accessTokenMono)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof ComplytAuth0Exception
+                                && throwable.getMessage().equals("5 Retries Exhausted"))
+                .verify();
+    }
+
+    @Test
+    void getManagementAccessToken_validCredentials_ReturnsAccessToken() {
+        // Given
+        AccessToken accessToken = TestUtilities.createAccessToken();
+        Auth0AccessToken auth0AccessToken = TestUtilities.createAuth0AccessToken();
+        String adminId = "admin ID";
+        String adminSecret = "admin Secret";
+        String audience = "Management Audience";
+        String grantType = "Grant Type";
+        String headerName = "Content-Type";
+        String headerValue = "application/x-www-form-urlencoded";
+
+        // When
+        when(webClient.post()).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.uri("/oauth/token")).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.header(headerName, headerValue)).thenReturn(requestBodySpecMock);
+        when(requestBodySpecMock.bodyValue("client_id=" + adminId +
+                "&client_secret=" + adminSecret +
+                "&audience=" + audience +
+                "&grant_type=" + grantType)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToMono(ArgumentMatchers.<Class<Auth0AccessToken>>notNull()))
+                .thenReturn(Mono.just(auth0AccessToken));
+
+
+        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken(adminId,
+                adminSecret, audience, grantType);
+
+        // Then
+        StepVerifier.create(accessTokenMono).expectNext(accessToken).verifyComplete();
+    }
+
+    @Test
+    void getManagementAccessToken_Auth0ServiceIsUnavailable_is5RetriesExhausted() {
+        // Given
+        AccessToken accessToken = TestUtilities.createAccessToken();
+        Auth0AccessToken auth0AccessToken = TestUtilities.createAuth0AccessToken();
+        String adminId = "admin ID";
+        String adminSecret = "admin Secret";
+        String audience = "Management Audience";
+        String grantType = "Grant Type";
+        String headerName = "Content-Type";
+        String headerValue = "application/x-www-form-urlencoded";
+
+        // When
+        when(webClient.post()).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.uri("/oauth/token")).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.header(headerName, headerValue)).thenReturn(requestBodySpecMock);
+        when(requestBodySpecMock.bodyValue("client_id=" + adminId +
+                "&client_secret=" + adminSecret +
+                "&audience=" + audience +
+                "&grant_type=" + grantType)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToMono(Auth0AccessToken.class))
+                .thenReturn(Mono.error(new Exception("Retries Exception")));
+
+        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken(adminId,
+                adminSecret, audience, grantType);
+
+        //Then
+        StepVerifier.create(accessTokenMono)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof ComplytAuth0Exception
+                                && throwable.getMessage().equals("5 Retries Exhausted"))
+                .verify();
+    }
+
+    @Test
+    void removeApiKeyFromClient_validCredentials_ReturnsAuth0Client() {
+        // Given
+        String clientName = "client Name";
+        String clientId = "client ID";
+        String tenantId = "tenant ID";
+        String managementToken = "management Access Token";
+        String newClientId = "New Client ID";
+        String newClientSecret = "New Client Secret";
+
+        String contentTypeHeaderName = "Content-Type";
+        String contentTypeHeaderValue = "application/json";
+        String authorizationHeaderName = "Authorization";
+        String authorizationHeaderValue = "Bearer " + managementToken;
+        Auth0Client auth0Client = TestUtilities.createAuth0Client();
+
+        String json = "{ \"name\": \"" + clientName +
+                "\", \"client_metadata\": { \"tenant_id\": \"" + tenantId +
+                "\", \"clientId\": " + newClientId + ", \"clientSecret\": " + newClientSecret + " } }";
+
+        // When
+        when(webClient.patch()).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.uri("/api/v2/clients/" + clientId)).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.header(contentTypeHeaderName, contentTypeHeaderValue)).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.header(authorizationHeaderName, authorizationHeaderValue)).thenReturn(requestBodySpecMock);
+        when(requestBodySpecMock.bodyValue(json)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToMono(ArgumentMatchers.<Class<Auth0Client>>notNull()))
+                .thenReturn(Mono.just(auth0Client));
+
+        Mono<Auth0Client> auth0ClientMono = auth0AuthorizationServerWrapper.removeApiKeyFromClient(clientName,
+                clientId, tenantId, managementToken, newClientId, newClientSecret);
+
+        // Then
+        StepVerifier.create(auth0ClientMono).expectNext(auth0Client).verifyComplete();
+    }
+
+    @Test
+    void removeApiKeyFromClient_Auth0ServiceIsUnavailable_is5RetriesExhausted() {
+        // Given
+        String clientName = "client Name";
+        String clientId = "client ID";
+        String tenantId = "tenant ID";
+        String managementToken = "management Access Token";
+        String newClientId = "New Client ID";
+        String newClientSecret = "New Client Secret";
+        String contentTypeHeaderName = "Content-Type";
+        String contentTypeHeaderValue = "application/json";
+        String authorizationHeaderName = "Authorization";
+        String authorizationHeaderValue = "Bearer " + managementToken;
+
+        String json = "{ \"name\": \"" + clientName +
+                "\", \"client_metadata\": { \"tenant_id\": \"" + tenantId +
+                "\", \"clientId\": " + newClientId + ", \"clientSecret\": " + newClientSecret + " } }";
+
+        // When
+        when(webClient.patch()).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.uri("/api/v2/clients/" + clientId)).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.header(contentTypeHeaderName, contentTypeHeaderValue)).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.header(authorizationHeaderName, authorizationHeaderValue)).thenReturn(requestBodySpecMock);
+        when(requestBodySpecMock.bodyValue(json)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToMono(Auth0Client.class))
+                .thenReturn(Mono.error(new Exception("Retries Exception")));
+
+        Mono<Auth0Client> auth0ClientMono = auth0AuthorizationServerWrapper.removeApiKeyFromClient(clientName,
+                clientId, tenantId, managementToken, newClientId, newClientSecret);
+
+        // Then
+        StepVerifier.create(auth0ClientMono)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof ComplytAuth0Exception
+                                && throwable.getMessage().equals("5 Retries Exhausted"))
+                .verify();
+    }
+
+    @Test
+    void removeApiKeyFromClient_newClientIdIsNull_ReturnsAuth0Client() {
+        // Given
+        String clientName = "client Name";
+        String clientId = "client ID";
+        String tenantId = "tenant ID";
+        String managementToken = "management Access Token";
+        String newClientId = null;
+        String newClientSecret = "New Client Secret";
+        String contentTypeHeaderName = "Content-Type";
+        String contentTypeHeaderValue = "application/json";
+        String authorizationHeaderName = "Authorization";
+        String authorizationHeaderValue = "Bearer " + managementToken;
+        Auth0Client auth0Client = TestUtilities.createAuth0Client();
+
+        String json = "{ \"name\": \"" + clientName +
+                "\", \"client_metadata\": { \"tenant_id\": \"" + tenantId +
+                "\", \"clientId\": " + newClientId + ", \"clientSecret\": " + newClientSecret + " } }";
+
+        // When
+        when(webClient.patch()).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.uri("/api/v2/clients/" + clientId)).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.header(contentTypeHeaderName, contentTypeHeaderValue)).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.header(authorizationHeaderName, authorizationHeaderValue)).thenReturn(requestBodySpecMock);
+        when(requestBodySpecMock.bodyValue(json)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToMono(ArgumentMatchers.<Class<Auth0Client>>notNull()))
+                .thenReturn(Mono.just(auth0Client));
+
+        Mono<Auth0Client> auth0ClientMono = auth0AuthorizationServerWrapper.removeApiKeyFromClient(clientName,
+                clientId, tenantId, managementToken, newClientId, newClientSecret);
+
+        // Then
+        StepVerifier.create(auth0ClientMono).expectNext(auth0Client).verifyComplete();
+    }
+
+    @Test
+    void removeApiKeyFromClient_newClientSecretIsNull_ReturnsAuth0Client() {
+        // Given
+        String clientName = "client Name";
+        String clientId = "client ID";
+        String tenantId = "tenant ID";
+        String managementToken = "management Access Token";
+        String newClientId = "New Client ID";
+        String newClientSecret = null;
+        String contentTypeHeaderName = "Content-Type";
+        String contentTypeHeaderValue = "application/json";
+        String authorizationHeaderName = "Authorization";
+        String authorizationHeaderValue = "Bearer " + managementToken;
+        Auth0Client auth0Client = TestUtilities.createAuth0Client();
+
+        String json = "{ \"name\": \"" + clientName +
+                "\", \"client_metadata\": { \"tenant_id\": \"" + tenantId +
+                "\", \"clientId\": " + newClientId + ", \"clientSecret\": " + newClientSecret + " } }";
+
+        // When
+        when(webClient.patch()).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.uri("/api/v2/clients/" + clientId)).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.header(contentTypeHeaderName, contentTypeHeaderValue)).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.header(authorizationHeaderName, authorizationHeaderValue)).thenReturn(requestBodySpecMock);
+        when(requestBodySpecMock.bodyValue(json)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToMono(ArgumentMatchers.<Class<Auth0Client>>notNull()))
+                .thenReturn(Mono.just(auth0Client));
+
+        Mono<Auth0Client> auth0ClientMono = auth0AuthorizationServerWrapper.removeApiKeyFromClient(clientName,
+                clientId, tenantId, managementToken, newClientId, newClientSecret);
+
+        // Then
+        StepVerifier.create(auth0ClientMono).expectNext(auth0Client).verifyComplete();
+    }
+
+    @Test
+    void getTenantIdAndClientNameFromAuth0_validInputs_ReturnsTenantIdAndClientObject() {
+        // Given
+        String clientId = "client ID";
+        String managementToken = "management Access Token";
+        String contentTypeHeaderName = "Content-Type";
+        String contentTypeHeaderValue = "application/x-www-form-urlencoded";
+        String authorizationHeaderName = "Authorization";
+        String authorizationHeaderValue = "Bearer " + managementToken;
+        Auth0Client auth0Client = TestUtilities.createAuth0Client();
+        TenantIdAndNameObject tenantIdAndNameObject = new TenantIdAndNameObject(auth0Client.getClient_metadata().getTenant_id(), auth0Client.getName());
+
+        // When
+        when(webClient.get()).thenReturn(requestHeadersUriSpecMock);
+        when(requestHeadersUriSpecMock.uri("/api/v2/clients/" + clientId)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.header(contentTypeHeaderName, contentTypeHeaderValue)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.header(authorizationHeaderName, authorizationHeaderValue)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToMono(ArgumentMatchers.<Class<Auth0Client>>notNull())).thenReturn(Mono.just(auth0Client));
+
+        Mono<TenantIdAndNameObject> tenantIdAndNameObjectMono = auth0AuthorizationServerWrapper.getTenantIdAndClientNameFromAuth0(clientId, managementToken);
+
+        // Then
+        StepVerifier.create(tenantIdAndNameObjectMono).expectNext(tenantIdAndNameObject).verifyComplete();
+    }
+
+    @Test
+    void getTenantIdAndClientNameFromAuth0_Auth0ServiceIsUnavailable_is5RetriesExhausted() {
+        // Given
+        String clientId = "client ID";
+        String managementToken = "management Access Token";
+        String contentTypeHeaderName = "Content-Type";
+        String contentTypeHeaderValue = "application/x-www-form-urlencoded";
+        String authorizationHeaderName = "Authorization";
+        String authorizationHeaderValue = "Bearer " + managementToken;
+
+        // When
+        when(webClient.get()).thenReturn(requestHeadersUriSpecMock);
+        when(requestHeadersUriSpecMock.uri("/api/v2/clients/" + clientId)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.header(contentTypeHeaderName, contentTypeHeaderValue)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.header(authorizationHeaderName, authorizationHeaderValue)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToMono(Auth0Client.class))
+                .thenReturn(Mono.error(new Exception("Retries Exception")));
+
+        Mono<TenantIdAndNameObject> tenantIdAndNameObjectMono = auth0AuthorizationServerWrapper.getTenantIdAndClientNameFromAuth0(clientId, managementToken);
+
+        // Then
+        StepVerifier.create(tenantIdAndNameObjectMono)
                 .expectErrorMatches(
                         throwable -> throwable instanceof ComplytAuth0Exception
                                 && throwable.getMessage().equals("5 Retries Exhausted"))
@@ -117,6 +392,7 @@ public class Auth0AuthorizationServerWrapperTest {
 
         assertEquals(nullPointerException.getMessage(), "clientId is marked non-null but is null");
     }
+
 
     @Test
     void getAccessToken_clientSecretIsNull_throwsNullException() {
@@ -146,5 +422,63 @@ public class Auth0AuthorizationServerWrapperTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "grantType is marked non-null but is null");
+    }
+
+    @Test
+    void removeApiKeyFromClient_clientNameIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.removeApiKeyFromClient(null,
+                    "client ID", "tenant ID", "management Access Token", "New Client ID", "New Client Secret");
+        });
+
+        assertEquals(nullPointerException.getMessage(), "clientName is marked non-null but is null");
+    }
+
+    @Test
+    void removeApiKeyFromClient_clientIdIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.removeApiKeyFromClient("client Name",
+                    null, "tenant ID", "management Access Token", "New Client ID", "New Client Secret");
+        });
+
+        assertEquals(nullPointerException.getMessage(), "clientId is marked non-null but is null");
+    }
+
+    @Test
+    void removeApiKeyFromClient_tenantIdIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.removeApiKeyFromClient("client Name",
+                    "client ID", null, "management Access Token", "New Client ID", "New Client Secret");
+        });
+
+        assertEquals(nullPointerException.getMessage(), "tenantId is marked non-null but is null");
+    }
+
+    @Test
+    void removeApiKeyFromClient_managementAccessTokenIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.removeApiKeyFromClient("client Name",
+                    "client ID", "tenant ID", null, "New Client ID", "New Client Secret");
+        });
+
+        assertEquals(nullPointerException.getMessage(), "accessToken is marked non-null but is null");
+    }
+
+    @Test
+    void getTenantIdAndClientNameFromAuth0_clientIdIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getTenantIdAndClientNameFromAuth0(null, "management Access Token");
+        });
+
+        assertEquals(nullPointerException.getMessage(), "clientId is marked non-null but is null");
+    }
+
+    @Test
+    void getTenantIdAndClientNameFromAuth0_AccessTokenIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getTenantIdAndClientNameFromAuth0("client ID", null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "accessToken is marked non-null but is null");
     }
 }

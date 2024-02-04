@@ -1,6 +1,6 @@
 package io.complyt.authentication.business.authorization.Wrappers;
 
-import io.complyt.authentication.business.authorization.Auth0Client;
+import io.complyt.authentication.auth0_client.Auth0Client;
 import lombok.NonNull;
 import org.springframework.web.bind.annotation.RequestParam;
 import reactor.core.publisher.Mono;

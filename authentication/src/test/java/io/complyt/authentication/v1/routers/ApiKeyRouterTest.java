@@ -3,6 +3,7 @@ package io.complyt.authentication.v1.routers;
 import io.complyt.authentication.config.ApiExceptionConfig;
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
+import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import io.complyt.authentication.facades.ApiKeyFacade;
 import io.complyt.authentication.repositories.exceptions.OperationFailedException;
 import io.complyt.authentication.v1.config.error_messages.GenericErrorMessages;
@@ -54,10 +55,18 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     Credentials credentials;
 
+    ApiKey apiKey;
+    ApiKeyDto apiKeyDto;
+
     @BeforeEach
     void postCredentialsRouterFunction() {
         credentialsDto = TestUtilities.createCredentialsDto();
         credentials = CredentialsMapper.INSTANCE.credentialsDtoTocredentials(credentialsDto);
+    }   
+    @BeforeEach
+    void deleteCredentialsRouterFunction() {
+        apiKey = TestUtilities.createApiKey();
+        apiKeyDto = ApiKeyMapper.INSTANCE.apiKeyToApiKeyDto(apiKey);
     }
 
     @Test
@@ -184,6 +193,122 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
                         .path(ApiKeyRouter.BASE_URL)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    // tests
+    @Test
+    @WithMockUser
+//    @Override
+    public void delete_Exists_Returns204() {
+        // Given
+        Credentials cancelledCredentials = credentials.withStatus(ApiKeyStatus.CANCELLED);
+
+        // When
+        when(apiKeyFacade.markAsCancelled(apiKey)).thenReturn(Mono.just(cancelledCredentials));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .queryParam("clientId", apiKeyDto.clientId())
+                        .queryParam("clientSecret", apiKeyDto.clientSecret())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+//    @Override
+    @WithMockUser
+    public void delete_DoesntExist_Returns204() {
+        // When
+        when(apiKeyFacade.markAsCancelled(apiKey)).thenReturn(Mono.empty());
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .queryParam("clientId", apiKeyDto.clientId())
+                        .queryParam("clientSecret", apiKeyDto.clientSecret())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+//    @Override
+    @WithMockUser
+    public void delete_InternalServerError_stillReturns204() {
+        // When
+        when(apiKeyFacade.markAsCancelled(apiKey)).thenThrow(OperationFailedException.class);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .queryParam("clientId", apiKeyDto.clientId())
+                        .queryParam("clientSecret", apiKeyDto.clientSecret())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+//    @Override
+    public void delete_NullHandler_ThrowsNullPointerException() {
+        // Given
+        ApiKeyRouter apiKeyRouter = new ApiKeyRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            apiKeyRouter.deleteCredentialsRouterFunction(null);
+        });
+
+        // Then
+        assertEquals("apiKeyHandler is marked non-null but is null", exception.getMessage());
+    }
+
+
+    @Test
+//    @Override
+    public void delete_UnauthenticatedUser_Returns401() {
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .queryParam("clientId", apiKeyDto.clientId())
+                        .queryParam("clientSecret", apiKeyDto.clientSecret())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().is4xxClientError();
+
+    }
+
+    @Test
+    @WithMockUser
+//    @Override
+    public void delete_missingCsrfToken_return403() {
+        webTestClient
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .queryParam("clientId", apiKeyDto.clientId())
+                        .queryParam("clientSecret", apiKeyDto.clientSecret())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
                 .exchange()
                 .expectStatus().isForbidden();
     }

@@ -40,7 +40,7 @@ public class ApiKeyFacade {
         return credentialsService.markAsCancelled(apiKey)
                 .flatMap(credentials -> authorizationService.getManagementAccessToken()
                         .flatMap(accessToken -> authorizationService.deleteApiKey(credentials, accessToken)
-                .then(tokenService.deleteToken(apiKey)
-                        .thenReturn(credentials))));
+                            .then(tokenService.deleteToken(apiKey)
+                                .thenReturn(credentials))));
     }
 }

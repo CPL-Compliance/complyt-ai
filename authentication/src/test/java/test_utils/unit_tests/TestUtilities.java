@@ -1,8 +1,9 @@
 package test_utils.unit_tests;
 
+import io.complyt.authentication.auth0_client.ClientMetadata;
 import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.business.authorization.Auth0AccessToken;
-import io.complyt.authentication.business.authorization.Auth0Client;
+import io.complyt.authentication.auth0_client.Auth0Client;
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.TenantIdAndNameObject;
@@ -12,6 +13,7 @@ import io.complyt.authentication.security.EncryptedData;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.models.TokenDto;
+import io.complyt.authentication.auth0_client.Auth0Client;
 import lombok.NonNull;
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -100,7 +102,7 @@ public class TestUtilities {
     }
 
     public static Auth0Client createAuth0Client() {
-        return new Auth0Client("tenant", false, false, "name", new Auth0Client.ClientMetadata("tenantId", "ClientId", "clientSecret"),
+        return new Auth0Client("tenant", false, false, "name", new ClientMetadata("tenantId", "ClientId", "clientSecret"),
                 true, true, false, false,null, null, "clientId", true, "clientSecret",
                 null, "appType", null, true );
     }
