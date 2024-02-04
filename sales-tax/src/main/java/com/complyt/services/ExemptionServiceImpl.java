@@ -46,10 +46,11 @@ public class ExemptionServiceImpl implements ExemptionService {
     public Mono<Boolean> isFullyExempted(@NonNull final Transaction transaction) {
         return findFullyExempted(transaction)
                 .hasElement()
-                .flatMap(hasElement -> {
-                    String logStr = "Transaction with ComplytId: " + transaction.getComplytId() + " is fully exempted: " + hasElement;
+                // hasElement will return true in case of a full exemption found in the DB
+                .flatMap(hasFullExemption -> {
+                    String logStr = "Transaction with ComplytId: " + transaction.getComplytId() + " has full exemption returned: " + hasFullExemption;
 
-                    return ContextLogger.observeCtx(logStr, log::info).then(Mono.just(hasElement));
+                    return ContextLogger.observeCtx(logStr, log::info).then(Mono.just(hasFullExemption));
                 });
     }
 
