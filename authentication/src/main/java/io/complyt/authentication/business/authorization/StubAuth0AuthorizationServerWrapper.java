@@ -1,6 +1,7 @@
 package io.complyt.authentication.business.authorization;
 
 import io.complyt.authentication.auth0_client.Auth0Client;
+import io.complyt.authentication.auth0_client.ClientMetadata;
 import io.complyt.authentication.domain.TenantIdAndNameObject;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -28,7 +29,9 @@ public class StubAuth0AuthorizationServerWrapper implements AuthorizationServerW
     @Override
     public Mono<Auth0Client> removeApiKeyFromClient(@NonNull String clientName, @NonNull String clientId, @NonNull String tenantId, @NonNull String accessToken, @RequestParam(value = "newClientId", required = false) String newClientId,
                                                     @RequestParam(value = "newClientSecret", required = false) String newClientSecret) {
-        return null;
+        return Mono.just(new Auth0Client("tenant", false, false, "name", new ClientMetadata("tenantId", "ClientId", "clientSecret"),
+                true, true, false, false,null, null, "clientId", true, "clientSecret",
+                null, "appType", null, true ));
     }
 
     @Override
