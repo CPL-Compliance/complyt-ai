@@ -138,24 +138,13 @@ public class ExemptionServiceImplTest {
     }
 
     @Test
-    void isFullyExempted_CustomerHasPartiallyExemptionInState_ReturnsFalse() {
-        // Given
-        Exemption partialExemption = exemption.withExemptionType(ExemptionType.PARTIALLY);
-
-        // When
-        when(exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), transaction.getShippingAddress().state())).thenReturn(Mono.just(partialExemption));
-        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
-
-        // Then
-        StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
-    }
-
-    @Test
     void isFullyExempted_CustomerHasFullyExemptionInState_ReturnsTrue() {
         // Given
 
         // When
-        when(exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), transaction.getShippingAddress().state())).thenReturn(Mono.just(exemption));
+        when(exemptionRepository.findFullyExempted(transaction.getCustomerId(),
+                transaction.getShippingAddress().state(),
+                transaction.getExternalTimestamps().getCreatedDate())).thenReturn(Mono.just(exemption));
         Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
 
         // Then
@@ -163,46 +152,13 @@ public class ExemptionServiceImplTest {
     }
 
     @Test
-    void isFullyExempted_NotExemptedBecauseDateExpired_ReturnsFalse() {
+    void isFullyExempted_CustomerDoesNotHaveExemptionInState_ReturnsTrue() {
         // Given
-        LocalDateTime createdDate = exemption.getValidationDates().getToDate().plusYears(1);
-        LocalDateTime updatedDate = LocalDateTime.now();
-
-        Transaction transactionWithDateLaterThanExemptionDate = transaction
-                .withExternalTimestamps(new Timestamps(createdDate, updatedDate));
 
         // When
-        when(exemptionRepository.findByCustomerAndState(transactionWithDateLaterThanExemptionDate.getCustomerId(), transactionWithDateLaterThanExemptionDate.getShippingAddress().state())).thenReturn(Mono.just(exemption));
-        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transactionWithDateLaterThanExemptionDate);
-
-        // Then
-        StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
-    }
-
-    @Test
-    void isFullyExempted_NotExemptedBecauseDateIsYetToCome_ReturnsFalse() {
-        // Given
-        LocalDateTime createdDate = exemption.getValidationDates().getFromDate().minusYears(1);
-        LocalDateTime updatedDate = LocalDateTime.now();
-
-        Transaction transactionWithDateLaterThanExemptionDate = transaction
-                .withExternalTimestamps(new Timestamps(createdDate, updatedDate));
-
-        // When
-        when(exemptionRepository.findByCustomerAndState(transactionWithDateLaterThanExemptionDate.getCustomerId(), transactionWithDateLaterThanExemptionDate.getShippingAddress().state())).thenReturn(Mono.just(exemption));
-        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transactionWithDateLaterThanExemptionDate);
-
-        // Then
-        StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
-    }
-
-    @Test
-    void isFullyExempted_ExemptionTypeIsPartially_ReturnsFalse() {
-        // Given
-        Exemption exemptionWithPartiallyType = exemption.withExemptionType(ExemptionType.PARTIALLY);
-
-        // When
-        when(exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), transaction.getShippingAddress().state())).thenReturn(Mono.just(exemptionWithPartiallyType));
+        when(exemptionRepository.findFullyExempted(transaction.getCustomerId(),
+                transaction.getShippingAddress().state(),
+                transaction.getExternalTimestamps().getCreatedDate())).thenReturn(Mono.empty());
         Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
 
         // Then
@@ -378,24 +334,12 @@ public class ExemptionServiceImplTest {
     }
 
     @Test
-    void isFullyExemptionActive_ExemptionIsPartially_ThrowsException() {
-        // Given
-        Exemption partiallyExemption = exemption.withExemptionType(ExemptionType.PARTIALLY);
-
-        // When + Then
-        when(exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), transaction.getShippingAddress().state())).thenReturn(Mono.just(partiallyExemption));
-        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
-
-        StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
-    }
-
-    @Test
     void findByClientCustomerAndState_NullTransactionPassed_ThrowsException() {
         // Given
         Transaction nullTransaction = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.findByClientCustomerAndState(nullTransaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.findFullyExempted(nullTransaction));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");

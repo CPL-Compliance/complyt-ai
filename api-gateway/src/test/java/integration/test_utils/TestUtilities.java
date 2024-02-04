@@ -96,23 +96,23 @@ public class TestUtilities {
                 isValidated ? "\"customerType\": \"RETAIL\"," : "");
     }
 
-    public static String unvalidatedTransactionJsonExample(String externalId, String customerId) {
-        return transactionJsonExample(externalId, customerId, null, false, null);
+    public static String unvalidatedTransactionJsonExample(String externalId, String customerId, String createdDate) {
+        return transactionJsonExample(externalId, customerId, null, false, null, createdDate);
     }
 
-    public static String transactionJsonExample(String externalId, String customerId) {
-        return transactionJsonExample(externalId, customerId, null, true, null);
+    public static String transactionJsonExample(String externalId, String customerId, String state, String createdDate) {
+        return transactionJsonExample(externalId, customerId, null, true, state, createdDate);
     }
 
-    public static String existingTransactionJsonExample(String externalId, String customerId, String complytId) {
-        return transactionJsonExample(externalId, customerId, complytId, true, null);
+    public static String existingTransactionJsonExample(String externalId, String customerId, String complytId, String createdDate) {
+        return transactionJsonExample(externalId, customerId, complytId, true, null, createdDate);
     }
 
-    public static String transactionJsonExampleWithState(String externalId, String customerId, String state) {
-        return transactionJsonExample(externalId, customerId, null, true, state);
+    public static String transactionJsonExampleWithState(String externalId, String customerId, String state, String createdDate) {
+        return transactionJsonExample(externalId, customerId, null, true, state, createdDate);
     }
 
-    private static String transactionJsonExample(String externalId, String customerId, String complytId, boolean isValidated, String state) {
+    private static String transactionJsonExample(String externalId, String customerId, String complytId, boolean isValidated, String state, String createdDate) {
         return String.format("""
                         {
                             %s
@@ -141,8 +141,8 @@ public class TestUtilities {
                             "customerId": "%s",
                             "transactionStatus": "ACTIVE",
                             "externalTimestamps": {
-                                "createdDate": "2023-02-05T12:24:43.193Z",
-                                "updatedDate": "2023-02-05T12:24:43.193Z"
+                                "createdDate": "%sT12:24:43.193Z",
+                                "updatedDate": "%sT12:24:43.193Z"
                             },
                             %s
                             "shippingFee": {
@@ -156,8 +156,10 @@ public class TestUtilities {
                 complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
                 externalId,
                 isValidated ? "\"source\": \"1\"," : "",
-                state != null ? state : "CA",
+                state,
                 customerId,
+                createdDate,
+                createdDate,
                 isValidated ? "\"transactionType\": \"INVOICE\"," : ""
         );
     }

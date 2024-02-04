@@ -421,7 +421,6 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> System.out.println("abc:" + map))
                 .value(map -> testUtilities.checkErrorMessages(map,
                         Set.of("complytId " + DtoErrorMessages.CONFLICTED_WITH_URL_ERROR)));
     }
