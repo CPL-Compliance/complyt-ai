@@ -163,6 +163,15 @@ public class SalesTaxTrackingServiceImplTest {
         StepVerifier.create(actualSalesTaxTracking).expectNext(savedSalesTaxTracking).verifyComplete();
     }
 
+    @Test
+    void updateEconomicNexus_UpdatesSalesTaxTracking_ReturnsSalesTaxTracking() {
+        // Given + When
+        when(salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.updateEconomicNexus(salesTaxTracking);
+
+        // Then
+        StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
+    }
 
     @Test
     void save_NullSalesTaxTrackingPassed_ThrowsException() {
@@ -387,6 +396,34 @@ public class SalesTaxTrackingServiceImplTest {
     }
 
     @Test
+    void handleSalesTaxTrackingAfterTransactionCalculated_SalesTaxTrackingWithEconomicNexusEstablished_UpdatesSalesTaxTracking() {
+        // Given
+        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(true, LocalDateTime.now());
+        SalesTaxTracking salesTaxTrackingWithEconomicNexusEstablished = salesTaxTracking.withEconomicNexusTracker(economicNexusTracker);
+
+        // When
+        when(salesTaxTrackingRepository.updateEconomicNexus(salesTaxTrackingWithEconomicNexusEstablished)).thenReturn(Mono.just(salesTaxTrackingWithEconomicNexusEstablished));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTrackingWithEconomicNexusEstablished);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithEconomicNexusEstablished).verifyComplete();
+    }
+
+    @Test
+    void handleSalesTaxTrackingAfterTransactionCalculated_SalesTaxTrackingWithEconomicNexusNotEstablished_SavesSalesTaxTracking() {
+        // Given
+        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false, null);
+        SalesTaxTracking salesTaxTrackingWithEconomicNexusNotEstablished = salesTaxTracking.withEconomicNexusTracker(economicNexusTracker);
+
+        // When
+        when(salesTaxTrackingRepository.save(salesTaxTrackingWithEconomicNexusNotEstablished)).thenReturn(Mono.just(salesTaxTrackingWithEconomicNexusNotEstablished));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTrackingWithEconomicNexusNotEstablished);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithEconomicNexusNotEstablished).verifyComplete();
+    }
+
+    @Test
     void update_NullSalesTaxTrackingPassed_ThrowsException() {
         // Given
         SalesTaxTracking nullSalesTaxTracking = null;
@@ -567,4 +604,16 @@ public class SalesTaxTrackingServiceImplTest {
         assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
     }
 
+    @Test
+    void handleSalesTaxTrackingAfterTransactionCalculated_NullSalesTaxTracking_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(nullSalesTaxTracking);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
 }

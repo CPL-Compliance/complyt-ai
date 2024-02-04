@@ -29,7 +29,9 @@ public record SalesTaxTrackingDto(
         Map<LocalDate, @Valid NexusCalculationSummaryDto> nexusCalculationSummaries,
         @Valid NexusStateRuleDto nexusStateRule,
         @Valid ClientTrackingDto clientTracking,
-        LocalDateTime appliedDate, boolean approved, LocalDateTime approvalDate,
+        @NotNull(message = "appliedDate " + DtoErrorMessages.NOT_NULL_ERROR) LocalDateTime appliedDate,
+        boolean approved,
+        LocalDateTime approvalDate,
         @Schema(description = FieldsDescriptions.FILING_FREQUENCY) FilingFrequencyDto filingFrequency)
         implements StateCheckable {
 }

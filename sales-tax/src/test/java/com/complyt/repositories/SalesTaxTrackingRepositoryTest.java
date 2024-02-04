@@ -2,6 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.security.TenantResolver;
+import com.complyt.utils.update.SalesTaxTrackingUpdateQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -41,6 +43,9 @@ public class SalesTaxTrackingRepositoryTest {
 
     @Mock
     TenantResolver tenantResolver;
+
+    @Mock
+    SalesTaxTrackingUpdateQueryBuilder updateQueryBuilder;
 
     SalesTaxTracking salesTaxTracking;
 
@@ -95,6 +100,40 @@ public class SalesTaxTrackingRepositoryTest {
 
         // Then
         Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingRepository.save(salesTaxTrackingNoId);
+
+        StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void updateEconomicNexus_UpdatesSalesTaxTracking_ReturnsSalesTaxTracking() {
+        // Given
+        Query query = new Query(Criteria.where("_id").is(salesTaxTracking.getId()));
+        Update update = testUtilities.buildSalesTaxTrackingUpdate(salesTaxTracking);
+
+        // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
+        when(updateQueryBuilder.build(salesTaxTracking)).thenReturn(update);
+        when(reactiveMongoTemplate.findAndModify(query, update, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
+
+        // Then
+        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking);
+
+        StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void updateEconomicNexus_UpdatesSalesTaxTrackingOfPreviousTwelveMonths_ReturnsSalesTaxTracking() {
+        // Given
+        Query query = new Query(Criteria.where("_id").is(salesTaxTracking.getId()));
+        Update update = testUtilities.buildSalesTaxTrackingUpdateOfPreviousTwelveMonths(salesTaxTracking);
+
+        // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
+        when(updateQueryBuilder.build(salesTaxTracking)).thenReturn(update);
+        when(reactiveMongoTemplate.findAndModify(query, update, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
+
+        // Then
+        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking);
 
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
     }
@@ -227,7 +266,7 @@ public class SalesTaxTrackingRepositoryTest {
         int calculatedOffset = (page - 1) * size;
 
         List<SalesTaxTracking> salesTaxTrackingList = IntStream.range(0, 4)
-                .mapToObj(i ->  salesTaxTracking.withComplytId(UUID.randomUUID()).withId(UUID.randomUUID().toString()))
+                .mapToObj(i -> salesTaxTracking.withComplytId(UUID.randomUUID()).withId(UUID.randomUUID().toString()))
                 .collect(Collectors.toList());
 
         // Creating the expected list (list of 2-4 sales tax tracking objects)
@@ -273,5 +312,17 @@ public class SalesTaxTrackingRepositoryTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
+    }
+
+    @Test
+    void updateEconomicNexus_NullSalesTaxTracking_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingRepository.updateEconomicNexus(nullSalesTaxTracking));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
     }
 }
