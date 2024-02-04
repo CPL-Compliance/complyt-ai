@@ -55,4 +55,49 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                 .exchange()
                 .expectStatus().isForbidden();
     }
+
+    @Test
+    public void authentication_apiKey_delete_clientCredentialsExists_Returns204() {
+        WEB_TEST_CLIENT
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.API_KEY_BASE_URL)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN_COMPLYT_ADMIN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+    public void authentication_apiKey_delete_noJwt_Returns204() {
+        WEB_TEST_CLIENT
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.API_KEY_BASE_URL)
+                        .build())
+                .headers(headers -> {
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+    public void authentication_apiKey_delete_notSuitableJwt_Returns403() {
+        WEB_TEST_CLIENT
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.API_KEY_BASE_URL)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.getNonExistingClientCredentialsJsonExample())
+                .exchange()
+                .expectStatus().isNoContent();
+    }
 }
