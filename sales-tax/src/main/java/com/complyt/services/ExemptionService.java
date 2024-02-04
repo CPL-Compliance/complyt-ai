@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 public interface ExemptionService extends CrudService<Exemption, String> {
-    Mono<Exemption> findByClientCustomerAndState(@NonNull final Transaction transaction);
+    Mono<Exemption> findFullyExempted(@NonNull final Transaction transaction);
 
     Mono<Exemption> findByComplytId(@NonNull final UUID complytId);
 

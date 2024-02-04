@@ -1,6 +1,8 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.customer.exemption.ExemptionStatus;
+import com.complyt.domain.customer.exemption.ExemptionType;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Repository
@@ -26,14 +29,19 @@ public class ExemptionRepository {
     @NonNull
     private TenantResolver tenantResolver;
 
-    public Mono<Exemption> findByCustomerAndState(@NonNull UUID customerId, @NonNull String state) {
+    public Mono<Exemption> findFullyExempted(@NonNull UUID customerId, @NonNull String state, @NonNull LocalDateTime createdDate) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)
                                     .and("customerId").is(customerId))
                             .addCriteria(new Criteria().orOperator(
                                     Criteria.where("state.abbreviation").is(state),
-                                    Criteria.where("state.name").is(state)));
+                                    Criteria.where("state.name").is(state)))
+                            .addCriteria(Criteria.where("validationDates.fromDate").lte(createdDate)
+                                    .and("validationDates.toDate").gte(createdDate)
+                                    .and("exemptionType").is(ExemptionType.FULLY)
+                                    .and("exemptionStatus").is(ExemptionStatus.ACTIVE));
+
 
                     return ContextLogger.observeCtx("Searching for exemption by query: " + query, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Exemption.class));

@@ -152,6 +152,167 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
     }
 
+    //Exemptions Testing
+    /*
+    This transaction's customer has two exemptions in state PA by this schema in this timeframe
+                 |-----Fully-Exemption-----------|
+                                 |---------Partially-Exemption------------|
+     time:  2025-01-01      2025-12-01        2026-01-01             2026-05-01
+     transactionCreatedDate:               (T)
+     */
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndPartiallyExemption_Exempt() {
+        String externalId = "nonExistingTransactionID_A";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "12345", false))
+                .withExternalTimestamps(new TimestampsDto("2025-12-02", "2025-12-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNull(transactionDto.salesTax()));
+    }
+
+    /*
+    This transaction's customer has two exemptions in state PA by this schema in this timeframe
+                 |-----Fully-Exemption-----------|
+                                 |---------Partially-Exemption------------|
+     time:  2025-01-01      2025-12-01        2026-01-01             2026-05-01
+     transactionCreatedDate:                                     (T)
+     */
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_CustomerIsPartiallyExempt_NotExempted() {
+        String externalId = "nonExistingTransactionID_B";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "12345", false))
+                .withExternalTimestamps(new TimestampsDto("2026-02-01", "2026-02-01"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
+    }
+
+    /*
+    This transaction's customer has two exemptions in state PA by this schema in this timeframe
+                 |-----Fully-Exemption-----------|
+                                 |---------Partially-Exemption------------|
+     time:  2025-01-01      2025-12-01        2026-01-01          2026-05-01
+     transactionCreatedDate:                                                         (T)
+     */
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_CustomerIsNotNoExempt_NoExempted() {
+        String externalId = "nonExistingTransactionID_C";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "12345", false))
+                .withExternalTimestamps(new TimestampsDto("2026-05-02", "2026-05-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
+    }
+
+    /*
+    This transaction's customer has two exemptions in state PA by this schema in this timeframe
+              |---------Not-Active-Exemption------------|
+                                |----------Fully-Exemption-----------|
+     time:  2027-01-01      2027-12-01             2028-01-01          2028-05-01
+     transactionCreatedDate:               (T)
+     */
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NotActiveExemptionAndFullyExempt_Exempted() {
+        String externalId = "nonExistingTransactionID_D";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "12345", false))
+                .withExternalTimestamps(new TimestampsDto("2027-12-02", "2027-12-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNull(transactionDto.salesTax()));
+    }
+
+    /*
+    This transaction's customer has two exemptions in state PA by this schema in this timeframe
+              |---------Not-Active-Exemption------------|
+                                        |----------Fully-Exemption-----------|
+     time:  2027-01-01              2027-12-01             2028-01-01          2028-05-01
+     transactionCreatedDate:  (T)
+     */
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NotActiveExemption_NoExempted() {
+        String externalId = "nonExistingTransactionID_E";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "12345", false))
+                .withExternalTimestamps(new TimestampsDto("2027-01-02", "2027-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
+    }
+
     @Order(2)
     @Test
     @Override
