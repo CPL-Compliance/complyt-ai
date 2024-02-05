@@ -59,19 +59,17 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
 
     public Mono<Auth0Client> removeApiKeyFromClient(final @NonNull String clientName, final @NonNull String clientId,
                                                     final @NonNull String tenantId, final @NonNull String accessToken,
-                                                    @RequestParam(value = "newClientId", required = false) String newClientId,
-                                                    @RequestParam(value = "newClientSecret", required = false) String newClientSecret) {
+                                                    final String newClientId, final String newClientSecret) {
 
-        String json = "{ \"name\": \"" + clientName +
-                "\", \"client_metadata\": { \"tenant_id\": \"" + tenantId +
-                "\", \"clientId\": " + newClientId + ", \"clientSecret\": " + newClientSecret + " } }";
+        UpdateAuth0ClientMetaDataJsonObject updateAuth0ClientMetaDataJsonObject = new UpdateAuth0ClientMetaDataJsonObject(clientName,
+                tenantId, newClientId, newClientSecret);
 
         return ContextLogger.observeCtx("Removing Auth0 Api-Key", log::info)
                 .then(webClient.patch()
                         .uri("/api/v2/clients/" + clientId)
                         .header("Content-Type", "application/json")
                         .header("Authorization", "Bearer " + accessToken)
-                        .bodyValue(json)
+                        .bodyValue(updateAuth0ClientMetaDataJsonObject.getAsJson())
                         .retrieve()
                         .bodyToMono(Auth0Client.class)
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(50))

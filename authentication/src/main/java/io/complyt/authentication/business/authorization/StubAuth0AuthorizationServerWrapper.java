@@ -27,8 +27,8 @@ public class StubAuth0AuthorizationServerWrapper implements AuthorizationServerW
     }
 
     @Override
-    public Mono<Auth0Client> removeApiKeyFromClient(@NonNull String clientName, @NonNull String clientId, @NonNull String tenantId, @NonNull String accessToken, @RequestParam(value = "newClientId", required = false) String newClientId,
-                                                    @RequestParam(value = "newClientSecret", required = false) String newClientSecret) {
+    public Mono<Auth0Client> removeApiKeyFromClient(@NonNull String clientName, @NonNull String clientId, @NonNull String tenantId, @NonNull String accessToken,
+                                                    final String newClientId, final String newClientSecret) {
         return Mono.just(new Auth0Client("tenant", false, false, "name", new ClientMetadata("tenantId", "ClientId", "clientSecret"),
                 true, true, false, false,null, null, "clientId", true, "clientSecret",
                 null, "appType", null, true ));

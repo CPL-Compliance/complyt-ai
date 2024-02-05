@@ -21,7 +21,7 @@ public class ApiKeyRouter {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> deleteCredentialsRouterFunction(@NonNull final ApiKeyHandler apiKeyHandler) {
+    public RouterFunction<ServerResponse> deleteApiKeyRouterFunction(@NonNull final ApiKeyHandler apiKeyHandler) {
         RequestPredicate postApiKeyRoute = RequestPredicates
                 .DELETE(BASE_URL)
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED));

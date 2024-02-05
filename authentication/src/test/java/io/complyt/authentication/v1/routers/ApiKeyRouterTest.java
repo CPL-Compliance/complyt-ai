@@ -272,7 +272,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
         // When
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            apiKeyRouter.deleteCredentialsRouterFunction(null);
+            apiKeyRouter.deleteApiKeyRouterFunction(null);
         });
 
         // Then
