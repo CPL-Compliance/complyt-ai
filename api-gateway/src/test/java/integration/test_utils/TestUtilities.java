@@ -96,23 +96,23 @@ public class TestUtilities {
                 isValidated ? "\"customerType\": \"RETAIL\"," : "");
     }
 
-    public static String unvalidatedTransactionJsonExample(String externalId, String customerId) {
-        return transactionJsonExample(externalId, customerId, null, false, null);
+    public static String unvalidatedTransactionJsonExample(String externalId, String customerId, String createdDate) {
+        return transactionJsonExample(externalId, customerId, null, false, null, createdDate);
     }
 
-    public static String transactionJsonExample(String externalId, String customerId) {
-        return transactionJsonExample(externalId, customerId, null, true, null);
+    public static String transactionJsonExample(String externalId, String customerId, String state, String createdDate) {
+        return transactionJsonExample(externalId, customerId, null, true, state, createdDate);
     }
 
-    public static String existingTransactionJsonExample(String externalId, String customerId, String complytId) {
-        return transactionJsonExample(externalId, customerId, complytId, true, null);
+    public static String existingTransactionJsonExample(String externalId, String customerId, String complytId, String createdDate) {
+        return transactionJsonExample(externalId, customerId, complytId, true, null, createdDate);
     }
 
-    public static String transactionJsonExampleWithState(String externalId, String customerId, String state) {
-        return transactionJsonExample(externalId, customerId, null, true, state);
+    public static String transactionJsonExampleWithState(String externalId, String customerId, String state, String createdDate) {
+        return transactionJsonExample(externalId, customerId, null, true, state, createdDate);
     }
 
-    private static String transactionJsonExample(String externalId, String customerId, String complytId, boolean isValidated, String state) {
+    private static String transactionJsonExample(String externalId, String customerId, String complytId, boolean isValidated, String state, String createdDate) {
         return String.format("""
                         {
                             %s
@@ -123,6 +123,84 @@ public class TestUtilities {
                                     "unitPrice": 0,
                                     "quantity": 0,
                                     "totalPrice": 0,
+                                    "description": "string",
+                                    "name": "string",
+                                    "taxCode": "C1S1",
+                                    "manualSalesTax": true,
+                                    "manualSalesTaxRate": 0
+                                }
+                            ],
+                            "shippingAddress": {
+                                "city": "Los Angeles",
+                                "country": "US",
+                                "state": "%s",
+                                "street": "10 5th Ave",
+                                "zip": "90210",
+                                "isPartial": "false"
+                            },
+                            "customerId": "%s",
+                            "transactionStatus": "ACTIVE",
+                            "externalTimestamps": {
+                                "createdDate": "%sT12:24:43.193Z",
+                                "updatedDate": "%sT12:24:43.193Z"
+                            },
+                            %s
+                            "shippingFee": {
+                                "manualSalesTax": true,
+                                "manualSalesTaxRate": 0,
+                                "totalPrice": 0,
+                                "taxCode": "C6S1"
+                            }
+                        }
+                        """,
+                complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
+                externalId,
+                isValidated ? "\"source\": \"1\"," : "",
+                state,
+                customerId,
+                createdDate,
+                createdDate,
+                isValidated ? "\"transactionType\": \"INVOICE\"," : ""
+        );
+    }
+
+    public static String getClientCredentialsJsonExample() {
+        return "{\n" +
+                "    \"clientId\": \"abc\",\n" +
+                "    \"clientSecret\": \"QWE$#@\"\n" +
+                "}";
+    }
+
+    public static String getNonExistingClientCredentialsJsonExample() {
+        return "{\n" +
+                "    \"clientId\": \"rte\",\n" +
+                "    \"clientSecret\": \"QWE$#@\"\n" +
+                "}";
+    }
+
+    public static String tokenJsonExample() {
+        return "{\n" +
+                "    \"clientId\":\"" + API_KEY_CLIENT_ID + "\",\n" +
+                "    \"clientSecret\":\"" + API_KEY_CLIENT_SECRET + "\"\n" +
+                "}";
+    }
+
+    public static String tokenUrlEncodedExample() {
+        return "clientId=" + API_KEY_CLIENT_ID +
+                "&clientSecret=" + API_KEY_CLIENT_SECRET;
+    }
+
+    public static String transactionItemIsNotAligned(String externalId, String customerId, String complytId, boolean isValidated, String state) {
+        return String.format("""
+                        {
+                            %s
+                            "externalId": "%s",
+                            %s
+                            "items": [
+                                {
+                                    "unitPrice": 1000,
+                                    "quantity": 1,
+                                    "totalPrice": -1000,
                                     "description": "string",
                                     "name": "string",
                                     "taxCode": "C1S1",
@@ -162,30 +240,64 @@ public class TestUtilities {
         );
     }
 
-    public static String getClientCredentialsJsonExample() {
-        return "{\n" +
-                "    \"clientId\": \"abc\",\n" +
-                "    \"clientSecret\": \"QWE$#@\"\n" +
-                "}";
-    }
-
-    public static String getNonExistingClientCredentialsJsonExample() {
-        return "{\n" +
-                "    \"clientId\": \"rte\",\n" +
-                "    \"clientSecret\": \"QWE$#@\"\n" +
-                "}";
-    }
-
-    public static String tokenJsonExample() {
-        return "{\n" +
-                "    \"clientId\":\"" + API_KEY_CLIENT_ID + "\",\n" +
-                "    \"clientSecret\":\"" + API_KEY_CLIENT_SECRET + "\"\n" +
-                "}";
-    }
-
-    public static String tokenUrlEncodedExample() {
-        return "clientId=" + API_KEY_CLIENT_ID +
-                "&clientSecret=" + API_KEY_CLIENT_SECRET;
+    public static String transactionTotalIsNegative(String externalId, String customerId, String complytId, boolean isValidated, String state) {
+        return String.format("""
+                        {
+                            %s
+                            "externalId": "%s",
+                            %s
+                            "items": [
+                                {
+                                    "unitPrice": 1000,
+                                    "quantity": 1,
+                                    "totalPrice": 1000,
+                                    "description": "string",
+                                    "name": "string",
+                                    "taxCode": "C1S1",
+                                    "manualSalesTax": true,
+                                    "manualSalesTaxRate": 0
+                                },
+                                {
+                                    "unitPrice": -1100,
+                                    "quantity": 1,
+                                    "totalPrice": -1100,
+                                    "description": "string",
+                                    "name": "string",
+                                    "taxCode": "C1S1",
+                                    "manualSalesTax": true,
+                                    "manualSalesTaxRate": 0
+                                }
+                            ],
+                            "shippingAddress": {
+                                "city": "Los Angeles",
+                                "country": "US",
+                                "state": "%s",
+                                "street": "10 5th Ave",
+                                "zip": "90210",
+                                "isPartial": "false"
+                            },
+                            "customerId": "%s",
+                            "transactionStatus": "ACTIVE",
+                            "externalTimestamps": {
+                                "createdDate": "2023-02-05T12:24:43.193Z",
+                                "updatedDate": "2023-02-05T12:24:43.193Z"
+                            },
+                            %s
+                            "shippingFee": {
+                                "manualSalesTax": true,
+                                "manualSalesTaxRate": 0,
+                                "totalPrice": 0,
+                                "taxCode": "C6S1"
+                            }
+                        }
+                        """,
+                complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
+                externalId,
+                isValidated ? "\"source\": \"1\"," : "",
+                state != null ? state : "CA",
+                customerId,
+                isValidated ? "\"transactionType\": \"INVOICE\"," : ""
+        );
     }
 
 }

@@ -27,6 +27,7 @@ public class TransactionFacade {
     @Qualifier("transactionServiceImpl")
     private TransactionService transactionService;
 
+
     @NonNull
     @Qualifier("customerServiceImpl")
     private CustomerService customerService;
@@ -65,8 +66,8 @@ public class TransactionFacade {
                 .map(savedTransaction -> savedTransaction.withCustomer(transaction.getCustomer()))
                 .flatMap(savedTransaction -> salesTaxTracking.isEnforcesSalesTax()
                         ? nexusService.upsertToNexusTracking(savedTransaction, salesTaxTracking)
-                        .flatMap(salesTaxTrackingService::save)
-                        .thenReturn(savedTransaction)
+                        .flatMap(salesTaxTrackingAfterCalculation -> salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTrackingAfterCalculation)
+                                .thenReturn(savedTransaction))
                         : Mono.just(savedTransaction));
     }
 
@@ -96,7 +97,7 @@ public class TransactionFacade {
         return salesTaxTracking.isEnforcesSalesTax()
                 ? transactionService.update(externalId, source, transaction)
                 .flatMap(updatedTransaction -> nexusService.upsertToNexusTracking(updatedTransaction.withCustomer(transaction.getCustomer()), salesTaxTracking)
-                        .flatMap(salesTaxTrackingService::save)
+                        .flatMap(salesTaxTrackingAfterCalculation -> salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTrackingAfterCalculation))
                         .thenReturn(updatedTransaction))
                 : transactionService.update(externalId, source, transaction);
     }
@@ -114,7 +115,7 @@ public class TransactionFacade {
     }
 
 
-        public Flux<Transaction> getAll(int page, int size) {
+    public Flux<Transaction> getAll(int page, int size) {
         return transactionService.findAll(page, size)
                 .flatMapSequential(transaction -> getCustomerByTransaction(transaction)
                         .map(transaction::withCustomer));

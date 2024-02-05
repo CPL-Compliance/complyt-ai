@@ -98,6 +98,12 @@ public interface TransactionRouterTestTemplate extends
 
     void upsert_EmptyItemsList_Returns400ValidationError();
 
+    void upsert_ItemWithQuantityAndAmountThatDoesNotHaveTheSameSignAsToTotalAmount_Returns400DataConflict();
+
+    void upsert_TotalItemsAmountIsNegative_Returns400DataConflict();
+
+    void upsert_ItemWithNegativeAmountAndTotalTransactionAmountIsAboveZero_Returns200();
+
     // Validation::SalesTax
     void upsert_NegativeAmountInSalesTax_Returns400validationError();
 
@@ -112,6 +118,8 @@ public interface TransactionRouterTestTemplate extends
     // Validation::Customer
     void upsert_InvalidCustomer_Returns400();
 
+
+    // Validation::DocumentName
     void upsert_nullDocumentName_Returns200Ok();
 
     void upsert_blankDocumentName_Returns400();
@@ -119,5 +127,4 @@ public interface TransactionRouterTestTemplate extends
     void upsert_moreThan50ChartsDocumentName_Returns400();
 
     void upsert_50ChartsDocumentName_Returns200Ok();
-
 }

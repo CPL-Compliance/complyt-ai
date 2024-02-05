@@ -2,7 +2,6 @@ package com.complyt.services;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.exemption.ExemptionListGenerator;
-import com.complyt.business.sales_tax.checker.CustomerFullyExemptionChecker;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
@@ -34,8 +33,8 @@ public class ExemptionServiceImpl implements ExemptionService {
     private ExemptionListGenerator exemptionListGenerator;
 
     @Override
-    public Mono<Exemption> findByClientCustomerAndState(@NonNull final Transaction transaction) {
-        return exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), transaction.getShippingAddress().state());
+    public Mono<Exemption> findFullyExempted(@NonNull final Transaction transaction) {
+        return exemptionRepository.findFullyExempted(transaction.getCustomerId(), transaction.getShippingAddress().state(), transaction.getExternalTimestamps().getCreatedDate());
     }
 
     @Override
@@ -45,11 +44,14 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @Override
     public Mono<Boolean> isFullyExempted(@NonNull final Transaction transaction) {
-        CustomerFullyExemptionChecker customerFullyExemptionChecker = new CustomerFullyExemptionChecker(transaction);
+        return findFullyExempted(transaction)
+                .hasElement()
+                // hasElement will return true in case of a full exemption found in the DB
+                .flatMap(hasFullExemption -> {
+                    String logStr = "Transaction with ComplytId: " + transaction.getComplytId() + " has full exemption returned: " + hasFullExemption;
 
-        return findByClientCustomerAndState(transaction)
-                .map(customerFullyExemptionChecker::check)
-                .switchIfEmpty(Mono.just(false));
+                    return ContextLogger.observeCtx(logStr, log::info).then(Mono.just(hasFullExemption));
+                });
     }
 
     @Override

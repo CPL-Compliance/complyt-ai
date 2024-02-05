@@ -10,10 +10,7 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.transaction.Address;
-import com.complyt.domain.transaction.Item;
-import com.complyt.domain.transaction.Transaction;
-import com.complyt.domain.transaction.TransactionStatus;
+import com.complyt.domain.transaction.*;
 import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
@@ -135,7 +132,7 @@ public class TransactionFacadeTest {
         when(nexusService.hasNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(transactionService.save(transactionWithCustomer.withCustomer(null))).thenReturn(Mono.just(transactionWithInjectedDataAndId));
         when(nexusService.upsertToNexusTracking(transactionWithInjectedDataAndId, salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
-        when(salesTaxTrackingService.save(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
 
         Mono<Transaction> actualTransaction = transactionFacade.saveTransaction(transactionNoId);
 
@@ -160,7 +157,7 @@ public class TransactionFacadeTest {
         when(nexusService.hasNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(transactionService.save(transactionWithCustomer.withCustomer(null))).thenReturn(Mono.just(transactionWithInjectedDataAndId));
         when(nexusService.upsertToNexusTracking(transactionWithInjectedDataAndId, salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
-        when(salesTaxTrackingService.save(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
 
         Mono<Transaction> actualTransaction = transactionFacade.saveTransaction(transactionNoId);
 
@@ -208,6 +205,7 @@ public class TransactionFacadeTest {
         when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.hasNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(transactionService.save(transaction.withCustomer(null))).thenReturn(Mono.just(transaction));
+
         Mono<Transaction> transactionMono = transactionFacade.saveTransaction(transaction);
 
         // Then
@@ -383,6 +381,7 @@ public class TransactionFacadeTest {
         when(nexusService.hasNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(salesTaxService.handleSalesTaxCalculation(modifiedTransaction, salesTaxTracking, customer)).thenReturn(Mono.just(newTransactionWithSalesTax));
         when(transactionService.update(newTransactionWithSalesTax.getExternalId(), source, newTransactionWithSalesTax)).thenReturn(Mono.just(newTransactionWithSalesTax));
+
         Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transactionWithNewAddress.getExternalId(), source, transactionWithNewAddress, transaction);
 
         // Then
@@ -411,6 +410,7 @@ public class TransactionFacadeTest {
         when(salesTaxTrackingService.findByState(newShippingAddress.state())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.hasNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(transactionService.update(modifiedTransaction.getExternalId(), source, modifiedTransaction)).thenReturn(Mono.just(modifiedTransaction));
+
         Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transactionWithNewAddress.getExternalId(), source, transactionWithNewAddress, transaction);
 
         // Then
@@ -429,7 +429,6 @@ public class TransactionFacadeTest {
                 .withId(transaction.getId())
                 .withComplytId(transaction.getComplytId())
                 .withCustomer(customer);
-
         // When
         when(transactionService.checkComplytIdOfModifiedEqualsToOriginal(transactionWithNewAddress, transaction)).thenReturn(Mono.just(transactionWithNewAddress));
         when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
@@ -439,7 +438,7 @@ public class TransactionFacadeTest {
         when(nexusService.hasNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(transactionService.update(modifiedTransaction.getExternalId(), source, modifiedTransaction)).thenReturn(Mono.just(modifiedTransaction));
         when(nexusService.upsertToNexusTracking(modifiedTransaction, salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
-        when(salesTaxTrackingService.save(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
         Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transactionWithNewAddress.getExternalId(), source, transactionWithNewAddress, transaction);
 
         // Then
@@ -467,7 +466,7 @@ public class TransactionFacadeTest {
         when(salesTaxTrackingService.findByState(newShippingAddress.state())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.hasNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(nexusService.upsertToNexusTracking(modifiedTransaction, salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
-        when(salesTaxTrackingService.save(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
         when(transactionService.update(modifiedTransaction.getExternalId(), source, modifiedTransaction)).thenReturn(Mono.just(modifiedTransaction));
         Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transactionWithNewAddress.getExternalId(), source, transactionWithNewAddress, transaction);
 
