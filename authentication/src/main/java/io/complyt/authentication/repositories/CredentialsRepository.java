@@ -40,7 +40,7 @@ public class CredentialsRepository {
         Update update = Update.update("status", ApiKeyStatus.CANCELLED);
 
 
-        return ContextLogger.observeCtx("Updating credentials status for complytClientId " + complytClientId, log::info)
+        return ContextLogger.observeCtx("Updating credentials status to cancelled for complytClientId " + complytClientId, log::info)
                 .then(reactiveMongoTemplate.findAndModify(query, update, Credentials.class));
     }
 

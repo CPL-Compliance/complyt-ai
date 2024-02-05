@@ -5,13 +5,9 @@ import io.complyt.authentication.business.exceptions.ComplytAuth0Exception;
 import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.mappers.Auth0AccessTokenToAccessToken;
 import io.complyt.authentication.utils.observability.ContextLogger;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -33,10 +29,10 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
     String grantType;
 
     @NonNull
-    String adminId;
+    String adminClientId;
 
     @NonNull
-    String adminSecret;
+    String adminClientSecret;
 
     @Override
     public Mono<AccessToken> getAccessToken(final @NonNull String clientId, final @NonNull String clientSecret,
@@ -57,11 +53,14 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                         .map(Auth0AccessTokenToAccessToken.INSTANCE::map));
     }
 
+    /*
+    When newClientId/newClientSecret is null the metadata is deleted, otherwise it changes the metadata
+     */
     public Mono<Auth0Client> removeApiKeyFromClient(final @NonNull String clientName, final @NonNull String clientId,
                                                     final @NonNull String tenantId, final @NonNull String accessToken,
                                                     final String newClientId, final String newClientSecret) {
 
-        UpdateAuth0ClientMetaDataJsonObject updateAuth0ClientMetaDataJsonObject = new UpdateAuth0ClientMetaDataJsonObject(clientName,
+        Auth0ClientMetaData updateAuth0ClientMetaDataJsonObject = new Auth0ClientMetaData(clientName,
                 tenantId, newClientId, newClientSecret);
 
         return ContextLogger.observeCtx("Removing Auth0 Api-Key", log::info)
@@ -82,8 +81,8 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                 .then(webClient.post()
                         .uri("/oauth/token")
                         .header("Content-Type", "application/x-www-form-urlencoded")
-                        .bodyValue("client_id=" + adminId +
-                                "&client_secret=" + adminSecret +
+                        .bodyValue("client_id=" + adminClientId +
+                                "&client_secret=" + adminClientSecret +
                                 "&audience=" + managementAudience +
                                 "&grant_type=" + grantType)
                         .retrieve()
@@ -105,6 +104,6 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
                                 .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
                                         new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))))
-                .map(auth0Client -> new TenantIdAndNameObject(auth0Client.getClient_metadata().getTenant_id(), auth0Client.getName()));
+                .map(auth0Client -> new TenantIdAndNameObject(auth0Client.client_metadata().getTenant_id(), auth0Client.name()));
     }
 }

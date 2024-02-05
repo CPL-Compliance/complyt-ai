@@ -334,7 +334,7 @@ public class Auth0AuthorizationServerWrapperTest {
         String authorizationHeaderName = "Authorization";
         String authorizationHeaderValue = "Bearer " + managementToken;
         Auth0Client auth0Client = TestUtilities.createAuth0Client();
-        TenantIdAndNameObject tenantIdAndNameObject = new TenantIdAndNameObject(auth0Client.getClient_metadata().getTenant_id(), auth0Client.getName());
+        TenantIdAndNameObject tenantIdAndNameObject = new TenantIdAndNameObject(auth0Client.client_metadata().getTenant_id(), auth0Client.name());
 
         // When
         when(webClient.get()).thenReturn(requestHeadersUriSpecMock);

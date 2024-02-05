@@ -2,11 +2,10 @@ package io.complyt.authentication.business.authorization;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 
 @AllArgsConstructor
 @Getter
-public class UpdateAuth0ClientMetaDataJsonObject {
+public class Auth0ClientMetaData {
     final String clientName;
     final String tenantId;
     final String newClientId;
