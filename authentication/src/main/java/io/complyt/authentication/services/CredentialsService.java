@@ -52,13 +52,6 @@ public class CredentialsService {
                 .flatMap(this::decrypt);
     }
 
-//    public Mono<Credentials> getCredentialsByApiKey(final @NonNull ApiKey apiKey) {
-//        return credentialsRepository.findByComplytClientId(apiKey.clientId())
-//                .filter(credentials -> passwordEncoder.matches(apiKey.clientSecret(),
-//                        credentials.getComplytClientSecret()))
-//                .switchIfEmpty(Mono.error(new ApiKeyNotValidException()));
-//    }
-
     public Mono<Credentials> markAsCancelled(final @NonNull ApiKey apiKey) {
         return credentialsRepository.markAsCancelled(apiKey.clientId());
     }

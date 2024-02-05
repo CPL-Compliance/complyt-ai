@@ -412,7 +412,21 @@ class CredentialsServiceTest {
     }
 
     @Test
+    void saveCredentials_credentialsIsNull_throwsNullException() {
+        ApiKey apiKey = TestUtilities.createApiKey();
+        String tenantId = TestUtilities.tenantId;
+        String name = TestUtilities.name;
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsService.saveCredentials(null, apiKey, tenantId, name);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");
+    }
+
+    @Test
     void saveCredentials_apiKeyIsNull_throwsNullException() {
+        Credentials credentials = TestUtilities.createCredentials();
         String tenantId = TestUtilities.tenantId;
         String name = TestUtilities.name;
 
@@ -424,16 +438,32 @@ class CredentialsServiceTest {
     }
 
     @Test
-    void saveCredentials_credentialsIsNull_throwsNullException() {
-        String tenantId = TestUtilities.tenantId;
+    void saveCredentials_tenantIdIsNull_throwsNullException() {
+        Credentials credentials = TestUtilities.createCredentials();
+        ApiKey apiKey = TestUtilities.createApiKey();
         String name = TestUtilities.name;
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            credentialsService.saveCredentials(null, TestUtilities.createApiKey(), tenantId, name);
+            credentialsService.saveCredentials(credentials, apiKey, null, name);
         });
 
-        assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "tenantId is marked non-null but is null");
     }
+
+    @Test
+    void saveCredentials_nameIsNull_throwsNullException() {
+        Credentials credentials = TestUtilities.createCredentials();
+        ApiKey apiKey = TestUtilities.createApiKey();
+        String tenantId = TestUtilities.tenantId;
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsService.saveCredentials(credentials, apiKey, tenantId, null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "name is marked non-null but is null");
+    }
+
+
 
     @Test
     void markAsCancelled_apiKeyIsNull_throwsNullException() {
@@ -443,4 +473,5 @@ class CredentialsServiceTest {
 
         assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
     }
+
 }

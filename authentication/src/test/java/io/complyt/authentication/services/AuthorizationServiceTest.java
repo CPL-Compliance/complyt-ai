@@ -4,6 +4,7 @@ import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.auth0_client.Auth0Client;
 import io.complyt.authentication.business.authorization.AuthorizationServerWrapper;
 import io.complyt.authentication.business.exceptions.ComplytAuth0Exception;
+import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.Token;
@@ -19,6 +20,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import test_utils.unit_tests.TestUtilities;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -136,6 +144,128 @@ class AuthorizationServiceTest {
         Mono<Auth0Client> resultMono = authorizationService.deleteApiKey(credentials, managementToken);
         StepVerifier.create(resultMono).expectNext(expectedAuth0Client).verifyComplete();
     }
+
+    ///eee
+    @Test
+    void deleteApiKey_encryptionThrowsNoSuchPaddingException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Credentials credentials = TestUtilities.createCredentials();
+        String managementToken = TestUtilities.createManagementAccessToken().accessToken();
+        EncryptedData encryptedClientId = new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
+
+        // When
+        when(cryptoAesGcmNoPadding.decrypt(encryptedClientId)).thenThrow(new NoSuchPaddingException("Failed to decrypt credentials."));
+
+        // Then
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
+            authorizationService.deleteApiKey(credentials, managementToken);
+        });
+
+        assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
+    }
+
+    @Test
+    void deleteApiKey_encryptionThrowsNoSuchAlgorithmException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Credentials credentials = TestUtilities.createCredentials();
+        String managementToken = TestUtilities.createManagementAccessToken().accessToken();
+        EncryptedData encryptedClientId = new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
+
+        // When
+        when(cryptoAesGcmNoPadding.decrypt(encryptedClientId)).thenThrow(new NoSuchPaddingException("Failed to decrypt credentials."));
+
+        // Then
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
+            authorizationService.deleteApiKey(credentials, managementToken);
+        });
+
+        assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
+    }
+
+    @Test
+    void deleteApiKey_encryptionThrowsInvalidAlgorithmParameterException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Credentials credentials = TestUtilities.createCredentials();
+        String managementToken = TestUtilities.createManagementAccessToken().accessToken();
+        EncryptedData encryptedClientId = new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
+
+        // When
+        when(cryptoAesGcmNoPadding.decrypt(encryptedClientId)).thenThrow(new NoSuchPaddingException("Failed to decrypt credentials."));
+
+        // Then
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
+            authorizationService.deleteApiKey(credentials, managementToken);
+        });
+
+        assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
+    }
+
+    @Test
+    void deleteApiKey_encryptionThrowsInvalidKeyException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Credentials credentials = TestUtilities.createCredentials();
+        String managementToken = TestUtilities.createManagementAccessToken().accessToken();
+        EncryptedData encryptedClientId = new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
+
+        // When
+        when(cryptoAesGcmNoPadding.decrypt(encryptedClientId)).thenThrow(new NoSuchPaddingException("Failed to decrypt credentials."));
+
+        // Then
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
+            authorizationService.deleteApiKey(credentials, managementToken);
+        });
+
+        assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
+    }
+
+    @Test
+    void deleteApiKey_encryptionThrowsBadPaddingException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Credentials credentials = TestUtilities.createCredentials();
+        String managementToken = TestUtilities.createManagementAccessToken().accessToken();
+        EncryptedData encryptedClientId = new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
+
+        // When
+        when(cryptoAesGcmNoPadding.decrypt(encryptedClientId)).thenThrow(new NoSuchPaddingException("Failed to decrypt credentials."));
+
+        // Then
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
+            authorizationService.deleteApiKey(credentials, managementToken);
+        });
+
+        assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
+    }
+
+    @Test
+    void deleteApiKey_encryptionThrowsIllegalBlockSizeException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Credentials credentials = TestUtilities.createCredentials();
+        String managementToken = TestUtilities.createManagementAccessToken().accessToken();
+        EncryptedData encryptedClientId = new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
+
+        // When
+        when(cryptoAesGcmNoPadding.decrypt(encryptedClientId)).thenThrow(new NoSuchPaddingException("Failed to decrypt credentials."));
+
+        // Then
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
+            authorizationService.deleteApiKey(credentials, managementToken);
+        });
+
+        assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
+    }
+    ///eee
 
     @Test
     void getToken_credentialsIsNull_ThrowsNullException() {

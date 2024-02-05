@@ -2,6 +2,7 @@ package io.complyt.authentication.services;
 
 import io.complyt.authentication.business.authorization.*;
 import io.complyt.authentication.auth0_client.Auth0Client;
+import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.Token;
@@ -9,6 +10,7 @@ import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Slf4j
+@EqualsAndHashCode
 public class AuthorizationService {
     @NonNull
     AuthorizationServerWrapper authorizationServerWrapper;

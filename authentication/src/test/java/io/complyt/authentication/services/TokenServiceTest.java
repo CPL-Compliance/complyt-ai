@@ -434,7 +434,7 @@ class TokenServiceTest {
     }
 
     @Test
-    void deleteToken_tokenFoundAndDeleted_returnsToken(){
+    void deleteToken_tokenFound_returnsDeletedToken(){
         //Given
         ApiKey apiKey = TestUtilities.createApiKey();
         Token token = TestUtilities.createToken();
@@ -445,6 +445,19 @@ class TokenServiceTest {
         //Then
         Mono<Token> tokenMono = tokenService.deleteToken(apiKey);
         StepVerifier.create(tokenMono).expectNext(token).verifyComplete();
+    }
+
+    @Test
+    void deleteToken_tokenNotFound_returnsMonoEmpty(){
+        //Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+
+        //When
+        when(tokenRepository.deleteByComplytClientId(apiKey.clientId())).thenReturn(Mono.empty());
+
+        //Then
+        Mono<Token> tokenMono = tokenService.deleteToken(apiKey);
+        StepVerifier.create(tokenMono).verifyComplete();
     }
 
     @Test
@@ -463,5 +476,14 @@ class TokenServiceTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "token is marked non-null but is null");
+    }
+
+    @Test
+    void deleteToken_tokenIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            tokenService.deleteToken(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
     }
 }

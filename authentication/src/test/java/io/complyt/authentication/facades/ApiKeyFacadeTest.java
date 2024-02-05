@@ -90,7 +90,7 @@ class ApiKeyFacadeTest {
     }
 
     @Test
-    void markAsCancelled_ApiKeyNotExists_returnMonoEmpty() {
+    void markAsCancelled_validApiKey_returnCredentials()  {
         ApiKey apiKey = TestUtilities.createApiKey();
         Credentials credentials = TestUtilities.createCredentials();
         String managementToken = TestUtilities.createManagementAccessToken().accessToken();
@@ -110,7 +110,7 @@ class ApiKeyFacadeTest {
     }
 
     @Test
-    void markAsCancelled_validApiKey_returnCredentials() {
+    void markAsCancelled_ApiKeyNotExists_returnMonoEmpty() {
         String notExistsApiKeyClientIdStr = "9a62acdf-cc85-4009-a57b-cf77c3ebnot";
         String notExistsApiKeyClientSecretStr = "3572db2e-486b-480a-995b-2e4d2b910not";
         ApiKey notExistedApiKey = new ApiKey(notExistsApiKeyClientIdStr, notExistsApiKeyClientSecretStr);
@@ -184,5 +184,15 @@ class ApiKeyFacadeTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");
+    }
+
+    @Test
+    void markAsCancelled_apiKeyIsNull_throwNullException() {
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            apiKeyFacade.markAsCancelled(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
     }
 }
