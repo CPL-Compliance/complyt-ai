@@ -19,6 +19,7 @@ public class Item implements Taxable, Discountable {
     private BigDecimal unitPrice;
     private BigDecimal quantity;
     private BigDecimal totalPrice;
+    private BigDecimal calculatedTotal;
     private String description;
     private String name;
     private String taxCode;
@@ -29,6 +30,10 @@ public class Item implements Taxable, Discountable {
     private BigDecimal discount;
     private TangibleCategory tangibleCategory;
     private TaxableCategory taxableCategory;
+
+    public final BigDecimal calculateTotal() {
+        return unitPrice.multiply(quantity);
+    }
 
     @Override
     public final BigDecimal getTotalPrice(){

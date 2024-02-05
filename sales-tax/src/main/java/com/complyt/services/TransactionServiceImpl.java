@@ -5,6 +5,7 @@ import com.complyt.business.timestamps_injection.ExistingTransactionInternalTime
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.business.transaction.CityCountyProvider;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
+import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.repositories.TransactionRepository;
@@ -21,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -51,6 +53,15 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Transaction> checkTransactionNotHavingComplytId(@NonNull final Transaction newTransaction) {
         return complytIdHandler.checkNewDontHaveComplytId(newTransaction);
+    }
+
+    @Override
+    public Mono<Transaction> calculateEachItemTotal(@NonNull Transaction transaction) {
+        return Mono.just(transaction.withItems(
+                transaction.getItems().stream()
+                        .map(item -> item.withCalculatedTotal(item.calculateTotal()))
+                        .collect(Collectors.toList())
+        ));
     }
 
 //    todo: delete
@@ -111,8 +122,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
         //todo: TransactionDiscountCollector
-
-        return productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transaction)
+        return calculateEachItemTotal(transaction)
+                .flatMap()
+                productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transaction)
                 .map(transactionItemsAmountsCollector::collect)
                 .flatMap(cityCountyProvider::provide);
     }

@@ -18,7 +18,6 @@ import java.util.UUID;
 @Value
 @Builder
 @With
-@AllArgsConstructor
 @Document(collection = "transaction")
 public class Transaction implements ComplytIdProperty {
 
