@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Service
 @AllArgsConstructor
 @Slf4j
-@Service
 public class ClientTrackingServiceImpl implements ClientTrackingService {
 
     @NonNull
@@ -40,6 +40,16 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
 
     @Override
     public Flux<ClientTracking> findAll(int page, int size) {
-        return clientTrackingRepository.findAll();
+        return clientTrackingRepository.findAll(page, size);
+    }
+
+    @Override
+    public Flux<ClientTracking> getByName(String name) {
+        return clientTrackingRepository.getByName(name);
+    }
+
+    @Override
+    public Flux<ClientTracking> getByTenantId(String tenantId) {
+        return clientTrackingRepository.getByTenantId(tenantId);
     }
 }

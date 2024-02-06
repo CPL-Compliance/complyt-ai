@@ -1,5 +1,7 @@
 package com.complyt.v1.config;
 
+import com.complyt.services.ClientTrackingService;
+import com.complyt.v1.models.ClientTrackingDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.checkables.ComplytIdCheckable;
 import com.complyt.v1.models.checkables.StateCheckable;
@@ -45,7 +47,8 @@ public class ValidatorConfig {
             HttpMethod.PUT, "^/v1/transactions/source/[^/]+/externalId/[^/]+$|"
                     + "^/v1/customers/source/[^/]+/externalId/[^/]+$|"
                     + "^/v1/exemptions/complytId/[^/]+$|"
-                    + "^/v1/nexus/state/[^/]+$",
+                    + "^/v1/nexus/state/[^/]+$|"
+                    + "^/v1/clientTracking$",
             HttpMethod.POST, "^/v1/nexus/refresh/state/[^/]+$|"
                     + "^/v1/exemptions$"));
 
@@ -89,6 +92,7 @@ public class ValidatorConfig {
                 pathVariableChecker,
                 queryParamChecker,
                 shouldCallValidate);
+
     }
 
     @Bean
@@ -117,6 +121,18 @@ public class ValidatorConfig {
     @Bean
     ValidationHandler<ExemptionWrapperDto, SpringValidatorAdapter> exemptionWrapperDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
         return new ValidationHandler<>(ExemptionWrapperDto.class, springValidatorAdapter,
+                new DataConflictChecksProvider(Map.of(),
+                        null),
+                new CustomBodyExtractorEmpty<>(),
+                pathVariableChecker,
+                queryParamChecker,
+                shouldCallValidate);
+
+    }
+
+    @Bean
+    ValidationHandler<ClientTrackingDto, SpringValidatorAdapter> clientTrackingDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
+        return new ValidationHandler<>(ClientTrackingService.class, springValidatorAdapter,
                 new DataConflictChecksProvider(Map.of(),
                         null),
                 new CustomBodyExtractorEmpty<>(),
