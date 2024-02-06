@@ -13,5 +13,13 @@ public interface ClientTrackingService extends CrudService<ClientTracking, Strin
 
     Flux<ClientTracking> getByName(String name);
 
-    Flux<ClientTracking> getByTenantId(String tenantId);
+    Mono<ClientTracking> getByTenantId(String tenantId);
+
+    Mono<ClientTracking> saveByTenantId(ClientTracking clientTracking, String tenantId);
+
+    Mono<ClientTracking> injectDataToExistingClientTracking(ClientTracking newClientTracking, ClientTracking originalClientTracking);
+
+    Mono<ClientTracking> injectDataToNewClientTracking(ClientTracking clientTracking);
+
+    Mono<ClientTracking> update(ClientTracking newClientTracking, ClientTracking originalClientTracking);
 }

@@ -42,7 +42,7 @@ public class ClientTrackingRouter {
     @Bean
     public RouterFunction<ServerResponse> upsert(@NonNull final ClientTrackingHandler clientTrackingHandler) {
         RequestPredicate putClientTrackingRoute = RequestPredicates
-                .PUT(BASE_URL)
+                .PUT(BASE_URL + "/tenantId/{tenantId}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(putClientTrackingRoute, clientTrackingHandler::upsert);

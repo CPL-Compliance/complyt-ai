@@ -5,6 +5,7 @@ import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.InformationComponent;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.TransactionFilingStatus;
 import com.complyt.v1.models.*;
@@ -144,6 +145,15 @@ public interface ITUtilities {
                                 "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
     }
 
+    static Timestamps createTimestamps() {
+        LocalDateTime localDateTime = LocalDateTime.now();
+        return new Timestamps(localDateTime.minusYears(1), localDateTime);
+    }
+
+    static TimestampsDto createTimestampsDto() {
+        LocalDateTime localDateTime = LocalDateTime.now();
+        return new TimestampsDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
+    }
     static Address createAddressInCalifornia() {
         return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
@@ -168,7 +178,7 @@ public interface ITUtilities {
     }
 
     static ClientTrackingDto stubClientTrackingDto() {
-        return new ClientTrackingDto(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), "it_tenant");
+        return new ClientTrackingDto(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), "it_tenant", createTimestampsDto());
     }
 
     static NexusStateRuleDto stubAlabamaNexusStateRuleDto() {

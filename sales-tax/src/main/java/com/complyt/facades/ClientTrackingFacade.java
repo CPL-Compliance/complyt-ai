@@ -2,10 +2,8 @@ package com.complyt.facades;
 
 import com.complyt.domain.ClientTracking;
 import com.complyt.services.ClientTrackingService;
-import io.swagger.v3.oas.annotations.servers.Server;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -17,14 +15,13 @@ import reactor.core.publisher.Mono;
 public class ClientTrackingFacade {
 
     @NonNull
-    @Qualifier("ClientTrackingServiceImpl")
     private ClientTrackingService clientTrackingService;
 
     public Flux<ClientTracking> getAll(int page, int size) {
         return clientTrackingService.findAll(page,size);
     }
 
-    public Flux<ClientTracking> getByTenantId(String tenantId) {
+    public Mono<ClientTracking> getByTenantId(String tenantId) {
         return clientTrackingService.getByTenantId(tenantId);
     }
 
@@ -32,7 +29,14 @@ public class ClientTrackingFacade {
         return clientTrackingService.getByName(name);
     }
 
-    public Mono<ClientTracking> save(ClientTracking clientTracking) {
-        return clientTrackingService.save(clientTracking);
+    public Mono<ClientTracking> saveClientTracking(ClientTracking clientTracking, String tenantId) {
+        return clientTrackingService.injectDataToNewClientTracking(clientTracking)
+                .flatMap(updatedClientTracking -> clientTrackingService.saveByTenantId(updatedClientTracking, tenantId));
+    }
+
+    public Mono<ClientTracking> updateIfModified(ClientTracking newClientTracking, ClientTracking originalClientTracking) {
+        return originalClientTracking.equals(newClientTracking) ?
+                Mono.just(newClientTracking) :
+                clientTrackingService.update(newClientTracking, originalClientTracking);
     }
 }

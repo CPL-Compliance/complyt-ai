@@ -399,7 +399,7 @@ public class UnitTestUtilities {
     }
 
     public ClientTracking createClientTracking(String tenantId) {
-        return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope");
+        return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope", createTimestamps());
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
@@ -419,7 +419,7 @@ public class UnitTestUtilities {
     }
 
     public ClientTrackingDto createClientTrackingDto() {
-        return new ClientTrackingDto(new NexusDto(localDateTime), "client dope");
+        return new ClientTrackingDto(new NexusDto(localDateTime), "client dope", createTimestampsDto());
     }
 
     public Result createResult() {

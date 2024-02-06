@@ -8,6 +8,7 @@ import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.ClientTrackingMapper;
 import com.complyt.v1.models.ClientTrackingDto;
+import com.complyt.v1.routers.ClientTrackingRouter;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.net.URI;
 
 @Component
 @Slf4j
@@ -59,7 +62,8 @@ public class ClientTrackingHandler {
         Flux<ClientTrackingDto> clientTrackingDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(clientTrackingFacade.getByName(name))
                 .map(ClientTrackingMapper.INSTANCE::clientTrackingToClientTrackingDto)
-                .flatMap(clientTrackingDto -> ContextLogger.observeCtx("<-- Returned Body: " + clientTrackingDto, log::info).thenReturn(clientTrackingDto));
+                .flatMap(clientTrackingDto -> ContextLogger.observeCtx("<-- Returned Body: " + clientTrackingDto, log::info).thenReturn(clientTrackingDto))
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(clientTrackingDtoFlux, ClientTrackingDto.class);
     }
@@ -72,24 +76,34 @@ public class ClientTrackingHandler {
         Flux<ClientTrackingDto> clientTrackingDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(clientTrackingFacade.getByTenantId(tenantId))
                 .map(ClientTrackingMapper.INSTANCE::clientTrackingToClientTrackingDto)
-                .flatMap(clientTrackingDto -> ContextLogger.observeCtx("<-- Returned Body: " + clientTrackingDto, log::info).thenReturn(clientTrackingDto));
+                .flatMap(clientTrackingDto -> ContextLogger.observeCtx("<-- Returned Body: " + clientTrackingDto, log::info).thenReturn(clientTrackingDto))
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(clientTrackingDtoFlux, ClientTrackingDto.class);
     }
 
     @ClientTrackingUpdatePermission
     public Mono<ServerResponse> upsert(ServerRequest serverRequest) {
+        String tenantId = serverRequest.pathVariable("tenantId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        String resourceURI = ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId;
 
-        Mono<ClientTrackingDto> clientTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
+
+        return ContextLogger.observeCtx(logStr, log::info)
                 .then(clientTrackingDtoValidationHandler.handle(serverRequest))
                 .map(ClientTrackingMapper.INSTANCE::clientTrackingDtoToClientTracking)
-                .flatMap(clientTrackingFacade::save)
-                .map(ClientTrackingMapper.INSTANCE::clientTrackingToClientTrackingDto)
-                .flatMap(clientTrackingDto -> ContextLogger.observeCtx("<-- Returned Body: " + clientTrackingDto, log::info).thenReturn(clientTrackingDto))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .flatMap(receivedClientTracking ->
+                        clientTrackingFacade.getByTenantId(tenantId)
+                        .flatMap(originalClientTracking -> clientTrackingFacade.updateIfModified(receivedClientTracking, originalClientTracking)
+                        .flatMap(savedClientTracking -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                                .body(Mono.just(ClientTrackingMapper.INSTANCE.clientTrackingToClientTrackingDto(savedClientTracking))
+                                        .flatMap(clientTrackingDto -> ContextLogger.observeCtx("<-- Returned Body: " + clientTrackingDto, log::info)
+                                                .thenReturn(clientTrackingDto)), ClientTrackingDto.class)))
 
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(clientTrackingDtoMono, ClientTrackingDto.class);
+                        .switchIfEmpty(clientTrackingFacade.saveClientTracking(receivedClientTracking, tenantId).flatMap(savedClientTracking ->
+                                ServerResponse.created(URI.create(resourceURI)).contentType(MediaType.APPLICATION_JSON)
+                                .body(Mono.just(ClientTrackingMapper.INSTANCE.clientTrackingToClientTrackingDto(savedClientTracking))
+                                        .flatMap(clientTrackingDto -> ContextLogger.observeCtx("<-- Returned Body: " + clientTrackingDto, log::info)
+                                                .thenReturn(clientTrackingDto)), ClientTrackingDto.class))));
     }
-
 }

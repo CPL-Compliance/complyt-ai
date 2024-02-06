@@ -13,6 +13,6 @@ import lombok.With;
 public record ClientTrackingDto(
         NexusDto nexus,
         @Size(max = 256, message = "ClientTracking.name " + StringErrorMessages.MAX_256_ERROR) String name,
-        @Schema(ref = "externalTimestamps") @Valid @NotNull(message = "externalTimestamps " + DtoErrorMessages.NOT_NULL_ERROR) TimestampsDto externalTimestamps
+        @Schema(ref = "internalTimestamps") @Valid TimestampsDto internalTimestamps
         ) {
 }
