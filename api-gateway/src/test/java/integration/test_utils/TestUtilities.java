@@ -178,7 +178,7 @@ public class TestUtilities {
                 "}";
     }
 
-    public static String tokenJsonExample() {
+    public static String apiKeyJsonExample() {
         return "{\n" +
                 "    \"clientId\":\"" + API_KEY_CLIENT_ID + "\",\n" +
                 "    \"clientSecret\":\"" + API_KEY_CLIENT_SECRET + "\"\n" +

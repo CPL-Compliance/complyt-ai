@@ -89,12 +89,14 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
 //                        .path(ApiKeyRouter.BASE_URL)
 //                        .queryParam("clientId", apiKeyDto.clientId())
 //                        .queryParam("clientSecret", apiKeyDto.clientSecret())
-//                        .build())
+//                        .build()
+//                )
+//                .headers(headers -> headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED))
 //                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
 //                .exchange()
 //                .expectStatus().isNoContent();
 //    }
-//
+
 //    @Test
 //    @WithMockUser
 //    public void delete_NoApiKeyProvided_Returns415() {
