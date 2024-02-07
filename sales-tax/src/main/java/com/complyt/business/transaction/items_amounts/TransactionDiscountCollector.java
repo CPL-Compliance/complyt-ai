@@ -1,16 +1,13 @@
 package com.complyt.business.transaction.items_amounts;
 
 import com.complyt.business.builder.CollectionBuilder;
-import com.complyt.business.builder.DiscountableCollectionBuilder;
-import com.complyt.business.transaction.ItemTotalRecalculator;
+import com.complyt.business.transaction.ItemTotalCalculator;
 import com.complyt.domain.Discountable;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -25,12 +22,8 @@ public class TransactionDiscountCollector implements TransactionAmountsCollector
     @NonNull
     AmountCalculator<List<Discountable>> discountablesTotalDiscountCalculator;
 
-    @NonNull
-    ItemTotalRecalculator itemTotalRecalculator;
-
     @Override
     public Transaction collect(@NonNull Transaction transaction) {
-        List<Item> recalculatedTotalItemDiscountables = itemTotalRecalculator.recalculate(transaction.getItems());
 
         List<Discountable> originalDiscountables = (List<Discountable>) discountableCollectionBuilder.build(transaction);
         BigDecimal totalDiscount = discountablesTotalDiscountCalculator.calculate(originalDiscountables);

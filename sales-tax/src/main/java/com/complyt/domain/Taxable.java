@@ -18,7 +18,7 @@ public interface Taxable {
 
     Taxable withSalesTaxRates(SalesTaxRates salesTaxRates);
 
-    BigDecimal getTotalPrice();
+    BigDecimal getCalculatedTotal();
 
     boolean isManualSalesTax();
 
@@ -27,7 +27,7 @@ public interface Taxable {
     BigDecimal getManualSalesTaxRate();
 
     default BigDecimal getManualSalesTaxAmount() {
-        return getManualSalesTaxRate().multiply(getTotalPrice());
+        return getCalculatedTotal().multiply((getManualSalesTaxRate()));
     }
 
     default BigDecimal calculateSalesTaxAmount() {
@@ -35,7 +35,7 @@ public interface Taxable {
             return getManualSalesTaxAmount();
         }
 
-        return getTotalPrice().multiply(getSalesTaxRates().taxRate());
+        return getCalculatedTotal().multiply(getSalesTaxRates().taxRate());
     }
 
     Taxable withTangibleCategory(TangibleCategory intangible);

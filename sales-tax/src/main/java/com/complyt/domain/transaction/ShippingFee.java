@@ -23,10 +23,10 @@ public class ShippingFee implements Taxable {
     private final String taxCode;
     private final TaxableCategory taxableCategory;
     private final TangibleCategory tangibleCategory;
+    private final BigDecimal calculatedAmount;
 
-    @Override
     public final BigDecimal getTotalPrice() {
-        return totalPrice != null ? totalPrice : BigDecimal.ZERO;
+        return totalPrice; //todo: remove all instances
     }
 
     @Override

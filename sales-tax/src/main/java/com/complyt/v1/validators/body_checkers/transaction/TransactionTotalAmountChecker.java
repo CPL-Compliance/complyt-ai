@@ -1,8 +1,9 @@
-package com.complyt.v1.validators.body_checkers;
+package com.complyt.v1.validators.body_checkers.transaction;
 
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.TransactionDto;
+import com.complyt.v1.validators.body_checkers.DtoBodyChecker;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.javatuples.Pair;
@@ -17,7 +18,7 @@ import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-public class TransactionTotalAmountChecker implements DtoBodyChecker<TransactionDto> {
+public class TransactionTotalAmountChecker implements DtoBodyChecker<TransactionDto>, TransactionBodyFunctions {
 
     @Override
     public Flux<String> check(@NonNull TransactionDto transactionDto) {
@@ -32,7 +33,7 @@ public class TransactionTotalAmountChecker implements DtoBodyChecker<Transaction
     private Function<List<ItemDto>, BigDecimal> calculateTotalItemsAmountAfterDiscount() {
         return (itemsDtoList) ->
                 itemsDtoList.stream()
-                        .map(ItemDto::totalPrice)
+                        .map(TransactionBodyFunctions::getItemDtoTotal)
                         .reduce(BigDecimal.ZERO, BigDecimal::add)
                         .subtract(itemsDtoList.stream()
                                 .map(ItemDto::discount)

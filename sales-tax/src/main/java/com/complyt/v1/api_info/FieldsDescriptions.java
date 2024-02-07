@@ -93,5 +93,5 @@ public interface FieldsDescriptions {
 
     String QUANTITY = "The quantity of the units, must be positive";
 
-    String TOTAL_PRICE = "The total price of the unit prices time the quantity, can be positive and negative";
+    String TOTAL_PRICE = "The total price of the unit prices time the quantity, can be positive and negative, value is before discount and sales tax";
 }

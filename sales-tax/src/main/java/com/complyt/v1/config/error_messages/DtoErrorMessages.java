@@ -40,4 +40,6 @@ public interface DtoErrorMessages {
     String ITEM_WITH_NEGATIVE_TOTAL_CANNOT_HAVE_A_DISCOUNT = "item with negative price cannot have a discount";
 
     String ONE_OF_THE_ITEMS_IS_UNALIGNED = "At least one of the item's total price hasn't the same sign as the amount (one is negative and one is positive)";
+
+    String ITEMS_MISSING_TOTAL_OR_QUANTITY_AND_UNITPRICE = "All items should have either total price OR quantity and unitPrice";
 }

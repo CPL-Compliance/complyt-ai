@@ -31,13 +31,12 @@ public class Item implements Taxable, Discountable {
     private TangibleCategory tangibleCategory;
     private TaxableCategory taxableCategory;
 
-    public final BigDecimal calculateTotal() {
-        return unitPrice.multiply(quantity);
-    }
+//    public final BigDecimal calculateTotal() {
+//        return unitPrice.multiply(quantity);
+//    } TODO: should the calc be here? in the bs? it ignores the discounts which is a seperate class entierlly
 
-    @Override
     public final BigDecimal getTotalPrice(){
-        return totalPrice != null ? totalPrice : BigDecimal.ZERO;
+        return this.totalPrice; //todo: remove after removing all usage
     }
 
     @Override

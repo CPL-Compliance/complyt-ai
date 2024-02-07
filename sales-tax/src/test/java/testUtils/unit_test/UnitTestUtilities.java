@@ -26,8 +26,8 @@ import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
-import com.complyt.v1.validators.body_checkers.TransactionDtoShippingAddressChecker;
-import com.complyt.v1.validators.body_checkers.TransactionTotalAmountChecker;
+import com.complyt.v1.validators.body_checkers.transaction.TransactionDtoShippingAddressChecker;
+import com.complyt.v1.validators.body_checkers.transaction.TransactionTotalAmountChecker;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
