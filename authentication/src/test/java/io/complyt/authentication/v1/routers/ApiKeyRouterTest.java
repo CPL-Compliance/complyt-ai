@@ -15,12 +15,14 @@ import io.complyt.authentication.v1.mappers.CredentialsMapper;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.validators.ValidatorConfig;
+import io.complyt.authentication.v1.validators.query_params.QueryParamsExtractorCredentials;
 import io.complyt.authentication.v1.validators.query_params.QueryParamsExtractorEmpty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,7 +42,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @WebFluxTest
 @ContextConfiguration(classes = {ApiKeyRouter.class, ApiKeyHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class, GlobalExceptionHandler.class, GlobalErrorAttributes.class,
-        QueryParamsExtractorEmpty.class})
+        QueryParamsExtractorEmpty.class, QueryParamsExtractorCredentials.class})
 class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecurityTemplate {
     @Autowired
     ApiKeyRouter apiKeyRouter;
@@ -59,12 +61,9 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     ApiKeyDto apiKeyDto;
 
     @BeforeEach
-    void postCredentialsRouterFunction() {
+    void setUp() {
         credentialsDto = TestUtilities.createCredentialsDto();
         credentials = CredentialsMapper.INSTANCE.credentialsDtoTocredentials(credentialsDto);
-    }   
-    @BeforeEach
-    void deleteCredentialsRouterFunction() {
         apiKey = TestUtilities.createApiKey();
         apiKeyDto = ApiKeyMapper.INSTANCE.apiKeyToApiKeyDto(apiKey);
     }
@@ -201,7 +200,31 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     @Test
     @WithMockUser
 //    @Override
-    public void delete_Exists_Returns204() {
+    public void delete_SentAsFormURLEncoded_Exists_Returns204() {
+        // Given
+        Credentials cancelledCredentials = credentials.withStatus(ApiKeyStatus.CANCELLED);
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
+        // When
+        when(apiKeyFacade.markAsCancelled(apiKey)).thenReturn(Mono.just(cancelledCredentials));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+    @WithMockUser
+    public void delete_SentAsJson_Exists_Returns204() {
         // Given
         Credentials cancelledCredentials = credentials.withStatus(ApiKeyStatus.CANCELLED);
 
@@ -211,13 +234,13 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
         // Then
         webTestClient
                 .mutateWith(csrf())
-                .delete()
+                .method(HttpMethod.DELETE)
                 .uri(uriBuilder -> uriBuilder
                         .path(ApiKeyRouter.BASE_URL)
-                        .queryParam("clientId", apiKeyDto.clientId())
-                        .queryParam("clientSecret", apiKeyDto.clientSecret())
-                        .build())
-                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                        .build()
+                )
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(apiKeyDto)
                 .exchange()
                 .expectStatus().isNoContent();
     }
@@ -228,16 +251,17 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     public void delete_DoesntExist_Returns204() {
         // When
         when(apiKeyFacade.markAsCancelled(apiKey)).thenReturn(Mono.empty());
-
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
         // Then
         webTestClient
                 .mutateWith(csrf())
-                .delete()
+                .method(HttpMethod.DELETE)
                 .uri(uriBuilder -> uriBuilder
                         .path(ApiKeyRouter.BASE_URL)
-                        .queryParam("clientId", apiKeyDto.clientId())
-                        .queryParam("clientSecret", apiKeyDto.clientSecret())
                         .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
                 .exchange()
                 .expectStatus().isNoContent();
@@ -246,22 +270,23 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     @Test
 //    @Override
     @WithMockUser
-    public void delete_InternalServerError_stillReturns204() {
+    public void delete_InternalServerError_ReturnInternalServerError() {
         // When
         when(apiKeyFacade.markAsCancelled(apiKey)).thenThrow(OperationFailedException.class);
-
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
         // Then
         webTestClient
                 .mutateWith(csrf())
-                .delete()
+                .method(HttpMethod.DELETE)
                 .uri(uriBuilder -> uriBuilder
                         .path(ApiKeyRouter.BASE_URL)
-                        .queryParam("clientId", apiKeyDto.clientId())
-                        .queryParam("clientSecret", apiKeyDto.clientSecret())
                         .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -283,14 +308,18 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     @Test
 //    @Override
     public void delete_UnauthenticatedUser_Returns401() {
+        // When
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
+        // Then
         webTestClient
                 .mutateWith(csrf())
-                .get()
+                .method(HttpMethod.DELETE)
                 .uri(uriBuilder -> uriBuilder
                         .path(ApiKeyRouter.BASE_URL)
-                        .queryParam("clientId", apiKeyDto.clientId())
-                        .queryParam("clientSecret", apiKeyDto.clientSecret())
                         .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
                 .exchange()
                 .expectStatus().is4xxClientError();
@@ -301,13 +330,17 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     @WithMockUser
 //    @Override
     public void delete_missingCsrfToken_return403() {
+        // When
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
+        // Then
         webTestClient
-                .delete()
+                .method(HttpMethod.DELETE)
                 .uri(uriBuilder -> uriBuilder
                         .path(ApiKeyRouter.BASE_URL)
-                        .queryParam("clientId", apiKeyDto.clientId())
-                        .queryParam("clientSecret", apiKeyDto.clientSecret())
                         .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
                 .exchange()
                 .expectStatus().isForbidden();

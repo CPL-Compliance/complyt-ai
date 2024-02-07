@@ -35,7 +35,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .headers(headers -> {
                     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
                 })
-                .bodyValue(TestUtilities.tokenUrlEncodedExample())
+                .bodyValue(TestUtilities.apiKeyUrlEncodedExample())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()

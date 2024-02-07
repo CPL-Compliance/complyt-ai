@@ -39,6 +39,20 @@ public class Auth0AuthorizationServerWrapperTest {
 
     @Mock
     private  WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
+    AccessToken accessToken = TestUtilities.createAccessToken();
+    Auth0AccessToken auth0AccessToken = TestUtilities.createAuth0AccessToken();
+    String clientId = "client ID";
+    String clientSecret = "Client Secret";
+    String adminId = "Admin Id";
+    String adminSecret = "Admin Secret";
+    String audience = "Audience";
+    String managementAudience = "Management Audience";
+    String managementToken = "management Access Token";
+    String grantType = "Grant Type";
+    String contentTypeHeaderName = "Content-Type";
+    String contentTypeHeaderValue = "application/x-www-form-urlencoded";
+    String authorizationHeaderName = "Authorization";
+    String authorizationHeaderValue = "Bearer " + managementToken;
 
     @BeforeEach
     void setUp() {
@@ -48,20 +62,10 @@ public class Auth0AuthorizationServerWrapperTest {
 
     @Test
     void getAccessToken_validCredentials_ReturnsAccessToken() {
-        // Given
-        AccessToken accessToken = TestUtilities.createAccessToken();
-        Auth0AccessToken auth0AccessToken = TestUtilities.createAuth0AccessToken();
-        String clientId = "client ID";
-        String clientSecret = "Client Secret";
-        String audience = "Audience";
-        String grantType = "Grant Type";
-        String headerName = "Content-Type";
-        String headerValue = "application/x-www-form-urlencoded";
-
         // When
         when(webClient.post()).thenReturn(requestBodyUriSpecMock);
         when(requestBodyUriSpecMock.uri("/oauth/token")).thenReturn(requestBodyUriSpecMock);
-        when(requestBodyUriSpecMock.header(headerName, headerValue)).thenReturn(requestBodySpecMock);
+        when(requestBodyUriSpecMock.header(contentTypeHeaderName, contentTypeHeaderValue)).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.bodyValue("client_id=" + clientId +
                 "&client_secret=" + clientSecret +
                 "&audience=" + audience +
@@ -80,18 +84,10 @@ public class Auth0AuthorizationServerWrapperTest {
 
     @Test
     void getAccessToken_Auth0ServiceIsUnavailable_is5RetriesExhausted() {
-        // Given
-        String clientId = "client ID";
-        String clientSecret = "Client Secret";
-        String audience = "Audience";
-        String grantType = "Grant Type";
-        String headerName = "Content-Type";
-        String headerValue = "application/x-www-form-urlencoded";
-
         // When
         when(webClient.post()).thenReturn(requestBodyUriSpecMock);
         when(requestBodyUriSpecMock.uri("/oauth/token")).thenReturn(requestBodyUriSpecMock);
-        when(requestBodyUriSpecMock.header(headerName, headerValue)).thenReturn(requestBodySpecMock);
+        when(requestBodyUriSpecMock.header(contentTypeHeaderName, contentTypeHeaderValue)).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.bodyValue("client_id=" + clientId +
                 "&client_secret=" + clientSecret +
                 "&audience=" + audience +
@@ -113,23 +109,13 @@ public class Auth0AuthorizationServerWrapperTest {
 
     @Test
     void getManagementAccessToken_validCredentials_ReturnsAccessToken() {
-        // Given
-        AccessToken accessToken = TestUtilities.createAccessToken();
-        Auth0AccessToken auth0AccessToken = TestUtilities.createAuth0AccessToken();
-        String adminId = "Admin Id";
-        String adminSecret = "Admin Secret";
-        String audience = "Management Audience";
-        String grantType = "Grant Type";
-        String headerName = "Content-Type";
-        String headerValue = "application/x-www-form-urlencoded";
-
         // When
         when(webClient.post()).thenReturn(requestBodyUriSpecMock);
         when(requestBodyUriSpecMock.uri("/oauth/token")).thenReturn(requestBodySpecMock);
-        when(requestBodySpecMock.header(headerName, headerValue)).thenReturn(requestBodySpecMock);
+        when(requestBodySpecMock.header(contentTypeHeaderName, contentTypeHeaderValue)).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.bodyValue("client_id=" + adminId +
                 "&client_secret=" + adminSecret +
-                "&audience=" + audience +
+                "&audience=" + managementAudience +
                 "&grant_type=" + grantType)).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
         when(responseSpecMock.bodyToMono(ArgumentMatchers.<Class<Auth0AccessToken>>notNull()))
@@ -144,23 +130,13 @@ public class Auth0AuthorizationServerWrapperTest {
 
     @Test
     void getManagementAccessToken_Auth0ServiceIsUnavailable_is5RetriesExhausted() {
-        // Given
-        AccessToken accessToken = TestUtilities.createAccessToken();
-        Auth0AccessToken auth0AccessToken = TestUtilities.createAuth0AccessToken();
-        String adminId = "Admin Id";
-        String adminSecret = "Admin Secret";
-        String audience = "Management Audience";
-        String grantType = "Grant Type";
-        String headerName = "Content-Type";
-        String headerValue = "application/x-www-form-urlencoded";
-
         // When
         when(webClient.post()).thenReturn(requestBodyUriSpecMock);
         when(requestBodyUriSpecMock.uri("/oauth/token")).thenReturn(requestBodyUriSpecMock);
-        when(requestBodyUriSpecMock.header(headerName, headerValue)).thenReturn(requestBodySpecMock);
+        when(requestBodyUriSpecMock.header(contentTypeHeaderName, contentTypeHeaderValue)).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.bodyValue("client_id=" + adminId +
                 "&client_secret=" + adminSecret +
-                "&audience=" + audience +
+                "&audience=" + managementAudience +
                 "&grant_type=" + grantType)).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
         when(responseSpecMock.bodyToMono(Auth0AccessToken.class))
@@ -180,16 +156,10 @@ public class Auth0AuthorizationServerWrapperTest {
     void removeApiKeyFromClient_validCredentials_ReturnsAuth0Client() {
         // Given
         String clientName = "client Name";
-        String clientId = "client ID";
         String tenantId = "tenant ID";
-        String managementToken = "management Access Token";
         String newClientId = "New Client ID";
         String newClientSecret = "New Client Secret";
-
-        String contentTypeHeaderName = "Content-Type";
         String contentTypeHeaderValue = "application/json";
-        String authorizationHeaderName = "Authorization";
-        String authorizationHeaderValue = "Bearer " + managementToken;
         Auth0Client auth0Client = TestUtilities.createAuth0Client();
 
         String json = "{ \"name\": \"" + clientName +
@@ -217,15 +187,11 @@ public class Auth0AuthorizationServerWrapperTest {
     void removeApiKeyFromClient_Auth0ServiceIsUnavailable_is5RetriesExhausted() {
         // Given
         String clientName = "client Name";
-        String clientId = "client ID";
         String tenantId = "tenant ID";
-        String managementToken = "management Access Token";
         String newClientId = "New Client ID";
         String newClientSecret = "New Client Secret";
-        String contentTypeHeaderName = "Content-Type";
         String contentTypeHeaderValue = "application/json";
-        String authorizationHeaderName = "Authorization";
-        String authorizationHeaderValue = "Bearer " + managementToken;
+
 
         String json = "{ \"name\": \"" + clientName +
                 "\", \"client_metadata\": { \"tenant_id\": \"" + tenantId +
@@ -256,15 +222,11 @@ public class Auth0AuthorizationServerWrapperTest {
     void removeApiKeyFromClient_newClientIdIsNull_ReturnsAuth0Client() {
         // Given
         String clientName = "client Name";
-        String clientId = "client ID";
         String tenantId = "tenant ID";
-        String managementToken = "management Access Token";
         String newClientId = null;
         String newClientSecret = "New Client Secret";
-        String contentTypeHeaderName = "Content-Type";
         String contentTypeHeaderValue = "application/json";
-        String authorizationHeaderName = "Authorization";
-        String authorizationHeaderValue = "Bearer " + managementToken;
+
         Auth0Client auth0Client = TestUtilities.createAuth0Client();
 
         String json = "{ \"name\": \"" + clientName +
@@ -292,15 +254,10 @@ public class Auth0AuthorizationServerWrapperTest {
     void removeApiKeyFromClient_newClientSecretIsNull_ReturnsAuth0Client() {
         // Given
         String clientName = "client Name";
-        String clientId = "client ID";
         String tenantId = "tenant ID";
-        String managementToken = "management Access Token";
         String newClientId = "New Client ID";
         String newClientSecret = null;
-        String contentTypeHeaderName = "Content-Type";
         String contentTypeHeaderValue = "application/json";
-        String authorizationHeaderName = "Authorization";
-        String authorizationHeaderValue = "Bearer " + managementToken;
         Auth0Client auth0Client = TestUtilities.createAuth0Client();
 
         String json = "{ \"name\": \"" + clientName +
@@ -327,12 +284,6 @@ public class Auth0AuthorizationServerWrapperTest {
     @Test
     void getTenantIdAndClientNameFromAuth0_validInputs_ReturnsTenantIdAndClientObject() {
         // Given
-        String clientId = "client ID";
-        String managementToken = "management Access Token";
-        String contentTypeHeaderName = "Content-Type";
-        String contentTypeHeaderValue = "application/x-www-form-urlencoded";
-        String authorizationHeaderName = "Authorization";
-        String authorizationHeaderValue = "Bearer " + managementToken;
         Auth0Client auth0Client = TestUtilities.createAuth0Client();
         TenantIdAndNameObject tenantIdAndNameObject = new TenantIdAndNameObject(auth0Client.client_metadata().getTenant_id(), auth0Client.name());
 
@@ -352,14 +303,6 @@ public class Auth0AuthorizationServerWrapperTest {
 
     @Test
     void getTenantIdAndClientNameFromAuth0_Auth0ServiceIsUnavailable_is5RetriesExhausted() {
-        // Given
-        String clientId = "client ID";
-        String managementToken = "management Access Token";
-        String contentTypeHeaderName = "Content-Type";
-        String contentTypeHeaderValue = "application/x-www-form-urlencoded";
-        String authorizationHeaderName = "Authorization";
-        String authorizationHeaderValue = "Bearer " + managementToken;
-
         // When
         when(webClient.get()).thenReturn(requestHeadersUriSpecMock);
         when(requestHeadersUriSpecMock.uri("/api/v2/clients/" + clientId)).thenReturn(requestHeadersSpecMock);
