@@ -178,7 +178,7 @@ public interface ITUtilities {
     }
 
     static ClientTrackingDto stubClientTrackingDto() {
-        return new ClientTrackingDto(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), "it_tenant", createTimestampsDto());
+        return new ClientTrackingDto(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), "it_tenant", createTimestampsDto(), null);
     }
 
     static NexusStateRuleDto stubAlabamaNexusStateRuleDto() {

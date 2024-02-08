@@ -94,7 +94,7 @@ public class ClientTrackingHandler {
                 .map(ClientTrackingMapper.INSTANCE::clientTrackingDtoToClientTracking)
                 .flatMap(receivedClientTracking ->
                         clientTrackingFacade.getByTenantId(tenantId)
-                        .flatMap(originalClientTracking -> clientTrackingFacade.updateIfModified(receivedClientTracking, originalClientTracking)
+                        .flatMap(originalClientTracking -> clientTrackingFacade.updateIfModified(receivedClientTracking, originalClientTracking, tenantId)
                         .flatMap(savedClientTracking -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                                 .body(Mono.just(ClientTrackingMapper.INSTANCE.clientTrackingToClientTrackingDto(savedClientTracking))
                                         .flatMap(clientTrackingDto -> ContextLogger.observeCtx("<-- Returned Body: " + clientTrackingDto, log::info)

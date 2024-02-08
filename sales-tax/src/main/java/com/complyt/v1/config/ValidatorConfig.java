@@ -48,7 +48,7 @@ public class ValidatorConfig {
                     + "^/v1/customers/source/[^/]+/externalId/[^/]+$|"
                     + "^/v1/exemptions/complytId/[^/]+$|"
                     + "^/v1/nexus/state/[^/]+$|"
-                    + "^/v1/clientTracking$",
+                    + "^/v1/clientTracking/tenantId/[^/]+$",
             HttpMethod.POST, "^/v1/nexus/refresh/state/[^/]+$|"
                     + "^/v1/exemptions$"));
 
@@ -132,7 +132,7 @@ public class ValidatorConfig {
 
     @Bean
     ValidationHandler<ClientTrackingDto, SpringValidatorAdapter> clientTrackingDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
-        return new ValidationHandler<>(ClientTrackingService.class, springValidatorAdapter,
+        return new ValidationHandler<>(ClientTrackingDto.class, springValidatorAdapter,
                 new DataConflictChecksProvider(Map.of(),
                         null),
                 new CustomBodyExtractorEmpty<>(),

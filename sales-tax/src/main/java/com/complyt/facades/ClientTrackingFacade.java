@@ -18,7 +18,7 @@ public class ClientTrackingFacade {
     private ClientTrackingService clientTrackingService;
 
     public Flux<ClientTracking> getAll(int page, int size) {
-        return clientTrackingService.findAll(page,size);
+        return clientTrackingService.findAll(page, size);
     }
 
     public Mono<ClientTracking> getByTenantId(String tenantId) {
@@ -34,9 +34,10 @@ public class ClientTrackingFacade {
                 .flatMap(updatedClientTracking -> clientTrackingService.saveByTenantId(updatedClientTracking, tenantId));
     }
 
-    public Mono<ClientTracking> updateIfModified(ClientTracking newClientTracking, ClientTracking originalClientTracking) {
+    public Mono<ClientTracking> updateIfModified(ClientTracking newClientTracking, ClientTracking originalClientTracking, String tenantId) {
         return originalClientTracking.equals(newClientTracking) ?
                 Mono.just(newClientTracking) :
-                clientTrackingService.update(newClientTracking, originalClientTracking);
+                clientTrackingService.update(newClientTracking, originalClientTracking)
+                        .flatMap(updatedClientTracking -> clientTrackingService.saveByTenantId(updatedClientTracking, tenantId));
     }
 }

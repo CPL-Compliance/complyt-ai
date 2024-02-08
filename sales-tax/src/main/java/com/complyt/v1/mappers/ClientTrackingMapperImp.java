@@ -22,9 +22,11 @@ public class ClientTrackingMapperImp implements ClientTrackingMapper{
 
         String id= null;
         String tenantId = null;
+        Timestamps internalTimestamps;
+
         Nexus nexus = nexusMapper.nexusDtoToNexus(clientTrackingDto.nexus());
         String name = clientTrackingDto.name();
-        Timestamps internalTimestamps = timestampsMapper.timestampsDtoTotimestamps(clientTrackingDto.internalTimestamps());
+        internalTimestamps = timestampsMapper.timestampsDtoTotimestamps(clientTrackingDto.internalTimestamps());
 
         return new ClientTracking(id,tenantId, nexus, name, internalTimestamps);
     }
@@ -37,8 +39,9 @@ public class ClientTrackingMapperImp implements ClientTrackingMapper{
         NexusDto nexusDto = nexusMapper.nexusToNexusDto(clientTracking.getNexus());
         String name = clientTracking.getName();
         TimestampsDto internalTimestamps = timestampsMapper.timestampsTotimestampsDto(clientTracking.getInternalTimestamps());
+        String tenantId = clientTracking.getTenantId();
 
-        return new ClientTrackingDto(nexusDto, name, internalTimestamps);
+        return new ClientTrackingDto(nexusDto, name, internalTimestamps, tenantId);
     }
 
 }

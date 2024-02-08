@@ -419,7 +419,7 @@ public class UnitTestUtilities {
     }
 
     public ClientTrackingDto createClientTrackingDto() {
-        return new ClientTrackingDto(new NexusDto(localDateTime), "client dope", createTimestampsDto());
+        return new ClientTrackingDto(new NexusDto(localDateTime), "client dope", createTimestampsDto(), null);
     }
 
     public Result createResult() {

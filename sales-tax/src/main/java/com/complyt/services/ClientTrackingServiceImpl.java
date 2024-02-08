@@ -67,8 +67,7 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
     public Mono<ClientTracking> update(ClientTracking newClientTracking, ClientTracking originalClientTracking) {
         return injectDataToExistingClientTracking(newClientTracking, originalClientTracking)
                 .map(clientTrackingWithInjectedData -> createFunctionUpdatedClientTracking(clientTrackingWithInjectedData)
-                        .apply(originalClientTracking))
-                .flatMap(clientTrackingRepository::save);
+                        .apply(originalClientTracking));
     }
 
     @Override

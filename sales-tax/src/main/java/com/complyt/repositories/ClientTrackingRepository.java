@@ -55,18 +55,18 @@ public class ClientTrackingRepository {
     }
 
     public Mono<ClientTracking> saveByTenantId(@NonNull ClientTracking clientTracking, @NonNull String tenantId) {
-         ClientTracking clientTrackingWithTenantId = clientTracking.withTenantId(tenantId);
+        ClientTracking clientTrackingWithTenantId = clientTracking.withTenantId(tenantId);
 
-            return ContextLogger.observeCtx("Saving client tracking with tenantId: " + tenantId  +
-                             " " +clientTrackingWithTenantId.toString(), log::info)
-                            .then(reactiveMongoTemplate.save(clientTrackingWithTenantId));
+        return ContextLogger.observeCtx("Saving client tracking with tenantId: " + tenantId +
+                        " " + clientTrackingWithTenantId.toString(), log::info)
+                .then(reactiveMongoTemplate.save(clientTrackingWithTenantId));
     }
 
     public Flux<ClientTracking> getByName(String name) {
         Query query = Query.query(Criteria.where("name").is(name));
 
-            return ContextLogger.observeCtx("Searching for client tracking by name: " + name, log::info)
-                            .thenMany(reactiveMongoTemplate.find(query, ClientTracking.class));
+        return ContextLogger.observeCtx("Searching for client tracking by name: " + name, log::info)
+                .thenMany(reactiveMongoTemplate.find(query, ClientTracking.class));
     }
 
     public Flux<ClientTracking> findAll(int page, int size) {

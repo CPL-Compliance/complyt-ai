@@ -80,9 +80,9 @@ spring:
           uri: lb://sales-tax
           predicates:
             - Method=PUT
-            - Path=/v1/clientTracking
+            - Path=/v1/clientTracking/tenantId/{tenantId}
           filters:
-            - SetPath=/v1/clientTracking
+            - SetPath=/v1/clientTracking/tenantId/{tenantId}
           # ---- Transaction ----
         - id: sales-tax-get-transactions
           uri: lb://sales-tax
