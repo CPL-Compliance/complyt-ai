@@ -1,5 +1,6 @@
 package io.complyt.authentication.v1.routers;
 
+import io.complyt.authentication.v1.api_info.DeleteApiKeyApiInfo;
 import io.complyt.authentication.v1.handlers.ApiKeyHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,7 @@ public class ApiKeyRouter {
     }
 
     @Bean
+    @DeleteApiKeyApiInfo
     public RouterFunction<ServerResponse> deleteApiKeyRouterFunction(@NonNull final ApiKeyHandler apiKeyHandler) {
         RequestPredicate postApiKeyRoute = RequestPredicates
                 .DELETE(BASE_URL)

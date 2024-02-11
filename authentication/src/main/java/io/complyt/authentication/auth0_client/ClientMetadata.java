@@ -1,14 +1,12 @@
 package io.complyt.authentication.auth0_client;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.With;
+import lombok.*;
 
 @Getter
 @With
 @AllArgsConstructor
 @EqualsAndHashCode
+@ToString
 public class ClientMetadata {
     private String tenant_id;
     private String clientId;

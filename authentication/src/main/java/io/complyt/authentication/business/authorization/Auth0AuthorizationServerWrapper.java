@@ -1,6 +1,7 @@
 package io.complyt.authentication.business.authorization;
 
 import io.complyt.authentication.auth0_client.Auth0Client;
+import io.complyt.authentication.auth0_client.ClientMetadata;
 import io.complyt.authentication.business.exceptions.ComplytAuth0Exception;
 import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.mappers.Auth0AccessTokenToAccessToken;
@@ -60,8 +61,9 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                                                     final @NonNull String tenantId, final @NonNull String accessToken,
                                                     final String newClientId, final String newClientSecret) {
 
+        ClientMetadata clientMetadata = new ClientMetadata(tenantId,newClientId, newClientSecret);
         Auth0ClientMetaData updateAuth0ClientMetaDataJsonObject = new Auth0ClientMetaData(clientName,
-                tenantId, newClientId, newClientSecret);
+                clientMetadata);
 
         return ContextLogger.observeCtx("Removing Auth0 Api-Key", log::info)
                 .then(webClient.patch()
@@ -70,10 +72,10 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                         .header("Authorization", "Bearer " + accessToken)
                         .bodyValue(updateAuth0ClientMetaDataJsonObject.getAsJson())
                         .retrieve()
-                        .bodyToMono(Auth0Client.class)
+                        .bodyToMono(Auth0Client.class))
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
                                 .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
-                                        new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted")))));
+                                        new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted"))));
     }
 
     public Mono<AccessToken> getManagementAccessToken() {
