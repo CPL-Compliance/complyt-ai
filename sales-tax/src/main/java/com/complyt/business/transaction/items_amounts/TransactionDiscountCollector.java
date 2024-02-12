@@ -1,7 +1,6 @@
 package com.complyt.business.transaction.items_amounts;
 
 import com.complyt.business.builder.CollectionBuilder;
-import com.complyt.business.transaction.ItemTotalCalculator;
 import com.complyt.domain.Discountable;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
@@ -30,18 +29,6 @@ public class TransactionDiscountCollector implements TransactionAmountsCollector
 
 
         // creating a new transaction instead of 2 with to save 1 construction
-        return new Transaction (
-        transaction.getComplytId(), transaction.getId(),
-                transaction.getExternalId(), transaction.getSource(), transaction.getDocumentName(),
-                recalculatedTotalItemDiscountables,
-                transaction.getBillingAddress(),transaction.getShippingAddress(), transaction.getCustomerId(), transaction.getCustomer(),
-                transaction.getSalesTax(), transaction.getTransactionStatus(),
-                transaction.getTenantId(), transaction.getInternalTimestamps(),
-                transaction.getExternalTimestamps(), transaction.getTransactionType(),
-                transaction.getShippingFee(), transaction.getCreatedFrom(),
-                transaction.getTaxableItemsAmount(), transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount(),
-                totalDiscount,
-                transaction.getTransactionFilingStatus()
-        );
+        return transaction.withTotalDiscount(totalDiscount);
     }
 }

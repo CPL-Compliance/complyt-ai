@@ -32,7 +32,7 @@ public class TransactionItemsAmountsCollector implements TransactionAmountsColle
     public Transaction collect(@NonNull Transaction transaction) {
 
         List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transaction);
-        //todo: recalculate total here with discount
+        //todo: recalculate total here with discount - not true - happens in service
         BigDecimal taxableItemsAmount = taxableItemsAmountCalculator.calculate(taxables);
         BigDecimal tangibleItemsAmount = tangibleItemsAmountCalculator.calculate(taxables);
         BigDecimal totalItemsAmount = totalItemsAmountCalculator.calculate(taxables);
@@ -46,7 +46,7 @@ public class TransactionItemsAmountsCollector implements TransactionAmountsColle
                 transaction.getTenantId(), transaction.getInternalTimestamps(),
                 transaction.getExternalTimestamps(), transaction.getTransactionType(),
                 transaction.getShippingFee(), transaction.getCreatedFrom(),
-                taxableItemsAmount, tangibleItemsAmount, totalItemsAmount,
+                taxableItemsAmount, tangibleItemsAmount, totalItemsAmount,transaction.getTotalDiscount(),
                 transaction.getTransactionFilingStatus()
         );
     }

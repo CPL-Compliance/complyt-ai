@@ -41,6 +41,9 @@ public class TransactionServiceImpl implements TransactionService {
     TransactionAmountsCollector<Transaction> transactionItemsAmountsCollector;
 
     @NonNull
+    TransactionAmountsCollector<Transaction> transactionDiscountCollector;
+
+    @NonNull
     CityCountyProvider cityCountyProvider;
 
     @NonNull
@@ -126,11 +129,12 @@ public class TransactionServiceImpl implements TransactionService {
 
     private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
         //todo: TransactionDiscountCollector
-        return itemsTotalCalculator.calculateItemsTotal(transaction.getItems())
-                .flatMap()
-                productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transaction)
-                .map(transactionItemsAmountsCollector::collect)
-                .flatMap(cityCountyProvider::provide);
+        return itemsTotalCalculator.injectRecalculatedTotal(transaction)
+                .flatMap(transactionWithCalculatedItems ->
+                        productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItems)
+                                .map(transactionDiscountCollector::collect)
+                                .map(transactionItemsAmountsCollector::collect)
+                                .flatMap(cityCountyProvider::provide));
     }
 
     @Deprecated

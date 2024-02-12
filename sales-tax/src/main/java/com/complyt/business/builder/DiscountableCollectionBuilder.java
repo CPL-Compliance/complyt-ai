@@ -12,7 +12,8 @@ import java.util.Collection;
 public class DiscountableCollectionBuilder implements CollectionBuilder<Discountable> {
     @Override
     public Collection<Discountable> build(@NonNull Transaction transaction) {
-        Collection discountables = new ArrayList<>(transaction.getItems());
+        Collection<Discountable> discountables = new ArrayList<>(transaction.getItems());
+
 
         return discountables;
     }

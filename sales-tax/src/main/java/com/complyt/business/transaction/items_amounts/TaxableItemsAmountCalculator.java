@@ -18,7 +18,7 @@ public class TaxableItemsAmountCalculator implements AmountCalculator<List<Taxab
         BigDecimal amount = BigDecimal.ZERO;
         for (Taxable item : items) {
             amount = item.getTaxableCategory() == TaxableCategory.TAXABLE ?
-                    amount.add(item.getTotalPrice()) : amount;
+                    amount.add(item.getCalculatedTotal()) : amount;
         }
         log.debug("Total Taxable items price calculated: " + amount);
 

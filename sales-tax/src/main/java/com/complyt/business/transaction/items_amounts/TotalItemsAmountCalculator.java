@@ -15,7 +15,7 @@ public class TotalItemsAmountCalculator implements AmountCalculator<List<Taxable
     public BigDecimal calculate(@NonNull List<Taxable> items) {
         BigDecimal amount = BigDecimal.ZERO;
         for (Taxable item : items) {
-            amount = amount.add(item.getTotalPrice());
+            amount = amount.add(item.getCalculatedTotal());
         }
         log.debug("Total Items price calculated: " + amount);
 

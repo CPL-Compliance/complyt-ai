@@ -38,6 +38,6 @@ public class ItemsTotalCalculator {
     }
 
     private ShippingFee shippingFeeCalculation(ShippingFee shippingFee) {
-        return shippingFee.withCalculatedAmount(shippingFee.getTotalPrice());
+        return shippingFee.withCalculatedTotal(shippingFee.getTotalPrice());
     }
 }
