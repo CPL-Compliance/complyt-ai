@@ -39,6 +39,6 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.accessToken").isEqualTo(expectedJwt);
+                .jsonPath("$.accessToken").isEqualTo(expectedJwt);c
     }
 }
