@@ -50,8 +50,8 @@ public class CustomerHandler {
         Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(customerDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Flux.defer(() -> customerfacade.getAll(Integer.parseInt(page), Integer.parseInt(size))
-                .map(CustomerMapper.INSTANCE::customerToCustomerDto)
-                .flatMapSequential(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto))));
+                        .map(CustomerMapper.INSTANCE::customerToCustomerDto)
+                        .flatMapSequential(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoFlux, CustomerDto.class);
     }
@@ -64,8 +64,8 @@ public class CustomerHandler {
         Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(customerDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Flux.defer(() -> customerfacade.getAllBySource(source)
-                .map(CustomerMapper.INSTANCE::customerToCustomerDto)
-                .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto))));
+                        .map(CustomerMapper.INSTANCE::customerToCustomerDto)
+                        .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoFlux, CustomerDto.class);
     }
@@ -74,7 +74,7 @@ public class CustomerHandler {
     public Mono<ServerResponse> upsert(ServerRequest serverRequest) {
         String externalId = serverRequest.pathVariable("externalId");
         String source = serverRequest.pathVariable("source");
-//cd        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
         String resourceURI = CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId;
 
         return ContextLogger.observeCtx(logStr, log::info)
@@ -101,10 +101,10 @@ public class CustomerHandler {
         Mono<CustomerDto> customerDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(customerDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Mono.defer(() -> customerfacade.findByComplytId(UUID.fromString(complytId))
-                            .map(CustomerMapper.INSTANCE::customerToCustomerDto)
-                            .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info)
-                                    .thenReturn(customerDto))
-                            .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()))));
+                        .map(CustomerMapper.INSTANCE::customerToCustomerDto)
+                        .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info)
+                                .thenReturn(customerDto))
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
     }
@@ -118,9 +118,9 @@ public class CustomerHandler {
         Mono<CustomerDto> customerDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(customerDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Mono.defer(() -> customerfacade.findByExternalIdAndSource(externalId, source))
-                .map(CustomerMapper.INSTANCE::customerToCustomerDto)
-                .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .map(CustomerMapper.INSTANCE::customerToCustomerDto)
+                        .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto))
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
     }
