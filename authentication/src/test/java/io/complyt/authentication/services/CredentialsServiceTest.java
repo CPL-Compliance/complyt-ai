@@ -251,8 +251,7 @@ class CredentialsServiceTest {
                 "clientSecretCipherText");
 
         Credentials encryptedCredentials = TestUtilities.createEncryptedCredentials(apiKey, clientIdEncryptedData,
-                        clientSecretEncryptedData, "encoded")
-                .withStatus(ApiKeyStatus.ACTIVE);
+                        clientSecretEncryptedData, "encoded");
 
         // When
         when(cryptoAesGcmNoPadding.encrypt(credentials.getClientId())).thenReturn(clientIdEncryptedData);

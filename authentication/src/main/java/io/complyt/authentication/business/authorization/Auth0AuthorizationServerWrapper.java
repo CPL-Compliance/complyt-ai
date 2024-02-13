@@ -64,7 +64,7 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
         Auth0ClientMetaData auth0ClientMetaData = new Auth0ClientMetaData(clientName,
                 new ClientMetadata(tenantId,newClientId, newClientSecret));
 
-        return ContextLogger.observeCtx("Removing Auth0 Api-Key", log::info)
+        return ContextLogger.observeCtx("Removing Auth0 Api-Key metadata", log::info)
                 .then(webClient.patch()
                         .uri("/api/v2/clients/" + clientId)
                         .header("Content-Type", "application/json")

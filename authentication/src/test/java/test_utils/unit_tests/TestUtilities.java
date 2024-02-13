@@ -150,7 +150,7 @@ public class TestUtilities {
     public static Credentials createDecryptedCreds(Credentials credentials) {
         return Credentials.builder().clientId(credentials.getClientId()).clientSecret(credentials.getClientSecret())
                 .audience(credentials.getAudience())
-                .grantType(credentials.getGrantType()).complytClientId(credentials.getComplytClientId())
+                .grantType(credentials.getGrantType()).complytClientId(credentials.getComplytClientId()).status(ApiKeyStatus.ACTIVE)
                 .complytClientSecret(credentials.getComplytClientSecret()).build();
     }
 
@@ -166,6 +166,7 @@ public class TestUtilities {
                 .complytClientSecret(clientSecretEncoded)
                 .name("Name")
                 .tenantId(tenantId)
+                .status(ApiKeyStatus.ACTIVE)
                 .build();
     }
 

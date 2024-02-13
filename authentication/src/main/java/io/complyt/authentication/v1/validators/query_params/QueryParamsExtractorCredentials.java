@@ -8,14 +8,16 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class QueryParamsExtractorCredentials implements QueryParamsExtractor<ApiKeyDto> {
     @Override
     public Mono<ApiKeyDto> extract(@NotNull ServerRequest serverRequest) {
-        MediaType mediaType = serverRequest.headers().contentType().orElse(MediaType.APPLICATION_FORM_URLENCODED);
+        Optional<MediaType> mediaType = serverRequest.headers().contentType();
+//        MediaType mediaType = serverRequest.headers().contentType().orElse(MediaType.APPLICATION_FORM_URLENCODED);
 
-        if (mediaType.equals(MediaType.APPLICATION_FORM_URLENCODED)) {
+        if (mediaType.isPresent() && mediaType.get().equals(MediaType.APPLICATION_FORM_URLENCODED)) {
             return serverRequest.formData()
                     .flatMap(formData -> {
                         Map<String, String> singleValueMap = formData.toSingleValueMap();

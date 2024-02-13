@@ -152,19 +152,11 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
 
     @Test
     @WithMockUser
-    public void delete_SentAsFormURLEncoded_NoContentTypeHeaderButValidApiKeyProvided_Returns204() {
+    public void delete_SentAsFormURLEncoded_NoContentTypeHeaderButValidApiKeyProvided_Returns415() {
         ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
 
         String body = "clientId=" + apiKeyDto.clientId() +
                 "&clientSecret=" + apiKeyDto.clientSecret();
-
-//        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-//        formData.add("clientId", UriUtils.encode(
-//                apiKeyDto.clientId()
-//                , StandardCharsets.ISO_8859_1));
-//        formData.add("clientSecret", UriUtils.encode(
-//                apiKeyDto.clientSecret()
-//                , StandardCharsets.ISO_8859_1));
 
         webTestClient
                 .mutateWith(csrf())
@@ -174,7 +166,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                         .build()
                 )
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
-                .bodyValue(body)
+                .bodyValue(body) // text:plain content type
                 .exchange()
                 .expectStatus().is4xxClientError();
     }
