@@ -53,7 +53,7 @@ import java.lang.annotation.Target;
                                         }),
                                 @ApiResponse(
                                         responseCode = "401",
-                                        description = "Api Key Not Found"),
+                                        description = "Api Key Unauthorized"),
                                 @ApiResponse(
                                         responseCode = "500",
                                         description = "Internal Error"

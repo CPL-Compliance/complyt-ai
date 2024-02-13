@@ -61,16 +61,15 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                                                     final @NonNull String tenantId, final @NonNull String accessToken,
                                                     final String newClientId, final String newClientSecret) {
 
-        ClientMetadata clientMetadata = new ClientMetadata(tenantId,newClientId, newClientSecret);
-        Auth0ClientMetaData updateAuth0ClientMetaDataJsonObject = new Auth0ClientMetaData(clientName,
-                clientMetadata);
+        Auth0ClientMetaData auth0ClientMetaData = new Auth0ClientMetaData(clientName,
+                new ClientMetadata(tenantId,newClientId, newClientSecret));
 
         return ContextLogger.observeCtx("Removing Auth0 Api-Key", log::info)
                 .then(webClient.patch()
                         .uri("/api/v2/clients/" + clientId)
                         .header("Content-Type", "application/json")
                         .header("Authorization", "Bearer " + accessToken)
-                        .bodyValue(updateAuth0ClientMetaDataJsonObject.getAsJson())
+                        .bodyValue(auth0ClientMetaData.getAsJson())
                         .retrieve()
                         .bodyToMono(Auth0Client.class))
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(50))

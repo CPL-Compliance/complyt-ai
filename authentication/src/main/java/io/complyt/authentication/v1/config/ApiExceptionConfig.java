@@ -1,4 +1,4 @@
-package io.complyt.authentication.config;
+package io.complyt.authentication.v1.config;
 
 import io.complyt.authentication.annotations.Generated;
 import io.complyt.authentication.v1.exceptions.types.ApiKeyNotValidException;

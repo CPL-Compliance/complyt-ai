@@ -80,7 +80,7 @@ public class CredentialsService {
         Credentials encryptedCredentials = createEncryptedCredentials(apiKey, clientIdEncryptedData, clientSecretEncryptedData,
                 clientSecretEncoded, tenantId, name);
 
-        return encryptedCredentials.withStatus(ApiKeyStatus.ACTIVE);
+        return encryptedCredentials;
     }
 
     private @NonNull Mono<Credentials> decrypt(Credentials credentials) {
@@ -107,7 +107,7 @@ public class CredentialsService {
     private static Credentials createDecryptedCredentials(Credentials credentials, String clientId,
                                                           String clientSecret) {
         return Credentials.builder().clientId(clientId).clientSecret(clientSecret).audience(credentials.getAudience())
-                .grantType(credentials.getGrantType()).complytClientId(credentials.getComplytClientId())
+                .grantType(credentials.getGrantType()).status(credentials.getStatus()).complytClientId(credentials.getComplytClientId())
                 .complytClientSecret(credentials.getComplytClientSecret()).build();
     }
 
@@ -118,9 +118,10 @@ public class CredentialsService {
                 .clientIdIv(clientIdEncryptedData.iv())
                 .clientSecret(clientSecretEncryptedData.cipherText())
                 .clientSecretIv(clientSecretEncryptedData.iv()).audience(audience).grantType(grantType)
-                .complytClientId(apiKey.clientId())
                 .tenantId(tenantId)
                 .name(name)
+                .status(ApiKeyStatus.ACTIVE)
+                .complytClientId(apiKey.clientId())
                 .complytClientSecret(clientSecretEncoded).build();
     }
 }

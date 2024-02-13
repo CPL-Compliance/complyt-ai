@@ -1,6 +1,6 @@
 package io.complyt.authentication.v1.routers;
 
-import io.complyt.authentication.config.ApiExceptionConfig;
+import io.complyt.authentication.v1.config.ApiExceptionConfig;
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.facades.TokenFacade;
