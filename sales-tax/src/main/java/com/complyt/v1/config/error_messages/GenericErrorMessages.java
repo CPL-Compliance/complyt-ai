@@ -9,6 +9,8 @@ public interface GenericErrorMessages {
 
     String MISSING_BODY_ERROR = "The requested operation failed because no request body has been provided";
     String UNSUPPORTED_MEDIA_TYPE = "415 Unsupported Media Type";
+    String TENANT_ID_FORMAT = "invalid tenantId provided. please provide a valid parameter";
 
+    String NOT_NULL = "may not be null";
 }
 

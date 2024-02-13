@@ -11,7 +11,6 @@ import reactor.core.publisher.Mono;
 
 @Component
 @AllArgsConstructor
-@Service
 public class ClientTrackingFacade {
 
     @NonNull

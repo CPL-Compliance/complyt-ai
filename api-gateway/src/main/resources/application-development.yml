@@ -53,6 +53,8 @@ springdoc:
         url: /v3/api-docs/sales-tax-rates
       - name: authentication
         url: /v3/api-docs/authentication
+      - name: clientTracking
+        url: /v3/api-docs/client_tracking
   api-docs:
     version: openapi_3_0
 

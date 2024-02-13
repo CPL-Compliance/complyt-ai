@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.regex.Pattern;
+
 @Slf4j
 @AllArgsConstructor
 @Repository
@@ -63,7 +65,7 @@ public class ClientTrackingRepository {
     }
 
     public Flux<ClientTracking> getByName(String name) {
-        Query query = Query.query(Criteria.where("name").is(name));
+        Query query = new Query(Criteria.where("name").regex("^" + Pattern.quote(name) + "$", "i"));
 
         return ContextLogger.observeCtx("Searching for client tracking by name: " + name, log::info)
                 .thenMany(reactiveMongoTemplate.find(query, ClientTracking.class));

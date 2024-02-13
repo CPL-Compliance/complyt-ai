@@ -1,10 +1,11 @@
 package com.complyt.v1.config;
 
 import com.complyt.services.ClientTrackingService;
-import com.complyt.v1.models.ClientTrackingDto;
+import com.complyt.v1.models.ClientTrackingDtoTenant;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.checkables.ComplytIdCheckable;
 import com.complyt.v1.models.checkables.StateCheckable;
+import com.complyt.v1.models.checkables.TenantIdCheckable;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import com.complyt.v1.models.customer.exemption.ExemptionWrapperDto;
@@ -36,7 +37,8 @@ public class ValidatorConfig {
             "complytId", ParamCheckerFunctions.UUID_CHECK,
             "source", ParamCheckerFunctions.SOURCE_CHECK,
             "externalId", ParamCheckerFunctions.EXTERNAL_ID_NOT_NULL_CHECK,
-            "state", ParamCheckerFunctions.STATE_CHECK));
+            "state", ParamCheckerFunctions.STATE_CHECK,
+            "tenantId", ParamCheckerFunctions.TENANT_ID_CHECK));
 
     ParameterChecksProvider queryParamChecker = new ParameterChecksProvider(Map.of(
             "page", ParamCheckerFunctions.PAGE_CHECK,
@@ -131,9 +133,10 @@ public class ValidatorConfig {
     }
 
     @Bean
-    ValidationHandler<ClientTrackingDto, SpringValidatorAdapter> clientTrackingDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
-        return new ValidationHandler<>(ClientTrackingDto.class, springValidatorAdapter,
-                new DataConflictChecksProvider(Map.of(),
+    ValidationHandler<ClientTrackingDtoTenant, SpringValidatorAdapter> ClientTrackingDtoTenantValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
+        return new ValidationHandler<>(ClientTrackingDtoTenant.class, springValidatorAdapter,
+                new DataConflictChecksProvider(Map.of(
+                        "tenantId", ClientTrackingDtoTenant.TENANT_ID_CONFLICT_CHECK),
                         null),
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,

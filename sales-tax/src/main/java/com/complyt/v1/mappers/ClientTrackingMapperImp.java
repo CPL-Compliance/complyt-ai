@@ -3,7 +3,7 @@ package com.complyt.v1.mappers;
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.Nexus;
 import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.v1.models.ClientTrackingDto;
+import com.complyt.v1.models.ClientTrackingDtoTenant;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.nexus.NexusDto;
 
@@ -15,8 +15,8 @@ public class ClientTrackingMapperImp implements ClientTrackingMapper{
     private final NexusMapper nexusMapper = NexusMapper.INSTANCE;
 
     @Override
-    public ClientTracking clientTrackingDtoToClientTracking(ClientTrackingDto clientTrackingDto) {
-        if (clientTrackingDto == null) {
+    public ClientTracking ClientTrackingDtoTenantToClientTracking(ClientTrackingDtoTenant ClientTrackingDtoTenant) {
+        if (ClientTrackingDtoTenant == null) {
             return null;
         }
 
@@ -24,15 +24,15 @@ public class ClientTrackingMapperImp implements ClientTrackingMapper{
         String tenantId = null;
         Timestamps internalTimestamps;
 
-        Nexus nexus = nexusMapper.nexusDtoToNexus(clientTrackingDto.nexus());
-        String name = clientTrackingDto.name();
-        internalTimestamps = timestampsMapper.timestampsDtoTotimestamps(clientTrackingDto.internalTimestamps());
+        Nexus nexus = nexusMapper.nexusDtoToNexus(ClientTrackingDtoTenant.nexus());
+        String name = ClientTrackingDtoTenant.name();
+        internalTimestamps = timestampsMapper.timestampsDtoTotimestamps(ClientTrackingDtoTenant.internalTimestamps());
 
         return new ClientTracking(id,tenantId, nexus, name, internalTimestamps);
     }
 
     @Override
-    public ClientTrackingDto clientTrackingToClientTrackingDto(ClientTracking clientTracking) {
+    public ClientTrackingDtoTenant clientTrackingToClientTrackingDtoTenant(ClientTracking clientTracking) {
         if (clientTracking == null) {
             return null;
         }
@@ -41,7 +41,7 @@ public class ClientTrackingMapperImp implements ClientTrackingMapper{
         TimestampsDto internalTimestamps = timestampsMapper.timestampsTotimestampsDto(clientTracking.getInternalTimestamps());
         String tenantId = clientTracking.getTenantId();
 
-        return new ClientTrackingDto(nexusDto, name, internalTimestamps, tenantId);
+        return new ClientTrackingDtoTenant(nexusDto, name, internalTimestamps, tenantId);
     }
 
 }
