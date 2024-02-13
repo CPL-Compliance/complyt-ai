@@ -15,9 +15,10 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TOKEN_BASE_URL)
                         .build())
-                .headers(headers -> {
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                })
+//                .headers(headers -> {
+//                    headers.setContentType(MediaType.APPLICATION_JSON);
+//                })
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(TestUtilities.apiKeyJsonExample())
                 .exchange()
                 .expectStatus().isOk()
@@ -32,9 +33,10 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TOKEN_BASE_URL)
                         .build())
-                .headers(headers -> {
-                    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                })
+//                .headers(headers -> {
+//                    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//                })
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue(TestUtilities.apiKeyUrlEncodedExample())
                 .exchange()
                 .expectStatus().isOk()

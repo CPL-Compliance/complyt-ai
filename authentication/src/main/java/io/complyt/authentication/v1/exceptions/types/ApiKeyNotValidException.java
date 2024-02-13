@@ -6,7 +6,7 @@ import lombok.Generated;
 @Generated
 public class ApiKeyNotValidException extends ComplytApiException{
 
-    private static final String message = GenericErrorMessages.NOT_FOUND_ERROR;
+    private static final String message = GenericErrorMessages.UNAUTHORIZED_ERROR;
 
     public ApiKeyNotValidException() {
         super(message);
