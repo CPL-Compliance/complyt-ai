@@ -74,7 +74,7 @@ public class CustomerHandler {
     public Mono<ServerResponse> upsert(ServerRequest serverRequest) {
         String externalId = serverRequest.pathVariable("externalId");
         String source = serverRequest.pathVariable("source");
-        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+cd        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
         String resourceURI = CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId;
 
         return ContextLogger.observeCtx(logStr, log::info)
