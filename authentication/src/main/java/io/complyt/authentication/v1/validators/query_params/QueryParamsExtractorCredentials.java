@@ -23,6 +23,7 @@ public class QueryParamsExtractorCredentials implements QueryParamsExtractor<Api
                         Map<String, String> singleValueMap = formData.toSingleValueMap();
 
                         return Mono.just(new ApiKeyDto(singleValueMap.get("clientId"), singleValueMap.get("clientSecret")));
+
                     });
         }
 
