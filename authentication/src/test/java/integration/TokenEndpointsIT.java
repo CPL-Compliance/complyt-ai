@@ -153,26 +153,4 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .expectBody(LinkedHashMap.class)
                 .value(map -> assertEquals(GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE, map.get("message")));
     }
-
-//    @Test
-//    public void authentication_token_post_jsonTypeApiKeyExistsButDoesntHaveToken_ReturnsAccessToken() {
-//        String expectedJwt = "accessToken";
-//        String accessToken = "accessToken";
-//        JSONObject jsonObject = new JSONObject();
-//        jsonObject.put("apiKeyClientId", "78fd4034-53af-4144-b2da-27ac31cdf45c");
-//        jsonObject.put("apiKeyClientSecret", "3d446591-d839-4906-97fe-85e1b51df0c8");
-//
-//        webTestClient
-//                .post()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TokenRouter.BASE_URL)
-//                        .build())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept()
-//                .bodyValue(jsonObject)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody()
-//                .jsonPath(accessToken).isEqualTo(expectedJwt);
-//    }
 }

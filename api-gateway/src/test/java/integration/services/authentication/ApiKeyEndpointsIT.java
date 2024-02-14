@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 
 public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
+
     @Test
     public void authentication_apiKey_post_clientCredentialsExists_Returns201() {
         WEB_TEST_CLIENT
@@ -57,92 +58,92 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                 .expectStatus().isForbidden();
     }
 
-//    @Test
-//    public void authentication_apiKey_delete_sentAsURLEncoded_clientApiKeyExists_SuccessfulDeletion_Returns204() {
-//
-//        WEB_TEST_CLIENT
-//                .method(HttpMethod.DELETE)
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TestUtilities.API_KEY_BASE_URL)
-//                        .build())
-//                .headers(headers -> headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED))
-//                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
-//                .bodyValue(TestUtilities.apiKeyUrlEncodedExample())
-//                .exchange()
-//                .expectStatus().isNoContent();
-//    }
-//
-//    @Test
-//    public void authentication_apiKey_delete_sentAsJson_clientApiKeyExists_SuccessfulDeletion_Returns204() {
-//        WEB_TEST_CLIENT
-//                .method(HttpMethod.DELETE)
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TestUtilities.API_KEY_BASE_URL)
-//                        .build())
-//                .headers(headers -> headers.setContentType(MediaType.APPLICATION_JSON))
-//                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
-//                .bodyValue(TestUtilities.apiKeyJsonExample())
-//                .exchange()
-//                .expectStatus().isNoContent();
-//    }
-//
-//
-//    @Test
-//    public void authentication_apiKey_delete_sentAsURLEncoded_noApiKeySent_ReturnsClientError() {
-//
-//        WEB_TEST_CLIENT
-//                .method(HttpMethod.DELETE)
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TestUtilities.API_KEY_BASE_URL)
-//                        .build())
-//                .headers(headers -> headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED))
-//                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
-//                .bodyValue("{}")
-//                .exchange()
-//                .expectStatus().is4xxClientError();
-//    }
-//
-//    @Test
-//    public void authentication_apiKey_delete_sentAsJson_noApiKeySent_ReturnsClientError() {
-//
-//        WEB_TEST_CLIENT
-//                .method(HttpMethod.DELETE)
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TestUtilities.API_KEY_BASE_URL)
-//                        .build())
-//                .headers(headers -> headers.setContentType(MediaType.APPLICATION_JSON))
-//                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
-//                .bodyValue("{}")
-//                .exchange()
-//                .expectStatus().is4xxClientError();
-//    }
-//
-//
-//    @Test
-//    public void authentication_apiKey_delete_NoContentTypeProvidedAndSentValidValueAsJson_noApiKeySent_ReturnsClientError() {
-//
-//        WEB_TEST_CLIENT
-//                .method(HttpMethod.DELETE)
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TestUtilities.API_KEY_BASE_URL)
-//                        .build())
-//                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
-//                .bodyValue(TestUtilities.apiKeyJsonExample())
-//                .exchange()
-//                .expectStatus().is4xxClientError();
-//    }
-//
-//    @Test
-//    public void authentication_apiKey_delete_NoContentTypeProvidedAndSentValidValueAsURLEncoded_noApiKeySent_ReturnsClientError() {
-//
-//        WEB_TEST_CLIENT
-//                .method(HttpMethod.DELETE)
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TestUtilities.API_KEY_BASE_URL)
-//                        .build())
-//                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
-//                .bodyValue(TestUtilities.apiKeyUrlEncodedExample())
-//                .exchange()
-//                .expectStatus().is4xxClientError();
-//    }
+    @Test
+    public void authentication_apiKey_delete_sentAsURLEncoded_clientApiKeyExists_SuccessfulDeletion_Returns204() {
+
+        WEB_TEST_CLIENT
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.API_KEY_BASE_URL)
+                        .build())
+                .headers(headers -> headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(TestUtilities.apiKey1UrlEncodedExample())
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+    public void authentication_apiKey_delete_sentAsJson_clientApiKeyExists_SuccessfulDeletion_Returns204() {
+        WEB_TEST_CLIENT
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.API_KEY_BASE_URL)
+                        .build())
+                .headers(headers -> headers.setContentType(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(TestUtilities.apiKey2JsonExample())
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+
+    @Test
+    public void authentication_apiKey_delete_sentAsURLEncoded_noApiKeySent_ReturnsClientError() {
+
+        WEB_TEST_CLIENT
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.API_KEY_BASE_URL)
+                        .build())
+                .headers(headers -> headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("{}")
+                .exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Test
+    public void authentication_apiKey_delete_sentAsJson_noApiKeySent_ReturnsClientError() {
+
+        WEB_TEST_CLIENT
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.API_KEY_BASE_URL)
+                        .build())
+                .headers(headers -> headers.setContentType(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("{}")
+                .exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+
+    @Test
+    public void authentication_apiKey_delete_sentAsJson_NoContentTypeProvidedAndApiKeyIsValid_ReturnsClientError() {
+
+        WEB_TEST_CLIENT
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.API_KEY_BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(TestUtilities.apiKeyJsonExample())
+                .exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Test
+    public void authentication_apiKey_delete_sentAsURLEncoded_NoContentTypeProvidedAndApiKeyIsValid_ReturnsClientError() {
+
+        WEB_TEST_CLIENT
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.API_KEY_BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(TestUtilities.apiKeyUrlEncodedExample())
+                .exchange()
+                .expectStatus().is4xxClientError();
+    }
 }
