@@ -8,11 +8,13 @@ import com.complyt.v1.models.checkables.ComplytIdCheckable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.With;
 
 import java.util.UUID;
 
 @With
+@Builder
 @Schema(name = "Exemption", description = FieldsDescriptions.EXEMPTION)
 public record ExemptionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID + "exemption") UUID complytId,
                            @Schema(description = FieldsDescriptions.CUSTOMER_ID + "exemption") @NotNull(message = "customerId " + DtoErrorMessages.NOT_NULL_ERROR) UUID customerId,

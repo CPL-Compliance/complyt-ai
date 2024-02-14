@@ -177,6 +177,13 @@ spring:
             - Path=/v1/exemptions/complytId/{complyt_id}
           filters:
             - SetPath=/v1/exemptions/complytId/{complyt_id}
+        - id: sales-tax-patch-exemption-by-complyt-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=PATCH
+            - Path=/v1/exemptions/complytId/{complyt_id}
+          filters:
+            - SetPath=/v1/exemptions/complytId/{complyt_id}
         # ---- Exemption ----
         # ---- Nexus ----
         - id: sales-tax-get-nexuses

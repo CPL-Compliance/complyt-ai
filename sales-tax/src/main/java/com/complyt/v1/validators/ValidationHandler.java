@@ -88,7 +88,6 @@ public class ValidationHandler<T, U extends Validator> {
                 .switchIfEmpty(Mono.just(true));
     }
 
-
     private Mono<Boolean> validatePathVariable(final ServerRequest serverRequest) {
         return Flux.fromIterable(serverRequest.pathVariables().entrySet())
                 .flatMapSequential(entry -> pathVariableChecksProvider.getFunctionCheck(entry.getKey())

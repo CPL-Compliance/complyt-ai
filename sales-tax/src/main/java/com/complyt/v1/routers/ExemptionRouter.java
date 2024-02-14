@@ -65,4 +65,14 @@ public class ExemptionRouter {
         return RouterFunctions.route(deleteExemptionRoute, exemptionHandler::delete);
     }
 
+    @Bean
+//    @DeleteExemptionByComplytIdApiInfo
+    public RouterFunction<ServerResponse> patchExemptionRouterFunction(@NonNull final ExemptionHandler exemptionHandler) {
+        RequestPredicate deleteExemptionRoute = RequestPredicates
+                .PATCH(BASE_URL + "/complytId/{complytId}")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(deleteExemptionRoute, exemptionHandler::patch);
+    }
+
 }
