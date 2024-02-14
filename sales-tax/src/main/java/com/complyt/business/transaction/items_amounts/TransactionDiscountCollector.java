@@ -25,6 +25,7 @@ public class TransactionDiscountCollector implements TransactionAmountsCollector
     public Transaction collect(@NonNull Transaction transaction) {
 
         List<Discountable> originalDiscountables = (List<Discountable>) discountableCollectionBuilder.build(transaction);
+
         BigDecimal totalDiscount = discountablesTotalDiscountCalculator.calculate(originalDiscountables);
 
 

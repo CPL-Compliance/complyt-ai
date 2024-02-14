@@ -3,7 +3,6 @@ package com.complyt.business.transaction;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
-import com.complyt.security.TenantResolver;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -26,17 +25,26 @@ public class ItemsTotalCalculator {
 
     private List<Item> recalculateItems(List<Item> itemsList) {
         return itemsList.stream()
-                .map(item -> item.withCalculatedTotal(totalPriceCalculation(item)))
+                .map(item -> item.withCalculatedTotal(calculatedTotalPriceCalculation(item)))
                 .collect(Collectors.toList());
     }
 
     //todo: maybe this should be in the domains...
-    private BigDecimal totalPriceCalculation(Item item) {
-        return item.getTotalPrice() != null ?
+    private BigDecimal calculatedTotalPriceCalculation(Item item) {
+        BigDecimal totalPrice = item.getTotalPrice() != null ?
                 item.getTotalPrice() :
                 item.getUnitPrice().multiply(item.getQuantity());
+
+        return item.getDiscount() != null ?
+                totalPrice.subtract(item.getDiscount()) :
+                totalPrice;
     }
 
+    /**
+     * this is used to aligned shippingFee and items
+     * in the future, if another way to calculate shipping fee will be intraduced,
+     * this code will need to be changed
+     */
     private ShippingFee shippingFeeCalculation(ShippingFee shippingFee) {
         return shippingFee.withCalculatedTotal(shippingFee.getTotalPrice());
     }

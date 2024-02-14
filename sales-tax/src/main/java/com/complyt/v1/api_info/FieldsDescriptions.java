@@ -65,7 +65,7 @@ public interface FieldsDescriptions {
 
     String SHIPPING_FEE = "The shipping fee for the transaction";
 
-    //String DISCOUNT = "Discount details for the transaction"; //todo:delete
+    String TOTAL_DISCOUNT = "The total discount of all the items combined. calculated on save";
 
     // In Customer
 
@@ -94,4 +94,8 @@ public interface FieldsDescriptions {
     String QUANTITY = "The quantity of the units, must be positive";
 
     String TOTAL_PRICE = "The total price of the unit prices time the quantity, can be positive and negative, value is before discount and sales tax";
+
+    String DISCOUNT = "The discount of the line items, must be positive";
+
+    String CALCULATED_TOTAL = "The calculated price of the items. represents the total price (or amount time quantity if not provided), after discount. calculated on run time";
 }
