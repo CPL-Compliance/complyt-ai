@@ -1,86 +1,52 @@
 package com.complyt.v1.config;
 
-import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.customer.exemption.*;
+import com.complyt.v1.config.patch.ExemptionPatcherFunctions;
+import com.complyt.v1.config.patch.TransactionPatcherFunctions;
+import com.complyt.v1.models.customer.exemption.ExemptionDto;
+import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.Patcher;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.BiFunction;
 
 @Configuration
 public class PatcherConfig {
 
-    ObjectMapper objectMapper = new ObjectMapper();
-
     @Bean
     Patcher<ExemptionDto> exemptionPatcher() {
-
-        BiFunction<ExemptionDto, Object, ExemptionDto> buildCustomerId = (exemptionDto, customerId) -> {
-            UUID convertedCustomerId = (UUID) mapObject(customerId, UUID.class);
-            return exemptionDto.withCustomerId(convertedCustomerId);
-        };
-
-        BiFunction<ExemptionDto, Object, ExemptionDto> buildState = (exemptionDto, state) -> {
-            StateDto convertedState = (StateDto) mapObject(state, StateDto.class);
-            return exemptionDto.withState(convertedState);
-        };
-
-        BiFunction<ExemptionDto, Object, ExemptionDto> buildClassification = (exemptionDto, classification) -> {
-            ClassificationDto convertedClassification = (ClassificationDto) mapObject(classification, ClassificationDto.class);
-            return exemptionDto.withClassification(convertedClassification);
-        };
-
-        BiFunction<ExemptionDto, Object, ExemptionDto> buildValidationDates = (exemptionDto, validationDates) -> {
-            ValidationDatesDto convertedValidationDates = (ValidationDatesDto) mapObject(validationDates, ValidationDatesDto.class);
-            return exemptionDto.withValidationDates(convertedValidationDates);
-        };
-
-        BiFunction<ExemptionDto, Object, ExemptionDto> buildStatus = (exemptionDto, status) -> {
-            StatusDto convertedStatus = (StatusDto) mapObject(status, StatusDto.class);
-            return exemptionDto.withStatus(convertedStatus);
-        };
-
-        BiFunction<ExemptionDto, Object, ExemptionDto> buildCertificate = (exemptionDto, certificate) -> {
-            CertificateDto convertedCertificate = (CertificateDto) mapObject(certificate, CertificateDto.class);
-            return exemptionDto.withCertificate(convertedCertificate);
-        };
-
-        BiFunction<ExemptionDto, Object, ExemptionDto> buildExemptionType = (exemptionDto, exemptionType) -> {
-            ExemptionTypeDto e = ExemptionTypeDto.valueOf((String) exemptionType);
-            return exemptionDto.withExemptionType(e);
-        };
-
-        BiFunction<ExemptionDto, Object, ExemptionDto> buildExemptionStatus = (exemptionDto, exemptionStatus) -> {
-            ExemptionStatusDto e = ExemptionStatusDto.valueOf((String) exemptionStatus);
-            return exemptionDto.withExemptionStatus(e);
-        };
-
-        Map<String, BiFunction<ExemptionDto, Object, ExemptionDto>> fieldsToBuilders = new HashMap<>() {{
-            put("customerId", buildCustomerId);
-            put("state", buildState);
-            put("classification", buildClassification);
-            put("validationDates", buildValidationDates);
-            put("status", buildStatus);
-            put("certificate", buildCertificate);
-            put("exemptionType", buildExemptionType);
-            put("exemptionStatus", buildExemptionStatus);
+        Map<String, BiFunction<ExemptionDto, Object, ExemptionDto>> valuesToFunctions = new HashMap<>() {{
+            put("customerId", ExemptionPatcherFunctions.buildCustomerId);
+            put("state", ExemptionPatcherFunctions.buildState);
+            put("classification", ExemptionPatcherFunctions.buildClassification);
+            put("validationDates", ExemptionPatcherFunctions.buildValidationDates);
+            put("status", ExemptionPatcherFunctions.buildStatus);
+            put("certificate", ExemptionPatcherFunctions.buildCertificate);
+            put("exemptionType", ExemptionPatcherFunctions.buildExemptionType);
+            put("exemptionStatus", ExemptionPatcherFunctions.buildExemptionStatus);
         }};
 
-        return new Patcher<>(fieldsToBuilders);
+        return new Patcher<>(valuesToFunctions);
     }
 
-    Object mapObject(Object o, Class patchingClass) {
-        try {
-            return objectMapper.convertValue(o, patchingClass);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
+//    @Bean
+//    Patcher<TransactionDto> transactionPatcher() {
+//        Map<String, BiFunction<TransactionDto, Object, TransactionDto>> valuesToFunctions = new HashMap<>() {{
+//            put("documentName", TransactionPatcherFunctions.);
+//            put("items", TransactionPatcherFunctions.buildState);
+//            put("billingAddress", TransactionPatcherFunctions.buildClassification);
+//            put("shippingAddress", TransactionPatcherFunctions.buildValidationDates);
+//            put("customerId", TransactionPatcherFunctions.buildStatus);
+//            put("externalTimestamps", TransactionPatcherFunctions.buildCertificate);
+//            put("transactionType", TransactionPatcherFunctions.buildExemptionType);
+//            put("shippingFee", TransactionPatcherFunctions.buildExemptionStatus);
+//            put("createdFrom", TransactionPatcherFunctions.buildExemptionStatus);
+//            put("transactionFilingStatus", TransactionPatcherFunctions.buildExemptionStatus);
+//        }};
+//
+//        return new Patcher<>(valuesToFunctions);
+//    }
 
 }
