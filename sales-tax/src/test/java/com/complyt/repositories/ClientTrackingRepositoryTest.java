@@ -196,6 +196,18 @@ public class ClientTrackingRepositoryTest {
     }
 
     @Test
+    void saveByTenantId_NullTenantIdPassed_ThrowsException() {
+        // Given
+        String tenantId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> clientTrackingRepository.saveByTenantId(clientTracking, tenantId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "tenantId is marked non-null but is null");
+    }
+
+    @Test
     void findById_NullId_ThrowsNullPointerException() {
         // Given
         String nullId = null;
