@@ -12,5 +12,7 @@ public interface GenericErrorMessages {
     String TENANT_ID_FORMAT = "invalid tenantId provided. please provide a valid parameter";
 
     String NOT_NULL = "may not be null";
+
+    String CONFLICTED_WITH_URL_ERROR = "in body and path should be identical";
 }
 

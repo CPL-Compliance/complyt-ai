@@ -133,7 +133,7 @@ public class ValidatorConfig {
     }
 
     @Bean
-    ValidationHandler<ClientTrackingDtoTenant, SpringValidatorAdapter> ClientTrackingDtoTenantValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
+    ValidationHandler<ClientTrackingDtoTenant, SpringValidatorAdapter> clientTrackingDtoTenantValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
         return new ValidationHandler<>(ClientTrackingDtoTenant.class, springValidatorAdapter,
                 new DataConflictChecksProvider(Map.of(
                         "tenantId", ClientTrackingDtoTenant.TENANT_ID_CONFLICT_CHECK),

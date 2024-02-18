@@ -6,6 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAuthority('SCOPE_read:clientTracking')")
+@PreAuthorize("hasAuthority('SCOPE_read:client_tracking')")
 public @interface ClientTrackingReadPermission {
 }

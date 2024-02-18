@@ -44,7 +44,7 @@ public interface ITUtilities {
         return new SalesTaxTrackingDto(null, state, "comment", true,
                 new PhysicalNexusTrackerDto(false, LocalDateTime.now()),
                 new EconomicNexusTrackerDto(false, LocalDateTime.now()),
-                null, null, null,
+                null, null, stubClientTrackingDto(),
                 LocalDateTime.now(), false, LocalDateTime.now(), FilingFrequencyDto.MONTHLY);
     }
 
@@ -180,6 +180,11 @@ public interface ITUtilities {
     static ClientTrackingDto stubClientTrackingDto() {
         TimestampsDto internalTimestamps =  new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString());
         return new ClientTrackingDto(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), "it_tenant", internalTimestamps);
+    }
+
+    static ClientTrackingDtoTenant stubClientTrackingDtoTenant(String tenantId, String name) {
+        TimestampsDto internalTimestamps =  new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        return new ClientTrackingDtoTenant(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), name, internalTimestamps, tenantId);
     }
 
     static NexusStateRuleDto stubAlabamaNexusStateRuleDto() {

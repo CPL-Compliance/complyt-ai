@@ -1,4 +1,4 @@
-package testUtils.integration_test.templates.endpoints;
+package integration.test_utils.templates.endpoints;
 
 public interface GetByNameITTemplate {
     void getByName_Exists_Returns200();

@@ -39,4 +39,5 @@ public interface DtoErrorMessages {
     String ONE_OF_THE_ITEMS_IS_UNALIGNED = "At least one of the item's total price does not have the same sign as the amount (one is negative and the other one is positive)";
 
     String TENANT_ID_FORMAT = "invalid tenantId provided. please provide a valid parameter";
+
 }

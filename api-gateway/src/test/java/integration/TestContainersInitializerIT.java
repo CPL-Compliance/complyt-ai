@@ -71,6 +71,7 @@ public abstract class TestContainersInitializerIT {
                 .withNetworkAliases(HOSTNAME)
                 .withRealmImportFile("realm-export.json");
         KEYCLOAK_CONTAINER.start();
+        System.out.println(KEYCLOAK_CONTAINER.getLogs());
         ACCESS_TOKEN_CLIENT = WebTestClient.bindToServer().baseUrl("http://localhost:" + KEYCLOAK_CONTAINER.getMappedPort(8080) + "/").build();
 
         String mongoUriEntrypoint = "-Dspring.data.mongodb.uri=mongodb://" + HOSTNAME + ":27017";

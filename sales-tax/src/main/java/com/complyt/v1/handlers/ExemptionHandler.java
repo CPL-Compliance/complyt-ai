@@ -47,7 +47,7 @@ public class ExemptionHandler {
     @NonNull
     ValidationHandler<ExemptionWrapperDto, SpringValidatorAdapter> exemptionWrapperDtoValidationHandler;
 
-    @ExemptionReadPermission
+        @ExemptionReadPermission
     public Mono<ServerResponse> findByComplytId(ServerRequest serverRequest) {
         String complytId = serverRequest.pathVariable("complytId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());

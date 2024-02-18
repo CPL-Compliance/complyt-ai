@@ -24,7 +24,7 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
 
 
     @Override
-    public Mono<ClientTracking> save(ClientTracking clientTracking) {
+    public Mono<ClientTracking> save(@NonNull ClientTracking clientTracking) {
         return clientTrackingRepository.save(clientTracking);
     }
 
@@ -44,12 +44,12 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
     }
 
     @Override
-    public Mono<ClientTracking> saveByTenantId(ClientTracking clientTracking, String tenantId) {
+    public Mono<ClientTracking> saveByTenantId(@NonNull ClientTracking clientTracking,@NonNull String tenantId) {
         return clientTrackingRepository.saveByTenantId(clientTracking, tenantId);
     }
 
     @Override
-    public Mono<ClientTracking> injectDataToExistingClientTracking(ClientTracking newClientTracking, ClientTracking originalClientTracking) {
+    public Mono<ClientTracking> injectDataToExistingClientTracking(@NonNull ClientTracking newClientTracking, @NonNull ClientTracking originalClientTracking) {
         return Mono.just(newClientTracking).map(clientTracking -> clientTracking
                         .withInternalTimestamps(originalClientTracking.getInternalTimestamps()))
                 .map(ExistingClientTrackingInternalTimestampsInjector::new)
@@ -57,14 +57,14 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
     }
 
     @Override
-    public Mono<ClientTracking> injectDataToNewClientTracking(ClientTracking clientTracking) {
+    public Mono<ClientTracking> injectDataToNewClientTracking(@NonNull ClientTracking clientTracking) {
         return Mono.just(clientTracking)
                 .map(NewClientTrackingInternalTimestampsInjector::new)
                 .map(NewClientTrackingInternalTimestampsInjector::inject);
     }
 
     @Override
-    public Mono<ClientTracking> update(ClientTracking newClientTracking, ClientTracking originalClientTracking) {
+    public Mono<ClientTracking> update(@NonNull ClientTracking newClientTracking, @NonNull ClientTracking originalClientTracking) {
         return injectDataToExistingClientTracking(newClientTracking, originalClientTracking)
                 .map(clientTrackingWithInjectedData -> createFunctionUpdatedClientTracking(clientTrackingWithInjectedData)
                         .apply(originalClientTracking));
@@ -76,13 +76,13 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
     }
 
     @Override
-    public Flux<ClientTracking> getByName(String name) {
-        return clientTrackingRepository.getByName(name);
+    public Flux<ClientTracking> getByName(@NonNull String name) {
+        return clientTrackingRepository.findByName(name);
     }
 
     @Override
-    public Mono<ClientTracking> getByTenantId(String tenantId) {
-        return clientTrackingRepository.getByTenantId(tenantId);
+    public Mono<ClientTracking> getByTenantId(@NonNull String tenantId) {
+        return clientTrackingRepository.findByTenantId(tenantId);
     }
 
     private Function<ClientTracking, ClientTracking> createFunctionUpdatedClientTracking(final ClientTracking clientTracking) {

@@ -1,5 +1,6 @@
 package com.complyt.v1.mappers;
 
+import com.complyt.domain.ClientTracking;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.TransactionNexusSummary;
@@ -37,6 +38,7 @@ public class SalesTaxTrackingMapperTest {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTracking = testUtilities.createSalesTaxTracking(UUID.randomUUID().toString())
                 .withNexusCalculationSummaries(Map.of(localDateTime.toLocalDate(), new NexusCalculationSummary(1, BigDecimal.valueOf(1200))))
+                .withClientTracking(testUtilities.createClientTracking(testUtilities.tenantId).withInternalTimestamps(new Timestamps(localDateTime, localDateTime)))
                 .withTransactionNexusSummaries(Map.of(transactionId, new TransactionNexusSummary(BigDecimal.valueOf(1200), localDateTime, TransactionType.INVOICE)));
         salesTaxTrackingWithWhatsExposedToDto = salesTaxTracking
                 .withTenantId(null).withId(null).withComplytId(salesTaxTracking.getComplytId())

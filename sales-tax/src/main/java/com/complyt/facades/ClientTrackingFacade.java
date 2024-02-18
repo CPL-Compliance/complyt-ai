@@ -20,20 +20,20 @@ public class ClientTrackingFacade {
         return clientTrackingService.findAll(page, size);
     }
 
-    public Mono<ClientTracking> getByTenantId(String tenantId) {
+    public Mono<ClientTracking> getByTenantId(@NonNull String tenantId) {
         return clientTrackingService.getByTenantId(tenantId);
     }
 
-    public Flux<ClientTracking> getByName(String name) {
+    public Flux<ClientTracking> getByName(@NonNull String name) {
         return clientTrackingService.getByName(name);
     }
 
-    public Mono<ClientTracking> saveClientTracking(ClientTracking clientTracking, String tenantId) {
+    public Mono<ClientTracking> saveClientTracking(@NonNull ClientTracking clientTracking, @NonNull String tenantId) {
         return clientTrackingService.injectDataToNewClientTracking(clientTracking)
                 .flatMap(updatedClientTracking -> clientTrackingService.saveByTenantId(updatedClientTracking, tenantId));
     }
 
-    public Mono<ClientTracking> updateIfModified(ClientTracking newClientTracking, ClientTracking originalClientTracking, String tenantId) {
+    public Mono<ClientTracking> updateIfModified(@NonNull ClientTracking newClientTracking, @NonNull ClientTracking originalClientTracking, @NonNull String tenantId) {
         return originalClientTracking.equals(newClientTracking) ?
                 Mono.just(newClientTracking) :
                 clientTrackingService.update(newClientTracking, originalClientTracking)

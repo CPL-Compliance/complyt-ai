@@ -4,6 +4,8 @@ public class TestUtilities {
 
     public static final String TRANSACTION_BASE_URL = "/v1/transactions";
     public static final String CUSTOMER_BASE_URL = "/v1/customers";
+
+    public static final String CLIENT_TRACKING_BASE_URL = "/v1/clientTracking";
     public static final String SALES_TAX_TRACKING_BASE_URL = "/v1/nexus";
     public static final String SALES_TAX_RATES_BASE_URL = "/v1/sales_tax_rates";
     public static final String FILES_BASE_URL = "/v1/files";
@@ -14,6 +16,7 @@ public class TestUtilities {
     public static final String API_KEY_CLIENT_ID = "78fd4034-53af-4144-b2da-27ac31cdf45c";
     public static final String API_KEY_CLIENT_SECRET = "3d446591-d839-4906-97fe-85e1b51df0c8";
 
+    public static final String NULL_STRING = "null";
 
     public static String unvalidatedSalesTaxTrackingJsonExample(String stateName, String stateAbbreviation) {
         return salesTaxTrackingJsonExample(stateName, stateAbbreviation, null, false);
@@ -23,6 +26,15 @@ public class TestUtilities {
         return salesTaxTrackingJsonExample(stateName, stateAbbreviation, complytId, true);
     }
 
+    public static String clientTrackingJsonExample(String name, String tenantId) {
+            return "{\n" +
+                    "    \"nexus\": {\n" +
+                    "        \"taxableDate\": \"2015-06-01T00:00:00\"\n" +
+                    "    },\n" +
+                    "    \"name\": \"" + name + "\",\n" +
+                    "    \"tenantId\": \"" + tenantId + "\"\n" +
+                    "}";
+    }
 
     private static String salesTaxTrackingJsonExample(String stateName, String stateAbbreviation, String complytId, boolean isValidated) {
         return String.format("""

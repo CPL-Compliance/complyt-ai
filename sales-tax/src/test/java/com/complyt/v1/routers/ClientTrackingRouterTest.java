@@ -544,7 +544,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = map.get("message").toString();
-                    assertTrue(message.contains(GenericErrorMessages.TENANT_ID_FORMAT));
+                    assertTrue(message.contains("tenantId " + GenericErrorMessages.CONFLICTED_WITH_URL_ERROR));
                 });
     }
 

@@ -11,7 +11,7 @@ public interface TenantIdCheckable {
             (sourceCheckable, serverRequest) ->
                     Mono.just(serverRequest.pathVariable("tenantId"))
                             .flatMap(source -> source.equals(sourceCheckable.tenantId()) ?
-                                    Mono.empty() : Mono.just(DtoErrorMessages.TENANT_ID_FORMAT));
+                                    Mono.empty() : Mono.just("tenantId " + DtoErrorMessages.CONFLICTED_WITH_URL_ERROR));
 
     String tenantId();
 }

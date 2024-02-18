@@ -30,7 +30,9 @@
       ],
       "defaultClientScopes": [
         "create:api_key",
-        "create:secret_key"
+        "create:secret_key",
+        "read:client_tracking",
+        "update:client_tracking"
       ]
     },
     {
@@ -187,6 +189,14 @@
     },
     {
       "name": "dummy:dummy",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "read:client_tracking",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "update:client_tracking",
       "protocol": "openid-connect"
     }
   ],
