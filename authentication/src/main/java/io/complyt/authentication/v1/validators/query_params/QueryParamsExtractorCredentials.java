@@ -15,7 +15,6 @@ public class QueryParamsExtractorCredentials implements QueryParamsExtractor<Api
     @Override
     public Mono<ApiKeyDto> extract(@NotNull ServerRequest serverRequest) {
         Optional<MediaType> mediaType = serverRequest.headers().contentType();
-//        MediaType mediaType = serverRequest.headers().contentType().orElse(MediaType.APPLICATION_FORM_URLENCODED);
 
         if (mediaType.isPresent() && mediaType.get().equals(MediaType.APPLICATION_FORM_URLENCODED)) {
             return serverRequest.formData()
