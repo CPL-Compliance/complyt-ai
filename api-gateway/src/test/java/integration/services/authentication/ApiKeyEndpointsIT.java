@@ -10,6 +10,8 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
 
     @Test
     public void authentication_apiKey_post_clientCredentialsExists_Returns201() {
+        String apiKey = TestUtilities.getClientCredentialsJsonExample();
+
         WEB_TEST_CLIENT
                 .post()
                 .uri(uriBuilder -> uriBuilder
@@ -19,7 +21,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                     headers.setBearerAuth(TOKEN_COMPLYT_ADMIN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.getClientCredentialsJsonExample())
+                .bodyValue(apiKey)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
@@ -29,6 +31,8 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
 
     @Test
     public void authentication_apiKey_post_noJwt_Returns401() {
+        String apiKey = TestUtilities.getNonExistingClientCredentialsJsonExample();
+
         WEB_TEST_CLIENT
                 .post()
                 .uri(uriBuilder -> uriBuilder
@@ -37,13 +41,15 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                 .headers(headers -> {
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.getNonExistingClientCredentialsJsonExample())
+                .bodyValue(apiKey)
                 .exchange()
                 .expectStatus().isUnauthorized();
     }
 
     @Test
     public void authentication_apiKey_post_notSuitableJwt_Returns403() {
+        String apiKey = TestUtilities.getNonExistingClientCredentialsJsonExample();
+
         WEB_TEST_CLIENT
                 .post()
                 .uri(uriBuilder -> uriBuilder
@@ -53,13 +59,14 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.getNonExistingClientCredentialsJsonExample())
+                .bodyValue(apiKey)
                 .exchange()
                 .expectStatus().isForbidden();
     }
 
     @Test
     public void authentication_apiKey_delete_sentAsURLEncoded_clientApiKeyExists_SuccessfulDeletion_Returns204() {
+        String apiKey = TestUtilities.apiKey1UrlEncodedExample();
 
         WEB_TEST_CLIENT
                 .method(HttpMethod.DELETE)
@@ -68,13 +75,15 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                         .build())
                 .headers(headers -> headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED))
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
-                .bodyValue(TestUtilities.apiKey1UrlEncodedExample())
+                .bodyValue(apiKey)
                 .exchange()
                 .expectStatus().isNoContent();
     }
 
     @Test
     public void authentication_apiKey_delete_sentAsJson_clientApiKeyExists_SuccessfulDeletion_Returns204() {
+        String apiKey = TestUtilities.apiKey2JsonExample();
+
         WEB_TEST_CLIENT
                 .method(HttpMethod.DELETE)
                 .uri(uriBuilder -> uriBuilder
@@ -82,7 +91,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                         .build())
                 .headers(headers -> headers.setContentType(MediaType.APPLICATION_JSON))
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
-                .bodyValue(TestUtilities.apiKey2JsonExample())
+                .bodyValue(apiKey)
                 .exchange()
                 .expectStatus().isNoContent();
     }
@@ -121,6 +130,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
 
     @Test
     public void authentication_apiKey_delete_sentAsJson_NoContentTypeProvidedAndApiKeyIsValid_ReturnsClientError() {
+        String apiKey = TestUtilities.apiKeyJsonExample();
 
         WEB_TEST_CLIENT
                 .method(HttpMethod.DELETE)
@@ -128,13 +138,14 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                         .path(TestUtilities.API_KEY_BASE_URL)
                         .build())
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
-                .bodyValue(TestUtilities.apiKeyJsonExample())
+                .bodyValue(apiKey)
                 .exchange()
                 .expectStatus().is4xxClientError();
     }
 
     @Test
     public void authentication_apiKey_delete_sentAsURLEncoded_NoContentTypeProvidedAndApiKeyIsValid_ReturnsClientError() {
+        String apiKey = TestUtilities.apiKeyUrlEncodedExample();
 
         WEB_TEST_CLIENT
                 .method(HttpMethod.DELETE)
@@ -142,7 +153,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                         .path(TestUtilities.API_KEY_BASE_URL)
                         .build())
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
-                .bodyValue(TestUtilities.apiKeyUrlEncodedExample())
+                .bodyValue(apiKey)
                 .exchange()
                 .expectStatus().is4xxClientError();
     }

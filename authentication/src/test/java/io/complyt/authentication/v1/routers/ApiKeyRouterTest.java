@@ -29,6 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import test_utils.unit_tests.TestUtilities;
+import test_utils.unit_tests.templates.DeleteRouterTestMonoTemplate;
 import test_utils.unit_tests.templates.PostCreatedRouterMonoTest;
 import test_utils.unit_tests.templates.PostRouterTestSecurityTemplate;
 
@@ -43,7 +44,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @ContextConfiguration(classes = {ApiKeyRouter.class, ApiKeyHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class, GlobalExceptionHandler.class, GlobalErrorAttributes.class,
         QueryParamsExtractorEmpty.class, QueryParamsExtractorCredentials.class})
-class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecurityTemplate {
+class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecurityTemplate, DeleteRouterTestMonoTemplate {
     @Autowired
     ApiKeyRouter apiKeyRouter;
 
@@ -196,10 +197,9 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
                 .expectStatus().isForbidden();
     }
 
-    // tests
     @Test
     @WithMockUser
-//    @Override
+    @Override
     public void delete_SentAsFormURLEncoded_Exists_Returns204() {
         // Given
         Credentials cancelledCredentials = credentials.withStatus(ApiKeyStatus.CANCELLED);
@@ -224,6 +224,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @WithMockUser
+    @Override
     public void delete_SentAsJson_Exists_Returns204() {
         // Given
         Credentials cancelledCredentials = credentials.withStatus(ApiKeyStatus.CANCELLED);
@@ -246,7 +247,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     }
 
     @Test
-//    @Override
+    @Override
     @WithMockUser
     public void delete_DoesntExist_Returns204() {
         // When
@@ -268,7 +269,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     }
 
     @Test
-//    @Override
+    @Override
     @WithMockUser
     public void delete_InternalServerError_ReturnInternalServerError() {
         // When
@@ -290,7 +291,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     }
 
     @Test
-//    @Override
+    @Override
     public void delete_NullHandler_ThrowsNullPointerException() {
         // Given
         ApiKeyRouter apiKeyRouter = new ApiKeyRouter();
@@ -306,7 +307,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
 
     @Test
-//    @Override
+    @Override
     public void delete_UnauthenticatedUser_Returns401() {
         // When
         String body = "clientId=" + apiKeyDto.clientId() +
@@ -328,7 +329,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @WithMockUser
-//    @Override
+    @Override
     public void delete_missingCsrfToken_return403() {
         // When
         String body = "clientId=" + apiKeyDto.clientId() +

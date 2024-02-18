@@ -53,6 +53,10 @@ public class Auth0AuthorizationServerWrapperTest {
     String contentTypeHeaderValue = "application/x-www-form-urlencoded";
     String authorizationHeaderName = "Authorization";
     String authorizationHeaderValue = "Bearer " + managementToken;
+    String clientName = "client Name";
+    String tenantId = "tenant ID";
+    String newClientId = "New Client ID";
+    String newClientSecret = "New Client Secret";
 
     @BeforeEach
     void setUp() {
@@ -155,10 +159,6 @@ public class Auth0AuthorizationServerWrapperTest {
     @Test
     void removeApiKeyFromClient_validCredentials_ReturnsAuth0Client() {
         // Given
-        String clientName = "client Name";
-        String tenantId = "tenant ID";
-        String newClientId = "New Client ID";
-        String newClientSecret = "New Client Secret";
         String contentTypeHeaderValue = "application/json";
         Auth0Client auth0Client = TestUtilities.createAuth0Client();
 
@@ -186,12 +186,7 @@ public class Auth0AuthorizationServerWrapperTest {
     @Test
     void removeApiKeyFromClient_Auth0ServiceIsUnavailable_is5RetriesExhausted() {
         // Given
-        String clientName = "client Name";
-        String tenantId = "tenant ID";
-        String newClientId = "New Client ID";
-        String newClientSecret = "New Client Secret";
         String contentTypeHeaderValue = "application/json";
-
 
         String json = "{ \"name\": \"" + clientName +
                 "\", \"client_metadata\": { \"tenant_id\": \"" + tenantId +
@@ -221,10 +216,7 @@ public class Auth0AuthorizationServerWrapperTest {
     @Test
     void removeApiKeyFromClient_newClientIdIsNull_ReturnsAuth0Client() {
         // Given
-        String clientName = "client Name";
-        String tenantId = "tenant ID";
         String newClientId = null;
-        String newClientSecret = "New Client Secret";
         String contentTypeHeaderValue = "application/json";
 
         Auth0Client auth0Client = TestUtilities.createAuth0Client();
@@ -253,9 +245,6 @@ public class Auth0AuthorizationServerWrapperTest {
     @Test
     void removeApiKeyFromClient_newClientSecretIsNull_ReturnsAuth0Client() {
         // Given
-        String clientName = "client Name";
-        String tenantId = "tenant ID";
-        String newClientId = "New Client ID";
         String newClientSecret = null;
         String contentTypeHeaderValue = "application/json";
         Auth0Client auth0Client = TestUtilities.createAuth0Client();
