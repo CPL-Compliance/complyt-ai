@@ -54,13 +54,13 @@ spring:
         # ==== Open API ====
         # ==== Sales Tax Service ====
         # ---- ClientTracking ----
-        - id: sales-tax-get-clientTracking
+        - id: sales-tax-get-client-tracking
           uri: lb://sales-tax
           predicates:
           - Method=GET
           - Path=/v1/clientTracking
           filters:
-          - SetPath=/v1/client-tracking
+          - SetPath=/v1/clientTracking
         - id: sales-tax-get-client-tracking-by-name
           uri: lb://sales-tax
           predicates:
@@ -75,7 +75,7 @@ spring:
             - Method=GET
             - Path=/v1/clientTracking/tenantId/{tenantId}
           filters:
-            - SetPath=/v1/client-tracking/tenantId/{tenantId}
+            - SetPath=/v1/clientTracking/tenantId/{tenantId}
         - id: sales-tax-put-client-tracking
           uri: lb://sales-tax
           predicates:
