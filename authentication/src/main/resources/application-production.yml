@@ -53,7 +53,8 @@ spring:
     mongodb:
       uri: ${mongo-uri}
       database: ${db-name}
-  logging:
+
+logging:
   level:
     root: INFO
     web: INFO
@@ -67,6 +68,7 @@ spring:
 crypto.secret-key: ${secret-key}
 token-service.token-expiration-safe-window-sec: ${token-expiration-safe-window-sec}
 authorization:
+  issuer-uri: ${issuer-uri}
   grant-type: ${grant-type}
   audience: ${audience}
   authorization-server-base-url: ${authorization-server-base-url}
