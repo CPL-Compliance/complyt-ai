@@ -60,8 +60,8 @@ spring:
           - Method=GET
           - Path=/v1/clientTracking
           filters:
-          - SetPath=/v1/clientTracking
-        - id: sales-tax-get-clientTracking-by-name
+          - SetPath=/v1/client-tracking
+        - id: sales-tax-get-client-tracking-by-name
           uri: lb://sales-tax
           predicates:
             - Method=GET
@@ -69,14 +69,14 @@ spring:
           filters:
             - SetPath=/v1/clientTracking/name/{name}
 
-        - id: sales-tax-get-clientTracking-by-tenantId
+        - id: sales-tax-get-client-tracking-by-tenantId
           uri: lb://sales-tax
           predicates:
             - Method=GET
             - Path=/v1/clientTracking/tenantId/{tenantId}
           filters:
-            - SetPath=/v1/clientTracking/tenantId/{tenantId}
-        - id: sales-tax-put-clientTracking
+            - SetPath=/v1/client-tracking/tenantId/{tenantId}
+        - id: sales-tax-put-client-tracking
           uri: lb://sales-tax
           predicates:
             - Method=PUT
