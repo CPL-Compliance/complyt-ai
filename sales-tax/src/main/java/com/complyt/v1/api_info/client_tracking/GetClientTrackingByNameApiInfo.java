@@ -71,14 +71,14 @@ import java.lang.annotation.Target;
 })
 
 public @interface GetClientTrackingByNameApiInfo {
-    String name = "Raz Adani";
+    String name = "Raz";
 
     String clientTrackingName = """
             [{
                 "complytId": "9f8ee193-1a71-42b4-801d-ee1d8a161fbe",
                 "externalId": "externalIdExample",
                 "source": "sourceExample",
-                "name": "Raz Adani",
+                "name": "Raz",
                 "nexus": {
                     "taxableDate": "2015-06-01T00:00:00"
                 },

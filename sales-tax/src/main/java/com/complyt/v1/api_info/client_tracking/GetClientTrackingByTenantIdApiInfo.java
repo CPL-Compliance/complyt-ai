@@ -78,7 +78,7 @@ public @interface GetClientTrackingByTenantIdApiInfo {
                 "complytId": "9f8ee193-1a71-42b4-801d-ee1d8a161fbe",
                 "externalId": "externalIdExample",
                 "source": "sourceExample",
-                "name": "Raz Adani",
+                "name": "Alex",
                 "nexus": {
                     "taxableDate": "2015-06-01T00:00:00"
                 },
