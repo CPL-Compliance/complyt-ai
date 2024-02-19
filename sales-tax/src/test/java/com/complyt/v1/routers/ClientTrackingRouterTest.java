@@ -230,6 +230,30 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
                 .expectStatus().isUnauthorized();
     }
 
+    @Override
+    @Test
+    @WithMockUser
+    public void getByName_PathVariableInvalid_Returns400() {
+        String invalidName = testUtilities.stringWithLength(258);
+
+        // When
+        when(clientTrackingFacade.getByName(name)).thenReturn(Flux.just(clientTracking));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ClientTrackingRouter.BASE_URL + "/name/" + invalidName)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = map.get("message").toString();
+                    assertTrue(message.contains(GenericErrorMessages.MAX_256_ERROR));
+                });
+    }
+
 
     @Override
     @Test
@@ -288,6 +312,8 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     @Test
     @WithMockUser
     public void getByTenantId_PathVariableInvalid_Returns400() {
+        String invalidTenantId = testUtilities.stringWithLength(50);
+
         // When
         when(clientTrackingFacade.getByTenantId(tenantId)).thenReturn(Mono.just(clientTracking));
 
@@ -295,7 +321,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + "null")
+                        .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + invalidTenantId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -308,7 +334,6 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
     public void getByTenantId_UnauthenticatedUser_Returns401() {
         // When
         when(clientTrackingFacade.getByTenantId(tenantId)).thenReturn(Mono.just(clientTracking));
@@ -317,11 +342,11 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + "null")
+                        .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest();
+                .expectStatus().isUnauthorized();
     }
 
     @Override
@@ -386,6 +411,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     @Test
     @WithMockUser
     public void upsertByTenantId_PathVariableInvalid_Returns400() {
+        String invalidTenantId = testUtilities.stringWithLength(50);
         // When
         when(clientTrackingFacade.getByTenantId(tenantId)).thenReturn(Mono.just(clientTracking));
         when(clientTrackingFacade.updateIfModified(clientTracking, clientTracking, tenantId)).thenReturn(Mono.just(clientTracking));
@@ -396,7 +422,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + "null")
+                        .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + invalidTenantId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(ClientTrackingDtoTenant)

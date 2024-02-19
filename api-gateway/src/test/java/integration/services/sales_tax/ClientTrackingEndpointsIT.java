@@ -198,6 +198,27 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
                 .expectStatus().isNotFound();
     }
 
+    @Order(2)
+    @Test
+    @Override
+    public void getByName_PathVariableInvalid_Returns400() {
+        // Given
+        String name = TestUtilities.stringWithLength(257);
+
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CLIENT_TRACKING_BASE_URL + "/name/" + name)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN_COMPLYT_ADMIN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
 
     @Order(2)
     @Test
@@ -250,7 +271,7 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Override
     public void getByTenantId_PathVariableInvalid_Returns400() {
         // Given
-        String tenantId = "invalidTenantId";
+        String tenantId = TestUtilities.stringWithLength(257);
 
         // Then
         WEB_TEST_CLIENT
@@ -296,7 +317,7 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Override
     public void upsertByTenantId_PathVariableInvalid_Returns400() {
         // Given
-        String tenantId = "invalidTenantId";
+        String tenantId = TestUtilities.stringWithLength(257);
         String name = "RAZ";
 
         // Then

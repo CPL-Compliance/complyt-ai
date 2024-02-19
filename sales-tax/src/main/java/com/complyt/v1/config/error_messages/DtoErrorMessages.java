@@ -40,4 +40,6 @@ public interface DtoErrorMessages {
 
     String TENANT_ID_FORMAT = "invalid tenantId provided. please provide a valid parameter";
 
+    String MAX_256_ERROR = "should be up to 256 characters maximum";
+
 }

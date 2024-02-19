@@ -11,6 +11,8 @@ public interface GenericErrorMessages {
     String UNSUPPORTED_MEDIA_TYPE = "415 Unsupported Media Type";
     String TENANT_ID_FORMAT = "invalid tenantId provided. please provide a valid parameter";
 
+    String MAX_256_ERROR = "should be up to 256 characters maximum";
+
     String NOT_NULL = "may not be null";
 
     String CONFLICTED_WITH_URL_ERROR = "in body and path should be identical";

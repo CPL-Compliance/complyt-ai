@@ -60,10 +60,11 @@ public class ClientTrackingHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Flux<ClientTrackingDtoTenant> ClientTrackingDtoTenantFlux = ContextLogger.observeCtx(logStr, log::info)
-                .thenMany(clientTrackingFacade.getByName(name))
+                .thenMany(ClientTrackingDtoTenantValidationHandler.handle(serverRequest))
+                .switchIfEmpty(Flux.defer(() ->clientTrackingFacade.getByName(name))
                 .map(ClientTrackingMapper.INSTANCE::clientTrackingToClientTrackingDtoTenant)
                 .flatMap(ClientTrackingDtoTenant -> ContextLogger.observeCtx("<-- Returned Body: " + ClientTrackingDtoTenant, log::info).thenReturn(ClientTrackingDtoTenant))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(ClientTrackingDtoTenantFlux, ClientTrackingDtoTenant.class);
     }

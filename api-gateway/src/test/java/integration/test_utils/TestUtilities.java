@@ -312,4 +312,9 @@ public class TestUtilities {
         );
     }
 
+    public static String stringWithLength(int length) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (; 0 < length; length--) stringBuilder.append('a');
+        return stringBuilder.toString();
+    }
 }

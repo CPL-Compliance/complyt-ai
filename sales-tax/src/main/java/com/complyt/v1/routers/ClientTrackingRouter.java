@@ -14,29 +14,29 @@ public class ClientTrackingRouter {
 
     @Bean
     public RouterFunction<ServerResponse> getAll(@NonNull final ClientTrackingHandler clientTrackingHandler) {
-        RequestPredicate putClientTrackingRoute = RequestPredicates
+        RequestPredicate getClientTrackingRoute = RequestPredicates
                 .GET(BASE_URL)
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
-        return RouterFunctions.route(putClientTrackingRoute, clientTrackingHandler::getAll);
+        return RouterFunctions.route(getClientTrackingRoute, clientTrackingHandler::getAll);
     }
 
     @Bean
     public RouterFunction<ServerResponse> getByName(@NonNull final ClientTrackingHandler clientTrackingHandler) {
-        RequestPredicate putClientTrackingRoute = RequestPredicates
+        RequestPredicate getClientTrackingRoute = RequestPredicates
                 .GET(BASE_URL + "/name/{name}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
-        return RouterFunctions.route(putClientTrackingRoute, clientTrackingHandler::getByName);
+        return RouterFunctions.route(getClientTrackingRoute, clientTrackingHandler::getByName);
     }
 
     @Bean
     public RouterFunction<ServerResponse> getByTenantId(@NonNull final ClientTrackingHandler clientTrackingHandler) {
-        RequestPredicate putClientTrackingRoute = RequestPredicates
+        RequestPredicate getClientTrackingRoute = RequestPredicates
                 .GET(BASE_URL + "/tenantId/{tenantId}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
-        return RouterFunctions.route(putClientTrackingRoute, clientTrackingHandler::getByTenantId);
+        return RouterFunctions.route(getClientTrackingRoute, clientTrackingHandler::getByTenantId);
     }
 
     @Bean

@@ -6,6 +6,7 @@ import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.ClientTrackingDtoTenant;
 import com.complyt.v1.routers.ClientTrackingRouter;
 import integration.TestContainersInitializerIT;
+import org.apache.commons.math.stat.inference.TestUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,8 +22,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -40,7 +44,7 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     TenantResolver tenantResolver;
     @Autowired
     private WebTestClient webTestClient;
-
+    private UnitTestUtilities testUtilities;
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -51,6 +55,7 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     void setup() {
         // Given
         String tenantId = "org_12345";
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
     }
 
@@ -240,6 +245,27 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Test
     @Override
     @WithMockUser
+    public void getByName_PathVariableInvalid_Returns400() {
+        // Given
+        String invalidName = testUtilities.stringWithLength(257);
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ClientTrackingRouter.BASE_URL + "/name/" + invalidName)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertTrue(map.get("message").toString().contains(GenericErrorMessages.MAX_256_ERROR)));;
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
     public void getByTenantId_Exists_Returns200() {
         // Given
         String tenantId = "org_12345";
@@ -282,13 +308,13 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @WithMockUser
     public void getByTenantId_PathVariableInvalid_Returns400() {
         // Given
-        String tenantId = "invalidTenantId";
+        String invalidTenantId = testUtilities.stringWithLength(50);
 
         // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId)
+                        .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + invalidTenantId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -325,7 +351,8 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     public void upsertByTenantId_PathVariableInvalid_Returns400() {
         // Given
         String name = "name";
-        String tenantId = "invalidTenantId";
+        String invalidTenantId = testUtilities.stringWithLength(50);
+        String tenantId = "org_12345";
         ClientTrackingDtoTenant clientTrackingDtoTenant = ITUtilities.stubClientTrackingDtoTenant(tenantId, name);
 
         // Then
@@ -333,7 +360,7 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId)
+                        .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + invalidTenantId)
                         .build())
                 .bodyValue(clientTrackingDtoTenant)
                 .accept(MediaType.APPLICATION_JSON)
