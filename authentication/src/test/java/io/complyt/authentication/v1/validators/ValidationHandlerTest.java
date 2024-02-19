@@ -262,17 +262,15 @@ class ValidationHandlerTest {
         StepVerifier.create(apiKeyDtoMono).expectError().verify();
     }
     @Test
-    void handle_jsonTypeSentWithoutContentTypeHeader_return() {
-        // Given
-        ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
+    void handle_noContentTypeHeader_throwsError() {
         // When
         ServerRequest.Headers headersMock = mock(ServerRequest.Headers.class);
         when(serverRequest.headers()).thenReturn(headersMock);
-        when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.just(apiKeyDto));
+        when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.error(new UnsupportedMediaTypeException("error")));
 
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 
         // Then
-        StepVerifier.create(apiKeyDtoMono).expectNext(apiKeyDto).verifyComplete();
+        StepVerifier.create(apiKeyDtoMono).expectError().verify();
     }
 }
