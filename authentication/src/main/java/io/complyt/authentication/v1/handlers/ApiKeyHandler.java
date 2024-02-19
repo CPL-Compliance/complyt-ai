@@ -67,4 +67,5 @@ public class ApiKeyHandler {
                 .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code "
                         + serverResponse.statusCode(), log::info).thenReturn(serverResponse));
     }
+
 }
