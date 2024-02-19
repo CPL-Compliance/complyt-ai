@@ -31,4 +31,5 @@ public class EurekaConfig {
 
         return config;
     }
+
 }
