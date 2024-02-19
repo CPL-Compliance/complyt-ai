@@ -1,8 +1,10 @@
 package io.complyt.authentication.config;
 
+import io.complyt.authentication.business.authorization.AuthorizationServerWrapper;
 import io.complyt.authentication.repositories.CredentialsRepository;
 import io.complyt.authentication.repositories.TokenRepository;
 import io.complyt.authentication.security.Crypto;
+import io.complyt.authentication.services.AuthorizationService;
 import io.complyt.authentication.services.CredentialsService;
 import io.complyt.authentication.services.TokenService;
 import org.junit.jupiter.api.BeforeEach;
@@ -202,5 +204,48 @@ class ServicesConfigTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "audience is marked non-null but is null");
+    }
+
+    @Test
+    void authorizationService_createAuthorizationService_returnAuthorizationService() {
+        // Given
+        AuthorizationServerWrapper authorizationServerWrapper = mock(AuthorizationServerWrapper.class);
+        Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
+
+        // When
+        AuthorizationService expectedAuthorizationService = new AuthorizationService(authorizationServerWrapper, cryptoAesGcmNoPadding);
+
+        AuthorizationService actualAuthorizationService = servicesConfig.authorizationService(authorizationServerWrapper, cryptoAesGcmNoPadding);
+
+        // Then
+        assertEquals(expectedAuthorizationService, actualAuthorizationService);
+    }
+
+    @Test
+    void authorizationService_authorizationServerWrapperIsNull_throwsNullException() {
+        // Given
+        AuthorizationServerWrapper authorizationServerWrapper = mock(AuthorizationServerWrapper.class);
+        Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            servicesConfig.authorizationService(null, cryptoAesGcmNoPadding);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "authorizationServerWrapper is marked non-null but is null");
+    }
+
+    @Test
+    void authorizationService_cryptoAesGcmNoPaddingIsNull_throwsNullException() {
+        // Given
+        AuthorizationServerWrapper authorizationServerWrapper = mock(AuthorizationServerWrapper.class);
+        Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            servicesConfig.authorizationService(authorizationServerWrapper, null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "cryptoAesGcmNoPadding is marked non-null but is null");
     }
 }

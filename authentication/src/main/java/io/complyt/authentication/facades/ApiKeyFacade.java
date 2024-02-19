@@ -3,7 +3,9 @@ package io.complyt.authentication.facades;
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.services.ApiKeyService;
+import io.complyt.authentication.services.AuthorizationService;
 import io.complyt.authentication.services.CredentialsService;
+import io.complyt.authentication.services.TokenService;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +23,24 @@ public class ApiKeyFacade {
     @NonNull
     ApiKeyService apiKeyService;
 
+    @NonNull
+    TokenService tokenService;
+
+    @NonNull
+    AuthorizationService authorizationService;
+
     public Mono<ApiKey> saveCredentials(@NonNull final Credentials credentials) {
         ApiKey apiKey = apiKeyService.generate();
-        return credentialsService.saveCredentials(credentials, apiKey).thenReturn(apiKey);
+        return authorizationService.getTenantIdAndClientName(credentials)
+                .flatMap(tenantIdAndNameObject -> credentialsService.saveCredentials(credentials, apiKey, tenantIdAndNameObject.getTenantId(), tenantIdAndNameObject.getName()).thenReturn(apiKey));
+    }
+
+    public Mono<Credentials> markAsCancelled(@NonNull final ApiKey apiKey) {
+
+        return credentialsService.markAsCancelled(apiKey)
+                .flatMap(credentials -> authorizationService.getManagementAccessToken()
+                        .flatMap(accessToken -> authorizationService.deleteApiKey(credentials, accessToken)
+                            .then(tokenService.deleteToken(apiKey)
+                                .thenReturn(credentials))));
     }
 }

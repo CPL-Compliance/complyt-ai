@@ -5,6 +5,7 @@ import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.services.AuthorizationService;
 import io.complyt.authentication.services.CredentialsService;
 import io.complyt.authentication.services.TokenService;
+import io.complyt.authentication.v1.exceptions.types.ApiKeyNotValidException;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +27,11 @@ public class TokenFacade {
     AuthorizationService authorizationService;
 
     public Mono<Token> getToken(final @NonNull ApiKey apiKey) {
-        return tokenService.findByApiKey(apiKey)
-                .switchIfEmpty(Mono.defer(() ->credentialsService.getCredentialsByApiKey(apiKey)
+        return tokenService.findByApiKeyAndDecrypt(apiKey)
+                .switchIfEmpty(Mono.defer(() -> credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey)
                         .flatMap(credentials -> authorizationService.getToken(credentials))
-                        .flatMap(tokenService::saveToken)));
+                        .switchIfEmpty(Mono.error(new ApiKeyNotValidException())))
+                        .flatMap(tokenService::saveToken));
+
     }
 }

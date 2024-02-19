@@ -1,6 +1,7 @@
 package io.complyt.authentication.repositories;
 
 import io.complyt.authentication.domain.Credentials;
+import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -91,5 +93,45 @@ class CredentialsRepositoryTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");
+    }
+
+    @Test
+    void markAsCancelled_complytClientIdIsValid_returnsCredentialsWithStatusCancelled() {
+        // Given
+        String complytClientId = "complytClientId";
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
+        Update update = Update.update("status", ApiKeyStatus.CANCELLED);
+        Credentials cancelledCredentials = credentials.withStatus(ApiKeyStatus.CANCELLED);
+
+        // When
+        when(reactiveMongoTemplate.findAndModify(query, update, Credentials.class)).thenReturn(Mono.just(cancelledCredentials));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsRepository.markAsCancelled(complytClientId);
+        StepVerifier.create(credentialsMono).expectNext(cancelledCredentials).verifyComplete();
+    }
+
+    @Test
+    void markAsCancelled_complytClientIdNotExists_returnsMonoEmpty() {
+        // Given
+        String complytClientId = "complytClientId";
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
+        Update update = Update.update("status", ApiKeyStatus.CANCELLED);
+
+        // When
+        when(reactiveMongoTemplate.findAndModify(query, update, Credentials.class)).thenReturn(Mono.empty());
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsRepository.markAsCancelled(complytClientId);
+        StepVerifier.create(credentialsMono).verifyComplete();
+    }
+
+    @Test
+    void markAsCancelled_complytClientIdIsNull_ThrowsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsRepository.markAsCancelled(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "complytClientId is marked non-null but is null");
     }
 }
