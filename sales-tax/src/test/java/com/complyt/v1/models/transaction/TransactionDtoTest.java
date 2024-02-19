@@ -43,6 +43,7 @@ class TransactionDtoTest {
                 ", taxableItemsAmount=" + transactionDto.taxableItemsAmount() +
                 ", tangibleItemsAmount=" + transactionDto.tangibleItemsAmount() +
                 ", totalItemsAmount=" + transactionDto.totalItemsAmount() +
+                ", totalDiscount=" + transactionDto.totalDiscount() +
                 ", transactionFilingStatus=" + transactionDto.transactionFilingStatus() + "]";
 
         // When

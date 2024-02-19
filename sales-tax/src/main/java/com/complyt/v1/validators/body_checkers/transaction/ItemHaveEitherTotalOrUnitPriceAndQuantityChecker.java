@@ -6,7 +6,7 @@ import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.body_checkers.DtoBodyChecker;
 import reactor.core.publisher.Flux;
 
-public class ItemHaveEitherTotalOrUnitPriceAndQuantity implements DtoBodyChecker<TransactionDto> {
+public class ItemHaveEitherTotalOrUnitPriceAndQuantityChecker implements DtoBodyChecker<TransactionDto> {
     @Override
     public Flux<String> check(TransactionDto transactionDto) {
         return transactionDto.items().stream()

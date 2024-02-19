@@ -35,7 +35,7 @@ public interface DtoErrorMessages {
 
     String STATE_FORMAT_ERROR = "invalid state provided. Please provide a valid state name or abbreviation.\";";
 
-    String TOTAL_AMOUNT_AFTER_DISCOUNT_IS_BELOW_ZERO = "total transaction price cannot be negative, please create a credit memo/refund with a positive price";
+    String TOTAL_AMOUNT_AFTER_DISCOUNT_IS_BELOW_ZERO = "total transaction price cannot be negative. please create a credit memo/refund with a positive price";
 
     String ITEM_WITH_NEGATIVE_TOTAL_CANNOT_HAVE_A_DISCOUNT = "item with negative price cannot have a discount";
 

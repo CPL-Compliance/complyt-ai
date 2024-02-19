@@ -128,7 +128,6 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
-        //todo: TransactionDiscountCollector
         return itemsTotalCalculator.injectRecalculatedTotal(transaction)
                 .flatMap(transactionWithCalculatedItems ->
                         productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItems)

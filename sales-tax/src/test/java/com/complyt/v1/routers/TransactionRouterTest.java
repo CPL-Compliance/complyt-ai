@@ -4639,7 +4639,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsert_NegativeQuantityInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
-        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("-200"), new BigDecimal("5000"), "desc", "HW Installation Services", "C1S1", null, null, false, BigDecimal.ZERO, null, null));
+        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("-200"), new BigDecimal("5000"),
+                null, "desc", "HW Installation Services", "C1S1",
+                null, null, false, BigDecimal.ZERO,
+                null, null,null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of("Item.quantity " + NumericErrorMessages.NOT_NEGATIVE_ERROR);
@@ -4696,7 +4699,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsert_NullNameInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
-        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"), "desc", null, "C1S1", null, null, false, BigDecimal.ZERO, null, null));
+        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
+                null, "desc", null, "C1S1", null,
+                null, false, BigDecimal.ZERO, null, null,null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4722,7 +4727,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsert_BlankNameInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
-        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"), "desc", "", "C1S1", null, null, false, BigDecimal.ZERO, null, null));
+        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
+                null, "desc", "", "C1S1", null,
+                null, false, BigDecimal.ZERO, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4748,7 +4755,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsert_LengthGreaterThen256NameInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
-        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"), "desc", testUtilities.stringWithLength(257), "C1S1", null, null, false, BigDecimal.ZERO, null, null));
+        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
+                null, "desc", testUtilities.stringWithLength(257), "C1S1",
+                null, null, false, BigDecimal.ZERO,
+                null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4774,7 +4784,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsert_NullTaxCodeInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
-        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"), "desc", "HW Installation Services", null, null, null, false, BigDecimal.ZERO, null, null));
+        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"), null,
+                "desc", "HW Installation Services", null, null,
+                null, false, BigDecimal.ZERO,
+                null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4800,7 +4813,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsert_LengthGreaterThen256TaxCodeInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
-        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"), "desc", "HW Installation Services", testUtilities.stringWithLength(257), null, null, false, BigDecimal.ZERO, null, null));
+        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),null,
+                "desc", "HW Installation Services", testUtilities.stringWithLength(257),
+                null, null, false, BigDecimal.ZERO,
+                null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4826,7 +4842,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsert_NegativeManualSalesTaxRateInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
-        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"), "desc", "HW Installation Services", "C1S1", null, null, false, new BigDecimal("-0.5"), null, null));
+        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
+                null, "desc", "HW Installation Services", "C1S1", null,
+                null, false, new BigDecimal("-0.5"),
+                null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4852,7 +4871,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsert_LargerThanMaxManualSalesTaxRateInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
-        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"), "desc", "HW Installation Services", "C1S1", null, null, false, new BigDecimal("0.5"), null, null));
+        itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
+                null, "desc", "HW Installation Services", "C1S1",
+                null, null, false, new BigDecimal("0.5"),
+                null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(

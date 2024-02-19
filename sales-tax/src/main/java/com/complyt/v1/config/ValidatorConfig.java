@@ -12,10 +12,7 @@ import com.complyt.v1.validators.DataConflictChecksProvider;
 import com.complyt.v1.validators.ParameterChecksProvider;
 import com.complyt.v1.validators.ShouldCallValidate;
 import com.complyt.v1.validators.ValidationHandler;
-import com.complyt.v1.validators.body_checkers.transaction.ItemsAlignmentChecker;
-import com.complyt.v1.validators.body_checkers.transaction.NegativeItemsNotHavingDiscountChecker;
-import com.complyt.v1.validators.body_checkers.transaction.TransactionDtoShippingAddressChecker;
-import com.complyt.v1.validators.body_checkers.transaction.TransactionTotalAmountChecker;
+import com.complyt.v1.validators.body_checkers.transaction.*;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractorEmpty;
 import com.complyt.v1.validators.custom_body.DateWrapperDtoCustomBodyExtractor;
 import com.complyt.v1.validators.param_checker.ParamCheckerFunctions;
@@ -72,6 +69,7 @@ public class ValidatorConfig {
                         new BodyCheckConfig(List.of(
                                 new TransactionDtoShippingAddressChecker(),
                                 new TransactionTotalAmountChecker(),
+                                new ItemHaveEitherTotalOrUnitPriceAndQuantityChecker(),
                                 new ItemsAlignmentChecker(),
                                 new NegativeItemsNotHavingDiscountChecker()
                         )).transactionDtoFluxFunction()),

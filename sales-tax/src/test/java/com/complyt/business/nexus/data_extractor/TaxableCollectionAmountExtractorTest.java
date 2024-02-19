@@ -4,6 +4,7 @@ import com.complyt.business.nexus.checker.qualification_check.QualificationCheck
 import com.complyt.domain.Taxable;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +48,11 @@ public class TaxableCollectionAmountExtractorTest {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         nexusStateRuleId = UUID.randomUUID().toString();
         customer = testUtilities.createCustomer(UUID.randomUUID().toString());
-        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
+        Transaction transactionBeforeCalculatedTotal = testUtilities.createTransaction(UUID.randomUUID().toString());
+        ShippingFee shippingFee = transactionBeforeCalculatedTotal.getShippingFee();
+        transaction = transactionBeforeCalculatedTotal
+                .withItems(testUtilities.setCalculatedTotalOnItemList(transactionBeforeCalculatedTotal.getItems()))
+                .withShippingFee(shippingFee.withCalculatedTotal(shippingFee.getTotalPrice()));
         nexusStateRule = testUtilities.createNexusStateRule(nexusStateRuleId);
         List<Taxable> taxables = testUtilities.createTaxables(transaction);
         taxableCollectionAmountExtractor = new TaxableCollectionAmountExtractor(qualificationChecker, taxables, nexusStateRule);

@@ -28,8 +28,6 @@ public class TransactionDiscountCollector implements TransactionAmountsCollector
 
         BigDecimal totalDiscount = discountablesTotalDiscountCalculator.calculate(originalDiscountables);
 
-
-        // creating a new transaction instead of 2 with to save 1 construction
         return transaction.withTotalDiscount(totalDiscount);
     }
 }

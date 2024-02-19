@@ -20,8 +20,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,10 +34,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TransactionProductClassificationDataInjectionManagerTest {
 
+    private UnitTestUtilities testUtilities;
     Transaction transaction;
 
     @BeforeEach
     void setUp() {
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = createTransaction();
     }
 
@@ -48,9 +52,12 @@ public class TransactionProductClassificationDataInjectionManagerTest {
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
         List<Item> items = new ArrayList<Item>() {
             {
-                add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "taxCode",
-                        null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO
-                        , TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
+                add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000),
+                        new BigDecimal(8000), "description", "name", "taxCode",
+                        null, new SalesTaxRates(new BigDecimal("0.5"),
+                        new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"),
+                        new BigDecimal("0.5"), null), false, null,
+                        BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
             }
         };
 
@@ -66,13 +73,10 @@ public class TransactionProductClassificationDataInjectionManagerTest {
     }
 
     private List<Item> createItemsNoRules() {
-        Item item1NoRule = new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1",
-                null, null, false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.NOT_TAXABLE);
-        Item item2NoRule = new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C2S2",
-                null, null, false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
+        List<Item> itemList = testUtilities.createItems(false, true);
         return new ArrayList<>() {{
-            add(item1NoRule);
-            add(item2NoRule);
+            add(itemList.get(0).withTaxableCategory(TaxableCategory.NOT_TAXABLE).withJurisdictionalSalesTaxRules(null));
+            add(itemList.get(1).withTaxCode("C2S2").withJurisdictionalSalesTaxRules(null));
         }};
     }
 

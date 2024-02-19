@@ -20,6 +20,7 @@ public record ItemDto(
         @Schema(description = FieldsDescriptions.UNIT_PRICE) BigDecimal unitPrice,
         @PositiveOrZero(message = "Item.quantity " + NumericErrorMessages.NOT_NEGATIVE_ERROR) @Schema(description = FieldsDescriptions.QUANTITY) BigDecimal quantity,
         @Schema(description = FieldsDescriptions.TOTAL_PRICE) BigDecimal totalPrice,
+        @Schema(description = FieldsDescriptions.CALCULATED_TOTAL) @PositiveOrZero(message = "Item.discount " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal calculatedTotal,
         String description,
         @NotNull(message = "Item.name " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "Item.name " + StringErrorMessages.MINMAX_256_ERROR) String name,
         @NotNull(message = "Item.taxCode " + DtoErrorMessages.NOT_NULL_ERROR) @Size(max = 256, message = "Item.taxCode " + StringErrorMessages.MINMAX_256_ERROR) String taxCode,
@@ -27,6 +28,5 @@ public record ItemDto(
         boolean manualSalesTax,
         @PositiveOrZero(message = "Item.manualSalesTaxRate " + NumericErrorMessages.NOT_NEGATIVE_ERROR) @DecimalMax(value = "0.2", message = "Item.manualSalesTaxRate" + NumericErrorMessages.DECIMAL_MAX_02_ERROR) BigDecimal manualSalesTaxRate,
         @Schema(description = FieldsDescriptions.DISCOUNT) @PositiveOrZero(message = "Item.discount " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal discount,
-        @Schema(description = FieldsDescriptions.CALCULATED_TOTAL) @PositiveOrZero(message = "Item.discount " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal calculatedTotal,
         TangibleCategoryDto tangibleCategory, TaxableCategoryDto taxableCategory) {
 }

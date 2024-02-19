@@ -38,7 +38,7 @@ class TransactionCityCountyInjectorTest {
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
         List<Item> items = new ArrayList<Item>() {
             {
-                add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), new BigDecimal(8000)
+                add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), new BigDecimal(8000),
                         "description", "name", "taxCode", null,
                         new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"),
                                 new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"),

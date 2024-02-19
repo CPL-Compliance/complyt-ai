@@ -21,6 +21,7 @@ import java.util.function.Function;
 public class TransactionTotalAmountChecker implements DtoBodyChecker<TransactionDto>, TransactionBodyFunctions {
 
     @Override
+    // check if the discount is not larger than all the items total
     public Flux<String> check(@NonNull TransactionDto transactionDto) {
         return Flux.from(Mono.just(transactionDto.items())
                         .map(calculateTotalItemsAmountAfterDiscount())

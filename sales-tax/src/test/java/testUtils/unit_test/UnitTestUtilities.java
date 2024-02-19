@@ -29,11 +29,13 @@ import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.validators.body_checkers.transaction.TransactionDtoShippingAddressChecker;
 import com.complyt.v1.validators.body_checkers.transaction.TransactionTotalAmountChecker;
 
+import javax.print.attribute.standard.SheetCollate;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -200,7 +202,7 @@ public class UnitTestUtilities {
                 customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()),
                 null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
                 TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
+                BigDecimal.ZERO, BigDecimal.ZERO, null, TransactionFilingStatus.NOT_FILED); //todo: added totaldiscount zero
     }
 
 //    public Transaction createTransactionWithDiscount(String id) {
@@ -221,61 +223,75 @@ public class UnitTestUtilities {
                 createCustomerDto(customerIdOtherDomains.toString()), null,
                 TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE,
                 shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO,
-                BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
+                BigDecimal.ZERO, null, TransactionFilingStatus.NOT_FILED); //added total discount null
     }
 
 //    public TransactionDto createTransactionDtoWithDiscount(String id) {
-//        DiscountDto discountDto = createDiscountDto(BigDecimal.valueOf(500), false, "description");
+//        List<Item> itemsWithDiscountList = createDiscountDto(BigDecimal.valueOf(500), false, "description");
 //        return createTransactionDto(id).withDiscount(discountDto);
 //    } //todo: fix
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
-            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
-                    null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
-            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
-                    null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
+            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), null, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+                    null, false, BigDecimal.ZERO, null, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
+            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), null, "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+                    null, false, BigDecimal.ZERO, null, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
 
         }};
     }
 
     public Item createItemWithNegativePrice(boolean withJurisdictionalRules, boolean withTangibleCategory) {
-        return new Item(new BigDecimal(-2000), new BigDecimal(4), new BigDecimal(-8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
-                null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE);
+        return new Item(new BigDecimal(-2000), new BigDecimal(4), new BigDecimal(-8000), null, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+                null, false, BigDecimal.ZERO, null, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE);
     }
 
     public List<Item> createItemsWithSalesTaxRate(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
-            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
-                    createSalesTaxRates(), false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
-            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
-                    createSalesTaxRates(), false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
+            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), null, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+                    createSalesTaxRates(), false, BigDecimal.ZERO, null, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
+            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), null, "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+                    createSalesTaxRates(), false, null, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
 
         }};
     }
 
+    public List<Item> setCalculatedTotalOnItemList(List<Item> items) {
+        return items.stream()
+                .map(item ->
+                     item.getDiscount() != null ?
+                            item.withCalculatedTotal(item.getTotalPrice()
+                                    .subtract(item.getDiscount())) :
+                            item.withCalculatedTotal(item.getTotalPrice())
+                ).collect(Collectors.toList());
+    }
+
+    public ShippingFee setCalculatedTotalOnShippingFee(ShippingFee shippingFee) {
+        return shippingFee.withCalculatedTotal(shippingFee.getTotalPrice());
+    }
+
     public List<ItemDto> createItemDtosWithSalesTaxRate(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
-            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
-                    createSalesTaxRatesDto(), false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
-            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
-                    createSalesTaxRatesDto(), false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
+            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), null, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+                    createSalesTaxRatesDto(), false, BigDecimal.ZERO, null, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
+            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), null, "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+                    createSalesTaxRatesDto(), false, BigDecimal.ZERO, null, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
         }};
     }
 
     public List<ItemDto> createItemDtos(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
-            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
-                    null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
-            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
-                    null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
+            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), null, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+                    null, false, BigDecimal.ZERO, null, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
+            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), null, "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+                    null, false, BigDecimal.ZERO, null, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
 
         }};
     }
 
     public ItemDto createItemDtoWithNegativeAmount(boolean withJurisdictionalRules, boolean withTangibleCategory) {
-            return new ItemDto(new BigDecimal(-2000), new BigDecimal(4), new BigDecimal(-8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
-                    null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE);
+        return new ItemDto(new BigDecimal(-2000), new BigDecimal(4), new BigDecimal(-8000), null, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+                null, false, BigDecimal.ZERO, null, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE);
     }
 
     public SalesTaxRates createSalesTaxRates() {
@@ -288,7 +304,10 @@ public class UnitTestUtilities {
 
     public ShippingFee createShippingFee(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
+        return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000),
+                withJurisdictionalRules ? rules : null, null, "C6S1",
+                TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null,
+                null);
     }
 
 //    public Discount createDiscount(BigDecimal discountAmount, boolean isPreTax, String discountDescription) {
@@ -297,7 +316,7 @@ public class UnitTestUtilities {
 
     public ShippingFee createShippingFeeWithSalesTaxRates(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, createSalesTaxRates(), "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
+        return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, createSalesTaxRates(), "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null, null);
     }
 
     public ShippingFeeDto createShippingFeeDto(boolean withJurisdictionalRules, boolean withTangibleCategory) {

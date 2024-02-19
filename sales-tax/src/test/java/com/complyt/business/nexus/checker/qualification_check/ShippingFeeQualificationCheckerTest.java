@@ -14,6 +14,7 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import com.complyt.domain.transaction.ShippingFee;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,21 +26,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ShippingFeeQualificationCheckerTest {
 
-    QualificationChecker qualificationChecker;
-    NexusStateRule nexusStateRule;
-    ShippingFee shippingFee;
+    private UnitTestUtilities testUtilities;
+    private QualificationChecker qualificationChecker;
+    private NexusStateRule nexusStateRule;
+    private ShippingFee shippingFee;
 
     @BeforeEach
     void setUp() {
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         qualificationChecker = new QualificationChecker();
         nexusStateRule = createNexusStateRule();
-        shippingFee = createShippingFee();
-    }
-
-    private ShippingFee createShippingFee() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), jurisdictionalSalesTaxRules,
-                new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.TANGIBLE);
+        shippingFee = testUtilities.createShippingFee(true, true)
+                .withTangibleCategory(TangibleCategory.TANGIBLE);
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {

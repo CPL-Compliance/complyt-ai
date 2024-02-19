@@ -27,7 +27,9 @@ public class ShippingFee implements Taxable {
     private final BigDecimal calculatedTotal;
 
     public final BigDecimal getTotalPrice() {
-        return totalPrice; //todo: remove all instances
+        return totalPrice != null ?
+        totalPrice:
+        BigDecimal.ZERO; //todo: remove all instances
     }
 
     @Override

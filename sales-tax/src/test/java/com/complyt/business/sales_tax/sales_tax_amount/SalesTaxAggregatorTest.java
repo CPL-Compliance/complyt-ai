@@ -2,6 +2,8 @@ package com.complyt.business.sales_tax.sales_tax_amount;
 
 import com.complyt.domain.Taxable;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,9 +37,11 @@ public class SalesTaxAggregatorTest {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
         salesTaxAggregator = new SalesTaxAggregator();
+        List<Item> itemsAfterCalculatedValue = testUtilities.setCalculatedTotalOnItemList(testUtilities.createItemsWithSalesTaxRate(true, true));
+        ShippingFee shippingFeeAfterCalculatedValue = testUtilities.setCalculatedTotalOnShippingFee(testUtilities.createShippingFeeWithSalesTaxRates(true, true));
         transaction = testUtilities.createTransaction(null)
-                .withItems(testUtilities.createItemsWithSalesTaxRate(true, true))
-                .withShippingFee(testUtilities.createShippingFeeWithSalesTaxRates(true, true));
+                .withItems(itemsAfterCalculatedValue)
+                .withShippingFee(shippingFeeAfterCalculatedValue);
     }
 
     @Test

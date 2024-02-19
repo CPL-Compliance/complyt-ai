@@ -9,8 +9,10 @@ import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import org.bson.types.ObjectId;
+import org.javatuples.Unit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,12 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NewTransactionInternalDateInjectorTest {
 
-    NewTransactionInternalTimestampsInjector newTransactionInternalDateInjector;
+    private UnitTestUtilities testUtilities;
+    private NewTransactionInternalTimestampsInjector newTransactionInternalDateInjector;
 
-    Transaction transaction;
+    private Transaction transaction;
 
     @BeforeEach
     void setup() {
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = createTransactionWithoutTimeStamps();
         newTransactionInternalDateInjector = new NewTransactionInternalTimestampsInjector(transaction);
     }
@@ -39,13 +43,15 @@ class NewTransactionInternalDateInjectorTest {
         String tenantId = UUID.randomUUID().toString();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip", false);
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
-        List<Item> items = new ArrayList<Item>() {
-            {
-                add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "taxCode",
-                        null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO
-                        , TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
-            }
-        };
+        List<Item> items = testUtilities.createItems(true, true); //todo: used to have 1 item
+        // new ArrayList<Item>() {
+//            {
+//                add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "taxCode",
+//                        null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO
+//                        , TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
+//            } //todo: remove
+
+//        };
 
         return Transaction.builder()
                 .id(id)

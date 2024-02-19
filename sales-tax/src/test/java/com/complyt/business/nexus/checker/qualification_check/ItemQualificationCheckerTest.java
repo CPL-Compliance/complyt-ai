@@ -11,6 +11,7 @@ import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.transaction.Item;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,22 +23,25 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ItemQualificationCheckerTest {
 
-    QualificationChecker qualificationChecker;
-    Item item;
-    NexusStateRule nexusStateRule;
+    private UnitTestUtilities testUtilities;
+    private QualificationChecker qualificationChecker;
+    private Item item;
+    private NexusStateRule nexusStateRule;
 
     @BeforeEach
     void setUp() {
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         qualificationChecker = new QualificationChecker();
-        item = createItem();
+        item = testUtilities.createItems(false, true).get(0);
         nexusStateRule = createNexusStateRule();
 
     }
 
-    private Item createItem() {
-        return new Item(new BigDecimal(1000), new BigDecimal(5), new BigDecimal(5000), "description", "item", "C1S1",
-                null, null, false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
-    }
+//    private Item createItem() {
+//        return new Item(new BigDecimal(1000), new BigDecimal(5), new BigDecimal(5000), null,
+//                "description", "item", "C1S1",
+//                null, null, false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
+//    }
 
     private NexusStateRule createNexusStateRule() {
         State state = new State("CA", "02", "California");

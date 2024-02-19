@@ -7,31 +7,65 @@ import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ItemTest {
 
+    private UnitTestUtilities testUtilities;
+
     private Item item;
 
     @BeforeEach
     void setUp() {
-        SalesTaxRates salesTaxRates = new SalesTaxRates(new BigDecimal("0.01"), new BigDecimal("0.01"),
-                new BigDecimal("0.01"), new BigDecimal("0.01"), new BigDecimal("0.01"), null);
-        JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
-                "California", "CA", true, true, CalculationType.FIXED,
-                "description", new BigDecimal("0.07"), null);
-        item = new Item(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"), "description", "name", "taxCode", rule, salesTaxRates, false, BigDecimal.ZERO, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+
+//        SalesTaxRates salesTaxRates = new SalesTaxRates(new BigDecimal("0.01"), new BigDecimal("0.01"),
+//                new BigDecimal("0.01"), new BigDecimal("0.01"), new BigDecimal("0.01"), null);
+//        JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
+//                "California", "CA", true, true, CalculationType.FIXED,
+//                "description", new BigDecimal("0.07"), null);
+//        item = new Item(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"),
+//                BigDecimal.valueOf(8000),"description", "name", "taxCode", rule,
+//                salesTaxRates, false, BigDecimal.ZERO, null, TangibleCategory.INTANGIBLE,
+//                TaxableCategory.NOT_TAXABLE);
+        //todo: remove
+
+        item = testUtilities.createItems(true, true)
+                .get(0)
+                .withSalesTaxRates(new SalesTaxRates(new BigDecimal("0.01"), new BigDecimal("0.01"),
+                        new BigDecimal("0.01"), new BigDecimal("0.01"), new BigDecimal("0.01"), null));
     }
 
     @Test
     void calculateSalesTaxAmount_SalesTaxIsSetManually_ReturnsAmount() {
         // Given
-        Item itemWithManualRate = item.withManualSalesTax(true).withManualSalesTaxRate(new BigDecimal("0.5"));
-        BigDecimal expectedAmount = itemWithManualRate.getManualSalesTaxRate().multiply(itemWithManualRate.getTotalPrice());
+        Item itemWithManualRate = item.withManualSalesTax(true)
+                .withManualSalesTaxRate(new BigDecimal("0.5"))
+                .withCalculatedTotal(item.getTotalPrice());
+        BigDecimal expectedAmount = itemWithManualRate.getManualSalesTaxRate()
+                .multiply(itemWithManualRate.getCalculatedTotal());
+
+        // When + Then
+        BigDecimal actualAmount = itemWithManualRate.calculateSalesTaxAmount();
+        assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    void calculateSalesTaxAmount_SalesTaxIsSetManuallyAndItemHaveDiscount_ReturnsAmount() {
+        // Given
+        Item itemWithManualRate = item.withManualSalesTax(true)
+                .withManualSalesTaxRate(new BigDecimal("0.5"))
+                .withDiscount(BigDecimal.valueOf(500))
+                .withCalculatedTotal(item.getTotalPrice().subtract(BigDecimal.valueOf(500)));
+        BigDecimal expectedAmount = itemWithManualRate.getManualSalesTaxRate()
+                .multiply(itemWithManualRate.getCalculatedTotal());
 
         // When + Then
         BigDecimal actualAmount = itemWithManualRate.calculateSalesTaxAmount();
@@ -42,14 +76,41 @@ class ItemTest {
     void calculateSalesTaxAmount_RuleIsSetToCalculateByPercentage_ReturnsAmount() {
         // Given
         JurisdictionalSalesTaxRules rulesByPercentage = item.getJurisdictionalSalesTaxRules()
-                .withTaxable(true).withSpecialTreatment(true).withCalculationType(CalculationType.PERCENTAGE);
+                .withTaxable(true)
+                .withSpecialTreatment(true)
+                .withCalculationType(CalculationType.PERCENTAGE);
+
         BigDecimal rateAfterPercentageCut = rulesByPercentage.getCalculationValue().multiply(item.getSalesTaxRates().taxRate());
         SalesTaxRates salesTaxRates = item.getSalesTaxRates().withTaxRate(rateAfterPercentageCut);
 
         Item itemWithRuleByPercentage = item.withJurisdictionalSalesTaxRules(rulesByPercentage)
-                .withSalesTaxRates(salesTaxRates);
+                .withSalesTaxRates(salesTaxRates)
+                .withCalculatedTotal(item.getTotalPrice());
 
-        BigDecimal expectedAmount = itemWithRuleByPercentage.getTotalPrice()
+        BigDecimal expectedAmount = itemWithRuleByPercentage.getCalculatedTotal()
+                .multiply(itemWithRuleByPercentage.getSalesTaxRates().taxRate());
+
+        // When + Then
+        BigDecimal actualAmount = itemWithRuleByPercentage.calculateSalesTaxAmount();
+        assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    void calculateSalesTaxAmount_RuleIsSetToCalculateByPercentageAndItemHaveDiscount_ReturnsAmount() {
+        // Given
+        JurisdictionalSalesTaxRules rulesByPercentage = item.getJurisdictionalSalesTaxRules()
+                .withTaxable(true)
+                .withSpecialTreatment(true)
+                .withCalculationType(CalculationType.PERCENTAGE);
+        BigDecimal rateAfterPercentageCut = rulesByPercentage.getCalculationValue().multiply(item.getSalesTaxRates().taxRate());
+        SalesTaxRates salesTaxRates = item.getSalesTaxRates().withTaxRate(rateAfterPercentageCut);
+
+        Item itemWithRuleByPercentage = item.withJurisdictionalSalesTaxRules(rulesByPercentage)
+                .withSalesTaxRates(salesTaxRates)
+                .withDiscount(BigDecimal.valueOf(500))
+                .withCalculatedTotal(item.getTotalPrice().subtract(BigDecimal.valueOf(500)));
+
+        BigDecimal expectedAmount = itemWithRuleByPercentage.getCalculatedTotal()
                 .multiply(itemWithRuleByPercentage.getSalesTaxRates().taxRate());
 
         // When + Then
@@ -60,12 +121,17 @@ class ItemTest {
     @Test
     void Equals_sameItem_ReturnsTrue() {
         // Given
-        SalesTaxRates salesTaxRates = new SalesTaxRates(new BigDecimal("0.01"), new BigDecimal("0.01"), new BigDecimal("0.01"),
-                new BigDecimal("0.01"), new BigDecimal("0.01"), null);
-        JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
-                "California", "CA", true, true, CalculationType.FIXED,
-                "description", new BigDecimal("0.07"), null);
-        Item givenItem = item = new Item(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"), "description", "name", "taxCode", rule, salesTaxRates, false, BigDecimal.ZERO, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
+//        SalesTaxRates salesTaxRates = new SalesTaxRates(new BigDecimal("0.01"), new BigDecimal("0.01"), new BigDecimal("0.01"),
+//                new BigDecimal("0.01"), new BigDecimal("0.01"), null);
+//        JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
+//                "California", "CA", true, true, CalculationType.FIXED,
+//                "description", new BigDecimal("0.07"), null);
+//        Item givenItem = item = new Item(new BigDecimal("2000"), new BigDecimal("4"),
+//                new BigDecimal("8000"), "description", "name", "taxCode", rule, salesTaxRates, false, BigDecimal.ZERO, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
+        //todo: remove
+        Item givenItem = testUtilities.createItems(true, true).get(0)
+                .withSalesTaxRates(new SalesTaxRates(new BigDecimal("0.01"), new BigDecimal("0.01"),
+                        new BigDecimal("0.01"), new BigDecimal("0.01"), new BigDecimal("0.01"), null));
 
         // When
         boolean isEquals = item.equals(givenItem);
@@ -80,6 +146,7 @@ class ItemTest {
         String expectedString = "Item(unitPrice=" + item.getUnitPrice() +
                 ", quantity=" + item.getQuantity() +
                 ", totalPrice=" + item.getTotalPrice() +
+                ", calculatedTotal=" + item.getCalculatedTotal() +
                 ", description=" + item.getDescription() +
                 ", name=" + item.getName() +
                 ", taxCode=" + item.getTaxCode() +
@@ -87,6 +154,7 @@ class ItemTest {
                 ", salesTaxRates=" + item.getSalesTaxRates() +
                 ", manualSalesTax=" + item.isManualSalesTax() +
                 ", manualSalesTaxRate=" + item.getManualSalesTaxRate() +
+                ", discount=" + item.getDiscount() +
                 ", tangibleCategory=" + item.getTangibleCategory() +
                 ", taxableCategory=" + item.getTaxableCategory() + ")";
 
@@ -98,15 +166,17 @@ class ItemTest {
     }
 
     @Test
-    void getTotalPrice_TotalPriceIsNull_ReturnsZero() {
+    void getTotalPrice_TotalPriceIsNullButUnitPriceIs2QuantityIs10_ReturnsBigDecimalOf20() {
         // Given
-        Item itemWithNullTotalPrice = item.withTotalPrice(null);
+        Item itemWithNullTotalPrice = item.withTotalPrice(null)
+                .withUnitPrice(BigDecimal.valueOf(2))
+                .withQuantity(BigDecimal.valueOf(10));
 
         // When
         BigDecimal actualTotalPrice = itemWithNullTotalPrice.getTotalPrice();
 
         // Then
-        assertEquals(BigDecimal.ZERO, actualTotalPrice);
+        assertEquals(BigDecimal.valueOf(20), actualTotalPrice);
     }
 
     @Test
@@ -127,10 +197,10 @@ class ItemTest {
         Item itemWithNullManualTaxRate = item.withManualSalesTaxRate(null);
 
         // When
-        BigDecimal actualTotalPrice = itemWithNullManualTaxRate.getManualSalesTaxRate();
+        BigDecimal actualManualSalesTaxRate = itemWithNullManualTaxRate.getManualSalesTaxRate();
 
         // Then
-        assertEquals(BigDecimal.ZERO, actualTotalPrice);
+        assertEquals(BigDecimal.ZERO, actualManualSalesTaxRate);
     }
 
     @Test
@@ -139,10 +209,10 @@ class ItemTest {
         Item itemWithManualTaxRateOf10 = item.withManualSalesTaxRate(new BigDecimal("10"));
 
         // When
-        BigDecimal actualTotalPrice = itemWithManualTaxRateOf10.getManualSalesTaxRate();
+        BigDecimal actualManualSalesTaxRate = itemWithManualTaxRateOf10.getManualSalesTaxRate();
 
         // Then
-        assertEquals(new BigDecimal("10"), actualTotalPrice);
+        assertEquals(new BigDecimal("10"), actualManualSalesTaxRate);
     }
 
     @Test
@@ -151,10 +221,10 @@ class ItemTest {
         Item itemWithNullQuantity = item.withQuantity(null);
 
         // When
-        BigDecimal actualTotalPrice = itemWithNullQuantity.getQuantity();
+        BigDecimal actualQuantity = itemWithNullQuantity.getQuantity();
 
         // Then
-        assertEquals(BigDecimal.ZERO, actualTotalPrice);
+        assertEquals(BigDecimal.ZERO, actualQuantity);
     }
 
     @Test
@@ -163,10 +233,10 @@ class ItemTest {
         Item itemWithQuantityOf10 = item.withQuantity(new BigDecimal("10"));
 
         // When
-        BigDecimal actualTotalPrice = itemWithQuantityOf10.getQuantity();
+        BigDecimal actualQuantity = itemWithQuantityOf10.getQuantity();
 
         // Then
-        assertEquals(new BigDecimal("10"), actualTotalPrice);
+        assertEquals(new BigDecimal("10"), actualQuantity);
     }
 
     @Test
