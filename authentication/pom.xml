@@ -11,12 +11,12 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
-        <tag>authentication-0.15.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <!-- Maven Coordinates -->
     <artifactId>authentication</artifactId>
-    <version>0.15.0</version>
+    <version>0.16.0-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <name>authentication</name>
