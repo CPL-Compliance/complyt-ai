@@ -1,6 +1,7 @@
 package io.complyt.authentication.repositories;
 
 import io.complyt.authentication.domain.Credentials;
+import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import io.complyt.authentication.utils.observability.ContextLogger;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
@@ -32,4 +34,14 @@ public class CredentialsRepository {
         return ContextLogger.observeCtx("Saving Credentials", log::info)
                 .then(reactiveMongoTemplate.save(credentials));
     }
+
+    public Mono<Credentials> markAsCancelled(final @NonNull String complytClientId) {
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
+        Update update = Update.update("status", ApiKeyStatus.CANCELLED);
+
+
+        return ContextLogger.observeCtx("Updating credentials status to cancelled for complytClientId " + complytClientId, log::info)
+                .then(reactiveMongoTemplate.findAndModify(query, update, Credentials.class));
+    }
+
 }

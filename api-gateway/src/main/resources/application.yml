@@ -277,6 +277,13 @@ spring:
             - Path=/v1/api_key
           filters:
             - SetPath=/v1/api_key
+        - id: authentication-delete-api-key
+          uri: lb://authentication
+          predicates:
+            - Method=DELETE
+            - Path=/v1/api_key
+          filters:
+            - SetPath=/v1/api_key
         # ---- ApiKey ----
         # ---- Token ----
         - id: authentication-post-token

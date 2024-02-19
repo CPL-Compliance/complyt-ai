@@ -1,6 +1,7 @@
 package io.complyt.authentication.v1.handlers;
 
 import io.complyt.authentication.facades.ApiKeyFacade;
+import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.validators.ValidationHandler;
 import org.junit.jupiter.api.Test;
@@ -26,11 +27,26 @@ class ApiKeyHandlerTest {
     @Mock
     ApiKeyFacade apiKeyFacade;
 
+    @Mock
+    ValidationHandler<ApiKeyDto, SpringValidatorAdapter> apiKeyDtoValidationHandler;
+
+
     @Test
     void post_serverRequestIsNull_throwsNullPointerException() {
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             apiKeyHandler.post(null);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "serverRequest is marked non-null but is null");
+    }
+
+    @Test
+    void delete_serverRequestIsNull_throwsNullPointerException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            apiKeyHandler.delete(null);
         });
 
         // Then

@@ -38,7 +38,8 @@ public class TokenService {
 
     int tokenExpirationSafeWindowSec;
 
-    public Mono<Token> findByApiKey(final @NonNull ApiKey apiKey) {
+
+    public Mono<Token> findByApiKeyAndDecrypt(final @NonNull ApiKey apiKey) {
         return tokenRepository.findByComplytClientId(apiKey.clientId())
                 .filter(token -> passwordEncoder.matches(apiKey.clientSecret(), token.getComplytClientSecret()))
                 .map(this::decryptToken);
@@ -50,6 +51,10 @@ public class TokenService {
                 .map(this::encryptToken)
                 .flatMap(tokenRepository::save)
                 .map(this::decryptToken);
+    }
+
+    public Mono<Token> deleteToken(@NonNull ApiKey apiKey) {
+        return tokenRepository.deleteByComplytClientId(apiKey.clientId());
     }
 
     @NonNull
@@ -104,6 +109,7 @@ public class TokenService {
                 .scopeIv(scopeEncryptedData.iv())
                 .expireAt(token.getExpireAt())
                 .createdAt(token.getCreatedAt())
+                .id(token.getId())
                 .build();
     }
 
@@ -120,6 +126,7 @@ public class TokenService {
                 .scopeIv(scopeEncryptedData.iv())
                 .expireAt(token.getExpireAt())
                 .createdAt(token.getCreatedAt())
+                .id(token.getId())
                 .build();
     }
 }

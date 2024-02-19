@@ -2,9 +2,11 @@ package io.complyt.authentication.services;
 
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
+import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import io.complyt.authentication.repositories.CredentialsRepository;
 import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
+import io.complyt.authentication.v1.exceptions.types.ApiKeyNotValidException;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -41,19 +43,26 @@ public class CredentialsService {
     @NonNull
     String audience;
 
-    public Mono<Credentials> getCredentialsByApiKey(final @NonNull ApiKey apiKey) {
+    public Mono<Credentials> getCredentialsByApiKeyAndDecrypt(final @NonNull ApiKey apiKey) {
         return credentialsRepository.findByComplytClientId(apiKey.clientId())
                 .filter(credentials -> passwordEncoder.matches(apiKey.clientSecret(),
                         credentials.getComplytClientSecret()))
-                .switchIfEmpty(Mono.empty()).flatMap(this::decrypt);
+                .filter(credentials -> credentials.getStatus().equals(ApiKeyStatus.ACTIVE))
+                .switchIfEmpty(Mono.empty())
+                .flatMap(this::decrypt);
     }
 
-    public Mono<Credentials> saveCredentials(@NonNull Credentials credentials, @NonNull ApiKey apiKey) {
-        return Mono.fromSupplier(() -> prepareCredentialsForSave(credentials, apiKey))
+    public Mono<Credentials> markAsCancelled(final @NonNull ApiKey apiKey) {
+        return credentialsRepository.markAsCancelled(apiKey.clientId());
+    }
+
+
+    public Mono<Credentials> saveCredentials(@NonNull Credentials credentials, @NonNull ApiKey apiKey, @NonNull String tenantId, @NonNull String name) {
+        return Mono.fromSupplier(() -> prepareCredentialsForSave(credentials, apiKey, tenantId, name))
                 .flatMap(credentialsRepository::save);
     }
 
-    private Credentials prepareCredentialsForSave(Credentials credentials, ApiKey apiKey) {
+    private Credentials prepareCredentialsForSave(Credentials credentials, ApiKey apiKey, String tenantId, String name) {
         EncryptedData clientIdEncryptedData;
         EncryptedData clientSecretEncryptedData;
 
@@ -68,8 +77,10 @@ public class CredentialsService {
         String clientSecret = apiKey.clientSecret();
         String clientSecretEncoded = passwordEncoder.encode(clientSecret);
 
-        return createEncryptedCredentials(apiKey, clientIdEncryptedData, clientSecretEncryptedData,
-                clientSecretEncoded);
+        Credentials encryptedCredentials = createEncryptedCredentials(apiKey, clientIdEncryptedData, clientSecretEncryptedData,
+                clientSecretEncoded, tenantId, name);
+
+        return encryptedCredentials;
     }
 
     private @NonNull Mono<Credentials> decrypt(Credentials credentials) {
@@ -96,17 +107,20 @@ public class CredentialsService {
     private static Credentials createDecryptedCredentials(Credentials credentials, String clientId,
                                                           String clientSecret) {
         return Credentials.builder().clientId(clientId).clientSecret(clientSecret).audience(credentials.getAudience())
-                .grantType(credentials.getGrantType()).complytClientId(credentials.getComplytClientId())
+                .grantType(credentials.getGrantType()).status(credentials.getStatus()).complytClientId(credentials.getComplytClientId())
                 .complytClientSecret(credentials.getComplytClientSecret()).build();
     }
 
     private Credentials createEncryptedCredentials(ApiKey apiKey, EncryptedData clientIdEncryptedData,
                                                    EncryptedData clientSecretEncryptedData,
-                                                   String clientSecretEncoded) {
+                                                   String clientSecretEncoded, String tenantId, String name) {
         return Credentials.builder().clientId(clientIdEncryptedData.cipherText())
                 .clientIdIv(clientIdEncryptedData.iv())
                 .clientSecret(clientSecretEncryptedData.cipherText())
                 .clientSecretIv(clientSecretEncryptedData.iv()).audience(audience).grantType(grantType)
+                .tenantId(tenantId)
+                .name(name)
+                .status(ApiKeyStatus.ACTIVE)
                 .complytClientId(apiKey.clientId())
                 .complytClientSecret(clientSecretEncoded).build();
     }

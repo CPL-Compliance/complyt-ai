@@ -1,6 +1,6 @@
 package io.complyt.authentication.v1.routers;
 
-import io.complyt.authentication.config.ApiExceptionConfig;
+import io.complyt.authentication.v1.config.ApiExceptionConfig;
 import io.complyt.authentication.security.AesSecretKeyUtils;
 import io.complyt.authentication.services.AesSecretKeyService;
 import io.complyt.authentication.v1.exceptions.GlobalErrorAttributes;
