@@ -85,7 +85,7 @@ public @interface PutClientTrackingApiInfo {
     String tenantId = "org_nD6T71fMDbR0qTSY";
 
     String clientTrackingPayloadExample = """
-            {
+            { 
                 "nexus": {
                     "taxableDate": "2015-06-01T00:00:00"
                 },
