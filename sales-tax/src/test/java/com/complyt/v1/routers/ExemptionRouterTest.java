@@ -19,6 +19,7 @@ import com.complyt.v1.mappers.ExemptionWrapperMapper;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.customer.exemption.*;
+import com.complyt.v1.validators.Patcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     WebTestClient webTestClient;
     @MockBean
     ExemptionFacade exemptionFacade;
+    @MockBean
+    Patcher<ExemptionDto> patcher;
     Exemption exemption;
     ExemptionDto exemptionDto;
     UnitTestUtilities testUtilities;

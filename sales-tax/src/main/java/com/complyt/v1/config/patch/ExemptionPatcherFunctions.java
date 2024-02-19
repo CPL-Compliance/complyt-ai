@@ -9,42 +9,42 @@ import java.util.function.BiFunction;
 
 public interface ExemptionPatcherFunctions {
 
-    BiFunction<ExemptionDto, Object, ExemptionDto> buildCustomerId = (exemptionDto, customerId) -> {
+    BiFunction<ExemptionDto, Object, ExemptionDto> patchCustomerId = (exemptionDto, customerId) -> {
         UUID convertedCustomerId = (UUID) ComplytObjectMapper.mapObject(customerId, UUID.class);
         return exemptionDto.withCustomerId(convertedCustomerId);
     };
 
-    BiFunction<ExemptionDto, Object, ExemptionDto> buildState = (exemptionDto, state) -> {
+    BiFunction<ExemptionDto, Object, ExemptionDto> patchState = (exemptionDto, state) -> {
         StateDto convertedState = (StateDto) ComplytObjectMapper.mapObject(state, StateDto.class);
         return exemptionDto.withState(convertedState);
     };
 
-    BiFunction<ExemptionDto, Object, ExemptionDto> buildClassification = (exemptionDto, classification) -> {
+    BiFunction<ExemptionDto, Object, ExemptionDto> patchClassification = (exemptionDto, classification) -> {
         ClassificationDto convertedClassification = (ClassificationDto) ComplytObjectMapper.mapObject(classification, ClassificationDto.class);
         return exemptionDto.withClassification(convertedClassification);
     };
 
-    BiFunction<ExemptionDto, Object, ExemptionDto> buildValidationDates = (exemptionDto, validationDates) -> {
+    BiFunction<ExemptionDto, Object, ExemptionDto> patchValidationDates = (exemptionDto, validationDates) -> {
         ValidationDatesDto convertedValidationDates = (ValidationDatesDto) ComplytObjectMapper.mapObject(validationDates, ValidationDatesDto.class);
         return exemptionDto.withValidationDates(convertedValidationDates);
     };
 
-    BiFunction<ExemptionDto, Object, ExemptionDto> buildStatus = (exemptionDto, status) -> {
+    BiFunction<ExemptionDto, Object, ExemptionDto> patchStatus = (exemptionDto, status) -> {
         StatusDto convertedStatus = (StatusDto) ComplytObjectMapper.mapObject(status, StatusDto.class);
         return exemptionDto.withStatus(convertedStatus);
     };
 
-    BiFunction<ExemptionDto, Object, ExemptionDto> buildCertificate = (exemptionDto, certificate) -> {
+    BiFunction<ExemptionDto, Object, ExemptionDto> patchCertificate = (exemptionDto, certificate) -> {
         CertificateDto convertedCertificate = (CertificateDto) ComplytObjectMapper.mapObject(certificate, CertificateDto.class);
         return exemptionDto.withCertificate(convertedCertificate);
     };
 
-    BiFunction<ExemptionDto, Object, ExemptionDto> buildExemptionType = (exemptionDto, exemptionType) -> {
+    BiFunction<ExemptionDto, Object, ExemptionDto> patchExemptionType = (exemptionDto, exemptionType) -> {
         ExemptionTypeDto e = ExemptionTypeDto.valueOf((String) exemptionType);
         return exemptionDto.withExemptionType(e);
     };
 
-    BiFunction<ExemptionDto, Object, ExemptionDto> buildExemptionStatus = (exemptionDto, exemptionStatus) -> {
+    BiFunction<ExemptionDto, Object, ExemptionDto> patchExemptionStatus = (exemptionDto, exemptionStatus) -> {
         ExemptionStatusDto e = ExemptionStatusDto.valueOf((String) exemptionStatus);
         return exemptionDto.withExemptionStatus(e);
     };

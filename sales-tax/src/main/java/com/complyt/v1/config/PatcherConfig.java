@@ -18,14 +18,14 @@ public class PatcherConfig {
     @Bean
     Patcher<ExemptionDto> exemptionPatcher() {
         Map<String, BiFunction<ExemptionDto, Object, ExemptionDto>> valuesToFunctions = new HashMap<>() {{
-            put("customerId", ExemptionPatcherFunctions.buildCustomerId);
-            put("state", ExemptionPatcherFunctions.buildState);
-            put("classification", ExemptionPatcherFunctions.buildClassification);
-            put("validationDates", ExemptionPatcherFunctions.buildValidationDates);
-            put("status", ExemptionPatcherFunctions.buildStatus);
-            put("certificate", ExemptionPatcherFunctions.buildCertificate);
-            put("exemptionType", ExemptionPatcherFunctions.buildExemptionType);
-            put("exemptionStatus", ExemptionPatcherFunctions.buildExemptionStatus);
+            put("customerId", ExemptionPatcherFunctions.patchCustomerId);
+            put("state", ExemptionPatcherFunctions.patchState);
+            put("classification", ExemptionPatcherFunctions.patchClassification);
+            put("validationDates", ExemptionPatcherFunctions.patchValidationDates);
+            put("status", ExemptionPatcherFunctions.patchStatus);
+            put("certificate", ExemptionPatcherFunctions.patchCertificate);
+            put("exemptionType", ExemptionPatcherFunctions.patchExemptionType);
+            put("exemptionStatus", ExemptionPatcherFunctions.patchExemptionStatus);
         }};
 
         return new Patcher<>(valuesToFunctions);
@@ -35,15 +35,15 @@ public class PatcherConfig {
 //    Patcher<TransactionDto> transactionPatcher() {
 //        Map<String, BiFunction<TransactionDto, Object, TransactionDto>> valuesToFunctions = new HashMap<>() {{
 //            put("documentName", TransactionPatcherFunctions.);
-//            put("items", TransactionPatcherFunctions.buildState);
-//            put("billingAddress", TransactionPatcherFunctions.buildClassification);
-//            put("shippingAddress", TransactionPatcherFunctions.buildValidationDates);
-//            put("customerId", TransactionPatcherFunctions.buildStatus);
-//            put("externalTimestamps", TransactionPatcherFunctions.buildCertificate);
-//            put("transactionType", TransactionPatcherFunctions.buildExemptionType);
-//            put("shippingFee", TransactionPatcherFunctions.buildExemptionStatus);
-//            put("createdFrom", TransactionPatcherFunctions.buildExemptionStatus);
-//            put("transactionFilingStatus", TransactionPatcherFunctions.buildExemptionStatus);
+//            put("items", TransactionPatcherFunctions.patchState);
+//            put("billingAddress", TransactionPatcherFunctions.patchClassification);
+//            put("shippingAddress", TransactionPatcherFunctions.patchValidationDates);
+//            put("customerId", TransactionPatcherFunctions.patchStatus);
+//            put("externalTimestamps", TransactionPatcherFunctions.patchCertificate);
+//            put("transactionType", TransactionPatcherFunctions.patchExemptionType);
+//            put("shippingFee", TransactionPatcherFunctions.patchExemptionStatus);
+//            put("createdFrom", TransactionPatcherFunctions.patchExemptionStatus);
+//            put("transactionFilingStatus", TransactionPatcherFunctions.patchExemptionStatus);
 //        }};
 //
 //        return new Patcher<>(valuesToFunctions);

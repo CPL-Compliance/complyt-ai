@@ -10,8 +10,6 @@ import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.DateWrapperToLocalDateMapper;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.customer.CustomerDto;
-import com.complyt.v1.models.customer.exemption.ExemptionWrapperDto;
 import com.complyt.v1.models.nexus.DateWrapperDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.validators.ValidationHandler;

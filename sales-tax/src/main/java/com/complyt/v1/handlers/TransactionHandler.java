@@ -1,6 +1,5 @@
 package com.complyt.v1.handlers;
 
-import ch.qos.logback.core.net.SocketConnector;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.permissions.transaction.TransactionCreatePermission;
@@ -12,7 +11,6 @@ import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.routers.TransactionRouter;
 import com.complyt.v1.validators.ValidationHandler;
-import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -27,7 +25,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 @Component
 @Slf4j
