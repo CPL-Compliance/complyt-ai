@@ -53,7 +53,7 @@ spring:
     mongodb:
       uri: ${mongo-uri}
       database: ${db-name}
-  logging:
+logging:
   level:
     root: INFO
     web: INFO
