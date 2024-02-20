@@ -16,11 +16,7 @@
 
     <!-- Maven Coordinates -->
     <artifactId>api-gateway</artifactId>
-<<<<<<< HEAD
-    <version>0.29.0-SNAPSHOT</version>
-=======
     <version>0.30.0-SNAPSHOT</version>
->>>>>>> main
     <!-- Maven Coordinates -->
 
     <name>api-gateway</name>
