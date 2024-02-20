@@ -59,6 +59,7 @@ public class SecurityConfig {
         http.authorizeExchange()
                 .pathMatchers("/actuator/health", "/actuator/info").permitAll()
                 .pathMatchers(HttpMethod.POST, "/v1/token").permitAll()
+                .pathMatchers(HttpMethod.DELETE, "/v1/api_key").permitAll()
                 .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyExchange().authenticated();
 
