@@ -264,6 +264,19 @@ class clientTrackingServiceImpImplTest {
     }
 
     @Test
+    void saveByTenantId_NullTenantId_ThrowsNullPointerException() {
+        // Given
+        String tenantId = null;
+
+        // When & Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            clientTrackingServiceImp.saveByTenantId(clientTracking, null).block();
+        });
+
+        assertEquals(nullPointerException.getMessage(), "tenantId is marked non-null but is null");
+    }
+
+    @Test
     void injectDataToExistingClientTracking_NullNewClientTracking_ThrowsNullPointerException() {
         // Given
         ClientTracking nullNewClientTracking = null;
