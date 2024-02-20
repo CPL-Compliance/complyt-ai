@@ -33,8 +33,8 @@ import java.lang.annotation.Target;
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "tenantId",
                                         description = "tenantId of the clientTracking",
-                                        examples = @ExampleObject(value = GetClientTrackingByTenantIdApiInfo.tenantId,
-                                                name = GetClientTrackingByTenantIdApiInfo.clientTrackingTenantId))
+                                        examples = @ExampleObject (name = GetClientTrackingByTenantIdApiInfo.tenantId,
+                                                value = GetClientTrackingByTenantIdApiInfo.tenantId))
                         },
                         tags = "clientTracing",
                         responses = {
