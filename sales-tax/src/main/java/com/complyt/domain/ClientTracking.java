@@ -15,7 +15,7 @@ public class ClientTracking {
     @Id
     private final String id;
     private final String tenantId;
-    private Nexus nexus;
-    private String name;
-    private Timestamps internalTimestamps;
+    private final Nexus nexus;
+    private final String name;
+    private final Timestamps internalTimestamps;
 }

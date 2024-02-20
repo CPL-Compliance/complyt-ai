@@ -48,8 +48,8 @@ public class ClientTrackingHandler {
         Flux<ClientTrackingDtoTenant> ClientTrackingDtoTenantFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(ClientTrackingDtoTenantValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Flux.defer(() -> clientTrackingFacade.getAll(Integer.parseInt(page), Integer.parseInt(size))
-                .map(ClientTrackingMapper.INSTANCE::clientTrackingToClientTrackingDtoTenant)
-                .flatMapSequential(ClientTrackingDtoTenant -> ContextLogger.observeCtx("<-- Returned Body: " + ClientTrackingDtoTenant, log::info).thenReturn(ClientTrackingDtoTenant))));
+                        .map(ClientTrackingMapper.INSTANCE::clientTrackingToClientTrackingDtoTenant)
+                        .flatMapSequential(ClientTrackingDtoTenant -> ContextLogger.observeCtx("<-- Returned Body: " + ClientTrackingDtoTenant, log::info).thenReturn(ClientTrackingDtoTenant))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(ClientTrackingDtoTenantFlux, ClientTrackingDtoTenant.class);
     }
@@ -61,10 +61,10 @@ public class ClientTrackingHandler {
 
         Flux<ClientTrackingDtoTenant> ClientTrackingDtoTenantFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(ClientTrackingDtoTenantValidationHandler.handle(serverRequest))
-                .switchIfEmpty(Flux.defer(() ->clientTrackingFacade.getByName(name))
-                .map(ClientTrackingMapper.INSTANCE::clientTrackingToClientTrackingDtoTenant)
-                .flatMap(ClientTrackingDtoTenant -> ContextLogger.observeCtx("<-- Returned Body: " + ClientTrackingDtoTenant, log::info).thenReturn(ClientTrackingDtoTenant))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                .switchIfEmpty(Flux.defer(() -> clientTrackingFacade.getByName(name))
+                        .map(ClientTrackingMapper.INSTANCE::clientTrackingToClientTrackingDtoTenant)
+                        .flatMap(ClientTrackingDtoTenant -> ContextLogger.observeCtx("<-- Returned Body: " + ClientTrackingDtoTenant, log::info).thenReturn(ClientTrackingDtoTenant))
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(ClientTrackingDtoTenantFlux, ClientTrackingDtoTenant.class);
     }
@@ -76,10 +76,10 @@ public class ClientTrackingHandler {
 
         Flux<ClientTrackingDtoTenant> ClientTrackingDtoTenantFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(ClientTrackingDtoTenantValidationHandler.handle(serverRequest))
-                .switchIfEmpty(Flux.defer(() ->(clientTrackingFacade.getByTenantId(tenantId))
-                .map(ClientTrackingMapper.INSTANCE::clientTrackingToClientTrackingDtoTenant)
-                .flatMap(ClientTrackingDtoTenant -> ContextLogger.observeCtx("<-- Returned Body: " + ClientTrackingDtoTenant, log::info).thenReturn(ClientTrackingDtoTenant))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()))));
+                .switchIfEmpty(Flux.defer(() -> (clientTrackingFacade.getByTenantId(tenantId))
+                        .map(ClientTrackingMapper.INSTANCE::clientTrackingToClientTrackingDtoTenant)
+                        .flatMap(ClientTrackingDtoTenant -> ContextLogger.observeCtx("<-- Returned Body: " + ClientTrackingDtoTenant, log::info).thenReturn(ClientTrackingDtoTenant))
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(ClientTrackingDtoTenantFlux, ClientTrackingDtoTenant.class);
     }
@@ -93,19 +93,19 @@ public class ClientTrackingHandler {
 
         return ContextLogger.observeCtx(logStr, log::info)
                 .then(ClientTrackingDtoTenantValidationHandler.handle(serverRequest))
-                .map(ClientTrackingMapper.INSTANCE::ClientTrackingDtoTenantToClientTracking)
+                .map(ClientTrackingMapper.INSTANCE::clientTrackingDtoTenantToClientTracking)
                 .flatMap(receivedClientTracking ->
                         clientTrackingFacade.getByTenantId(tenantId)
-                        .flatMap(originalClientTracking -> clientTrackingFacade.updateIfModified(receivedClientTracking, originalClientTracking, tenantId)
-                        .flatMap(savedClientTracking -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                                .body(Mono.just(ClientTrackingMapper.INSTANCE.clientTrackingToClientTrackingDtoTenant(savedClientTracking))
-                                        .flatMap(ClientTrackingDtoTenant -> ContextLogger.observeCtx("<-- Returned Body: " + ClientTrackingDtoTenant, log::info)
-                                                .thenReturn(ClientTrackingDtoTenant)), ClientTrackingDtoTenant.class)))
+                                .flatMap(originalClientTracking -> clientTrackingFacade.updateIfModified(receivedClientTracking, originalClientTracking, tenantId)
+                                        .flatMap(savedClientTracking -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                                                .body(Mono.just(ClientTrackingMapper.INSTANCE.clientTrackingToClientTrackingDtoTenant(savedClientTracking))
+                                                        .flatMap(ClientTrackingDtoTenant -> ContextLogger.observeCtx("<-- Returned Body: " + ClientTrackingDtoTenant, log::info)
+                                                                .thenReturn(ClientTrackingDtoTenant)), ClientTrackingDtoTenant.class)))
 
-                        .switchIfEmpty(clientTrackingFacade.saveClientTracking(receivedClientTracking, tenantId).flatMap(savedClientTracking ->
-                                ServerResponse.created(URI.create(resourceURI)).contentType(MediaType.APPLICATION_JSON)
-                                .body(Mono.just(ClientTrackingMapper.INSTANCE.clientTrackingToClientTrackingDtoTenant(savedClientTracking))
-                                        .flatMap(ClientTrackingDtoTenant -> ContextLogger.observeCtx("<-- Returned Body: " + ClientTrackingDtoTenant, log::info)
-                                                .thenReturn(ClientTrackingDtoTenant)), ClientTrackingDtoTenant.class))));
+                                .switchIfEmpty(clientTrackingFacade.saveClientTracking(receivedClientTracking, tenantId).flatMap(savedClientTracking ->
+                                        ServerResponse.created(URI.create(resourceURI)).contentType(MediaType.APPLICATION_JSON)
+                                                .body(Mono.just(ClientTrackingMapper.INSTANCE.clientTrackingToClientTrackingDtoTenant(savedClientTracking))
+                                                        .flatMap(ClientTrackingDtoTenant -> ContextLogger.observeCtx("<-- Returned Body: " + ClientTrackingDtoTenant, log::info)
+                                                                .thenReturn(ClientTrackingDtoTenant)), ClientTrackingDtoTenant.class))));
     }
 }

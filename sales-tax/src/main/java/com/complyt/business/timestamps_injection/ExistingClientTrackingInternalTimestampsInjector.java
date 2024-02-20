@@ -18,10 +18,6 @@ public class ExistingClientTrackingInternalTimestampsInjector implements Timesta
 
     @Override
     public ClientTracking inject() {
-        //todo if null == make the change here?
-        if (clientTracking.getInternalTimestamps() == null) {
-            return clientTracking.withInternalTimestamps(new Timestamps(LocalDateTime.now(), LocalDateTime.now()));
-        }
         LocalDateTime createdDate = clientTracking.getInternalTimestamps().getCreatedDate();
         LocalDateTime modifiedDate = LocalDateTime.now();
         Timestamps modifiedTimeStamps = new Timestamps(createdDate, modifiedDate);

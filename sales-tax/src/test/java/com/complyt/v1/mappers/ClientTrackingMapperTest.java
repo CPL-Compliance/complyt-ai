@@ -12,7 +12,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class ClientTrackingMapperImpTest {
+class ClientTrackingMapperTest {
 
    private ClientTracking clientTracking;
    private ClientTrackingDtoTenant clientTrackingDtoTenant;
@@ -32,7 +32,7 @@ class ClientTrackingMapperImpTest {
         ClientTrackingDtoTenant givenClientTrackingDtoTenant = clientTrackingDtoTenant;
 
         // When
-        ClientTracking actualClientTracking = ClientTrackingMapper.INSTANCE.ClientTrackingDtoTenantToClientTracking(givenClientTrackingDtoTenant);
+        ClientTracking actualClientTracking = ClientTrackingMapper.INSTANCE.clientTrackingDtoTenantToClientTracking(givenClientTrackingDtoTenant);
 
         // Then
         assertEquals(actualClientTracking, clientTracking);
@@ -54,7 +54,7 @@ class ClientTrackingMapperImpTest {
     void mapping_NullState_ReturnNull() {
         // Given + When
         ClientTrackingDtoTenant givenClientTrackingDtoTenant = ClientTrackingMapper.INSTANCE.clientTrackingToClientTrackingDtoTenant(null);
-        ClientTracking givenClientTracking = ClientTrackingMapper.INSTANCE.ClientTrackingDtoTenantToClientTracking(null);
+        ClientTracking givenClientTracking = ClientTrackingMapper.INSTANCE.clientTrackingDtoTenantToClientTracking(null);
 
         // Then
         assertNull(givenClientTrackingDtoTenant);
@@ -67,7 +67,7 @@ class ClientTrackingMapperImpTest {
         ClientTrackingDtoTenant givenClientTrackingDtoTenant = null;
 
         // When
-        ClientTracking actualClientTracking = ClientTrackingMapper.INSTANCE.ClientTrackingDtoTenantToClientTracking(givenClientTrackingDtoTenant);
+        ClientTracking actualClientTracking = ClientTrackingMapper.INSTANCE.clientTrackingDtoTenantToClientTracking(givenClientTrackingDtoTenant);
 
         // Then
         assertNull(actualClientTracking);

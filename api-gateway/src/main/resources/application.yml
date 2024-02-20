@@ -51,38 +51,8 @@ spring:
             - Path=/v3/api-docs/**
           filters:
             - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
-        # ==== Open API ====
-        # ==== Sales Tax Service ====
-        # ---- ClientTracking ----
-        - id: sales-tax-get-client-tracking
-          uri: lb://sales-tax
-          predicates:
-          - Method=GET
-          - Path=/v1/clientTracking
-          filters:
-          - SetPath=/v1/clientTracking
-        - id: sales-tax-get-client-tracking-by-name
-          uri: lb://sales-tax
-          predicates:
-            - Method=GET
-            - Path=/v1/clientTracking/name/{name}
-          filters:
-            - SetPath=/v1/clientTracking/name/{name}
-
-        - id: sales-tax-get-client-tracking-by-tenantId
-          uri: lb://sales-tax
-          predicates:
-            - Method=GET
-            - Path=/v1/clientTracking/tenantId/{tenantId}
-          filters:
-            - SetPath=/v1/clientTracking/tenantId/{tenantId}
-        - id: sales-tax-put-client-tracking
-          uri: lb://sales-tax
-          predicates:
-            - Method=PUT
-            - Path=/v1/clientTracking/tenantId/{tenantId}
-          filters:
-            - SetPath=/v1/clientTracking/tenantId/{tenantId}
+          # ==== Open API ====
+          # ==== Sales Tax Service ====
           # ---- Transaction ----
         - id: sales-tax-get-transactions
           uri: lb://sales-tax
@@ -245,6 +215,36 @@ spring:
           filters:
             - SetPath=/v1/nexus/state/{state}
         # ---- Nexus ----
+        # ---- ClientTracking ----
+        - id: sales-tax-get-client-tracking
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/clientTracking
+          filters:
+            - SetPath=/v1/clientTracking
+        - id: sales-tax-get-client-tracking-by-name
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/clientTracking/name/{name}
+          filters:
+            - SetPath=/v1/clientTracking/name/{name}
+
+        - id: sales-tax-get-client-tracking-by-tenantId
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/clientTracking/tenantId/{tenantId}
+          filters:
+            - SetPath=/v1/clientTracking/tenantId/{tenantId}
+        - id: sales-tax-put-client-tracking
+          uri: lb://sales-tax
+          predicates:
+            - Method=PUT
+            - Path=/v1/clientTracking/tenantId/{tenantId}
+          filters:
+            - SetPath=/v1/clientTracking/tenantId/{tenantId}
         # ==== Sales Tax Service ====
         # ==== Files Service ====
         # ---- Files ----

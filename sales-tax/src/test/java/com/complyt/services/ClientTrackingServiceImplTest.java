@@ -93,20 +93,16 @@ class clientTrackingServiceImpImplTest {
 
     }
 
-
-
-
-//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-//
     @Test
     void saveByTenantId_SavesClientTracking_ReturnsClientTracking() {
         // Given
         String tenantId = "org_12345";
+        // When
+        when(clientTrackingRepository.saveByTenantId(clientTracking.withTenantId(tenantId), tenantId)).thenReturn(Mono.just(clientTracking));
 
-        // When + Then
-        when(clientTrackingRepository.saveByTenantId(clientTracking, tenantId)).thenReturn(Mono.just(clientTracking));
         Mono<ClientTracking> clientTrackingMono = clientTrackingServiceImp.saveByTenantId(clientTracking, tenantId);
 
+        // Then
         StepVerifier.create(clientTrackingMono).expectNext(clientTracking).verifyComplete();
     }
 

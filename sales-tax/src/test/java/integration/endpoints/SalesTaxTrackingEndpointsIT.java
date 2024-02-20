@@ -51,6 +51,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     private final StateDto newState = new StateDto("AL", "01", "Alabama");
     private final StateDto stateWithNexus = new StateDto("TX", "48", "Texas");
     private final StateDto stateWithOldRule = new StateDto("HI", "101", "Hawaii");
+    private final TimestampsDto timestampsDto = new TimestampsDto("2024-01-01T00:00:00", "2024-01-01T00:00:00");
 
     @MockBean
     TenantResolver tenantResolver;
@@ -436,7 +437,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                         salesTaxTrackingDto
                                 .withComplytId(resultSalesTaxTrackingDto.complytId())
                                 .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
-                                .withClientTracking(ITUtilities.stubClientTrackingDto().withInternalTimestamps(null))
+                                .withClientTracking(ITUtilities.stubClientTrackingDto().withInternalTimestamps(timestampsDto))
                                 .withNexusStateRule(ITUtilities.stubAlabamaNexusStateRuleDto())
                         , resultSalesTaxTrackingDto)
                 );
@@ -467,9 +468,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                                 withComplytId(resultSalesTaxTrackingDto.complytId())
                                 .withComment("a new comment")
                                 .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
-                                .withClientTracking(ITUtilities.stubClientTrackingDto())
+                                .withClientTracking(ITUtilities.stubClientTrackingDto().withInternalTimestamps(timestampsDto))
                                 .withNexusStateRule(ITUtilities.stubAlabamaNexusStateRuleDto())
-                                .withClientTracking(resultSalesTaxTrackingDto.clientTracking().withInternalTimestamps(null))
                         ,
                         resultSalesTaxTrackingDto)
                 );

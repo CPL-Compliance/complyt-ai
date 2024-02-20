@@ -57,11 +57,8 @@ public class ClientTrackingRepository {
     }
 
     public Mono<ClientTracking> saveByTenantId(@NonNull ClientTracking clientTracking, @NonNull String tenantId) {
-        ClientTracking clientTrackingWithTenantId = clientTracking.withTenantId(tenantId);
-
-        return ContextLogger.observeCtx("Saving client tracking with tenantId: " + tenantId +
-                        " " + clientTrackingWithTenantId.toString(), log::info)
-                .then(reactiveMongoTemplate.save(clientTrackingWithTenantId));
+        return ContextLogger.observeCtx("Saving client tracking " + clientTracking.toString(), log::info)
+                .then(reactiveMongoTemplate.save(clientTracking));
     }
 
     public Flux<ClientTracking> findByName(@NonNull String name) {

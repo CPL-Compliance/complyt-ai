@@ -6,7 +6,6 @@ import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
-import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
@@ -66,7 +65,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
         tenantId = "org_nD6T71fMDbR0qTSY";
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         ClientTrackingDtoTenant = testUtilities.createClientTrackingDtoTenant(tenantId);
-        clientTracking = ClientTrackingMapper.INSTANCE.ClientTrackingDtoTenantToClientTracking(ClientTrackingDtoTenant);
+        clientTracking = ClientTrackingMapper.INSTANCE.clientTrackingDtoTenantToClientTracking(ClientTrackingDtoTenant);
         ClientTracking secondClientTracking = clientTracking.withId(UUID.randomUUID().toString());
         clientTrackingList = new ArrayList<>() {{
             add(clientTracking);

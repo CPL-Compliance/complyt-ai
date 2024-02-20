@@ -12,6 +12,6 @@ import java.util.HashMap;
 public interface ClientTrackingMapper {
     ClientTrackingMapper INSTANCE = Mappers.getMapper(ClientTrackingMapper.class);
 
-    ClientTracking ClientTrackingDtoTenantToClientTracking(ClientTrackingDtoTenant ClientTrackingDtoTenant);
+    ClientTracking clientTrackingDtoTenantToClientTracking(ClientTrackingDtoTenant ClientTrackingDtoTenant);
     ClientTrackingDtoTenant clientTrackingToClientTrackingDtoTenant(ClientTracking clientTracking);
 }

@@ -47,7 +47,7 @@ public class ExemptionHandler {
     @NonNull
     ValidationHandler<ExemptionWrapperDto, SpringValidatorAdapter> exemptionWrapperDtoValidationHandler;
 
-        @ExemptionReadPermission
+    @ExemptionReadPermission
     public Mono<ServerResponse> findByComplytId(ServerRequest serverRequest) {
         String complytId = serverRequest.pathVariable("complytId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
@@ -120,8 +120,8 @@ public class ExemptionHandler {
         Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(exemptionDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Mono.defer(() -> exemptionFacade.markAsCancelled(UUID.fromString(complytId)))
-                    .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
-                    .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
 
         return exemptionDtoMono.switchIfEmpty(exemptionDtoMono)
                 .flatMap(response -> ServerResponse.noContent().build()
