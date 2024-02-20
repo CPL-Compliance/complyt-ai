@@ -5,6 +5,7 @@ import com.complyt.domain.ClientTracking;
 import com.complyt.domain.Nexus;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.ClientTrackingRepository;
+import feign.Client;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,6 +53,19 @@ class clientTrackingServiceImpImplTest {
         Mono<ClientTracking> clientTrackingMono = clientTrackingServiceImp.save(clientTracking);
 
         StepVerifier.create(clientTrackingMono).expectNext(clientTracking).verifyComplete();
+    }
+
+    @Test
+    void save_NullClientTracking_ThrowsException() {
+        // Given
+        ClientTracking nullId = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            clientTrackingServiceImp.save(nullId);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "clientTracking is marked non-null but is null");
     }
 
     @Test
