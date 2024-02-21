@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
+import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -235,6 +236,38 @@ class ValidationHandlerTest {
         when(serverRequest.headers()).thenReturn(headersMock);
         when(serverRequest.headers().contentType()).thenReturn(Optional.of(MediaType.APPLICATION_FORM_URLENCODED));
         when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.just(apiKeyDto));
+        Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
+
+        // Then
+        StepVerifier.create(apiKeyDtoMono).expectError().verify();
+    }
+
+    @Test
+    void handle_urlEncodedTypeSentWithoutContentTypeHeader_throwsError() {
+        // Given
+        ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("clientId", apiKeyDto.clientId());
+        formData.add("clientSecret", apiKeyDto.clientSecret());
+
+        // When
+        ServerRequest.Headers headersMock = mock(ServerRequest.Headers.class);
+        when(serverRequest.formData()).thenReturn(Mono.just(formData));
+        when(serverRequest.headers()).thenReturn(headersMock);
+        when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.error(new UnsupportedMediaTypeException("error")));
+
+        Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
+
+        // Then
+        StepVerifier.create(apiKeyDtoMono).expectError().verify();
+    }
+    @Test
+    void handle_noContentTypeHeader_throwsError() {
+        // When
+        ServerRequest.Headers headersMock = mock(ServerRequest.Headers.class);
+        when(serverRequest.headers()).thenReturn(headersMock);
+        when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.error(new UnsupportedMediaTypeException("error")));
+
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 
         // Then

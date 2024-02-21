@@ -1,8 +1,9 @@
 package io.complyt.authentication.v1.routers;
 
-import io.complyt.authentication.config.ApiExceptionConfig;
+import io.complyt.authentication.v1.config.ApiExceptionConfig;
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
+import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import io.complyt.authentication.facades.ApiKeyFacade;
 import io.complyt.authentication.repositories.exceptions.OperationFailedException;
 import io.complyt.authentication.v1.config.error_messages.GenericErrorMessages;
@@ -14,18 +15,21 @@ import io.complyt.authentication.v1.mappers.CredentialsMapper;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.validators.ValidatorConfig;
+import io.complyt.authentication.v1.validators.query_params.QueryParamsExtractorCredentials;
 import io.complyt.authentication.v1.validators.query_params.QueryParamsExtractorEmpty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import test_utils.unit_tests.TestUtilities;
+import test_utils.unit_tests.templates.DeleteRouterTestMonoTemplate;
 import test_utils.unit_tests.templates.PostCreatedRouterMonoTest;
 import test_utils.unit_tests.templates.PostRouterTestSecurityTemplate;
 
@@ -39,8 +43,8 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @WebFluxTest
 @ContextConfiguration(classes = {ApiKeyRouter.class, ApiKeyHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class, GlobalExceptionHandler.class, GlobalErrorAttributes.class,
-        QueryParamsExtractorEmpty.class})
-class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecurityTemplate {
+        QueryParamsExtractorEmpty.class, QueryParamsExtractorCredentials.class})
+class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecurityTemplate, DeleteRouterTestMonoTemplate {
     @Autowired
     ApiKeyRouter apiKeyRouter;
 
@@ -54,10 +58,15 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     Credentials credentials;
 
+    ApiKey apiKey;
+    ApiKeyDto apiKeyDto;
+
     @BeforeEach
-    void postCredentialsRouterFunction() {
+    void setUp() {
         credentialsDto = TestUtilities.createCredentialsDto();
         credentials = CredentialsMapper.INSTANCE.credentialsDtoTocredentials(credentialsDto);
+        apiKey = TestUtilities.createApiKey();
+        apiKeyDto = ApiKeyMapper.INSTANCE.apiKeyToApiKeyDto(apiKey);
     }
 
     @Test
@@ -184,6 +193,156 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
                         .path(ApiKeyRouter.BASE_URL)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void delete_SentAsFormURLEncoded_Exists_Returns204() {
+        // Given
+        Credentials cancelledCredentials = credentials.withStatus(ApiKeyStatus.CANCELLED);
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
+        // When
+        when(apiKeyFacade.markAsCancelled(apiKey)).thenReturn(Mono.just(cancelledCredentials));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void delete_SentAsJson_Exists_Returns204() {
+        // Given
+        Credentials cancelledCredentials = credentials.withStatus(ApiKeyStatus.CANCELLED);
+
+        // When
+        when(apiKeyFacade.markAsCancelled(apiKey)).thenReturn(Mono.just(cancelledCredentials));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .build()
+                )
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(apiKeyDto)
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void delete_DoesntExist_Returns204() {
+        // When
+        when(apiKeyFacade.markAsCancelled(apiKey)).thenReturn(Mono.empty());
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void delete_InternalServerError_ReturnInternalServerError() {
+        // When
+        when(apiKeyFacade.markAsCancelled(apiKey)).thenThrow(OperationFailedException.class);
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    @Override
+    public void delete_NullHandler_ThrowsNullPointerException() {
+        // Given
+        ApiKeyRouter apiKeyRouter = new ApiKeyRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            apiKeyRouter.deleteApiKeyRouterFunction(null);
+        });
+
+        // Then
+        assertEquals("apiKeyHandler is marked non-null but is null", exception.getMessage());
+    }
+
+
+    @Test
+    @Override
+    public void delete_UnauthenticatedUser_Returns401() {
+        // When
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().is4xxClientError();
+
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void delete_missingCsrfToken_return403() {
+        // When
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
+        // Then
+        webTestClient
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
                 .exchange()
                 .expectStatus().isForbidden();
     }

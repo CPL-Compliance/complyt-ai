@@ -1,9 +1,12 @@
 package io.complyt.authentication.business.authorization;
 
-import lombok.NonNull;
-import reactor.core.publisher.Mono;
+import io.complyt.authentication.business.authorization.Wrappers.AccessTokenAuthorizationServerWrapper;
+import io.complyt.authentication.business.authorization.Wrappers.ApiKeyRevocationAuthorinzationServerWrapper;
+import io.complyt.authentication.business.authorization.Wrappers.ManagementAuthorizationServerWrapper;
+import io.complyt.authentication.business.authorization.Wrappers.TenantIdAndNameAuthorizationServerWrapper;
 
-public interface AuthorizationServerWrapper {
-    Mono<AccessToken> getAccessToken(final @NonNull String clientId, final @NonNull String clientSecret,
-                                     final @NonNull String audience, final @NonNull String grantType);
+
+public interface AuthorizationServerWrapper extends AccessTokenAuthorizationServerWrapper, ApiKeyRevocationAuthorinzationServerWrapper,
+        ManagementAuthorizationServerWrapper, TenantIdAndNameAuthorizationServerWrapper {
+
 }

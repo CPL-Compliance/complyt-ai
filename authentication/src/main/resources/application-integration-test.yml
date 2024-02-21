@@ -32,4 +32,7 @@ token-service.token-expiration-safe-window-sec: 10
 authorization:
   grant-type: "client_credentials"
   audience: "https://integration-test/"
-  authorization-server-url: "https://integration-test.com/path"
+  authorization-server-base-url: "authorization-server-base-url"
+  management-audience: "management-audience"
+  admin-client-id: "admin-client-id"
+  admin-client-secret: "admin-client-secret"

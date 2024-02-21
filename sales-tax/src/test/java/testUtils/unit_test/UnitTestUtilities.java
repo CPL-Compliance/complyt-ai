@@ -29,8 +29,6 @@ import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.validators.body_checkers.ItemsAlignmentChecker;
 import com.complyt.v1.validators.body_checkers.TransactionDtoShippingAddressChecker;
 import com.complyt.v1.validators.body_checkers.TransactionTotalAmountChecker;
-import feign.Body;
-import lombok.NonNull;
 import org.springframework.data.mongodb.core.query.Update;
 
 import java.math.BigDecimal;
@@ -399,7 +397,8 @@ public class UnitTestUtilities {
     }
 
     public ClientTracking createClientTracking(String tenantId) {
-        return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope");
+        Timestamps internalTimestamp = new Timestamps(localDateTime, localDateTime);
+        return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope", internalTimestamp);
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
@@ -418,8 +417,14 @@ public class UnitTestUtilities {
         return salesTaxTrackingDto;
     }
 
+    public ClientTrackingDtoTenant createClientTrackingDtoTenant(String tenantId) {
+        TimestampsDto internalTimestamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
+        return new ClientTrackingDtoTenant(new NexusDto(localDateTime), "client dope", internalTimestamps, tenantId);
+    }
+
     public ClientTrackingDto createClientTrackingDto() {
-        return new ClientTrackingDto(new NexusDto(localDateTime), "client dope");
+        TimestampsDto internalTimestamps =  new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        return new ClientTrackingDto(new NexusDto(localDateTime), "client dope", internalTimestamps);
     }
 
     public Result createResult() {

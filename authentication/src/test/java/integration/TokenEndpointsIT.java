@@ -5,6 +5,7 @@ import io.complyt.authentication.v1.config.error_messages.GenericErrorMessages;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.TokenDto;
 import io.complyt.authentication.v1.routers.TokenRouter;
+import net.minidev.json.JSONObject;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
     @Order(1)
     @Test
     @WithMockUser
-    public void post_jsonTypeApiKeyNotExists_Returns404() {
+    public void post_jsonTypeApiKeyNotExists_Returns401() {
         ApiKeyDto apiKeyDto = new ApiKeyDto("e2019b6f-a8c1-415c-b8b0-3fd6725c9a67", "e25f4d90-1051-44f7-89fb-4c6097af7747");
 
         webTestClient
@@ -62,13 +63,13 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .bodyValue(apiKeyDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isNotFound()
+                .expectStatus().isUnauthorized()
                 .expectBody(TokenDto.class);
     }
     @Order(2)
     @Test
     @WithMockUser
-    public void post_urlEncodedTypeApiKeyNotExists_Returns404() {
+    public void post_urlEncodedTypeApiKeyNotExists_Returns401() {
         String urlEncodedApiKey = "clientId=e2019b6f-a8c1-415c-b8b0-3fd6725c9a67&clientSecret=e25f4d90-1051-44f7-89fb-4c6097af7747";
 
         webTestClient
@@ -83,7 +84,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .bodyValue(urlEncodedApiKey)
                 .accept(MediaType.APPLICATION_FORM_URLENCODED)
                 .exchange()
-                .expectStatus().isNotFound()
+                .expectStatus().isUnauthorized()
                 .expectBody(TokenDto.class);
     }
     @Order(3)
@@ -152,4 +153,5 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .expectBody(LinkedHashMap.class)
                 .value(map -> assertEquals(GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE, map.get("message")));
     }
+
 }

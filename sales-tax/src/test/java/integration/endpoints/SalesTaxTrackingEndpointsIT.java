@@ -7,6 +7,7 @@ import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
+import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import integration.TestContainersInitializerIT;
@@ -50,6 +51,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     private final StateDto newState = new StateDto("AL", "01", "Alabama");
     private final StateDto stateWithNexus = new StateDto("TX", "48", "Texas");
     private final StateDto stateWithOldRule = new StateDto("HI", "101", "Hawaii");
+    private final TimestampsDto timestampsDto = new TimestampsDto("2024-01-01T00:00:00", "2024-01-01T00:00:00");
 
     @MockBean
     TenantResolver tenantResolver;
@@ -435,9 +437,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                         salesTaxTrackingDto
                                 .withComplytId(resultSalesTaxTrackingDto.complytId())
                                 .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
-                                .withClientTracking(ITUtilities.stubClientTrackingDto())
-                                .withNexusStateRule(ITUtilities.stubAlabamaNexusStateRuleDto()),
-                        resultSalesTaxTrackingDto)
+                                .withClientTracking(ITUtilities.stubClientTrackingDto().withInternalTimestamps(timestampsDto))
+                                .withNexusStateRule(ITUtilities.stubAlabamaNexusStateRuleDto())
+                        , resultSalesTaxTrackingDto)
                 );
     }
 
@@ -466,8 +468,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                                 withComplytId(resultSalesTaxTrackingDto.complytId())
                                 .withComment("a new comment")
                                 .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
-                                .withClientTracking(ITUtilities.stubClientTrackingDto())
-                                .withNexusStateRule(ITUtilities.stubAlabamaNexusStateRuleDto()),
+                                .withClientTracking(ITUtilities.stubClientTrackingDto().withInternalTimestamps(timestampsDto))
+                                .withNexusStateRule(ITUtilities.stubAlabamaNexusStateRuleDto())
+                        ,
                         resultSalesTaxTrackingDto)
                 );
     }

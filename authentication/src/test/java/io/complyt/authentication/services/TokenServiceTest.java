@@ -359,7 +359,7 @@ class TokenServiceTest {
     }
 
     @Test
-    void findByApiKey_apiKeyExists_returnsMonoToken() throws InvalidAlgorithmParameterException,
+    void findByApiKeyAndDecrypt_apiKeyExists_returnsMonoToken() throws InvalidAlgorithmParameterException,
             IllegalBlockSizeException, NoSuchPaddingException, BadPaddingException, NoSuchAlgorithmException,
             InvalidKeyException {
         // Given
@@ -387,13 +387,13 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenReturn(scopePlainText);
 
         // Then
-        Mono<Token> tokenMono = tokenService.findByApiKey(apiKey);
+        Mono<Token> tokenMono = tokenService.findByApiKeyAndDecrypt(apiKey);
 
         StepVerifier.create(tokenMono).expectNext(token).verifyComplete();
     }
 
     @Test
-    void findByApiKey_apiKeyDoesntExist_returnsMonoEmpty() {
+    void findByApiKeyAndDecrypt_apiKeyDoesntExist_returnsMonoEmpty() {
         // Given
         ApiKey apiKey = TestUtilities.createApiKey();
 
@@ -401,13 +401,13 @@ class TokenServiceTest {
         when(tokenRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.empty());
 
         // Then
-        Mono<Token> tokenMono = tokenService.findByApiKey(apiKey);
+        Mono<Token> tokenMono = tokenService.findByApiKeyAndDecrypt(apiKey);
 
         StepVerifier.create(tokenMono).verifyComplete();
     }
 
     @Test
-    void findByApiKey_authenticationFails_returnsMonoEmpty() {
+    void findByApiKeyAndDecrypt_authenticationFails_returnsMonoEmpty() {
         // Given
         ApiKey apiKey = TestUtilities.createApiKey();
         Token token = TestUtilities.createToken();
@@ -428,15 +428,42 @@ class TokenServiceTest {
                 .thenReturn(false);
 
         // Then
-        Mono<Token> tokenMono = tokenService.findByApiKey(apiKey);
+        Mono<Token> tokenMono = tokenService.findByApiKeyAndDecrypt(apiKey);
 
         StepVerifier.create(tokenMono).verifyComplete();
     }
 
     @Test
-    void findByApiKey_apiKeyIsNull_throwsNullException() {
+    void deleteToken_tokenFound_returnsDeletedToken(){
+        //Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Token token = TestUtilities.createToken();
+
+        //When
+        when(tokenRepository.deleteByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(token));
+
+        //Then
+        Mono<Token> tokenMono = tokenService.deleteToken(apiKey);
+        StepVerifier.create(tokenMono).expectNext(token).verifyComplete();
+    }
+
+    @Test
+    void deleteToken_tokenNotFound_returnsMonoEmpty(){
+        //Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+
+        //When
+        when(tokenRepository.deleteByComplytClientId(apiKey.clientId())).thenReturn(Mono.empty());
+
+        //Then
+        Mono<Token> tokenMono = tokenService.deleteToken(apiKey);
+        StepVerifier.create(tokenMono).verifyComplete();
+    }
+
+    @Test
+    void findByApiKeyAndDecrypt_apiKeyIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            tokenService.findByApiKey(null);
+            tokenService.findByApiKeyAndDecrypt(null);
         });
 
         assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
@@ -449,5 +476,14 @@ class TokenServiceTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "token is marked non-null but is null");
+    }
+
+    @Test
+    void deleteToken_tokenIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            tokenService.deleteToken(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
     }
 }

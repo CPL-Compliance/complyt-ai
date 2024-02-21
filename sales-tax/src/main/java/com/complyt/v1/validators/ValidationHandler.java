@@ -51,7 +51,26 @@ public class ValidationHandler<T, U extends Validator> {
     public Mono<T> handle(final ServerRequest serverRequest) {
         return validatePathVariable(serverRequest.pathVariables().entrySet())
                 .then(validateQueryParam(serverRequest))
-                .then(Mono.defer(() -> shouldCallValidate.apply(serverRequest) ? handleRequestBody(serverRequest) : Mono.empty()));
+                .then(Mono.defer(() -> shouldCallValidate.apply(serverRequest) ? validateRequestBody(serverRequest) : Mono.empty()));
+    }
+
+    private Mono<T> validateRequestBody(final ServerRequest serverRequest) {
+        return customBodyExtractor.extract(serverRequest)
+                .switchIfEmpty(serverRequest.bodyToMono(validationClass))
+                .flatMap(this::validateBody)
+                .switchIfEmpty(Mono.error(new MissingBodyApiException()));
+    }
+
+    public Mono<T> validate(final ServerRequest serverRequest) {
+        return this.validateRequestBody(serverRequest)
+                .flatMap(body -> Flux.fromIterable(serverRequest.pathVariables().keySet())
+                        .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)
+                                .flatMap(check -> check.apply(body, serverRequest)))
+                        .concatWith(dataConflictChecksProvider.getBodyConflictCheck()
+                                .flatMapMany(check -> check.apply(body)))
+                        .collectList()
+                        .flatMap(errorList -> errorList.isEmpty() ? Mono.just(body) :
+                                Mono.error(new ConflictedDataApiException(errorList))));
     }
 
     private Mono<Boolean> validateQueryParam(final ServerRequest serverRequest) {
@@ -94,13 +113,6 @@ public class ValidationHandler<T, U extends Validator> {
                         .concatWith(checkBodyConflicts(body))
                         .collectList()
                         .flatMap(errorList -> checkErrorList(body, errorList)));
-    }
-
-    private Mono<T> validateRequestBody(final ServerRequest serverRequest) {
-        return customBodyExtractor.extract(serverRequest)
-                .switchIfEmpty(serverRequest.bodyToMono(validationClass))
-                .flatMap(this::validateBody)
-                .switchIfEmpty(Mono.error(new MissingBodyApiException()));
     }
 
     public Mono<T> handle(@NonNull final T object, @NonNull final Set<Map.Entry<String, String>> entrySet) {
