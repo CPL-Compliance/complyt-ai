@@ -12,6 +12,7 @@ import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.nexus.DateWrapperDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
+import com.complyt.v1.validators.Patcher;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.UUID;
 
 @Component
@@ -45,6 +47,9 @@ public class SalesTaxTrackingHandler {
     @NonNull
     ValidationHandler<DateWrapperDto, SpringValidatorAdapter> dateWrapperDtoValidationHandler;
 
+    @NonNull
+    Patcher<SalesTaxTrackingDto> salesTaxTrackingPatcher;
+
     @NexusReadPermission
     public Mono<ServerResponse> getOne(ServerRequest serverRequest) {
         String state = serverRequest.pathVariable("state");
@@ -53,8 +58,8 @@ public class SalesTaxTrackingHandler {
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(salesTaxTrackingDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Mono.defer(() -> salesTaxTrackingFacade.findByState(state))
-                .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
 
@@ -68,8 +73,8 @@ public class SalesTaxTrackingHandler {
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(salesTaxTrackingDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Mono.defer(() -> salesTaxTrackingFacade.findByComplytId(UUID.fromString(complytId)))
-                .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
     }
@@ -106,7 +111,7 @@ public class SalesTaxTrackingHandler {
         Flux<SalesTaxTrackingDto> salesTaxTrackingDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(salesTaxTrackingDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Flux.defer(() -> salesTaxTrackingFacade.findAll(Integer.parseInt(page), Integer.parseInt(size))
-                                .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)));
+                        .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)));
 
         return ServerResponse.ok().body(salesTaxTrackingDtoFlux, SalesTaxTrackingDto.class);
 
@@ -125,5 +130,23 @@ public class SalesTaxTrackingHandler {
                                 .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new))));
 
         return ServerResponse.ok().body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
+    }
+
+    public Mono<ServerResponse> patch(ServerRequest serverRequest) {
+        String state = serverRequest.pathVariable("state");
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+
+        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
+                .then(salesTaxTrackingDtoValidationHandler.validateParam("state", state))
+                .then(Mono.defer(() -> salesTaxTrackingFacade.findByState(state))
+                        .flatMap(existingSalesTaxTracking -> serverRequest.bodyToMono(Map.class)
+                                .map(map -> salesTaxTrackingPatcher.patch(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(existingSalesTaxTracking), map))
+                                .flatMap(salesTaxTrackingDto -> salesTaxTrackingDtoValidationHandler.handle(salesTaxTrackingDto, serverRequest.pathVariables().entrySet()))
+                                .flatMap(salesTaxTrackingDto -> salesTaxTrackingFacade.update(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto), existingSalesTaxTracking))
+                                .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
+                                .flatMap(salesTaxTrackingDto -> ContextLogger.observeCtx("<-- Returned Body: " + salesTaxTrackingDto, log::info).thenReturn(salesTaxTrackingDto)))
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
     }
 }

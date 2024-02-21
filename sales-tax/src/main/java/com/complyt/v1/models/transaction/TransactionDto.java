@@ -1,6 +1,5 @@
 package com.complyt.v1.models.transaction;
 
-import com.complyt.domain.transaction.TransactionFilingStatus;
 import com.complyt.v1.api_info.FieldsDescriptions;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
@@ -43,6 +42,6 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(description = FieldsDescriptions.TAXABLE_ITEMS_AMOUNT) BigDecimal taxableItemsAmount,
                              @Schema(description = FieldsDescriptions.TANGIBLE_ITEMS_AMOUNT) BigDecimal tangibleItemsAmount,
                              @Schema(description = FieldsDescriptions.TOTAL_ITEMS_AMOUNT) BigDecimal totalItemsAmount,
-                             @Schema(description = FieldsDescriptions.TRANSACTION_FILING_STATUS) TransactionFilingStatus transactionFilingStatus)
+                             @Schema(description = FieldsDescriptions.TRANSACTION_FILING_STATUS) TransactionFilingStatusDto transactionFilingStatus)
         implements SourceCheckable, ExternalIdCheckable {
 }

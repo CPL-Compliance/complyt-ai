@@ -3,6 +3,9 @@ package com.complyt.utils.object_mapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class ComplytObjectMapper {
 
@@ -15,4 +18,17 @@ public class ComplytObjectMapper {
             throw new RuntimeException();
         }
     }
+
+    public static <T> List<T> convertToList(Object objectList, Class patchingClass) {
+        List<T> returnedObjects = new ArrayList<>();
+        List<Object> objectsToMap = (List<Object>) objectList;
+
+        for (Object objectToMap : objectsToMap) {
+            Object mappedObject = mapObject(objectToMap, patchingClass);
+            returnedObjects.add((T) mappedObject);
+        }
+
+        return returnedObjects;
+    }
+
 }

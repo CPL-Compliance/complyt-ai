@@ -10,6 +10,7 @@ import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.routers.TransactionRouter;
+import com.complyt.v1.validators.Patcher;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,9 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 import java.net.URI;
+import java.util.Map;
 import java.util.UUID;
 
 @Component
@@ -38,6 +41,9 @@ public class TransactionHandler {
     @NonNull
     ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler;
 
+    @NonNull
+    Patcher<TransactionDto> transactionPatcher;
+
     @TransactionReadPermission
     public Mono<ServerResponse> getByExternalIdAndSource(ServerRequest serverRequest) {
         String externalId = serverRequest.pathVariable("externalId");
@@ -48,9 +54,9 @@ public class TransactionHandler {
         Mono<TransactionDto> transactionDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(transactionDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Mono.defer(() -> transactionFacade.findByExternalIdAndSource(externalId, source))
-                .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
-                .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
+                        .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto))
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoMono, TransactionDto.class);
     }
@@ -67,8 +73,8 @@ public class TransactionHandler {
         Flux<TransactionDto> transactionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(transactionDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Flux.defer(() -> transactionFacade.getAll(Integer.parseInt(page), Integer.parseInt(size)))
-                .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
-                .flatMapSequential(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto)));
+                        .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
+                        .flatMapSequential(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto)));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoFlux, TransactionDto.class);
     }
@@ -81,8 +87,8 @@ public class TransactionHandler {
         Flux<TransactionDto> transactionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(transactionDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Flux.defer(() -> transactionFacade.getAllBySource(source))
-                .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
-                .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto)));
+                        .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
+                        .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto)));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoFlux, TransactionDto.class);
     }
@@ -129,7 +135,7 @@ public class TransactionHandler {
         String source = serverRequest.pathVariable("source");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<TransactionDto> transactionDtoMono =  ContextLogger.observeCtx(logStr, log::info)
+        Mono<TransactionDto> transactionDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(transactionDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Mono.defer(() -> transactionFacade.markAsCancelled(externalId, source))
                         .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
@@ -138,7 +144,25 @@ public class TransactionHandler {
 
         return transactionDtoMono.switchIfEmpty(transactionDtoMono)
                 .flatMap(response -> ServerResponse.noContent().build()
-                .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse)));
+                        .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse)));
+    }
+
+    public Mono<ServerResponse> patch(ServerRequest serverRequest) {
+        String complytId = serverRequest.pathVariable("complytId");
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+
+        Mono<TransactionDto> transactionDtoMono = ContextLogger.observeCtx(logStr, log::info)
+                .then(transactionDtoValidationHandler.validateParam("complytId", complytId))
+                .then(Mono.defer(() -> transactionFacade.findByComplytId(UUID.fromString(complytId)))
+                        .flatMap(existingTransaction -> serverRequest.bodyToMono(Map.class)
+                                .map(map -> transactionPatcher.patch(TransactionMapper.INSTANCE.transactionToTransactionDto(existingTransaction), map))
+                                .flatMap(transactionDto -> transactionDtoValidationHandler.handle(transactionDto, serverRequest.pathVariables().entrySet()))
+                                .flatMap(transactionDto -> transactionFacade.update(transactionDto.externalId(), transactionDto.source(), TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto), existingTransaction))
+                                .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
+                                .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto)))
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoMono, TransactionDto.class);
     }
 
 }

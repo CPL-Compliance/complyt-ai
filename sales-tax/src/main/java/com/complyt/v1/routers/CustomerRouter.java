@@ -2,6 +2,7 @@ package com.complyt.v1.routers;
 
 import com.complyt.v1.api_info.customer.*;
 import com.complyt.v1.handlers.CustomerHandler;
+import com.complyt.v1.handlers.CustomerHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,6 +62,16 @@ public class CustomerRouter {
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(getCustomerRoute, customerHandler::getByComplytId);
+    }
+
+    @Bean
+//    @PatchCustomerByComplytIdApiInfo
+    public RouterFunction<ServerResponse> patchCustomerRouterFunction(@NonNull final CustomerHandler customerHandler) {
+        RequestPredicate deleteCustomerRoute = RequestPredicates
+                .PATCH(BASE_URL + "/complytId/{complytId}")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(deleteCustomerRoute, customerHandler::patch);
     }
 
 }

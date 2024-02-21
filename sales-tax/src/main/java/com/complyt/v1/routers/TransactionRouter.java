@@ -73,4 +73,14 @@ public class TransactionRouter {
         return RouterFunctions.route(deleteTransactionRoute, transactionHandler::delete);
     }
 
+    @Bean
+//    @PatchTransactionByComplytIdApiInfo
+    public RouterFunction<ServerResponse> patchTransactionRouterFunction(@NonNull final TransactionHandler transactionHandler) {
+        RequestPredicate deleteTransactionRoute = RequestPredicates
+                .PATCH(BASE_URL + "/complytId/{complytId}")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(deleteTransactionRoute, transactionHandler::patch);
+    }
+    
 }

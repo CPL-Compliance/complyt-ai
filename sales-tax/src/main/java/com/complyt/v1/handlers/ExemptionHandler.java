@@ -50,7 +50,7 @@ public class ExemptionHandler {
     ValidationHandler<ExemptionWrapperDto, SpringValidatorAdapter> exemptionWrapperDtoValidationHandler;
 
     @NonNull
-    Patcher<ExemptionDto> patcher;
+    Patcher<ExemptionDto> exemptionPatcher;
 
     @ExemptionReadPermission
     public Mono<ServerResponse> findByComplytId(ServerRequest serverRequest) {
@@ -131,7 +131,6 @@ public class ExemptionHandler {
         return exemptionDtoMono.switchIfEmpty(exemptionDtoMono)
                 .flatMap(response -> ServerResponse.noContent().build()
                         .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse)));
-
     }
 
     public Mono<ServerResponse> patch(ServerRequest serverRequest) {
@@ -139,20 +138,17 @@ public class ExemptionHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info)
-                .then(exemptionFacade.findByComplytId(UUID.fromString(complytId)))
-                .flatMap(existingExemption -> {
-                    ExemptionDto existingExemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(existingExemption);
-
-                    return serverRequest.bodyToMono(Map.class)
-                            .map(map -> patcher.patch(existingExemptionDto, map))
-                            .flatMap(patchedExemptionDto -> exemptionDtoValidationHandler.handle(patchedExemptionDto, Map.of("complytId", complytId).entrySet()))
-                            .map(ExemptionMapper.INSTANCE::exemptionDtoToExemption)
-                            .flatMap(exemption -> exemptionFacade.update(exemption, UUID.fromString(complytId)))
-                            .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
-                            .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto))
-                            .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
-                });
+                .then(exemptionDtoValidationHandler.validateParam("complytId", complytId))
+                .then(Mono.defer(() -> exemptionFacade.findByComplytId(UUID.fromString(complytId)))
+                        .flatMap(existingExemption -> serverRequest.bodyToMono(Map.class)
+                                .map(map -> exemptionPatcher.patch(ExemptionMapper.INSTANCE.exemptionToExemptionDto(existingExemption), map))
+                                .flatMap(exemptionDto -> exemptionDtoValidationHandler.handle(exemptionDto, serverRequest.pathVariables().entrySet()))
+                                .flatMap(exemptionDto -> exemptionFacade.update(ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto), UUID.fromString(complytId)))
+                                .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
+                                .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto)))
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(exemptionDtoMono, ExemptionDto.class);
     }
+
 }

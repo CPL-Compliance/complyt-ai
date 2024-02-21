@@ -66,7 +66,7 @@ public class ExemptionRouter {
     }
 
     @Bean
-//    @DeleteExemptionByComplytIdApiInfo
+//    @PatchExemptionByComplytIdApiInfo
     public RouterFunction<ServerResponse> patchExemptionRouterFunction(@NonNull final ExemptionHandler exemptionHandler) {
         RequestPredicate deleteExemptionRoute = RequestPredicates
                 .PATCH(BASE_URL + "/complytId/{complytId}")

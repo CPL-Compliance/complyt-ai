@@ -62,4 +62,14 @@ public class SalesTaxTrackingRouter {
         return RouterFunctions.route(refreshNexusSummaryByDateRoute, salesTaxTrackingHandler::refreshNexusSummaryByDate);
     }
 
+    @Bean
+//    @PatchSalesTaxTrackingByComplytIdApiInfo
+    public RouterFunction<ServerResponse> patchSalesTaxTrackingRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
+        RequestPredicate deleteSalesTaxTrackingRoute = RequestPredicates
+                .PATCH(BASE_URL + "/state/{state}")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(deleteSalesTaxTrackingRoute, salesTaxTrackingHandler::patch);
+    }
+
 }
