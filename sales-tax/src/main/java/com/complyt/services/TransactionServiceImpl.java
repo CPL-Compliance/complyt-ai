@@ -62,31 +62,6 @@ public class TransactionServiceImpl implements TransactionService {
         return complytIdHandler.checkNewDontHaveComplytId(newTransaction);
     }
 
-//    @Override
-//    public Mono<Transaction> calculateEachItemTotal(@NonNull Transaction transaction) {
-//        return Mono.just(transaction.withItems(
-//                transaction.getItems().stream()
-//                        .map(item -> item.withCalculatedTotal(item.calculateTotal()))
-//                        .collect(Collectors.toList())
-//        ));
-//    }
-
-//    todo: delete
-//    @Override
-//    public Mono<Transaction> setItemsTotalAfterDiscount(@NonNull Transaction transaction) {
-//        return Mono.just(transaction.withItems(
-//                transaction.getItems().stream()
-//                        .map(item -> )
-//        ))
-//    }
-
-//    @Override
-//    public Mono<Transaction> checkAfterTaxDiscountAndHandle(@NonNull Transaction transaction) {
-//        return transaction.getDiscount() != null && !transaction.getDiscount().isPreTax() ?
-//                Mono.just(transaction.withTotalItemsAmount(transaction.getTotalItemsAmount().add(transaction.getDiscount().discountAmount()))) :
-//                Mono.just(transaction);
-//    } //todo: remove
-
     @Override
     public Mono<Transaction> findByExternalIdAndSource(@NonNull String externalId, String source) {
         return transactionRepository.findByExternalIdAndSource(externalId, source);

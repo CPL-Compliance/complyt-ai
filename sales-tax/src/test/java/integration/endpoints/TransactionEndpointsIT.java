@@ -817,7 +817,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL) // Set your API endpoint
-                        .queryParam("page",page)
+                        .queryParam("page", page)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -853,6 +853,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_OneItemIsNegativeAmount_ReturnsTaxableTransaction() {
+        // Given
         String externalId = "NonExistingIdNegativeAmount";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto(),
@@ -873,5 +874,284 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_TransactionWithShippingFee_ReturnsTaxableTransactionWithShippingFeeAndItemsCalculatedTotal() {
+        //Given
+        String externalId = "NonExistingIdTransactionWithShipping";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto())
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(ITUtilities.stubItemDto().totalPrice(), transactionDto.items().get(0).calculatedTotal());
+                    assertEquals(ITUtilities.stubShippingFeeDto().totalPrice(), transactionDto.shippingFee().calculatedTotal());
+                    assertNotNull(transactionDto.salesTax());
+                });
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_ItemWithManualSalesTax_ReturnsTaxableTransactionWithCalculatedTotal() {
+        //Given
+        String externalId = "NonExistingIdTransactionWithManualSalesTax";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withManualSalesTax(true).withManualSalesTaxRate(new BigDecimal("0.2")))
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        BigDecimal itemSalesTaxAmount = ITUtilities.stubItemDto().totalPrice().multiply(new BigDecimal("0.2"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(ITUtilities.stubItemDto().totalPrice(), transactionDto.items().get(0).calculatedTotal());
+                    assertEquals(itemSalesTaxAmount, transactionDto.salesTax().amount());
+                    assertNotNull(transactionDto.salesTax());
+                });
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NoItemHasDiscount_ReturnsTaxableTransactionWithDiscountTotal0() {
+        //Given
+        String externalId = "NonExistingIdTransactionWithNoDiscount";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto())
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(BigDecimal.ZERO, transactionDto.totalDiscount());
+                    assertNotNull(transactionDto.salesTax());
+                });
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_OneItemHasDiscount_ReturnsTaxableTransactionWithDiscountTotal() {
+        //Given
+        String externalId = "NonExistingIdTransactionOneItemHaveDiscount";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withDiscount(BigDecimal.valueOf(500)))
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(BigDecimal.valueOf(500), transactionDto.totalDiscount());
+                    assertNotNull(transactionDto.salesTax());
+                });
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_TwoItemHaveDiscount_ReturnsTaxableTransactionWithDiscountTotal() {
+        //Given
+        String externalId = "NonExistingIdTransactionTwoItemsHaveDiscount";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withDiscount(BigDecimal.valueOf(500)),
+                        ITUtilities.stubItemDto().withDiscount(BigDecimal.valueOf(700)))
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(BigDecimal.valueOf(1200), transactionDto.totalDiscount());
+                    assertNotNull(transactionDto.salesTax());
+                });
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_OneItemHasDiscountOneItemIsNegative_ReturnsTaxableTransactionWithDiscount() {
+        //Given
+        String externalId = "NonExistingIdTransactionOneItemHaveDiscountOneNegative";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withDiscount(BigDecimal.valueOf(500)),
+                        ITUtilities.stubItemDto().withUnitPrice(BigDecimal.valueOf(-800)).withTotalPrice(BigDecimal.valueOf(-800)))
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(BigDecimal.valueOf(500), transactionDto.totalDiscount());
+                    assertNotNull(transactionDto.salesTax());
+                });
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_ItemUnitPriceAndQuantityNullAndTotalNotNull_ReturnsTaxableTransaction() {
+        //Given
+        String externalId = "NonExistingIdTransactionUnitPriceQuantityNull";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withQuantity(null).withUnitPrice(null))
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(ITUtilities.stubItemDto().totalPrice(), transactionDto.totalItemsAmount());
+                    assertNotNull(transactionDto.salesTax());
+                });
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_ItemUnitPriceAndQuantityNotNullAndTotalNull_ReturnsTaxableTransaction() {
+        //Given
+        String externalId = "NonExistingIdTransactionItemUnitPriceAndQuantityNotNullAndTotalNull";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withTotalPrice(null))
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertNotNull(transactionDto.salesTax());
+                });
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_ItemHasNoUnitPriceAndQuantityAndTotal_Returns400ConflictedData() {
+        //Given
+        String externalId = "NonExistingIdTransactionItemHasNoUnitPriceAndQuantityAndTotal";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withTotalPrice(null).withQuantity(null).withUnitPrice(null))
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 }

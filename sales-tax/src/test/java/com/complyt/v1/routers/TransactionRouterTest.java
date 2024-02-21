@@ -4899,7 +4899,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NegativeManualSalesRateTaxInShippingFee_Returns400ValidationError() {
         // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("-0.5"), new BigDecimal("5000"), null, testUtilities.createSalesTaxRatesDto(), "C1S1", null, null);
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("-0.5"), new BigDecimal("5000"), BigDecimal.ZERO,null, testUtilities.createSalesTaxRatesDto(), "C1S1", null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4924,7 +4924,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NegativeTotalPriceInShippingFee_Returns400ValidationError() {
         // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("-5000"), null, testUtilities.createSalesTaxRatesDto(), "C1S1", null, null);
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("-5000"), BigDecimal.ZERO,null, testUtilities.createSalesTaxRatesDto(), "C1S1", null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4949,7 +4949,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NullTaxCodeInShippingFee_Returns400ValidationError() {
         // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("5000"), null, testUtilities.createSalesTaxRatesDto(), null, null, null);
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("5000"), BigDecimal.ZERO,null, testUtilities.createSalesTaxRatesDto(), null, null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4974,7 +4974,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_LengthGreaterThan256TaxCodeInShippingFee_Returns400ValidationError() {
         // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("5000"), null, testUtilities.createSalesTaxRatesDto(), testUtilities.stringWithLength(257), null, null);
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("5000"), BigDecimal.ZERO,null, testUtilities.createSalesTaxRatesDto(), testUtilities.stringWithLength(257), null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(

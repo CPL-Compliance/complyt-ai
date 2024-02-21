@@ -45,13 +45,6 @@ class ExistingTransactionInternalDateInjectorTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip", false);
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
         List<Item> items = testUtilities.createItems(true, true);
-//        List<Item> items = new ArrayList<>() {
-//            {
-//                add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "taxCode",
-//                        null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO
-//                        , TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
-//            } //todo: remove
-//        };
 
         return Transaction.builder()
                 .id(id)

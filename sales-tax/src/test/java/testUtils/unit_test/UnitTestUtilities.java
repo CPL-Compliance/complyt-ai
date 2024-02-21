@@ -205,11 +205,6 @@ public class UnitTestUtilities {
                 BigDecimal.ZERO, BigDecimal.ZERO, null, TransactionFilingStatus.NOT_FILED); //todo: added totaldiscount zero
     }
 
-//    public Transaction createTransactionWithDiscount(String id) {
-//        Discount discount = createDiscount(BigDecimal.valueOf(500), false, "description");
-//        return createTransaction(id).withDiscount(discount);
-//    } //todo: fix
-
     public TransactionDto createTransactionDto(String id) {
         String documentName = "INVUS1000";
         OptionalAddressDto billingAddress = new OptionalAddressDto("City", "Country", "County", "CA", "Street", "Zip", false);
@@ -217,7 +212,6 @@ public class UnitTestUtilities {
         List<ItemDto> items = createItemDtos(true, false);
         TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);
-//        DiscountDto discountDto = createDiscountDto(BigDecimal.valueOf(500), false, "description");     // todo: fix
         return new TransactionDto(UUID.randomUUID(), id, source, documentName,
                 items, billingAddress, shippingAddress, customerIdOtherDomains,
                 createCustomerDto(customerIdOtherDomains.toString()), null,
@@ -307,12 +301,8 @@ public class UnitTestUtilities {
         return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000),
                 withJurisdictionalRules ? rules : null, null, "C6S1",
                 TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null,
-                null);
+                BigDecimal.ZERO);
     }
-
-//    public Discount createDiscount(BigDecimal discountAmount, boolean isPreTax, String discountDescription) {
-//        return new Discount(discountAmount, isPreTax, discountDescription);
-//    }
 
     public ShippingFee createShippingFeeWithSalesTaxRates(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
@@ -321,13 +311,8 @@ public class UnitTestUtilities {
 
     public ShippingFeeDto createShippingFeeDto(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRulesDto rules = createJurisdictionalSalesTaxRulesDto();
-        return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
+        return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal(1000), BigDecimal.ZERO, withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
     }
-
-//    public DiscountDto createDiscountDto(BigDecimal discountAmount, boolean isPreTax, String discountDescription) {
-//        return new DiscountDto(discountAmount, isPreTax, discountDescription);
-//    }
-
 
     public JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
         return new JurisdictionalSalesTaxRules("California", "CA", true,

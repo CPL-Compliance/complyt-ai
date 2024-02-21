@@ -33,9 +33,8 @@ public interface ITUtilities {
                 null, null, TransactionStatusDto.ACTIVE, null,
                 new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
                 TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED); // , new DiscountDto(BigDecimal.ZERO,false, "") todo: fix
+                BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
         // this is discount      ^
-        //todo:maybe we should change the value of discount from zero to null?
     }
 
     static CustomerDto stubCustomerDto(String externalId) {
@@ -55,8 +54,13 @@ public interface ITUtilities {
     static ItemDto stubItemDto() {
         return new ItemDto(new BigDecimal(10000), new BigDecimal(1), new BigDecimal(10000),
                 null, "some description", "Hardware", "C1S1",
-                null, null, false, null, BigDecimal.ZERO,
+                null, null, false, BigDecimal.ZERO, null,
                 null, null);
+    }
+
+    static ShippingFeeDto stubShippingFeeDto() {
+        return new ShippingFeeDto(false, BigDecimal.ZERO, BigDecimal.valueOf(500), null,
+                null, null, "C6S1", null, null);
     }
 
     static FastTaxData stubFastTaxFlorida() {

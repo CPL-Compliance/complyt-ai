@@ -85,6 +85,8 @@ public @interface GetTransactionByComplytIdApiInfo {
                         "unitPrice": 0,
                         "quantity": 0,
                         "totalPrice": 0,
+                        "calculatedTotal":0,
+                        "discount":0,
                         "description": "string",
                         "name": "string",
                         "taxCode": "string",
@@ -181,6 +183,7 @@ public @interface GetTransactionByComplytIdApiInfo {
                     "manualSalesTax": true,
                     "manualSalesTaxRate": 0,
                     "totalPrice": 0,
+                    "calculatedTotal":0
                     "taxCode": "string",
                     "taxableCategory": "TAXABLE",
                     "tangibleCategory": "TANGIBLE",
@@ -207,6 +210,7 @@ public @interface GetTransactionByComplytIdApiInfo {
                 "taxableItemsAmount": 0,
                 "tangibleItemsAmount": 0,
                 "totalItemsAmount": 0,
+                "totalDiscount" :0,
                 "transactionFilingStatus": "NOT_FILED"
             }
             """;

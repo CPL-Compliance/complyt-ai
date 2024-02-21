@@ -28,14 +28,14 @@ public class TransactionRepository {
     private TenantResolver tenantResolver;
 
 
-
     public Mono<Transaction> save(@NonNull Transaction transaction) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Transaction transactionWithTenantId = transaction.withTenantId(tenantId);
 
                     return ContextLogger.observeCtx("Saving transaction: " + transactionWithTenantId.toString(), log::info)
-                            .then(reactiveMongoTemplate.save(transactionWithTenantId));
+                            .then(reactiveMongoTemplate.save(transactionWithTenantId))
+                            .map(x -> x);
                 });
     }
 
