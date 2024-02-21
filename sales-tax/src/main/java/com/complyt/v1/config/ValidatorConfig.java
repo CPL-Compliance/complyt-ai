@@ -1,8 +1,11 @@
 package com.complyt.v1.config;
 
+import com.complyt.services.ClientTrackingService;
+import com.complyt.v1.models.ClientTrackingDtoTenant;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.checkables.ComplytIdCheckable;
 import com.complyt.v1.models.checkables.StateCheckable;
+import com.complyt.v1.models.checkables.TenantIdCheckable;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import com.complyt.v1.models.customer.exemption.ExemptionWrapperDto;
@@ -34,7 +37,9 @@ public class ValidatorConfig {
             "complytId", ParamCheckerFunctions.UUID_CHECK,
             "source", ParamCheckerFunctions.SOURCE_CHECK,
             "externalId", ParamCheckerFunctions.EXTERNAL_ID_NOT_NULL_CHECK,
-            "state", ParamCheckerFunctions.STATE_CHECK));
+            "state", ParamCheckerFunctions.STATE_CHECK,
+            "tenantId", ParamCheckerFunctions.TENANT_ID_CHECK,
+            "name", ParamCheckerFunctions.NAME_CHECK));
 
     ParameterChecksProvider queryParamChecker = new ParameterChecksProvider(Map.of(
             "page", ParamCheckerFunctions.PAGE_CHECK,
@@ -45,7 +50,8 @@ public class ValidatorConfig {
             HttpMethod.PUT, "^/v1/transactions/source/[^/]+/externalId/[^/]+$|"
                     + "^/v1/customers/source/[^/]+/externalId/[^/]+$|"
                     + "^/v1/exemptions/complytId/[^/]+$|"
-                    + "^/v1/nexus/state/[^/]+$",
+                    + "^/v1/nexus/state/[^/]+$|"
+                    + "^/v1/clientTracking/tenantId/[^/]+$",
             HttpMethod.POST, "^/v1/nexus/refresh/state/[^/]+$|"
                     + "^/v1/exemptions$"));
 
@@ -89,6 +95,7 @@ public class ValidatorConfig {
                 pathVariableChecker,
                 queryParamChecker,
                 shouldCallValidate);
+
     }
 
     @Bean
@@ -118,6 +125,19 @@ public class ValidatorConfig {
     ValidationHandler<ExemptionWrapperDto, SpringValidatorAdapter> exemptionWrapperDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
         return new ValidationHandler<>(ExemptionWrapperDto.class, springValidatorAdapter,
                 new DataConflictChecksProvider(Map.of(),
+                        null),
+                new CustomBodyExtractorEmpty<>(),
+                pathVariableChecker,
+                queryParamChecker,
+                shouldCallValidate);
+
+    }
+
+    @Bean
+    ValidationHandler<ClientTrackingDtoTenant, SpringValidatorAdapter> clientTrackingDtoTenantValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
+        return new ValidationHandler<>(ClientTrackingDtoTenant.class, springValidatorAdapter,
+                new DataConflictChecksProvider(Map.of(
+                        "tenantId", ClientTrackingDtoTenant.TENANT_ID_CONFLICT_CHECK),
                         null),
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,

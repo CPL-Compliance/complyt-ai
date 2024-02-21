@@ -1,5 +1,7 @@
-package com.complyt.domain;
+package com.complyt.domain.client_tracking;
 
+import com.complyt.domain.ClientTracking;
+import com.complyt.domain.Nexus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,13 +23,13 @@ class ClientTrackingTest {
         id = UUID.randomUUID().toString();
         tenantId = UUID.randomUUID().toString();
         nexusDate = LocalDateTime.now();
-        clientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name");
+        clientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name", null);
     }
 
     @Test
     void Equals_sameClientTracking_ReturnsTrue() {
         // Given
-        ClientTracking givenClientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name");
+        ClientTracking givenClientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name",  null);
 
         // When
         boolean isEquals = clientTracking.equals(givenClientTracking);
@@ -42,7 +44,9 @@ class ClientTrackingTest {
         String expectedString = "ClientTracking(id=" + clientTracking.getId() +
                 ", tenantId=" + clientTracking.getTenantId() +
                 ", nexus=" + clientTracking.getNexus() +
-                ", name=" + clientTracking.getName() + ")";
+                ", name=" + clientTracking.getName() +
+                ", internalTimestamps=" + clientTracking.getInternalTimestamps() +
+                ")";
 
         // When
         String actualString = clientTracking.toString();

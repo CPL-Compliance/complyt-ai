@@ -64,7 +64,7 @@ public class ValidationHandler<T, U extends Validator> {
                 .switchIfEmpty(Mono.error(new MissingBodyApiException()));
     }
 
-    private Mono<T> validate(final ServerRequest serverRequest) {
+    public Mono<T> validate(final ServerRequest serverRequest) {
         return this.validateRequestBody(serverRequest)
                 .flatMap(body -> Flux.fromIterable(serverRequest.pathVariables().keySet())
                         .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)

@@ -14,5 +14,6 @@ public interface ParamCheckerFunctions  {
     Function<String, Mono<String>> EXTERNAL_ID_NOT_NULL_CHECK = ParameterCheckableDefault.createParamCheckerFunction(NotNullUndefinedRegex.expression, DtoErrorMessages.EXTERNAL_ID_NOT_NULL_ERROR);
     Function<String, Mono<String>> STATE_CHECK = ParameterCheckableDefault.createParamCheckerFunction(StateRegex.expression, DtoErrorMessages.STATE_FORMAT_ERROR);
     Function<String, Mono<String>> DATE_CHECK = ParameterCheckableDefault.createParamCheckerFunction(ISO8601Regex.expression, "date " + DtoErrorMessages.LOCALDATE_FORMAT_ERROR);
-
+    Function<String, Mono<String>> TENANT_ID_CHECK = ParameterCheckableDefault.createParamCheckerFunction(TenantIdMaxLimitRegex.expression, DtoErrorMessages.TENANT_ID_FORMAT);
+    Function<String, Mono<String>> NAME_CHECK = ParameterCheckableDefault.createParamCheckerFunction(NameMaxLimitRegex.expression, "name " + DtoErrorMessages.MAX_256_ERROR);
 }

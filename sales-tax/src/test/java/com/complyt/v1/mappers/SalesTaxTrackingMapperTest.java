@@ -1,10 +1,13 @@
 package com.complyt.v1.mappers;
 
+import com.complyt.domain.ClientTracking;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.TransactionNexusSummary;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.TransactionType;
 import com.complyt.v1.models.SalesTaxTrackingDto;
+import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +38,7 @@ public class SalesTaxTrackingMapperTest {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTracking = testUtilities.createSalesTaxTracking(UUID.randomUUID().toString())
                 .withNexusCalculationSummaries(Map.of(localDateTime.toLocalDate(), new NexusCalculationSummary(1, BigDecimal.valueOf(1200))))
+                .withClientTracking(testUtilities.createClientTracking(testUtilities.tenantId).withInternalTimestamps(new Timestamps(localDateTime, localDateTime)))
                 .withTransactionNexusSummaries(Map.of(transactionId, new TransactionNexusSummary(BigDecimal.valueOf(1200), localDateTime, TransactionType.INVOICE)));
         salesTaxTrackingWithWhatsExposedToDto = salesTaxTracking
                 .withTenantId(null).withId(null).withComplytId(salesTaxTracking.getComplytId())
@@ -42,7 +46,8 @@ public class SalesTaxTrackingMapperTest {
                 .withNexusStateRule(salesTaxTracking.getNexusStateRule().withId(null))
                 .withTransactionNexusSummaries(new HashMap<>());
         salesTaxTrackingDto = testUtilities.createSalesTaxTrackingDto().withComplytId(salesTaxTracking.getComplytId())
-                .withNexusCalculationSummaries(Map.of(localDateTime.toLocalDate(), new NexusCalculationSummaryDto(1, BigDecimal.valueOf(1200))));
+                .withNexusCalculationSummaries(Map.of(localDateTime.toLocalDate(), new NexusCalculationSummaryDto(1, BigDecimal.valueOf(1200))))
+                .withClientTracking(testUtilities.createClientTrackingDto().withInternalTimestamps(new TimestampsDto(localDateTime.toString(), localDateTime.toString())));
     }
 
     @Test
