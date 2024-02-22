@@ -6,6 +6,7 @@ import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
@@ -457,7 +458,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = map.get("message").toString();
-                    assertTrue(message.contains("must not be null"));
+                    assertTrue(message.contains("nexus " + DtoErrorMessages.NOT_NULL_ERROR));
                 });
     }
 
@@ -485,7 +486,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = map.get("message").toString();
-                    assertTrue(message.contains("must not be null"));
+                    assertTrue(message.contains("name " + DtoErrorMessages.NOT_NULL_ERROR));
                 });
     }
 
@@ -512,7 +513,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = map.get("message").toString();
-                    assertTrue(message.contains("must not be null"));
+                    assertTrue(message.contains("tenantId " + DtoErrorMessages.NOT_NULL_ERROR));
                 });
     }
 

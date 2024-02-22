@@ -18,9 +18,9 @@ import java.math.BigDecimal;
 @Schema(name = "Item")
 public record ItemDto(
 
-        @NotNull @Schema(description = FieldsDescriptions.UNIT_PRICE) BigDecimal unitPrice,
+        @NotNull(message = "ItemDto.unitPrice " + DtoErrorMessages.NOT_NULL_ERROR) @Schema(description = FieldsDescriptions.UNIT_PRICE) BigDecimal unitPrice,
         @PositiveOrZero(message = "Item.quantity " + NumericErrorMessages.NOT_NEGATIVE_ERROR) @Schema(description = FieldsDescriptions.QUANTITY) BigDecimal quantity,
-        @NotNull @Schema(description = FieldsDescriptions.TOTAL_PRICE) BigDecimal totalPrice,
+        @NotNull(message = "ItemDto.totalPrice " + DtoErrorMessages.NOT_NULL_ERROR) @Schema(description = FieldsDescriptions.TOTAL_PRICE) BigDecimal totalPrice,
         String description,
         @NotNull(message = "Item.name " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "Item.name " + StringErrorMessages.MINMAX_256_ERROR) String name,
         @NotNull(message = "Item.taxCode " + DtoErrorMessages.NOT_NULL_ERROR) @Size(max = 256, message = "Item.taxCode " + StringErrorMessages.MINMAX_256_ERROR) String taxCode,
