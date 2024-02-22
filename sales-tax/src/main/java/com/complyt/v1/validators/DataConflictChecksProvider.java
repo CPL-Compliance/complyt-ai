@@ -22,7 +22,8 @@ public class DataConflictChecksProvider<T> {
 
     Function<T, Flux<String>> bodyConflictCheckFunction;
 
-    public Mono<BiFunction<T, ServerRequest, Mono<String>>> getPathVariableCheck(@NonNull String pathVariable) {
+    public Mono<BiFunction<T, ServerRequest, Mono<String>>>
+    getPathVariableCheck(@NonNull String pathVariable) {
         BiFunction<T, ServerRequest, Mono<String>> check = pathVariablesChecksMap.get(pathVariable);
         return Mono.just(check == null ? (body, request) -> Mono.empty() : check);
     }
