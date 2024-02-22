@@ -1,7 +1,5 @@
 package com.complyt.v1.routers;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.security.test.context.support.WithMockUser;
 import testUtils.unit_test.templates.endpoints.*;
 import testUtils.unit_test.templates.validations.ExternalTimestampsValidationTestTemplate;
 import testUtils.unit_test.templates.validations.InternalTimestampsValidationTestTemplate;
@@ -82,12 +80,8 @@ public interface TransactionRouterTestTemplate extends
 
     void upsert_LengthGreaterThen200StreetInBillingAddress_Returns400ValidationError();
 
-    @Test
-    @WithMockUser
     void upsert_PartialAddressWithNullState_Returns400ValidationError();
 
-    @Test
-    @WithMockUser
     void upsert_PartialAddressWithNullZip_Returns400ValidationError();
 
     // Validation::TransactionType
@@ -98,11 +92,23 @@ public interface TransactionRouterTestTemplate extends
 
     void upsert_EmptyItemsList_Returns400ValidationError();
 
-    void upsert_ItemWithQuantityAndAmountThatDoesNotEqualToTotalAmount_Returns400DataConflict();
+    void upsert_ItemWithQuantityAndAmountThatDoesNotHaveTheSameSignAsTotalAmount_Returns400DataConflict();
 
     void upsert_TotalItemsAmountIsNegative_Returns400DataConflict();
 
     void upsert_ItemWithNegativeAmountAndTotalTransactionAmountIsAboveZero_Returns200();
+
+    void upsertByExternalIdAndSource_ItemDiscountIsEqualsToTotal_Returns200();
+
+    void upsertByExternalIdAndSource_ItemDiscountIsEqualsToUnitPriceMultiplyByQuantity_Returns200();
+
+    void upsertByExternalIdAndSource_ConflictingItemHasNoUnitPriceAndQuantityAndTotal_Returns400ConflictedData();
+
+    void upsertByExternalIdAndSource_ConflictingItemHasNegativeTotalAndDiscount_Returns400ConflictedData();
+
+    void upsertByExternalIdAndSource_ConflictingItemHasNegativeUnitPriceAndQuantityAndDiscount_Returns400ConflictedData();
+
+    void upsertByExternalIdAndSource_ConflictingItemHasNegativeDiscount_Returns400ConflictedData();
 
     // Validation::SalesTax
     void upsert_NegativeAmountInSalesTax_Returns400validationError();
@@ -118,7 +124,6 @@ public interface TransactionRouterTestTemplate extends
     // Validation::Customer
     void upsert_InvalidCustomer_Returns400();
 
-
     // Validation::DocumentName
     void upsert_nullDocumentName_Returns200Ok();
 
@@ -127,18 +132,4 @@ public interface TransactionRouterTestTemplate extends
     void upsert_moreThan50ChartsDocumentName_Returns400();
 
     void upsert_50ChartsDocumentName_Returns200Ok();
-
-
-//    // Validation::Discount todo:fix
-//    void upsert_TransactionWithNoDiscount_Return200();
-//
-//    void upsert_TransactionWithDiscountLessThanTotalAmount_Return200();
-//
-//    void upsert_TransactionWithPositiveDiscountAmount_Return200();
-//
-//    void upsert_TransactionWithDiscountEqualsToTotalAmount_Return200();
-//
-//    void upsert_TransactionWithDiscountLargerThanTotalAmount_Return400();
-//
-//    void upsert_TransactionWithDiscountNoDiscountAmount_Return400();
 }

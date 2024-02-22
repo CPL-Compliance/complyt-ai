@@ -17,6 +17,7 @@ import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -1133,11 +1134,162 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     @WithMockUser
-    public void upsertByExternalIdAndSource_ItemHasNoUnitPriceAndQuantityAndTotal_Returns400ConflictedData() {
+    public void upsertByExternalIdAndSource_ItemDiscountIsEqualsToTotal_ReturnsTaxableTransactionWithItemAmount0() {
+        //Given
+        String externalId = "NonExistingIdTransactionItemDiscountIsEqualsToTotal";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withTotalPrice(BigDecimal.valueOf(500))
+                                .withDiscount(BigDecimal.valueOf(500)))
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertNotNull(transactionDto.salesTax());
+                    assertEquals(BigDecimal.ZERO, transactionDto.salesTax().amount());
+                    assertEquals(BigDecimal.ZERO, transactionDto.totalItemsAmount());
+                });
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_ItemDiscountIsEqualsToUnitPriceMultiplyByQuantity_ReturnsTaxableTransactionWithItemAmount0() {
+        //Given
+        String externalId = "NonExistingIdTransactionItemDiscountIsEqualsToUnitPriceMultiplyByQuantity";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withTotalPrice(null)
+                                .withQuantity(BigDecimal.ONE)
+                                .withUnitPrice(BigDecimal.valueOf(500))
+                                .withDiscount(BigDecimal.valueOf(500)))
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertNotNull(transactionDto.salesTax());
+                    assertEquals(BigDecimal.ZERO, transactionDto.salesTax().amount());
+                    assertEquals(BigDecimal.ZERO, transactionDto.totalItemsAmount());
+                });
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_ConflictingItemHasNoUnitPriceAndQuantityAndTotal_Returns400ConflictedData() {
         //Given
         String externalId = "NonExistingIdTransactionItemHasNoUnitPriceAndQuantityAndTotal";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withTotalPrice(null).withQuantity(null).withUnitPrice(null))
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_ConflictingItemHasNegativeTotalAndDiscount_Returns400ConflictedData() {
+        //Given
+        String externalId = "NonExistingIdTransactionItemHasNegativeTotalAndDiscount";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withTotalPrice(BigDecimal.valueOf(-500))
+                                .withQuantity(null).withUnitPrice(null).withDiscount(BigDecimal.valueOf(10)))
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_ConflictingItemHasNegativeUnitPriceAndQuantityAndDiscount_Returns400ConflictedData() {
+        //Given
+        String externalId = "NonExistingIdTransactionItemHasNegativeUnitPriceAndQuantityAndDiscount";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withTotalPrice(null)
+                                .withQuantity(BigDecimal.valueOf(1)).withUnitPrice(BigDecimal.valueOf(-500))
+                                .withDiscount(BigDecimal.valueOf(10)))
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_ConflictingItemHasNegativeDiscount_Returns400ConflictedData() {
+        //Given
+        String externalId = "NonExistingIdTransactionItemHasNegativeDiscount";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withTotalPrice(null)
+                                .withQuantity(BigDecimal.valueOf(1)).withUnitPrice(BigDecimal.valueOf(-500))
+                                .withDiscount(BigDecimal.valueOf(-10)))
                 .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));

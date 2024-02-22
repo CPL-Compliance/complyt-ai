@@ -21,4 +21,32 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_ConflictingTransactionAmountIsNegative_Returns400ConflictedData();
 
     void upsertByExternalIdAndSource_ConflictingTransactionItemTotalIsNotAligned_Returns400ConflictedData();
+
+    void upsertByExternalIdAndSource_TransactionWithShippingFee_Returns200();
+
+    void upsertByExternalIdAndSource_ItemWithManualSalesTax_Returns200();
+
+    void upsertByExternalIdAndSource_NoItemHasDiscount_Returns200();
+
+    void upsertByExternalIdAndSource_OneItemHasDiscount_Returns200();
+
+    void upsertByExternalIdAndSource_TwoItemHaveDiscount_Returns200();
+
+    void upsertByExternalIdAndSource_OneItemHasDiscountOneItemIsNegative_Returns200();
+
+    void upsertByExternalIdAndSource_ItemUnitPriceAndQuantityNullAndTotalNotNull_Returns200();
+
+    void upsertByExternalIdAndSource_ItemUnitPriceAndQuantityNotNullAndTotalNull_Returns200();
+
+    void upsertByExternalIdAndSource_ItemDiscountIsEqualsToTotal_Returns200();
+
+    void upsertByExternalIdAndSource_ItemDiscountIsEqualsToUnitPriceMultiplyByQuantity_Returns200();
+
+    void upsertByExternalIdAndSource_ItemHasNoUnitPriceAndQuantityAndTotal_Returns400ConflictedData();
+
+    void upsertByExternalIdAndSource_ConflictingItemHasNegativeTotalAndDiscount_Returns400ConflictedData();
+
+    void upsertByExternalIdAndSource_ConflictingItemHasNegativeUnitPriceAndQuantityAndDiscount_Returns400ConflictedData();
+
+    void upsertByExternalIdAndSource_ConflictingItemHasNegativeDiscount_Returns400ConflictedData();
 }

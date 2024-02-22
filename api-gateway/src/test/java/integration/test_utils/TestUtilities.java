@@ -1,5 +1,8 @@
 package integration.test_utils;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
+
 public class TestUtilities {
 
     public static final String TRANSACTION_BASE_URL = "/v1/transactions";
@@ -292,6 +295,67 @@ public class TestUtilities {
                 complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
                 externalId,
                 isValidated ? "\"source\": \"1\"," : "",
+                state != null ? state : "CA",
+                customerId,
+                isValidated ? "\"transactionType\": \"INVOICE\"," : ""
+        );
+    }
+
+    public static String customItem(BigDecimal total, BigDecimal quantity, BigDecimal unitPrice, BigDecimal discount) {
+        return String.format("""
+                        {
+                                            "unitPrice": %s,
+                                            "quantity": %s,
+                                            "totalPrice": %s,
+                                            "description": "string",
+                                            "name": "string",
+                                            "taxCode": "C1S1",
+                                            "manualSalesTax": true,
+                                            "manualSalesTaxRate": 0,
+                                            "discount":%s
+                                        }
+                        """,
+                unitPrice,
+                quantity,
+                total,
+                discount);
+    }
+
+    public static String transactionWithCustomItems(String externalId, String customerId, String complytId, boolean isValidated, String state,
+                                                    String... items) {
+        return String.format("""
+                        {
+                            %s
+                            "externalId": "%s",
+                            %s
+                            "items": %s,
+                            "shippingAddress": {
+                                "city": "Los Angeles",
+                                "country": "US",
+                                "state": "%s",
+                                "street": "10 5th Ave",
+                                "zip": "90210",
+                                "isPartial": "false"
+                            },
+                            "customerId": "%s",
+                            "transactionStatus": "ACTIVE",
+                            "externalTimestamps": {
+                                "createdDate": "2023-02-05T12:24:43.193Z",
+                                "updatedDate": "2023-02-05T12:24:43.193Z"
+                            },
+                            %s
+                            "shippingFee": {
+                                "manualSalesTax": true,
+                                "manualSalesTaxRate": 0,
+                                "totalPrice": 0,
+                                "taxCode": "C6S1"
+                            }
+                        }
+                        """,
+                complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
+                externalId,
+                isValidated ? "\"source\": \"1\"," : "",
+                Arrays.toString(items),
                 state != null ? state : "CA",
                 customerId,
                 isValidated ? "\"transactionType\": \"INVOICE\"," : ""
