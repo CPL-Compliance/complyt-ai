@@ -58,6 +58,7 @@ public class PatcherConfig {
             put("enforcesSalesTax", SalesTaxTrackingPatcherFunctions.patchEnforcesSalesTax);
             put("physicalNexusTracker", SalesTaxTrackingPatcherFunctions.patchPhysicalNexusTracker);
             put("economicNexusTracker", SalesTaxTrackingPatcherFunctions.patchEconomicNexusTracker);
+            put("appliedDate", SalesTaxTrackingPatcherFunctions.patchAppliedDate);
             put("approved", SalesTaxTrackingPatcherFunctions.patchApproved);
             put("approvalDate", SalesTaxTrackingPatcherFunctions.patchApprovalDate);
         }};

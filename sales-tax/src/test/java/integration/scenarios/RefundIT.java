@@ -216,9 +216,9 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
                                 .bodyValue(receivedSalesTaxTracking
                                         .withApproved(true)
                                         .withPhysicalNexusTracker(
-                                                new PhysicalNexusTrackerDto(true, referenceDate.toString()))
-                                        .withAppliedDate(referenceDate.toString())
-                                        .withApprovalDate(referenceDate.toString()))
+                                                new PhysicalNexusTrackerDto(true, referenceDate))
+                                        .withAppliedDate(referenceDate)
+                                        .withApprovalDate(referenceDate))
                                 .accept(MediaType.APPLICATION_JSON)
                                 .exchange()
                                 .expectStatus().isOk()

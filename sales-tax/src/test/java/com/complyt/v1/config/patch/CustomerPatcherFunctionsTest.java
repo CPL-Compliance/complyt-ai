@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 
 import static com.fasterxml.jackson.databind.jsonFormatVisitors.JsonValueFormat.UUID;
 
@@ -42,9 +43,18 @@ public class CustomerPatcherFunctionsTest {
         // Given
         OptionalAddressDto addressToPatch = customer.address().withStreet("10010 Patch Street");
         CustomerDto expectedCustomer = customer.withAddress(addressToPatch);
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("street", addressToPatch.street());
+            put("country", addressToPatch.country());
+            put("state", addressToPatch.state());
+            put("city", addressToPatch.city());
+            put("county", addressToPatch.county());
+            put("zip", addressToPatch.zip());
+            put("isPartial", addressToPatch.isPartial());
+        }};
 
         // When
-        CustomerDto actualCustomer = CustomerPatcherFunctions.patchAddress.apply(customer, addressToPatch);
+        CustomerDto actualCustomer = CustomerPatcherFunctions.patchAddress.apply(customer, map);
 
         // Then
         Assertions.assertEquals(expectedCustomer, actualCustomer);
@@ -69,7 +79,10 @@ public class CustomerPatcherFunctionsTest {
         LocalDateTime updatedDate = LocalDateTime.parse(customer.externalTimestamps().updatedDate());
         TimestampsDto externalTimestampsToPatch = customer.externalTimestamps()
                 .withUpdatedDate(String.valueOf(updatedDate.plusDays(1)));
-
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("createdDate", externalTimestampsToPatch.createdDate());
+            put("updatedDate", externalTimestampsToPatch.updatedDate());
+        }};
         // When
         CustomerDto expectedCustomer = customer.withExternalTimestamps(externalTimestampsToPatch);
 

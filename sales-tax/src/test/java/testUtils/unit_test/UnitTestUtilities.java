@@ -405,13 +405,13 @@ public class UnitTestUtilities {
         StateDto state = new StateDto("CA", "02", "California");
         SalesTaxTrackingDto salesTaxTrackingDto = new SalesTaxTrackingDto(UUID.randomUUID(), state,
                 "comment", true,
-                new PhysicalNexusTrackerDto(false, localDateTime.toString()),
-                new EconomicNexusTrackerDto(false, localDateTime.toString()),
+                new PhysicalNexusTrackerDto(false, localDateTime),
+                new EconomicNexusTrackerDto(false, localDateTime),
                 Map.of(),
                 createNexusStateRuleDto(),
                 createClientTrackingDto(),
-                localDateTime.toString(),
-                true, localDateTime.toString(),
+                localDateTime,
+                true, localDateTime,
                 FilingFrequencyDto.MONTHLY);
 
         return salesTaxTrackingDto;
@@ -423,7 +423,7 @@ public class UnitTestUtilities {
     }
 
     public ClientTrackingDto createClientTrackingDto() {
-        TimestampsDto internalTimestamps =  new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        TimestampsDto internalTimestamps = new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString());
         return new ClientTrackingDto(new NexusDto(localDateTime), "client dope", internalTimestamps);
     }
 

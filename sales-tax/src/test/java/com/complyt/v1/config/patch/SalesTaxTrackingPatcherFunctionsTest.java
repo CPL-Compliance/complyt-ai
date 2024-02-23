@@ -4,17 +4,21 @@ import com.complyt.v1.models.EconomicNexusTrackerDto;
 import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 
 public class SalesTaxTrackingPatcherFunctionsTest {
 
     private SalesTaxTrackingDto salesTaxTracking;
     UnitTestUtilities unitTestUtilities;
+
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
@@ -27,6 +31,11 @@ public class SalesTaxTrackingPatcherFunctionsTest {
         // Given
         StateDto stateToPatch = salesTaxTracking.state().withName("PatchedName");
         SalesTaxTrackingDto expectedSalesTaxTracking = salesTaxTracking.withState(stateToPatch);
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("abbreviation", stateToPatch.abbreviation());
+            put("code", stateToPatch.code());
+            put("name", stateToPatch.name());
+        }};
 
         // When
         SalesTaxTrackingDto actualSalesTaxTracking = SalesTaxTrackingPatcherFunctions.patchState.apply(salesTaxTracking, stateToPatch);
@@ -51,32 +60,38 @@ public class SalesTaxTrackingPatcherFunctionsTest {
     @Test
     void patchPhysicalNexusTracker_PatchesPhysicalNexusTracker_ReturnsModifiedSalesTaxTracking() {
         // Given
-        String establishedDateToPatch = LocalDateTime.parse(salesTaxTracking.physicalNexusTracker().establishedDate())
-                .plusMonths(1)
-                .toString();
+        LocalDateTime establishedDateToPatch = salesTaxTracking.physicalNexusTracker().establishedDate().plusMonths(1);
         PhysicalNexusTrackerDto physicalNexusTrackerToPatch = salesTaxTracking.physicalNexusTracker()
                 .withEstablishedDate(establishedDateToPatch);
+
         SalesTaxTrackingDto expectedSalesTaxTracking = salesTaxTracking.withPhysicalNexusTracker(physicalNexusTrackerToPatch);
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("established", salesTaxTracking.physicalNexusTracker().established());
+            put("establishedDate", establishedDateToPatch);
+        }};
 
         // When
-        SalesTaxTrackingDto actualSalesTaxTracking = SalesTaxTrackingPatcherFunctions.patchPhysicalNexusTracker.apply(salesTaxTracking, physicalNexusTrackerToPatch);
+        SalesTaxTrackingDto actualSalesTaxTracking = SalesTaxTrackingPatcherFunctions.patchPhysicalNexusTracker.apply(salesTaxTracking, map);
 
         // Then
         Assertions.assertEquals(expectedSalesTaxTracking, actualSalesTaxTracking);
     }
 
     @Test
-    void patchEconomicNexusTracker_PatchesEconomicNexusTracker_ReturnsModifiedSalesTaxTracking() {
+    void patchEconomicNexusTracker_PatchesEconomicNexusTracker_ReturnsModifiedSalesTaxTracking() throws Exception {
         // Given
-        String establishedDateToPatch = LocalDateTime.parse(salesTaxTracking.economicNexusTracker()
-                        .establishedDate())
-                .plusMonths(1).toString();
+        LocalDateTime establishedDateToPatch = salesTaxTracking.economicNexusTracker().establishedDate()
+                .plusMonths(1);
         EconomicNexusTrackerDto economicNexusTrackerToPatch = salesTaxTracking.economicNexusTracker()
                 .withEstablishedDate(establishedDateToPatch);
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("established", salesTaxTracking.economicNexusTracker().established());
+            put("establishedDate", establishedDateToPatch);
+        }};
         SalesTaxTrackingDto expectedSalesTaxTracking = salesTaxTracking.withEconomicNexusTracker(economicNexusTrackerToPatch);
 
         // When
-        SalesTaxTrackingDto actualSalesTaxTracking = SalesTaxTrackingPatcherFunctions.patchEconomicNexusTracker.apply(salesTaxTracking, economicNexusTrackerToPatch);
+        SalesTaxTrackingDto actualSalesTaxTracking = SalesTaxTrackingPatcherFunctions.patchEconomicNexusTracker.apply(salesTaxTracking, map);
 
         // Then
         Assertions.assertEquals(expectedSalesTaxTracking, actualSalesTaxTracking);
@@ -85,7 +100,7 @@ public class SalesTaxTrackingPatcherFunctionsTest {
     @Test
     void patchAppliedDate_PatchesAppliedDate_ReturnsModifiedSalesTaxTracking() {
         // Given
-        String appliedDateToPatch = LocalDateTime.parse(salesTaxTracking.appliedDate()).plusMonths(1).toString();
+        LocalDateTime appliedDateToPatch = salesTaxTracking.appliedDate().plusMonths(1);
         SalesTaxTrackingDto expectedSalesTaxTracking = salesTaxTracking.withAppliedDate(appliedDateToPatch);
 
         // When
@@ -111,7 +126,7 @@ public class SalesTaxTrackingPatcherFunctionsTest {
     @Test
     void patchApprovalDate_PatchesApprovalDate_ReturnsModifiedSalesTaxTracking() {
         // Given
-        String approvalDateToPatch = LocalDateTime.parse(salesTaxTracking.approvalDate()).plusMonths(1).toString();
+        LocalDateTime approvalDateToPatch = salesTaxTracking.approvalDate().plusMonths(1);
         SalesTaxTrackingDto expectedSalesTaxTracking = salesTaxTracking.withApprovalDate(approvalDateToPatch);
 
         // When

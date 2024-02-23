@@ -122,9 +122,9 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                                 .bodyValue(salesTaxTrackingDto
                                         .withApproved(true)
                                         .withPhysicalNexusTracker(
-                                                new PhysicalNexusTrackerDto(true, referenceDate.toString()))
-                                        .withAppliedDate(referenceDate.toString())
-                                        .withApprovalDate(referenceDate.plusMonths(1).toString()))
+                                                new PhysicalNexusTrackerDto(true, referenceDate))
+                                        .withAppliedDate(referenceDate)
+                                        .withApprovalDate(referenceDate.plusMonths(1)))
                                 .accept(MediaType.APPLICATION_JSON)
                                 .exchange()
                                 .expectStatus().isOk()
@@ -211,13 +211,13 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getName())
                                         .build())
                                 .bodyValue(salesTaxTrackingDto
-                                        .withApprovalDate(referenceDate.minusMonths(1).toString()))
+                                        .withApprovalDate(referenceDate.minusMonths(1)))
                                 .accept(MediaType.APPLICATION_JSON)
                                 .exchange()
                                 .expectStatus().isOk()
                                 .expectBody(SalesTaxTrackingDto.class)
-                                .value(receivedSalesTaxTrackingDto -> assertTrue(LocalDateTime.parse(receivedSalesTaxTrackingDto.appliedDate())
-                                        .isAfter(LocalDateTime.parse(receivedSalesTaxTrackingDto.approvalDate())))));
+                                .value(receivedSalesTaxTrackingDto -> assertTrue(receivedSalesTaxTrackingDto.appliedDate()
+                                        .isAfter(receivedSalesTaxTrackingDto.approvalDate()))));
     }
 
     @Order(6)

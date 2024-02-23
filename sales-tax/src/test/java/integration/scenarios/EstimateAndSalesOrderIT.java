@@ -166,9 +166,9 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
                                 .bodyValue(salesTaxTrackingDto
                                         .withApproved(true)
                                         .withPhysicalNexusTracker(
-                                                new PhysicalNexusTrackerDto(true, referenceDate.toString()))
-                                        .withAppliedDate(referenceDate.toString())
-                                        .withApprovalDate(referenceDate.toString()))
+                                                new PhysicalNexusTrackerDto(true, referenceDate))
+                                        .withAppliedDate(referenceDate)
+                                        .withApprovalDate(referenceDate))
                                 .accept(MediaType.APPLICATION_JSON)
                                 .exchange()
                                 .expectStatus().isOk()

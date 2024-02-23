@@ -7,37 +7,51 @@ import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.function.BiFunction;
 
 public interface SalesTaxTrackingPatcherFunctions {
 
     BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchState = (salesTaxTrackingDto, state) -> {
-        StateDto convertedState = (StateDto) ComplytObjectMapper.mapObject(state, StateDto.class);
-        return salesTaxTrackingDto.withState(convertedState);
+        StateDto convertedStateDto = (StateDto) ComplytObjectMapper.mapObject(state, StateDto.class);
+        return salesTaxTrackingDto.withState(convertedStateDto);
     };
 
-    BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchEnforcesSalesTax = (salesTaxTrackingDto, enforcesSalesTax) -> {
-        Boolean convertedEnforcesSalesTax = (Boolean) ComplytObjectMapper.mapObject(enforcesSalesTax, Boolean.class);
-        return salesTaxTrackingDto.withEnforcesSalesTax(convertedEnforcesSalesTax);
-    };
+    BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchEnforcesSalesTax = (salesTaxTrackingDto, enforcesSalesTax) ->{
+        return salesTaxTrackingDto.withEnforcesSalesTax((Boolean) enforcesSalesTax);
+    } ;
 
     BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchPhysicalNexusTracker = (salesTaxTrackingDto, physicalNexusTracker) -> {
-        PhysicalNexusTrackerDto convertedPhysicalNexusTracker = (PhysicalNexusTrackerDto) ComplytObjectMapper.mapObject(physicalNexusTracker, PhysicalNexusTrackerDto.class);
+        LinkedHashMap<String, Object> economicNexusTrackerDtoLinkedHashMap = (LinkedHashMap<String, Object>) physicalNexusTracker;
+        boolean established = (boolean) economicNexusTrackerDtoLinkedHashMap.get("established");
+        LocalDateTime establishedDate = LocalDateTime.parse(economicNexusTrackerDtoLinkedHashMap.get("establishedDate").toString());
+        PhysicalNexusTrackerDto convertedPhysicalNexusTracker = new PhysicalNexusTrackerDto(established,establishedDate);
+
         return salesTaxTrackingDto.withPhysicalNexusTracker(convertedPhysicalNexusTracker);
     };
 
     BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchEconomicNexusTracker = (salesTaxTrackingDto, economicNexusTracker) -> {
-        EconomicNexusTrackerDto convertedEconomicNexusTracker = (EconomicNexusTrackerDto) ComplytObjectMapper.mapObject(economicNexusTracker, EconomicNexusTrackerDto.class);
+        LinkedHashMap<String, Object> economicNexusTrackerDtoLinkedHashMap = (LinkedHashMap<String, Object>) economicNexusTracker;
+        boolean established = (boolean) economicNexusTrackerDtoLinkedHashMap.get("established");
+        LocalDateTime establishedDate = LocalDateTime.parse(economicNexusTrackerDtoLinkedHashMap.get("establishedDate").toString());
+        EconomicNexusTrackerDto convertedEconomicNexusTracker = new EconomicNexusTrackerDto(established,establishedDate);
+
         return salesTaxTrackingDto.withEconomicNexusTracker(convertedEconomicNexusTracker);
     };
 
-    BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchAppliedDate = (salesTaxTrackingDto, appliedDate) -> salesTaxTrackingDto.withAppliedDate((String) appliedDate);
+    BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchAppliedDate = (salesTaxTrackingDto, appliedDate) -> {
+        LocalDateTime convertedAppliedDate = LocalDateTime.parse(appliedDate.toString());
+        return salesTaxTrackingDto.withAppliedDate(convertedAppliedDate);
+    };
 
     BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchApproved = (salesTaxTrackingDto, approved) -> {
         Boolean convertedApproved = (Boolean) ComplytObjectMapper.mapObject(approved, Boolean.class);
         return salesTaxTrackingDto.withApproved(convertedApproved);
     };
 
-    BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchApprovalDate = (salesTaxTrackingDto, approvalDate) -> salesTaxTrackingDto.withApprovalDate((String) approvalDate);
+    BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchApprovalDate = (salesTaxTrackingDto, approvalDate) -> {
+        LocalDateTime convertedApprovalDate = LocalDateTime.parse(approvalDate.toString());
+        return salesTaxTrackingDto.withApprovalDate(convertedApprovalDate);
+    };
 
 }

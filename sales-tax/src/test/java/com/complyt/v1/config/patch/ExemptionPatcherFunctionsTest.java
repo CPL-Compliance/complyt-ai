@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 
 public class ExemptionPatcherFunctionsTest {
@@ -38,9 +39,13 @@ public class ExemptionPatcherFunctionsTest {
         // Given
         StateDto stateToPatch = exemption.state().withName("PatchedName");
         ExemptionDto expectedExemption = exemption.withState(stateToPatch);
-
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("abbreviation", stateToPatch.abbreviation());
+            put("code", stateToPatch.code());
+            put("name", stateToPatch.name());
+        }};
         // When
-        ExemptionDto actualExemption = ExemptionPatcherFunctions.patchState.apply(exemption, stateToPatch);
+        ExemptionDto actualExemption = ExemptionPatcherFunctions.patchState.apply(exemption, map);
 
         // Then
         Assertions.assertEquals(expectedExemption, actualExemption);
@@ -51,9 +56,14 @@ public class ExemptionPatcherFunctionsTest {
         // Given
         ClassificationDto classificationToPatch = exemption.classification().withDescription("Patched Description");
         ExemptionDto expectedExemption = exemption.withClassification(classificationToPatch);
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("code", classificationToPatch.code());
+            put("description", classificationToPatch.description());
+
+        }};
 
         // When
-        ExemptionDto actualExemption = ExemptionPatcherFunctions.patchClassification.apply(exemption, classificationToPatch);
+        ExemptionDto actualExemption = ExemptionPatcherFunctions.patchClassification.apply(exemption, map);
 
         // Then
         Assertions.assertEquals(expectedExemption, actualExemption);
@@ -66,9 +76,13 @@ public class ExemptionPatcherFunctionsTest {
         ValidationDatesDto validationDatesToPatch = exemption.validationDates()
                 .withFromDate(fromDateToPatch.toString());
         ExemptionDto expectedExemption = exemption.withValidationDates(validationDatesToPatch);
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("fromDate", validationDatesToPatch.fromDate());
+            put("toDate", validationDatesToPatch.toDate());
+        }};
 
         // When
-        ExemptionDto actualExemption = ExemptionPatcherFunctions.patchValidationDates.apply(exemption, validationDatesToPatch);
+        ExemptionDto actualExemption = ExemptionPatcherFunctions.patchValidationDates.apply(exemption, map);
 
         // Then
         Assertions.assertEquals(expectedExemption, actualExemption);
@@ -79,9 +93,13 @@ public class ExemptionPatcherFunctionsTest {
         // Given
         StatusDto statusToPatch = exemption.status().withName("Patched Status");
         ExemptionDto expectedExemption = exemption.withStatus(statusToPatch);
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("code", statusToPatch.code());
+            put("name", statusToPatch.name());
+        }};
 
         // When
-        ExemptionDto actualExemption = ExemptionPatcherFunctions.patchStatus.apply(exemption, statusToPatch);
+        ExemptionDto actualExemption = ExemptionPatcherFunctions.patchStatus.apply(exemption, map);
 
         // Then
         Assertions.assertEquals(expectedExemption, actualExemption);
@@ -92,9 +110,14 @@ public class ExemptionPatcherFunctionsTest {
         // Given
         CertificateDto certificateToPatch = exemption.certificate().withName("Patched Cert.");
         ExemptionDto expectedExemption = exemption.withCertificate(certificateToPatch);
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("certificateId", certificateToPatch.certificateId());
+            put("name", certificateToPatch.name());
+            put("url", certificateToPatch.url());
+        }};
 
         // When
-        ExemptionDto actualExemption = ExemptionPatcherFunctions.patchCertificate.apply(exemption, certificateToPatch);
+        ExemptionDto actualExemption = ExemptionPatcherFunctions.patchCertificate.apply(exemption, map);
 
         // Then
         Assertions.assertEquals(expectedExemption, actualExemption);

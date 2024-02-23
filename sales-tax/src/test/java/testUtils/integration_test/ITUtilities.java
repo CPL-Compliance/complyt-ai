@@ -42,10 +42,10 @@ public interface ITUtilities {
 
     static SalesTaxTrackingDto stubSalesTaxTrackingDto(StateDto state) {
         return new SalesTaxTrackingDto(null, state, "comment", true,
-                new PhysicalNexusTrackerDto(false, LocalDateTime.now().toString()),
-                new EconomicNexusTrackerDto(false, LocalDateTime.now().toString()),
+                new PhysicalNexusTrackerDto(false, LocalDateTime.now()),
+                new EconomicNexusTrackerDto(false, LocalDateTime.now()),
                 null, null, stubClientTrackingDto(),
-                LocalDateTime.now().toString(), false, LocalDateTime.now().toString(), FilingFrequencyDto.MONTHLY);
+                LocalDateTime.now(), false, LocalDateTime.now(), FilingFrequencyDto.MONTHLY);
     }
 
     static ItemDto stubItemDto() {
