@@ -40,13 +40,13 @@ public interface ExemptionPatcherFunctions {
     };
 
     BiFunction<ExemptionDto, Object, ExemptionDto> patchExemptionType = (exemptionDto, exemptionType) -> {
-        ExemptionTypeDto e = ExemptionTypeDto.valueOf((String) exemptionType);
-        return exemptionDto.withExemptionType(e);
+        ExemptionTypeDto convertedExemptionType = (ExemptionTypeDto) ComplytObjectMapper.mapObject(exemptionType, ExemptionTypeDto.class);
+        return exemptionDto.withExemptionType(convertedExemptionType);
     };
 
     BiFunction<ExemptionDto, Object, ExemptionDto> patchExemptionStatus = (exemptionDto, exemptionStatus) -> {
-        ExemptionStatusDto e = ExemptionStatusDto.valueOf((String) exemptionStatus);
-        return exemptionDto.withExemptionStatus(e);
+        ExemptionStatusDto convertedExemptionStatus = (ExemptionStatusDto) ComplytObjectMapper.mapObject(exemptionStatus, ExemptionStatusDto.class);
+        return exemptionDto.withExemptionStatus(convertedExemptionStatus);
     };
 
 }

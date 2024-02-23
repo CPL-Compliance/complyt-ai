@@ -1,7 +1,6 @@
 package com.complyt.utils.object_mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;

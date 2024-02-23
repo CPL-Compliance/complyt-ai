@@ -303,7 +303,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
                                 .uri(uriBuilder -> uriBuilder
                                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
                                         .build())
-                                .bodyValue(receivedSalesTaxTracking.withApproved(false).withEconomicNexusTracker(new EconomicNexusTrackerDto(false, LocalDateTime.now())))
+                                .bodyValue(receivedSalesTaxTracking.withApproved(false).withEconomicNexusTracker(new EconomicNexusTrackerDto(false, LocalDateTime.now().toString())))
                                 .accept(MediaType.APPLICATION_JSON)
                                 .exchange()
                                 .expectStatus().isOk()

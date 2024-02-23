@@ -9,7 +9,7 @@ import com.complyt.v1.models.StateDto;
 import java.time.LocalDateTime;
 import java.util.function.BiFunction;
 
-public interface SalesTaxTrackingPatcher {
+public interface SalesTaxTrackingPatcherFunctions {
 
     BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchState = (salesTaxTrackingDto, state) -> {
         StateDto convertedState = (StateDto) ComplytObjectMapper.mapObject(state, StateDto.class);
@@ -31,19 +31,13 @@ public interface SalesTaxTrackingPatcher {
         return salesTaxTrackingDto.withEconomicNexusTracker(convertedEconomicNexusTracker);
     };
 
-    BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchAppliedDate = (salesTaxTrackingDto, appliedDate) -> {
-        LocalDateTime convertedAppliedDate = (LocalDateTime) ComplytObjectMapper.mapObject(appliedDate, LocalDateTime.class);
-        return salesTaxTrackingDto.withAppliedDate(convertedAppliedDate);
-    };
+    BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchAppliedDate = (salesTaxTrackingDto, appliedDate) -> salesTaxTrackingDto.withAppliedDate((String) appliedDate);
 
     BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchApproved = (salesTaxTrackingDto, approved) -> {
         Boolean convertedApproved = (Boolean) ComplytObjectMapper.mapObject(approved, Boolean.class);
         return salesTaxTrackingDto.withApproved(convertedApproved);
     };
 
-    BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchApprovalDate = (salesTaxTrackingDto, approvalDate) -> {
-        LocalDateTime convertedApprovalDate = (LocalDateTime) ComplytObjectMapper.mapObject(approvalDate, LocalDateTime.class);
-        return salesTaxTrackingDto.withApprovalDate(convertedApprovalDate);
-    };
+    BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchApprovalDate = (salesTaxTrackingDto, approvalDate) -> salesTaxTrackingDto.withApprovalDate((String) approvalDate);
 
 }

@@ -3,12 +3,14 @@ package com.complyt.v1.models;
 import com.complyt.v1.api_info.FieldsDescriptions;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
+import com.complyt.v1.config.regex.ISO8601Regex;
 import com.complyt.v1.models.checkables.StateCheckable;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.models.nexus.NexusStateRuleDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.With;
 
@@ -29,9 +31,9 @@ public record SalesTaxTrackingDto(
         Map<LocalDate, @Valid NexusCalculationSummaryDto> nexusCalculationSummaries,
         @Valid NexusStateRuleDto nexusStateRule,
         @Valid ClientTrackingDto clientTracking,
-        @NotNull(message = "appliedDate " + DtoErrorMessages.NOT_NULL_ERROR) LocalDateTime appliedDate,
+        @Schema(ref = "timestamp") @Pattern(regexp = ISO8601Regex.expression, message = "appliedDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR) String appliedDate,
         boolean approved,
-        LocalDateTime approvalDate,
+        @Schema(ref = "timestamp") @Pattern(regexp = ISO8601Regex.expression, message = "approvalDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR) String approvalDate,
         @Schema(description = FieldsDescriptions.FILING_FREQUENCY) FilingFrequencyDto filingFrequency)
         implements StateCheckable {
 }

@@ -8,11 +8,9 @@ import com.complyt.v1.models.transaction.OptionalAddressDto;
 
 import java.util.function.BiFunction;
 
-public interface CustomerPatcher {
+public interface CustomerPatcherFunctions {
 
-    BiFunction<CustomerDto, Object, CustomerDto> patchName = (customerDto, name) -> {
-        return customerDto.withName((String) name);
-    };
+    BiFunction<CustomerDto, Object, CustomerDto> patchName = (customerDto, name) -> customerDto.withName((String) name);
 
     BiFunction<CustomerDto, Object, CustomerDto> patchAddress = (customerDto, address) -> {
         OptionalAddressDto convertedAddress = (OptionalAddressDto) ComplytObjectMapper.mapObject(address, OptionalAddressDto.class);
