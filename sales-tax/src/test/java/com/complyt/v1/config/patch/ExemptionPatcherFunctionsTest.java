@@ -59,7 +59,6 @@ public class ExemptionPatcherFunctionsTest {
         LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
             put("code", classificationToPatch.code());
             put("description", classificationToPatch.description());
-
         }};
 
         // When

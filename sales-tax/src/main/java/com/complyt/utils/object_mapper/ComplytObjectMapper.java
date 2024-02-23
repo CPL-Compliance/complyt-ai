@@ -17,16 +17,16 @@ public interface ComplytObjectMapper {
         }
     }
 
-    static <T> List<T> convertToList(Object objectList, Class patchingClass) {
-        List<T> returnedObjects = new ArrayList<>();
-        List<Object> objectsToMap = (List<Object>) objectList;
-
-        for (Object objectToMap : objectsToMap) {
-            Object mappedObject = mapObject(objectToMap, patchingClass);
-            returnedObjects.add((T) mappedObject);
-        }
-
-        return returnedObjects;
-    }
+//    static <T> List<T> convertToList(Object objectList, Class patchingClass) {
+//        List<T> returnedObjects = new ArrayList<>();
+//        List<Object> objectsToMap = (List<Object>) objectList;
+//
+//        for (Object objectToMap : objectsToMap) {
+//            Object mappedObject = mapObject(objectToMap, patchingClass);
+//            returnedObjects.add((T) mappedObject);
+//        }
+//
+//        return returnedObjects;
+//    }
 
 }
