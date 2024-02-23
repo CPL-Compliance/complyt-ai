@@ -6,12 +6,11 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
-public class ComplytObjectMapper {
+public interface ComplytObjectMapper {
 
-    public static ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper = new ObjectMapper();
 
-    public static Object mapObject(Object o, Class patchingClass) {
+    static Object mapObject(Object o, Class patchingClass) {
         try {
             return objectMapper.convertValue(o, patchingClass);
         } catch (Exception e) {
@@ -19,7 +18,7 @@ public class ComplytObjectMapper {
         }
     }
 
-    public static <T> List<T> convertToList(Object objectList, Class patchingClass) {
+    static <T> List<T> convertToList(Object objectList, Class patchingClass) {
         List<T> returnedObjects = new ArrayList<>();
         List<Object> objectsToMap = (List<Object>) objectList;
 
