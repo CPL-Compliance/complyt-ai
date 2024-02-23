@@ -17,6 +17,7 @@ import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.transaction.OptionalAddressDto;
+import com.complyt.v1.validators.Patcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,9 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @MockBean
     private CustomerFacade customerFacade;
+
+    @MockBean
+    Patcher<CustomerDto> customerPatcher;
 
     @Autowired
     private WebTestClient webTestClient;
@@ -1146,7 +1150,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         }};
 
         // When
-        when(customerFacade.getAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(allCustomers));
+        when(customerFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(allCustomers));
 
         // Then
         webTestClient

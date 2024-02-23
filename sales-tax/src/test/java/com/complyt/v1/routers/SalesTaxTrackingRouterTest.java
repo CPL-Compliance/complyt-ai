@@ -19,6 +19,7 @@ import com.complyt.v1.models.EconomicNexusTrackerDto;
 import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
+import com.complyt.v1.validators.Patcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @MockBean
     SalesTaxTrackingFacade salesTaxTrackingFacade;
-
+    @MockBean
+    Patcher<SalesTaxTrackingDto> salesTaxTrackingPatcher;
     SalesTaxTracking salesTaxTracking;
 
     SalesTaxTrackingDto salesTaxTrackingDto;
@@ -470,25 +472,25 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n" +
-                           "    \"approved\": \"true\",\n" +
-                           "    \"complytId\": \"1111-boohoo\",\n" +
-                           "    \"enforcesSalesTax\": \"true\",\n" +
-                           "    \"state\": {\n" +
-                           "        \"abbreviation\": \"CA\",\n" +
-                           "        \"code\": \"02\",\n" +
-                           "        \"name\": \"\"\n" +
-                           "    },\n" +
-                           "    \"physicalNexusTracker\": {\n" +
-                           "        \"established\": \"true\",\n" +
-                           "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                           "    },\n" +
-                           "    \"economicNexusTracker\": {\n" +
-                           "        \"established\": \"true\",\n" +
-                           "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                           "    },\n" +
-                           "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                           "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                           "}")
+                        "    \"approved\": \"true\",\n" +
+                        "    \"complytId\": \"1111-boohoo\",\n" +
+                        "    \"enforcesSalesTax\": \"true\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"\"\n" +
+                        "    },\n" +
+                        "    \"physicalNexusTracker\": {\n" +
+                        "        \"established\": \"true\",\n" +
+                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"economicNexusTracker\": {\n" +
+                        "        \"established\": \"true\",\n" +
+                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    },\n" +
+                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
+                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
+                        "}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -643,7 +645,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         List<SalesTaxTrackingDto> salesTaxTrackingDtoList = new ArrayList<>();
 
         // When
-        when(salesTaxTrackingFacade.findAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
+        when(salesTaxTrackingFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -682,7 +684,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // When
-        when(salesTaxTrackingFacade.findAll(0,0)).thenReturn(Flux.error(new OperationFailedException()));
+        when(salesTaxTrackingFacade.findAll(0, 0)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient
@@ -1088,7 +1090,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
-                .value(map -> assertEquals("[date must be in the format yyyy-mm-dd]",map.get("message")));;
+                .value(map -> assertEquals("[date must be in the format yyyy-mm-dd]", map.get("message")));
+        ;
     }
 
     @Test
@@ -1113,7 +1116,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
-                .value(map -> assertEquals("[date must be in the format yyyy-mm-dd]",map.get("message")));
+                .value(map -> assertEquals("[date must be in the format yyyy-mm-dd]", map.get("message")));
     }
 
     @Test

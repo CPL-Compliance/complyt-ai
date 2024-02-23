@@ -65,8 +65,8 @@ public class CustomerRouter {
     }
 
     @Bean
-//    @PatchCustomerByComplytIdApiInfo
-    public RouterFunction<ServerResponse> patchCustomerRouterFunction(@NonNull final CustomerHandler customerHandler) {
+    @PatchCustomerByComplytIdApiInfo
+    public RouterFunction<ServerResponse> patchCustomerByComplytIdRouterFunction(@NonNull final CustomerHandler customerHandler) {
         RequestPredicate deleteCustomerRoute = RequestPredicates
                 .PATCH(BASE_URL + "/complytId/{complytId}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));

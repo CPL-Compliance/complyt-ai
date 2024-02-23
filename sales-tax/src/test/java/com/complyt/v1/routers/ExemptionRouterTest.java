@@ -55,7 +55,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @MockBean
     ExemptionFacade exemptionFacade;
     @MockBean
-    Patcher<ExemptionDto> patcher;
+    Patcher<ExemptionDto> exemptionPatcher;
     Exemption exemption;
     ExemptionDto exemptionDto;
     UnitTestUtilities testUtilities;
@@ -604,7 +604,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         }};
 
         // When
-        when(exemptionFacade.findAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(exemptions));
+        when(exemptionFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(exemptions));
 
 
         // Then
@@ -641,7 +641,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         }};
 
         // When
-        when(exemptionFacade.findAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(exemptions));
+        when(exemptionFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(exemptions));
 
 
         // Then

@@ -16,13 +16,13 @@ import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.handlers.TransactionHandler;
 import com.complyt.v1.mappers.TransactionMapper;
-import com.complyt.v1.models.TaxableCategoryDto;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.sales_tax.RatesMetaDataDto;
 import com.complyt.v1.models.sales_tax.SalesTaxDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
+import com.complyt.v1.validators.Patcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,8 +69,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     UnitTestUtilities testUtilities;
     @MockBean
     private TransactionFacade transactionFacade;
+    @MockBean
+    Patcher<TransactionDto> transactionPatcher;
     @Autowired
     private WebTestClient webTestClient;
+
 
     @BeforeEach
     void setUp() {
@@ -2145,7 +2148,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsert_ItemWithNegativeAmountAndTotalTransactionAmountIsAboveZero_Returns200() {
         // Given
         String externalId = transactionDto.externalId();
-        List<ItemDto> itemsDto = testUtilities.createItemDtos(true,true);
+        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, true);
         itemsDto.add(testUtilities.createItemDtoWithNegativeAmount(true, true));
 
         TransactionDto givenTransactionDto = transactionDto.withItems(itemsDto);

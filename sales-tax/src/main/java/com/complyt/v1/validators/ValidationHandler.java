@@ -51,18 +51,11 @@ public class ValidationHandler<T, U extends Validator> {
     public Mono<T> handle(final ServerRequest serverRequest) {
         return validatePathVariable(serverRequest.pathVariables().entrySet())
                 .then(validateQueryParam(serverRequest))
-                .then(Mono.defer(() -> shouldCallValidate.apply(serverRequest) ? validateRequestBody(serverRequest) : Mono.empty()));
-    }
-
-    private Mono<T> validateRequestBody(final ServerRequest serverRequest) {
-        return customBodyExtractor.extract(serverRequest)
-                .switchIfEmpty(serverRequest.bodyToMono(validationClass))
-                .flatMap(this::validateBody)
-                .switchIfEmpty(Mono.error(new MissingBodyApiException()));
+                .then(Mono.defer(() -> shouldCallValidate.apply(serverRequest) ? validate(serverRequest) : Mono.empty()));
     }
 
     public Mono<T> validate(final ServerRequest serverRequest) {
-        return this.validateRequestBody(serverRequest)
+        return validateRequestBody(serverRequest)
                 .flatMap(body -> Flux.fromIterable(serverRequest.pathVariables().keySet())
                         .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)
                                 .flatMap(check -> check.apply(body, serverRequest)))
@@ -71,6 +64,13 @@ public class ValidationHandler<T, U extends Validator> {
                         .collectList()
                         .flatMap(errorList -> errorList.isEmpty() ? Mono.just(body) :
                                 Mono.error(new ConflictedDataApiException(errorList))));
+    }
+
+    private Mono<T> validateRequestBody(final ServerRequest serverRequest) {
+        return customBodyExtractor.extract(serverRequest)
+                .switchIfEmpty(serverRequest.bodyToMono(validationClass))
+                .flatMap(this::validateBody)
+                .switchIfEmpty(Mono.error(new MissingBodyApiException()));
     }
 
     private Mono<Boolean> validateQueryParam(final ServerRequest serverRequest) {
@@ -103,16 +103,6 @@ public class ValidationHandler<T, U extends Validator> {
     private Mono<T> checkErrorList(T object, List<String> errorList) {
         return errorList.isEmpty() ? Mono.just(object) :
                 Mono.error(new ConflictedDataApiException(errorList));
-    }
-
-    private Mono<T> handleRequestBody(final ServerRequest serverRequest) {
-        return validateRequestBody(serverRequest)
-                .flatMap(body -> Flux.fromIterable(serverRequest.pathVariables().keySet())
-                        .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)
-                                .flatMap(check -> check.apply(body, serverRequest)))
-                        .concatWith(checkBodyConflicts(body))
-                        .collectList()
-                        .flatMap(errorList -> checkErrorList(body, errorList)));
     }
 
     public Mono<T> handle(@NonNull final T object, @NonNull final Set<Map.Entry<String, String>> entrySet) {

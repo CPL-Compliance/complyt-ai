@@ -28,31 +28,24 @@ import java.lang.annotation.Target;
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "Update or Insert Customer by External ID and source",
-                        operationId = "upsertCustomerByExternalId",
+                        description = "Patch Customer by  Complyt Id",
+                        operationId = "patchCustomerByComplytId",
                         parameters = {
                                 @Parameter(in = ParameterIn.PATH,
-                                        name = "externalId",
-                                        description = "Customer External ID",
-                                        examples = @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.externalIdExample,
-                                                name = UpsertCustomerByExternalIdAndSourceApiInfo.externalIdExample)),
-                                @Parameter(in = ParameterIn.PATH,
-                                        name = "source",
-                                        description = "Transaction Source (should be [1-9])",
-                                        required = true,
-                                        schema = @Schema(type = "string", pattern = "[1-9]"),
-                                        examples = @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.sourceExample,
-                                                name = UpsertCustomerByExternalIdAndSourceApiInfo.sourceExample))
+                                        name = "complytId",
+                                        description = "Customer complytId",
+                                        examples = @ExampleObject(value = com.complyt.v1.api_info.customer.PatchCustomerByComplytIdApiInfo.complytIdExample,
+                                                name = com.complyt.v1.api_info.customer.PatchCustomerByComplytIdApiInfo.complytIdExample)),
                         },
                         tags = "customer",
                         requestBody =
                         @RequestBody(
-                                description = "Customer to add",
+                                description = "Customer fields to patch",
                                 required = true,
                                 content = @Content(
                                         schema = @Schema(implementation = CustomerDto.class, required = true),
                                         examples = {
-                                                @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.newCustomerExample)
+                                                @ExampleObject(value = com.complyt.v1.api_info.customer.PatchCustomerByComplytIdApiInfo.newCustomerExample)
                                         })
                         ),
                         responses = {
@@ -64,20 +57,10 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = CustomerDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.returnedCustomerExample)
+                                                                @ExampleObject(value = com.complyt.v1.api_info.customer.UpsertCustomerByExternalIdAndSourceApiInfo.returnedCustomerExample)
                                                         })
-                                        }),
-                                @ApiResponse(
-                                        responseCode = "201",
-                                        description = "Successful operation",
-                                        content = {
-                                                @Content(
-                                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                        schema = @Schema(implementation = CustomerDto.class),
-                                                        examples = {
-                                                                @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.returnedCustomerExample)
-                                                        })
-                                        }),
+                                        })
+                                ,
                                 @ApiResponse(
                                         responseCode = "400",
                                         description = "Something is wrong with your request"
@@ -100,13 +83,12 @@ import java.lang.annotation.Target;
                         }))
 })
 
-public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
-    String externalIdExample = "999444";
-    String sourceExample = "1";
+public @interface PatchCustomerByComplytIdApiInfo {
+    String complytIdExample = "9f8ee193-1a71-42b4-801d-ee1d8a161fbe";
     String newCustomerExample = """
             {
                 "externalId": "externalIdExample",\s
-                "source": "1",\s
+                "source": "sourceExample",\s
                 "name": "Complyt",\s
                 "address": {\s
                     "city": "Sacramento",\s
@@ -131,7 +113,7 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
             {
                 "complytId": "9f8ee193-1a71-42b4-801d-ee1d8a161fbe",
                 "externalId": "externalIdExample",
-                "source": "1",
+                "source": "sourceExample",
                 "name": "Complyt",
                 "address": {
                     "city": "Sacramento",
