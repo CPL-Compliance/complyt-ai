@@ -33,22 +33,6 @@ public class TotalItemsAmountCalculatorTest {
         totalItemsAmountCalculator = new TotalItemsAmountCalculator();
     }
 
-//    private List<Taxable> createItems() {
-//        return new ArrayList<>() {
-//            {
-//                add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1",
-//                        null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
-//                ));
-//                add(new Item(new BigDecimal(5000), new BigDecimal(4), new BigDecimal(20000), "description", "name", "C1S3",
-//                        null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
-//                ));
-//                add(new Item(new BigDecimal(5000), new BigDecimal(4), new BigDecimal(20000), "description", "name", "C1S2",
-//                        null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
-//                ));
-//            }
-//        };
-//    }
-
     @Test
     void calculate_CalculatesTotalItemsAmount_ReturnsTotalAmount() { //todo: fox
         // Given

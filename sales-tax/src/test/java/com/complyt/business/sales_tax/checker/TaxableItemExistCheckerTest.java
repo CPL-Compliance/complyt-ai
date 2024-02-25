@@ -36,9 +36,6 @@ public class TaxableItemExistCheckerTest {
     }
 
     private Item createTaxableItem() {
-//        return new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1",
-//                null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
-//        );
         return testUtilities.createItems(true, true).get(0);
     }
 

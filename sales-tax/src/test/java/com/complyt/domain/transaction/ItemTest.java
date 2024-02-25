@@ -25,18 +25,7 @@ class ItemTest {
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-
-//        SalesTaxRates salesTaxRates = new SalesTaxRates(new BigDecimal("0.01"), new BigDecimal("0.01"),
-//                new BigDecimal("0.01"), new BigDecimal("0.01"), new BigDecimal("0.01"), null);
-//        JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
-//                "California", "CA", true, true, CalculationType.FIXED,
-//                "description", new BigDecimal("0.07"), null);
-//        item = new Item(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"),
-//                BigDecimal.valueOf(8000),"description", "name", "taxCode", rule,
-//                salesTaxRates, false, BigDecimal.ZERO, null, TangibleCategory.INTANGIBLE,
-//                TaxableCategory.NOT_TAXABLE);
-        //todo: remove
-
+        
         item = testUtilities.createItems(true, true)
                 .get(0)
                 .withSalesTaxRates(new SalesTaxRates(new BigDecimal("0.01"), new BigDecimal("0.01"),

@@ -37,12 +37,6 @@ public class ItemQualificationCheckerTest {
 
     }
 
-//    private Item createItem() {
-//        return new Item(new BigDecimal(1000), new BigDecimal(5), new BigDecimal(5000), null,
-//                "description", "item", "C1S1",
-//                null, null, false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
-//    }
-
     private NexusStateRule createNexusStateRule() {
         State state = new State("CA", "02", "California");
         List<TaxableCategory> taxableCategories = new ArrayList<>() {{
