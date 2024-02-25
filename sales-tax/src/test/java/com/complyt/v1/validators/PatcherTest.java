@@ -16,6 +16,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class PatcherTest {
     Map<String, BiFunction<CustomerDto, Object, CustomerDto>> fieldsToFunctions;
     UnitTestUtilities testUtilities;
@@ -138,6 +141,35 @@ public class PatcherTest {
 
         // Then
         Assertions.assertEquals(expectedObject, actualObject);
+    }
+
+    @Test
+    void patch_NullObject_ReturnsNullPointerException() {
+        // Given
+        Map<String, Object> map = new HashMap<>() {{
+            put("externalTimestamps", null);
+            put("customerType", null);
+        }};
+
+        // When
+        CustomerDto nullObject = null;
+        Exception nullPointerException = assertThrows(NullPointerException.class, () -> patcher.patch(nullObject, map));
+
+        // Then
+        assertEquals("object is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void patch_NullMap_ReturnsNullPointerException() {
+        // Given
+        Map<String, Object> nullMap = null;
+
+        // When
+        CustomerDto nullObject = null;
+        Exception nullPointerException = assertThrows(NullPointerException.class, () -> patcher.patch(objectToPatch, nullMap));
+
+        // Then
+        assertEquals("map is marked non-null but is null", nullPointerException.getMessage());
     }
 
 }

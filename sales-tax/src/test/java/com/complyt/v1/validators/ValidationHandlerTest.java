@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest()
@@ -126,7 +128,7 @@ class ValidationHandlerTest {
                 .verify();
     }
 
-    //PathVariable
+    // PathVariable
     @Test
     public void handle_WithValidPathVariable_ReturnsMonoEmpty() {
         // Given
@@ -362,5 +364,56 @@ class ValidationHandlerTest {
         StepVerifier.create(validationMono).expectError(ObjectNotValidApiException.class).verify();
     }
 
+    @Test
+    void validateParam_ParamIsValid_ReturnsMonoEmpty() {
+        // Given
+        Map<String, String> pathVariables = new HashMap<>();
+        pathVariables.put("complytId", "f47ac10b-58cc-4372-a567-0e02b2c3d479");
+
+        // When
+        Mono<String> stringMono = transactionDtoValidationHandler.validateParam("complytId", pathVariables.get("complytId"));
+
+        // Then
+        StepVerifier.create(stringMono).verifyComplete();
+    }
+
+    @Test
+    void validateParam_ParamIsInValid_ReturnsValidationError() {
+        // Given
+        Map<String, String> pathVariablesWithInvalidComplytId = new HashMap<>();
+        pathVariablesWithInvalidComplytId.put("complytId", "f47ac10b-58cc-4372-a567-0");
+
+        // When
+        Mono<String> stringMono = transactionDtoValidationHandler.validateParam("complytId", pathVariablesWithInvalidComplytId.get("complytId"));
+
+        // Then
+        StepVerifier.create(stringMono).expectError(PathVariableErrorException.class).verify();
+    }
+
+    @Test
+    void validateParam_NullKeySent_ThrowsNullPointerException() {
+        String nullKey = null;
+
+        // Given + When
+        Exception nullPointerException = assertThrows(NullPointerException.class, () ->
+                transactionDtoValidationHandler.validateParam(nullKey, "value"));
+
+        // Then
+
+        assertEquals("key is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void validateParam_NullValueSent_ThrowsNullPointerException() {
+        // Given
+        String nullValue = null;
+
+        // Given + When
+        Exception nullPointerException = assertThrows(NullPointerException.class, () ->
+                transactionDtoValidationHandler.validateParam("key", nullValue));
+
+        // Then
+        assertEquals("value is marked non-null but is null", nullPointerException.getMessage());
+    }
 
 }
