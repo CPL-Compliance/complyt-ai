@@ -23,6 +23,7 @@ import testUtils.unit_test.UnitTestUtilities;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -428,6 +429,35 @@ class ValidationHandlerTest {
 
         // Then
         StepVerifier.create(validationMono).expectNext(transactionDto).verifyComplete();
+    }
+
+    @Test
+    void handleObjectAndEntrySet_NullObjectPassed_ThrowsNullPointerException() {
+        // Given
+        TransactionDto nullTransactionDto = null;
+        Map<String, String> pathVariables = new HashMap<>();
+        pathVariables.put("complytId", UUID.randomUUID().toString());
+
+        // Given + When
+        Exception nullPointerException = assertThrows(NullPointerException.class, () ->
+                transactionDtoValidationHandler.handle(nullTransactionDto, pathVariables.entrySet()));
+
+        // Then
+        assertEquals("object is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void handleObjectAndEntrySet_NullEntrySetPassed_ThrowsNullPointerException() {
+        // Given
+        TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString());
+        Set<Map.Entry<String, String>> nullEntrySet = null;
+
+        // Given + When
+        Exception nullPointerException = assertThrows(NullPointerException.class, () ->
+                transactionDtoValidationHandler.handle(transactionDto, nullEntrySet));
+
+        // Then
+        assertEquals("entrySet is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
