@@ -991,7 +991,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     @Test
     @Override
     @WithMockUser
-    public void upsert_NewWithBlankComment_Returns201() throws InterruptedException {
+    public void upsert_NewWithBlankComment_Returns201() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto.withComment("");

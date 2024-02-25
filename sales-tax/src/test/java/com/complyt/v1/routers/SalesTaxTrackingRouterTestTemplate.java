@@ -34,7 +34,7 @@ public interface SalesTaxTrackingRouterTestTemplate extends
     // Validation: Comment
     void upsert_LengthGreaterThen200Comment_Returns400ValidationError();
 
-    void upsert_NewWithBlankComment_Returns201() throws InterruptedException;
+    void upsert_NewWithBlankComment_Returns201();
 
     //     Refresh By State And Date
     void refreshByStateAndDate_ReturnsSalesTaxTracking_Returns200();

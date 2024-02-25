@@ -21,7 +21,7 @@ public class CustomerMapperTest {
 
     @BeforeEach
     void setup() {
-        testUtilities = new UnitTestUtilities(LocalDateTime.now().withSecond(0), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         customer = testUtilities.createCustomer(UUID.randomUUID().toString());
         customerNoTenantNorId = testUtilities.createCustomer(customer.getId()).withTenantId(null).withComplytId(customer.getComplytId()).withId(null);
         customerDto = testUtilities.createCustomerDto(customer.getId()).withComplytId(customer.getComplytId());
