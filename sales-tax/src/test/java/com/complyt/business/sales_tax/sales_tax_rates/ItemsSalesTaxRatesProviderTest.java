@@ -47,13 +47,6 @@ public class ItemsSalesTaxRatesProviderTest {
         address = testUtilities.createAddress();
     }
 
-//    private List<Item> createItems() {
-//        return new ArrayList<>() {{
-//            add(new Item(new BigDecimal(1000), new BigDecimal(2), new BigDecimal(2000), null, "description", "name", "taxCode", jurisdictionalSalesTaxRules, null, false, BigDecimal.ZERO, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE));
-//            add(new Item(new BigDecimal(3000),new BigDecimal( 3),new BigDecimal( 9000), "description", "name", "taxCode", jurisdictionalSalesTaxRules, null, false, BigDecimal.ZERO, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
-//        }};
-//    }
-
     private List<Item> setRatesToItems(List<Item> items) {
         return items.stream().map(item -> item.withSalesTaxRates(salesTaxRates)).collect(Collectors.toList());
     }
