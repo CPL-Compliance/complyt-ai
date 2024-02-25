@@ -381,6 +381,16 @@ public class UnitTestUtilities {
         return taxables;
     }
 
+    public ClientTracking createClientTracking(String tenantId) {
+        Timestamps internalTimestamps = new Timestamps(localDateTime, localDateTime);
+        return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope", internalTimestamps);
+    }
+
+    public ClientTrackingDto createClientTrackingDto() {
+        TimestampsDto internalTimestampsDto = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
+        return new ClientTrackingDto(new NexusDto(localDateTime), "client dope", internalTimestampsDto);
+    }
+
     public SalesTaxTracking createSalesTaxTracking(String id) {
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID(), id, state,
@@ -394,11 +404,6 @@ public class UnitTestUtilities {
                 localDateTime,
                 true, localDateTime,
                 FilingFrequency.MONTHLY);
-    }
-
-    public ClientTracking createClientTracking(String tenantId) {
-        Timestamps internalTimestamps = new Timestamps(localDateTime, localDateTime);
-        return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope", internalTimestamps);
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
@@ -420,11 +425,6 @@ public class UnitTestUtilities {
     public ClientTrackingDtoTenant createClientTrackingDtoTenant(String tenantId) {
         TimestampsDto internalTimestamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         return new ClientTrackingDtoTenant(new NexusDto(localDateTime), "client dope", internalTimestamps, tenantId);
-    }
-
-    public ClientTrackingDto createClientTrackingDto() {
-        TimestampsDto internalTimestampsDto = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
-        return new ClientTrackingDto(new NexusDto(localDateTime), "client dope", internalTimestampsDto);
     }
 
     public Result createResult() {
