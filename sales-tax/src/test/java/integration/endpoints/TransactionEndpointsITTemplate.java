@@ -4,6 +4,7 @@ import testUtils.integration_test.templates.endpoints.*;
 
 public interface TransactionEndpointsITTemplate extends
         UpsertByExternalIdAndSourceITTemplate,
+        UpsertByExternalIdAndSourceWithExemptionTemplate,
         GetByExternalIdAndSourceITTemplate,
         GetByComplytIdITTemplate,
         GetAllITTemplate,
@@ -17,12 +18,6 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_DoesntExistsAndSaleTaxTrackingDoesntExists_Returns500();
 
     void upsertByExternalIdAndSource_ExistsAndSaleTaxTrackingDoesntExists_Returns500();
-
-    void upsertByExternalIdAndSource_CustomerIsExemptByStateAndDate_ReturnsNonTaxableTransaction();
-
-    void upsertByExternalIdAndSource_CustomerIsNotExemptByStateAndDate_ReturnsTaxableTransaction();
-
-    void upsertByExternalIdAndSource_CustomerIsNotExemptBecauseExemptionIsCancelled_ReturnsTaxableTransaction();
 
     void upsertByExternalIdAndSource_OneItemIsNegativeAmount_ReturnsTaxableTransaction();
 

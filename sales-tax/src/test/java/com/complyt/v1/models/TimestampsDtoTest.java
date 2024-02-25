@@ -56,7 +56,7 @@ class TimestampsDtoTest {
 
         // Then
         Assertions.assertNotNull(actualCreatedDate);
-        Assertions.assertNotNull(actualUpdatedDate); //TODO
+        Assertions.assertNotNull(actualUpdatedDate);
         Assertions.assertEquals(expectedCreatedDate, actualCreatedDate);
         Assertions.assertEquals(expectedUpdatedDate, actualUpdatedDate);
     }
@@ -71,7 +71,6 @@ class TimestampsDtoTest {
         String differentDate = "2004-04-04T04:04:04";
 
         // When
-        //TODO : check what should I do with the - @with function - TimestampsDto actualTimestampsDto = timestampsDto.withUpdatedDate(differentDateTimestamp);
         TimestampsDto actualTimestampsDto = timestampsDto.withUpdatedDate(updatedDate);
 
 

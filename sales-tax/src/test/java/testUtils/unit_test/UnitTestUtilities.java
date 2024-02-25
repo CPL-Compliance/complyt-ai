@@ -26,12 +26,13 @@ import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
-import com.complyt.v1.validators.body_checkers.transaction.TransactionDtoShippingAddressChecker;
-import com.complyt.v1.validators.body_checkers.transaction.TransactionTotalAmountChecker;
+import com.complyt.v1.validators.body_checkers.transaction.*;
+import org.springframework.data.mongodb.core.query.Update;
 
 import javax.print.attribute.standard.SheetCollate;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -219,11 +220,6 @@ public class UnitTestUtilities {
                 shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO,
                 BigDecimal.ZERO, null, TransactionFilingStatus.NOT_FILED); //added total discount null
     }
-
-//    public TransactionDto createTransactionDtoWithDiscount(String id) {
-//        List<Item> itemsWithDiscountList = createDiscountDto(BigDecimal.valueOf(500), false, "description");
-//        return createTransactionDto(id).withDiscount(discountDto);
-//    } //todo: fix
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
@@ -472,8 +468,31 @@ public class UnitTestUtilities {
         return new BodyCheckConfig(
                 List.of(
                         new TransactionDtoShippingAddressChecker(),
-                        new TransactionTotalAmountChecker()
+                        new TransactionTotalAmountChecker(),
+                        new ItemsAlignmentChecker(),
+                        new ItemHaveEitherTotalOrUnitPriceAndQuantityChecker(),
+                        new NegativeItemsNotHavingDiscountChecker()
                 ));
+    }
+
+    public Update buildSalesTaxTrackingUpdate(SalesTaxTracking salesTaxTracking) {
+        Update update = buildSalesTaxTrackingUpdateOfPreviousTwelveMonths(salesTaxTracking);
+
+        update.set("transactionNexusSummaries", salesTaxTracking.getTransactionNexusSummaries());
+        Map<String, NexusCalculationSummary> stringKeysSummaries = salesTaxTracking.getNexusCalculationSummaries().entrySet().stream()
+                .collect(Collectors.toMap(entry -> entry.getKey().format(DateTimeFormatter.ISO_LOCAL_DATE), Map.Entry::getValue));
+        update.set("nexusCalculationSummaries", stringKeysSummaries);
+
+        return update;
+    }
+
+    public Update buildSalesTaxTrackingUpdateOfPreviousTwelveMonths(SalesTaxTracking salesTaxTracking) {
+        Update update = new Update();
+
+        update.set("economicNexusTracker", salesTaxTracking.getEconomicNexusTracker());
+        update.set("appliedDate", salesTaxTracking.getAppliedDate());
+
+        return update;
     }
 
 }

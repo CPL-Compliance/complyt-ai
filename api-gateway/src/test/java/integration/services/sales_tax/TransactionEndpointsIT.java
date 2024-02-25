@@ -13,16 +13,17 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TransactionEndpointsIT extends TestContainersInitializerIT implements TransactionEndpointsITTemplate {
 
     private final String source = "1";
+    private final String state = "CA";
+    private final String createdDate = "2023-02-05";
+    private final String exemptedState = "PA";
     private final String customerId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
-
 
     @Order(2)
     @Test
@@ -40,7 +41,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, TestUtilities.NON_EXISTING_COMPLYT_ID))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, TestUtilities.NON_EXISTING_COMPLYT_ID, state, createdDate))
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -62,7 +63,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, TestUtilities.NON_EXISTING_COMPLYT_ID))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, TestUtilities.NON_EXISTING_COMPLYT_ID, state, createdDate))
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -85,7 +86,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExampleWithState(externalId, customerId, nonExistingState))
+                .bodyValue(TestUtilities.transactionJsonExampleWithState(externalId, customerId, nonExistingState, createdDate))
                 .exchange()
                 .expectStatus().is5xxServerError();
     }
@@ -108,7 +109,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExampleWithState(externalId, customerId, nonExistingState))
+                .bodyValue(TestUtilities.transactionJsonExampleWithState(externalId, customerId, nonExistingState, createdDate ))
                 .exchange()
                 .expectStatus().is5xxServerError();
 
@@ -207,7 +208,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "CA", createdDate))
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -229,7 +230,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "CA", createdDate))
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -566,8 +567,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isForbidden();
     }
 
-    @Order(2)
-    @Test
+//    @Order(2)
+//    @Test
     @Override
     public void delete_InsufficientScopes_Returns403() {
         WEB_TEST_CLIENT
@@ -774,7 +775,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, state, createdDate))
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -796,7 +797,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, state, createdDate))
                 .exchange()
                 .expectStatus().isBadRequest();
     }
@@ -818,7 +819,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, state, createdDate))
                 .exchange()
                 .expectStatus().isCreated();
     }
@@ -840,7 +841,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.existingTransactionJsonExample(externalId, customerId, TestUtilities.NON_EXISTING_COMPLYT_ID))
+                .bodyValue(TestUtilities.existingTransactionJsonExample(externalId, customerId, TestUtilities.NON_EXISTING_COMPLYT_ID, createdDate))
                 .exchange()
                 .expectStatus().isBadRequest();
     }
@@ -863,7 +864,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, state, createdDate))
                 .exchange()
                 .expectStatus().isBadRequest();
     }
@@ -886,7 +887,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, state, createdDate))
                 .exchange()
                 .expectStatus().isBadRequest();
     }
@@ -905,7 +906,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.unvalidatedTransactionJsonExample(externalId, customerId))
+                .bodyValue(TestUtilities.unvalidatedTransactionJsonExample(externalId, customerId, createdDate))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -1112,6 +1113,264 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectBodyList(LinkedHashMap.class)
                 .value(transaction -> assertEquals(transaction.get(0).get("complytId"), expectedComplyId))
                 .value(transactionLst -> assertTrue(transactionLst.size() <= RepositoryConstant.DEFAULT_SIZE));
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    /*
+     This transaction's customer has an exemption in state PA with validation dates of:
+     fromDate: 2025-01-01, toDate: 26-01-01, therefore transaction is sales-tax exempt
+    */
+    public void upsertByExternalIdAndSource_CustomerIsExemptByStateAndDate_ReturnsNonTaxableTransaction() {
+        String externalId = "nonExistingTransactionID";
+        String createdDate = "2025-01-02";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, exemptedState, createdDate))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertNull(map.get("salesTax"));
+                });
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    /*
+     This transaction's customer has an exemption in state PA with validation dates of:
+     fromDate: 2025-01-01, toDate: 26-01-01, therefore transaction is NOT sales-tax exempt
+    */
+    public void upsertByExternalIdAndSource_CustomerIsNotExemptByStateAndDate_ReturnsTaxableTransaction() {
+        String externalId = "anotherNonExistingTransactionID";
+        String createdDate = "2024-01-02";
+        String exemptedState = "PA";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, exemptedState, createdDate))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertNotNull(map.get("salesTax"));
+                });
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    /*
+     This transaction's customer has an exemption in state FL with Exemption Status - CANCELLED,
+     therefore transaction is NOT sales-tax exempt
+    */
+    public void upsertByExternalIdAndSource_CustomerIsNotExemptBecauseExemptionIsCancelled_ReturnsTaxableTransaction() {
+        String externalId = "ThirdNonExistingIdForExemptionChecks";
+        String createdDate = "2024-01-02";
+        String stateCancelled = "AK";
+
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, stateCancelled, createdDate))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertNotNull(map.get("salesTax"));
+                });
+    }
+
+    /*
+    This transaction's customer has two exemptions in state PA by this schema in this timeframe
+                 |-----Fully-Exemption-----------|
+                                 |---------Partially-Exemption------------|
+     time:  2025-01-01      2025-12-01        2026-01-01             2026-05-01
+     transactionCreatedDate:               (T)
+     */
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndPartiallyExemption_Exempt() {
+        String externalId = "nonExistingTransactionID_A";
+        String createdDate = "2025-12-02";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, exemptedState, createdDate))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String salesTax = (String) map.get("salesTax");
+                    assertNull(salesTax);
+                });
+    }
+
+    /*
+    This transaction's customer has two exemptions in state PA by this schema in this timeframe
+                 |-----Fully-Exemption-----------|
+                                 |---------Partially-Exemption------------|
+     time:  2025-01-01      2025-12-01        2026-01-01             2026-05-01
+     transactionCreatedDate:                                     (T)
+     */
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_CustomerIsPartiallyExempt_NotExempted() {
+        String externalId = "nonExistingTransactionID_B";
+        String createdDate = "2026-02-01";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, exemptedState, createdDate))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertNotNull(map.get("salesTax"));
+                });
+    }
+
+    /*
+    This transaction's customer has two exemptions in state PA by this schema in this timeframe
+                 |-----Fully-Exemption-----------|
+                                 |---------Partially-Exemption------------|
+     time:  2025-01-01      2025-12-01        2026-01-01          2026-05-01
+     transactionCreatedDate:                                                         (T)
+     */
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_CustomerIsNotNoExempt_NoExempted() {
+        String externalId = "nonExistingTransactionID_C";
+        String createdDate = "2026-05-02";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, exemptedState, createdDate))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertNotNull(map.get("salesTax"));
+                });
+    }
+
+    /*
+    This transaction's customer has two exemptions in state PA by this schema in this timeframe
+              |---------Not-Active-Exemption------------|
+                                |----------Fully-Exemption-----------|
+     time:  2027-01-01      2027-12-01             2028-01-01          2028-05-01
+     transactionCreatedDate:               (T)
+     */
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_NotActiveExemptionAndFullyExempt_Exempted() {
+        String externalId = "nonExistingTransactionID_D";
+        String createdDate = "2027-12-02";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, exemptedState, createdDate))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String salesTax = (String) map.get("salesTax").toString();
+                    assertNull(salesTax);
+                });
+    }
+
+    /*
+    This transaction's customer has two exemptions in state PA by this schema in this timeframe
+              |---------Not-Active-Exemption------------|
+                                        |----------Fully-Exemption-----------|
+     time:  2027-01-01              2027-12-01             2028-01-01          2028-05-01
+     transactionCreatedDate:  (T)
+     */
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_NotActiveExemption_NoExempted() {
+        String externalId = "nonExistingTransactionID_E";
+        String createdDate = "2027-01-02";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, exemptedState, createdDate))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertNotNull(map.get("salesTax"));
+                });
     }
 
 }

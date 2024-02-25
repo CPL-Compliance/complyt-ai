@@ -20,11 +20,13 @@ import java.util.function.Function;
 @AllArgsConstructor
 public class TransactionTotalAmountChecker implements DtoBodyChecker<TransactionDto>, TransactionBodyFunctions {
 
+    // a transaction must have a positive sum
+    // this check was added when supporting negative total items was started
     @Override
     // check if the discount is not larger than all the items total
     public Flux<String> check(@NonNull TransactionDto transactionDto) {
         return Flux.from(Mono.just(transactionDto.items())
-                        .map(calculateTotalItemsAmountAfterDiscount())
+                .map(calculateTotalItemsAmountAfterDiscount())
                 .flatMap(this::checkTransactionTotalAmountIsNotBelowZero));
     }
 

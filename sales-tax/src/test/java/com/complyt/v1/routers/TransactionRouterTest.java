@@ -2681,174 +2681,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
-//    @Test
-//    @Override
-//    @WithMockUser
-//    public void upsert_TransactionWithNoDiscount_Return200() {
-//        // Given
-//        String externalId = transactionDto.externalId();
-//        TransactionDto givenTransactionDto = transactionDto.withDiscount(null);
-//
-//        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-//        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
-//
-//        // When + Then
-//        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-//        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
-//        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
-//
-//        webTestClient
-//                .mutateWith(csrf())
-//                .put()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-//                        .build())
-//                .bodyValue(givenTransactionDto)
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody(TransactionDto.class)
-//                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
-//    }
-
-//    @Test
-//    @Override
-//    @WithMockUser
-//    public void upsert_TransactionWithDiscountLessThanTotalAmount_Return200() {
-//        // Given
-//        String externalId = transactionDto.externalId();
-//        TransactionDto givenTransactionDto = transactionDto
-//                .withDiscount(testUtilities.createDiscountDto(BigDecimal.ZERO, false, "discount"));
-//
-//        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-//        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
-//
-//        // When + Then
-//        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-//        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
-//        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
-//
-//        webTestClient
-//                .mutateWith(csrf())
-//                .put()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-//                        .build())
-//                .bodyValue(givenTransactionDto)
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody(TransactionDto.class)
-//                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
-//    }
-
-//    @Test
-//    @Override
-//    @WithMockUser
-//    public void upsert_TransactionWithPositiveDiscountAmount_Return200() {
-//
-//        // Given
-//        String externalId = transactionDto.externalId();
-//        TransactionDto givenTransactionDto = transactionDto
-//                .withDiscount(testUtilities.createDiscountDto(BigDecimal.valueOf(16000), false, "discount"));
-//
-//        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-//        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
-//
-//        // When + Then
-//        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-//        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
-//        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
-//
-//        webTestClient
-//                .mutateWith(csrf())
-//                .put()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-//                        .build())
-//                .bodyValue(givenTransactionDto)
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody(TransactionDto.class)
-//                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
-//    }
-
-//    @Test
-//    @Override
-//    @WithMockUser
-//    public void upsert_TransactionWithDiscountEqualsToTotalAmount_Return200() {
-//        // Given
-//        String externalId = transactionDto.externalId();
-//        BigDecimal negativeItemsTotalAmount = transactionDto.items().stream()
-//                .map(ItemDto::totalPrice).reduce(BigDecimal.ZERO, BigDecimal::add)
-//                .multiply(BigDecimal.valueOf(-1));
-//
-//        TransactionDto givenTransactionDto = transactionDto
-//                .withDiscount(testUtilities.createDiscountDto(negativeItemsTotalAmount, false, "discount"));
-//
-//        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-//        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
-//
-//        // When + Then
-//        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-//        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
-//        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
-//
-//        webTestClient
-//                .mutateWith(csrf())
-//                .put()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-//                        .build())
-//                .bodyValue(givenTransactionDto)
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody(TransactionDto.class)
-//                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
-//    }
-
-//    @Test
-//    @Override
-//    @WithMockUser
-//    public void upsert_TransactionWithDiscountLargerThanTotalAmount_Return400() {
-//        // Given //asdasdasd
-//        String externalId = transactionDto.externalId();
-//        BigDecimal negativeItemsTotalAmount = transactionDto.items().stream()
-//                .map(ItemDto::totalPrice).reduce(BigDecimal.ZERO, BigDecimal::add)
-//                .multiply(BigDecimal.valueOf(-1));
-//
-//        TransactionDto givenTransactionDto = transactionDto
-//                .withDiscount(testUtilities.createDiscountDto(negativeItemsTotalAmount.subtract(BigDecimal.ONE), false, "discount"));
-//
-//        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-//        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
-//
-//        // When + Then
-//        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-//        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
-//        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
-//
-//        webTestClient
-//                .mutateWith(csrf())
-//                .put()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-//                        .build())
-//                .bodyValue(givenTransactionDto)
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isBadRequest();
-//    }
-
-//    @Test
-//    @Override
-//    @WithMockUser
-//    public void upsert_TransactionWithDiscountNoDiscountAmount_Return400() {
-//
-//    }
-
     @Test
     @Override
     @WithMockUser
@@ -4822,7 +4654,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NegativeTotalPriceInItemWithDiscount_Returns400ValidationError() {
         // Given
-
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", null, "C1S1", null,
@@ -4845,14 +4676,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
-
-    @Test
-    @Override
-    @WithMockUser
-    public void upsert_NullTotalAndQuantityAndUnitPriceInItem_Returns400ValidationError() {
-
-    }
-
 
     @Test
     @Override

@@ -104,6 +104,4 @@ public interface FieldsDescriptions {
     String SHIPPING_FEE_TOTAL_PRICE =  "The total price of the shipping fee";
 
     String SHIPPING_FEE_CALCULATED_TOTAL = "The calculated price of the shipping fee. calculated on run time";
-
-
 }

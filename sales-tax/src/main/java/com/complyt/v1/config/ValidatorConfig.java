@@ -53,7 +53,7 @@ public class ValidatorConfig {
                 new DataConflictChecksProvider(Map.of(
                         "source", CustomerDto.SOURCE_CONFLICT_CHECK,
                         "externalId", CustomerDto.EXTERNAL_ID_CONFLICT_CHECK),
-                                                          null),
+                        null),
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,
                 queryParamChecker,

@@ -5,8 +5,6 @@ public interface ItemValidationTestTemplate {
 
     void upsert_NegativeTotalPriceInItemWithDiscount_Returns400ValidationError();
 
-    void upsert_NullTotalAndQuantityAndUnitPriceInItem_Returns400ValidationError();
-
     void upsert_NullNameInItem_Returns400ValidationError();
 
     void upsert_BlankNameInItem_Returns400ValidationError();

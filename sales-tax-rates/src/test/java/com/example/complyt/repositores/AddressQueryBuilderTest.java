@@ -74,6 +74,7 @@ public class AddressQueryBuilderTest {
         Assertions.assertEquals(expectedQuery, actualQuery);
     }
 
+
     @Test
     void build_FullAddressWithCountyPassed_ReturnsQuery() {
         // Given
