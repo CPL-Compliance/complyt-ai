@@ -20,6 +20,7 @@ class ClientTrackingMapperTest {
 
     @BeforeEach
     void setup() {
+        //test
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         String tenantId = "org_12345";
         clientTracking = testUtilities.createClientTracking(tenantId);
