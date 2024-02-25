@@ -45,10 +45,6 @@ public class TaxableItemExistCheckerTest {
     private Item createNotTaxableItem() {
         return testUtilities.createItems(true, true).get(0)
                 .withTaxableCategory(TaxableCategory.NOT_TAXABLE);
-//
-//        return new Item(new BigDecimal(1000), new BigDecimal(5), new BigDecimal(5000), null,"description", "name", "C2S1",
-//                null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, null, TangibleCategory.TANGIBLE, TaxableCategory.NOT_TAXABLE
-//        ); //todo: remove
     }
 
     @Test

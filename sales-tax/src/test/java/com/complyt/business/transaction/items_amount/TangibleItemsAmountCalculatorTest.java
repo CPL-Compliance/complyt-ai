@@ -52,7 +52,7 @@ public class TangibleItemsAmountCalculatorTest {
     }
 
     @Test
-    void calculate_TwoItemsAreTangible_ReturnsAmountOfTwoItems() { //todo: oh no this is going to fail :(
+    void calculate_TwoItemsAreTangible_ReturnsAmountOfTwoItems() {
         // Before
         BigDecimal expectedAmount = items.get(0).getCalculatedTotal().add(items.get(1).getCalculatedTotal());
 
@@ -62,7 +62,7 @@ public class TangibleItemsAmountCalculatorTest {
     }
 
     @Test
-    void calculate_OneItemIsTangible_ReturnsAmountOfOneItem() { //todo: oh no another fail incoming
+    void calculate_OneItemIsTangible_ReturnsAmountOfOneItem() {
         // Before
         items.set(0, items.get(0).withTangibleCategory(TangibleCategory.INTANGIBLE));
         BigDecimal expectedAmount = items.get(1).getCalculatedTotal();

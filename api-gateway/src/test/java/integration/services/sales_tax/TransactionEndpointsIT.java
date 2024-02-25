@@ -1335,7 +1335,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isCreated()
                 .expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String salesTax = (String) map.get("salesTax").toString();
+                    String salesTax = (String) map.get("salesTax");
                     assertNull(salesTax);
                 });
     }

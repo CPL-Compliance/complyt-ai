@@ -71,7 +71,7 @@ public class TaxableItemsAmountCalculatorTest {
     }
 
     @Test
-    void calculate_ItemsWithDiscountPassedBothTaxable_ReturnsAmount() { //todo: good example
+    void calculate_ItemsWithDiscountPassedBothTaxable_ReturnsAmount() {
         // Before
         List<Taxable> discountedItems = new ArrayList<>(unitTestUtilities.setCalculatedTotalOnItemList(
                 unitTestUtilities.createItems(true, true)
