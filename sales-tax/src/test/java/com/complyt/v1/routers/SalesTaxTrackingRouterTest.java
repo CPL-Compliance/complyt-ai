@@ -1001,7 +1001,6 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         when(salesTaxTrackingFacade.findByState(stateName)).thenReturn(Mono.empty());
         when(salesTaxTrackingFacade.save(mappedSalesTaxTracking)).thenReturn(Mono.just(mappedSalesTaxTracking));
 
-        Thread.sleep(3);
         // Then
         webTestClient
                 .mutateWith(csrf())
