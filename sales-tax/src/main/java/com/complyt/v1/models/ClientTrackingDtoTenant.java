@@ -1,5 +1,6 @@
 package com.complyt.v1.models;
 
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.checkables.TenantIdCheckable;
 import com.complyt.v1.models.nexus.NexusDto;
@@ -10,10 +11,10 @@ import lombok.With;
 
 @With
 public record ClientTrackingDtoTenant(
-        @Valid @NotNull NexusDto nexus,
-        @NotNull @Size(max = 256, message = "ClientTracking.name " + StringErrorMessages.MAX_256_ERROR) String name,
+        @Valid @NotNull(message = "ClientTrackingDto.nexus " + DtoErrorMessages.NOT_NULL_ERROR) NexusDto nexus,
+        @NotNull(message = "ClientTrackingDto.name " + DtoErrorMessages.NOT_NULL_ERROR) @Size(max = 256, message = "ClientTracking.name " + StringErrorMessages.MAX_256_ERROR) String name,
         @Valid TimestampsDto internalTimestamps,
-        @NotNull @Size(max = 35, message = "tenantId " + StringErrorMessages.MAX_30_ERROR) String tenantId)
+        @NotNull(message = "ClientTrackingDto.tenantId " + DtoErrorMessages.NOT_NULL_ERROR) @Size(max = 35, message = "tenantId " + StringErrorMessages.MAX_30_ERROR) String tenantId)
 
         implements TenantIdCheckable {
 }
