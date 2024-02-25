@@ -19,7 +19,4 @@ public class ItemHaveEitherTotalOrUnitPriceAndQuantityChecker implements DtoBody
     private boolean checkItemFieldsExists(ItemDto itemDto) {
         return itemDto.totalPrice() != null || (itemDto.unitPrice() != null && itemDto.quantity() != null);
     }
-
-
-
 }
