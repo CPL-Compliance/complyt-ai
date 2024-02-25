@@ -6,7 +6,6 @@ import com.complyt.business.timestamps_injection.NewTransactionInternalTimestamp
 import com.complyt.business.transaction.CityCountyProvider;
 import com.complyt.business.transaction.ItemsTotalCalculator;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
-import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.repositories.TransactionRepository;
