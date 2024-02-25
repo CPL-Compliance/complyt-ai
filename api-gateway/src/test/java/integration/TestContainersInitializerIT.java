@@ -73,7 +73,7 @@ public abstract class TestContainersInitializerIT {
         KEYCLOAK_CONTAINER.start();
         ACCESS_TOKEN_CLIENT = WebTestClient.bindToServer().baseUrl("http://localhost:" + KEYCLOAK_CONTAINER.getMappedPort(8080) + "/").build();
 
-        String mongoUriEntrypoint = "-Dspring.data.mongodb.uri=mongodb://" + HOSTNAME + ":27017";
+        String mongoUriEntrypoint = "-Dspring.data.mongodb.uri=mongodb://" + HOSTNAME + ":27017"; //todo: fix
         String discoveryUrlEntrypoint = "-Deureka.client.serviceUrl.defaultZone=http://" + HOSTNAME + ":8761/eureka/";
         String discoveryHostEntrypoint = "-Deureka.instance.hostname=" + HOSTNAME;
         String oauthUriEntrypoint = "-Dspring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:" + KEYCLOAK_CONTAINER.getMappedPort(8080) + "/realms/test-realm";
