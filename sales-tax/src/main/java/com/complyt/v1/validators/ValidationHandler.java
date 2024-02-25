@@ -85,7 +85,7 @@ public class ValidationHandler<T, U extends Validator> {
                 .switchIfEmpty(Mono.just(true));
     }
 
-    private Mono<Boolean> validatePathVariable(@NonNull final Set<Map.Entry<String, String>> entrySet) {
+    private Mono<Boolean> validatePathVariable(final Set<Map.Entry<String, String>> entrySet) {
         return Flux.fromIterable(entrySet)
                 .flatMapSequential(entry -> pathVariableChecksProvider.getFunctionCheck(entry.getKey())
                         .flatMapMany(check -> check.apply(entry.getValue())))
