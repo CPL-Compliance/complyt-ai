@@ -511,5 +511,4 @@ class ValidationHandlerTest {
         // Then
         assertEquals("value is marked non-null but is null", nullPointerException.getMessage());
     }
-
 }
