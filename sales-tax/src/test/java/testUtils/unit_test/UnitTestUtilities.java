@@ -397,8 +397,8 @@ public class UnitTestUtilities {
     }
 
     public ClientTracking createClientTracking(String tenantId) {
-        Timestamps internalTimestamp = new Timestamps(localDateTime, localDateTime);
-        return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope", internalTimestamp);
+        Timestamps internalTimestamps = new Timestamps(localDateTime, localDateTime);
+        return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope", internalTimestamps);
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
@@ -423,8 +423,8 @@ public class UnitTestUtilities {
     }
 
     public ClientTrackingDto createClientTrackingDto() {
-        TimestampsDto internalTimestamps =  new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString());
-        return new ClientTrackingDto(new NexusDto(localDateTime), "client dope", internalTimestamps);
+        TimestampsDto internalTimestampsDto = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
+        return new ClientTrackingDto(new NexusDto(localDateTime), "client dope", internalTimestampsDto);
     }
 
     public Result createResult() {
