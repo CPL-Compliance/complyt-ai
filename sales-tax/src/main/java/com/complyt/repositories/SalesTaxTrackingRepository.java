@@ -45,8 +45,7 @@ public class SalesTaxTrackingRepository {
 
                     return ContextLogger.observeCtx("Searching for sales tax tracking with state "
                                     + state + " and tenant ID " + tenantId, log::info)
-                            .then(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class))
-                            .map(x->x);
+                            .then(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class));
                 });
     }
 

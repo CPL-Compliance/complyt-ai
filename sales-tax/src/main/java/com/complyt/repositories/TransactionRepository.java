@@ -34,8 +34,7 @@ public class TransactionRepository {
                     Transaction transactionWithTenantId = transaction.withTenantId(tenantId);
 
                     return ContextLogger.observeCtx("Saving transaction: " + transactionWithTenantId.toString(), log::info)
-                            .then(reactiveMongoTemplate.save(transactionWithTenantId))
-                            .map(x -> x);
+                            .then(reactiveMongoTemplate.save(transactionWithTenantId));
                 });
     }
 
