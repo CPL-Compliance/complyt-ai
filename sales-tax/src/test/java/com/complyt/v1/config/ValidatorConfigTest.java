@@ -1,6 +1,8 @@
 package com.complyt.v1.config;
 
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
+import com.complyt.v1.models.ClientTrackingDto;
+import com.complyt.v1.models.ClientTrackingDtoTenant;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
@@ -120,6 +122,29 @@ class ValidatorConfigTest {
 
         // Then
         StepVerifier.create(exemptionDtoMono).expectErrorMessage(GenericErrorMessages.DATA_CONFLICT_ERROR);
+    }
+
+    @Test
+    void ClientTrackingValidationHandler_ReturnsValidationHandler() {
+        // Given
+        String tenantId = "org_12345";
+        ValidationHandler<ClientTrackingDtoTenant, SpringValidatorAdapter> clientTrackingDtoValidationHandler = validatorConfig.clientTrackingDtoTenantValidationHandler(springValidatorAdapter);
+        ClientTrackingDtoTenant clientTrackingDtoTenant = testUtilities.createClientTrackingDtoTenant(tenantId);
+        Map<String, String> pathVariables = new HashMap<>();
+        pathVariables.put("tenantId", clientTrackingDtoTenant.tenantId());
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
+
+        // When
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
+        when(serverRequest.bodyToMono(ClientTrackingDtoTenant.class)).thenReturn(Mono.just(clientTrackingDtoTenant));
+        when(serverRequest.pathVariable("tenantId")).thenReturn("conflict tenantId");
+
+        Mono<ClientTrackingDtoTenant> clientTrackingDtoMono = clientTrackingDtoValidationHandler.handle(serverRequest);
+
+        // Then
+        StepVerifier.create(clientTrackingDtoMono).expectErrorMessage(GenericErrorMessages.TENANT_ID_FORMAT);
     }
 
     @Test

@@ -6,4 +6,6 @@ public interface GenericErrorMessages {
     String NOT_FOUND_ERROR = "The requested operation failed because a resource associated with the request could not be found.";
 
     String UNSUPPORTED_MEDIA_TYPE = "415 Unsupported Media Type";
+
+    String UNAUTHORIZED_ERROR = "401 Unauthorized";
 }

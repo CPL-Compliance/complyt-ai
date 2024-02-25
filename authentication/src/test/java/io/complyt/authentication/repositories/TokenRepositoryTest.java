@@ -38,7 +38,7 @@ class TokenRepositoryTest {
     }
 
     @Test
-    public void findByComplytClientId_tokenExists_returnsToken() {
+    void findByComplytClientId_tokenExists_returnsToken() {
         // Given
         String complytClientId = "complytClientId";
         Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
@@ -52,7 +52,7 @@ class TokenRepositoryTest {
     }
 
     @Test
-    public void findByComplytClientId_tokenNotExists_returnEmpty() {
+    void findByComplytClientId_tokenNotExists_returnEmpty() {
         // Given
         String complytClientId = "complytClientId";
         Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
@@ -66,13 +66,41 @@ class TokenRepositoryTest {
     }
 
     @Test
-    public void save_tokenIsValid_returnsTokenFromDb() {
+    void save_tokenIsValid_returnsTokenFromDb() {
         // When
         when(reactiveMongoTemplate.save(token)).thenReturn(Mono.just(token));
 
         // Then
         Mono<Token> tokenMono = tokenRepository.save(token);
         StepVerifier.create(tokenMono).expectNext(token).verifyComplete();
+    }
+
+    @Test
+    void deleteByComplytClientId_complytClientIdExists_returnsTheDeletedToken() {
+        // Given
+        String complytClientId = "complytClientId";
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
+
+        // When
+        when(reactiveMongoTemplate.findAndRemove(query, Token.class)).thenReturn(Mono.just(token));
+
+        // Then
+        Mono<Token> tokenMono = tokenRepository.deleteByComplytClientId(complytClientId);
+        StepVerifier.create(tokenMono).expectNext(token).verifyComplete();
+    }
+
+    @Test
+     void deleteByComplytClientId_tokenNotExists_returnsEmpty() {
+        // Given
+        String complytClientId = "complytClientId";
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
+
+        // When
+        when(reactiveMongoTemplate.findAndRemove(query, Token.class)).thenReturn(Mono.empty());
+
+        // Then
+        Mono<Token> tokenMono = tokenRepository.deleteByComplytClientId(complytClientId);
+        StepVerifier.create(tokenMono).verifyComplete();
     }
 
     @Test
@@ -96,4 +124,17 @@ class TokenRepositoryTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "token is marked non-null but is null");
     }
+
+    @Test
+    void deleteByComplytClientId_tokenIsNull_throwsNullPointerException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            tokenRepository.deleteByComplytClientId(null);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "complytClientId is marked non-null but is null");
+    }
+
+
 }

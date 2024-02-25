@@ -1,5 +1,6 @@
 package io.complyt.authentication.v1.routers;
 
+import io.complyt.authentication.v1.api_info.DeleteApiKeyApiInfo;
 import io.complyt.authentication.v1.handlers.ApiKeyHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -18,5 +19,15 @@ public class ApiKeyRouter {
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(postApiKeyRoute, apiKeyHandler::post);
+    }
+
+    @Bean
+    @DeleteApiKeyApiInfo
+    public RouterFunction<ServerResponse> deleteApiKeyRouterFunction(@NonNull final ApiKeyHandler apiKeyHandler) {
+        RequestPredicate postApiKeyRoute = RequestPredicates
+                .DELETE(BASE_URL)
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED));
+
+        return RouterFunctions.route(postApiKeyRoute, apiKeyHandler::delete);
     }
 }

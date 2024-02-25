@@ -7,6 +7,7 @@ public class TestUtilities {
 
     public static final String TRANSACTION_BASE_URL = "/v1/transactions";
     public static final String CUSTOMER_BASE_URL = "/v1/customers";
+    public static final String CLIENT_TRACKING_BASE_URL = "/v1/clientTracking";
     public static final String SALES_TAX_TRACKING_BASE_URL = "/v1/nexus";
     public static final String SALES_TAX_RATES_BASE_URL = "/v1/sales_tax_rates";
     public static final String FILES_BASE_URL = "/v1/files";
@@ -14,9 +15,26 @@ public class TestUtilities {
     public static final String API_KEY_BASE_URL = "/v1/api_key";
     public static final String SECRET_KEY_BASE_URL = "/v1/secret_key";
     public static final String NON_EXISTING_COMPLYT_ID = "d18068f0-6d98-4b0d-ba19-4536f0b4173a";
+
+    /*
+    We have 5 sets of API_KEY_CLIENT_ID, API_KEY_CLIENT_SECRET.
+    The API_KEY_CLIENT_ID, API_KEY_CLIENT_SECRET are in use for all the non-changing tests (unit and integration).
+    The other 4 sets API_KEY_CLIENT_ID#, API_KEY_CLIENT_SECRET# are being used in cases where the test might mutate
+    the document (DELETE API Key) or when we want to test a few times the behavior of a metric that happens for
+    the first time (POST Token).
+     */
     public static final String API_KEY_CLIENT_ID = "78fd4034-53af-4144-b2da-27ac31cdf45c";
     public static final String API_KEY_CLIENT_SECRET = "3d446591-d839-4906-97fe-85e1b51df0c8";
+    public static final String API_KEY_CLIENT_ID1 = "0f6daf12-5851-4fa9-8f6c-4e3af2e28922";
+    public static final String API_KEY_CLIENT_SECRET1 = "c0faf9b1-1539-454c-b87e-34b6d39fdc54";
+    public static final String API_KEY_CLIENT_ID2 = "a4e25dac-e414-4491-bdd2-552c83939ec5";
+    public static final String API_KEY_CLIENT_SECRET2 = "0e60bc95-5876-4036-9c32-c23bec5f045b";
+    public static final String API_KEY_CLIENT_ID3 = "70b4d5d7-c0cd-469f-a8c4-02383f57f79a";
+    public static final String API_KEY_CLIENT_SECRET3 = "06795f62-027a-439a-8983-33e7f33e8d78";
+    public static final String API_KEY_CLIENT_ID4 = "35b0163d-6161-451b-afda-d4f5476cd81a";
+    public static final String API_KEY_CLIENT_SECRET4 = "27efbba1-2a52-4561-a7c9-ddc54c166331";
 
+    public static final String NULL_STRING = "null";
 
     public static String unvalidatedSalesTaxTrackingJsonExample(String stateName, String stateAbbreviation) {
         return salesTaxTrackingJsonExample(stateName, stateAbbreviation, null, false);
@@ -26,6 +44,15 @@ public class TestUtilities {
         return salesTaxTrackingJsonExample(stateName, stateAbbreviation, complytId, true);
     }
 
+    public static String clientTrackingJsonExample(String name, String tenantId) {
+            return "{\n" +
+                    "    \"nexus\": {\n" +
+                    "        \"taxableDate\": \"2015-06-01T00:00:00\"\n" +
+                    "    },\n" +
+                    "    \"name\": \"" + name + "\",\n" +
+                    "    \"tenantId\": \"" + tenantId + "\"\n" +
+                    "}";
+    }
 
     private static String salesTaxTrackingJsonExample(String stateName, String stateAbbreviation, String complytId, boolean isValidated) {
         return String.format("""
@@ -181,16 +208,38 @@ public class TestUtilities {
                 "}";
     }
 
-    public static String tokenJsonExample() {
+    public static String apiKeyJsonExample() {
         return "{\n" +
                 "    \"clientId\":\"" + API_KEY_CLIENT_ID + "\",\n" +
                 "    \"clientSecret\":\"" + API_KEY_CLIENT_SECRET + "\"\n" +
                 "}";
     }
 
-    public static String tokenUrlEncodedExample() {
+    public static String apiKey2JsonExample() {
+        return "{\n" +
+                "    \"clientId\":\"" + API_KEY_CLIENT_ID2 + "\",\n" +
+                "    \"clientSecret\":\"" + API_KEY_CLIENT_SECRET2 + "\"\n" +
+                "}";
+    }
+    public static String apiKey4JsonExample() {
+        return "{\n" +
+                "    \"clientId\":\"" + API_KEY_CLIENT_ID4 + "\",\n" +
+                "    \"clientSecret\":\"" + API_KEY_CLIENT_SECRET4 + "\"\n" +
+                "}";
+    }
+
+    public static String apiKeyUrlEncodedExample() {
         return "clientId=" + API_KEY_CLIENT_ID +
                 "&clientSecret=" + API_KEY_CLIENT_SECRET;
+    }
+    public static String apiKey1UrlEncodedExample() {
+        return "clientId=" + API_KEY_CLIENT_ID1 +
+                "&clientSecret=" + API_KEY_CLIENT_SECRET1;
+    }
+
+    public static String apiKey3UrlEncodedExample() {
+        return "clientId=" + API_KEY_CLIENT_ID3 +
+                "&clientSecret=" + API_KEY_CLIENT_SECRET3;
     }
 
     public static String transactionItemIsNotAligned(String externalId, String customerId, String complytId, boolean isValidated, String state) {
@@ -364,4 +413,9 @@ public class TestUtilities {
         );
     }
 
+    public static String stringWithLength(int length) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (; 0 < length; length--) stringBuilder.append('a');
+        return stringBuilder.toString();
+    }
 }

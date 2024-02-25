@@ -160,6 +160,8 @@ buildNumber.properties
 .classpath
 
 dockerdata/
+#ignore Dockerfiles in brances
+Dockerfile
 
 .DS_Store
 # End of https://www.toptal.com/developers/gitignore/api/intellij,maven,java

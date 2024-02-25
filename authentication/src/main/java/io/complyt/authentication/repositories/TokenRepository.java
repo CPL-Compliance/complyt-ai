@@ -32,4 +32,11 @@ public class TokenRepository {
         return ContextLogger.observeCtx("Saving token: " + token, log::info)
                 .then(reactiveMongoTemplate.save(token));
     }
+
+    public Mono<Token> deleteByComplytClientId(final @NonNull String complytClientId) {
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
+
+        return ContextLogger.observeCtx("Deleting token by ComplytClientId " + complytClientId, log::info)
+                .then(reactiveMongoTemplate.findAndRemove(query, Token.class));
+    }
 }

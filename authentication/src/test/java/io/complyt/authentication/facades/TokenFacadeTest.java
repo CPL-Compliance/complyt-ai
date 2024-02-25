@@ -6,6 +6,7 @@ import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.services.AuthorizationService;
 import io.complyt.authentication.services.CredentialsService;
 import io.complyt.authentication.services.TokenService;
+import io.complyt.authentication.v1.exceptions.types.ApiKeyNotValidException;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +59,7 @@ class TokenFacadeTest {
         token = TestUtilities.createOutputToken();
 
         // When
-        when(tokenService.findByApiKey(any())).thenReturn(Mono.just(token));
+        when(tokenService.findByApiKeyAndDecrypt(any())).thenReturn(Mono.just(token));
 
         // Then
         Mono<Token> actualtokenMono = tokenFacade.getToken(apiKey);
@@ -73,8 +74,8 @@ class TokenFacadeTest {
         Token somethingElseToken = token.withAccessToken("Something else");
 
         // When
-        when(tokenService.findByApiKey(any())).thenReturn(Mono.empty());
-        when(credentialsService.getCredentialsByApiKey(any())).thenReturn(Mono.just(credentials));
+        when(tokenService.findByApiKeyAndDecrypt(any())).thenReturn(Mono.empty());
+        when(credentialsService.getCredentialsByApiKeyAndDecrypt(any())).thenReturn(Mono.just(credentials));
         when(authorizationService.getToken(any())).thenReturn(Mono.just(somethingElseToken));
         when(tokenService.saveToken(any())).thenReturn(Mono.just(somethingElseToken));
 
@@ -82,6 +83,19 @@ class TokenFacadeTest {
         Mono<Token> actualtokenMono = tokenFacade.getToken(apiKey);
 
         StepVerifier.create(actualtokenMono).expectNext(somethingElseToken).verifyComplete();
+    }
+
+    @Test
+    void getToken_credentailsNotExists_return401() {
+        // When
+        when(tokenService.findByApiKeyAndDecrypt(any())).thenReturn(Mono.empty());
+        when(credentialsService.getCredentialsByApiKeyAndDecrypt(any())).thenReturn(Mono.empty());
+
+
+        // Then
+        Mono<Token> actualtokenMono = tokenFacade.getToken(apiKey);
+
+        StepVerifier.create(actualtokenMono).expectError(ApiKeyNotValidException.class).verify();
     }
 
     @Test
