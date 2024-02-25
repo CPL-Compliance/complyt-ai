@@ -8,7 +8,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.HashMap;
 
-@Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL, nullValueMapMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT, imports = HashMap.class)
+@Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL, nullValueMapMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT, imports = HashMap.class, uses = {TimestampsMapper.class})
 public interface ClientTrackingMapper {
     ClientTrackingMapper INSTANCE = Mappers.getMapper(ClientTrackingMapper.class);
 

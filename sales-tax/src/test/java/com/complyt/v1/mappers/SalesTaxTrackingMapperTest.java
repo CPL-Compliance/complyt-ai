@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,8 +42,7 @@ public class SalesTaxTrackingMapperTest {
                 .withTransactionNexusSummaries(Map.of(transactionId, new TransactionNexusSummary(BigDecimal.valueOf(1200), localDateTime, TransactionType.INVOICE)));
         salesTaxTrackingWithWhatsExposedToDto = salesTaxTracking
                 .withTenantId(null).withId(null).withComplytId(salesTaxTracking.getComplytId())
-                .withClientTracking(salesTaxTracking.getClientTracking().withTenantId(null).withId(null)
-                )
+                .withClientTracking(salesTaxTracking.getClientTracking().withTenantId(null).withId(null))
                 .withNexusStateRule(salesTaxTracking.getNexusStateRule().withId(null))
                 .withTransactionNexusSummaries(new HashMap<>());
         salesTaxTrackingDto = testUtilities.createSalesTaxTrackingDto().withComplytId(salesTaxTracking.getComplytId())

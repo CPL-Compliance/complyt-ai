@@ -991,7 +991,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     @Test
     @Override
     @WithMockUser
-    public void upsert_NewWithBlankComment_Returns201() {
+    public void upsert_NewWithBlankComment_Returns201() throws InterruptedException {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto.withComment("");
@@ -1001,6 +1001,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         when(salesTaxTrackingFacade.findByState(stateName)).thenReturn(Mono.empty());
         when(salesTaxTrackingFacade.save(mappedSalesTaxTracking)).thenReturn(Mono.just(mappedSalesTaxTracking));
 
+        Thread.sleep(3);
         // Then
         webTestClient
                 .mutateWith(csrf())

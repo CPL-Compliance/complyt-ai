@@ -19,7 +19,7 @@ class ClientTrackingMapperTest {
     UnitTestUtilities testUtilities;
 
     @BeforeEach
-    void setup()  {
+    void setup() throws InterruptedException {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         String tenantId = "org_12345";
         clientTracking = testUtilities.createClientTracking(tenantId);
