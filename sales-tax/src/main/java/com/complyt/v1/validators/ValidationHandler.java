@@ -61,8 +61,7 @@ public class ValidationHandler<T, U extends Validator> {
                                 .flatMap(check -> check.apply(body, serverRequest)))
                         .concatWith(checkBodyConflicts(body))
                         .collectList()
-                        .flatMap(errorList -> errorList.isEmpty() ? Mono.just(body) :
-                                Mono.error(new ConflictedDataApiException(errorList))));
+                        .flatMap(errorList -> checkErrorList(body, errorList)));
     }
 
     private Mono<T> validateRequestBody(final ServerRequest serverRequest) {
@@ -99,17 +98,17 @@ public class ValidationHandler<T, U extends Validator> {
                 .flatMap(error -> Mono.error(new PathVariableErrorException(List.of(error))));
     }
 
-    private Mono<T> checkErrorList(T object, List<String> errorList) {
-        return errorList.isEmpty() ? Mono.just(object) :
-                Mono.error(new ConflictedDataApiException(errorList));
-    }
-
     public Mono<T> handle(@NonNull final T object, @NonNull final Set<Map.Entry<String, String>> entrySet) {
         return validatePathVariable(entrySet)
                 .then(validateBody(object))
                 .flatMapMany(this::checkBodyConflicts)
                 .collectList()
                 .flatMap(errorList -> checkErrorList(object, errorList));
+    }
+
+    private Mono<T> checkErrorList(T object, List<String> errorList) {
+        return errorList.isEmpty() ? Mono.just(object) :
+                Mono.error(new ConflictedDataApiException(errorList));
     }
 
     private Mono<T> validateBody(final T object) {
