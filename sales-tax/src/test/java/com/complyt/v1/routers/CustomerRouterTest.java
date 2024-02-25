@@ -3077,4 +3077,21 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
     }
 
+    // Patch
+
+    @Test
+    public void patch_NullHandler_ThrowsNullPointerException() {
+        // Given
+        CustomerHandler nullCustomerHandler = null;
+        CustomerRouter customerRouter = new CustomerRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            customerRouter.patchCustomerByComplytIdRouterFunction(nullCustomerHandler);
+        });
+
+        // Then
+        assertEquals("customerHandler is marked non-null but is null", exception.getMessage());
+    }
+
 }

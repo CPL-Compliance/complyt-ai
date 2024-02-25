@@ -1487,4 +1487,20 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
+
+    @Test
+    public void patch_NullHandler_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
+        SalesTaxTrackingRouter exemptionRouter = new SalesTaxTrackingRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            exemptionRouter.patchSalesTaxTrackingRouterFunction(nullSalesTaxTrackingHandler);
+        });
+
+        // Then
+        assertEquals("salesTaxTrackingHandler is marked non-null but is null", exception.getMessage());
+    }
+
 }

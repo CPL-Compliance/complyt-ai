@@ -3702,4 +3702,22 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .expectBody(ExemptionDto.class)
                 .isEqualTo(expectedExemption);
     }
+
+    // Patch
+
+    @Test
+    public void patch_NullHandler_ThrowsNullPointerException() {
+        // Given
+        ExemptionHandler nullExemptionHandler = null;
+        ExemptionRouter exemptionRouter = new ExemptionRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            exemptionRouter.patchExemptionRouterFunction(nullExemptionHandler);
+        });
+
+        // Then
+        assertEquals("exemptionHandler is marked non-null but is null", exception.getMessage());
+    }
+
 }
