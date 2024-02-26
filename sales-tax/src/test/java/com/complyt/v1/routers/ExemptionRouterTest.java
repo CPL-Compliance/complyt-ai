@@ -7,6 +7,7 @@ import com.complyt.facades.ExemptionFacade;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
+import com.complyt.v1.config.PatcherConfig;
 import com.complyt.v1.config.ValidatorConfig;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
@@ -37,6 +38,7 @@ import testUtils.unit_test.UnitTestUtilities;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -46,7 +48,8 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @ContextConfiguration(classes = {ExemptionRouter.class, ExemptionHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
-        GlobalExceptionHandler.class})
+        GlobalExceptionHandler.class,
+        PatcherConfig.class})
 public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     ExemptionRouter exemptionRouter;
@@ -54,8 +57,6 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     WebTestClient webTestClient;
     @MockBean
     ExemptionFacade exemptionFacade;
-    @MockBean
-    Patcher<ExemptionDto> exemptionPatcher;
     Exemption exemption;
     ExemptionDto exemptionDto;
     UnitTestUtilities testUtilities;
@@ -3704,6 +3705,39 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     }
 
     // Patch
+
+    @Test
+    @WithMockUser
+    public void patch_PatchingByFewFields_Returns200() {
+        // Given
+        CertificateDto certificateToPatch = exemptionDto.certificate().withName("Patched Cert.");
+        ExemptionStatusDto exemptionStatusToPatch = ExemptionStatusDto.CANCELLED;
+
+        ExemptionDto expectedExemptionDto = exemptionDto.withCertificate(certificateToPatch)
+                .withExemptionStatus(exemptionStatusToPatch);
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("certificate", certificateToPatch);
+            put("exemptionStatus", exemptionStatusToPatch);
+        }};
+        Exemption expectedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(expectedExemptionDto);
+
+        when(exemptionFacade.findByComplytId(exemptionDto.complytId())).thenReturn(Mono.just(ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto)));
+        when(exemptionFacade.update(expectedExemption,exemptionDto.complytId())).thenReturn(Mono.just(expectedExemption));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + exemptionDto.complytId().toString())
+                        .build())
+                .bodyValue(map)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .value(returnedExemption -> returnedExemption, equalTo(expectedExemptionDto));
+    }
 
     @Test
     public void patch_NullHandler_ThrowsNullPointerException() {

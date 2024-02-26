@@ -156,7 +156,7 @@ public class SalesTaxTrackingHandler {
 
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(salesTaxTrackingDtoValidationHandler.validateParam("state", state))
-                .then(Mono.defer(() -> salesTaxTrackingFacade.findByComplytId(UUID.fromString(state)))
+                .then(Mono.defer(() -> salesTaxTrackingFacade.findByState(state))
                         .flatMap(existingSalesTaxTracking -> serverRequest.bodyToMono(Map.class)
                                 .map(map -> salesTaxTrackingPatcher.patch(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(existingSalesTaxTracking), map))
                                 .flatMap(salesTaxTrackingDto -> salesTaxTrackingDtoValidationHandler.handle(salesTaxTrackingDto, serverRequest.pathVariables().entrySet()))

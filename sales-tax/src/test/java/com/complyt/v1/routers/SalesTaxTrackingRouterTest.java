@@ -6,6 +6,7 @@ import com.complyt.facades.SalesTaxTrackingFacade;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
+import com.complyt.v1.config.PatcherConfig;
 import com.complyt.v1.config.ValidatorConfig;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
@@ -37,6 +38,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -46,7 +48,8 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @ContextConfiguration(classes = {SalesTaxTrackingRouter.class, SalesTaxTrackingHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
-        GlobalExceptionHandler.class})
+        GlobalExceptionHandler.class,
+        PatcherConfig.class})
 public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTemplate {
 
     SalesTaxTrackingRouter salesTaxTrackingRouter;
@@ -56,8 +59,6 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @MockBean
     SalesTaxTrackingFacade salesTaxTrackingFacade;
-    @MockBean
-    Patcher<SalesTaxTrackingDto> salesTaxTrackingPatcher;
     SalesTaxTracking salesTaxTracking;
 
     SalesTaxTrackingDto salesTaxTrackingDto;
@@ -1487,15 +1488,56 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
+    // Patch
+
+    @Test
+    @WithMockUser
+    public void patch_PatchingByFewFields_Returns200() {
+        // Given
+        LocalDateTime establishedDateToPatch = salesTaxTrackingDto.physicalNexusTracker().establishedDate().plusMonths(1);
+        PhysicalNexusTrackerDto physicalNexusTrackerToPatch = salesTaxTrackingDto.physicalNexusTracker()
+                .withEstablishedDate(establishedDateToPatch);
+        LocalDateTime appliedDateToPatch = salesTaxTrackingDto.appliedDate().plusMonths(1);
+        SalesTaxTrackingDto expectedSalesTaxTrackingDto = salesTaxTrackingDto
+                .withPhysicalNexusTracker(physicalNexusTrackerToPatch)
+                .withAppliedDate(appliedDateToPatch);
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("physicalNexusTracker", physicalNexusTrackerToPatch);
+            put("appliedDate", appliedDateToPatch);
+        }};
+
+        String state = salesTaxTrackingDto.state().name();
+
+        SalesTaxTracking expectedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(expectedSalesTaxTrackingDto);
+        SalesTaxTracking originalSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto);
+
+        when(salesTaxTrackingFacade.findByState(state)).thenReturn(Mono.just(originalSalesTaxTracking));
+        when(salesTaxTrackingFacade.update(expectedSalesTaxTracking, originalSalesTaxTracking)).thenReturn(Mono.just(expectedSalesTaxTracking));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)
+                        .build())
+                .bodyValue(map)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(returnedSalesTaxTracking -> returnedSalesTaxTracking, equalTo(expectedSalesTaxTrackingDto));
+    }
+
     @Test
     public void patch_NullHandler_ThrowsNullPointerException() {
         // Given
         SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
-        SalesTaxTrackingRouter exemptionRouter = new SalesTaxTrackingRouter();
+        SalesTaxTrackingRouter salesTaxTrackingRouter = new SalesTaxTrackingRouter();
 
         // When
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            exemptionRouter.patchSalesTaxTrackingRouterFunction(nullSalesTaxTrackingHandler);
+            salesTaxTrackingRouter.patchSalesTaxTrackingRouterFunction(nullSalesTaxTrackingHandler);
         });
 
         // Then
