@@ -39,7 +39,7 @@ public class ExemptionEndpointsIT extends TestContainersInitializerIT implements
     TenantResolver tenantResolver;
     @Autowired
     private WebTestClient webTestClient;
-    String expectedComplyId = "2aa5809f-301d-44f3-9081-b4f32613463c";
+    String expectedComplyId = "f6da33d2-fc09-4c94-a01a-e89305163a2f";
     ClassificationDto classificationToPatch = ITUtilities.createClassificationDto();
 
     @DynamicPropertySource
