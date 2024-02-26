@@ -2,7 +2,6 @@ package com.complyt.v1.routers;
 
 import com.complyt.v1.api_info.customer.*;
 import com.complyt.v1.handlers.CustomerHandler;
-import com.complyt.v1.handlers.CustomerHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

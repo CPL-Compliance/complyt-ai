@@ -147,7 +147,7 @@ spring:
             - Path=/v1/customers/source/{source}/externalId/{external_id}
           filters:
             - SetPath=/v1/customers/source/{source}/externalId/{external_id}
-        - id: sales-tax-patch-customer-by-external-id-and-source
+        - id: sales-tax-patch-customer-by-complyt-id
           uri: lb://sales-tax
           predicates:
             - Method=PATCH
