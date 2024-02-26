@@ -130,6 +130,24 @@ public class CustomerHandler {
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
     }
 
+//    public Mono<ServerResponse> patch(ServerRequest serverRequest) {
+//        String complytId = serverRequest.pathVariable("complytId");
+//        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+//
+//        Mono<CustomerDto> customerDtoMono = ContextLogger.observeCtx(logStr, log::info)
+//                .then(customerDtoValidationHandler.validateParam("complytId", complytId))
+//                .then(Mono.defer(() -> customerFacade.findByComplytId(UUID.fromString(complytId)))
+//                        .flatMap(existingCustomer -> serverRequest.bodyToMono(Map.class)
+//                                .map(map -> customerPatcher.patch(CustomerMapper.INSTANCE.customerToCustomerDto(existingCustomer), map))
+//                                .flatMap(customerDto -> customerDtoValidationHandler.handle(customerDto, serverRequest.pathVariables().entrySet()))
+//                                .flatMap(customerDto -> customerFacade.updateIfModified(CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto), existingCustomer))
+//                                .map(CustomerMapper.INSTANCE::customerToCustomerDto)
+//                                .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto)))
+//                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+//
+//        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
+//    }
+
     public Mono<ServerResponse> patch(ServerRequest serverRequest) {
         String complytId = serverRequest.pathVariable("complytId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
