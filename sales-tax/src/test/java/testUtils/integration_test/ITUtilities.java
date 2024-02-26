@@ -11,6 +11,7 @@ import com.complyt.domain.transaction.TransactionFilingStatus;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
+import com.complyt.v1.models.customer.exemption.ClassificationDto;
 import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
@@ -139,10 +140,10 @@ public interface ITUtilities {
                 .issuer("https://localhost")
                 .claim("tenant_id", "it_tenant")
                 .claim("scope", "create:customer delete:customer read:customer " +
-                                "update:customer create:transaction read:transaction " +
-                                "update:transaction delete:transaction read:state " +
-                                "create:exemption update:exemption delete:exemption " +
-                                "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
+                        "update:customer create:transaction read:transaction " +
+                        "update:transaction delete:transaction read:state " +
+                        "create:exemption update:exemption delete:exemption " +
+                        "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
     }
 
     static Timestamps createTimestamps() {
@@ -154,12 +155,17 @@ public interface ITUtilities {
         LocalDateTime localDateTime = LocalDateTime.now();
         return new TimestampsDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
     }
+
     static Address createAddressInCalifornia() {
         return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
     static MandatoryAddressDto createAddressDtoInCalifornia() {
         return new MandatoryAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
+    }
+
+    static OptionalAddressDto createOptionalAddressDtoInCalifornia() {
+        return new OptionalAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
     static SalesTaxRates createCaliforniaSalesTaxRates() {
@@ -179,12 +185,12 @@ public interface ITUtilities {
 
     static ClientTrackingDto stubClientTrackingDto() {
         String localDate = "2024-01-01T00:00";
-        TimestampsDto internalTimestamps =  new TimestampsDto(localDate, localDate);
+        TimestampsDto internalTimestamps = new TimestampsDto(localDate, localDate);
         return new ClientTrackingDto(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), "it_tenant", internalTimestamps);
     }
 
     static ClientTrackingDtoTenant stubClientTrackingDtoTenant(String tenantId, String name) {
-        TimestampsDto internalTimestamps =  new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        TimestampsDto internalTimestamps = new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString());
         return new ClientTrackingDtoTenant(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), name, internalTimestamps, tenantId);
     }
 
@@ -196,6 +202,10 @@ public interface ITUtilities {
                 List.of(CustomerTypeDto.RETAIL),
                 TimeFrameDto.PREVIOUS_TWELVE_MONTHS,
                 new NexusThresholdDto(BigDecimal.valueOf(250000), 0, DefinitionDto.AMOUNT),
-                LocalDateTime.of(1970,1,1,0,0,0));
+                LocalDateTime.of(1970, 1, 1, 0, 0, 0));
+    }
+
+    static ClassificationDto createClassificationDto() {
+        return new ClassificationDto("new code", "new description");
     }
 }

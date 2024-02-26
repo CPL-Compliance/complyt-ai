@@ -5,6 +5,7 @@ import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
+import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.TimestampsDto;
@@ -485,7 +486,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/null" )
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/null")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
@@ -639,10 +640,63 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectBodyList(SalesTaxTrackingDto.class)
                 .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.get(0).complytId().toString(), expectedComplyId))
                 .value(salesTaxTrackingDto -> assertTrue(salesTaxTrackingDto.size() <= RepositoryConstant.DEFAULT_PAGE_SIZE));
-
     }
+
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void patch_PatchesOneField_ReturnsPatchedResource() {
+        String state = "CA";
+        LocalDateTime establishedDate = LocalDateTime.now().plusMonths(1);
+        PhysicalNexusTrackerDto physicalNexusTrackerToPatch = new PhysicalNexusTrackerDto(true, establishedDate);
+
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("physicalNexusTracker", physicalNexusTrackerToPatch);
+        }};
+
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state) // Set your API endpoint
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(returnedSalesTaxTrackingDto -> assertEquals(returnedSalesTaxTrackingDto.physicalNexusTracker(), physicalNexusTrackerToPatch));
+    }
+
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void patch_PatchesTwoFields_ReturnsPatchedResource() {
+        String state = "CA";
+        LocalDateTime date = LocalDateTime.now().plusMonths(1);
+        PhysicalNexusTrackerDto physicalNexusTrackerToPatch = new PhysicalNexusTrackerDto(true, date);
+
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("physicalNexusTracker", physicalNexusTrackerToPatch);
+            put("appliedDate", date);
+
+        }};
+
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state) // Set your API endpoint
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(returnedSalesTaxTrackingDto -> {
+                    assertEquals(returnedSalesTaxTrackingDto.physicalNexusTracker(), physicalNexusTrackerToPatch);
+                    assertEquals(returnedSalesTaxTrackingDto.appliedDate(), date);
+                });
+    }
+
 }
-
-
-
-

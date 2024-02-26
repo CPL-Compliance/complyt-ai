@@ -7,5 +7,6 @@ public interface CustomerEndpointsITTemplate extends
         GetByExternalIdAndSourceITTemplate,
         GetByComplytIdITTemplate,
         GetAllITTemplate,
-        GetAllBySourceTTemplate {
+        GetAllBySourceTTemplate,
+        PatchTemplate {
 }
