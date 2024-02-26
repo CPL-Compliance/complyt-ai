@@ -33,7 +33,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = SalesTaxApplication.class)
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ExemptionEndpointsIT extends TestContainersInitializerIT implements PatchEndpointsITTemplate {
+public class ExemptionEndpointsIT extends TestContainersInitializerIT implements ExemptionEndpointsITTemplate {
 
     @MockBean
     TenantResolver tenantResolver;
@@ -76,8 +76,9 @@ public class ExemptionEndpointsIT extends TestContainersInitializerIT implements
     }
 
     @Override
+    @Test
+    @WithMockUser
     public void patch_PatchesTwoFields_ReturnsPatchedResource() {
-
         ExemptionTypeDto exemptionTypeToPatch = ExemptionTypeDto.PARTIALLY;
         LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
             put("classification", classificationToPatch);
