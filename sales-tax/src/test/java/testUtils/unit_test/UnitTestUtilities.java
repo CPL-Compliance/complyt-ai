@@ -423,7 +423,7 @@ public class UnitTestUtilities {
     }
 
     public ClientTrackingDto createClientTrackingDto() {
-        TimestampsDto internalTimestamps = new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        TimestampsDto internalTimestamps =  new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         return new ClientTrackingDto(new NexusDto(localDateTime), "client dope", internalTimestamps);
     }
 
