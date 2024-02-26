@@ -226,6 +226,7 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
                             .expectBody(SalesTaxTrackingDto.class)
                             .value(updatedSalesTaxTracking -> assertTrue(updatedSalesTaxTracking.approved()));
                 });
+
     }
 
     @Order(5)
