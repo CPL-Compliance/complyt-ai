@@ -6,7 +6,6 @@ import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.checkables.StateCheckable;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.models.nexus.NexusStateRuleDto;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
