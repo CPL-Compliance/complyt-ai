@@ -185,6 +185,11 @@ jobs:
           container-image-name-updates: "container=<<parameters.service_name>>, tag=${IMAGE_TAG}"
           family: "<<parameters.service_name>>-complyt-prd"
           service-name: "<<parameters.service_name>>"
+      - aws-ecs/update-service:
+          cluster-name: "demo"
+          container-image-name-updates: "container=<<parameters.service_name>>, tag=${IMAGE_TAG}"
+          family: "demo-<<parameters.service_name>>"
+          service-name: "<<parameters.service_name>>"
 
 
 workflows:
