@@ -91,7 +91,7 @@ import java.lang.annotation.Target;
                         }))
 })
 public @interface PatchSalesTaxTrackingByStateApiInfo {
-    
+
     String stateExample = "California";
 
     String patchedSalesTaxTrackingFieldsExample = """
@@ -126,47 +126,48 @@ public @interface PatchSalesTaxTrackingByStateApiInfo {
                      "establishedDate": "1990-08-02T19:12:00"
                  },
                  "nexusCalculationSummaries": {
-                         "2024-01-01": {
-                             "count": 338,
-                             "amount": 256800.0
-                         }
+                     "2024-01-01": {
+                         "count": 338,
+                         "amount": 256800.0
+                     }
+                 },
+                 "nexusStateRule": {
+                     "enforcesSalesTax": true,
+                     "state": {
+                         "abbreviation": "CA",
+                         "code": "06",
+                         "name": "California"
                      },
-                     "nexusStateRule": {
-                         "enforcesSalesTax": true,
-                         "state": {
-                             "abbreviation": "CA",
-                             "code": "06",
-                             "name": "California"
-                         },
-                         "taxableCategories": [
-                             "TAXABLE"
-                         ],
-                         "tangibleCategories": [
-                             "TANGIBLE"
-                         ],
-                         "customerTypes": [
-                             "RETAIL",
-                             "MARKETPLACE",
-                             "RESELLER"
-                         ],
-                         "timeFrame": "CURRENT_TAXABLE_YEAR",
-                         "nexusThreshold": {
-                             "amount": 500000,
-                             "count": 0,
-                             "definition": "AMOUNT"
-                         },
-                         "appliedDate": "1970-01-01T00:00:00"
+                     "taxableCategories": [
+                         "TAXABLE"
+                     ],
+                     "tangibleCategories": [
+                         "TANGIBLE"
+                     ],
+                     "customerTypes": [
+                         "RETAIL",
+                         "MARKETPLACE",
+                         "RESELLER"
+                     ],
+                     "timeFrame": "CURRENT_TAXABLE_YEAR",
+                     "nexusThreshold": {
+                         "amount": 500000,
+                         "count": 0,
+                         "definition": "AMOUNT"
                      },
-                     "clientTracking": {
-                         "nexus": {
-                             "taxableDate": "2015-01-01T00:00:00"
-                         },
-                         "name": "some client"
+                     "appliedDate": "1970-01-01T00:00:00"
+                 },
+                 "clientTracking": {
+                     "nexus": {
+                         "taxableDate": "2015-01-01T00:00:00"
                      },
+                     "name": "some client"
+                 },
                  "appliedDate": "2015-08-02T16:12:00",
                  "approved": true,
                  "approvalDate": "2015-06-22T13:57:00",
                  "filingFrequency": "MONTHLY"
              }
             """;
+
 }

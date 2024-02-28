@@ -130,6 +130,7 @@ public class CustomerHandler {
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
     }
 
+    @CustomerUpdatePermission
     public Mono<ServerResponse> patch(ServerRequest serverRequest) {
         String complytId = serverRequest.pathVariable("complytId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());

@@ -134,6 +134,7 @@ public class ExemptionHandler {
                         .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse)));
     }
 
+    @ExemptionUpdatePermission
     public Mono<ServerResponse> patch(ServerRequest serverRequest) {
         String complytId = serverRequest.pathVariable("complytId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());

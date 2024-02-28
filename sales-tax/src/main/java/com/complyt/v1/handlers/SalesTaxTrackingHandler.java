@@ -132,24 +132,7 @@ public class SalesTaxTrackingHandler {
         return ServerResponse.ok().body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
     }
 
-//    public Mono<ServerResponse> patch(ServerRequest serverRequest) {
-//        String state = serverRequest.pathVariable("state");
-//        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
-//
-//        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
-//                .then(salesTaxTrackingDtoValidationHandler.validateParam("state", state))
-//                .then(Mono.defer(() -> salesTaxTrackingFacade.findByState(state))
-//                        .flatMap(existingSalesTaxTracking -> serverRequest.bodyToMono(Map.class)
-//                                .map(map -> salesTaxTrackingPatcher.patch(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(existingSalesTaxTracking), map))
-//                                .flatMap(salesTaxTrackingDto -> salesTaxTrackingDtoValidationHandler.handle(salesTaxTrackingDto, serverRequest.pathVariables().entrySet()))
-//                                .flatMap(salesTaxTrackingDto -> salesTaxTrackingFacade.update(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto), existingSalesTaxTracking))
-//                                .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-//                                .flatMap(salesTaxTrackingDto -> ContextLogger.observeCtx("<-- Returned Body: " + salesTaxTrackingDto, log::info).thenReturn(salesTaxTrackingDto)))
-//                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
-//
-//        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
-//    }
-
+    @NexusUpdatePermission
     public Mono<ServerResponse> patch(ServerRequest serverRequest) {
         String state = serverRequest.pathVariable("state");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
