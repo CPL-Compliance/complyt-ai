@@ -8,7 +8,6 @@ import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import integration.TestContainersInitializerIT;
@@ -646,8 +645,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @WithMockUser
     public void patch_PatchesOneField_ReturnsPatchedResource() {
-        String state = "CA";
-        LocalDateTime establishedDate = LocalDateTime.now().plusMonths(1);
+        String state = "NJ";
+        LocalDateTime establishedDate = LocalDateTime.now();
         PhysicalNexusTrackerDto physicalNexusTrackerToPatch = new PhysicalNexusTrackerDto(true, establishedDate);
 
         LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
@@ -665,28 +664,30 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
-                .value(returnedSalesTaxTrackingDto -> assertEquals(returnedSalesTaxTrackingDto.physicalNexusTracker(), physicalNexusTrackerToPatch));
+                .value(returnedSalesTaxTrackingDto -> {
+                    assertTrue(returnedSalesTaxTrackingDto.physicalNexusTracker().established());
+                    assertEquals(returnedSalesTaxTrackingDto.physicalNexusTracker().establishedDate(), establishedDate);
+                });
     }
 
-    @Order(1)
+    @Order(2)
     @Test
     @WithMockUser
     public void patch_PatchesTwoFields_ReturnsPatchedResource() {
-        String state = "CA";
-        LocalDateTime date = LocalDateTime.now().plusMonths(1);
-        PhysicalNexusTrackerDto physicalNexusTrackerToPatch = new PhysicalNexusTrackerDto(true, date);
+        String state = "NJ";
+        LocalDateTime date = LocalDateTime.now();
+        PhysicalNexusTrackerDto physicalNexusTrackerToPatch = new PhysicalNexusTrackerDto(false, date);
 
         LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
             put("physicalNexusTracker", physicalNexusTrackerToPatch);
             put("appliedDate", date);
-
         }};
 
         webTestClient
                 .mutateWith(csrf())
                 .patch()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state) // Set your API endpoint
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(map)
@@ -694,7 +695,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(returnedSalesTaxTrackingDto -> {
-                    assertEquals(returnedSalesTaxTrackingDto.physicalNexusTracker(), physicalNexusTrackerToPatch);
+                    assertFalse(returnedSalesTaxTrackingDto.physicalNexusTracker().established());
+                    assertEquals(returnedSalesTaxTrackingDto.physicalNexusTracker().establishedDate(), date);
                     assertEquals(returnedSalesTaxTrackingDto.appliedDate(), date);
                 });
     }

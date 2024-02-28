@@ -160,6 +160,7 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(receivedSalesTaxTracking -> {
+                    System.out.println("YOAV --- : " + receivedSalesTaxTracking);
                     assertEquals(BigDecimal.valueOf(450010), receivedSalesTaxTracking.nexusCalculationSummaries().get(LocalDate.of(2022,6,1)).amount());
                     assertFalse(receivedSalesTaxTracking.economicNexusTracker().established());
                     assertFalse(receivedSalesTaxTracking.approved());
