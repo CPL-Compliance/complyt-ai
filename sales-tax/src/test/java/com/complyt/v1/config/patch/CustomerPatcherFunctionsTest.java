@@ -12,7 +12,7 @@ import testUtils.unit_test.UnitTestUtilities;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 
-import static com.fasterxml.jackson.databind.jsonFormatVisitors.JsonValueFormat.UUID;
+import java.util.UUID;
 
 public class CustomerPatcherFunctionsTest {
 
@@ -23,7 +23,7 @@ public class CustomerPatcherFunctionsTest {
     @BeforeEach
     void setUp() {
         unitTestUtilities = new UnitTestUtilities(LocalDateTime.now(), "tenant_id");
-        customer = unitTestUtilities.createCustomerDto(UUID.toString());
+        customer = unitTestUtilities.createCustomerDto(UUID.randomUUID().toString());
     }
 
     @Test
