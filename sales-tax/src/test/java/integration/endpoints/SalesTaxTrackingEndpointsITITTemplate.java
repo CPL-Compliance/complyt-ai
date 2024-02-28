@@ -2,12 +2,12 @@ package integration.endpoints;
 
 import testUtils.integration_test.templates.endpoints.*;
 
-public interface SalesTaxTrackingEndpointsITTemplate extends
+public interface SalesTaxTrackingEndpointsITITTemplate extends
         UpsertByStateITTemplate,
         GetByStateITTemplate,
         GetByComplytIdITTemplate,
         GetAllITTemplate,
-        PatchTemplate {
+        PatchITTemplate {
 
     // Refresh By State And date
     void refreshByStateAndDate_Exists_Returns200WithSummaryAndNewNexusRule();

@@ -7,6 +7,7 @@ public class TestUtilities {
 
     public static final String CLIENT_TRACKING_BASE_URL = "/v1/clientTracking";
     public static final String SALES_TAX_TRACKING_BASE_URL = "/v1/nexus";
+    public static final String EXEMPTION_BASE_URL = "/v1/exemptions";
     public static final String SALES_TAX_RATES_BASE_URL = "/v1/sales_tax_rates";
     public static final String FILES_BASE_URL = "/v1/files";
     public static final String TOKEN_BASE_URL = "/v1/token";
@@ -43,13 +44,13 @@ public class TestUtilities {
     }
 
     public static String clientTrackingJsonExample(String name, String tenantId) {
-            return "{\n" +
-                    "    \"nexus\": {\n" +
-                    "        \"taxableDate\": \"2015-06-01T00:00:00\"\n" +
-                    "    },\n" +
-                    "    \"name\": \"" + name + "\",\n" +
-                    "    \"tenantId\": \"" + tenantId + "\"\n" +
-                    "}";
+        return "{\n" +
+                "    \"nexus\": {\n" +
+                "        \"taxableDate\": \"2015-06-01T00:00:00\"\n" +
+                "    },\n" +
+                "    \"name\": \"" + name + "\",\n" +
+                "    \"tenantId\": \"" + tenantId + "\"\n" +
+                "}";
     }
 
     private static String salesTaxTrackingJsonExample(String stateName, String stateAbbreviation, String complytId, boolean isValidated) {
@@ -219,6 +220,7 @@ public class TestUtilities {
                 "    \"clientSecret\":\"" + API_KEY_CLIENT_SECRET2 + "\"\n" +
                 "}";
     }
+
     public static String apiKey4JsonExample() {
         return "{\n" +
                 "    \"clientId\":\"" + API_KEY_CLIENT_ID4 + "\",\n" +
@@ -230,6 +232,7 @@ public class TestUtilities {
         return "clientId=" + API_KEY_CLIENT_ID +
                 "&clientSecret=" + API_KEY_CLIENT_SECRET;
     }
+
     public static String apiKey1UrlEncodedExample() {
         return "clientId=" + API_KEY_CLIENT_ID1 +
                 "&clientSecret=" + API_KEY_CLIENT_SECRET1;
@@ -355,4 +358,45 @@ public class TestUtilities {
         for (; 0 < length; length--) stringBuilder.append('a');
         return stringBuilder.toString();
     }
+
+    public static String customerPatchTwoFieldsJsonExample() {
+        return """
+                {
+                    "name": "NameToPatch",
+                    "address": {
+                        "city": "Sacramento",
+                        "country": "US",
+                        "county": null,
+                        "state": "CA",
+                        "street": "10010 Patched St.",
+                        "zip": "95823"
+                    }
+                }
+                """;
+    }
+
+    public static String salesTaxTrackingPatchTwoFieldsJsonExample() {
+        return """
+                {
+                    "economicNexusTracker": {
+                        "established": true,
+                        "establishedDate": "2024-08-02T19:12:00"
+                    },
+                    "enforcesSalesTax": true
+                }
+                """;
+    }
+
+    public static String exemptionPatchTwoFieldsJsonExample() {
+        return """
+                {
+                    "customerId": "2155317e-877d-4c08-8c5c-8cd2b485d80b",
+                    "classification": {
+                            "code": "code",
+                            "description": "patchedDescription"
+                    }
+                }
+                """;
+    }
+
 }

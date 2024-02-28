@@ -244,25 +244,25 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .expectStatus().isOk();
     }
 
-        @Order(2)
-        @Test
-        @Override
-        public void getByExternalIdAndSource_PathVariableInvalid_Returns400() {
-            // Given
-            String externalId = "null";
+    @Order(2)
+    @Test
+    @Override
+    public void getByExternalIdAndSource_PathVariableInvalid_Returns400() {
+        // Given
+        String externalId = "null";
 
-            // Then
-            WEB_TEST_CLIENT
-                    .get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                            .build())
-                    .headers(headers -> {
-                        headers.setBearerAuth(TOKEN);
-                        headers.setContentType(MediaType.APPLICATION_JSON);
-                    })
-                    .exchange()
-                    .expectStatus().isBadRequest();
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -533,7 +533,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .expectStatus().isForbidden();
     }
 
-
+    @Order(1)
     @Test
     @Override
     public void getAll_GetByParamSize_ReturnsExpectedSize() {
@@ -558,7 +558,9 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .value(customer -> assertEquals(customer.get(0).get("complytId"), expectedComplyId));
     }
 
+    @Order(1)
     @Override
+    @Test
     public void getAll_GetByParamPage_ReturnsExpectedPage() {
         int size = 1;
         int page = 2;
@@ -581,7 +583,9 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .value(customer -> assertEquals(customer.get(0).get("complytId"), expectedComplyId));
     }
 
+    @Order(1)
     @Override
+    @Test
     public void getAll_GetByDefaultsSizeAndPage_ReturnsExpectedEntries() {
         String expectedComplyId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
 
@@ -601,4 +605,58 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .value(customerLst -> assertTrue(customerLst.size() <= RepositoryConstant.DEFAULT_SIZE));
     }
 
+    @Order(1)
+    @Override
+    @Test
+    public void patch_PatchesOneField_ReturnsPatchedResource() {
+        String complytId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
+        String map = """
+                {
+                    "name": "NameToPatch"
+                }
+                """;
+
+
+        WEB_TEST_CLIENT
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(customer -> assertEquals(customer.get(0).get("name"), "NameToPatch"));
+    }
+
+    @Order(2)
+    @Override
+    @Test
+    public void patch_PatchesTwoFields_ReturnsPatchedResource() {
+        // Given
+        String complytId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
+
+        // Then
+        WEB_TEST_CLIENT
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.customerPatchTwoFieldsJsonExample())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(customer -> {
+                    assertEquals(customer.get(0).get("name"), "NameToPatch");
+                    assertTrue(customer.get(0).get("address").toString().contains("10010 Patched St."));
+                });
+    }
 }

@@ -33,7 +33,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = SalesTaxApplication.class)
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ExemptionEndpointsIT extends TestContainersInitializerIT implements ExemptionEndpointsITTemplate {
+public class ExemptionEndpointsIT extends TestContainersInitializerIT implements ExemptionEndpointsITITTemplate {
 
     @MockBean
     TenantResolver tenantResolver;

@@ -2,11 +2,11 @@ package integration.endpoints;
 
 import testUtils.integration_test.templates.endpoints.*;
 
-public interface CustomerEndpointsITTemplate extends
+public interface CustomerEndpointsITITTemplate extends
         UpsertByExternalIdAndSourceITTemplate,
         GetByExternalIdAndSourceITTemplate,
         GetByComplytIdITTemplate,
         GetAllITTemplate,
         GetAllBySourceTTemplate,
-        PatchTemplate {
+        PatchITTemplate {
 }
