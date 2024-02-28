@@ -63,7 +63,7 @@ public class SalesTaxTrackingRouter {
     }
 
     @Bean
-//    @PatchSalesTaxTrackingByComplytIdApiInfo
+    @PatchSalesTaxTrackingByStateApiInfo
     public RouterFunction<ServerResponse> patchSalesTaxTrackingRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
         RequestPredicate deleteSalesTaxTrackingRoute = RequestPredicates
                 .PATCH(BASE_URL + "/state/{state}")

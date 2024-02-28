@@ -369,7 +369,8 @@ public class TestUtilities {
                         "county": null,
                         "state": "CA",
                         "street": "10010 Patched St.",
-                        "zip": "95823"
+                        "zip": "95823",
+                        "isPartial": false
                     }
                 }
                 """;

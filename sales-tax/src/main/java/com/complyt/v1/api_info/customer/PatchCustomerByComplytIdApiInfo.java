@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @RouterOperations({
         @RouterOperation(
-                method = RequestMethod.PUT,
+                method = RequestMethod.PATCH,
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
@@ -45,7 +45,7 @@ import java.lang.annotation.Target;
                                 content = @Content(
                                         schema = @Schema(implementation = CustomerDto.class, required = true),
                                         examples = {
-                                                @ExampleObject(value = com.complyt.v1.api_info.customer.PatchCustomerByComplytIdApiInfo.newCustomerExample)
+                                                @ExampleObject(value = com.complyt.v1.api_info.customer.PatchCustomerByComplytIdApiInfo.patchedCustomerFieldsExample)
                                         })
                         ),
                         responses = {
@@ -57,7 +57,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = CustomerDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = com.complyt.v1.api_info.customer.UpsertCustomerByExternalIdAndSourceApiInfo.returnedCustomerExample)
+                                                                @ExampleObject(value = com.complyt.v1.api_info.customer.PatchCustomerByComplytIdApiInfo.returnedCustomerExample)
                                                         })
                                         })
                                 ,
@@ -85,28 +85,18 @@ import java.lang.annotation.Target;
 
 public @interface PatchCustomerByComplytIdApiInfo {
     String complytIdExample = "9f8ee193-1a71-42b4-801d-ee1d8a161fbe";
-    String newCustomerExample = """
+    String patchedCustomerFieldsExample = """
             {
-                "externalId": "externalIdExample",\s
-                "source": "sourceExample",\s
-                "name": "Complyt",\s
-                "address": {\s
-                    "city": "Sacramento",\s
-                    "country": "US",\s
-                    "county": null,\s
-                    "state": "CA",\s
-                    "street": "944 W. Wintergreen St.",\s
-                    "zip": "95823",\s
-                    "isPartial": false\s
-                },\s
-                "email": "example@some.mail.com",\s
-                "customerType": "RETAIL",\s
-                "externalTimestamps": {\s
-                    "createdDate": "2022-10-19T07:00:00.000Z",\s
-                    "updatedDate": "2022-10-19T09:07:54.585Z"\s
-                },\s
-                "comment": "this is a customer"\s
-            }\s
+                "name": "NameToPatch",
+                    "address": {
+                        "city": "Sacramento",
+                        "country": "US",
+                        "county": null,
+                        "state": "CA",
+                        "street": "10010 Patched St.",
+                        "zip": "95823"
+                    }
+            }
             """;
 
     String returnedCustomerExample = """
@@ -114,14 +104,14 @@ public @interface PatchCustomerByComplytIdApiInfo {
                 "complytId": "9f8ee193-1a71-42b4-801d-ee1d8a161fbe",
                 "externalId": "externalIdExample",
                 "source": "sourceExample",
-                "name": "Complyt",
+                "name": "NameToPatch",
                 "address": {
                     "city": "Sacramento",
                     "country": "US",
                     "county": null,
                     "state": "CA",
-                    "street": "944 W. Wintergreen St.",
-                    "zip": "95823",
+                    "street": "10010 Patched St.",
+                    "zip": "95823"
                     "isPartial": false
                 },
                 "email": "example@some.mail.com",

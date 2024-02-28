@@ -24,12 +24,12 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @RouterOperations({
         @RouterOperation(
-                method = RequestMethod.PUT,
+                method = RequestMethod.PATCH,
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "put exemption",
-                        operationId = "PutExemption",
+                        description = "patch exemption",
+                        operationId = "PatchExemption",
                         tags = "exemption",
                         parameters = {
                                 @Parameter(in = ParameterIn.PATH,
@@ -37,8 +37,8 @@ import java.lang.annotation.Target;
                                         description = "The unique identifier for an exemption (UUID)",
                                         required = true,
                                         schema = @Schema(type = "string", format = "uuid"),
-                                        examples = @ExampleObject(value = PutExemptionApiInfo.complytIdExample,
-                                                name = PutExemptionApiInfo.complytIdExample))
+                                        examples = @ExampleObject(value = PatchExemptionByComplytIdApiInfo.complytIdExample,
+                                                name = PatchExemptionByComplytIdApiInfo.complytIdExample))
                         },
                         requestBody =
                         @RequestBody(
@@ -47,7 +47,7 @@ import java.lang.annotation.Target;
                                 content = @Content(
                                         schema = @Schema(implementation = ExemptionDto.class, required = true),
                                         examples = {
-                                                @ExampleObject(value = PutExemptionApiInfo.newExemptionExample)
+                                                @ExampleObject(value = PatchExemptionByComplytIdApiInfo.patchedExemptionFieldsExample)
                                         })
                         ),
                         responses = {
@@ -59,7 +59,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = ExemptionDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = PutExemptionApiInfo.returnedExemptionExample)
+                                                                @ExampleObject(value = PatchExemptionByComplytIdApiInfo.returnedExemptionExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -80,45 +80,29 @@ import java.lang.annotation.Target;
                                 )
                         }))
 })
-public @interface PutExemptionApiInfo {
+public @interface PatchExemptionByComplytIdApiInfo {
+
     String complytIdExample = "b4320a2b-1ac1-4fae-96c1-f2d7c2cc14a6";
 
-    String newExemptionExample = """
+    String patchedExemptionFieldsExample = """
             {
-                "customerId": "9f8ee193-1a71-42b4-801d-ee1d8a161fbe",
-                "state": {
-                    "abbreviation": "AZ",
-                    "code": "04",
-                    "name": "Arizona"
-                },
                 "classification": {
                     "code": "code",
-                    "description": "description"
+                    "description": "patchedDescription"
                 },
                 "validationDates": {
-                    "fromDate": "2022-11-01T02:00:00",
-                    "toDate": "2023-02-28T02:00:00"
-                },
-                "internalTimestamps": {
-                    "createdDate": "2022-12-29T10:24:54.577",
-                    "updatedDate": "2022-12-29T10:24:54.577"
+                    "fromDate": "2024-11-01T02:00:00",
+                    "toDate": "2025-02-28T02:00:00"
                 },
                 "status": {
-                    "code": "code",
+                    "code": "patchedCode",
                     "name": "name"
-                },
-                "certificate": {
-                    "certificateId": "id",
-                    "url": "url",
-                    "name": "name"
-                },
-                "exemptionType": "FULLY",
-                "exemptionStatus": "ACTIVE"
+                }
             }""";
 
     String returnedExemptionExample = """
             [{
-                     "complytId": "f2cfcad9-d4e2-4ade-96b4-e83b7d402933",
+                     "complytId": "b4320a2b-1ac1-4fae-96c1-f2d7c2cc14a6",
                      "customerId": "85627561-bf73-45b7-ba09-8d2540a51541",
                      "state": {
                          "abbreviation": "AZ",
@@ -127,18 +111,18 @@ public @interface PutExemptionApiInfo {
                      },
                      "classification": {
                          "code": "code",
-                         "description": "description"
+                         "description": "patchedDescription"
                      },
                      "validationDates": {
-                         "fromDate": "2022-11-01T02:00:00",
-                         "toDate": "2023-02-28T02:00:00"
+                         "fromDate": "2024-11-01T02:00:00",
+                         "toDate": "2025-02-28T02:00:00"
                      },
                      "internalTimestamps": {
                          "createdDate": "2022-12-29T10:24:54.577",
                          "updatedDate": "2022-12-29T10:24:54.577"
                      },
                      "status": {
-                         "code": "code",
+                         "code": "patchedCode",
                          "name": "name"
                      },
                      "certificate": {
