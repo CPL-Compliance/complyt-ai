@@ -8,7 +8,7 @@ public interface PostOkRouterMonoTest {
     void post_Exists_Returns200();
 
     @Test
-    void post_DoesntExist_Returns404();
+    void post_DoesntExist_Returns401();
 
     @Test
     void post_InternalServerError_Returns500();
