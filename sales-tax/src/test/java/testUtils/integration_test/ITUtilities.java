@@ -178,7 +178,8 @@ public interface ITUtilities {
     }
 
     static ClientTrackingDto stubClientTrackingDto() {
-        TimestampsDto internalTimestamps =  new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        String localDate = "2024-01-01T00:00";
+        TimestampsDto internalTimestamps =  new TimestampsDto(localDate, localDate);
         return new ClientTrackingDto(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), "it_tenant", internalTimestamps);
     }
 

@@ -22,8 +22,8 @@ class ClientTrackingMapperTest {
     void setup() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         String tenantId = "org_12345";
-        clientTracking = testUtilities.createClientTracking(tenantId).withInternalTimestamps(null);
-        clientTrackingDtoTenant = testUtilities.createClientTrackingDtoTenant(tenantId).withInternalTimestamps(null);
+        clientTracking = testUtilities.createClientTracking(tenantId);
+        clientTrackingDtoTenant = testUtilities.createClientTrackingDtoTenant(tenantId);
     }
 
     @Test

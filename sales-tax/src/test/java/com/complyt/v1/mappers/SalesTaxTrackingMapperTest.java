@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,16 +39,14 @@ public class SalesTaxTrackingMapperTest {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTracking = testUtilities.createSalesTaxTracking(UUID.randomUUID().toString())
                 .withNexusCalculationSummaries(Map.of(localDateTime.toLocalDate(), new NexusCalculationSummary(1, BigDecimal.valueOf(1200))))
-                .withClientTracking(testUtilities.createClientTracking(testUtilities.tenantId).withInternalTimestamps(null))
                 .withTransactionNexusSummaries(Map.of(transactionId, new TransactionNexusSummary(BigDecimal.valueOf(1200), localDateTime, TransactionType.INVOICE)));
         salesTaxTrackingWithWhatsExposedToDto = salesTaxTracking
                 .withTenantId(null).withId(null).withComplytId(salesTaxTracking.getComplytId())
-                .withClientTracking(salesTaxTracking.getClientTracking().withTenantId(null).withId(null).withInternalTimestamps(null))
+                .withClientTracking(salesTaxTracking.getClientTracking().withTenantId(null).withId(null))
                 .withNexusStateRule(salesTaxTracking.getNexusStateRule().withId(null))
                 .withTransactionNexusSummaries(new HashMap<>());
         salesTaxTrackingDto = testUtilities.createSalesTaxTrackingDto().withComplytId(salesTaxTracking.getComplytId())
-                .withNexusCalculationSummaries(Map.of(localDateTime.toLocalDate(), new NexusCalculationSummaryDto(1, BigDecimal.valueOf(1200))))
-                .withClientTracking(testUtilities.createClientTrackingDto().withInternalTimestamps(null));
+                .withNexusCalculationSummaries(Map.of(localDateTime.toLocalDate(), new NexusCalculationSummaryDto(1, BigDecimal.valueOf(1200))));
     }
 
     @Test
