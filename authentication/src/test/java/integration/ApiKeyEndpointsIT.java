@@ -164,6 +164,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     @WithMockUser
     public void delete_SentAsJson_HasContentTypeHeaderButNoApiKeyProvided_Returns415() {
         String expectedMassage = "401 Unauthorized";
+
         webTestClient
                 .mutateWith(csrf())
                 .method(HttpMethod.DELETE)
