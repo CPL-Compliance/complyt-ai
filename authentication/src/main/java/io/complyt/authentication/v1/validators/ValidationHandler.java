@@ -1,5 +1,6 @@
 package io.complyt.authentication.v1.validators;
 
+import io.complyt.authentication.utils.observability.ContextLogger;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotValidApiException;
 import io.complyt.authentication.v1.validators.query_params.QueryParamsExtractor;
 import lombok.AccessLevel;
@@ -7,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -15,6 +18,7 @@ import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
 @EqualsAndHashCode
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ValidationHandler<T, U extends Validator> {
 
@@ -56,11 +60,12 @@ public class ValidationHandler<T, U extends Validator> {
         if (errors.getAllErrors().isEmpty()) {
             return Mono.just(objectToValidate);
         } else {
-            return onValidationErrors(errors);
+            return ContextLogger.observeCtx("Failed to validate the format " + errors.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList(), log::info)
+                    .then(onValidationErrors());
         }
     }
 
-    private @NonNull Mono<T> onValidationErrors(Errors errors) {
-        return Mono.error(new ObjectNotValidApiException(errors));
+    private @NonNull Mono<T> onValidationErrors() {
+        return Mono.error(new ObjectNotValidApiException());
     }
 }
