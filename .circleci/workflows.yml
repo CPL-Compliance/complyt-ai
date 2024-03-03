@@ -180,11 +180,18 @@ jobs:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-region: AWS_DEFAULT_REGION
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+      ## Deploy to production cluster
       - aws-ecs/update-service:
           cluster-name: "complyt-prd"
           container-image-name-updates: "container=<<parameters.service_name>>, tag=${IMAGE_TAG}"
           family: "<<parameters.service_name>>-complyt-prd"
           service-name: "<<parameters.service_name>>"
+      ## Deploy to demo cluster
+      - aws-ecs/update-service:
+          cluster-name: "demo"
+          container-image-name-updates: "container=demo, tag=<<parameters.service_name>>-latest"
+          family: "demo-<<parameters.service_name>>-task-definition"
+          service-name: "demo-<<parameters.service_name>>-service"
 
 
 workflows:
