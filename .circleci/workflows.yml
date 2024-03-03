@@ -190,7 +190,7 @@ jobs:
       - aws-ecs/update-service:
           cluster-name: "demo"
           container-image-name-updates: "container=demo, tag=<<parameters.service_name>>-latest"
-          family: "demo-<<parameters.service_name>>"
+          family: "demo-<<parameters.service_name>>-task-definition"
           service-name: "demo-<<parameters.service_name>>-service"
 
 
