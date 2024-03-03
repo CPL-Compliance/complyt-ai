@@ -91,7 +91,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
     @Test
     @Override
     @WithMockUser
-    public void post_DoesntExist_Returns404() {
+    public void post_DoesntExist_Returns401() {
         // Given
         ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
         ApiKey apiKey = TestUtilities.createApiKey();
@@ -109,7 +109,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
                 .bodyValue(apiKeyDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isNotFound();
+                .expectStatus().isUnauthorized();
     }
 
     @Test
@@ -247,7 +247,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
                 .bodyValue(apiKeyDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isEqualTo(HttpStatusCode.valueOf(400));
+                .expectStatus().isEqualTo(HttpStatusCode.valueOf(401));
     }
 
     @Test
@@ -264,7 +264,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
                 .bodyValue(apiKeyDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest();
+                .expectStatus().isUnauthorized();
     }
 
     @Test
@@ -281,6 +281,6 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
                 .bodyValue(apiKeyDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest();
+                .expectStatus().isUnauthorized();
     }
 }
