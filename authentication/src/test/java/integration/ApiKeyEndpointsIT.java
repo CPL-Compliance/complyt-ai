@@ -118,17 +118,10 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                 .expectStatus().isNoContent();
     }
 
-    /*
-    Checks the length of the expected massage because the order of the Sub-sentences might change from time to time.
-    Some Examples:
-    1. [ApiKey.clientId may not be blank, ApiKey.clientId may not be null, ApiKey.clientSecret may not be null, ApiKey.clientSecret may not be blank]
-    2. [ApiKey.clientSecret may not be blank, ApiKey.clientId may not be blank, ApiKey.clientId may not be null, ApiKey.clientSecret may not be null]
-    3. [ApiKey.clientSecret may not be null, ApiKey.clientSecret may not be blank, ApiKey.clientId may not be blank, ApiKey.clientId may not be null]
-     */
     @Test
     @WithMockUser
     public void delete_SentAsFormURLEncoded_HasContentTypeHeaderButNoApiKeyProvided_Returns415() {
-        String expectedMassage = "[ApiKey.clientId may not be blank, ApiKey.clientId may not be null, ApiKey.clientSecret may not be null, ApiKey.clientSecret may not be blank]";
+        String expectedMassage = "401 Unauthorized";
 
         webTestClient
                 .mutateWith(csrf())
@@ -143,7 +136,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody(LinkedHashMap.class)
-                .value(map -> assertEquals(expectedMassage.length(), ((String)map.get("message")).length()));
+                .value(map -> assertEquals(expectedMassage, map.get("message")));
     }
 
     @Test
@@ -167,17 +160,10 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                 .expectStatus().is4xxClientError();
     }
 
-    /*
-Checks the length of the expected massage because the order of the Sub-sentences might change from time to time.
-Some Examples:
-1. [ApiKey.clientId may not be blank, ApiKey.clientId may not be null, ApiKey.clientSecret may not be null, ApiKey.clientSecret may not be blank]
-2. [ApiKey.clientSecret may not be blank, ApiKey.clientId may not be blank, ApiKey.clientId may not be null, ApiKey.clientSecret may not be null]
-3. [ApiKey.clientSecret may not be null, ApiKey.clientSecret may not be blank, ApiKey.clientId may not be blank, ApiKey.clientId may not be null]
- */
     @Test
     @WithMockUser
     public void delete_SentAsJson_HasContentTypeHeaderButNoApiKeyProvided_Returns415() {
-        String expectedMassage = "[ApiKey.clientId may not be blank, ApiKey.clientId may not be null, ApiKey.clientSecret may not be null, ApiKey.clientSecret may not be blank]";
+        String expectedMassage = "401 Unauthorized";
 
         webTestClient
                 .mutateWith(csrf())
@@ -192,7 +178,7 @@ Some Examples:
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody(LinkedHashMap.class)
-                .value(map -> assertEquals(expectedMassage.length(), ((String)map.get("message")).length()));
+                .value(map -> assertEquals(expectedMassage, map.get("message")));
     }
 
     @Test
