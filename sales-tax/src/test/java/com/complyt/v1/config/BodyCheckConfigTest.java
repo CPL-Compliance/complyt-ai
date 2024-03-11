@@ -1,7 +1,5 @@
 package com.complyt.v1.config;
 
-import com.complyt.v1.models.TaxableCategoryDto;
-import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.body_checkers.transaction.ItemsAlignmentChecker;
 import com.complyt.v1.validators.body_checkers.transaction.TransactionDtoShippingAddressChecker;
