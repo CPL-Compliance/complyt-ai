@@ -18,5 +18,4 @@ public interface SalesTaxTrackingMapper {
     SalesTaxTracking salesTaxTrackingDtoToSalesTaxTracking(SalesTaxTrackingDto salesTaxTrackingDto);
 
     SalesTaxTrackingDto salesTaxTrackingToSalesTaxTrackingDto(SalesTaxTracking salesTaxTracking);
-    
 }

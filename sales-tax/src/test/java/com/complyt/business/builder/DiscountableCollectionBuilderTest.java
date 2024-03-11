@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @ExtendWith(MockitoExtension.class)
 
 class DiscountableCollectionBuilderTest {
@@ -42,5 +45,18 @@ class DiscountableCollectionBuilderTest {
 
         // Then
         Assertions.assertEquals(expectedDiscountables, actualDiscountable);
+    }
+
+    @Test
+    void build_NullTransactionPassed_ThrowsException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () ->
+                discountableCollectionBuilder.build(nullTransaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
     }
 }

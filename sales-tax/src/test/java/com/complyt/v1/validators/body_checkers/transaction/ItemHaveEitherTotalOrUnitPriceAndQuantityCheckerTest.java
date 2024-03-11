@@ -121,6 +121,22 @@ class ItemHaveEitherTotalOrUnitPriceAndQuantityCheckerTest {
     }
 
     @Test
+    public void check_ItemDtoWithTotalAndUnitNoNullAndQuantityNull_ReturnEmptyFlux() {
+        // Given
+        TransactionDto transactionProblematicItemDto = transactionDto
+                .withItems(List.of(itemDto.withTotalPrice(BigDecimal.ZERO)
+                        .withUnitPrice(BigDecimal.ZERO)
+                        .withQuantity(null)));
+
+        // When
+        Flux<String> errorStringFlux = itemHaveEitherTotalOrUnitPriceAndQuantityChecker
+                .check(transactionProblematicItemDto);
+
+        // Then
+        StepVerifier.create(errorStringFlux).expectNextCount(0).verifyComplete();
+    }
+
+    @Test
     public void check_2ItemsDtoWithTotalAndQuantityNullAndUnitPriceNotNull_ReturnFluxError() {
         // Given
         ItemDto problematicItemDto = itemDto.withTotalPrice(null)
