@@ -2,9 +2,6 @@ package com.complyt.utils.object_mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public interface ComplytObjectMapper {
 
     ObjectMapper objectMapper = new ObjectMapper();

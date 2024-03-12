@@ -27,8 +27,13 @@ public class Patcher<T> {
             }
 
             return object;
-        } catch (Exception exception) {
-//            log.info("The requested operation failed because of an invalid patch field provided.");
+        } catch (NullPointerException  | ClassCastException  exception) {
+            log.error("Failed to patch", exception);
+
+            throw new InvalidPatchFieldException();
+        } catch (RuntimeException exception) {
+            log.error("Failed to patch - failed to map object", exception);
+
             throw new InvalidPatchFieldException();
         }
     }
