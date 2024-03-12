@@ -1,6 +1,7 @@
 package com.complyt.v1.validators;
 
 import com.complyt.v1.config.patch.CustomerPatcherFunctions;
+import com.complyt.v1.exceptions.types.InvalidPatchFieldException;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
@@ -141,6 +142,35 @@ public class PatcherTest {
 
         // Then
         Assertions.assertEquals(expectedObject, actualObject);
+    }
+
+    @Test
+    void patch_FieldDoesNotExistInMap_ReturnsInvalidPatchFieldException() {
+        // Given
+        String name = "Wrong key";
+        Map<String, Object> map = new HashMap<>() {{
+            put("namee", name);
+        }};
+
+        // When
+        InvalidPatchFieldException exception = assertThrows(InvalidPatchFieldException.class, () -> patcher.patch(objectToPatch, map));
+
+        // Then
+        assertEquals(InvalidPatchFieldException.class, exception.getClass());
+    }
+
+    @Test
+    void patch_FieldIsOfWrongType_ReturnsInvalidPatchFieldException() {
+        // Given
+        Map<String, Object> map = new HashMap<>() {{
+            put("name", 5);
+        }};
+
+        // When
+        InvalidPatchFieldException exception = assertThrows(InvalidPatchFieldException.class, () -> patcher.patch(objectToPatch, map));
+
+        // Then
+        assertEquals(InvalidPatchFieldException.class, exception.getClass());
     }
 
     @Test

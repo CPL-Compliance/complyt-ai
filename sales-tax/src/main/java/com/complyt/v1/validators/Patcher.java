@@ -27,12 +27,8 @@ public class Patcher<T> {
             }
 
             return object;
-        } catch (NullPointerException  | ClassCastException  exception) {
+        } catch (NullPointerException | ClassCastException exception) {
             log.error("Failed to patch", exception);
-
-            throw new InvalidPatchFieldException();
-        } catch (RuntimeException exception) {
-            log.error("Failed to patch - failed to map object", exception);
 
             throw new InvalidPatchFieldException();
         }
