@@ -38,6 +38,12 @@ public class Item implements Taxable, Discountable {
     }
 
     @Override
+    public final BigDecimal getCalculatedTotal() {
+        return calculatedTotal == null ? BigDecimal.ZERO :
+                calculatedTotal;
+    }
+
+    @Override
     public final BigDecimal getManualSalesTaxRate() {
         return manualSalesTaxRate != null ? manualSalesTaxRate : BigDecimal.ZERO;
     }
