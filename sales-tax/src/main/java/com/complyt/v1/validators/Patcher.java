@@ -28,9 +28,9 @@ public class Patcher<T> {
 
             return object;
         } catch (Exception exception) {
-            log.info("The requested operation failed because of an invalid patch field provided.");
+//            log.info("The requested operation failed because of an invalid patch field provided.");
+            throw new InvalidPatchFieldException();
         }
-        return null;
     }
 
 }
