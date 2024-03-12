@@ -110,14 +110,6 @@ class ItemTest {
     @Test
     void Equals_sameItem_ReturnsTrue() {
         // Given
-//        SalesTaxRates salesTaxRates = new SalesTaxRates(new BigDecimal("0.01"), new BigDecimal("0.01"), new BigDecimal("0.01"),
-//                new BigDecimal("0.01"), new BigDecimal("0.01"), null);
-//        JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
-//                "California", "CA", true, true, CalculationType.FIXED,
-//                "description", new BigDecimal("0.07"), null);
-//        Item givenItem = item = new Item(new BigDecimal("2000"), new BigDecimal("4"),
-//                new BigDecimal("8000"), "description", "name", "taxCode", rule, salesTaxRates, false, BigDecimal.ZERO, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
-        //todo: remove
         Item givenItem = testUtilities.createItems(true, true).get(0)
                 .withSalesTaxRates(new SalesTaxRates(new BigDecimal("0.01"), new BigDecimal("0.01"),
                         new BigDecimal("0.01"), new BigDecimal("0.01"), new BigDecimal("0.01"), null));
@@ -250,5 +242,31 @@ class ItemTest {
 
         // Then
         assertEquals(new BigDecimal("10"), actualUnitPrice);
+    }
+
+    @Test
+    void getCalculatedTotal_calculatedTotalIsNull_ReturnsZero() {
+        // Given
+        Item itemWithNoCalculatedTotal = item
+                .withCalculatedTotal(null);
+
+        BigDecimal expectedAmount = BigDecimal.ZERO;
+
+        // When + Then
+        BigDecimal actualAmount = itemWithNoCalculatedTotal.getCalculatedTotal();
+        assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    void getCalculatedTotal_calculatedTotalIsNotNull_ReturnsCalulatedTotal() {
+        // Given
+        Item itemWithCalculatedTotal = item
+                .withCalculatedTotal(BigDecimal.valueOf(5));
+
+        BigDecimal expectedAmount = BigDecimal.valueOf(5);
+
+        // When + Then
+        BigDecimal actualAmount = itemWithCalculatedTotal.getCalculatedTotal();
+        assertEquals(expectedAmount, actualAmount);
     }
 }
