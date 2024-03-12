@@ -6,6 +6,7 @@ import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.permissions.sales_tax_tracking.NexusReadPermission;
 import com.complyt.security.permissions.sales_tax_tracking.NexusUpdatePermission;
 import com.complyt.utils.observability.ContextLogger;
+import com.complyt.v1.exceptions.types.InvalidPatchFieldException;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.DateWrapperToLocalDateMapper;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
@@ -142,6 +143,7 @@ public class SalesTaxTrackingHandler {
                 .then(Mono.defer(() -> salesTaxTrackingFacade.findByState(state))
                         .flatMap(existingSalesTaxTracking -> serverRequest.bodyToMono(Map.class)
                                 .map(map -> salesTaxTrackingPatcher.patch(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(existingSalesTaxTracking), map))
+                                .switchIfEmpty(Mono.error(new InvalidPatchFieldException()))
                                 .flatMap(salesTaxTrackingDto -> salesTaxTrackingDtoValidationHandler.handle(salesTaxTrackingDto, serverRequest.pathVariables().entrySet()))
                                 .flatMap(salesTaxTrackingDto -> salesTaxTrackingFacade.update(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto), existingSalesTaxTracking))
                                 .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)

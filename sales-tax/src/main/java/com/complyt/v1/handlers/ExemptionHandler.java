@@ -10,6 +10,7 @@ import com.complyt.security.permissions.exemption.ExemptionReadPermission;
 import com.complyt.security.permissions.exemption.ExemptionUpdatePermission;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.api_info.exemption.PatchExemptionByComplytIdApiInfo;
+import com.complyt.v1.exceptions.types.InvalidPatchFieldException;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.mappers.ExemptionWrapperMapper;
@@ -34,6 +35,7 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @Component
 @Slf4j
