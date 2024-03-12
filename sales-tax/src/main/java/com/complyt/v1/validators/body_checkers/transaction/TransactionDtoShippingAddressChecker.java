@@ -1,16 +1,17 @@
-package com.complyt.v1.validators.body_checkers;
+package com.complyt.v1.validators.body_checkers.transaction;
 
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.transaction.TransactionDto;
+import com.complyt.v1.validators.body_checkers.DtoBodyChecker;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
-public class TransactionDtoShippingAddressChecker implements DtoBodyChecker<TransactionDto>{
+public class TransactionDtoShippingAddressChecker implements DtoBodyChecker<TransactionDto> {
     
     @Override
     public Flux<String> check(@NonNull TransactionDto transactionDto) {

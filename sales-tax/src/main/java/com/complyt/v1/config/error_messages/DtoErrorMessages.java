@@ -5,6 +5,7 @@ import com.complyt.v1.api_info.FieldsDescriptions;
 public interface DtoErrorMessages {
 
     String NOT_NULL_ERROR = "may not be null";
+
     String CONFLICTED_WITH_URL_ERROR = "in body and path should be identical";
 
     String STATE_CONFLICTED_WITH_URL_ERROR = "in path should be same as the name or abbreviation in body";
@@ -34,7 +35,9 @@ public interface DtoErrorMessages {
 
     String STATE_FORMAT_ERROR = "invalid state provided. Please provide a valid state name or abbreviation.\";";
 
-    String TOTAL_AMOUNT_AFTER_DISCOUNT_IS_BELOW_ZERO = "The transaction total amount after discount is below 0";
+    String TOTAL_AMOUNT_AFTER_DISCOUNT_IS_BELOW_ZERO = "total transaction price cannot be negative. please create a credit memo/refund with a positive price";
+
+    String ITEM_WITH_NEGATIVE_TOTAL_CANNOT_HAVE_A_DISCOUNT = "item with negative price cannot have a discount";
 
     String ONE_OF_THE_ITEMS_IS_UNALIGNED = "At least one of the item's total price does not have the same sign as the amount (one is negative and the other one is positive)";
 
@@ -42,4 +45,5 @@ public interface DtoErrorMessages {
 
     String MAX_256_ERROR = "should be up to 256 characters maximum";
 
+    String ITEMS_MISSING_TOTAL_OR_QUANTITY_AND_UNITPRICE = "All items should have either total price OR quantity and unitPrice";
 }

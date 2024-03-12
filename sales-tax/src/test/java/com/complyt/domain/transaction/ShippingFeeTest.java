@@ -24,7 +24,7 @@ public class ShippingFeeTest {
 
     private ShippingFee createShippingFee() {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), rules, SalesTaxRates.zeroSalesTaxRate(), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
+        return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), rules, SalesTaxRates.zeroSalesTaxRate(), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE, null);
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
@@ -35,7 +35,10 @@ public class ShippingFeeTest {
     @Test
     void calculateSalesTaxAmount_SalesTaxIsSetManually_ReturnsAmount() {
         // Given
-        ShippingFee shippingFeeWithManualRate = shippingFee.withManualSalesTax(true).withManualSalesTaxRate(new BigDecimal("0.5"));
+        ShippingFee shippingFeeWithManualRate = shippingFee
+                .withManualSalesTax(true)
+                .withManualSalesTaxRate(new BigDecimal("0.5"))
+                .withCalculatedTotal(shippingFee.getTotalPrice());
         BigDecimal expectedAmount = shippingFeeWithManualRate.getManualSalesTaxRate().multiply(shippingFeeWithManualRate.getTotalPrice());
 
         // When + Then
@@ -51,7 +54,8 @@ public class ShippingFeeTest {
         BigDecimal rateAfterPercentageCut = shippingFee.getSalesTaxRates().taxRate().multiply(rulesByPercentage.getCalculationValue());
         SalesTaxRates salesTaxRates = shippingFee.getSalesTaxRates().withTaxRate(rateAfterPercentageCut);
         ShippingFee shippingFeeWithRuleByPercentage = shippingFee.withJurisdictionalSalesTaxRules(rulesByPercentage)
-                .withSalesTaxRates(salesTaxRates);
+                .withSalesTaxRates(salesTaxRates)
+                .withCalculatedTotal(shippingFee.getTotalPrice());
 
         BigDecimal expectedAmount = shippingFeeWithRuleByPercentage.getTotalPrice()
                 .multiply(shippingFeeWithRuleByPercentage.getSalesTaxRates().taxRate());
@@ -83,7 +87,8 @@ public class ShippingFeeTest {
                 ", salesTaxRates=" + shippingFee.getSalesTaxRates() +
                 ", taxCode=" + shippingFee.getTaxCode() +
                 ", taxableCategory=" + shippingFee.getTaxableCategory() +
-                ", tangibleCategory=" + shippingFee.getTangibleCategory() + ")";
+                ", tangibleCategory=" + shippingFee.getTangibleCategory() +
+                ", calculatedTotal=" + shippingFee.getCalculatedTotal() + ")";
 
         // When
         String actualString = shippingFee.toString();

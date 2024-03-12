@@ -8,23 +8,30 @@ import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.transaction.Item;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TangibleItemsAmountCalculatorTest {
 
+    private UnitTestUtilities testUtilities;
     private TangibleItemsAmountCalculator tangibleItemsAmountCalculator;
 
     List<Taxable> items;
 
     @BeforeEach
     void setUp() {
-        items = createItems();
+//        items = createItems();
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+
+        items = new ArrayList<>(testUtilities.setCalculatedTotalOnItemList(testUtilities.createItems(true, true)));
         tangibleItemsAmountCalculator = new TangibleItemsAmountCalculator();
     }
 
@@ -32,15 +39,14 @@ public class TangibleItemsAmountCalculatorTest {
         return new ArrayList<>() {
             {
                 SalesTaxRates salesTaxRates = new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null);
-                add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1",
-                        null, salesTaxRates, false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
-                ));
-                add(new Item(new BigDecimal(5000), new BigDecimal(4), new BigDecimal(20000), "description", "name", "C1S3",
-                        null, salesTaxRates, false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
-                ));
-                add(new Item(new BigDecimal(5000), new BigDecimal(4), new BigDecimal(20000), "description", "name", "C1S2",
-                        null, salesTaxRates, false, BigDecimal.ZERO, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE
-                ));
+                Item item = new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000),
+                        null, "description", "name", "C1S1",
+                        null, salesTaxRates, false, BigDecimal.ZERO,
+                        null, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
+
+                add(item.withName("name"));
+                add(item.withName("name"));
+                add(item.withName("name"));
             }
         };
     }
@@ -48,7 +54,7 @@ public class TangibleItemsAmountCalculatorTest {
     @Test
     void calculate_TwoItemsAreTangible_ReturnsAmountOfTwoItems() {
         // Before
-        BigDecimal expectedAmount = items.get(0).getTotalPrice().add(items.get(1).getTotalPrice());
+        BigDecimal expectedAmount = items.get(0).getCalculatedTotal().add(items.get(1).getCalculatedTotal());
 
         // When + Then
         BigDecimal actualAmount = tangibleItemsAmountCalculator.calculate(items);
@@ -59,7 +65,7 @@ public class TangibleItemsAmountCalculatorTest {
     void calculate_OneItemIsTangible_ReturnsAmountOfOneItem() {
         // Before
         items.set(0, items.get(0).withTangibleCategory(TangibleCategory.INTANGIBLE));
-        BigDecimal expectedAmount = items.get(1).getTotalPrice();
+        BigDecimal expectedAmount = items.get(1).getCalculatedTotal();
 
         // When + Then
         BigDecimal actualAmount = tangibleItemsAmountCalculator.calculate(items);

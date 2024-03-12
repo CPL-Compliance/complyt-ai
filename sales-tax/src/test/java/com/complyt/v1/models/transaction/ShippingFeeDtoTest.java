@@ -22,7 +22,7 @@ class ShippingFeeDtoTest {
 
     private ShippingFeeDto createShippingFeeDto() {
         JurisdictionalSalesTaxRulesDto rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal("1000"), rules, null, "C6S1", TaxableCategoryDto.TAXABLE, TangibleCategoryDto.INTANGIBLE);
+        return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal("1000"), BigDecimal.ZERO, rules, null, "C6S1", TaxableCategoryDto.TAXABLE, TangibleCategoryDto.INTANGIBLE);
     }
 
     private JurisdictionalSalesTaxRulesDto createJurisdictionalSalesTaxRules() {
@@ -48,6 +48,7 @@ class ShippingFeeDtoTest {
         String expectedString = "ShippingFeeDto[manualSalesTax=" + shippingFeeDto.manualSalesTax()
                 + ", manualSalesTaxRate=" + shippingFeeDto.manualSalesTaxRate() +
                 ", totalPrice=" + shippingFeeDto.totalPrice() +
+                ", calculatedTotal=" + shippingFeeDto.calculatedTotal() +
                 ", jurisdictionalSalesTaxRules=" + shippingFeeDto.jurisdictionalSalesTaxRules() +
                 ", salesTaxRates=" + shippingFeeDto.salesTaxRates() +
                 ", taxCode=" + shippingFeeDto.taxCode() +

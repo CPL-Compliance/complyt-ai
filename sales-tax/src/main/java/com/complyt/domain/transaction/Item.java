@@ -1,5 +1,6 @@
 package com.complyt.domain.transaction;
 
+import com.complyt.domain.Discountable;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -14,10 +15,11 @@ import java.math.BigDecimal;
 @ToString
 @With
 @AllArgsConstructor
-public class Item implements Taxable {
+public class Item implements Taxable, Discountable {
     private BigDecimal unitPrice;
     private BigDecimal quantity;
     private BigDecimal totalPrice;
+    private BigDecimal calculatedTotal;
     private String description;
     private String name;
     private String taxCode;
@@ -25,12 +27,14 @@ public class Item implements Taxable {
     private SalesTaxRates salesTaxRates;
     private boolean manualSalesTax;
     private BigDecimal manualSalesTaxRate;
+    private BigDecimal discount;
     private TangibleCategory tangibleCategory;
     private TaxableCategory taxableCategory;
 
-    @Override
-    public final BigDecimal getTotalPrice(){
-        return totalPrice != null ? totalPrice : BigDecimal.ZERO;
+    public final BigDecimal getTotalPrice() {
+        return this.totalPrice != null ?
+                this.totalPrice :
+                this.getUnitPrice().multiply(this.getQuantity());
     }
 
     @Override

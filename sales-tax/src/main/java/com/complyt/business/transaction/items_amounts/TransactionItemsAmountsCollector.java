@@ -30,11 +30,11 @@ public class TransactionItemsAmountsCollector implements TransactionAmountsColle
     CollectionBuilder<Taxable> taxableCollectionBuilder;
 
     public Transaction collect(@NonNull Transaction transaction) {
-        List<Taxable> items = (List<Taxable>) taxableCollectionBuilder.build(transaction);
 
-        BigDecimal taxableItemsAmount = taxableItemsAmountCalculator.calculate(items);
-        BigDecimal tangibleItemsAmount = tangibleItemsAmountCalculator.calculate(items);
-        BigDecimal totalItemsAmount = totalItemsAmountCalculator.calculate(items);
+        List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transaction);
+        BigDecimal taxableItemsAmount = taxableItemsAmountCalculator.calculate(taxables);
+        BigDecimal tangibleItemsAmount = tangibleItemsAmountCalculator.calculate(taxables);
+        BigDecimal totalItemsAmount = totalItemsAmountCalculator.calculate(taxables);
 
         return new Transaction(
                 transaction.getComplytId(), transaction.getId(),
@@ -45,7 +45,8 @@ public class TransactionItemsAmountsCollector implements TransactionAmountsColle
                 transaction.getTenantId(), transaction.getInternalTimestamps(),
                 transaction.getExternalTimestamps(), transaction.getTransactionType(),
                 transaction.getShippingFee(), transaction.getCreatedFrom(),
-                taxableItemsAmount, tangibleItemsAmount, totalItemsAmount,
-                transaction.getTransactionFilingStatus());
+                taxableItemsAmount, tangibleItemsAmount, totalItemsAmount,transaction.getTotalDiscount(),
+                transaction.getTransactionFilingStatus()
+        );
     }
 }

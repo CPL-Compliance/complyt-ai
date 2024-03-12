@@ -1,5 +1,6 @@
 package com.complyt.domain.transaction;
 
+import com.complyt.domain.Discountable;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -23,10 +24,12 @@ public class ShippingFee implements Taxable {
     private final String taxCode;
     private final TaxableCategory taxableCategory;
     private final TangibleCategory tangibleCategory;
+    private final BigDecimal calculatedTotal;
 
-    @Override
     public final BigDecimal getTotalPrice() {
-        return totalPrice != null ? totalPrice : BigDecimal.ZERO;
+        return totalPrice != null ?
+                totalPrice :
+                BigDecimal.ZERO;
     }
 
     @Override

@@ -6,48 +6,41 @@ import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.transaction.Item;
+import org.apache.commons.math.stat.inference.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TaxableItemsAmountCalculatorTest {
 
+    UnitTestUtilities unitTestUtilities;
     private TaxableItemsAmountCalculator taxableItemsAmountCalculator;
 
     List<Taxable> items;
 
     @BeforeEach
     void setUp() {
-        items = createItems();
-        taxableItemsAmountCalculator = new TaxableItemsAmountCalculator();
-    }
+//        items = createItems();
+        unitTestUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
 
-    private List<Taxable> createItems() {
-        return new ArrayList<>() {
-            {
-                add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1",
-                        null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
-                ));
-                add(new Item(new BigDecimal(5000), new BigDecimal(4), new BigDecimal(20000), "description", "name", "C1S3",
-                        null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
-                ));
-                add(new Item(new BigDecimal(5000), new BigDecimal(4), new BigDecimal(20000), "description", "name", "C1S2",
-                        null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
-                ));
-            }
-        };
+        items = new ArrayList<>(unitTestUtilities.setCalculatedTotalOnItemList(unitTestUtilities.createItems(true, true)));
+        taxableItemsAmountCalculator = new TaxableItemsAmountCalculator();
     }
 
     @Test
     void calculate_TwoItemsAreTaxable_ReturnsAmountOfTwoItems() {
         // Before
-        BigDecimal expectedAmount = items.get(0).getTotalPrice().add(items.get(1).getTotalPrice());
+        BigDecimal expectedAmount = items.get(0).getCalculatedTotal().add(items.get(1).getCalculatedTotal());
 
         // When + Then
         BigDecimal actualAmount = taxableItemsAmountCalculator.calculate(items);
@@ -58,7 +51,7 @@ public class TaxableItemsAmountCalculatorTest {
     void calculate_OneItemIsTaxable_ReturnsAmountOfOneItem() {
         // Before
         items.set(0, items.get(0).withTaxableCategory(TaxableCategory.NOT_TAXABLE));
-        BigDecimal expectedAmount = items.get(1).getTotalPrice();
+        BigDecimal expectedAmount = items.get(1).getCalculatedTotal();
 
         // When + Then
         BigDecimal actualAmount = taxableItemsAmountCalculator.calculate(items);
@@ -74,6 +67,22 @@ public class TaxableItemsAmountCalculatorTest {
 
         // When + Then
         BigDecimal actualAmount = taxableItemsAmountCalculator.calculate(items);
+        assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    void calculate_ItemsWithDiscountPassedBothTaxable_ReturnsAmount() {
+        // Before
+        List<Taxable> discountedItems = new ArrayList<>(unitTestUtilities.setCalculatedTotalOnItemList(
+                unitTestUtilities.createItems(true, true)
+                        .stream().map(item -> item
+                                .withDiscount(BigDecimal.valueOf(500)))
+                        .collect(Collectors.toList())));
+
+        BigDecimal expectedAmount = discountedItems.get(0).getCalculatedTotal().add(discountedItems.get(1).getCalculatedTotal());
+
+        // When + Then
+        BigDecimal actualAmount = taxableItemsAmountCalculator.calculate(discountedItems);
         assertEquals(expectedAmount, actualAmount);
     }
 

@@ -28,7 +28,6 @@ public class TransactionRepository {
     private TenantResolver tenantResolver;
 
 
-
     public Mono<Transaction> save(@NonNull Transaction transaction) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {

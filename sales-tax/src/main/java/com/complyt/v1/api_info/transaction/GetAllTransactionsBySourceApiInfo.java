@@ -83,6 +83,8 @@ public @interface GetAllTransactionsBySourceApiInfo {
                                     "unitPrice": 0,
                                     "quantity": 0,
                                     "totalPrice": 0,
+                                    "calculatedTotal":0,
+                                    "discount":0,
                                     "description": "string",
                                     "name": "string",
                                     "taxCode": "string",
@@ -140,7 +142,8 @@ public @interface GetAllTransactionsBySourceApiInfo {
                                     "county": "string",
                                     "state": "string",
                                     "street": "string",
-                                    "zip": "string"
+                                    "zip": "string",
+                                    "isPartial": false
                                 },
                                 "email": "example@some.mail.com",
                                 "customerType": "RETAIL",
@@ -170,7 +173,7 @@ public @interface GetAllTransactionsBySourceApiInfo {
                                 "updatedDate": "2023-02-05T12:24:43.193Z"
                             },
                             "externalTimestamps": {
-                                "createdDate": "2023-02-05T12:24:43.193Z",
+                                "createdDate":"2023-02-05T12:24:43.193Z",
                                 "updatedDate": "2023-02-05T12:24:43.193Z"
                             },
                             "transactionType": "SALES_ORDER",
@@ -178,6 +181,7 @@ public @interface GetAllTransactionsBySourceApiInfo {
                                 "manualSalesTax": true,
                                 "manualSalesTaxRate": 0,
                                 "totalPrice": 0,
+                                "calculatedTotal":0
                                 "taxCode": "string",
                                 "taxableCategory": "TAXABLE",
                                 "tangibleCategory": "TANGIBLE",
@@ -204,6 +208,7 @@ public @interface GetAllTransactionsBySourceApiInfo {
                             "taxableItemsAmount": 0,
                             "tangibleItemsAmount": 0,
                             "totalItemsAmount": 0,
+                            "totalDiscount" :0,
                             "transactionFilingStatus": "NOT_FILED"
                         }
             ]

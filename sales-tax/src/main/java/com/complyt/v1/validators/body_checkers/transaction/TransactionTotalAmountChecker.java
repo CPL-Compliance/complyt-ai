@@ -1,25 +1,29 @@
-package com.complyt.v1.validators.body_checkers;
+package com.complyt.v1.validators.body_checkers.transaction;
 
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.TransactionDto;
+import com.complyt.v1.validators.body_checkers.DtoBodyChecker;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.javatuples.Pair;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-public class TransactionTotalAmountChecker implements DtoBodyChecker<TransactionDto> {
+public class TransactionTotalAmountChecker implements DtoBodyChecker<TransactionDto>, TransactionBodyFunctions {
 
     // a transaction must have a positive sum
     // this check was added when supporting negative total items was started
     @Override
+    // check if the discount is not larger than all the items total
     public Flux<String> check(@NonNull TransactionDto transactionDto) {
         return Flux.from(Mono.just(transactionDto.items())
                 .map(calculateTotalItemsAmountAfterDiscount())
@@ -27,13 +31,17 @@ public class TransactionTotalAmountChecker implements DtoBodyChecker<Transaction
     }
 
     // calculating the total amount and adding the discount.
-    // discount is being received negatively (hence, the usage of BigDecimal.add and not BigDecimal.subtract
+    // discount is being received positively (hence, the usage of BigDecimal.subtract and not BigDecimal.add
     // this ignores if the discount is before tax or after tax
     private Function<List<ItemDto>, BigDecimal> calculateTotalItemsAmountAfterDiscount() {
         return (itemsDtoList) ->
                 itemsDtoList.stream()
-                        .map(ItemDto::totalPrice)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        .map(TransactionBodyFunctions::getItemDtoTotal)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .subtract(itemsDtoList.stream()
+                                .map(ItemDto::discount)
+                                .filter(Objects::nonNull)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     private Mono<String> checkTransactionTotalAmountIsNotBelowZero(BigDecimal transactionTotalAmount) {

@@ -17,16 +17,23 @@ class ItemDtoTest {
 
     @BeforeEach
     void setup() {
-        itemDto = new ItemDto(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"), "description", "name", "taxCode",
-                null, new SalesTaxRatesDto(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
+        itemDto = new ItemDto(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"),
+                null, "description", "name", "taxCode",
+                null, new SalesTaxRatesDto(new BigDecimal("0.5"), new BigDecimal("0.5"),
+                new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null),
+                false, BigDecimal.ZERO, null, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
         );
     }
 
     @Test
     void Equals_sameItemDto_ReturnsTrue() {
         // Given
-        ItemDto givenItemDto = new ItemDto(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"), "description", "name", "taxCode",
-                null, new SalesTaxRatesDto(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
+        ItemDto givenItemDto = new ItemDto(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"),
+                null, "description", "name", "taxCode",
+                null, new SalesTaxRatesDto(new BigDecimal("0.5"),
+                new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"),
+                new BigDecimal("0.5"), null), false, BigDecimal.ZERO,
+                null, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
         );
 
         // When
@@ -42,6 +49,7 @@ class ItemDtoTest {
         String expectedString = "ItemDto[unitPrice=" + itemDto.unitPrice() +
                 ", quantity=" + itemDto.quantity() +
                 ", totalPrice=" + itemDto.totalPrice() +
+                ", calculatedTotal=" + itemDto.calculatedTotal() +
                 ", description=" + itemDto.description() +
                 ", name=" + itemDto.name() +
                 ", taxCode=" + itemDto.taxCode() +
@@ -49,6 +57,7 @@ class ItemDtoTest {
                 ", salesTaxRates=" + itemDto.salesTaxRates() +
                 ", manualSalesTax=" + itemDto.manualSalesTax() +
                 ", manualSalesTaxRate=" + itemDto.manualSalesTaxRate() +
+                ", discount=" + itemDto.discount() +
                 ", tangibleCategory=" + itemDto.tangibleCategory() +
                 ", taxableCategory=" + itemDto.taxableCategory() + "]";
 
