@@ -30,9 +30,13 @@ public interface ITUtilities {
     static TransactionDto stubTransactionDto(String externalId, UUID customerId, ItemDto... items) {
         return new TransactionDto(null, externalId, "1", "INVUS1000",
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
-                null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "95220", false), customerId,
-                null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
-                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED);
+                null, new MandatoryAddressDto("Acampo", "US", null,
+                "CA", "1525 R Jahant Rd", "95220", false), customerId,
+                null, null, TransactionStatusDto.ACTIVE, null,
+                new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
+                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO,
+                BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED);
+        // this is discount      ^
     }
 
     static CustomerDto stubCustomerDto(String externalId) {
@@ -50,8 +54,15 @@ public interface ITUtilities {
     }
 
     static ItemDto stubItemDto() {
-        return new ItemDto(new BigDecimal(10000), new BigDecimal(1), new BigDecimal(10000), "some description", "Hardware", "C1S1",
-                null, null, false, BigDecimal.ZERO, null, null);
+        return new ItemDto(new BigDecimal(10000), new BigDecimal(1), new BigDecimal(10000),
+                null, "some description", "Hardware", "C1S1",
+                null, null, false, BigDecimal.ZERO, null,
+                null, null);
+    }
+
+    static ShippingFeeDto stubShippingFeeDto() {
+        return new ShippingFeeDto(false, BigDecimal.ZERO, BigDecimal.valueOf(500), null,
+                null, null, "C6S1", null, null);
     }
 
     static FastTaxData stubFastTaxFlorida() {
@@ -155,7 +166,6 @@ public interface ITUtilities {
         LocalDateTime localDateTime = LocalDateTime.now();
         return new TimestampsDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
     }
-
     static Address createAddressInCalifornia() {
         return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }

@@ -1,13 +1,9 @@
 package com.complyt.v1.config;
 
-import com.complyt.domain.transaction.Item;
-import com.complyt.v1.models.TangibleCategoryDto;
-import com.complyt.v1.models.TaxableCategoryDto;
-import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.TransactionDto;
-import com.complyt.v1.validators.body_checkers.ItemsAlignmentChecker;
-import com.complyt.v1.validators.body_checkers.TransactionDtoShippingAddressChecker;
-import com.complyt.v1.validators.body_checkers.TransactionTotalAmountChecker;
+import com.complyt.v1.validators.body_checkers.transaction.ItemsAlignmentChecker;
+import com.complyt.v1.validators.body_checkers.transaction.TransactionDtoShippingAddressChecker;
+import com.complyt.v1.validators.body_checkers.transaction.TransactionTotalAmountChecker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
@@ -118,14 +114,13 @@ public class BodyCheckConfigTest {
     @Test
     void transactionBodyCheck_WithNegativeTotalAndItemNotAligned_Returns2ErrorMessages() {
         // Given
+        TransactionDto transactionToCheck = transactionDto.withItems(List.of(
+                unitTestUtilities.createItemDtoWithNegativeAmount(true, true)
+                        .withTotalPrice(BigDecimal.valueOf(-10000))
+                        .withUnitPrice(BigDecimal.valueOf(1000))
+                        .withQuantity(BigDecimal.valueOf(1))
+        ));
 
-        List<ItemDto> itemDtosList = List.of(
-                new ItemDto(new BigDecimal(200), new BigDecimal(4), new BigDecimal(-800), "description", "name", "C1S1", null,
-                        null, false, BigDecimal.ZERO, null, TaxableCategoryDto.TAXABLE),
-        new ItemDto(new BigDecimal(-2000), new BigDecimal(4), new BigDecimal(-8000), "description", "name", "C3S1", null,
-                null, false, BigDecimal.ZERO, null, TaxableCategoryDto.TAXABLE));
-
-        TransactionDto transactionToCheck = transactionDto.withItems(itemDtosList);
 
         // When + Then
         Flux<String> isValid = bodyCheckConfig.transactionDtoFluxFunction().apply(transactionToCheck);

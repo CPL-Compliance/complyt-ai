@@ -18,7 +18,7 @@ public class TangibleItemsAmountCalculator implements AmountCalculator<List<Taxa
         BigDecimal amount = BigDecimal.ZERO;
         for (Taxable item : items) {
             amount = item.getTangibleCategory() == TangibleCategory.TANGIBLE ?
-                    amount.add(item.getTotalPrice()) : amount;
+                    amount.add(item.getCalculatedTotal()) : amount;
         }
         log.debug("Total Tangible items price calculated: " + amount);
 

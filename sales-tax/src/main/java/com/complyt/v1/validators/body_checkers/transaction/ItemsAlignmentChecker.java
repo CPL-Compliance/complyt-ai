@@ -1,8 +1,9 @@
-package com.complyt.v1.validators.body_checkers;
+package com.complyt.v1.validators.body_checkers.transaction;
 
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.TransactionDto;
+import com.complyt.v1.validators.body_checkers.DtoBodyChecker;
 import lombok.NonNull;
 import reactor.core.publisher.Flux;
 
@@ -25,7 +26,9 @@ public class ItemsAlignmentChecker implements DtoBodyChecker<TransactionDto> {
     }
 
     private boolean checkItemAlignment(ItemDto itemDto) {
-        return itemDto.totalPrice().signum() == itemDto.unitPrice().multiply(itemDto.quantity()).signum();
+        return itemDto.totalPrice() == null || itemDto.unitPrice() == null || itemDto.quantity() == null ||
+                // ItemHaveEitherTotalOrUnitPriceAndQuantity checks if at least one kind of "total" was received
+                itemDto.totalPrice().signum() == itemDto.unitPrice().multiply(itemDto.quantity()).signum();
     }
 
 }

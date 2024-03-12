@@ -4,6 +4,7 @@ import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.business.transaction.CityCountyProvider;
+import com.complyt.business.transaction.ItemsTotalCalculator;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
@@ -38,10 +39,16 @@ public class TransactionServiceImpl implements TransactionService {
     TransactionAmountsCollector<Transaction> transactionItemsAmountsCollector;
 
     @NonNull
+    TransactionAmountsCollector<Transaction> transactionDiscountCollector;
+
+    @NonNull
     CityCountyProvider cityCountyProvider;
 
     @NonNull
     private ComplytIdHandler<Transaction> complytIdHandler;
+
+    @NonNull
+    ItemsTotalCalculator itemsTotalCalculator;
 
     @Override
     public Mono<Transaction> save(Transaction transaction) {
@@ -94,9 +101,12 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
-        return productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transaction)
-                .map(transactionItemsAmountsCollector::collect)
-                .flatMap(cityCountyProvider::provide);
+        return itemsTotalCalculator.injectRecalculatedTotal(transaction)
+                .flatMap(transactionWithCalculatedItems ->
+                        productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItems)
+                                .map(transactionDiscountCollector::collect)
+                                .map(transactionItemsAmountsCollector::collect)
+                                .flatMap(cityCountyProvider::provide));
     }
 
     @Deprecated
@@ -140,8 +150,9 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.getTransactionStatus(), transactionInfo.getTenantId(), transaction.getInternalTimestamps(),
                         transaction.getExternalTimestamps(), transaction.getTransactionType(), transaction.getShippingFee(),
                         transaction.getCreatedFrom(), transaction.getTaxableItemsAmount(),
-                        transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount(),
-                        transaction.getTransactionFilingStatus());
+                        transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount(), transaction.getTotalDiscount(),
+                        transaction.getTransactionFilingStatus()
+                );
     }
 
 }

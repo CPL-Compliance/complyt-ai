@@ -13,9 +13,7 @@ import com.complyt.v1.validators.DataConflictChecksProvider;
 import com.complyt.v1.validators.ParameterChecksProvider;
 import com.complyt.v1.validators.ShouldCallValidate;
 import com.complyt.v1.validators.ValidationHandler;
-import com.complyt.v1.validators.body_checkers.ItemsAlignmentChecker;
-import com.complyt.v1.validators.body_checkers.TransactionDtoShippingAddressChecker;
-import com.complyt.v1.validators.body_checkers.TransactionTotalAmountChecker;
+import com.complyt.v1.validators.body_checkers.transaction.*;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractorEmpty;
 import com.complyt.v1.validators.custom_body.DateWrapperDtoCustomBodyExtractor;
 import com.complyt.v1.validators.param_checker.ParamCheckerFunctions;
@@ -74,8 +72,10 @@ public class ValidatorConfig {
                         "externalId", TransactionDto.EXTERNAL_ID_CONFLICT_CHECK),
                         new BodyCheckConfig(List.of(
                                 new TransactionDtoShippingAddressChecker(),
+                                new TransactionTotalAmountChecker(),
+                                new ItemHaveEitherTotalOrUnitPriceAndQuantityChecker(),
                                 new ItemsAlignmentChecker(),
-                                new TransactionTotalAmountChecker()
+                                new NegativeItemsNotHavingDiscountChecker()
                         )).transactionDtoFluxFunction()),
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,

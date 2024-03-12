@@ -10,10 +10,13 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,23 +25,23 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TaxableItemExistCheckerTest {
 
-    TaxableItemExistChecker taxableItemExistenceCheck;
+    private UnitTestUtilities testUtilities;
+
+    private TaxableItemExistChecker taxableItemExistenceCheck;
 
     @BeforeEach
     void setUp() {
+        testUtilities =  new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         taxableItemExistenceCheck = new TaxableItemExistChecker();
     }
 
     private Item createTaxableItem() {
-        return new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1",
-                null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
-        );
+        return testUtilities.createItems(true, true).get(0);
     }
 
     private Item createNotTaxableItem() {
-        return new Item(new BigDecimal(1000), new BigDecimal(5), new BigDecimal(5000), "description", "name", "C2S1",
-                null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.NOT_TAXABLE
-        );
+        return testUtilities.createItems(true, true).get(0)
+                .withTaxableCategory(TaxableCategory.NOT_TAXABLE);
     }
 
     @Test

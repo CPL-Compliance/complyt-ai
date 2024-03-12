@@ -18,8 +18,8 @@ import java.util.UUID;
 @Value
 @Builder
 @With
-@AllArgsConstructor
 @Document(collection = "transaction")
+@AllArgsConstructor
 public class Transaction implements ComplytIdProperty {
 
     UUID complytId;
@@ -44,5 +44,6 @@ public class Transaction implements ComplytIdProperty {
     BigDecimal taxableItemsAmount;
     BigDecimal tangibleItemsAmount;
     BigDecimal totalItemsAmount;
+    BigDecimal totalDiscount;
     TransactionFilingStatus transactionFilingStatus;
 }

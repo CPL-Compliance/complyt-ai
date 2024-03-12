@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.http.MediaType;
 
+import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
@@ -145,6 +146,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isBadRequest();
     }
 
+    @Order(2)
+    @Test
     @Override
     public void upsertByExternalIdAndSource_ConflictingTransactionItemTotalIsNotAligned_Returns400ConflictedData() {
         // Given
@@ -165,6 +168,330 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isBadRequest();
     }
 
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_TransactionWithShippingFee_Returns200() {
+        //Given
+        String externalId = "10005";
+        String item = TestUtilities.customItem(BigDecimal.valueOf(8000), BigDecimal.valueOf(2), BigDecimal.valueOf(4000), null);
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, null, item))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_ItemWithManualSalesTax_Returns200() {
+        //Given
+        String externalId = "10005";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "CA", createdDate))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_NoItemHasDiscount_Returns200() {
+        //Given
+        String externalId = "10005";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "CA", createdDate))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_OneItemHasDiscount_Returns200() {
+        //Given
+        String externalId = "10005";
+        String item = TestUtilities.customItem(BigDecimal.valueOf(8000), BigDecimal.valueOf(2), BigDecimal.valueOf(4000), BigDecimal.valueOf(500));
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, null, item))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_TwoItemHaveDiscount_Returns200() {
+        //Given
+        String externalId = "10005";
+        String item1 = TestUtilities.customItem(BigDecimal.valueOf(8000), BigDecimal.valueOf(2), BigDecimal.valueOf(4000), BigDecimal.valueOf(500));
+        String item2 = TestUtilities.customItem(BigDecimal.valueOf(8000), BigDecimal.valueOf(2), BigDecimal.valueOf(4000), BigDecimal.valueOf(600));
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, null, item1, item2))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_OneItemHasDiscountOneItemIsNegative_Returns200() {
+        //Given
+        String externalId = "10005";
+        String item1 = TestUtilities.customItem(BigDecimal.valueOf(-800), BigDecimal.valueOf(2), BigDecimal.valueOf(-400), null);
+        String item2 = TestUtilities.customItem(BigDecimal.valueOf(8000), BigDecimal.valueOf(2), BigDecimal.valueOf(4000), BigDecimal.valueOf(600));
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, null, item1, item2))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_ItemUnitPriceAndQuantityNullAndTotalNotNull_Returns200() {
+        //Given
+        String externalId = "10005";
+        String item= TestUtilities.customItem(BigDecimal.valueOf(8000), null, null, null);
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, null, item))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_ItemUnitPriceAndQuantityNotNullAndTotalNull_Returns200() {
+        //Given
+        String externalId = "10005";
+        String item= TestUtilities.customItem(null, BigDecimal.valueOf(2), BigDecimal.valueOf(4000), null);
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, null, item))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_ItemDiscountIsEqualsToTotal_Returns200() {
+        //Given
+        String externalId = "10005";
+        String item= TestUtilities.customItem(BigDecimal.valueOf(8000), null, null, BigDecimal.valueOf(8000));
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, null, item))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_ItemDiscountIsEqualsToUnitPriceMultiplyByQuantity_Returns200() {
+        //Given
+        String externalId = "10005";
+        String item= TestUtilities.customItem(null, BigDecimal.valueOf(2), BigDecimal.valueOf(4000), BigDecimal.valueOf(8000));
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, null, item))
+                .exchange()
+                .expectStatus().isCreated();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_ItemHasNoUnitPriceAndQuantityAndTotal_Returns400ConflictedData() {
+        // Given
+        String externalId = "10005";
+        String item = TestUtilities.customItem(null, null, null, BigDecimal.ZERO);
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, null, item))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_ConflictingItemHasNegativeTotalAndDiscount_Returns400ConflictedData() {
+        // Given
+        String externalId = "10005";
+        String item = TestUtilities.customItem(BigDecimal.valueOf(-500), null, null, BigDecimal.valueOf(-1));
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, null, item))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_ConflictingItemHasNegativeUnitPriceAndQuantityAndDiscount_Returns400ConflictedData() {
+        // Given
+        String externalId = "10005";
+        String item = TestUtilities.customItem(null, BigDecimal.valueOf(-500), BigDecimal.valueOf(1), BigDecimal.valueOf(-1));
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, null, item))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_ConflictingItemHasNegativeDiscount_Returns400ConflictedData() {
+        // Given
+        String externalId = "10005";
+        String item = TestUtilities.customItem(null, BigDecimal.valueOf(500), BigDecimal.valueOf(1), BigDecimal.valueOf(-1));
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, null, item))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
     @Override
     public void put_NoAccessToken_Returns401() {
         WEB_TEST_CLIENT
@@ -179,6 +506,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isUnauthorized();
     }
 
+    @Order(2)
+    @Test
     @Override
     public void get_NoAccessToken_Returns401() {
         WEB_TEST_CLIENT
@@ -190,6 +519,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isUnauthorized();
     }
 
+    @Order(2)
+    @Test
     @Override
     public void delete_NoAccessToken_Returns401() {
         WEB_TEST_CLIENT
@@ -201,6 +532,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isUnauthorized();
     }
 
+//    @Order(2)
+//    @Test
+    //todo: fix this test
     @Override
     public void put_InsufficientScopes_Returns403() {
         WEB_TEST_CLIENT
@@ -216,6 +550,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isForbidden();
     }
 
+//    @Order(2)
+//    @Test
+    //todo: fix this test
     @Override
     public void get_InsufficientScopes_Returns403() {
         WEB_TEST_CLIENT
@@ -230,6 +567,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isForbidden();
     }
 
+//    @Order(2)
+//    @Test
     @Override
     public void delete_InsufficientScopes_Returns403() {
         WEB_TEST_CLIENT

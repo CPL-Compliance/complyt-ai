@@ -75,7 +75,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         String externalId = "10071";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(60000), null, null,
+                        new BigDecimal(60000), BigDecimal.ZERO,null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -122,7 +122,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         String externalId = "10072";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(60000), null, null,
+                        new BigDecimal(60000), BigDecimal.ZERO,null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -151,7 +151,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         String externalId = "10073";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(35000), null, null,
+                        new BigDecimal(35000), BigDecimal.ZERO,null, null,
                         "C6S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -198,7 +198,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         String externalId = "10074";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(35000), null, null,
+                        new BigDecimal(35000), BigDecimal.ZERO,null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -261,7 +261,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         String externalId = "10075";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(10000), null, null,
+                        new BigDecimal(10000), BigDecimal.ZERO,null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -292,7 +292,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         String externalId = "10076";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(10000), null, null,
+                        new BigDecimal(10000), BigDecimal.ZERO,null, null,
                         "C7S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -324,7 +324,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withUnitPrice(new BigDecimal(10)).withTotalPrice(new BigDecimal(10)))
                 .withShippingFee(new ShippingFeeDto(true, new BigDecimal("0.15"),
-                        new BigDecimal(10000), null, null,
+                        new BigDecimal(10000), BigDecimal.ZERO,null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 

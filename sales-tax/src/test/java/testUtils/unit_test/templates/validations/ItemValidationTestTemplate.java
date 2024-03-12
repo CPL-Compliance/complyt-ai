@@ -1,12 +1,9 @@
 package testUtils.unit_test.templates.validations;
 
 public interface ItemValidationTestTemplate {
-
-    void upsert_NullUnitPriceInItem_Returns400ValidationError();
-
     void upsert_NegativeQuantityInItem_Returns400ValidationError();
 
-    void upsert_NullTotalPriceInItem_Returns400ValidationError();
+    void upsert_NegativeTotalPriceInItemWithDiscount_Returns400ValidationError();
 
     void upsert_NullNameInItem_Returns400ValidationError();
 
@@ -21,4 +18,6 @@ public interface ItemValidationTestTemplate {
     void upsert_NegativeManualSalesTaxRateInItem_Returns400ValidationError();
 
     void upsert_LargerThanMaxManualSalesTaxRateInItem_Returns400ValidationError();
+
+    void upsert_NegativeDiscountInItem_Returns400ValidationError();
 }

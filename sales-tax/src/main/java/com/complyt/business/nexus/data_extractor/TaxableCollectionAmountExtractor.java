@@ -32,6 +32,6 @@ public class TaxableCollectionAmountExtractor {
                 .flatMap(filteredTaxables -> filteredTaxables.isEmpty()
                         ? Mono.empty()
                         : Flux.fromIterable(filteredTaxables)
-                        .reduce(BigDecimal.ZERO, (amountSum, taxable) -> amountSum.add(taxable.getTotalPrice())));
+                        .reduce(BigDecimal.ZERO, (amountSum, taxable) -> amountSum.add(taxable.getCalculatedTotal())));
     }
 }

@@ -59,11 +59,13 @@ public interface FieldsDescriptions {
 
     String TAXABLE_ITEMS_AMOUNT = "The amount of taxable items in the transaction";
 
-    String TOTAL_ITEMS_AMOUNT = "The total amount of items in the transaction";
+    String TOTAL_ITEMS_AMOUNT = "The total amount of items in the transaction. tax and discount excluded";
 
     String TANGIBLE_ITEMS_AMOUNT = "The amount of tangible items in the transaction";
 
     String SHIPPING_FEE = "The shipping fee for the transaction";
+
+    String TOTAL_DISCOUNT = "The total discount of all the items combined. calculated on save";
 
     // In Customer
 
@@ -91,5 +93,15 @@ public interface FieldsDescriptions {
 
     String QUANTITY = "The quantity of the units, must be positive";
 
-    String TOTAL_PRICE = "The total price of the unit prices time the quantity, can be positive and negative";
+    String TOTAL_PRICE = "The total price of the unit prices time the quantity, can be positive and negative, value is before discount and sales tax";
+
+    String DISCOUNT = "The discount of the line items, must be positive";
+
+    String CALCULATED_TOTAL = "The calculated price of the items. represents the total price (or amount time quantity if not provided), after discount. calculated on run time";
+
+    // In shippingFee
+
+    String SHIPPING_FEE_TOTAL_PRICE =  "The total price of the shipping fee";
+
+    String SHIPPING_FEE_CALCULATED_TOTAL = "The calculated price of the shipping fee. calculated on run time";
 }
