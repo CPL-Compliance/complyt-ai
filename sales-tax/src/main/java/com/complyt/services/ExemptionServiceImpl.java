@@ -122,6 +122,7 @@ public class ExemptionServiceImpl implements ExemptionService {
                 .withInternalTimestamps(exemption.getInternalTimestamps())
                 .withStatus(exemption.getStatus())
                 .withCertificate(exemption.getCertificate())
-                .withExemptionType(exemption.getExemptionType());
+                .withExemptionType(exemption.getExemptionType())
+                .withExemptionStatus(exemption.getExemptionStatus());
     }
 }

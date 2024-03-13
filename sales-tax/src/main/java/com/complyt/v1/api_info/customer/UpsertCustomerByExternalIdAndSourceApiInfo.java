@@ -106,7 +106,7 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
     String newCustomerExample = """
             {
                 "externalId": "externalIdExample",\s
-                "source": "sourceExample",\s
+                "source": "1",\s
                 "name": "Complyt",\s
                 "address": {\s
                     "city": "Sacramento",\s
@@ -131,7 +131,7 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
             {
                 "complytId": "9f8ee193-1a71-42b4-801d-ee1d8a161fbe",
                 "externalId": "externalIdExample",
-                "source": "sourceExample",
+                "source": "1",
                 "name": "Complyt",
                 "address": {
                     "city": "Sacramento",

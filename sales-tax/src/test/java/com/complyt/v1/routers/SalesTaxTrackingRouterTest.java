@@ -6,6 +6,7 @@ import com.complyt.facades.SalesTaxTrackingFacade;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
+import com.complyt.v1.config.PatcherConfig;
 import com.complyt.v1.config.ValidatorConfig;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
@@ -19,6 +20,7 @@ import com.complyt.v1.models.EconomicNexusTrackerDto;
 import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
+import com.complyt.v1.validators.Patcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -45,7 +48,8 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @ContextConfiguration(classes = {SalesTaxTrackingRouter.class, SalesTaxTrackingHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
-        GlobalExceptionHandler.class})
+        GlobalExceptionHandler.class,
+        PatcherConfig.class})
 public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTemplate {
 
     SalesTaxTrackingRouter salesTaxTrackingRouter;
@@ -55,7 +59,6 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @MockBean
     SalesTaxTrackingFacade salesTaxTrackingFacade;
-
     SalesTaxTracking salesTaxTracking;
 
     SalesTaxTrackingDto salesTaxTrackingDto;
@@ -248,7 +251,6 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
-
     }
 
     @Test
@@ -470,25 +472,25 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n" +
-                           "    \"approved\": \"true\",\n" +
-                           "    \"complytId\": \"1111-boohoo\",\n" +
-                           "    \"enforcesSalesTax\": \"true\",\n" +
-                           "    \"state\": {\n" +
-                           "        \"abbreviation\": \"CA\",\n" +
-                           "        \"code\": \"02\",\n" +
-                           "        \"name\": \"\"\n" +
-                           "    },\n" +
-                           "    \"physicalNexusTracker\": {\n" +
-                           "        \"established\": \"true\",\n" +
-                           "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                           "    },\n" +
-                           "    \"economicNexusTracker\": {\n" +
-                           "        \"established\": \"true\",\n" +
-                           "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                           "    },\n" +
-                           "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                           "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                           "}")
+                        "    \"approved\": \"true\",\n" +
+                        "    \"complytId\": \"1111-boohoo\",\n" +
+                        "    \"enforcesSalesTax\": \"true\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"\"\n" +
+                        "    },\n" +
+                        "    \"physicalNexusTracker\": {\n" +
+                        "        \"established\": \"true\",\n" +
+                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"economicNexusTracker\": {\n" +
+                        "        \"established\": \"true\",\n" +
+                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    },\n" +
+                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
+                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
+                        "}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -643,7 +645,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         List<SalesTaxTrackingDto> salesTaxTrackingDtoList = new ArrayList<>();
 
         // When
-        when(salesTaxTrackingFacade.findAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
+        when(salesTaxTrackingFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -682,7 +684,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // When
-        when(salesTaxTrackingFacade.findAll(0,0)).thenReturn(Flux.error(new OperationFailedException()));
+        when(salesTaxTrackingFacade.findAll(0, 0)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient
@@ -1088,7 +1090,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
-                .value(map -> assertEquals("[date must be in the format yyyy-mm-dd]",map.get("message")));;
+                .value(map -> assertEquals("[date must be in the format yyyy-mm-dd]", map.get("message")));
+        ;
     }
 
     @Test
@@ -1113,7 +1116,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
-                .value(map -> assertEquals("[date must be in the format yyyy-mm-dd]",map.get("message")));
+                .value(map -> assertEquals("[date must be in the format yyyy-mm-dd]", map.get("message")));
     }
 
     @Test
@@ -1484,4 +1487,61 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
+
+    // Patch
+
+    @Test
+    @WithMockUser
+    public void patch_PatchingByFewFields_Returns200() {
+        // Given
+        LocalDateTime establishedDateToPatch = salesTaxTrackingDto.physicalNexusTracker().establishedDate().plusMonths(1);
+        PhysicalNexusTrackerDto physicalNexusTrackerToPatch = salesTaxTrackingDto.physicalNexusTracker()
+                .withEstablishedDate(establishedDateToPatch);
+        LocalDateTime appliedDateToPatch = salesTaxTrackingDto.appliedDate().plusMonths(1);
+        SalesTaxTrackingDto expectedSalesTaxTrackingDto = salesTaxTrackingDto
+                .withPhysicalNexusTracker(physicalNexusTrackerToPatch)
+                .withAppliedDate(appliedDateToPatch);
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("physicalNexusTracker", physicalNexusTrackerToPatch);
+            put("appliedDate", appliedDateToPatch);
+        }};
+
+        String state = salesTaxTrackingDto.state().name();
+
+        SalesTaxTracking expectedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(expectedSalesTaxTrackingDto);
+        SalesTaxTracking originalSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto);
+
+        when(salesTaxTrackingFacade.findByState(state)).thenReturn(Mono.just(originalSalesTaxTracking));
+        when(salesTaxTrackingFacade.update(expectedSalesTaxTracking, originalSalesTaxTracking)).thenReturn(Mono.just(expectedSalesTaxTracking));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)
+                        .build())
+                .bodyValue(map)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(returnedSalesTaxTracking -> returnedSalesTaxTracking, equalTo(expectedSalesTaxTrackingDto));
+    }
+
+    @Test
+    public void patch_NullHandler_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
+        SalesTaxTrackingRouter salesTaxTrackingRouter = new SalesTaxTrackingRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingRouter.patchSalesTaxTrackingRouterFunction(nullSalesTaxTrackingHandler);
+        });
+
+        // Then
+        assertEquals("salesTaxTrackingHandler is marked non-null but is null", exception.getMessage());
+    }
+
 }

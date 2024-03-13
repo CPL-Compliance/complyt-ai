@@ -83,7 +83,7 @@ public class CustomerRepository {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
-                    return ContextLogger.observeCtx("Searching for a customer with id of: " + id + " and tenant ID " + tenantId , log::info)
+                    return ContextLogger.observeCtx("Searching for a customer with id of: " + id + " and tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }

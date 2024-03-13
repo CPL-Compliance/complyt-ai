@@ -1,11 +1,9 @@
 package com.complyt.v1.config;
 
-import com.complyt.services.ClientTrackingService;
 import com.complyt.v1.models.ClientTrackingDtoTenant;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.checkables.ComplytIdCheckable;
 import com.complyt.v1.models.checkables.StateCheckable;
-import com.complyt.v1.models.checkables.TenantIdCheckable;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import com.complyt.v1.models.customer.exemption.ExemptionWrapperDto;
@@ -107,7 +105,6 @@ public class ValidatorConfig {
                 pathVariableChecker,
                 queryParamChecker,
                 shouldCallValidate);
-
     }
 
     @Bean
@@ -130,7 +127,6 @@ public class ValidatorConfig {
                 pathVariableChecker,
                 queryParamChecker,
                 shouldCallValidate);
-
     }
 
     @Bean

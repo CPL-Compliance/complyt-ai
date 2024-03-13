@@ -11,6 +11,7 @@ import com.complyt.domain.transaction.TransactionFilingStatus;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
+import com.complyt.v1.models.customer.exemption.ClassificationDto;
 import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
@@ -34,7 +35,7 @@ public interface ITUtilities {
                 null, null, TransactionStatusDto.ACTIVE, null,
                 new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
                 TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED);
+                BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED);
         // this is discount      ^
     }
 
@@ -173,6 +174,10 @@ public interface ITUtilities {
         return new MandatoryAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
+    static OptionalAddressDto createOptionalAddressDtoInCalifornia() {
+        return new OptionalAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
+    }
+
     static SalesTaxRates createCaliforniaSalesTaxRates() {
         return new SalesTaxRates(new BigDecimal("0.00375"), new BigDecimal("0.0"), new BigDecimal("0.00725"), new BigDecimal("0.0125"), new BigDecimal("0.06"), null);
     }
@@ -190,12 +195,12 @@ public interface ITUtilities {
 
     static ClientTrackingDto stubClientTrackingDto() {
         String localDate = "2024-01-01T00:00";
-        TimestampsDto internalTimestamps =  new TimestampsDto(localDate, localDate);
+        TimestampsDto internalTimestamps = new TimestampsDto(localDate, localDate);
         return new ClientTrackingDto(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), "it_tenant", internalTimestamps);
     }
 
     static ClientTrackingDtoTenant stubClientTrackingDtoTenant(String tenantId, String name) {
-        TimestampsDto internalTimestamps =  new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        TimestampsDto internalTimestamps = new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString());
         return new ClientTrackingDtoTenant(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), name, internalTimestamps, tenantId);
     }
 
@@ -208,5 +213,9 @@ public interface ITUtilities {
                 TimeFrameDto.PREVIOUS_TWELVE_MONTHS,
                 new NexusThresholdDto(BigDecimal.valueOf(250000), 0, DefinitionDto.AMOUNT),
                 LocalDateTime.of(1970, 1, 1, 0, 0, 0));
+    }
+
+    static ClassificationDto createClassificationDto() {
+        return new ClassificationDto("new code", "new description");
     }
 }

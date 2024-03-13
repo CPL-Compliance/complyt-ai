@@ -23,8 +23,11 @@ import testUtils.unit_test.UnitTestUtilities;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest()
@@ -126,7 +129,7 @@ class ValidationHandlerTest {
                 .verify();
     }
 
-    //PathVariable
+    // PathVariable
     @Test
     public void handle_WithValidPathVariable_ReturnsMonoEmpty() {
         // Given
@@ -362,5 +365,150 @@ class ValidationHandlerTest {
         StepVerifier.create(validationMono).expectError(ObjectNotValidApiException.class).verify();
     }
 
+    @Test
+    void handleObjectAndEntrySet_NoPathVariablesInvalidTransaction_ReturnsValidationError() {
+        // Given
+        TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString()).withTransactionType(null);
+        Map<String, String> pathVariables = new HashMap<>();
+        pathVariables.put("complytId", transactionDto.complytId().toString());
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
 
+        // When
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
+        when(serverRequest.method()).thenReturn(HttpMethod.PUT);
+        when(serverRequest.path()).thenReturn("/v1/transactions/complytId/someComplytId");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
+
+        Mono<TransactionDto> validationMono = transactionDtoValidationHandler.handle(transactionDto, pathVariables.entrySet());
+
+        // Then
+        StepVerifier.create(validationMono).expectError(ObjectNotValidApiException.class).verify();
+    }
+
+    @Test
+    void handleObjectAndEntrySet_InvalidPathVariables_ReturnsValidationError() {
+        // Given
+        TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString());
+        Map<String, String> pathVariables = new HashMap<>();
+        pathVariables.put("complytId", "invalidComplytId");
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
+        // When
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
+        when(serverRequest.method()).thenReturn(HttpMethod.PUT);
+        when(serverRequest.path()).thenReturn("/v1/transactions/complytId/someComplytId");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
+
+        Mono<TransactionDto> validationMono = transactionDtoValidationHandler.handle(transactionDto, pathVariables.entrySet());
+
+        // Then
+        StepVerifier.create(validationMono).expectError(PathVariableErrorException.class).verify();
+    }
+
+    @Test
+    void handleObjectAndEntrySet_ValidData_ReturnsObject() {
+        // Given
+        TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString());
+        Map<String, String> pathVariables = new HashMap<>();
+        pathVariables.put("complytId", transactionDto.complytId().toString());
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
+        // When
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
+        when(serverRequest.method()).thenReturn(HttpMethod.PUT);
+        when(serverRequest.path()).thenReturn("/v1/transactions/complytId/someComplytId");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
+
+        Mono<TransactionDto> validationMono = transactionDtoValidationHandler.handle(transactionDto, pathVariables.entrySet());
+
+        // Then
+        StepVerifier.create(validationMono).expectNext(transactionDto).verifyComplete();
+    }
+
+    @Test
+    void handleObjectAndEntrySet_NullObjectPassed_ThrowsNullPointerException() {
+        // Given
+        TransactionDto nullTransactionDto = null;
+        Map<String, String> pathVariables = new HashMap<>();
+        pathVariables.put("complytId", UUID.randomUUID().toString());
+
+        // Given + When
+        Exception nullPointerException = assertThrows(NullPointerException.class, () ->
+                transactionDtoValidationHandler.handle(nullTransactionDto, pathVariables.entrySet()));
+
+        // Then
+        assertEquals("object is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void handleObjectAndEntrySet_NullEntrySetPassed_ThrowsNullPointerException() {
+        // Given
+        TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString());
+        Set<Map.Entry<String, String>> nullEntrySet = null;
+
+        // Given + When
+        Exception nullPointerException = assertThrows(NullPointerException.class, () ->
+                transactionDtoValidationHandler.handle(transactionDto, nullEntrySet));
+
+        // Then
+        assertEquals("entrySet is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void validateParam_ParamIsValid_ReturnsMonoEmpty() {
+        // Given
+        Map<String, String> pathVariables = new HashMap<>();
+        pathVariables.put("complytId", "f47ac10b-58cc-4372-a567-0e02b2c3d479");
+
+        // When
+        Mono<String> stringMono = transactionDtoValidationHandler.validateParam("complytId", pathVariables.get("complytId"));
+
+        // Then
+        StepVerifier.create(stringMono).verifyComplete();
+    }
+
+    @Test
+    void validateParam_ParamIsInValid_ReturnsValidationError() {
+        // Given
+        Map<String, String> pathVariablesWithInvalidComplytId = new HashMap<>();
+        pathVariablesWithInvalidComplytId.put("complytId", "f47ac10b-58cc-4372-a567-0");
+
+        // When
+        Mono<String> stringMono = transactionDtoValidationHandler.validateParam("complytId", pathVariablesWithInvalidComplytId.get("complytId"));
+
+        // Then
+        StepVerifier.create(stringMono).expectError(PathVariableErrorException.class).verify();
+    }
+
+    @Test
+    void validateParam_NullKeySent_ThrowsNullPointerException() {
+        String nullKey = null;
+
+        // Given + When
+        Exception nullPointerException = assertThrows(NullPointerException.class, () ->
+                transactionDtoValidationHandler.validateParam(nullKey, "value"));
+
+        // Then
+
+        assertEquals("key is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void validateParam_NullValueSent_ThrowsNullPointerException() {
+        // Given
+        String nullValue = null;
+
+        // Given + When
+        Exception nullPointerException = assertThrows(NullPointerException.class, () ->
+                transactionDtoValidationHandler.validateParam("key", nullValue));
+
+        // Then
+        assertEquals("value is marked non-null but is null", nullPointerException.getMessage());
+    }
 }

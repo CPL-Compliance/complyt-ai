@@ -217,7 +217,7 @@ public class UnitTestUtilities {
                 createCustomerDto(customerIdOtherDomains.toString()), null,
                 TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE,
                 shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO,
-                BigDecimal.ZERO, null, TransactionFilingStatus.NOT_FILED); //added total discount null
+                BigDecimal.ZERO, null, TransactionFilingStatusDto.NOT_FILED); //added total discount null
     }
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {
