@@ -270,9 +270,9 @@ public class UnitTestUtilities {
 
     public List<ItemDto> createItemDtos(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
-            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), null, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), BigDecimal.ZERO, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
                     null, false, BigDecimal.ZERO, null, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
-            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), null, "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), BigDecimal.ZERO, "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
                     null, false, BigDecimal.ZERO, null, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
 
         }};
