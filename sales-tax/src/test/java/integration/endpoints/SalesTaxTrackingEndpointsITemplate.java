@@ -2,7 +2,7 @@ package integration.endpoints;
 
 import testUtils.integration_test.templates.endpoints.*;
 
-public interface SalesTaxTrackingEndpointsITITTemplate extends
+public interface SalesTaxTrackingEndpointsITemplate extends
         UpsertByStateITTemplate,
         GetByStateITTemplate,
         GetByComplytIdITTemplate,

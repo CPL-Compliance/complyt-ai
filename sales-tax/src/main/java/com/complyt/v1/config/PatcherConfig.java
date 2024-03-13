@@ -33,6 +33,9 @@ public class PatcherConfig {
         return new Patcher<>(valuesToFunctions);
     }
 
+    /*
+        This Bean initialization will be implemented as soon as we add patch to transaction
+    */
 //    @Bean
 //    Patcher<TransactionDto> transactionPatcher() {
 //        Map<String, BiFunction<TransactionDto, Object, TransactionDto>> valuesToFunctions = new HashMap<>() {{

@@ -8,6 +8,15 @@
 //import java.util.UUID;
 //import java.util.function.BiFunction;
 //
+
+
+    /*
+     ***************************
+     * This Bean initialization will be implemented as soon as we add patch to transaction
+     ***************************
+    */
+
+
 //public interface TransactionPatcherFunctions {
 //
 //    BiFunction<TransactionDto, Object, TransactionDto> patchDocumentName = (transcationDto, documentName) -> transcationDto.withDocumentName((String) documentName);

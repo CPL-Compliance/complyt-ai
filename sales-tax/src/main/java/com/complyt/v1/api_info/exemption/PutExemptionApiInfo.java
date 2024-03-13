@@ -85,7 +85,7 @@ public @interface PutExemptionApiInfo {
 
     String newExemptionExample = """
             {
-                "customerId": "9f8ee193-1a71-42b4-801d-ee1d8a161fbe",
+                "customerId": "b4320a2b-1ac1-4fae-96c1-f2d7c2cc14a6",
                 "state": {
                     "abbreviation": "AZ",
                     "code": "04",

@@ -45,7 +45,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = SalesTaxApplication.class)
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT implements SalesTaxTrackingEndpointsITITTemplate {
+public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT implements SalesTaxTrackingEndpointsITemplate {
 
     private final StateDto existingState = new StateDto("AZ", "04", "Arizona");
     private final StateDto newState = new StateDto("AL", "01", "Alabama");
