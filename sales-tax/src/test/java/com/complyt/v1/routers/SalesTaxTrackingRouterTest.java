@@ -39,8 +39,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -454,6 +453,35 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     assertEquals(GenericErrorMessages.DATA_CONFLICT_ERROR, map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_NotRegisteredButDateGiven_Returns400ConflictedData() {
+        // Given
+        String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto salesTaxTrackingConflictedDto = salesTaxTrackingDto.withRegistered(null)
+                .withRegistrationDate(LocalDateTime.now());
+
+        // When
+        when(salesTaxTrackingFacade.findByState(stateName)).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingFacade.save(salesTaxTracking)).thenReturn(Mono.error(new ConflictedDataApiException()));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingConflictedDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertTrue(map.get("message").toString().contains(GenericErrorMessages.CONFLICTED_REGISTERED_ERROR));
                 });
     }
 

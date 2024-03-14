@@ -2,6 +2,7 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
+import com.complyt.business.timestamps_injection.SalesTaxTrackingRegisteredDateTimestampsInjector;
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.CustomerType;
@@ -10,6 +11,7 @@ import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
+import com.complyt.domain.sales_tax.RegisteredType;
 import com.complyt.domain.transaction.TransactionType;
 import com.complyt.repositories.ClientTrackingRepository;
 import com.complyt.repositories.NexusStateRuleRepository;
@@ -338,6 +340,92 @@ public class SalesTaxTrackingServiceImplTest {
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking.withComplytId(complytId)).verifyComplete();
+    }
+
+
+    @Test
+    void injectRegisteredDateToSalesTaxTracking_notNullSalesTaxTracking_ReturnsSalesTaxTrackingWithData() {
+        //Given
+        SalesTaxTrackingRegisteredDateTimestampsInjector injector = new SalesTaxTrackingRegisteredDateTimestampsInjector(salesTaxTracking);
+        SalesTaxTracking salesTaxTrackingWithUpdatedDate = injector.inject();
+
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.injectRegisteredDateToSalesTaxTracking(salesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono)
+                .expectNextMatches(salesTaxTracking -> {
+                    LocalDateTime expectedRegistrationDate = salesTaxTrackingWithUpdatedDate.getRegistrationDate();
+                    LocalDateTime actualRegistrationDate = salesTaxTracking.getRegistrationDate();
+
+                    return expectedRegistrationDate.getYear() == actualRegistrationDate.getYear() &&
+                            expectedRegistrationDate.getMonthValue() == actualRegistrationDate.getMonthValue() &&
+                            expectedRegistrationDate.getDayOfYear() == actualRegistrationDate.getDayOfYear() &&
+                            expectedRegistrationDate.getHour() == actualRegistrationDate.getHour();
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void injectRegisteredDateToSalesTaxTracking_NullSalesTaxTracking_ReturnsSalesTaxTrackingWithData() {
+        // Given
+        SalesTaxTracking salesTaxTracking = null;
+
+        // When & Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.injectRegisteredDateToSalesTaxTracking(salesTaxTracking).block();
+        });
+
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void updateRegisteredDateIfIsRegisteredModified_RegisteredAndDateNull_ReturnsSalesTaxTrackingWithDate() {
+        //Given
+        SalesTaxTracking salesTaxTrackingUpdated = salesTaxTracking
+                .withRegistered(RegisteredType.REGISTERED).withRegistrationDate(null);
+        LocalDateTime expectedRegistrationDate = LocalDateTime.now();
+
+        //When
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.updateRegisteredDateIfIsRegisteredModified(salesTaxTrackingUpdated);
+
+        //Then
+        StepVerifier.create(salesTaxTrackingMono)
+                .expectNextMatches(salesTaxTracking -> {
+                    LocalDateTime actualRegistrationDate = salesTaxTracking.getRegistrationDate();
+                    return expectedRegistrationDate.getYear() == actualRegistrationDate.getYear() &&
+                            expectedRegistrationDate.getMonthValue() == actualRegistrationDate.getMonthValue() &&
+                            expectedRegistrationDate.getDayOfYear() == actualRegistrationDate.getDayOfYear() &&
+                            expectedRegistrationDate.getHour() == actualRegistrationDate.getHour();
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void updateRegisteredDateIfIsRegisteredModified_RegisteredAndGivenDate_ReturnsSalesTaxTracking() {
+        //Given
+        LocalDateTime registrationDate = LocalDateTime.now();
+        SalesTaxTracking salesTaxTrackingUpdated = salesTaxTracking
+                .withRegistered(RegisteredType.REGISTERED).withRegistrationDate(registrationDate);
+
+        //When
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.updateRegisteredDateIfIsRegisteredModified(salesTaxTrackingUpdated);
+
+        //Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingUpdated).verifyComplete();
+    }
+
+    @Test
+    void updateRegisteredDateIfIsRegisteredModified_NonRegisteredAndGivenDate_ReturnsSalesTaxTracking() {
+        //Given
+        LocalDateTime registrationDate = LocalDateTime.now();
+        SalesTaxTracking salesTaxTrackingUpdated = salesTaxTracking
+                .withRegistered(null).withRegistrationDate(registrationDate);
+
+        //When
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.updateRegisteredDateIfIsRegisteredModified(salesTaxTrackingUpdated);
+
+        //Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingUpdated).verifyComplete();
     }
 
     @Test

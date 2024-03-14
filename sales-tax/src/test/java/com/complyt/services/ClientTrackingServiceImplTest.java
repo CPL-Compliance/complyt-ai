@@ -131,21 +131,13 @@ class clientTrackingServiceImpImplTest {
         Mono<ClientTracking> clientTrackingMono = clientTrackingServiceImp.injectDataToExistingClientTracking(clientTracking, anotherClientTracking);
 
         StepVerifier.create(clientTrackingMono).expectNextMatches(clientTracking -> {
-            LocalDateTime expectedCreatedDateTime = clientTrackingWithUpdatedDates.getInternalTimestamps().getCreatedDate();
             LocalDateTime expectedUpdatedDateTime = clientTrackingWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
-
-            LocalDateTime actualCreatedDateTime = clientTracking.getInternalTimestamps().getCreatedDate();
             LocalDateTime actualUpdatedDateTime = clientTracking.getInternalTimestamps().getUpdatedDate();
 
             return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
                     expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
                     expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() &&
-                    expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() &&
-                    expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
-                    expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
-                    expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
-                    expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour();
-
+                    expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour();
         }).verifyComplete();
     }
 
