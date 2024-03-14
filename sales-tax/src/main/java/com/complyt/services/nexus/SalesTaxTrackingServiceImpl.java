@@ -2,10 +2,12 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
+import com.complyt.business.timestamps_injection.SalesTaxTrackingRegisteredDateTimestampsInjector;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TimeFrame;
+import com.complyt.domain.sales_tax.RegisteredType;
 import com.complyt.repositories.ClientTrackingRepository;
 import com.complyt.repositories.NexusStateRuleRepository;
 import com.complyt.repositories.SalesTaxTrackingRepository;
@@ -136,7 +138,9 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                                 salesTaxTrackingWithDetails.getNexusCalculationSummaries(), salesTaxTrackingWithDetails.getTransactionNexusSummaries(),
                                 salesTaxTrackingWithDetails.getAppliedDate(), salesTaxTrackingWithDetails.isApproved(),
                                 salesTaxTrackingWithDetails.getApprovalDate(),
-                                salesTaxTrackingWithDetails.getFilingFrequency()));
+                                salesTaxTrackingWithDetails.getFilingFrequency(),
+                                salesTaxTrackingWithDetails.getRegistered(),
+                                salesTaxTrackingWithDetails.getRegistrationDate()));
     }
 
     @Override
@@ -158,8 +162,21 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> injectDataToNewSalesTaxTracking(@NonNull SalesTaxTracking salesTaxTracking) {
-        return addClientAndStateDetails(salesTaxTracking)
+        return updateRegisteredDateIfIsRegisteredModified(salesTaxTracking)
+                .flatMap(this::addClientAndStateDetails)
                 .map(complytIdHandler::insertComplytIdToNew);
     }
 
+    @Override
+    public Mono<SalesTaxTracking> injectRegisteredDateToSalesTaxTracking(@NonNull SalesTaxTracking salesTaxTracking) {
+        return Mono.just(salesTaxTracking)
+                .map(SalesTaxTrackingRegisteredDateTimestampsInjector::new)
+                .map(SalesTaxTrackingRegisteredDateTimestampsInjector::inject);
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> updateRegisteredDateIfIsRegisteredModified(@NonNull SalesTaxTracking salesTaxTracking) {
+        return (salesTaxTracking.getRegistered() == RegisteredType.REGISTERED && salesTaxTracking.getRegistrationDate() == null) ?
+                injectRegisteredDateToSalesTaxTracking(salesTaxTracking) : Mono.just(salesTaxTracking);
+    }
 }

@@ -6,6 +6,8 @@ public interface DtoErrorMessages {
 
     String NOT_NULL_ERROR = "may not be null";
 
+    String REGISTERED_CONFLICT = "registered field is false but date was provided";
+
     String CONFLICTED_WITH_URL_ERROR = "in body and path should be identical";
 
     String STATE_CONFLICTED_WITH_URL_ERROR = "in path should be same as the name or abbreviation in body";

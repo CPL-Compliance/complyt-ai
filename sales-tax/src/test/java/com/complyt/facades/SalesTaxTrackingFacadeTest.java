@@ -89,6 +89,7 @@ public class SalesTaxTrackingFacadeTest {
         SalesTaxTracking salesTaxTrackingWithId = salesTaxTracking.withId(UUID.randomUUID().toString());
 
         // When
+        when(salesTaxTrackingService.updateRegisteredDateIfIsRegisteredModified(salesTaxTracking).thenReturn(Mono.just(salesTaxTracking)));
         when(salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, salesTaxTrackingWithId)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingService.addClientAndStateDetails(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingService.insertSummariesFromOriginal(salesTaxTracking, salesTaxTrackingWithId)).thenReturn(Mono.just(salesTaxTracking));

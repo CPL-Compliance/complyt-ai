@@ -1,11 +1,9 @@
 package com.complyt.v1.config;
 
-import com.complyt.services.ClientTrackingService;
 import com.complyt.v1.models.ClientTrackingDtoTenant;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.checkables.ComplytIdCheckable;
 import com.complyt.v1.models.checkables.StateCheckable;
-import com.complyt.v1.models.checkables.TenantIdCheckable;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import com.complyt.v1.models.customer.exemption.ExemptionWrapperDto;
@@ -15,6 +13,7 @@ import com.complyt.v1.validators.DataConflictChecksProvider;
 import com.complyt.v1.validators.ParameterChecksProvider;
 import com.complyt.v1.validators.ShouldCallValidate;
 import com.complyt.v1.validators.ValidationHandler;
+import com.complyt.v1.validators.body_checkers.sales_tax_tracking.RegisteredChecker;
 import com.complyt.v1.validators.body_checkers.transaction.*;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractorEmpty;
 import com.complyt.v1.validators.custom_body.DateWrapperDtoCustomBodyExtractor;
@@ -72,13 +71,13 @@ public class ValidatorConfig {
                 new DataConflictChecksProvider(Map.of(
                         "source", TransactionDto.SOURCE_CONFLICT_CHECK,
                         "externalId", TransactionDto.EXTERNAL_ID_CONFLICT_CHECK),
-                        new BodyCheckConfig(List.of(
+                        new BodyCheckConfig<TransactionDto>(List.of(
                                 new TransactionDtoShippingAddressChecker(),
                                 new TransactionTotalAmountChecker(),
                                 new ItemHaveEitherTotalOrUnitPriceAndQuantityChecker(),
                                 new ItemsAlignmentChecker(),
                                 new NegativeItemsNotHavingDiscountChecker()
-                        )).transactionDtoFluxFunction()),
+                        )).entityDtoFluxFunction()),
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,
                 queryParamChecker,
@@ -103,11 +102,13 @@ public class ValidatorConfig {
         return new ValidationHandler<>(SalesTaxTrackingDto.class, springValidatorAdapter,
                 new DataConflictChecksProvider(Map.of(
                         "state", StateCheckable.STATE_CONFLICT_CHECK),
-                        null), new CustomBodyExtractorEmpty<>(),
+                        new BodyCheckConfig<SalesTaxTrackingDto>(List.of(
+                                new RegisteredChecker()
+                        )).entityDtoFluxFunction()),
+                new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,
                 queryParamChecker,
                 shouldCallValidate);
-
     }
 
     @Bean

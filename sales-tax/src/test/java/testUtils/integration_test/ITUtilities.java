@@ -49,7 +49,7 @@ public interface ITUtilities {
                 new PhysicalNexusTrackerDto(false, LocalDateTime.now()),
                 new EconomicNexusTrackerDto(false, LocalDateTime.now()),
                 null, null, stubClientTrackingDto(),
-                LocalDateTime.now(), false, LocalDateTime.now(), FilingFrequencyDto.MONTHLY);
+                LocalDateTime.now(), false, LocalDateTime.now(), FilingFrequencyDto.MONTHLY, null, null);
     }
 
     static ItemDto stubItemDto() {
@@ -189,7 +189,8 @@ public interface ITUtilities {
     }
 
     static ClientTrackingDto stubClientTrackingDto() {
-        TimestampsDto internalTimestamps =  new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        String localDate = "2024-01-01T00:00";
+        TimestampsDto internalTimestamps =  new TimestampsDto(localDate, localDate);
         return new ClientTrackingDto(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), "it_tenant", internalTimestamps);
     }
 

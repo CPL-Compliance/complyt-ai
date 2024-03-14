@@ -288,12 +288,23 @@
                                     <assembly>
                                         <descriptorRef>artifact</descriptorRef>
                                     </assembly>
+                                    <!-- the 'latest' tag is generated automatically -->
                                     <tags>
                                         <tag>
                                             ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
                                         </tag>
-                                        <tag>latest</tag>
                                     </tags>
+                                </build>
+                            </image>
+                            <image>
+                                <name>${docker.image.prefix}/demo:${docker.image.name}-latest</name>
+                                <alias>complyt</alias>
+                                <build>
+                                    <dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>
+                                    <!--copies artifact to docker build directory in target-->
+                                    <assembly>
+                                        <descriptorRef>artifact</descriptorRef>
+                                    </assembly>
                                 </build>
                             </image>
                         </images>

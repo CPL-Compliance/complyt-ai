@@ -98,7 +98,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     @Test
     @Override
     @WithMockUser
-    public void post_DoesntExist_Returns404() {
+    public void post_DoesntExist_Returns401() {
         // When
         when(apiKeyFacade.saveCredentials(credentials)).thenReturn(Mono.empty());
 
@@ -112,7 +112,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
                 .bodyValue(credentialsDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isNotFound();
+                .expectStatus().isUnauthorized();
     }
 
     @Test

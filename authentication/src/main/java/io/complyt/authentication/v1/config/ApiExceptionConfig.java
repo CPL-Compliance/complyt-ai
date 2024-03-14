@@ -28,8 +28,8 @@ public class ApiExceptionConfig {
     @Bean
     public Map<Class<? extends Exception>, HttpStatus> exceptionToStatusCode() {
         return Map.of(
-                ObjectNotFoundApiException.class, HttpStatus.NOT_FOUND,
-                ObjectNotValidApiException.class, HttpStatus.BAD_REQUEST,
+                ObjectNotFoundApiException.class, HttpStatus.UNAUTHORIZED,
+                ObjectNotValidApiException.class, HttpStatus.UNAUTHORIZED,
                 ApiKeyNotValidException.class, HttpStatus.UNAUTHORIZED
         );
     }
