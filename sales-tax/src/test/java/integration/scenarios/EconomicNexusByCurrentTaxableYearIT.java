@@ -160,7 +160,7 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(receivedSalesTaxTracking -> {
-                    assertEquals(BigDecimal.valueOf(450010), receivedSalesTaxTracking.nexusCalculationSummaries().get(LocalDate.of(2022,6,1)).amount());
+                    assertEquals(BigDecimal.valueOf(450010), receivedSalesTaxTracking.nexusCalculationSummaries().get(LocalDate.of(2022, 6, 1)).amount());
                     assertFalse(receivedSalesTaxTracking.economicNexusTracker().established());
                     assertFalse(receivedSalesTaxTracking.approved());
                 });
@@ -209,7 +209,7 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(receivedSalesTaxTracking -> {
                     assertTrue(receivedSalesTaxTracking.economicNexusTracker().established());
-                            assertEquals(BigDecimal.valueOf(510010), receivedSalesTaxTracking.nexusCalculationSummaries().get(LocalDate.of(2022,6,1)).amount());
+                    assertEquals(BigDecimal.valueOf(510010), receivedSalesTaxTracking.nexusCalculationSummaries().get(LocalDate.of(2022, 6, 1)).amount());
                     assertEquals(receivedSalesTaxTracking.economicNexusTracker().establishedDate(), LocalDateTime.parse(referenceDate.toString()));
                     assertEquals(receivedSalesTaxTracking.appliedDate(), LocalDateTime.parse(referenceDate.toString()));
 
@@ -226,6 +226,7 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
                             .expectBody(SalesTaxTrackingDto.class)
                             .value(updatedSalesTaxTracking -> assertTrue(updatedSalesTaxTracking.approved()));
                 });
+
     }
 
     @Order(5)
@@ -251,7 +252,7 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(receivedTransaction -> assertEquals(new BigDecimal("775.0000"),receivedTransaction.salesTax().amount()));
+                .value(receivedTransaction -> assertEquals(new BigDecimal("775.0000"), receivedTransaction.salesTax().amount()));
     }
 
     @Order(5)

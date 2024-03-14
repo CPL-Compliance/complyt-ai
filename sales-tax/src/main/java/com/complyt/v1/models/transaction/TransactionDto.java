@@ -1,6 +1,5 @@
 package com.complyt.v1.models.transaction;
 
-import com.complyt.domain.transaction.TransactionFilingStatus;
 import com.complyt.v1.api_info.FieldsDescriptions;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
@@ -38,12 +37,12 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(ref = "internalTimestamps") @Valid TimestampsDto internalTimestamps,
                              @Schema(ref = "externalTimestamps") @Valid @NotNull(message = "externalTimestamps " + DtoErrorMessages.NOT_NULL_ERROR) TimestampsDto externalTimestamps,
                              @NotNull(message = "transactionType " + DtoErrorMessages.NOT_NULL_ERROR) TransactionTypeDto transactionType,
-                             @Valid ShippingFeeDto shippingFee,
+                             @Schema(description = FieldsDescriptions.SHIPPING_FEE) @Valid ShippingFeeDto shippingFee,
                              @Schema(description = FieldsDescriptions.CREATED_FROM) @Size(max = 256, message = "createdFrom " + StringErrorMessages.MAX_256_ERROR) String createdFrom,
                              @Schema(description = FieldsDescriptions.TAXABLE_ITEMS_AMOUNT) BigDecimal taxableItemsAmount,
                              @Schema(description = FieldsDescriptions.TANGIBLE_ITEMS_AMOUNT) BigDecimal tangibleItemsAmount,
                              @Schema(description = FieldsDescriptions.TOTAL_ITEMS_AMOUNT) BigDecimal totalItemsAmount,
                              @Schema(description = FieldsDescriptions.TOTAL_DISCOUNT) BigDecimal totalDiscount,
-                             @Schema(description = FieldsDescriptions.TRANSACTION_FILING_STATUS) TransactionFilingStatus transactionFilingStatus)
+                             @Schema(description = FieldsDescriptions.TRANSACTION_FILING_STATUS) TransactionFilingStatusDto transactionFilingStatus)
         implements SourceCheckable, ExternalIdCheckable {
 }

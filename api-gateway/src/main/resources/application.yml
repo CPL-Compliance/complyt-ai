@@ -96,6 +96,13 @@ spring:
             - Path=/v1/transactions/source/{source}/externalId/{external_id}
           filters:
             - SetPath=/v1/transactions/source/{source}/externalId/{external_id}
+#        - id: sales-tax-patch-transaction-by-complyt-id
+#          uri: lb://sales-tax
+#          predicates:
+#            - Method=PATCH
+#            - Path=/v1/transactions/complytId/{complyt_id}
+#          filters:
+#            - SetPath=/v1/transactions/complytId/{complyt_id}
         # ---- Transaction ----
         # ---- Customer ----
         - id: sales-tax-get-customers
@@ -140,6 +147,13 @@ spring:
             - Path=/v1/customers/source/{source}/externalId/{external_id}
           filters:
             - SetPath=/v1/customers/source/{source}/externalId/{external_id}
+        - id: sales-tax-patch-customer-by-complyt-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=PATCH
+            - Path=/v1/customers/complytId/{complyt_id}
+          filters:
+            - SetPath=/v1/customers/complytId/{complyt_id}
         # ---- Customer ----
         # ---- Exemption ----
         - id: sales-tax-get-exemptions
@@ -177,6 +191,13 @@ spring:
             - Path=/v1/exemptions/complytId/{complyt_id}
           filters:
             - SetPath=/v1/exemptions/complytId/{complyt_id}
+        - id: sales-tax-patch-exemption-by-complyt-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=PATCH
+            - Path=/v1/exemptions/complytId/{complyt_id}
+          filters:
+            - SetPath=/v1/exemptions/complytId/{complyt_id}
         # ---- Exemption ----
         # ---- Nexus ----
         - id: sales-tax-get-nexuses
@@ -211,6 +232,13 @@ spring:
           uri: lb://sales-tax
           predicates:
             - Method=PUT
+            - Path=/v1/nexus/state/{state}
+          filters:
+            - SetPath=/v1/nexus/state/{state}
+        - id: sales-tax-patch-nexus
+          uri: lb://sales-tax
+          predicates:
+            - Method=PATCH
             - Path=/v1/nexus/state/{state}
           filters:
             - SetPath=/v1/nexus/state/{state}

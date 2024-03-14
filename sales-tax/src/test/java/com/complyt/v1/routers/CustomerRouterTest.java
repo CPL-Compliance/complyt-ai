@@ -5,6 +5,7 @@ import com.complyt.facades.CustomerFacade;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
+import com.complyt.v1.config.PatcherConfig;
 import com.complyt.v1.config.ValidatorConfig;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
@@ -16,6 +17,7 @@ import com.complyt.v1.handlers.CustomerHandler;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.transaction.OptionalAddressDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +46,8 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @ContextConfiguration(classes = {CustomerRouter.class, CustomerHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
-        GlobalExceptionHandler.class})
+        GlobalExceptionHandler.class,
+        PatcherConfig.class})
 class CustomerRouterTest implements CustomerRouterTestTemplate {
     Customer customer;
 
@@ -1147,7 +1150,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         }};
 
         // When
-        when(customerFacade.getAll(0,  RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(allCustomers));
+        when(customerFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(allCustomers));
 
         // Then
         webTestClient
@@ -3072,6 +3075,63 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isOk()
                 .expectBody(CustomerDto.class)
                 .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+    // Patch
+
+    @Test
+    @WithMockUser
+    public void patch_PatchingByFewFields_Returns200() {
+        // Given
+        String now = LocalDateTime.now().toString();
+        CustomerTypeDto customerTypePatch = CustomerTypeDto.RETAIL_EXEMPT;
+        LinkedHashMap<String, Object> externalTimestampsToPatch = new LinkedHashMap<>() {{
+            put("createdDate", now);
+            put("updatedDate", now);
+        }};
+        TimestampsDto timestampsDto = new TimestampsDto(now, now);
+        Map<String, Object> map = new HashMap<>() {{
+            put("externalTimestamps", externalTimestampsToPatch);
+            put("customerType", customerTypePatch);
+        }};
+        CustomerDto expectedCustomerDto = customerDto
+                .withExternalTimestamps(timestampsDto)
+                .withCustomerType(customerTypePatch);
+
+        Customer expectedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(expectedCustomerDto);
+
+        // When + Then
+        when(customerFacade.findByComplytId(customerDto.complytId())).thenReturn(Mono.just(customer));
+        when(customerFacade.updateIfModified(expectedCustomer, customer)).thenReturn(Mono.just(expectedCustomer));
+
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/complytId/" + customerDto.complytId().toString())
+                        .build())
+                .bodyValue(map)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomerDto));
+    }
+
+
+    @Test
+    public void patch_NullHandler_ThrowsNullPointerException() {
+        // Given
+        CustomerHandler nullCustomerHandler = null;
+        CustomerRouter customerRouter = new CustomerRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            customerRouter.patchCustomerByComplytIdRouterFunction(nullCustomerHandler);
+        });
+
+        // Then
+        assertEquals("customerHandler is marked non-null but is null", exception.getMessage());
     }
 
 }

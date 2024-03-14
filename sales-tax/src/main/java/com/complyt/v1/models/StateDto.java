@@ -5,8 +5,10 @@ import com.complyt.v1.config.error_messages.StringErrorMessages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.With;
 
 @Schema(name = "State")
+@With
 public record StateDto(
         @NotNull(message = "State.abbreviation " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "State.abbreviation " + StringErrorMessages.MINMAX_256_ERROR) String abbreviation,
         @NotNull(message = "State.code " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "State.code " + StringErrorMessages.MINMAX_256_ERROR) String code,

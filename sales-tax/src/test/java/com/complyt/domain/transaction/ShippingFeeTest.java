@@ -47,6 +47,32 @@ public class ShippingFeeTest {
     }
 
     @Test
+    void getCalculatedTotal_calculatedTotalIsNull_ReturnsZero() {
+        // Given
+        ShippingFee shippingFeeWithNoCalculatedTotal = shippingFee
+                .withCalculatedTotal(null);
+
+        BigDecimal expectedAmount = BigDecimal.ZERO;
+
+        // When + Then
+        BigDecimal actualAmount = shippingFeeWithNoCalculatedTotal.getCalculatedTotal();
+        assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    void getCalculatedTotal_calculatedTotalIsNotNull_ReturnsCalulatedTotal() {
+        // Given
+        ShippingFee shippingFeeWithCalculatedTotal = shippingFee
+                .withCalculatedTotal(BigDecimal.valueOf(5));
+
+        BigDecimal expectedAmount = BigDecimal.valueOf(5);
+
+        // When + Then
+        BigDecimal actualAmount = shippingFeeWithCalculatedTotal.getCalculatedTotal();
+        assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
     void calculateSalesTaxAmount_RuleIsSetToCalculateByPercentage_ReturnsAmount() {
         // Given
         JurisdictionalSalesTaxRules rulesByPercentage = shippingFee.getJurisdictionalSalesTaxRules()

@@ -12,8 +12,7 @@ import org.springframework.http.MediaType;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT implements SalesTaxTrackingEndpointsITTemplate {
@@ -45,7 +44,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
-                        .queryParam("page","null")
+                        .queryParam("page", "null")
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -563,4 +562,79 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .value(salesTaxTracking -> assertEquals(salesTaxTracking.get(0).get("complytId"), expectedComplyId))
                 .value(customerLst -> assertTrue(customerLst.size() <= RepositoryConstant.DEFAULT_SIZE));
     }
+
+    @Order(2)
+    @Test
+    public void getByStateNameToPatch_Exists_Returns200() {
+        // Given
+        String existingStateName = "Virginia";
+
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + existingStateName)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.state.name").isEqualTo(existingStateName);
+    }
+
+    @Order(0)
+    @Override
+    @Test
+    public void patch_PatchesOneField_ReturnsPatchedResource() {
+        String state = "VA";
+        String map = """
+                {
+                    "enforcesSalesTax": false
+                }
+                """;
+
+        WEB_TEST_CLIENT
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + state)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(salesTaxTracking -> assertFalse((Boolean) salesTaxTracking.get(0).get("enforcesSalesTax")));
+    }
+
+    @Order(1)
+    @Override
+    @Test
+    public void patch_PatchesTwoFields_ReturnsPatchedResource() {
+        String state = "VA";
+
+        WEB_TEST_CLIENT
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + state)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.salesTaxTrackingPatchTwoFieldsJsonExample())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(salesTaxTracking -> {
+                    assertTrue((Boolean) salesTaxTracking.get(0).get("enforcesSalesTax"));
+                    assertTrue(salesTaxTracking.get(0).get("economicNexusTracker").toString().contains("2024-08-02T19:12:00"));
+                });
+    }
+
 }

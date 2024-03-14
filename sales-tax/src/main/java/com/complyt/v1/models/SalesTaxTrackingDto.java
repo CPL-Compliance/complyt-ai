@@ -37,6 +37,6 @@ public record SalesTaxTrackingDto(
         LocalDateTime approvalDate,
         @Schema(description = FieldsDescriptions.FILING_FREQUENCY) FilingFrequencyDto filingFrequency,
         RegisteredType registered,
-        @Valid @Pattern(regexp = ISO8601Regex.expression, message = "registrationDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR) String registrationDate)
+        LocalDateTime registrationDate)
         implements StateCheckable {
 }

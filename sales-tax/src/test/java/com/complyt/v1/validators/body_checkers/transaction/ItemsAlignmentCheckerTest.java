@@ -1,13 +1,11 @@
 package com.complyt.v1.validators.body_checkers.transaction;
 
-import com.complyt.domain.transaction.Item;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
@@ -16,87 +14,151 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class ItemsAlignmentCheckerTest {
     private ItemDto itemDto;
     private TransactionDto transactionDto;
     private UnitTestUtilities testUtilities;
-    private NegativeItemsNotHavingDiscountChecker negativeItemsNotHavingDiscountChecker;
-
+    private ItemsAlignmentChecker itemsAlignmentChecker;
 
     @BeforeEach
     void setup() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        itemDto = testUtilities.createItemDtoWithNegativeAmount(true, true);
+        itemDto = testUtilities.createTransactionDto("").items().get(0);
         transactionDto = testUtilities.createTransactionDto("")
                 .withItems(List.of(itemDto));
-        negativeItemsNotHavingDiscountChecker = new NegativeItemsNotHavingDiscountChecker();
+        itemsAlignmentChecker = new ItemsAlignmentChecker();
     }
 
     @Test
-    public void check_ItemWithNegativeTotalAndNoDiscount_ReturnEmpty() {
-        // Given + When
-        Flux<String> errorStringFlux = negativeItemsNotHavingDiscountChecker
-                .check(transactionDto);
+    public void check_ItemDtoWithTotalAndUnitPriceAndQuantityNotNullAndSignIsEqual_ReturnEmpty() {
+        // Given
+        TransactionDto transactionWithFullItemDto = transactionDto
+                .withItems(List.of(itemDto.withTotalPrice(BigDecimal.ZERO)
+                        .withUnitPrice(BigDecimal.ZERO)
+                        .withQuantity(BigDecimal.ZERO)
+                        .withTotalPrice(BigDecimal.ONE)
+                        .withQuantity(BigDecimal.ONE)
+                        .withUnitPrice(BigDecimal.ONE)));
+        // When
+        Flux<String> errorStringFlux = itemsAlignmentChecker
+                .check(transactionWithFullItemDto);
 
         // Then
         StepVerifier.create(errorStringFlux).expectNextCount(0).verifyComplete();
     }
 
     @Test
-    public void check_ItemWithPositiveTotalItemAndNegativeTotalItemNoDiscount_ReturnEmpty() {
-        // Given + When
-        ItemDto positiveTotalItemDto = itemDto.withTotalPrice(BigDecimal.valueOf(800));
-        List<ItemDto> itemDtoList = List.of(
-                transactionDto.items().get(0),
-                positiveTotalItemDto
-        );
-        Flux<String> errorStringFlux = negativeItemsNotHavingDiscountChecker
-                .check(transactionDto.withItems(itemDtoList));
-
-        // Then
-        StepVerifier.create(errorStringFlux).expectNextCount(0).verifyComplete();
-    }
-
-    @Test
-    public void check_ItemWithNegativeTotalItemDiscount_ReturnError() {
-        // Given + When
-        ItemDto itemWithNegativeTotalAndDiscount = itemDto.withDiscount(BigDecimal.valueOf(500));
-        Flux<String> errorStringFlux = negativeItemsNotHavingDiscountChecker.
-                check(transactionDto.withItems(List.of(itemWithNegativeTotalAndDiscount)));
+    public void check_ItemDtoWithTotalAndUnitPriceAndQuantityNotNullAndSignIsNotEqualUnitPriceIsMinus_ReturnEmpty() {
+        // Given
+        TransactionDto transactionWithFullItemDto = transactionDto
+                .withItems(List.of(itemDto
+                        .withTotalPrice(BigDecimal.ONE)
+                        .withQuantity(BigDecimal.ONE)
+                        .withUnitPrice(BigDecimal.valueOf(-1))));
+        // When
+        Flux<String> errorStringFlux = itemsAlignmentChecker
+                .check(transactionWithFullItemDto);
 
         // Then
         StepVerifier.create(errorStringFlux)
-                .expectNext(DtoErrorMessages.ITEM_WITH_NEGATIVE_TOTAL_CANNOT_HAVE_A_DISCOUNT)
-                .verifyComplete();
+                .expectNext(DtoErrorMessages.ONE_OF_THE_ITEMS_IS_UNALIGNED).verifyComplete();
     }
 
     @Test
-    public void check_ItemWithNullTotalButNegativeUnitPriceItemAndDiscount_ReturnError() {
-        // Given + When
-        ItemDto itemWithNegativeUnitPriceAndDiscount = itemDto.withDiscount(BigDecimal.valueOf(500))
-                .withTotalPrice(null)
-                .withUnitPrice(BigDecimal.valueOf(-500));
-        Flux<String> errorStringFlux = negativeItemsNotHavingDiscountChecker.
-                check(transactionDto.withItems(List.of(itemWithNegativeUnitPriceAndDiscount)));
+    public void check_ItemDtoWithTotalAndUnitPriceAndQuantityNotNullAndSignIsNotEqualQuantityIsMinus_ReturnEmpty() {
+        // Given
+        TransactionDto transactionWithFullItemDto = transactionDto
+                .withItems(List.of(itemDto
+                        .withTotalPrice(BigDecimal.ONE)
+                        .withQuantity(BigDecimal.valueOf(-1))
+                        .withUnitPrice(BigDecimal.ONE)));
+        // When
+        Flux<String> errorStringFlux = itemsAlignmentChecker
+                .check(transactionWithFullItemDto);
 
         // Then
-        StepVerifier.create(errorStringFlux).expectNext(DtoErrorMessages.ITEM_WITH_NEGATIVE_TOTAL_CANNOT_HAVE_A_DISCOUNT)
-                .verifyComplete();
+        StepVerifier.create(errorStringFlux)
+                .expectNext(DtoErrorMessages.ONE_OF_THE_ITEMS_IS_UNALIGNED).verifyComplete();
     }
 
     @Test
-    public void check_ItemWithPositiveTotalItemDiscountLargetThanTotal_ReturnEmpty() {
-        // Given + When
-        ItemDto itemWithPositiveTotalAndDiscountLargetThanTotal = itemDto.withDiscount(BigDecimal.valueOf(500))
-                .withTotalPrice(BigDecimal.valueOf(499));
-        Flux<String> errorStringFlux = negativeItemsNotHavingDiscountChecker.
-                check(transactionDto.withItems(List.of(itemWithPositiveTotalAndDiscountLargetThanTotal)));
+    public void check_ItemDtoWithTotalAndUnitPriceAndQuantityNotNullAndSignIsNotEqualTotalIsMinus_ReturnEmpty() {
+        // Given
+        TransactionDto transactionWithFullItemDto = transactionDto
+                .withItems(List.of(itemDto
+                        .withTotalPrice(BigDecimal.valueOf(-1))
+                        .withQuantity(BigDecimal.ONE)
+                        .withUnitPrice(BigDecimal.ONE)));
+        // When
+        Flux<String> errorStringFlux = itemsAlignmentChecker
+                .check(transactionWithFullItemDto);
 
         // Then
-        StepVerifier.create(errorStringFlux).expectNextCount(0)
-                .verifyComplete();
+        StepVerifier.create(errorStringFlux)
+                .expectNext(DtoErrorMessages.ONE_OF_THE_ITEMS_IS_UNALIGNED).verifyComplete();
     }
 
+    @Test
+    public void check_ItemDtoWithTotalAndUnitPriceAndQuantityNotNullAndSignIEqualAllAreZero_ReturnEmpty() {
+        // Given
+        TransactionDto transactionWithFullItemDto = transactionDto
+                .withItems(List.of(itemDto
+                        .withTotalPrice(BigDecimal.ZERO)
+                        .withQuantity(BigDecimal.ZERO)
+                        .withUnitPrice(BigDecimal.ZERO)));
+        // When
+        Flux<String> errorStringFlux = itemsAlignmentChecker
+                .check(transactionWithFullItemDto);
+
+        // Then
+        StepVerifier.create(errorStringFlux).expectNextCount(0).verifyComplete();
+    }
+
+    @Test
+    public void check_ItemDtoWithQuantityAndUnitPriceNotNullAndTotalNullAndSignIsEqual_ReturnEmpty() {
+        // Given
+        TransactionDto transactionWithFullItemDto = transactionDto
+                .withItems(List.of(itemDto
+                        .withTotalPrice(null)
+                        .withQuantity(BigDecimal.ONE)
+                        .withUnitPrice(BigDecimal.ONE)));
+        // When
+        Flux<String> errorStringFlux = itemsAlignmentChecker
+                .check(transactionWithFullItemDto);
+
+        // Then
+        StepVerifier.create(errorStringFlux).expectNextCount(0).verifyComplete();
+    }
+
+    @Test
+    public void check_ItemDtoWithTotalAndUnitPriceNotNullAndQuantityNullAndSignIsEqual_ReturnEmpty() {
+        // Given
+        TransactionDto transactionWithFullItemDto = transactionDto
+                .withItems(List.of(itemDto
+                        .withTotalPrice(BigDecimal.ONE)
+                        .withQuantity(null)
+                        .withUnitPrice(BigDecimal.ONE)));
+        // When
+        Flux<String> errorStringFlux = itemsAlignmentChecker
+                .check(transactionWithFullItemDto);
+
+        // Then
+        StepVerifier.create(errorStringFlux).expectNextCount(0).verifyComplete();
+    }
+
+    @Test
+    public void check_ItemDtoWithTotalAndQuantityNotNullAndUnitPriceNullAndSignIsEqual_ReturnEmpty() {
+        // Given
+        TransactionDto transactionWithFullItemDto = transactionDto
+                .withItems(List.of(itemDto
+                        .withTotalPrice(BigDecimal.ONE)
+                        .withQuantity(BigDecimal.ONE)
+                        .withUnitPrice(null)));
+        // When
+        Flux<String> errorStringFlux = itemsAlignmentChecker
+                .check(transactionWithFullItemDto);
+
+        // Then
+        StepVerifier.create(errorStringFlux).expectNextCount(0).verifyComplete();
+    }
 }

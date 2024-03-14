@@ -63,4 +63,14 @@ public class CustomerRouter {
         return RouterFunctions.route(getCustomerRoute, customerHandler::getByComplytId);
     }
 
+    @Bean
+    @PatchCustomerByComplytIdApiInfo
+    public RouterFunction<ServerResponse> patchCustomerByComplytIdRouterFunction(@NonNull final CustomerHandler customerHandler) {
+        RequestPredicate deleteCustomerRoute = RequestPredicates
+                .PATCH(BASE_URL + "/complytId/{complytId}")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(deleteCustomerRoute, customerHandler::patch);
+    }
+
 }

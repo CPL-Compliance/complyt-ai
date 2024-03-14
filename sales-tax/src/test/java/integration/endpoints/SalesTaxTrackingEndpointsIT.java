@@ -5,9 +5,9 @@ import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
+import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import integration.TestContainersInitializerIT;
@@ -45,7 +45,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = SalesTaxApplication.class)
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT implements SalesTaxTrackingEndpointsITTemplate {
+public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT implements SalesTaxTrackingEndpointsITemplate {
 
     private final StateDto existingState = new StateDto("AZ", "04", "Arizona");
     private final StateDto newState = new StateDto("AL", "01", "Alabama");
@@ -485,7 +485,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/null" )
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/null")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
@@ -639,10 +639,66 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectBodyList(SalesTaxTrackingDto.class)
                 .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.get(0).complytId().toString(), expectedComplyId))
                 .value(salesTaxTrackingDto -> assertTrue(salesTaxTrackingDto.size() <= RepositoryConstant.DEFAULT_PAGE_SIZE));
-
     }
+
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void patch_PatchesOneField_ReturnsPatchedResource() {
+        String state = "NJ";
+        LocalDateTime establishedDate = LocalDateTime.now();
+        PhysicalNexusTrackerDto physicalNexusTrackerToPatch = new PhysicalNexusTrackerDto(true, establishedDate);
+
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("physicalNexusTracker", physicalNexusTrackerToPatch);
+        }};
+
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state) // Set your API endpoint
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(returnedSalesTaxTrackingDto -> {
+                    assertTrue(returnedSalesTaxTrackingDto.physicalNexusTracker().established());
+                    assertEquals(returnedSalesTaxTrackingDto.physicalNexusTracker().establishedDate(), establishedDate);
+                });
+    }
+
+    @Order(2)
+    @Test
+    @WithMockUser
+    public void patch_PatchesTwoFields_ReturnsPatchedResource() {
+        String state = "NJ";
+        LocalDateTime date = LocalDateTime.now();
+        PhysicalNexusTrackerDto physicalNexusTrackerToPatch = new PhysicalNexusTrackerDto(false, date);
+
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("physicalNexusTracker", physicalNexusTrackerToPatch);
+            put("appliedDate", date);
+        }};
+
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(returnedSalesTaxTrackingDto -> {
+                    assertFalse(returnedSalesTaxTrackingDto.physicalNexusTracker().established());
+                    assertEquals(returnedSalesTaxTrackingDto.physicalNexusTracker().establishedDate(), date);
+                    assertEquals(returnedSalesTaxTrackingDto.appliedDate(), date);
+                });
+    }
+
 }
-
-
-
-

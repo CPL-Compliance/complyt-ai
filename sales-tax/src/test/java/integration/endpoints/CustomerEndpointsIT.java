@@ -1,11 +1,11 @@
 package integration.endpoints;
 
 import com.complyt.SalesTaxApplication;
-import com.complyt.domain.customer.Customer;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.transaction.OptionalAddressDto;
 import com.complyt.v1.routers.CustomerRouter;
 import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
@@ -38,7 +38,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = SalesTaxApplication.class)
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CustomerEndpointsIT extends TestContainersInitializerIT implements CustomerEndpointsITTemplate {
+public class CustomerEndpointsIT extends TestContainersInitializerIT implements CustomerEndpointsITITTemplate {
 
     @MockBean
     TenantResolver tenantResolver;
@@ -552,7 +552,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Customer.class)
+                .expectBodyList(CustomerDto.class)
                 .hasSize(size);
     }
 
@@ -576,8 +576,8 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Customer.class)
-                .value(customers -> Assertions.assertEquals(customers.get(0).getComplytId().toString(), expectedComplyId));
+                .expectBodyList(CustomerDto.class)
+                .value(customers -> Assertions.assertEquals(customers.get(0).complytId().toString(), expectedComplyId));
 
     }
 
@@ -598,10 +598,65 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Customer.class)
-                .value(customers -> Assertions.assertEquals(customers.get(0).getComplytId().toString(), expectedComplyId))
+                .expectBodyList(CustomerDto.class)
+                .value(customers -> Assertions.assertEquals(customers.get(0).complytId().toString(), expectedComplyId))
                 .hasSize(size);
     }
 
+    @Order(1)
+    @Override
+    @Test
+    @WithMockUser
+    public void patch_PatchesOneField_ReturnsPatchedResource() {
+        String expectedComplyId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
+        OptionalAddressDto addressToPatch = ITUtilities.createOptionalAddressDtoInCalifornia().withStreet("10010 Patch Street");
+
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("address", addressToPatch);
+        }};
+
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/complytId/" + expectedComplyId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> Assertions.assertEquals(returnedCustomer.address(), addressToPatch));
+    }
+
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void patch_PatchesTwoFields_ReturnsPatchedResource() {
+        String expectedComplyId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
+        OptionalAddressDto addressToPatch = ITUtilities.createOptionalAddressDtoInCalifornia().withStreet("10010 Patch Street");
+        String nameToPatch = "nameToPatch";
+
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("address", addressToPatch);
+            put("name", nameToPatch);
+        }};
+
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/complytId/" + expectedComplyId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> {
+                    Assertions.assertEquals(returnedCustomer.address(), addressToPatch);
+                    Assertions.assertEquals(returnedCustomer.name(), nameToPatch);
+                });
+    }
 
 }
