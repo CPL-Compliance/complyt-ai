@@ -1,6 +1,8 @@
 package testUtils.integration_test.templates.endpoints;
 
-public interface UpsertByStateITTemplate {
+import integration.scenarios.SalesTaxTrackingRegisteredITTemplate;
+
+public interface UpsertByStateITTemplate extends SalesTaxTrackingRegisteredITTemplate {
 
     void upsertByState_Exists_Returns200();
 
