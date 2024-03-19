@@ -4,6 +4,4 @@ public interface PatchITTemplate {
     void patch_PatchesOneField_ReturnsPatchedResource();
 
     void patch_PatchesTwoFields_ReturnsPatchedResource();
-
-    void patch_PatchesRegistered_ReturnsPatchedResource();
 }

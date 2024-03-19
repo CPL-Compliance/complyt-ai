@@ -801,7 +801,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(4)
     @Test
     @WithMockUser
-    @Override
     public void patch_PatchesRegistered_ReturnsPatchedResource() {
         RegisteredType registered = RegisteredType.REGISTERED;
         String state = "NJ";
