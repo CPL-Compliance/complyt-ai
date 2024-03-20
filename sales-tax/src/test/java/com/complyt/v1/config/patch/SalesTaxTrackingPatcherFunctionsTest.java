@@ -1,5 +1,6 @@
 package com.complyt.v1.config.patch;
 
+import com.complyt.domain.sales_tax.RegisteredType;
 import com.complyt.v1.models.EconomicNexusTrackerDto;
 import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
@@ -134,6 +135,30 @@ public class SalesTaxTrackingPatcherFunctionsTest {
 
         // Then
         Assertions.assertEquals(expectedSalesTaxTracking, actualSalesTaxTracking);
+    }
+
+    @Test
+    void patchRegistered_PatchesRegistered_ReturnsModifiedSalesTaxTrackingDto() {
+        // Given
+        RegisteredType registeredValue = RegisteredType.REGISTERED;
+
+        // When
+        SalesTaxTrackingDto modifiedDto = SalesTaxTrackingPatcherFunctions.patchRegistered.apply(salesTaxTracking, registeredValue);
+
+        // Then
+        Assertions.assertEquals(RegisteredType.REGISTERED, modifiedDto.registered());
+    }
+
+    @Test
+    void patchRegistrationDate_PatchesRegistrationDate_ReturnsModifiedSalesTaxTrackingDto() {
+        // Given
+        Object registrationDateValue = "2024-03-20T12:00:00";
+
+        // When
+        SalesTaxTrackingDto modifiedDto = SalesTaxTrackingPatcherFunctions.patchRegistrationDate.apply(salesTaxTracking, registrationDateValue);
+
+        // Then
+        Assertions.assertEquals(LocalDateTime.parse("2024-03-20T12:00:00"), modifiedDto.registrationDate());
     }
 
 }

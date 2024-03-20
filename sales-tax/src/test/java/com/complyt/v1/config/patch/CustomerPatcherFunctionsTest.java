@@ -1,5 +1,7 @@
 package com.complyt.v1.config.patch;
 
+import com.complyt.domain.sales_tax.RegisteredType;
+import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;

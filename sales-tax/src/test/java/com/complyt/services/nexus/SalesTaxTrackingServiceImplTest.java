@@ -429,6 +429,20 @@ public class SalesTaxTrackingServiceImplTest {
     }
 
     @Test
+    void updateRegisteredDateIfIsRegisteredModified_NullSalesTaxTrackingPassed_ThrowsException() {
+        //Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.updateRegisteredDateIfIsRegisteredModified(nullSalesTaxTracking);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
     void insertSummariesFromOriginal_OriginalHaveSummaries_ReturnsNewWithSummaries() {
         // Given
         SalesTaxTracking originalSalesTaxTracking = salesTaxTracking
