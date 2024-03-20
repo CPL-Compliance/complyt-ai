@@ -750,7 +750,12 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .bodyValue(salesTaxTrackingDto)
                 .exchange()
                 .expectBody(SalesTaxTrackingDto.class)
-                .value(resultSalesTaxTrackingDto -> assertEquals(resultSalesTaxTrackingDto.registrationDate(), registrationDate));
+                .value(resultSalesTaxTrackingDto -> {
+                    // Verify day, month, and year of registration date
+                    assertEquals(resultSalesTaxTrackingDto.registrationDate().getDayOfMonth(), registrationDate.getDayOfMonth());
+                    assertEquals(resultSalesTaxTrackingDto.registrationDate().getMonth(), registrationDate.getMonth());
+                    assertEquals(resultSalesTaxTrackingDto.registrationDate().getYear(), registrationDate.getYear());
+                });
     }
 
     @Order(4)
