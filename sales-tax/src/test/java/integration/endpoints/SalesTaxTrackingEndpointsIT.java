@@ -70,6 +70,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Test
     @Override
+    @WithMockUser
     public void upsertByState_NoBody_Returns400() {
         // Given
         String state = "CA";
@@ -90,6 +91,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Test
     @Override
+    @WithMockUser
     public void upsertByState_UnsupportedMediaType_Returns415() {
         // Given
         String state = "CA";
