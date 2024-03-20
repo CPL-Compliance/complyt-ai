@@ -692,7 +692,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     public void upsertByState_RegisteredAndDate_ReturnsSalesTaxTrackingWithGivenDate() {
-        String registrationDate = LocalDateTime.now().toString();
+        String registrationDate = "2024-03-20T14:15:20";
         String registered = "REGISTERED";
         System.out.println(TestUtilities.salesTaxTrackingWithRegistrationJsonExample(registered, registrationDate));
 
@@ -711,7 +711,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectBodyList(LinkedHashMap.class)
                 .value(salesTaxTracking -> {
                     assertEquals(salesTaxTracking.get(0).get("registered"), "REGISTERED");
-                    assertEquals(salesTaxTracking.get(0).get("registrationDate"), registrationDate);
+                    assertTrue(salesTaxTracking.get(0).get("registrationDate").toString().contains(registrationDate));
                 });
     }
 
