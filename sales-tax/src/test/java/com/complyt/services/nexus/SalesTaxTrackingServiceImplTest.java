@@ -372,7 +372,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When & Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.injectRegisteredDateToSalesTaxTracking(salesTaxTracking).block();
+            salesTaxTrackingService.injectRegisteredDateToSalesTaxTracking(salesTaxTracking);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
