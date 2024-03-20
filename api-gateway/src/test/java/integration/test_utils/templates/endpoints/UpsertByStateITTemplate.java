@@ -2,7 +2,7 @@ package integration.test_utils.templates.endpoints;
 
 import integration.test_utils.templates.methods.PutITTemplate;
 
-public interface UpsertByStateITTemplate extends PutITTemplate {
+public interface UpsertByStateITTemplate extends PutITTemplate, SalesTaxTrackingRegisteredITTemplate {
 
     void upsertByState_Exists_Returns200();
 

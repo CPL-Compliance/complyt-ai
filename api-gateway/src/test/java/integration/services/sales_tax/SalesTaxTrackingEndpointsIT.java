@@ -10,6 +10,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.http.MediaType;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -637,4 +638,129 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 });
     }
 
+    @Order(2)
+    @Test
+    public void patch_PatchesRegistered_ReturnsPatchedResource() {
+        String state = "VA";
+
+        WEB_TEST_CLIENT
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + state)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.salesTaxTrackingRegisteredPatchJsonExample())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(salesTaxTracking -> {
+                    assertEquals(salesTaxTracking.get(0).get("registered"), "REGISTERED");
+                    assertNotNull(salesTaxTracking.get(0).get("registrationDate"));
+                });
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByState_RegisteredAndDateNull_ReturnsSalesTaxTrackingWithDate() {
+        String registered = "REGISTERED";
+        System.out.println(TestUtilities.salesTaxTrackingWithRegistrationJsonExample(registered, null));
+
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Hawaii")
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.salesTaxTrackingWithRegistrationJsonExample(registered, null))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(salesTaxTracking -> {
+                    assertEquals(salesTaxTracking.get(0).get("registered"), "REGISTERED");
+                    assertNotNull(salesTaxTracking.get(0).get("registrationDate"));
+                });
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByState_RegisteredAndDate_ReturnsSalesTaxTrackingWithGivenDate() {
+        String registrationDate = LocalDateTime.now().toString();
+        String registered = "REGISTERED";
+        System.out.println(TestUtilities.salesTaxTrackingWithRegistrationJsonExample(registered, registrationDate));
+
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Hawaii")
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.salesTaxTrackingWithRegistrationJsonExample(registered, registrationDate))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(salesTaxTracking -> {
+                    assertEquals(salesTaxTracking.get(0).get("registered"), "REGISTERED");
+                    assertEquals(salesTaxTracking.get(0).get("registrationDate"), registrationDate);
+                });
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByState_NonRegisteredAndDateNull_ReturnsSalesTaxTracking() {
+        String registrationDate = null;
+        String registered = null;
+        System.out.println(TestUtilities.salesTaxTrackingWithRegistrationJsonExample(registered, registrationDate));
+
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Hawaii")
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.salesTaxTrackingWithRegistrationJsonExample(registered, registrationDate))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(salesTaxTracking -> {
+                    assertNull(salesTaxTracking.get(0).get("registered"));
+                    assertNull(salesTaxTracking.get(0).get("registrationDate"));
+                });
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByState_NonRegisteredAndDate_Returns400() {
+        String registrationDate = LocalDateTime.now().toString();
+        String registered = null;
+
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Hawaii")
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.salesTaxTrackingWithRegistrationJsonExample(registered, registrationDate))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBodyList(LinkedHashMap.class);
+    }
 }

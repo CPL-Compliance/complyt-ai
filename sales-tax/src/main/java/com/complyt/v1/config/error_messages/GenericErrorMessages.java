@@ -17,5 +17,7 @@ public interface GenericErrorMessages {
     String NOT_NULL = "may not be null";
 
     String CONFLICTED_WITH_URL_ERROR = "in body and path should be identical";
+
+    String CONFLICTED_REGISTERED_ERROR = "registered field is false but date was provided";
 }
 

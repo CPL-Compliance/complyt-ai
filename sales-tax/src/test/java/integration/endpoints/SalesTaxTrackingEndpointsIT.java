@@ -1,6 +1,7 @@
 package integration.endpoints;
 
 import com.complyt.SalesTaxApplication;
+import com.complyt.domain.sales_tax.RegisteredType;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
@@ -67,7 +68,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
     }
 
+    @Test
     @Override
+    @WithMockUser
     public void upsertByState_NoBody_Returns400() {
         // Given
         String state = "CA";
@@ -86,7 +89,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .value(map -> assertEquals(GenericErrorMessages.MISSING_BODY_ERROR, map.get("message")));
     }
 
+    @Test
     @Override
+    @WithMockUser
     public void upsertByState_UnsupportedMediaType_Returns415() {
         // Given
         String state = "CA";
@@ -698,6 +703,127 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                     assertFalse(returnedSalesTaxTrackingDto.physicalNexusTracker().established());
                     assertEquals(returnedSalesTaxTrackingDto.physicalNexusTracker().establishedDate(), date);
                     assertEquals(returnedSalesTaxTrackingDto.appliedDate(), date);
+                });
+    }
+
+    @Order(4)
+    @Test
+    @WithMockUser
+    @Override
+    public void upsertByState_RegisteredAndDateNull_ReturnsSalesTaxTrackingWithDate() {
+        // Given
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState).withRegistered(RegisteredType.REGISTERED)
+                .withRegistrationDate(null);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().abbreviation())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .exchange()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(resultSalesTaxTrackingDto -> assertNotNull(resultSalesTaxTrackingDto.registrationDate()));
+    }
+
+    @Order(4)
+    @Test
+    @WithMockUser
+    @Override
+    public void upsertByState_RegisteredAndDate_ReturnsSalesTaxTrackingWithGivenDate() {
+        // Given
+        LocalDateTime registrationDate = LocalDateTime.now();
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState).withRegistered(RegisteredType.REGISTERED)
+                .withRegistrationDate(registrationDate);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().abbreviation())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .exchange()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(resultSalesTaxTrackingDto -> assertEquals(resultSalesTaxTrackingDto.registrationDate(), registrationDate));
+    }
+
+    @Order(4)
+    @Test
+    @WithMockUser
+    @Override
+    public void upsertByState_NonRegisteredAndDateNull_ReturnsSalesTaxTracking() {
+        // Given
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState).withRegistered(null)
+                .withRegistrationDate(null);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().abbreviation())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .exchange()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(resultSalesTaxTrackingDto -> assertNull(resultSalesTaxTrackingDto.registrationDate()));
+    }
+
+    @Order(4)
+    @Test
+    @WithMockUser
+    @Override
+    public void upsertByState_NonRegisteredAndDate_Returns400() {
+        // Given
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState).withRegistered(null)
+                .withRegistrationDate(LocalDateTime.now());
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().abbreviation())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertTrue(map.get("message").toString().contains(GenericErrorMessages.CONFLICTED_REGISTERED_ERROR)));
+    }
+
+    @Order(4)
+    @Test
+    @WithMockUser
+    public void patch_PatchesRegistered_ReturnsPatchedResource() {
+        RegisteredType registered = RegisteredType.REGISTERED;
+        String state = "NJ";
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("registered", registered);
+        }};
+
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(returnedSalesTaxTrackingDto -> {
+                    assertEquals(returnedSalesTaxTrackingDto.registered(), RegisteredType.REGISTERED);
+                    assertNotNull(returnedSalesTaxTrackingDto.registrationDate());
                 });
     }
 

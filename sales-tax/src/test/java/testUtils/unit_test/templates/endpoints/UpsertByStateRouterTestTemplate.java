@@ -17,6 +17,8 @@ public interface UpsertByStateRouterTestTemplate {
 
     void upsertByState_DoesntExistAndHasComplytId_Returns400ConflictedData();
 
+    void upsertByState_NotRegisteredButDateGiven_Returns400ConflictedData();
+
     void upsertByState_ComplytIdFailedToParse_Returns400();
 
     void upsertByState_UnauthenticatedUser_Returns401();

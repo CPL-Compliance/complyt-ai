@@ -23,7 +23,7 @@ public class BodyCheckConfigTest {
     UnitTestUtilities unitTestUtilities;
     TransactionDto transactionDto;
 
-    BodyCheckConfig bodyCheckConfig;
+    BodyCheckConfig<TransactionDto> bodyCheckConfig;
 
     @BeforeEach
     void setUp() {
@@ -40,7 +40,7 @@ public class BodyCheckConfigTest {
                 (transactionDto.shippingAddress().withPartial(true));
 
         // When + Then
-        Flux<String> isValid = bodyCheckConfig.transactionDtoFluxFunction().apply(transactionToCheck);
+        Flux<String> isValid = bodyCheckConfig.entityDtoFluxFunction().apply(transactionToCheck);
 
         StepVerifier.create(isValid).expectNextCount(0).verifyComplete();
     }
@@ -52,7 +52,7 @@ public class BodyCheckConfigTest {
                 (transactionDto.shippingAddress().withStreet(null));
 
         // When + Then
-        Flux<String> isValid = bodyCheckConfig.transactionDtoFluxFunction().apply(transactionToCheck);
+        Flux<String> isValid = bodyCheckConfig.entityDtoFluxFunction().apply(transactionToCheck);
 
         StepVerifier.create(isValid).expectNextCount(1).verifyComplete();
     }
@@ -64,7 +64,7 @@ public class BodyCheckConfigTest {
                 (transactionDto.shippingAddress().withCity(null));
 
         // When + Then
-        Flux<String> isValid = bodyCheckConfig.transactionDtoFluxFunction().apply(transactionToCheck);
+        Flux<String> isValid = bodyCheckConfig.entityDtoFluxFunction().apply(transactionToCheck);
 
         StepVerifier.create(isValid).expectNextCount(1).verifyComplete();
     }
@@ -76,7 +76,7 @@ public class BodyCheckConfigTest {
                 (transactionDto.shippingAddress().withCountry(null).withCity(null));
 
         // When + Then
-        Flux<String> isValid = bodyCheckConfig.transactionDtoFluxFunction().apply(transactionToCheck);
+        Flux<String> isValid = bodyCheckConfig.entityDtoFluxFunction().apply(transactionToCheck);
 
         StepVerifier.create(isValid).expectNextCount(2).verifyComplete();
     }
@@ -90,7 +90,7 @@ public class BodyCheckConfigTest {
         ));
 
         // When + Then
-        Flux<String> isValid = bodyCheckConfig.transactionDtoFluxFunction().apply(transactionToCheck);
+        Flux<String> isValid = bodyCheckConfig.entityDtoFluxFunction().apply(transactionToCheck);
 
         // error is items not aligned
         StepVerifier.create(isValid).expectNextCount(1).verifyComplete();
@@ -105,7 +105,7 @@ public class BodyCheckConfigTest {
         ));
 
         // When + Then
-        Flux<String> isValid = bodyCheckConfig.transactionDtoFluxFunction().apply(transactionToCheck);
+        Flux<String> isValid = bodyCheckConfig.entityDtoFluxFunction().apply(transactionToCheck);
 
         // error is transaction total amount is below 0
         StepVerifier.create(isValid).expectNextCount(1).verifyComplete();
@@ -123,7 +123,7 @@ public class BodyCheckConfigTest {
 
 
         // When + Then
-        Flux<String> isValid = bodyCheckConfig.transactionDtoFluxFunction().apply(transactionToCheck);
+        Flux<String> isValid = bodyCheckConfig.entityDtoFluxFunction().apply(transactionToCheck);
 
         // error is transaction total amount is below 0 and item not aligned
         StepVerifier.create(isValid).expectNextCount(2).verifyComplete();

@@ -23,7 +23,6 @@ public class ClientTrackingFacade {
     public Mono<ClientTracking> getByTenantId(@NonNull String tenantId) {
         return clientTrackingService.getByTenantId(tenantId);
     }
-
     public Flux<ClientTracking> getByName(@NonNull String name) {
         return clientTrackingService.getByName(name);
     }

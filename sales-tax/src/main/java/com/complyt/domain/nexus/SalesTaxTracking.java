@@ -4,6 +4,7 @@ import com.complyt.domain.ClientTracking;
 import com.complyt.domain.FilingFrequency;
 import com.complyt.domain.State;
 import com.complyt.domain.properties.ComplytIdProperty;
+import com.complyt.domain.sales_tax.RegisteredType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
@@ -39,4 +40,6 @@ public class SalesTaxTracking implements ComplytIdProperty {
     boolean approved;
     LocalDateTime approvalDate;
     FilingFrequency filingFrequency;
+    RegisteredType registered;
+    LocalDateTime registrationDate;
 }

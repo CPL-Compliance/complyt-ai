@@ -55,6 +55,7 @@ public class TestUtilities {
                 "}";
     }
 
+
     private static String salesTaxTrackingJsonExample(String stateName, String stateAbbreviation, String complytId, boolean isValidated) {
         return String.format("""
                         {
@@ -86,6 +87,38 @@ public class TestUtilities {
                 isValidated ? "\"establishedDate\": \"2000-12-31T22:00:00\"," : ""
         );
     }
+
+
+    public static String salesTaxTrackingWithRegistrationJsonExample(String registered, String registrationDate) {
+        return String.format("""
+                       {
+                            "state": {
+                                "abbreviation": "HI",
+                                 "code": "06",
+                                 "name": "Hawaii"
+                            },
+                            "enforcesSalesTax": true,
+                            "physicalNexusTracker": {
+                                "establishedDate": "2022-08-02T16:12:00",
+                                "established": false
+                            },
+                            "economicNexusTracker": {
+                                "established": true,
+                                "establishedDate": "2022-08-02T16:12:00"
+                            },
+                            "comment": "a comment",
+                            "appliedDate": "2015-08-02T16:12:00",
+                            "approvalDate": "2015-06-22T13:57:00",
+                            "approved": true,
+                            "registered": %s,
+                            "registrationDate": %s
+                    }
+                    """,
+                registered != null ? "\"" + registered + "\"" : null,
+                registrationDate != null ? "\"" + registrationDate + "\"" : null
+        );
+    }
+
 
     public static String customerJsonExample(String externalId, String complytId) {
         return customerJsonExample(externalId, complytId, true);
@@ -463,4 +496,11 @@ public class TestUtilities {
                 """;
     }
 
+    public static String salesTaxTrackingRegisteredPatchJsonExample() {
+        return """
+                {
+                    "registered": "REGISTERED"
+                }
+                                """;
+    }
 }

@@ -50,7 +50,7 @@ public interface ITUtilities {
                 new PhysicalNexusTrackerDto(false, LocalDateTime.now()),
                 new EconomicNexusTrackerDto(false, LocalDateTime.now()),
                 null, null, stubClientTrackingDto(),
-                LocalDateTime.now(), false, LocalDateTime.now(), FilingFrequencyDto.MONTHLY);
+                LocalDateTime.now(), false, LocalDateTime.now(), FilingFrequencyDto.MONTHLY, null, null);
     }
 
     static ItemDto stubItemDto() {

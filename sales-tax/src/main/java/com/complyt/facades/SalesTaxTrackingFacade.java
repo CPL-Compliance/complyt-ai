@@ -45,6 +45,7 @@ public class SalesTaxTrackingFacade {
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull SalesTaxTracking originalSalesTaxTracking) {
         return salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, originalSalesTaxTracking)
                 .flatMap(salesTaxTrackingService::addClientAndStateDetails)
+                .flatMap(salesTaxTrackingService::updateRegisteredDateIfIsRegisteredModified)
                 .flatMap(salesTaxTrackingWithClientAndStateDetails -> salesTaxTrackingService.insertSummariesFromOriginal(salesTaxTrackingWithClientAndStateDetails, originalSalesTaxTracking))
                 .flatMap(salesTaxTrackingService::update)
                 .flatMap(recalculateCurrentNexusSummaryIfNeeded());

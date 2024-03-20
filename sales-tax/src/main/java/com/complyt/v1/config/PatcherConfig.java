@@ -64,6 +64,8 @@ public class PatcherConfig {
             put("appliedDate", SalesTaxTrackingPatcherFunctions.patchAppliedDate);
             put("approved", SalesTaxTrackingPatcherFunctions.patchApproved);
             put("approvalDate", SalesTaxTrackingPatcherFunctions.patchApprovalDate);
+            put("registered", SalesTaxTrackingPatcherFunctions.patchRegistered);
+            put("registrationDate", SalesTaxTrackingPatcherFunctions.patchRegistrationDate);
         }};
 
         return new Patcher<>(valuesToFunctions);

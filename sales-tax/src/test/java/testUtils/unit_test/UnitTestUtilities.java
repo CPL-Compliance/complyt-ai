@@ -408,7 +408,8 @@ public class UnitTestUtilities {
                 new HashMap<>(),
                 localDateTime,
                 true, localDateTime,
-                FilingFrequency.MONTHLY);
+                FilingFrequency.MONTHLY,
+                null, null);
     }
 
     public ClientTracking createClientTracking(String tenantId) {
@@ -427,7 +428,8 @@ public class UnitTestUtilities {
                 createClientTrackingDto(),
                 localDateTime,
                 true, localDateTime,
-                FilingFrequencyDto.MONTHLY);
+                FilingFrequencyDto.MONTHLY,
+                null,  null);
 
         return salesTaxTrackingDto;
     }

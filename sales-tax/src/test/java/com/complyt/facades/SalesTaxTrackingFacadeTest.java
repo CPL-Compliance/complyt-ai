@@ -91,6 +91,7 @@ public class SalesTaxTrackingFacadeTest {
         // When
         when(salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, salesTaxTrackingWithId)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingService.addClientAndStateDetails(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingService.updateRegisteredDateIfIsRegisteredModified(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingService.insertSummariesFromOriginal(salesTaxTracking, salesTaxTrackingWithId)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingService.update(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingWithId));
         when(nexusService.getNexusSummaryDate(eq(salesTaxTrackingWithId), any())).thenReturn(Mono.just(dateRange));
