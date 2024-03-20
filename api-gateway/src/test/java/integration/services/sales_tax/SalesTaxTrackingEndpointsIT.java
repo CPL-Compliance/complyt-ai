@@ -667,7 +667,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     public void upsertByState_RegisteredAndDateNull_ReturnsSalesTaxTrackingWithDate() {
         String registered = "REGISTERED";
-        System.out.println(TestUtilities.salesTaxTrackingWithRegistrationJsonExample(registered, null));
 
         WEB_TEST_CLIENT
                 .put()
@@ -694,7 +693,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     public void upsertByState_RegisteredAndDate_ReturnsSalesTaxTrackingWithGivenDate() {
         String registrationDate = "2024-03-20T14:15:20";
         String registered = "REGISTERED";
-        System.out.println(TestUtilities.salesTaxTrackingWithRegistrationJsonExample(registered, registrationDate));
 
         WEB_TEST_CLIENT
                 .put()
@@ -721,7 +719,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     public void upsertByState_NonRegisteredAndDateNull_ReturnsSalesTaxTracking() {
         String registrationDate = null;
         String registered = null;
-        System.out.println(TestUtilities.salesTaxTrackingWithRegistrationJsonExample(registered, registrationDate));
 
         WEB_TEST_CLIENT
                 .put()
