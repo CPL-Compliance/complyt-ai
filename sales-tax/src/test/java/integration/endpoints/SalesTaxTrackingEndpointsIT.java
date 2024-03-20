@@ -755,7 +755,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                     assertEquals(resultSalesTaxTrackingDto.registrationDate().getDayOfMonth(), registrationDate.getDayOfMonth());
                     assertEquals(resultSalesTaxTrackingDto.registrationDate().getMonth(), registrationDate.getMonth());
                     assertEquals(resultSalesTaxTrackingDto.registrationDate().getYear(), registrationDate.getYear());
-                }); 
+                });
     }
 
     @Order(4)
