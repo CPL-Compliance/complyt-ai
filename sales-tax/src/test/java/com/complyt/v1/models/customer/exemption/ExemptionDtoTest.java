@@ -44,6 +44,7 @@ class ExemptionDtoTest {
         // Given
         String expectedString = "ExemptionDto[complytId=" + exemptionDto.complytId() +
                 ", customerId=" + exemptionDto.customerId() +
+                ", country=" + exemptionDto.country() +
                 ", state=" + exemptionDto.state() +
                 ", classification=" + exemptionDto.classification() +
                 ", validationDates=" + exemptionDto.validationDates() +

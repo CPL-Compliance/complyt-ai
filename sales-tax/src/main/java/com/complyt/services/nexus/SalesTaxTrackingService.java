@@ -3,6 +3,7 @@ package com.complyt.services.nexus;
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.transaction.Address;
 import com.complyt.services.crud.CrudService;
 import lombok.NonNull;
 import reactor.core.publisher.Flux;
@@ -20,7 +21,7 @@ public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, S
 
     Mono<SalesTaxTracking> addClientAndStateDetails(@NonNull SalesTaxTracking salesTaxTracking);
 
-    Mono<SalesTaxTracking> findByState(@NonNull String state);
+    Mono<SalesTaxTracking> findByCountryAndState(@NonNull String country, String state);
 
     Mono<SalesTaxTracking> findByComplytId(@NonNull UUID complytId);
 

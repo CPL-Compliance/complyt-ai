@@ -1,5 +1,6 @@
 package com.complyt.domain;
 
+import com.complyt.domain.transaction.tax.GtRates;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;
@@ -18,11 +19,13 @@ public interface Taxable {
 
     Taxable withSalesTaxRates(SalesTaxRates salesTaxRates);
 
+    Taxable withGtRates(GtRates gstRates);
+
     BigDecimal getCalculatedTotal();
 
     boolean isManualSalesTax();
 
-    SalesTaxRates getSalesTaxRates();
+    TaxRates getTaxRates();
 
     BigDecimal getManualSalesTaxRate();
 
@@ -35,7 +38,7 @@ public interface Taxable {
             return getManualSalesTaxAmount();
         }
 
-        return getCalculatedTotal().multiply(getSalesTaxRates().taxRate());
+        return getCalculatedTotal().multiply(getTaxRates().getTaxRate());
     }
 
     Taxable withTangibleCategory(TangibleCategory intangible);

@@ -63,7 +63,7 @@ class TransactionDiscountCollectorTest {
     @Test
     public void collect_CollectsAllAmounts1ItemHasDiscount_ReturnsTransactionWithTotalDiscountOf1Item() {
         // Given
-        List<Item> itemList = testUtilities.createItems(true, true);
+        List<Item> itemList = testUtilities.createItems(true, false,true);
         List<Item> itemListWith1Discount = List.of(
                 itemList.get(0).withDiscount(BigDecimal.valueOf(500)),
                 itemList.get(1).withDiscount(null)
@@ -87,7 +87,7 @@ class TransactionDiscountCollectorTest {
     @Test
     public void collect_CollectsAllAmounts2ItemHasDiscount_ReturnsTransactionWithTotalDiscountOf1Item() {
         // Given
-        List<Item> itemList = testUtilities.createItems(true, true);
+        List<Item> itemList = testUtilities.createItems(true, false,true);
         List<Item> itemListWith2Discount = List.of(
                 itemList.get(0).withDiscount(BigDecimal.valueOf(500)),
                 itemList.get(1).withDiscount(BigDecimal.valueOf(400))

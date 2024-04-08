@@ -1,5 +1,6 @@
 package com.complyt.business.sales_tax.checker;
 
+import com.complyt.business.tax.sales_tax.checker.TaxableItemExistChecker;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;
@@ -36,13 +37,14 @@ public class TaxableItemExistCheckerTest {
     }
 
     private Item createTaxableItem() {
-        return testUtilities.createItems(true, true).get(0);
-    }
+        return testUtilities.createItemsWithSalesTaxRate(true, false, true)
+                .get(0).withTaxableCategory(TaxableCategory.TAXABLE);
+    } //note gst is null
 
     private Item createNotTaxableItem() {
-        return testUtilities.createItems(true, true).get(0)
-                .withTaxableCategory(TaxableCategory.NOT_TAXABLE);
-    }
+        return testUtilities.createItemsWithSalesTaxRate(true, false, true)
+                .get(0).withTaxableCategory(TaxableCategory.NOT_TAXABLE);
+    } //note gst is null
 
     @Test
     void hasTaxableItem_ListHasTaxableItem_ReturnsTrue() {

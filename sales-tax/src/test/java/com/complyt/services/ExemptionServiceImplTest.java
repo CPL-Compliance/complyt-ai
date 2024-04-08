@@ -143,7 +143,7 @@ public class ExemptionServiceImplTest {
 
         // When
         when(exemptionRepository.findFullyExempted(transaction.getCustomerId(),
-                transaction.getShippingAddress().state(),
+                transaction.getShippingAddress().country(), transaction.getShippingAddress().state(),
                 transaction.getExternalTimestamps().getCreatedDate())).thenReturn(Mono.just(exemption));
         Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
 
@@ -157,7 +157,7 @@ public class ExemptionServiceImplTest {
 
         // When
         when(exemptionRepository.findFullyExempted(transaction.getCustomerId(),
-                transaction.getShippingAddress().state(),
+                transaction.getShippingAddress().country(), transaction.getShippingAddress().state(),
                 transaction.getExternalTimestamps().getCreatedDate())).thenReturn(Mono.empty());
         Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
 

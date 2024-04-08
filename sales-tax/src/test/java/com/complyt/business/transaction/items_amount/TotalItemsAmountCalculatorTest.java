@@ -29,12 +29,12 @@ public class TotalItemsAmountCalculatorTest {
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        items = new ArrayList<>(testUtilities.setCalculatedTotalOnItemList(testUtilities.createItems(true, true)));
+        items = new ArrayList<>(testUtilities.setCalculatedTotalOnItemList(testUtilities.createItems(true, false, true)));
         totalItemsAmountCalculator = new TotalItemsAmountCalculator();
     }
 
     @Test
-    void calculate_CalculatesTotalItemsAmount_ReturnsTotalAmount() { //todo: fox
+    void calculate_CalculatesTotalItemsAmount_ReturnsTotalAmount() {
         // Given
         BigDecimal expectedAmount = items.get(0).getCalculatedTotal().add(items.get(1)
                 .getCalculatedTotal());

@@ -47,6 +47,7 @@ public class NexusThresholdCheckTest {
     }
 
     private NexusStateRule createNexusStateRule() {
+        String country = "USA";
         State state = new State("CA", "02", "California");
         List<TaxableCategory> taxableCategories = new ArrayList<>() {{
             add(TaxableCategory.TAXABLE);
@@ -62,7 +63,7 @@ public class NexusThresholdCheckTest {
 
         NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(1000), 2, Definition.AMOUNT_OR_COUNT);
 
-        return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
+        return new NexusStateRule(UUID.randomUUID().toString(), true, country, state, taxableCategories, tangibleCategories, customerTypes,
                 TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold, LocalDateTime.now());
     }
 

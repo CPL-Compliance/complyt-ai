@@ -23,6 +23,7 @@ public class Exemption implements ComplytIdProperty {
     private final String id;
     private final String tenantId;
     private final UUID customerId;
+    private final String country;
     private final State state;
     private final Classification classification;
     private final ValidationDates validationDates;

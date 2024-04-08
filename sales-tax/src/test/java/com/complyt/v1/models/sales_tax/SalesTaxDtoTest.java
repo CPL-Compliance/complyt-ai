@@ -6,8 +6,11 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -20,13 +23,18 @@ public class SalesTaxDtoTest {
     private SalesTaxDto salesTaxDto;
     private SalesTaxDto anotherSalesTaxDto;
 
+    private UnitTestUtilities testUtilities;
+
+
     @BeforeEach
     void setUp() {
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         // Given
-        salesTaxDto = new SalesTaxDto(new BigDecimal("5000"), null);
+        salesTaxDto = testUtilities.createSalesTaxDtoWithAllFields();
+
 
         // Then
-        anotherSalesTaxDto = new SalesTaxDto(salesTaxDto.amount(), null);
+        anotherSalesTaxDto = testUtilities.createSalesTaxDtoWithAllFields();
     }
 
     @Test
@@ -61,8 +69,12 @@ public class SalesTaxDtoTest {
 
     @Test
     void toString_StringMatches_Equal() {
-        String salesTaxDtoToString = "SalesTaxDto[amount=" + salesTaxDto.amount() +
-                ", salesTaxRates=" + salesTaxDto.salesTaxRates() + "]";
+        String salesTaxDtoToString = "SalesTaxDto" + "[" +
+                "amount=" + salesTaxDto.amount() +
+                ", rate=" + salesTaxDto.rate() +
+                ", salesTaxRates=" + salesTaxDto.salesTaxRates() +
+                ", gtRates=" + salesTaxDto.gtRates() +
+                "]";
         assertEquals(salesTaxDto.toString(), salesTaxDtoToString);
     }
 

@@ -1,47 +1,33 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.business.strategy.StrategySelector;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
-import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
-import lombok.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
 
-@EqualsAndHashCode(callSuper = true)
 @Getter
+@AllArgsConstructor
+@Component
 @Slf4j
 public class TransactionShippingFeeJurisdictionalRulesInjector extends TransactionShippingFeeInjectionChecker {
 
-    public TransactionShippingFeeJurisdictionalRulesInjector(Transaction transaction) {
-        super(transaction);
-    }
+    @NonNull
+    StrategySelector shippingFeeJurisdictionalRulesInjectionStrategy;
 
     @Override
-    public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
-        if (!shouldInject(mapTaxCodesToClassifications)) {
+    public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications, @NonNull Transaction transaction) {
+        if (!shouldInject(mapTaxCodesToClassifications, transaction)) {
             return Mono.just(transaction);
         }
 
-        return Mono.fromCallable(() -> {
-            String state = transaction.getShippingAddress().state();
-            ProductClassification classification = mapTaxCodesToClassifications.get(transaction.getShippingFee().getTaxCode());
-            JurisdictionalSalesTaxRules rules = classification.getJurisdictionalSalesTaxRules().get(state);
-
-            ShippingFee modifiedShippingFee = transaction.getShippingFee().withJurisdictionalSalesTaxRules(rules);
-
-            TaxableCategory category = modifiedShippingFee.getJurisdictionalSalesTaxRules().isTaxable() ?
-                    TaxableCategory.TAXABLE : TaxableCategory.NOT_TAXABLE;
-            ShippingFee shippingFeeWithTaxableCategory = modifiedShippingFee.withTaxableCategory(category);
-
-            log.debug("Inserting new shipping fee with rules : " + rules + ", with taxable category : " + category);
-
-            return transaction.withShippingFee(shippingFeeWithTaxableCategory);
-        });
+        return Mono.fromCallable(() -> (Transaction) shippingFeeJurisdictionalRulesInjectionStrategy.select(transaction).apply(mapTaxCodesToClassifications));
     }
 }

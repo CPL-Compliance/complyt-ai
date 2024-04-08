@@ -34,7 +34,7 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @Override
     public Mono<Exemption> findFullyExempted(@NonNull final Transaction transaction) {
-        return exemptionRepository.findFullyExempted(transaction.getCustomerId(), transaction.getShippingAddress().state(), transaction.getExternalTimestamps().getCreatedDate());
+        return exemptionRepository.findFullyExempted(transaction.getCustomerId(), transaction.getShippingAddress().country(), transaction.getShippingAddress().state(), transaction.getExternalTimestamps().getCreatedDate());
     }
 
     @Override
@@ -94,7 +94,8 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @Override
     public Mono<Exemption> injectDataToNewExemption(@NonNull Exemption exemption) {
-        return Mono.just(exemption).map(complytIdHandler::insertComplytIdToNew);
+        return Mono.just(exemption).map(complytIdHandler::insertComplytIdToNew)
+                .map(exemptionWithComplytId -> exemptionWithComplytId.withCountry(exemptionWithComplytId.getCountry().toUpperCase()));
     }
 
     @Override
@@ -123,6 +124,7 @@ public class ExemptionServiceImpl implements ExemptionService {
                 .withStatus(exemption.getStatus())
                 .withCertificate(exemption.getCertificate())
                 .withExemptionType(exemption.getExemptionType())
-                .withExemptionStatus(exemption.getExemptionStatus());
+                .withExemptionStatus(exemption.getExemptionStatus())
+                .withCountry(exemption.getCountry().toUpperCase());
     }
 }

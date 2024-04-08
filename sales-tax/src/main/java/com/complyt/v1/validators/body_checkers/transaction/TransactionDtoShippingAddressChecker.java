@@ -1,6 +1,7 @@
 package com.complyt.v1.validators.body_checkers.transaction;
 
-import com.complyt.domain.transaction.Transaction;
+import com.complyt.business.address.CountryIsSupportedNonUsaChecker;
+import com.complyt.business.address.CountryIsUsaChecker;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.transaction.TransactionDto;
@@ -12,14 +13,21 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class TransactionDtoShippingAddressChecker implements DtoBodyChecker<TransactionDto> {
-    
+
     @Override
     public Flux<String> check(@NonNull TransactionDto transactionDto) {
-        return transactionDto.shippingAddress().isPartial() ? Flux.empty() :
-                Flux.just(transactionDto.shippingAddress()).flatMap(address ->
-                        Flux.concat(checkVariableNotBlank(address.street(), addressErrorBuilder("street")),
-                                checkVariableNotBlank(address.city(), addressErrorBuilder("city")),
-                                checkVariableNotBlank(address.country(), addressErrorBuilder("country"))));
+        return Flux.just(transactionDto.shippingAddress()).flatMap(address ->
+                CountryIsUsaChecker.isCountryUsa(address.country()) ?
+                        transactionDto.shippingAddress().isPartial() ?
+                                Flux.concat(checkVariableNotBlank(address.zip(), addressErrorBuilder("zip")),
+                                        checkVariableNotBlank(address.state(), addressErrorBuilder("state"))) :
+                                Flux.concat(checkVariableNotBlank(address.state(), addressErrorBuilder("state")),
+                                        checkVariableNotBlank(address.street(), addressErrorBuilder("street")),
+                                        checkVariableNotBlank(address.city(), addressErrorBuilder("city")),
+                                        checkVariableNotBlank(address.zip(), addressErrorBuilder("zip"))) :
+                        !CountryIsSupportedNonUsaChecker.isCountrySupportedNonUsaCountry(address.country()) ?
+                                Flux.just(DtoErrorMessages.NOT_SUPPORTED_COUNTRY_FORMAT_ERROR) :
+                                Flux.empty());
     }
 
     private Mono<String> checkVariableNotBlank(String variable, String errorMessage) {

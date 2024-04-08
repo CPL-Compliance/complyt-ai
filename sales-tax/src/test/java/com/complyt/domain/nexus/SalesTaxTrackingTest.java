@@ -32,6 +32,7 @@ class SalesTaxTrackingTest {
         // Given
         String expectedString = "SalesTaxTracking(complytId=" + salesTaxTracking.getComplytId() +
                                 ", id=" + salesTaxTracking.getId() +
+                                ", country=" + salesTaxTracking.getCountry() +
                                 ", state=" + salesTaxTracking.getState() +
                                 ", tenantId=" + salesTaxTracking.getTenantId() +
                                 ", comment=" + salesTaxTracking.getComment() +

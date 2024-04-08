@@ -1,7 +1,7 @@
 package com.complyt.services;
 
+import com.complyt.business.transaction.data_injector.TransactionProductClassificationDataInjector;
 import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
@@ -12,12 +12,10 @@ import com.complyt.repositories.ProductClassificationRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -30,9 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ProductClassificationServiceTest {
 
     @InjectMocks
@@ -40,6 +36,9 @@ public class ProductClassificationServiceTest {
 
     @Mock
     ProductClassificationRepository productClassificationRepository;
+
+    @Mock
+    TransactionProductClassificationDataInjector transactionProductClassificationDataInjector;
 
     ProductClassification firstItemProductClassification;
     ProductClassification secondItemProductClassification;
@@ -64,19 +63,19 @@ public class ProductClassificationServiceTest {
     private ProductClassification createFirstItemProductClassification() {
         Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = createJurisdictionalSalesTaxRulesList();
         return new ProductClassification("id", "C1S1", "description",
-                "title", jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
+                "title", jurisdictionalSalesTaxRulesList, null, TangibleCategory.TANGIBLE);// todo: gst is null - we should check gst here
     }
 
     private ProductClassification createSecondItemProductClassification() {
         Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = createJurisdictionalSalesTaxRulesList();
         return new ProductClassification("id", "C3S1", "description",
-                "title", jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
+                "title", jurisdictionalSalesTaxRulesList, null, TangibleCategory.TANGIBLE);
     }
 
     private ProductClassification createShippingFeeProductClassification() {
         Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = createJurisdictionalSalesTaxRulesList();
         return new ProductClassification("id", "C6S1", "description",
-                "title", jurisdictionalSalesTaxRulesList, TangibleCategory.INTANGIBLE);
+                "title", jurisdictionalSalesTaxRulesList, null, TangibleCategory.INTANGIBLE);
     }
 
     private Map<String, JurisdictionalSalesTaxRules> createJurisdictionalSalesTaxRulesList() {
@@ -88,58 +87,99 @@ public class ProductClassificationServiceTest {
     }
 
     private Transaction createTransactionWithProductClassificationData() {
-        JurisdictionalSalesTaxRules rules = testUtilities.createJurisdictionalSalesTaxRules();
-
-        Item item = transaction.getItems().get(0)
-                .withTaxableCategory(TaxableCategory.TAXABLE)
-                .withTangibleCategory(TangibleCategory.TANGIBLE)
-                .withJurisdictionalSalesTaxRules(rules);
-
-        List<Item> modifiedItems = testUtilities.createItems(true, true);
+        List<Item> modifiedItems = testUtilities.createItems(true, false, true);
         return transaction.withItems(modifiedItems);
     }
 
+//    @Test
+//    void getTransactionWithRelevantProductClassificationData_InjectsDataToTransaction_ReturnsTransaction() {
+//        // Given
+//        Transaction givenTransaction = transaction.withShippingFee(null);
+//        String taxCode0 = givenTransaction.getItems().get(0).getTaxCode();
+//        String taxCode1 = givenTransaction.getItems().get(1).getTaxCode();
+//
+//        JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", true, false,
+//                CalculationType.FIXED, "rule1", BigDecimal.ZERO, null);
+//        JurisdictionalSalesTaxRules secondRule = new JurisdictionalSalesTaxRules("rule2", "CA", true, false,
+//                CalculationType.FIXED, "rule2", BigDecimal.ZERO, null);
+//
+//        Transaction transactionWithData = createTransactionWithProductClassificationData()
+//                .withShippingFee(null)
+//                .withComplytId(givenTransaction.getComplytId())
+//                .withExternalId(givenTransaction.getExternalId())
+//                .withCustomer(givenTransaction.getCustomer());
+//
+//        Map<String, ProductClassification> mapTaxCodesToClassifications = testUtilities.createUsaClassificationsMap(firstRule, secondRule);
+//
+//        // When
+//        when(productClassificationRepository.findOneByTaxCode(taxCode0)).thenReturn(Mono.just(mapTaxCodesToClassifications.get(taxCode0)));
+//        when(productClassificationRepository.findOneByTaxCode(taxCode1)).thenReturn(Mono.just(mapTaxCodesToClassifications.get(taxCode1)));
+//        when(transactionProductClassificationDataInjector.inject(mapTaxCodesToClassifications, givenTransaction)).thenReturn(Mono.just(transactionWithData));
+//
+//        Mono<Transaction> actualTransaction = productClassificationService.getTransactionWithRelevantProductClassificationData(givenTransaction);
+//
+//        // Then
+//        StepVerifier.create(actualTransaction).expectNext(transactionWithData).verifyComplete();
+//    }
+
     @Test
-    void getTransactionWithRelevantProductClassificationData_InjectsDataToTransaction_ReturnsTransaction() {
-        // Given
-        Transaction givenTransaction = transaction.withShippingFee(null);
-        String taxCode0 = givenTransaction.getItems().get(0).getTaxCode();
-        String taxCode1 = givenTransaction.getItems().get(1).getTaxCode();
-        Transaction transactionWithData = createTransactionWithProductClassificationData()
-                .withShippingFee(null)
-                .withComplytId(givenTransaction.getComplytId())
-                .withExternalId(givenTransaction.getExternalId())
-                .withCustomer(givenTransaction.getCustomer());
-
-        // When
-        when(productClassificationRepository.findOneByTaxCode(taxCode0)).thenReturn(Mono.just(firstItemProductClassification));
-        when(productClassificationRepository.findOneByTaxCode(taxCode1)).thenReturn(Mono.just(secondItemProductClassification));
-        Mono<Transaction> actualTransaction = productClassificationService.getTransactionWithRelevantProductClassificationData(givenTransaction);
-
-        // Then
-        StepVerifier.create(actualTransaction).expectNext(transactionWithData).verifyComplete();
-    }
-
-    @Test
-    void getTransactionWithRelevantProductClassificationData_InjectsDataToTransactionWithShippingFee_ReturnsTransaction() {
-        // Given
+    void getTransactionWithRelevantProductClassificationData_WithValidTransactionWithShippingFee_ShouldInjectClassificationCorrectly() {
+        // Prepare test data
         SalesTaxRates salesTaxRates = testUtilities.createSalesTaxRates();
-        ShippingFee shippingFee = testUtilities.createShippingFee(true, true).withSalesTaxRates(salesTaxRates);
+        ShippingFee shippingFee = testUtilities.createShippingFee(true, false, true).withSalesTaxRates(salesTaxRates);
         Transaction givenTransaction = transaction.withShippingFee(shippingFee);
         String taxCode0 = givenTransaction.getItems().get(0).getTaxCode();
         String taxCode1 = givenTransaction.getItems().get(1).getTaxCode();
         ProductClassification shippingClassification = createShippingFeeProductClassification();
-        Transaction transactionWithData = createTransactionWithProductClassificationData()
+
+        Transaction transactionWithFullData = createTransactionWithProductClassificationData()
                 .withShippingFee(shippingFee);
+        Map<String, ProductClassification> mapTaxCodesToClassifications = testUtilities
+                .createUsaClassificationsMap(givenTransaction.getItems().get(0).getJurisdictionalSalesTaxRules(), givenTransaction.getItems().get(1).getJurisdictionalSalesTaxRules());
+        mapTaxCodesToClassifications.put(shippingFee.getTaxCode(), shippingClassification);
+
+        // Mocking the repository call to return a classification for any tax code
+        when(productClassificationRepository.findOneByTaxCode(taxCode0)).thenReturn(Mono.just(firstItemProductClassification));
+        when(productClassificationRepository.findOneByTaxCode(taxCode1)).thenReturn(Mono.just(secondItemProductClassification));
+        when(productClassificationRepository.findOneByTaxCode(givenTransaction.getShippingFee().getTaxCode())).thenReturn(Mono.just(shippingClassification));
+
+        // Mocking the injector to return the transaction itself for simplicity
+        when(transactionProductClassificationDataInjector.inject(mapTaxCodesToClassifications, givenTransaction))
+                .thenReturn(Mono.just(transactionWithFullData));
+
+        // Executing the method under test
+        Mono<Transaction> result = productClassificationService.getTransactionWithRelevantProductClassificationData(givenTransaction);
+
+        // Assertions
+        StepVerifier.create(result).expectNext(transactionWithFullData).verifyComplete();
+    }
+
+    @Test
+    void getTransactionWithRelevantProductClassificationData_WithValidTransaction_ShouldInjectClassificationCorrectlyy() {
+        // Given
+        Transaction givenTransaction = transaction.withShippingFee(null);
+        String taxCode0 = "C1S1";
+        String taxCode1 = "C3S1";
+
+        Transaction transactionWithFullData = createTransactionWithProductClassificationData().withShippingFee(null);
+
+        Map<String, ProductClassification> mapTaxCodesToClassifications = testUtilities
+                .createUsaClassificationsMap(
+                        givenTransaction.getItems().get(0).getJurisdictionalSalesTaxRules(),
+                        givenTransaction.getItems().get(1).getJurisdictionalSalesTaxRules()
+                );
 
         // When
         when(productClassificationRepository.findOneByTaxCode(taxCode0)).thenReturn(Mono.just(firstItemProductClassification));
         when(productClassificationRepository.findOneByTaxCode(taxCode1)).thenReturn(Mono.just(secondItemProductClassification));
-        when(productClassificationRepository.findOneByTaxCode(givenTransaction.getShippingFee().getTaxCode())).thenReturn(Mono.just(shippingClassification));
-        Mono<Transaction> actualTransaction = productClassificationService.getTransactionWithRelevantProductClassificationData(givenTransaction);
+
+        when(transactionProductClassificationDataInjector.inject(mapTaxCodesToClassifications, givenTransaction))
+                .thenReturn(Mono.just(transactionWithFullData));
 
         // Then
-        StepVerifier.create(actualTransaction).expectNext(transactionWithData).verifyComplete();
+        Mono<Transaction> result = productClassificationService.getTransactionWithRelevantProductClassificationData(givenTransaction);
+
+        StepVerifier.create(result).expectNext(transactionWithFullData).verifyComplete();
     }
 
     @Test
@@ -173,7 +213,7 @@ public class ProductClassificationServiceTest {
     void findAll_FindsAllClassifications_ReturnsAllClassifications() {
         // Given
         ProductClassification otherProductClassification = firstItemProductClassification.withDescription("second classification").withTaxCode("C2S1");
-        List<ProductClassification> productClassifications = new ArrayList<ProductClassification>() {{
+        List<ProductClassification> productClassifications = new ArrayList<>() {{
             add(firstItemProductClassification);
             add(otherProductClassification);
         }};

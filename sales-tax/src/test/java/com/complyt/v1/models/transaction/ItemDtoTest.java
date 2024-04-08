@@ -5,8 +5,11 @@ import com.complyt.v1.models.TaxableCategoryDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -14,27 +17,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ItemDtoTest {
 
     private ItemDto itemDto;
+    private UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setup() {
-        itemDto = new ItemDto(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"),
-                null, "description", "name", "taxCode",
-                null, new SalesTaxRatesDto(new BigDecimal("0.5"), new BigDecimal("0.5"),
-                new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null),
-                false, BigDecimal.ZERO, null, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
-        );
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        itemDto = testUtilities.createItemDtos(true, true, true)
+                .get(0)
+                .withSalesTaxRates(testUtilities.createSalesTaxRatesDto())
+                .withGtRates(testUtilities.createGtRatesDto());
     }
 
     @Test
     void Equals_sameItemDto_ReturnsTrue() {
         // Given
-        ItemDto givenItemDto = new ItemDto(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"),
-                null, "description", "name", "taxCode",
-                null, new SalesTaxRatesDto(new BigDecimal("0.5"),
-                new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"),
-                new BigDecimal("0.5"), null), false, BigDecimal.ZERO,
-                null, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
-        );
+        ItemDto givenItemDto = testUtilities.createItemDtos(true, true, true)
+                .get(0)
+                .withSalesTaxRates(testUtilities.createSalesTaxRatesDto())
+                .withGtRates(testUtilities.createGtRatesDto());
 
         // When
         boolean isEquals = itemDto.equals(givenItemDto);
@@ -55,6 +55,7 @@ class ItemDtoTest {
                 ", taxCode=" + itemDto.taxCode() +
                 ", jurisdictionalSalesTaxRules=" + itemDto.jurisdictionalSalesTaxRules() +
                 ", salesTaxRates=" + itemDto.salesTaxRates() +
+                ", gtRates=" + itemDto.gtRates() +
                 ", manualSalesTax=" + itemDto.manualSalesTax() +
                 ", manualSalesTaxRate=" + itemDto.manualSalesTaxRate() +
                 ", discount=" + itemDto.discount() +

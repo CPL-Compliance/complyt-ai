@@ -1,0 +1,26 @@
+package com.complyt.business.tax.sales_tax.checker;
+
+import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.transaction.Item;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Slf4j
+@Component
+public class TaxableItemExistChecker implements SalesTaxApplyChecker<List<Item>> {
+
+    public boolean check(@NonNull List<Item> items) {
+        for (Item item : items) {
+            if (item.getTaxableCategory().equals(TaxableCategory.TAXABLE)) {
+                log.debug("Taxable item found : " + item);
+                return true;
+            }
+        }
+        log.debug("No Taxable items found");
+        return false;
+    }
+
+}

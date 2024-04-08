@@ -103,7 +103,8 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
                             "calculationType": "FIXED",
                             "description": "string",
                             "calculationValue": 0,
-                            "cities": null
+                            "cities": null,
+                            "regions":null
                         },
                         "salesTaxRates": {
                             "cityDistrictRate": 0,
@@ -112,6 +113,11 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
                             "countyRate": 0,
                             "stateRate": 0,
                             "taxRate": 0
+                        },
+                        "gtRates": {
+                                "countryRate": 0,
+                                "regionRate": 0,
+                                "taxRate": 0
                         },
                         "manualSalesTax": true,
                         "manualSalesTaxRate": 0,
@@ -135,6 +141,7 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
                     "state": "string",
                     "street": "string",
                     "zip": "string",
+                    "region":"string",
                     "isPartial": false
                 },
                 "customerId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
@@ -150,6 +157,7 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
                         "state": "string",
                         "street": "string",
                         "zip": "string",
+                        "region":"string",
                         "isPartial": false
                     },
                     "email": "example@some.mail.com",
@@ -165,6 +173,7 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
                 },
                 "salesTax": {
                     "amount": 0,
+                    "taxRate": 0,
                     "salesTaxRates": {
                         "cityDistrictRate": 0,
                         "cityRate": 0,
@@ -172,6 +181,11 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
                         "countyRate": 0,
                         "stateRate": 0,
                         "taxRate": 0
+                    },
+                    "gtRates": {
+                      "countryRate": 0,
+                      "regionRate": 0,
+                      "taxRate": 0
                     }
                 },
                 "transactionStatus": "ACTIVE",
@@ -188,7 +202,7 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
                     "manualSalesTax": true,
                     "manualSalesTaxRate": 0,
                     "totalPrice": 0,
-                    "calculatedTotal":0
+                    "calculatedTotal":0,
                     "taxCode": "string",
                     "taxableCategory": "TAXABLE",
                     "tangibleCategory": "TANGIBLE",
@@ -200,7 +214,8 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
                         "calculationType": "FIXED",
                         "description": "string",
                         "calculationValue": 0,
-                        "cities": null
+                        "cities": null,
+                        "regions": null
                     },
                     "salesTaxRates": {
                         "cityDistrictRate": 0,
@@ -209,6 +224,11 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
                         "countyRate": 0,
                         "stateRate": 0,
                         "taxRate": 0
+                    },
+                    "gtRates": {
+                      "countryRate": 0,
+                      "regionRate": 0,
+                      "taxRate": 0
                     }
                 },
                 "createdFrom": "string",
@@ -216,7 +236,9 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
                 "tangibleItemsAmount": 0,
                 "totalItemsAmount": 0,
                 "totalDiscount" :0,
-                "transactionFilingStatus": "NOT_FILED"
+                "finalTransactionAmount": 0,
+                "transactionFilingStatus": "NOT_FILED",
+                "currency": "USD"
             }
             """;
 }

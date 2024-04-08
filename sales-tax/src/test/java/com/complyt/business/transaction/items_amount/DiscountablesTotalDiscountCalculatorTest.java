@@ -27,7 +27,7 @@ class DiscountablesTotalDiscountCalculatorTest {
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        items = new ArrayList<>(testUtilities.createItems(true, true));
+        items = new ArrayList<>(testUtilities.createItems(true, false,true));
         discountablesTotalDiscountCalculator = new DiscountablesTotalDiscountCalculator();
     }
 
@@ -45,7 +45,7 @@ class DiscountablesTotalDiscountCalculatorTest {
     void calculate_TwoItemsWithDiscount_ReturnsAmountOfTwoItemsDiscount() {
         // Given
 
-        List<Item> itemList = testUtilities.createItems(true, true);
+        List<Item> itemList = testUtilities.createItems(true, false,true);
         List<Discountable> itemListWith2Discounts = List.of(
                 itemList.get(0).withDiscount(BigDecimal.valueOf(500)),
                 itemList.get(1).withDiscount(BigDecimal.valueOf(400))
@@ -63,7 +63,7 @@ class DiscountablesTotalDiscountCalculatorTest {
     void calculate_OneItemsWithDiscount_ReturnsAmountOfOneItemsDiscount() {
         // Given
 
-        List<Item> itemList = testUtilities.createItems(true, true);
+        List<Item> itemList = testUtilities.createItems(true, false,true);
         List<Discountable> itemListWith1Discount = List.of(
                 itemList.get(0).withDiscount(BigDecimal.valueOf(500)),
                 itemList.get(1).withDiscount(null)

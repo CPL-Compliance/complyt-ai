@@ -17,8 +17,11 @@ public class CityCountyProvider implements SalesTaxDataProvider<Transaction> {
     @NonNull
     private CityCountyFetcher addressFetcher;
 
+    @NonNull
+    private TransactionCityCountyInjector transactionCityCountyInjector;
+
     public Mono<Transaction> provide(Transaction transaction) {
         return addressFetcher.fetch(transaction.getShippingAddress())
-                .flatMap(cityCountyWrapper -> new TransactionCityCountyInjector(transaction).inject(cityCountyWrapper));
+                .flatMap(cityCountyWrapper -> transactionCityCountyInjector.inject(cityCountyWrapper, transaction));
     }
 }

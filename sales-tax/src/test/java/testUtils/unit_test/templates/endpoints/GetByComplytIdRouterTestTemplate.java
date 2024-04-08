@@ -3,7 +3,7 @@ package testUtils.unit_test.templates.endpoints;
 public interface GetByComplytIdRouterTestTemplate {
     void getByComplytId_Exists_Returns200();
 
-    void getByComplytId_PathVariableInvalid_Returns400();
+    void getByComplytId_QueryParamInvalid_Returns400();
 
     void getByComplytId_DoesntExists_Returns404();
 

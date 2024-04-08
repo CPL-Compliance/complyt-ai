@@ -12,13 +12,14 @@ class AddressTest {
     private final String state = "State";
     private final String street = "Street";
     private final String zip = "ZIP";
+    private final String region = "Region";
     private Address address;
     private Address referenceAddress;
 
     @BeforeEach
     void setUp() {
-        address = new Address("City", "Country", "County", "State", "Street", "ZIP", false);
-        referenceAddress = new Address("City", "Country", "County", "State", "Street", "ZIP", false);
+        address = new Address("City", "Country", "County", "State", "Street", "ZIP", "Region", false);
+        referenceAddress = new Address("City", "Country", "County", "State", "Street", "ZIP", "Region",false);
     }
 
     @Test
@@ -75,6 +76,7 @@ class AddressTest {
                 ", state=" + state +
                 ", street=" + street +
                 ", zip=" + zip +
+                ", region=" + region +
                 ", isPartial=" + isPartial + "]";
 
         assertEquals(referenceString, address.toString());

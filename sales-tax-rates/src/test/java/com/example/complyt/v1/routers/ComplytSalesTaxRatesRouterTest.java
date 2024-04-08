@@ -51,13 +51,13 @@ import static org.mockito.Mockito.when;
 public class ComplytSalesTaxRatesRouterTest {
 
     @Autowired
-    ComplytSalesTaxRatesRouter addressWithSalesTaxRatesRouter;
+    ComplytSalesTaxRatesRouter complytSalesTaxRatesRouter;
 
     @Autowired
     private WebTestClient webTestClient;
 
     @MockBean
-    private ComplytSalesTaxRatesFacade addressWithSalesTaxRatesFacade;
+    private ComplytSalesTaxRatesFacade complytSalesTaxRatesFacade;
 
     @Test
     @WithMockUser
@@ -68,7 +68,7 @@ public class ComplytSalesTaxRatesRouterTest {
         Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
 
         // When
-        when(addressWithSalesTaxRatesFacade.findByAddress(address)).thenReturn(Mono.just(addressWithSalesTaxRates));
+        when(complytSalesTaxRatesFacade.findByAddress(address)).thenReturn(Mono.just(addressWithSalesTaxRates));
         ComplytSalesTaxRatesDto addressWithSalesTaxRatesDto = ComplytSalesTaxRatesMapper.INSTANCE
                 .complytSalesTaxRatesToComplytSalesTaxRates(addressWithSalesTaxRates);
 
@@ -101,7 +101,7 @@ public class ComplytSalesTaxRatesRouterTest {
         Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
 
         // When
-        when(addressWithSalesTaxRatesFacade.findByAddress(address)).thenReturn(Mono.just(addressWithSalesTaxRates));
+        when(complytSalesTaxRatesFacade.findByAddress(address)).thenReturn(Mono.just(addressWithSalesTaxRates));
         ComplytSalesTaxRatesDto addressWithSalesTaxRatesDto = ComplytSalesTaxRatesMapper.INSTANCE
                 .complytSalesTaxRatesToComplytSalesTaxRates(addressWithSalesTaxRates);
 
@@ -131,7 +131,7 @@ public class ComplytSalesTaxRatesRouterTest {
         Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
 
         // When
-        when(addressWithSalesTaxRatesFacade.findByAddress(address)).thenReturn(Mono.empty());
+        when(complytSalesTaxRatesFacade.findByAddress(address)).thenReturn(Mono.empty());
 
         // Then
         webTestClient
@@ -428,7 +428,7 @@ public class ComplytSalesTaxRatesRouterTest {
         Address address = TestUtilities.createAddressInCalifornia();
 
         // When
-        when(addressWithSalesTaxRatesFacade.findByAddress(address)).thenThrow(RuntimeException.class);
+        when(complytSalesTaxRatesFacade.findByAddress(address)).thenThrow(RuntimeException.class);
 
         // Then
         webTestClient

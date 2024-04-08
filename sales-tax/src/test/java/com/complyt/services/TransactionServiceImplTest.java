@@ -389,6 +389,51 @@ class TransactionServiceImplTest {
     }
 
     @Test
+    void injectDataToNewTransaction_InjectsDataToNewTransactionWhichIsNotFromUsa_ReturnsTransaction() {
+        // Given
+        Transaction transactionToSend = transaction.withShippingAddress(testUtilities.createNonUsaAddress());
+        ShippingFee givenShippingFee = transactionToSend.getShippingFee();
+        Transaction transactionWithItemsCalculatedTotal = transactionToSend
+                .withItems(testUtilities.setCalculatedTotalOnItemList(transactionToSend.getItems()))
+                .withShippingFee(givenShippingFee.withCalculatedTotal(givenShippingFee.getTotalPrice()));
+
+        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithItemsCalculatedTotal);
+
+        Transaction transactionWithAllInjectedData = transactionWithProductClassification.withComplytId(UUID.randomUUID());
+
+        NewTransactionInternalTimestampsInjector injector = new NewTransactionInternalTimestampsInjector(transactionWithAllInjectedData);
+        Transaction transactionWithUpdatedDates = injector.inject();
+
+        // When
+        when(itemsTotalCalculator.injectRecalculatedTotal(transactionToSend)).thenReturn(Mono.just(transactionWithItemsCalculatedTotal));
+        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassification)).thenReturn(transactionWithAllInjectedData);
+        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotal)).thenReturn(Mono.just(transactionWithProductClassification));
+        when(cityCountyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassification));
+        when(transactionAmountsCollector.collect(transactionWithProductClassification)).thenReturn(transactionWithProductClassification);
+        when(transactionDiscountCollector.collect(transactionWithProductClassification)).thenReturn(transactionWithProductClassification);
+        Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transactionToSend);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNextMatches(transaction -> {
+            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
+
+            LocalDateTime actualCreatedDateTime = transaction.getInternalTimestamps().getCreatedDate();
+            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimestamps().getUpdatedDate();
+
+            return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
+                    expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
+                    expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() &&
+                    expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() &&
+                    expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
+                    expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
+                    expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
+                    expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour() &&
+                    transaction.getComplytId() == transactionWithAllInjectedData.getComplytId();
+        }).expectComplete().verify();
+    }
+
+    @Test
     void injectDataToModifiedTransaction_InjectsDataToModifiedTransaction_ReturnsTransaction() {
         // Given
         Transaction transactionWithCustomer = transaction.withCustomer(customer);

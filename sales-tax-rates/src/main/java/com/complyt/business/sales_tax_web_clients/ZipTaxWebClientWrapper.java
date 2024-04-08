@@ -32,7 +32,7 @@ public class ZipTaxWebClientWrapper extends SalesTaxWebClientWrapperBase {
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve()
                 .bodyToMono(ZipTaxData.class)
-                .cast(SalesTaxData.class).log();
+                .cast(SalesTaxData.class);
     }
 
     @Override

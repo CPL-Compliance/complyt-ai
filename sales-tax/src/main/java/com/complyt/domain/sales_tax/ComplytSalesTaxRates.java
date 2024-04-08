@@ -1,9 +1,9 @@
 package com.complyt.domain.sales_tax;
 
+import com.complyt.domain.TaxRates;
 import com.complyt.domain.transaction.Address;
 import lombok.With;
 
 @With
-public record ComplytSalesTaxRates(Address address, SalesTaxRates salesTaxRates) {
+public record ComplytSalesTaxRates(Address address, SalesTaxRates salesTaxRates) implements ComplytInternalRates {
 }
-

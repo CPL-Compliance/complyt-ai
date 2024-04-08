@@ -6,12 +6,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL, uses = {TimestampsMapper.class})
+@Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL, uses = {TimestampsMapper.class, ItemMapper.class, ShippingFeeMapper.class})
 public interface TransactionMapper {
     TransactionMapper INSTANCE = Mappers.getMapper(TransactionMapper.class);
 
     Transaction transactionDtoToTransaction(TransactionDto transactionDto);
 
     TransactionDto transactionToTransactionDto(Transaction transaction);
-
 }

@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.transaction.data_injector.TransactionProductClassificationDataInjectionManager;
+import com.complyt.business.transaction.data_injector.TransactionProductClassificationDataInjector;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.ProductClassificationRepository;
@@ -18,6 +18,9 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
 
     @NonNull
     private ProductClassificationRepository productClassificationRepository;
+
+    @NonNull
+    private final TransactionProductClassificationDataInjector transactionProductClassificationDataInjector;
 
     public Mono<ProductClassification> save(ProductClassification productClassification) {
         return productClassificationRepository.save(productClassification);
@@ -44,7 +47,7 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
                 .flatMap(item -> getItemClassification(item.getTaxCode()))
                 .concatWith(getShippingFeeClassification(transaction))
                 .collectMap(ProductClassification::getTaxCode, productClassification -> productClassification)
-                .flatMap(mapTaxCodesToClassifications -> new TransactionProductClassificationDataInjectionManager(transaction).inject(mapTaxCodesToClassifications));
+                .flatMap(mapTaxCodesToClassifications -> transactionProductClassificationDataInjector.inject(mapTaxCodesToClassifications, transaction));
     }
 
     private Mono<ProductClassification> getItemClassification(String taxCode) {
@@ -54,4 +57,5 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     private Mono<ProductClassification> getShippingFeeClassification(Transaction transaction) {
         return transaction.getShippingFee() == null ? Mono.empty() : findOneByTaxCode(transaction.getShippingFee().getTaxCode());
     }
+
 }

@@ -6,5 +6,5 @@ import lombok.NonNull;
 import reactor.core.publisher.Mono;
 
 public interface NexusStateRuleService extends CrudService<NexusStateRule, String> {
-    Mono<NexusStateRule> findByState(@NonNull String state);
+    Mono<NexusStateRule> findByCountryAndState(@NonNull String country, String state);
 }

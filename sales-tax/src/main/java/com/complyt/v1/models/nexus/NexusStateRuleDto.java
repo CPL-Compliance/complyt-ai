@@ -12,6 +12,7 @@ import java.util.List;
 @With
 public record NexusStateRuleDto(
         boolean enforcesSalesTax,
+        String country,
         StateDto state,
         List<TaxableCategoryDto> taxableCategories,
         List<TangibleCategoryDto> tangibleCategories,

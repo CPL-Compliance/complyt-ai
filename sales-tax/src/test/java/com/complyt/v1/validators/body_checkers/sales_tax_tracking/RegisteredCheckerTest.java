@@ -10,6 +10,7 @@ import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
+
 public class RegisteredCheckerTest {
 
     private RegisteredChecker registeredChecker;
@@ -41,5 +42,6 @@ public class RegisteredCheckerTest {
         StepVerifier.create(result)
                 .expectNext(DtoErrorMessages.REGISTERED_CONFLICT)
                 .expectComplete()
-                .verify();}
+                .verify();
+    }
 }

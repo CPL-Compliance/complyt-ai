@@ -4,9 +4,9 @@ import com.complyt.domain.transaction.Transaction;
 import reactor.core.publisher.Mono;
 
 public interface TransactionDataInjector<T> {
-    Mono<Transaction> inject(T t);
+    Mono<Transaction> inject(T t, Transaction transaction);
 
-    default boolean shouldInject(T t) {
+    default boolean shouldInject(T t, Transaction transaction) {
         return true;
     }
 }

@@ -154,7 +154,7 @@ public abstract class TestContainersInitializerIT {
                                 .forHttp(TestUtilities.TRANSACTION_BASE_URL)
                                 .withHeader("Authorization", "Bearer " + TOKEN))
                         .withStrategy(Wait
-                                .forHttp(TestUtilities.SALES_TAX_RATES_BASE_URL + "?state=CA&zip=90210&isPartial=true")
+                                .forHttp(TestUtilities.COMPLYT_SALES_TAX_RATES_BASE_URL + "?state=CA&zip=90210&isPartial=true")
                                 .withHeader("Authorization", "Bearer " + TOKEN))
                         .withStrategy(Wait
                                 .forHttp(TestUtilities.FILES_BASE_URL)

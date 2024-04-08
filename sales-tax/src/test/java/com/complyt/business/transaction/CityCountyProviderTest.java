@@ -1,6 +1,7 @@
 package com.complyt.business.transaction;
 
 import com.complyt.business.transaction.data_fetcher.CityCountyFetcher;
+import com.complyt.business.transaction.data_injector.TransactionCityCountyInjector;
 import com.complyt.domain.transaction.CityCountyWrapper;
 import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,9 @@ public class CityCountyProviderTest {
     @Mock
     CityCountyFetcher addressFetcher;
 
+    @Mock
+    TransactionCityCountyInjector transactionCityCountyInjector;
+
     UnitTestUtilities testUtilities;
 
     @BeforeEach
@@ -44,11 +48,14 @@ public class CityCountyProviderTest {
         // Given
         Transaction transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(transaction.getShippingAddress().city(), transaction.getShippingAddress().county());
+
         // When
         when(addressFetcher.fetch(transaction.getShippingAddress())).thenReturn(Mono.just(cityCountyWrapper));
+        when(transactionCityCountyInjector.inject(cityCountyWrapper, transaction)).thenReturn(Mono.just(transaction));
         Mono<Transaction> transactionMono = cityCountyProvider.provide(transaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
     }
+
 }

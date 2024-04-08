@@ -1,5 +1,6 @@
 package com.complyt.services;
 
+import com.complyt.business.address.CountryIsUsaChecker;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
@@ -95,19 +96,21 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
         return injectCommonDataToNewAndModifiedTransaction(transaction)
-                .map(complytIdHandler::insertComplytIdToNew)
-                .map(NewTransactionInternalTimestampsInjector::new)
-                .map(NewTransactionInternalTimestampsInjector::inject);
+                .map(x -> complytIdHandler.insertComplytIdToNew(x))
+                .map(y->new NewTransactionInternalTimestampsInjector(y))
+                .map(z -> z.inject());
     }
 
     private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
         return itemsTotalCalculator.injectRecalculatedTotal(transaction)
                 .flatMap(transactionWithCalculatedItems ->
                         productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItems)
-                                .map(transactionDiscountCollector::collect)
-                                .map(transactionItemsAmountsCollector::collect)
-                                .flatMap(cityCountyProvider::provide));
-    }
+                                .map(x -> transactionDiscountCollector.collect(x))
+                                .map(y ->transactionItemsAmountsCollector.collect(y))
+                                .flatMap(transactionWithAmounts -> CountryIsUsaChecker.isCountryUsa(transactionWithAmounts.getShippingAddress()) ? //todo: make sure addressInUsaChecker is needed here is is the right thing to do here
+                                        cityCountyProvider.provide(transactionWithAmounts) :
+                                        Mono.just(transactionWithAmounts))); //todo: fix - this causes error if not usa state
+    } //todo: also - county can be null, fails is not null
 
     @Deprecated
     @Override
@@ -145,13 +148,13 @@ public class TransactionServiceImpl implements TransactionService {
                 new Transaction(
                         transactionInfo.getComplytId(), transactionInfo.getId(),
                         transaction.getExternalId(), transaction.getSource(), transaction.getDocumentName(),
-                        transaction.getItems(), transaction.getBillingAddress(), transaction.getShippingAddress(),
+                        transaction.getItems(), transaction.getIsTaxInclusive(), transaction.getBillingAddress(), transaction.getShippingAddress(), //todo: note now it's getIsTaxFromTotal
                         transaction.getCustomerId(), null, transaction.getSalesTax(),
                         transaction.getTransactionStatus(), transactionInfo.getTenantId(), transaction.getInternalTimestamps(),
                         transaction.getExternalTimestamps(), transaction.getTransactionType(), transaction.getShippingFee(),
                         transaction.getCreatedFrom(), transaction.getTaxableItemsAmount(),
-                        transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount(), transaction.getTotalDiscount(),
-                        transaction.getTransactionFilingStatus()
+                        transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount(), transaction.getFinalTransactionAmount(), transaction.getTotalDiscount(),
+                        transaction.getTransactionFilingStatus(), transaction.getCurrency()
                 );
     }
 

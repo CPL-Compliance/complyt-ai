@@ -204,23 +204,23 @@ spring:
           uri: lb://sales-tax
           predicates:
             - Method=GET
-            - Path=/v1/nexus
+            - Path=/v1/nexus/all
           filters:
-            - SetPath=/v1/nexus
+            - SetPath=/v1/nexus/all
         - id: sales-tax-get-nexus-by-state
           uri: lb://sales-tax
           predicates:
             - Method=GET
-            - Path=/v1/nexus/state/{state}
+            - Path=/v1/nexus
           filters:
-            - SetPath=/v1/nexus/state/{state}
+            - SetPath=/v1/nexus
         - id: sales-tax-refresh-nexus-by-state
           uri: lb://sales-tax
           predicates:
             - Method=POST
-            - Path=/v1/nexus/refresh/state/{state}
+            - Path=/v1/nexus/refresh
           filters:
-            - SetPath=/v1/nexus/refresh/state/{state}
+            - SetPath=/v1/nexus/refresh
         - id: sales-tax-get-nexus-by-complyt-id
           uri: lb://sales-tax
           predicates:
@@ -232,16 +232,16 @@ spring:
           uri: lb://sales-tax
           predicates:
             - Method=PUT
-            - Path=/v1/nexus/state/{state}
+            - Path=/v1/nexus
           filters:
-            - SetPath=/v1/nexus/state/{state}
+            - SetPath=/v1/nexus
         - id: sales-tax-patch-nexus
           uri: lb://sales-tax
           predicates:
             - Method=PATCH
-            - Path=/v1/nexus/state/{state}
+            - Path=/v1/nexus
           filters:
-            - SetPath=/v1/nexus/state/{state}
+            - SetPath=/v1/nexus
         # ---- Nexus ----
         # ---- ClientTracking ----
         - id: sales-tax-get-client-tracking
@@ -294,6 +294,13 @@ spring:
             - Path=/v1/sales_tax_rates
           filters:
             - SetPath=/v1/sales_tax_rates
+        - id: sales-tax-rates-get-gt-rates
+          uri: lb://sales-tax-rates
+          predicates:
+            - Method=GET
+            - Path=/v1/gt_rates
+          filters:
+            - SetPath=/v1/gt_rates
         # ---- SalesTaxRates ----
         # ==== Sales Tax Rates Service ====
         # ==== Authentication Service ====

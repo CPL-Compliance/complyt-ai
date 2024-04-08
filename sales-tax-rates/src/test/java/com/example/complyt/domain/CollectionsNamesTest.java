@@ -1,6 +1,6 @@
 package com.example.complyt.domain;
 
-import com.complyt.domain.CollectionsNames;
+import com.complyt.business.collection_fetcher.CollectionsNames;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

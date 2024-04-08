@@ -28,8 +28,8 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString())
-                .withShippingFee(testUtilities.createShippingFee(false, false));
-        transactionShippingFeeTangibleCategoryInjector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
+                .withShippingFee(testUtilities.createShippingFee(false, false, false));
+        transactionShippingFeeTangibleCategoryInjector = new TransactionShippingFeeTangibleCategoryInjector();
     }
 
     private Map<String, ProductClassification> createMapTaxCodesToClassifications() {
@@ -38,12 +38,12 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
             put("CA", jurisdictionalSalesTaxRules);
         }};
         ProductClassification itemProductClassification = new ProductClassification(UUID.randomUUID().toString()
-                , "C1S1", "item", "title", itemJurisdictionalSalesTaxRulesMap, TangibleCategory.TANGIBLE);
+                , "C1S1", "item", "title", itemJurisdictionalSalesTaxRulesMap, null, TangibleCategory.TANGIBLE);
         Map<String, JurisdictionalSalesTaxRules> shippingJurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);
         }};
         ProductClassification shippingProductClassification = new ProductClassification(UUID.randomUUID().toString()
-                , "C6S1", "item", "title", shippingJurisdictionalSalesTaxRulesMap, TangibleCategory.INTANGIBLE);
+                , "C6S1", "item", "title", shippingJurisdictionalSalesTaxRulesMap, null, TangibleCategory.INTANGIBLE);
 
         return new HashMap<>() {{
             put("C1S1", itemProductClassification);
@@ -55,13 +55,13 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
     void inject_ClassificationsMapDoesNotContainShippingFeeTaxCode_TransactionNotModified() {
         // Given
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Transaction expectedTransaction = transaction.withShippingFee(testUtilities.createShippingFee(false, true));
+        classifications.remove("C6S1");
 
         // When
-        Mono<Transaction> transactionMono = transactionShippingFeeTangibleCategoryInjector.inject(classifications);
+        Mono<Transaction> transactionMono = transactionShippingFeeTangibleCategoryInjector.inject(classifications, transaction);
 
         // Then
-        StepVerifier.create(transactionMono).expectNext(expectedTransaction).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
     }
 
     @Test
@@ -70,11 +70,10 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
         ShippingFee shippingFeeThatExistInMap = transaction.getShippingFee().withTaxCode("C1S1");
         Transaction givenTransaction = transaction.withShippingFee(shippingFeeThatExistInMap);
-        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(givenTransaction);
         Transaction expectedTransaction = givenTransaction.withShippingFee(givenTransaction.getShippingFee().withTangibleCategory(TangibleCategory.TANGIBLE));
 
         // When
-        Mono<Transaction> transactionMono = injector.inject(classifications);
+        Mono<Transaction> transactionMono = transactionShippingFeeTangibleCategoryInjector.inject(classifications, givenTransaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(expectedTransaction).verifyComplete();
@@ -83,8 +82,8 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
     @Test
     void equals_SameTransactionShippingFeeTangibleCategoryInjector_ReturnsTrue() {
         // Given
-        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
-        TransactionShippingFeeTangibleCategoryInjector secondInjector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
+        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector();
+        TransactionShippingFeeTangibleCategoryInjector secondInjector = new TransactionShippingFeeTangibleCategoryInjector();
 
         // When
         boolean isEquals = injector.equals(secondInjector);
@@ -94,31 +93,18 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
     }
 
     @Test
-    void equals_DifferentTransactionShippingFeeTangibleCategoryInjector_ReturnsFalse() {
-        // Given
-        Transaction differentTransaction = transaction.withId(UUID.randomUUID().toString());
-        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
-        TransactionShippingFeeTangibleCategoryInjector secondInjector = new TransactionShippingFeeTangibleCategoryInjector(differentTransaction);
-
-        // When
-        boolean isEquals = injector.equals(secondInjector);
-
-        // Then
-        assertFalse(isEquals);
-    }
-
-    @Test
-    void defaultConstructor_NullTransaction_ThrowsNullPointerException() {
+    void inject_NullTransactionPassed_ThrowsNullPointerException() {
         // Given
         Transaction nullTransaction = null;
+        Map<String, ProductClassification> classifications = testUtilities.createMapTaxCodesToClassifications();
 
         // When
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            new TransactionShippingFeeTangibleCategoryInjector(nullTransaction);
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionShippingFeeTangibleCategoryInjector.inject(classifications, nullTransaction);
         });
 
         // Then
-        assertEquals("transaction is marked non-null but is null", exception.getMessage());
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
     }
 
 }

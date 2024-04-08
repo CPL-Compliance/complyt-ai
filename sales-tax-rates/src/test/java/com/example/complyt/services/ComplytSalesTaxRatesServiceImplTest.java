@@ -1,5 +1,6 @@
 package com.example.complyt.services;
 
+import com.complyt.business.collection_fetcher.UsaStatesMap;
 import com.complyt.business.data_fetcher.CityCountyFetcher;
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
@@ -44,7 +45,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
     void findByAddress_FindsComplytSalesTaxRates_ReturnsRates() {
         // Given
         Address califoniaAddress = TestUtilities.createAddressInCalifornia();
-        String collectionName = StatesMap.statesToCollections.get(califoniaAddress.state());
+        String collectionName = UsaStatesMap.statesToCollections.get(califoniaAddress.state());
 
         ComplytSalesTaxRates expectedComplytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
 
@@ -61,7 +62,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
         // Given
         Address califoniaAddress = TestUtilities.createAddressInCalifornia();
         Address californiaAddressWithBlankCity = califoniaAddress.withCity("");
-        String collectionName = StatesMap.statesToCollections.get(califoniaAddress.state());
+        String collectionName = UsaStatesMap.statesToCollections.get(califoniaAddress.state());
 
         ComplytSalesTaxRates complytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates()
                 .withAddress(californiaAddressWithBlankCity);
@@ -82,7 +83,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
         // Given
         Address califoniaAddress = TestUtilities.createAddressInCalifornia();
         Address californiaAddressWithBlankCity = califoniaAddress.withCity("");
-        String collectionName = StatesMap.statesToCollections.get(califoniaAddress.state());
+        String collectionName = UsaStatesMap.statesToCollections.get(califoniaAddress.state());
 
         ComplytSalesTaxRates complytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates()
                 .withAddress(californiaAddressWithBlankCity);
@@ -103,7 +104,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
         // Given
         Address califoniaAddress = TestUtilities.createAddressInCalifornia();
         CityCountyWrapper cityCountyWrapper = TestUtilities.createCityCountyInCalifornia();
-        String collectionName = StatesMap.statesToCollections.get(califoniaAddress.state());
+        String collectionName = UsaStatesMap.statesToCollections.get(califoniaAddress.state());
         SalesTaxRates californiaRates = TestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates expectedComplytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
 
@@ -167,7 +168,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
     void findByAddress_RepositoryThrowsException_ThrowsException() {
         // Given
         Address address = TestUtilities.createAddressInCalifornia();
-        String collection = StatesMap.statesToCollections.get(address.state());
+        String collection = UsaStatesMap.statesToCollections.get(address.state());
         when(complytSalesTaxRatesRepository.findByAddress(address, collection)).thenThrow(RuntimeException.class);
 
         // When + Then

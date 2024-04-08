@@ -59,6 +59,9 @@ public class ValidationHandler<T, U extends Validator> {
                 .flatMap(body -> Flux.fromIterable(serverRequest.pathVariables().keySet())
                         .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)
                                 .flatMap(check -> check.apply(body, serverRequest)))
+                        .concatWith(Flux.fromIterable(serverRequest.queryParams().keySet())
+                                .flatMap(param -> dataConflictChecksProvider.getPathVariableCheck(param)
+                                        .flatMap(check -> check.apply(body, serverRequest))))
                         .concatWith(checkBodyConflicts(body))
                         .collectList()
                         .flatMap(errorList -> checkErrorList(body, errorList)));
@@ -92,10 +95,16 @@ public class ValidationHandler<T, U extends Validator> {
                         Mono.error(new PathVariableErrorException(errorList)));
     }
 
-    public Mono<String> validateParam(@NonNull String key, @NonNull String value) {
+    public Mono<String> validatePathVariable(@NonNull String key, @NonNull String value) {
         return pathVariableChecksProvider.getFunctionCheck(key)
                 .flatMap(check -> check.apply(value))
                 .flatMap(error -> Mono.error(new PathVariableErrorException(List.of(error))));
+    }
+
+    public Mono<String> validateQueryParam(@NonNull String key, String value) {
+        return queryParamChecksProvider.getFunctionCheck(key)
+                .flatMap(check -> check.apply(value))
+                .flatMap(error -> Mono.error(new QueryParamErrorException(List.of(error))));
     }
 
     public Mono<T> handle(@NonNull final T object, @NonNull final Set<Map.Entry<String, String>> entrySet) {

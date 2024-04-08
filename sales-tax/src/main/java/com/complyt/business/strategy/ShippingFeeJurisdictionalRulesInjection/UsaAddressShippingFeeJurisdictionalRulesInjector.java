@@ -1,0 +1,38 @@
+package com.complyt.business.strategy.ShippingFeeJurisdictionalRulesInjection;
+
+import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.domain.sales_tax.product_classification.ProductClassification;
+import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.ShippingFee;
+import com.complyt.domain.transaction.Transaction;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+@Component
+@Slf4j
+public class UsaAddressShippingFeeJurisdictionalRulesInjector implements ShippingFeeJurisdictionalInjector {
+    @Override
+    public Function<Map<String, ProductClassification>, Transaction> inject(Transaction transaction) {
+        return mapTaxCodesToClassifications -> {
+            String state = transaction.getShippingAddress().state();
+            ProductClassification classification = mapTaxCodesToClassifications.get(transaction.getShippingFee().getTaxCode());
+            JurisdictionalSalesTaxRules rules = classification.getJurisdictionalSalesTaxRules().get(state);
+
+            ShippingFee modifiedShippingFee = transaction.getShippingFee().withJurisdictionalSalesTaxRules(rules);
+
+            TaxableCategory category = modifiedShippingFee.getJurisdictionalSalesTaxRules().isTaxable() ?
+                    TaxableCategory.TAXABLE : TaxableCategory.NOT_TAXABLE;
+            ShippingFee shippingFeeWithTaxableCategory = modifiedShippingFee.withTaxableCategory(category);
+
+            log.debug("Inserting new shipping fee with rules : " + rules + ", with taxable category : " + category);
+
+            return transaction.withShippingFee(shippingFeeWithTaxableCategory);
+        };
+    }
+}

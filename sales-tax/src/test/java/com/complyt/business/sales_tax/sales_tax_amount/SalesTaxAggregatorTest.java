@@ -1,5 +1,6 @@
 package com.complyt.business.sales_tax.sales_tax_amount;
 
+import com.complyt.business.tax.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.transaction.Item;
@@ -37,18 +38,16 @@ public class SalesTaxAggregatorTest {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
         salesTaxAggregator = new SalesTaxAggregator();
-        List<Item> itemsAfterCalculatedValue = testUtilities.setCalculatedTotalOnItemList(testUtilities.createItemsWithSalesTaxRate(true, true));
-        ShippingFee shippingFeeAfterCalculatedValue = testUtilities.setCalculatedTotalOnShippingFee(testUtilities.createShippingFeeWithSalesTaxRates(true, true));
         transaction = testUtilities.createTransaction(null)
-                .withItems(itemsAfterCalculatedValue)
-                .withShippingFee(shippingFeeAfterCalculatedValue);
+                .withItems(testUtilities.createItemsWithSalesTaxRate(true, false, true))
+                .withShippingFee(testUtilities.createShippingFeeWithSalesTaxRates(true, true));
     }
 
     @Test
     void aggregate_SalesTaxCalculatedForBothItemsAndShippingFee_SalesTaxAmountReturned() {
         // Given
-        BigDecimal expectedItemsSalesTaxAmount = transaction.getItems().stream().map(item -> item.getSalesTaxRates().taxRate().multiply(item.getTotalPrice())).reduce(BigDecimal::add).get();
-        BigDecimal expectedShippingFeeSalesTaxAmount = transaction.getShippingFee().getSalesTaxRates().taxRate().multiply(transaction.getShippingFee().getTotalPrice());
+        BigDecimal expectedItemsSalesTaxAmount = transaction.getItems().stream().map(item -> item.getSalesTaxRates().taxRate().multiply(item.getCalculatedTotal())).reduce(BigDecimal::add).get();
+        BigDecimal expectedShippingFeeSalesTaxAmount = transaction.getShippingFee().getSalesTaxRates().taxRate().multiply(transaction.getShippingFee().getCalculatedTotal());
         BigDecimal expectedAmount = expectedItemsSalesTaxAmount.add(expectedShippingFeeSalesTaxAmount);
         List<Taxable> taxAbles = testUtilities.createTaxables(transaction);
 

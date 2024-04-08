@@ -102,6 +102,7 @@ class ParameterChecksProviderTest {
         Exception nullPointerException = assertThrows(NullPointerException.class, () -> parameterChecksProvider.getFunctionCheck(null));
 
         // Then
-        assertEquals("pathVariable is marked non-null but is null", nullPointerException.getMessage());
+        assertEquals("uriVariable is marked non-null but is null", nullPointerException.getMessage());
     }
+
 }

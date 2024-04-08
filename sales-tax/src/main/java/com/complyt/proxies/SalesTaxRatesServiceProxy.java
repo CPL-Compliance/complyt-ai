@@ -1,6 +1,7 @@
 package com.complyt.proxies;
 
 import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
+import com.complyt.v1.models.sales_tax.gt.ComplytGtRatesDto;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import reactivefeign.spring.config.ReactiveFeignClient;
@@ -15,6 +16,12 @@ public interface SalesTaxRatesServiceProxy {
             @RequestParam(name = "county") String county, @RequestParam(name = "city") String city,
             @RequestParam(name = "street") String street, @RequestParam(name = "zip") String zip,
             @RequestParam(name = "isPartial") boolean isPartial
+    );
+
+    @GetMapping("/v1/gt_rates")
+    Mono<ComplytGtRatesDto> findGstByAddress(
+            @RequestParam(name = "country") String country,
+            @RequestParam(name = "region") String region
     );
 
 }

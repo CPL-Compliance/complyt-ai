@@ -3,7 +3,7 @@ package testUtils.unit_test.templates.endpoints;
 public interface GetByStateRouterTestTemplate {
     void getByState_Exists_Returns200WithList();
 
-    void getByState_PathVariableError_Returns400();
+    void getByState_QueryParamError_Returns400();
 
     void getByState_DoesntExists_Returns404();
 

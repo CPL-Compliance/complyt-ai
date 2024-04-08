@@ -59,7 +59,7 @@ class ValidationHandlerTest {
     }
 
 
-    //QueryParam
+    // QueryParam
     @Test
     public void handle_NoParamsValid_ReturnsMonoEmpty() {
         // Given
@@ -189,7 +189,7 @@ class ValidationHandlerTest {
         // When
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.queryParams()).thenReturn(queryParams);
-        when(serverRequest.queryParam("page")).thenReturn("null".describeConstable());
+        when(serverRequest.queryParam("page")).thenReturn("null" .describeConstable());
         when(paramChecksProvider.getFunctionCheck("page")).thenReturn(Mono.just(ParamCheckerFunctions.PAGE_CHECK));
         when(serverRequest.method()).thenReturn(HttpMethod.PUT);
         when(serverRequest.path()).thenReturn("/v1/transactions/source/someSource/externalId/someExternalId");
@@ -467,7 +467,7 @@ class ValidationHandlerTest {
         pathVariables.put("complytId", "f47ac10b-58cc-4372-a567-0e02b2c3d479");
 
         // When
-        Mono<String> stringMono = transactionDtoValidationHandler.validateParam("complytId", pathVariables.get("complytId"));
+        Mono<String> stringMono = transactionDtoValidationHandler.validatePathVariable("complytId", pathVariables.get("complytId"));
 
         // Then
         StepVerifier.create(stringMono).verifyComplete();
@@ -480,7 +480,7 @@ class ValidationHandlerTest {
         pathVariablesWithInvalidComplytId.put("complytId", "f47ac10b-58cc-4372-a567-0");
 
         // When
-        Mono<String> stringMono = transactionDtoValidationHandler.validateParam("complytId", pathVariablesWithInvalidComplytId.get("complytId"));
+        Mono<String> stringMono = transactionDtoValidationHandler.validatePathVariable("complytId", pathVariablesWithInvalidComplytId.get("complytId"));
 
         // Then
         StepVerifier.create(stringMono).expectError(PathVariableErrorException.class).verify();
@@ -492,10 +492,23 @@ class ValidationHandlerTest {
 
         // Given + When
         Exception nullPointerException = assertThrows(NullPointerException.class, () ->
-                transactionDtoValidationHandler.validateParam(nullKey, "value"));
+                transactionDtoValidationHandler.validatePathVariable(nullKey, "value"));
 
         // Then
 
+        assertEquals("key is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void validateQueryParam_NullKeySent_ThrowsNullPointerException() {
+        // Given
+        String nullKey = null;
+
+        // Given + When
+        Exception nullPointerException = assertThrows(NullPointerException.class, () ->
+                transactionDtoValidationHandler.validateQueryParam(nullKey, "value"));
+
+        // Then
         assertEquals("key is marked non-null but is null", nullPointerException.getMessage());
     }
 
@@ -506,7 +519,7 @@ class ValidationHandlerTest {
 
         // Given + When
         Exception nullPointerException = assertThrows(NullPointerException.class, () ->
-                transactionDtoValidationHandler.validateParam("key", nullValue));
+                transactionDtoValidationHandler.validatePathVariable("key", nullValue));
 
         // Then
         assertEquals("value is marked non-null but is null", nullPointerException.getMessage());

@@ -10,30 +10,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CitySalesTaxRulesTest {
 
-    private CitySalesTaxRules citySalesTaxRules;
+    private SubJurisdictionalTaxRules SubJurisdictionalTaxRules;
 
     @BeforeEach
     void setup() {
-        citySalesTaxRules = createCitySalesTaxRulesRates();
+        SubJurisdictionalTaxRules = createCitySalesTaxRulesRates();
     }
 
-    private CitySalesTaxRules createCitySalesTaxRulesRates() {
-        return new CitySalesTaxRules("California", "Ca", false, false, CalculationType.FIXED, "", new BigDecimal("1000"));
+    private SubJurisdictionalTaxRules createCitySalesTaxRulesRates() {
+        return new SubJurisdictionalTaxRules("California", "Ca", false, false, CalculationType.FIXED, "", new BigDecimal("1000"));
     }
 
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "CitySalesTaxRules(name=" + citySalesTaxRules.getName() +
-                ", abbreviation=" + citySalesTaxRules.getAbbreviation() +
-                ", taxable=" + citySalesTaxRules.isTaxable() +
-                ", specialTreatment=" + citySalesTaxRules.isSpecialTreatment() +
-                ", calculationType=" + citySalesTaxRules.getCalculationType() +
-                ", description=" + citySalesTaxRules.getDescription() +
-                ", calculationValue=" + citySalesTaxRules.getCalculationValue() + ")";
+        String expectedString = "SubJurisdictionalTaxRules(name=" + SubJurisdictionalTaxRules.getName() +
+                ", abbreviation=" + SubJurisdictionalTaxRules.getAbbreviation() +
+                ", taxable=" + SubJurisdictionalTaxRules.isTaxable() +
+                ", specialTreatment=" + SubJurisdictionalTaxRules.isSpecialTreatment() +
+                ", calculationType=" + SubJurisdictionalTaxRules.getCalculationType() +
+                ", description=" + SubJurisdictionalTaxRules.getDescription() +
+                ", calculationValue=" + SubJurisdictionalTaxRules.getCalculationValue() + ")";
 
         // When
-        String actualString = citySalesTaxRules.toString();
+        String actualString = SubJurisdictionalTaxRules.toString();
 
         // Then
         assertEquals(expectedString, actualString);
@@ -42,10 +42,10 @@ class CitySalesTaxRulesTest {
     @Test
     void Equals_SameCitySalesTaxRules_ReturnTrue() {
         // Given
-        CitySalesTaxRules givenCitySalesTaxRules = createCitySalesTaxRulesRates();
+        SubJurisdictionalTaxRules givenCitySalesTaxRules = createCitySalesTaxRulesRates();
 
         // When
-        boolean isEquals = citySalesTaxRules.equals(givenCitySalesTaxRules);
+        boolean isEquals = SubJurisdictionalTaxRules.equals(givenCitySalesTaxRules);
 
         // Then
         assertTrue(isEquals);

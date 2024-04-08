@@ -78,6 +78,20 @@ public class NexusCheckerTest {
     }
 
     @Test
+    void hasNexus_TrackingIndicatesThatClientHasPhysicalNexusWithNullState_ReturnsTrue() {
+        // Given
+        SalesTaxTracking salesTaxTrackingToSend = salesTaxTracking.withState(null);
+
+        // When
+        when(salesTaxEnforcementChecker.check(salesTaxTrackingToSend)).thenReturn(true);
+        when(physicalNexusChecker.check(salesTaxTrackingToSend)).thenReturn(true);
+        boolean hasNexus = nexusChecker.hasNexus(salesTaxTrackingToSend);
+
+        // Then
+        Assertions.assertTrue(hasNexus);
+    }
+
+    @Test
     void hasNexus_TrackingIndicatesThatClientHasEconomicNexus_ReturnsTrue() {
         // Given
 
@@ -150,6 +164,21 @@ public class NexusCheckerTest {
         // Then
         assertTrue(passedThreshold);
     }
+
+    @Test
+    void passedThreshold_NoNexusCalculationSummaryAtDateRangeAndStateIsNull_ReturnsFalse() {
+        // Given
+        SalesTaxTracking salesTaxTrackingToSend = salesTaxTracking.withNexusStateRule(salesTaxTracking.getNexusStateRule().withState(null));
+        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(nexusCalculationSummary, salesTaxTrackingToSend.getNexusStateRule());
+
+        // When
+        when(nexusThresholdChecker.check(summaryAndRule)).thenReturn(true);
+        boolean passedThreshold = nexusChecker.passedThreshold(salesTaxTrackingToSend, dateRange);
+
+        // Then
+        assertTrue(passedThreshold);
+    }
+
 
     @Test
     void passedThreshold_SummaryDoesNotPassedThreshold_ReturnsFalse() {

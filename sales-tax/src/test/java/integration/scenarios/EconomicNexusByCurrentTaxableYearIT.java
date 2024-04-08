@@ -56,8 +56,10 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
     // Given
     private final LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T07:00:00");
     private final UUID customerId = UUID.fromString("9ff0912a-2d60-4e8a-a6ba-1a9e7385338e"); // complytId of an existing customer in the database
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "95220", false);
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false);
     private final String source = "1";
+    private final String country = "USA";
+
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -82,13 +84,18 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
                 .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state)
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .queryParam("date", referenceDate.toLocalDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk().expectBody(SalesTaxTrackingDto.class)
-                .value(salesTaxTrackingDto -> LOGGER.info(String.valueOf(salesTaxTrackingDto)));
+                .value(salesTaxTrackingDto -> {
+                    LOGGER.info(String.valueOf(salesTaxTrackingDto));
+                    assertFalse(salesTaxTrackingDto.economicNexusTracker().established());
+                });
     }
 
     @Order(1)
@@ -153,7 +160,9 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", referenceAddress.state())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -201,7 +210,9 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", referenceAddress.state())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -217,7 +228,9 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
                             .mutateWith(csrf())
                             .put()
                             .uri(uriBuilder -> uriBuilder
-                                    .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                                    .path(SalesTaxTrackingRouter.BASE_URL)
+                                    .queryParam("country", country)
+                                    .queryParam("state", referenceAddress.state())
                                     .build())
                             .bodyValue(receivedSalesTaxTracking.withApproved(true))
                             .accept(MediaType.APPLICATION_JSON)

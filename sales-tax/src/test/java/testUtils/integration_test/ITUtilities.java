@@ -7,7 +7,6 @@ import com.complyt.domain.sales_tax.fast_tax.InformationComponent;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.Address;
-import com.complyt.domain.transaction.TransactionFilingStatus;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
@@ -30,13 +29,16 @@ public interface ITUtilities {
     static TransactionDto stubTransactionDto(String externalId, UUID customerId, ItemDto... items) {
         return new TransactionDto(null, externalId, "1", "INVUS1000",
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
-                null, new MandatoryAddressDto("Acampo", "US", null,
-                "CA", "1525 R Jahant Rd", "95220", false), customerId,
-                null, null, TransactionStatusDto.ACTIVE, null,
-                new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
-                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED);
-        // this is discount      ^
+                false, null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd","", "95220", false), customerId,
+                null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
+                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD");
+    } // note isTaxInclusive is false, finalTransactionAmount is zero
+
+
+    static TransactionDto stubTransactionDtoNonUsaCountry(String externalId, UUID customerId, ItemDto... items){
+        MandatoryAddressDto shippingAddress = new MandatoryAddressDto(null, "Canada", null, null, "", "Quebec", null, false);
+        return stubTransactionDto(externalId, customerId, items)
+                .withShippingAddress(shippingAddress);
     }
 
     static CustomerDto stubCustomerDto(String externalId) {
@@ -45,24 +47,28 @@ public interface ITUtilities {
                 null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()), "comment");
     }
 
-    static SalesTaxTrackingDto stubSalesTaxTrackingDto(StateDto state) {
-        return new SalesTaxTrackingDto(null, state, "comment", true,
+    static SalesTaxTrackingDto stubSalesTaxTrackingDto(String country, StateDto state) {
+        return new SalesTaxTrackingDto(null, country, state, "comment", true,
                 new PhysicalNexusTrackerDto(false, LocalDateTime.now()),
                 new EconomicNexusTrackerDto(false, LocalDateTime.now()),
                 null, null, stubClientTrackingDto(),
                 LocalDateTime.now(), false, LocalDateTime.now(), FilingFrequencyDto.MONTHLY, null, null);
     }
 
+    static SalesTaxTrackingDto stubSalesTaxTrackingNonUsaDto(String country) {
+        return stubSalesTaxTrackingDto(country, null);
+    }
+
     static ItemDto stubItemDto() {
         return new ItemDto(new BigDecimal(10000), new BigDecimal(1), new BigDecimal(10000),
                 null, "some description", "Hardware", "C1S1",
-                null, null, false, BigDecimal.ZERO, null,
+                null, null,null, false, BigDecimal.ZERO, null,
                 null, null);
     }
 
     static ShippingFeeDto stubShippingFeeDto() {
         return new ShippingFeeDto(false, BigDecimal.ZERO, BigDecimal.valueOf(500), null,
-                null, null, "C6S1", null, null);
+                null, null, null,"C6S1", null, null);
     }
 
     static FastTaxData stubFastTaxFlorida() {
@@ -167,15 +173,15 @@ public interface ITUtilities {
         return new TimestampsDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
     }
     static Address createAddressInCalifornia() {
-        return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
+        return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", "", false);
     }
 
     static MandatoryAddressDto createAddressDtoInCalifornia() {
-        return new MandatoryAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
+        return new MandatoryAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave",  "", "93711-5508", false);
     }
 
     static OptionalAddressDto createOptionalAddressDtoInCalifornia() {
-        return new OptionalAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
+        return new OptionalAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", null,"93711-5508", false);
     }
 
     static SalesTaxRates createCaliforniaSalesTaxRates() {
@@ -205,7 +211,7 @@ public interface ITUtilities {
     }
 
     static NexusStateRuleDto stubAlabamaNexusStateRuleDto() {
-        return new NexusStateRuleDto(true,
+        return new NexusStateRuleDto(true,"USA",
                 new StateDto("AL", "01", "Alabama"),
                 List.of(TaxableCategoryDto.TAXABLE, TaxableCategoryDto.NOT_TAXABLE),
                 List.of(TangibleCategoryDto.INTANGIBLE, TangibleCategoryDto.TANGIBLE),
@@ -213,6 +219,13 @@ public interface ITUtilities {
                 TimeFrameDto.PREVIOUS_TWELVE_MONTHS,
                 new NexusThresholdDto(BigDecimal.valueOf(250000), 0, DefinitionDto.AMOUNT),
                 LocalDateTime.of(1970, 1, 1, 0, 0, 0));
+    }
+
+    static NexusStateRuleDto stubBrazilNexusStateRuleDto() {
+        return stubAlabamaNexusStateRuleDto()
+                .withState(null)
+                .withCountry("BRAZIL")
+                .withAppliedDate(LocalDateTime.of(2022, 1, 1, 0, 0, 0));
     }
 
     static ClassificationDto createClassificationDto() {

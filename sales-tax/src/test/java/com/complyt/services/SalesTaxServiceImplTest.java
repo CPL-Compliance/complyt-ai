@@ -1,14 +1,16 @@
 package com.complyt.services;
 
 import com.complyt.business.builder.TaxableCollectionBuilder;
-import com.complyt.business.sales_tax.mapper.ComplytSalesTaxRatesToSalesTaxRates;
-import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
-import com.complyt.business.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
-import com.complyt.business.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
-import com.complyt.domain.Taxable;
+import com.complyt.business.strategy.StrategySelector;
+import com.complyt.business.tax.gt.TransactionGtRatesHandler;
+import com.complyt.business.tax.sales_tax.mapper.ComplytSalesTaxRatesToSalesTaxRates;
+import com.complyt.business.tax.sales_tax.sales_tax_amount.SalesTaxAggregator;
+import com.complyt.business.tax.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
+import com.complyt.business.tax.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.sales_tax.ComplytInternalRates;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRates;
@@ -58,7 +60,16 @@ public class SalesTaxServiceImplTest {
     TransactionSalesTaxRatesHandler transactionSalesTaxRatesHandler;
 
     @Mock
+    TransactionGtRatesHandler transactionGstRatesHandler;
+
+    @Mock
     TaxableCollectionBuilder taxableCollectionBuilder;
+
+    @Mock
+    StrategySelector salesTaxRatesWrapperStrategy;
+
+    @Mock
+    StrategySelector transactionRatesInjectionStrategy;
 
     Transaction transaction;
     Customer customer;
@@ -119,24 +130,18 @@ public class SalesTaxServiceImplTest {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(new BigDecimal(10), salesTaxRates);
+        SalesTax salesTax = new SalesTax(new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //todo: note gst is null
 
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
         }};
-        Transaction transactionWithRates = transaction.withItems(itemsWithRates);
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
-        List<Taxable> taxAbles = new ArrayList<>(transaction.getItems());
         SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
-        when(complytSalesTaxRatesClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(complytSalesTaxRates));
-        when(complytSalesTaxRatesToSalesTaxRates.map(complytSalesTaxRates)).thenReturn(Mono.just(salesTaxRates));
-        when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates))
-                .thenReturn(Mono.just(transactionWithRates));
-        when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
-        when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.amount());
+        when(salesTaxRatesWrapperStrategy.select(transaction)).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
+        when(transactionRatesInjectionStrategy.select(transaction)).thenReturn(transaction -> Mono.just(transactionWithSalesTax));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, customer);
 
         // Then
@@ -148,26 +153,18 @@ public class SalesTaxServiceImplTest {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(new BigDecimal(10), salesTaxRates);
+        SalesTax salesTax = new SalesTax(new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //todo: note gst is null
 
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
         }};
-        Transaction transactionWithRates = transaction.withItems(itemsWithRates);
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
         SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
-        List<Taxable> taxAbles = new ArrayList<>() {{
-            add(transaction.getItems().get(0));
-        }};
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
-        when(complytSalesTaxRatesClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(complytSalesTaxRates));
-        when(complytSalesTaxRatesToSalesTaxRates.map(complytSalesTaxRates)).thenReturn(Mono.just(salesTaxRates));
-        when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates))
-                .thenReturn(Mono.just(transactionWithRates));
-        when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
-        when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.amount());
+        when(salesTaxRatesWrapperStrategy.select(transaction)).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
+        when(transactionRatesInjectionStrategy.select(transaction)).thenReturn(transaction -> Mono.just(transactionWithSalesTax));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, customer);
 
         // Then

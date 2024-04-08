@@ -136,7 +136,7 @@ public class CustomerHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<CustomerDto> customerDtoMono = ContextLogger.observeCtx(logStr, log::info)
-                .then(customerDtoValidationHandler.validateParam("complytId", complytId))
+                .then(customerDtoValidationHandler.validatePathVariable("complytId", complytId))
                 .then(Mono.defer(() -> customerFacade.findByComplytId(UUID.fromString(complytId)))
                         .flatMap(existingCustomer -> serverRequest.bodyToMono(Map.class)
                                 .map(map -> customerPatcher.patch(CustomerMapper.INSTANCE.customerToCustomerDto(existingCustomer), map))

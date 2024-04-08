@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -19,21 +20,19 @@ import java.util.Map;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Getter
+@Component
 @Slf4j
 public class TransactionItemsTangibleCategoryInjector implements TransactionDataInjector<Map<String, ProductClassification>> {
 
-    @NonNull
-    private final Transaction transaction;
-
     @Override
-    public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
+    public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications, @NonNull Transaction transaction) {
         return ContextLogger.observeCtx("Setting tangible categories to Transaction's items", log::debug)
-                .then(Mono.just(transaction.withItems(createItemsWithTangibleCategories(mapTaxCodesToClassifications))))
+                .then(Mono.just(transaction.withItems(createItemsWithTangibleCategories(mapTaxCodesToClassifications, transaction))))
                 .flatMap(modifiedTransaction -> ContextLogger.observeCtx("Transaction with items with tangible categories injected : " + modifiedTransaction, log::debug)
                         .thenReturn(modifiedTransaction));
     }
 
-    private List<Item> createItemsWithTangibleCategories(Map<String, ProductClassification> mapTaxCodesToClassifications) {
+    private List<Item> createItemsWithTangibleCategories(Map<String, ProductClassification> mapTaxCodesToClassifications, Transaction transaction) {
         List<Item> modifiedItems = new ArrayList<>();
 
         for (Item item : transaction.getItems()) {

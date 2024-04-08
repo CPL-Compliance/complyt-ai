@@ -6,6 +6,7 @@ import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.javatuples.Pair;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -19,11 +20,13 @@ public class ComplytSalesTaxRatesRepository {
     @NonNull
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    @NonNull
-    QueryBuilder<Address> addressQueryBuilder;
+    @NonNull //todo: remove
+    QueryBuilder<Address> unitedStatesAddressQueryBuilder;
 
     public Mono<ComplytSalesTaxRates> findByAddress(@NonNull Address address, @NonNull String collection) {
-        Query query = addressQueryBuilder.build(address);
+
+        Query query = unitedStatesAddressQueryBuilder.build(address);
+
 
         return ContextLogger.observeCtx("Searching for rates in " + collection + ", by requestAddress: " + query, log::info)
                 .then(reactiveMongoTemplate.findOne(query, ComplytSalesTaxRates.class, collection));

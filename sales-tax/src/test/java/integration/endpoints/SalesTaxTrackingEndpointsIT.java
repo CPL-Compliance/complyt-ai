@@ -48,6 +48,9 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT implements SalesTaxTrackingEndpointsITemplate {
 
+    private final String usaCountry = "USA";
+
+    private final String nonUsaCountry = "Brazil";
     private final StateDto existingState = new StateDto("AZ", "04", "Arizona");
     private final StateDto newState = new StateDto("AL", "01", "Alabama");
     private final StateDto stateWithNexus = new StateDto("TX", "48", "Texas");
@@ -80,7 +83,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -101,7 +106,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue("{}")
@@ -127,7 +134,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + stateWithOldRule.name())
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", stateWithOldRule.name())
                         .queryParam("date", localDate)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -156,7 +165,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + stateWithNexus.name())
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", stateWithNexus.name())
                         .queryParam("date", localDate)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -179,7 +190,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state)
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state)
                         .queryParam("date", LocalDate.now())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -201,7 +214,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state)
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state)
                         .queryParam("date", badDate)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -209,6 +224,181 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
                 .value(map -> assertEquals("[date " + DtoErrorMessages.LOCALDATE_FORMAT_ERROR + "]", map.get("message")));
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByCountryAndState_NonUsaCountryDoesntExists_Returns201() {
+        // Given
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingNonUsaDto(nonUsaCountry.toUpperCase());
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", nonUsaCountry)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(resultSalesTaxTrackingDto -> assertEquals(
+                        salesTaxTrackingDto
+                                .withComplytId(resultSalesTaxTrackingDto.complytId())
+                                .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
+                                .withNexusStateRule(ITUtilities.stubBrazilNexusStateRuleDto())
+                        , resultSalesTaxTrackingDto)
+                );
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void getByCountry_Exists_Returns200() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", nonUsaCountry)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.country(), nonUsaCountry.toUpperCase()));
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByCountryAndStateAndDate_NonUsaCountryExistsAndHasNexus_Returns200NoSummary() {
+        LocalDate localDate = LocalDate.now();
+        LocalDate summaryDate = localDate.isAfter(localDate.withDayOfMonth(1).withMonth(6))
+                ? LocalDate.of(localDate.getYear() + 1, 6, 1)
+                : LocalDate.of(localDate.getYear(), 6, 1);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
+                        .queryParam("country", nonUsaCountry)
+                        .queryParam("date", localDate)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> {
+                    assertNull(salesTaxTrackingDto.nexusCalculationSummaries().get(summaryDate));
+                    assertNotNull(salesTaxTrackingDto.nexusCalculationSummaries().get(localDate));
+                    assertEquals(
+                            LocalDateTime.of(2022, 1, 1, 0, 0, 0, 0),
+                            salesTaxTrackingDto.nexusStateRule().appliedDate());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByCountryAndState_StateIsNull_Returns400() {
+        // Given
+        StateDto nullState = null;
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, null);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", nonUsaCountry)
+                        .queryParam("state", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByCountryAndState_CountryIsNull_Returns400() {
+        // Given
+        String nullCountry = "null";
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(nullCountry, stateWithNexus);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", nullCountry)
+                        .queryParam("state", stateWithNexus.abbreviation())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByCountryAndState_UsaAndStateIsDifferentInBody_Returns400ConflictedData() {
+        // Given
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, stateWithNexus);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", stateWithOldRule)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByCountryAndState_CountryInQueryAndBodyAreDifferent_Returns400ConflictedData() {
+        // Given
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, stateWithNexus);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", nonUsaCountry)
+                        .queryParam("state", stateWithOldRule)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -219,7 +409,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/all")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -236,7 +426,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/all")
                         .queryParam("page", "null")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -256,7 +446,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/all")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -277,7 +467,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/all")
                         .queryParam("size", "null")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -346,7 +536,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + existingState.name())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", existingState.name())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -363,7 +555,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + "null")
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", "null")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -378,7 +572,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + existingState.abbreviation())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", existingState.abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -395,7 +591,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + newState.abbreviation())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", newState.abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -410,7 +608,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + newState.name())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", newState.name())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -423,14 +623,16 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @WithMockUser
     public void upsertByState_DoesntExists_Returns201() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState);
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, newState);
 
         // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().name())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", salesTaxTrackingDto.state().name())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
@@ -452,14 +654,16 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @WithMockUser
     public void upsertByState_Exists_Returns200() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState).withComment("a new comment");
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, newState).withComment("a new comment");
 
         // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().abbreviation())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", salesTaxTrackingDto.state().abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
@@ -481,16 +685,18 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     @WithMockUser
-    public void upsertByState_PathVariableInvalid_Returns400() {
+    public void upsertByCountryAndState_StateQueryParamInvalid_Returns400() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState).withComment("a new comment");
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, newState).withComment("a new comment");
 
         // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/null")
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", "null")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
@@ -504,7 +710,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @WithMockUser
     public void upsertByState_DoesntExistsWithComplytId_Returns400ConflictedData() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState)
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, newState)
                 .withComplytId(UUID.randomUUID());
 
         // Then
@@ -512,7 +718,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().name())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", salesTaxTrackingDto.country())
+                        .queryParam("state", salesTaxTrackingDto.state().name())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
@@ -526,7 +734,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @WithMockUser
     public void upsertByState_ConflictingState_Returns400ConflictedData() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState)
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, newState)
                 .withComplytId(UUID.randomUUID());
 
         // Then
@@ -534,7 +742,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/dope")
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", salesTaxTrackingDto.country())
+                        .queryParam("state", "dope")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
@@ -548,7 +758,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @WithMockUser
     public void upsertByState_DoesntPassValidation_Returns400CValidationError() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(new StateDto("AL", "01", null))
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, new StateDto("AL", "01", null))
                 .withEconomicNexusTracker(null);
         Set<String> expectedErrors = Set.of(
                 "economicNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR,
@@ -559,7 +769,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().abbreviation())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", salesTaxTrackingDto.country())
+                        .queryParam("state", salesTaxTrackingDto.state().abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
@@ -588,7 +800,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL) // Set your API endpoint
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/all") // Set your API endpoint
                         .queryParam("size", size)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -612,7 +824,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL) // Set your API endpoint
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/all") // Set your API endpoint
                         .queryParam("size", size)
                         .queryParam("page", page)
                         .build())
@@ -636,7 +848,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL) // Set your API endpoint
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/all") // Set your API endpoint
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -650,6 +862,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @WithMockUser
     public void patch_PatchesOneField_ReturnsPatchedResource() {
+        String country = "USA";
         String state = "NJ";
         LocalDateTime establishedDate = LocalDateTime.now();
         PhysicalNexusTrackerDto physicalNexusTrackerToPatch = new PhysicalNexusTrackerDto(true, establishedDate);
@@ -662,7 +875,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .patch()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state) // Set your API endpoint
+                        .path(SalesTaxTrackingRouter.BASE_URL) // Set your API endpoint
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(map)
@@ -679,6 +894,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @WithMockUser
     public void patch_PatchesTwoFields_ReturnsPatchedResource() {
+        String country = "USA";
         String state = "NJ";
         LocalDateTime date = LocalDateTime.now();
         PhysicalNexusTrackerDto physicalNexusTrackerToPatch = new PhysicalNexusTrackerDto(false, date);
@@ -692,7 +908,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .patch()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(map)
@@ -712,7 +930,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     public void upsertByState_RegisteredAndDateNull_ReturnsSalesTaxTrackingWithDate() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState).withRegistered(RegisteredType.REGISTERED)
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", newState).withRegistered(RegisteredType.REGISTERED)
                 .withRegistrationDate(null);
 
         // Then
@@ -720,7 +938,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().abbreviation())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", salesTaxTrackingDto.country())
+                        .queryParam("state", salesTaxTrackingDto.state().abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
@@ -736,7 +956,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     public void upsertByState_RegisteredAndDate_ReturnsSalesTaxTrackingWithGivenDate() {
         // Given
         LocalDateTime registrationDate = LocalDateTime.now();
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState).withRegistered(RegisteredType.REGISTERED)
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", newState).withRegistered(RegisteredType.REGISTERED)
                 .withRegistrationDate(registrationDate);
 
         // Then
@@ -744,7 +964,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().abbreviation())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", salesTaxTrackingDto.country())
+                        .queryParam("state", salesTaxTrackingDto.state().abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
@@ -764,7 +986,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     public void upsertByState_NonRegisteredAndDateNull_ReturnsSalesTaxTracking() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState).withRegistered(null)
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", newState).withRegistered(null)
                 .withRegistrationDate(null);
 
         // Then
@@ -772,7 +994,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().abbreviation())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", salesTaxTrackingDto.country())
+                        .queryParam("state", salesTaxTrackingDto.state().abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
@@ -787,7 +1011,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     public void upsertByState_NonRegisteredAndDate_Returns400() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState).withRegistered(null)
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", newState).withRegistered(null)
                 .withRegistrationDate(LocalDateTime.now());
 
         // Then
@@ -795,7 +1019,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().abbreviation())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", salesTaxTrackingDto.country())
+                        .queryParam("state", salesTaxTrackingDto.state().abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
@@ -819,7 +1045,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .mutateWith(csrf())
                 .patch()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(map)

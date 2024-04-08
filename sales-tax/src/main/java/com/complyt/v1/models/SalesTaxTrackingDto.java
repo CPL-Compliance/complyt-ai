@@ -5,6 +5,7 @@ import com.complyt.v1.api_info.FieldsDescriptions;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.config.regex.ISO8601Regex;
+import com.complyt.v1.models.checkables.CountryCheckable;
 import com.complyt.v1.models.checkables.StateCheckable;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.models.nexus.NexusStateRuleDto;
@@ -24,7 +25,8 @@ import java.util.UUID;
 @Schema(name = "SalesTaxTracking", description = FieldsDescriptions.SALES_TAX_TRACKING)
 public record SalesTaxTrackingDto(
         @Schema(description = FieldsDescriptions.COMPLYT_ID + "salesTaxTracking") UUID complytId,
-        @Valid @NotNull(message = "state " + DtoErrorMessages.NOT_NULL_ERROR) StateDto state,
+        @Valid @NotNull(message = "country " + DtoErrorMessages.NOT_NULL_ERROR) String country,
+        @Valid StateDto state, //note: can be null in case of non usa
         @Size(max = 200, message = "comment " + StringErrorMessages.MAX_200_ERROR) String comment,
         boolean enforcesSalesTax,
         @Valid @NotNull(message = "physicalNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR) PhysicalNexusTrackerDto physicalNexusTracker,
@@ -38,5 +40,5 @@ public record SalesTaxTrackingDto(
         @Schema(description = FieldsDescriptions.FILING_FREQUENCY) FilingFrequencyDto filingFrequency,
         RegisteredType registered,
         LocalDateTime registrationDate)
-        implements StateCheckable {
+        implements StateCheckable, CountryCheckable {
 }

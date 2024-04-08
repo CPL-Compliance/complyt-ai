@@ -5,6 +5,7 @@ import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.customer.exemption.ExemptionType;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
+import com.complyt.utils.query.CountryAndStateCriteriaBuilder;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -27,16 +28,17 @@ public class ExemptionRepository {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     @NonNull
+    CountryAndStateCriteriaBuilder countryQueryBuilder;
+
+    @NonNull
     private TenantResolver tenantResolver;
 
-    public Mono<Exemption> findFullyExempted(@NonNull UUID customerId, @NonNull String state, @NonNull LocalDateTime createdDate) {
+    public Mono<Exemption> findFullyExempted(@NonNull UUID customerId, @NonNull String country, String state, @NonNull LocalDateTime createdDate) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)
                                     .and("customerId").is(customerId))
-                            .addCriteria(new Criteria().orOperator(
-                                    Criteria.where("state.abbreviation").is(state),
-                                    Criteria.where("state.name").is(state)))
+                            .addCriteria(countryQueryBuilder.build(country, state)) //todo: make sure this works
                             .addCriteria(Criteria.where("validationDates.fromDate").lte(createdDate)
                                     .and("validationDates.toDate").gte(createdDate)
                                     .and("exemptionType").is(ExemptionType.FULLY)

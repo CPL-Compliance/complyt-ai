@@ -28,23 +28,25 @@ import reactor.core.publisher.Mono;
 public class ComplytSalesTaxRatesHandler {
 
     @NonNull
-    ComplytSalesTaxRatesFacade complytSalesTaxRatesFacadeFacade;
+    ComplytSalesTaxRatesFacade complytSalesTaxRatesFacade;
 
     @NonNull
-    ValidationHandler<AddressDto, SpringValidatorAdapter> addressDtoValidationHandler;
+    ValidationHandler<AddressDto, SpringValidatorAdapter> gstAddressDtoValidationHandler;
 
     @SalesTaxRatesReadPermission
     public Mono<ServerResponse> getSalesTaxRatesByAddress(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<ComplytSalesTaxRatesDto> complytSalesTaxRatesDto = ContextLogger.observeCtx(logStr, log::info)
-                .then(addressDtoValidationHandler.validate(serverRequest))
+                .then(gstAddressDtoValidationHandler.validate(serverRequest))
                 .map(AddressMapper.INSTANCE::addressDtoToAddress)
-                .flatMap(complytSalesTaxRatesFacadeFacade::findByAddress)
+                .flatMap(complytSalesTaxRatesFacade::findByAddress)
                 .map(ComplytSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesToComplytSalesTaxRates)
-                .flatMap(complytSalesTaxRates -> ContextLogger.observeCtx("<-- Returned Body: " + complytSalesTaxRates, log::info).thenReturn(complytSalesTaxRates))
+                .flatMap(complytSalesTaxRates -> ContextLogger.observeCtx("<-- Returned Body: " + complytSalesTaxRates, log::info)
+                        .thenReturn(complytSalesTaxRates))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(complytSalesTaxRatesDto, ComplytSalesTaxRatesDto.class);
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                .body(complytSalesTaxRatesDto, ComplytSalesTaxRatesDto.class);
     }
 }

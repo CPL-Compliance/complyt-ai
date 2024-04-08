@@ -51,7 +51,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
     @Autowired
     private WebTestClient webTestClient;
 
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Indianapolis", "US", null, "IN", "705 Riley Hospital Dr", "46202", false);
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Indianapolis", "US", null, "IN", "705 Riley Hospital Dr","","46202", false);
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private final String source = "1";
 
@@ -75,7 +75,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         String externalId = "10071";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(60000), BigDecimal.ZERO,null, null,
+                        new BigDecimal(60000), BigDecimal.ZERO,null, null,null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -122,7 +122,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         String externalId = "10072";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(60000), BigDecimal.ZERO,null, null,
+                        new BigDecimal(60000), BigDecimal.ZERO,null, null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -151,7 +151,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         String externalId = "10073";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(35000), BigDecimal.ZERO,null, null,
+                        new BigDecimal(35000), BigDecimal.ZERO,null, null, null,
                         "C6S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -175,9 +175,13 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
     @Override
     @WithMockUser
     public void getSalesTaxTracking_checkEconomicNexusNotPassed_Returns200() {
+        String country = referenceAddress.country();
+        String state = referenceAddress.state();
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -198,7 +202,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         String externalId = "10074";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(35000), BigDecimal.ZERO,null, null,
+                        new BigDecimal(35000), BigDecimal.ZERO,null, null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -224,11 +228,15 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
     public void upsertSalesTaxTracking_ApproveEconomicNexus_Returns200() {
         //Given
         State state = new State("IN", "18", "Indiana");
+        String country = referenceAddress.country();
+        String stateAbbreviation = state.getAbbreviation();
 
         // Then
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getAbbreviation())
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", stateAbbreviation)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -241,7 +249,9 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                                 .mutateWith(csrf())
                                 .put()
                                 .uri(uriBuilder -> uriBuilder
-                                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getName())
+                                        .path(SalesTaxTrackingRouter.BASE_URL)
+                                        .queryParam("country", country)
+                                        .queryParam("state", stateAbbreviation)
                                         .build())
                                 .bodyValue(salesTaxTrackingDto
                                         .withApproved(true))
@@ -261,7 +271,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         String externalId = "10075";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(10000), BigDecimal.ZERO,null, null,
+                        new BigDecimal(10000), BigDecimal.ZERO,null, null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -292,7 +302,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         String externalId = "10076";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
-                        new BigDecimal(10000), BigDecimal.ZERO,null, null,
+                        new BigDecimal(10000), BigDecimal.ZERO,null, null, null,
                         "C7S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -324,7 +334,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withUnitPrice(new BigDecimal(10)).withTotalPrice(new BigDecimal(10)))
                 .withShippingFee(new ShippingFeeDto(true, new BigDecimal("0.15"),
-                        new BigDecimal(10000), BigDecimal.ZERO,null, null,
+                        new BigDecimal(10000), BigDecimal.ZERO,null, null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 

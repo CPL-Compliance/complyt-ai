@@ -35,8 +35,9 @@ public class TimeFrameQueryBuilderTest {
     }
 
     private NexusStateRule createNexusStateRule() {
+        String country = "USA";
         State state = new State("CA", "02", "California");
-        return new NexusStateRule(UUID.randomUUID().toString(), true, state, null, null, null,
+        return new NexusStateRule(UUID.randomUUID().toString(), true, country, state, null, null, null,
                 TimeFrame.CURRENT_CALENDER_YEAR, null, LocalDateTime.now());
     }
 

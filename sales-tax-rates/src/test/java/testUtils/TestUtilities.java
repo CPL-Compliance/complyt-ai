@@ -6,10 +6,16 @@ import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
+import com.complyt.domain.gt.ComplytGtRates;
+import com.complyt.domain.gt.GtAddress;
+import com.complyt.domain.gt.GtRates;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.RatesMetaDataDto;
 import com.complyt.v1.model.SalesTaxRatesDto;
+import com.complyt.v1.model.gt.ComplytGtRatesDto;
+import com.complyt.v1.model.gt.GtAddressDto;
+import com.complyt.v1.model.gt.GtRatesDto;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -117,6 +123,48 @@ public interface TestUtilities {
                 null,
                 null
         );
+    }
+
+    static GtRates createCanadaGtRates() {
+        return new GtRates(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975));
+    }
+
+    static GtRatesDto createCanadaGtRatesDto() {
+        return new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975));
+    }
+
+    static GtAddress createCanadaGtAddress() {
+        return new GtAddress("Canada", "Quebec");
+    }
+
+    static GtAddressDto createCanadaGtAddressDto() {
+        return new GtAddressDto("Canada", "Quebec");
+    }
+
+    static ComplytGtRates createCanadaComplytGtRates() {
+        GtAddress gtAddress = createCanadaGtAddress();
+        GtRates gtRates = createCanadaGtRates();
+        return new ComplytGtRates(UUID.randomUUID().toString(), gtAddress, gtRates);
+    }
+
+    static ComplytGtRatesDto createCanadaComplytGtRatesDto() {
+        GtAddressDto gtAddress = createCanadaGtAddressDto();
+        GtRatesDto gtRates = createCanadaGtRatesDto();
+        return new ComplytGtRatesDto(gtAddress, gtRates);
+    }
+
+    static GtAddressDto createArmeniaGtAddressDto() {
+        return new GtAddressDto("Armenia", null);
+    }
+
+    static GtRatesDto createArmeniaGtRatesDto() {
+        return new GtRatesDto(BigDecimal.valueOf(0.18), null, BigDecimal.valueOf(0.18));
+    }
+
+    static ComplytGtRatesDto createArmeniaComplytGtRatesDto() {
+        GtAddressDto gtAddress = createArmeniaGtAddressDto();
+        GtRatesDto gtRates = createArmeniaGtRatesDto();
+        return new ComplytGtRatesDto(gtAddress, gtRates);
     }
 
 }

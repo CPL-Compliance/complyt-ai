@@ -50,4 +50,16 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_ConflictingItemHasNegativeUnitPriceAndQuantityAndDiscount_Returns400ConflictedData();
 
     void upsertByExternalIdAndSource_ConflictingItemHasNegativeDiscount_Returns400ConflictedData();
+
+    void upsertByExternalIdAndSource_NonUsaCountry_Returns200WithTax();
+
+    void upsertByExternalIdAndSource_NonUsaCountryWithRegion_Returns200WithTax();
+
+    void upsertByExternalIdAndSource_NonUsaCountryWithRegionTaxInclusiveTrue_Returns200WithTaxFromTotal();
+
+    void upsertByExternalIdAndSource_UsaCountryTaxInclusiveTrue_Returns200WithTaxFromTotal();
+
+    void upsertByExternalIdAndSource_UsaCountryNoZipNoSupportedState_Returns400();
+
+    void upsertByExternalIdAndSource_NotSupportedNonUsaCountryNo_Returns400();
 }
