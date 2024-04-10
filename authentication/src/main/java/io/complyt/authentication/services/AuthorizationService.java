@@ -53,19 +53,28 @@ public class AuthorizationService {
                 .build();
     }
 
-    public Mono<Auth0Client> deleteApiKey(@NonNull Credentials credentials, @NonNull String accessToken) {
+    //deleteMetaData...
+    public Mono<Auth0Client> deleteClientMetadata(@NonNull Credentials credentials, @NonNull String accessToken) {
+        String decodedClientId = getDecryptClientId(credentials);
+        return authorizationServerWrapper.updateApiKeyFromClient(credentials.getName(), decodedClientId, credentials.getTenantId(), accessToken, null, null);
+    }
 
-        String decodedClientId;
+    public Mono<Auth0Client> rotateClientMetadata(@NonNull Credentials credentials, @NonNull ApiKey apiKey) {
+        String decodedClientId = getDecryptClientId(credentials);
+        return getManagementAccessToken()
+                .flatMap(accessToken -> authorizationServerWrapper.updateApiKeyFromClient(credentials.getName(), decodedClientId, credentials.getTenantId(),
+                        accessToken, apiKey.clientId(), apiKey.clientSecret()));
+    }
+
+    private String getDecryptClientId(Credentials credentials) {
         EncryptedData encryptedClientId = new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
         try {
-            decodedClientId = cryptoAesGcmNoPadding.decrypt(encryptedClientId);
+            return cryptoAesGcmNoPadding.decrypt(encryptedClientId);
         } catch (IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException |
                  InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Failed to decrypt credentials.");
         }
-        return authorizationServerWrapper.removeApiKeyFromClient(credentials.getName(), decodedClientId, credentials.getTenantId(), accessToken, null, null);
     }
-
 
     public Mono<TenantIdAndNameObject> getTenantIdAndClientName(@NonNull Credentials credentials) {
         return authorizationServerWrapper

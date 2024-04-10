@@ -6,6 +6,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -28,4 +30,5 @@ public class Credentials {
     String tenantId;
     String name;
     ApiKeyStatus status;
+    LocalDateTime expiredAt;
 }

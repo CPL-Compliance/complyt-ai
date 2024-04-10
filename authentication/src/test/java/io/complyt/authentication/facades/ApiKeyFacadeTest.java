@@ -68,7 +68,7 @@ class ApiKeyFacadeTest {
         when(credentialsService.saveCredentials(credentials, expectedApiKey, tenantId, name)).thenReturn(Mono.just(credentials));
 
         // Then
-        Mono<ApiKey> actualApiKey = apiKeyFacade.saveCredentials(credentials);
+        Mono<ApiKey> actualApiKey = apiKeyFacade.generateAndSaveNewCredentials(credentials);
 
         StepVerifier.create(actualApiKey).expectNext(expectedApiKey).verifyComplete();
     }
@@ -84,7 +84,7 @@ class ApiKeyFacadeTest {
         when(authorizationService.getTenantIdAndClientName(credentials)).thenReturn(Mono.error(new ComplytAuth0Exception()));
 
         // Then
-        Mono<ApiKey> actualApiKey = apiKeyFacade.saveCredentials(credentials);
+        Mono<ApiKey> actualApiKey = apiKeyFacade.generateAndSaveNewCredentials(credentials);
 
         StepVerifier.create(actualApiKey).expectError(ComplytAuth0Exception.class).verify();
     }
@@ -100,7 +100,7 @@ class ApiKeyFacadeTest {
         // When
         when(credentialsService.markAsCancelled(apiKey)).thenReturn(Mono.just(credentials));
         when(authorizationService.getManagementAccessToken()).thenReturn(Mono.just(managementToken));
-        when(authorizationService.deleteApiKey(credentials, managementToken)).thenReturn(Mono.just(auth0Client));
+        when(authorizationService.deleteClientMetadata(credentials, managementToken)).thenReturn(Mono.just(auth0Client));
         when(tokenService.deleteToken(apiKey)).thenReturn(Mono.just(token));
 
         // Then
@@ -148,7 +148,7 @@ class ApiKeyFacadeTest {
         // When
         when(credentialsService.markAsCancelled(apiKey)).thenReturn(Mono.just(credentials));
         when(authorizationService.getManagementAccessToken()).thenReturn(Mono.just(managementToken));
-        when(authorizationService.deleteApiKey(credentials, managementToken)).thenReturn(Mono.error(new ComplytAuth0Exception()));
+        when(authorizationService.deleteClientMetadata(credentials, managementToken)).thenReturn(Mono.error(new ComplytAuth0Exception()));
         when(tokenService.deleteToken(apiKey)).thenReturn(Mono.empty());
 
         // Then
@@ -167,7 +167,7 @@ class ApiKeyFacadeTest {
         // When
         when(credentialsService.markAsCancelled(apiKey)).thenReturn(Mono.just(credentials));
         when(authorizationService.getManagementAccessToken()).thenReturn(Mono.just(managementToken));
-        when(authorizationService.deleteApiKey(credentials, managementToken)).thenReturn(Mono.just(auth0Client));
+        when(authorizationService.deleteClientMetadata(credentials, managementToken)).thenReturn(Mono.just(auth0Client));
         when(tokenService.deleteToken(apiKey)).thenReturn(Mono.empty());
 
         // Then
@@ -180,7 +180,7 @@ class ApiKeyFacadeTest {
     void saveCredentials_credentialsIsNull_throwNullException() {
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            apiKeyFacade.saveCredentials(null);
+            apiKeyFacade.generateAndSaveNewCredentials(null);
         });
 
         assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");

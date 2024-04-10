@@ -29,7 +29,7 @@ public class ApiKeyFacade {
     @NonNull
     AuthorizationService authorizationService;
 
-    public Mono<ApiKey> saveCredentials(@NonNull final Credentials credentials) {
+    public Mono<ApiKey> generateAndSaveNewCredentials(@NonNull final Credentials credentials) {
         ApiKey apiKey = apiKeyService.generate();
         return authorizationService.getTenantIdAndClientName(credentials)
                 .flatMap(tenantIdAndNameObject -> credentialsService.saveCredentials(credentials, apiKey, tenantIdAndNameObject.getTenantId(), tenantIdAndNameObject.getName()).thenReturn(apiKey));
@@ -39,8 +39,20 @@ public class ApiKeyFacade {
 
         return credentialsService.markAsCancelled(apiKey)
                 .flatMap(credentials -> authorizationService.getManagementAccessToken()
-                        .flatMap(accessToken -> authorizationService.deleteApiKey(credentials, accessToken)
-                            .then(tokenService.deleteToken(apiKey)
-                                .thenReturn(credentials))));
+                        .flatMap(accessToken -> authorizationService.deleteClientMetadata(credentials, accessToken)
+                                .then(tokenService.deleteToken(apiKey)
+                                        .thenReturn(credentials))));
+    }
+
+    public Mono<ApiKey> rotateCredentials(@NonNull final ApiKey apiKey) {
+        return credentialsService.rotateOldCredentials(apiKey)
+                .flatMap(credentials -> generateAndSaveNewCredentialsByExisting(credentials)
+                        .flatMap(newApiKey -> authorizationService.rotateClientMetadata(credentials, newApiKey)
+                                .thenReturn(newApiKey)));
+    }
+
+    public Mono<ApiKey> generateAndSaveNewCredentialsByExisting(@NonNull final Credentials credentials) {
+        ApiKey apiKey = apiKeyService.generate();
+        return credentialsService.saveCredentialsByExistingCredentials(credentials, apiKey).thenReturn(apiKey);
     }
 }

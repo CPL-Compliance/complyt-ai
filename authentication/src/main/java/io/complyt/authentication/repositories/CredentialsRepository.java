@@ -24,7 +24,19 @@ public class CredentialsRepository {
     ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Mono<Credentials> findByComplytClientId(final @NonNull String complytClientId) {
-        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
+        // Criteria to filter out documents with the status CANCELLED
+        Criteria statusCriteria = Criteria.where("status").in(ApiKeyStatus.ACTIVE, ApiKeyStatus.ROTATED);
+        Criteria clientIdCriteria = Criteria.where("complytClientId").is(complytClientId);
+        Query query = Query.query(new Criteria().andOperator(clientIdCriteria, statusCriteria));
+
+        return ContextLogger.observeCtx("Searching for credentials by complytClientId " + complytClientId, log::info)
+                .then(reactiveMongoTemplate.findOne(query, Credentials.class));
+    }
+
+    public Mono<Credentials> findActiveCredentialsByComplytClientId(final @NonNull String complytClientId) {
+        Criteria statusCriteria = Criteria.where("status").is(ApiKeyStatus.ACTIVE);
+        Criteria clientIdCriteria = Criteria.where("complytClientId").is(complytClientId);
+        Query query = Query.query(new Criteria().andOperator(clientIdCriteria, statusCriteria));
 
         return ContextLogger.observeCtx("Searching for credentials by complytClientId " + complytClientId, log::info)
                 .then(reactiveMongoTemplate.findOne(query, Credentials.class));

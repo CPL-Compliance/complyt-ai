@@ -51,8 +51,9 @@ class CredentialsServiceTest {
     void setUp() {
         String grantType = "grantType";
         String audience = "audience";
+        int expirationCredentials = 100;
         credentialsService = new CredentialsService(credentialsRepository, passwordEncoder, cryptoAesGcmNoPadding,
-                grantType, audience);
+                grantType, audience, expirationCredentials);
     }
 
     @Test

@@ -29,6 +29,7 @@ spring:
 
 crypto.secret-key: "VtrmN9T8f1v0lGsrzYzbFib2CAPHwDpQV9vCuOlOgug="
 token-service.token-expiration-safe-window-sec: 10
+credentials-service.credentials-rotated-expiration-sec: 100
 authorization:
   grant-type: "client_credentials"
   audience: "https://integration-test/"

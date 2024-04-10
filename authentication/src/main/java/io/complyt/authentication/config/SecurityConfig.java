@@ -66,7 +66,7 @@ public class SecurityConfig {
         // Authentication and Authorization
         http.authorizeExchange()
                 .pathMatchers(HttpMethod.GET, "/actuator/health", "/actuator/info").permitAll()
-                .pathMatchers(HttpMethod.POST, "/v1/token").permitAll()
+                .pathMatchers(HttpMethod.POST, "/v1/token", "v1/api_key/rotate").permitAll()
                 .pathMatchers(HttpMethod.DELETE, "/v1/api_key").permitAll()
                 .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyExchange().authenticated();
@@ -94,7 +94,7 @@ public class SecurityConfig {
                         "/webjars/**",
                         "/swagger-ui*/**"
                 ).permitAll()
-                .pathMatchers(HttpMethod.POST, "/v1/token").permitAll()
+                .pathMatchers(HttpMethod.POST, "/v1/token", "v1/api_key/rotate").permitAll()
                 .pathMatchers(HttpMethod.DELETE, "/v1/api_key").permitAll()
                 .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyExchange().authenticated();
@@ -113,7 +113,7 @@ public class SecurityConfig {
         // Authentication and Authorization
         http.authorizeExchange()
                 .pathMatchers("/actuator/health").permitAll()
-                .pathMatchers(HttpMethod.POST, "/v1/token").permitAll()
+                .pathMatchers(HttpMethod.POST, "/v1/token", "v1/api_key/rotate").permitAll()
                 .pathMatchers(HttpMethod.DELETE, "/v1/api_key").permitAll()
                 .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyExchange().authenticated();

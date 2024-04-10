@@ -62,6 +62,7 @@ logging:
         http: INFO
 crypto.secret-key: ${secret-key}
 token-service.token-expiration-safe-window-sec: ${token-expiration-safe-window-sec}
+credentials-service.credentials-rotated-expiration-sec: ${credentials-rotated-expiration-sec}
 authorization:
   issuer-uri: ${issuer-uri}
   grant-type: ${grant-type}

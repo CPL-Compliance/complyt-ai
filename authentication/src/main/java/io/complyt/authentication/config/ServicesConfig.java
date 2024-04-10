@@ -24,9 +24,10 @@ public class ServicesConfig {
                                           @NonNull PasswordEncoder passwordEncoder,
                                           @NonNull Crypto cryptoAesGcmNoPadding,
                                           @NonNull @Value("${authorization.grant-type}") String grantType,
-                                          @NonNull @Value("${authorization.audience}") String audience) {
+                                          @NonNull @Value("${authorization.audience}") String audience,
+                                          @Value("${credentials-service.credentials-rotated-expiration-sec}") int credentialsExpirationSec){
         return new CredentialsService(credentialsRepository, passwordEncoder, cryptoAesGcmNoPadding, grantType,
-                audience);
+                audience, credentialsExpirationSec);
     }
 
     @Bean

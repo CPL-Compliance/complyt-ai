@@ -312,6 +312,13 @@ spring:
             - Path=/v1/api_key
           filters:
             - SetPath=/v1/api_key
+        - id: authentication-rotate-api-key
+          uri: lb://authentication
+          predicates:
+            - Method=POST
+            - Path=/v1/api_key/rotate
+          filters:
+            - SetPath=/v1/api_key/rotate
         # ---- ApiKey ----
         # ---- Token ----
         - id: authentication-post-token

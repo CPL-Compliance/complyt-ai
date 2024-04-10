@@ -176,7 +176,7 @@ public class Auth0AuthorizationServerWrapperTest {
         when(responseSpecMock.bodyToMono(ArgumentMatchers.<Class<Auth0Client>>notNull()))
                 .thenReturn(Mono.just(auth0Client));
 
-        Mono<Auth0Client> auth0ClientMono = auth0AuthorizationServerWrapper.removeApiKeyFromClient(clientName,
+        Mono<Auth0Client> auth0ClientMono = auth0AuthorizationServerWrapper.updateApiKeyFromClient(clientName,
                 clientId, tenantId, managementToken, newClientId, newClientSecret);
 
         // Then
@@ -202,7 +202,7 @@ public class Auth0AuthorizationServerWrapperTest {
         when(responseSpecMock.bodyToMono(Auth0Client.class))
                 .thenReturn(Mono.error(new Exception("Retries Exception")));
 
-        Mono<Auth0Client> auth0ClientMono = auth0AuthorizationServerWrapper.removeApiKeyFromClient(clientName,
+        Mono<Auth0Client> auth0ClientMono = auth0AuthorizationServerWrapper.updateApiKeyFromClient(clientName,
                 clientId, tenantId, managementToken, newClientId, newClientSecret);
 
         // Then
@@ -235,7 +235,7 @@ public class Auth0AuthorizationServerWrapperTest {
         when(responseSpecMock.bodyToMono(ArgumentMatchers.<Class<Auth0Client>>notNull()))
                 .thenReturn(Mono.just(auth0Client));
 
-        Mono<Auth0Client> auth0ClientMono = auth0AuthorizationServerWrapper.removeApiKeyFromClient(clientName,
+        Mono<Auth0Client> auth0ClientMono = auth0AuthorizationServerWrapper.updateApiKeyFromClient(clientName,
                 clientId, tenantId, managementToken, newClientId, newClientSecret);
 
         // Then
@@ -263,7 +263,7 @@ public class Auth0AuthorizationServerWrapperTest {
         when(responseSpecMock.bodyToMono(ArgumentMatchers.<Class<Auth0Client>>notNull()))
                 .thenReturn(Mono.just(auth0Client));
 
-        Mono<Auth0Client> auth0ClientMono = auth0AuthorizationServerWrapper.removeApiKeyFromClient(clientName,
+        Mono<Auth0Client> auth0ClientMono = auth0AuthorizationServerWrapper.updateApiKeyFromClient(clientName,
                 clientId, tenantId, managementToken, newClientId, newClientSecret);
 
         // Then
@@ -355,7 +355,7 @@ public class Auth0AuthorizationServerWrapperTest {
     @Test
     void removeApiKeyFromClient_clientNameIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            auth0AuthorizationServerWrapper.removeApiKeyFromClient(null,
+            auth0AuthorizationServerWrapper.updateApiKeyFromClient(null,
                     "client ID", "tenant ID", "management Access Token", "New Client ID", "New Client Secret");
         });
 
@@ -365,7 +365,7 @@ public class Auth0AuthorizationServerWrapperTest {
     @Test
     void removeApiKeyFromClient_clientIdIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            auth0AuthorizationServerWrapper.removeApiKeyFromClient("client Name",
+            auth0AuthorizationServerWrapper.updateApiKeyFromClient("client Name",
                     null, "tenant ID", "management Access Token", "New Client ID", "New Client Secret");
         });
 
@@ -375,7 +375,7 @@ public class Auth0AuthorizationServerWrapperTest {
     @Test
     void removeApiKeyFromClient_tenantIdIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            auth0AuthorizationServerWrapper.removeApiKeyFromClient("client Name",
+            auth0AuthorizationServerWrapper.updateApiKeyFromClient("client Name",
                     "client ID", null, "management Access Token", "New Client ID", "New Client Secret");
         });
 
@@ -385,7 +385,7 @@ public class Auth0AuthorizationServerWrapperTest {
     @Test
     void removeApiKeyFromClient_managementAccessTokenIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            auth0AuthorizationServerWrapper.removeApiKeyFromClient("client Name",
+            auth0AuthorizationServerWrapper.updateApiKeyFromClient("client Name",
                     "client ID", "tenant ID", null, "New Client ID", "New Client Secret");
         });
 

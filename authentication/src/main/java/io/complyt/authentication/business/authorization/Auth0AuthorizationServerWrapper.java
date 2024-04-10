@@ -9,6 +9,7 @@ import io.complyt.authentication.utils.observability.ContextLogger;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -57,7 +58,7 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
     /*
     When newClientId/newClientSecret is null the metadata is deleted, otherwise it changes the metadata
      */
-    public Mono<Auth0Client> removeApiKeyFromClient(final @NonNull String clientName, final @NonNull String clientId,
+    public Mono<Auth0Client> updateApiKeyFromClient(final @NonNull String clientName, final @NonNull String clientId,
                                                     final @NonNull String tenantId, final @NonNull String accessToken,
                                                     final String newClientId, final String newClientSecret) {
 
