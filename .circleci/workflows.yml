@@ -66,18 +66,17 @@ jobs:
         type: string
         default: ""
 
-    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+#    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: ubuntu-vm
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
+      - checkout
       - attach_workspace:
-          at: ~/complyt_work_directory
+          at: .
       - run:
           name: Execute
           command: ./mvnw clean verify
       - persist_to_workspace:
-          root: target
+          root: <<parameters.service_directory>>/target
           paths:
             - coverage-reports
             - failsafe-reports
