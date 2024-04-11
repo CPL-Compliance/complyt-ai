@@ -74,7 +74,9 @@ jobs:
           at: .
       - run:
           name: Execute
-          command: ./mvnw clean verify
+          command: |
+            cd <<parameters.service_directory>>
+            ./mvnw clean verify
       - persist_to_workspace:
           root: <<parameters.service_directory>>/target
           paths:
@@ -146,13 +148,14 @@ jobs:
       - run:
           name: Save test results
           command: |
+            cd <<parameters.service_directory>>
             mkdir -p test-results
             find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
           when: always
       - store_test_results:
-          path: test-results/
+          path: <<parameters.service_directory>>/test-results/
       - codecov/upload:
-          file: target/site/jacoco-ut/jacoco.xml
+          file: <<parameters.service_directory>>/target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
           flags: <<parameters.service_directory>>
 
