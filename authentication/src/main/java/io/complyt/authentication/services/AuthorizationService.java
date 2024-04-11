@@ -53,17 +53,14 @@ public class AuthorizationService {
                 .build();
     }
 
-    //deleteMetaData...
     public Mono<Auth0Client> deleteClientMetadata(@NonNull Credentials credentials, @NonNull String accessToken) {
         String decodedClientId = getDecryptClientId(credentials);
         return authorizationServerWrapper.updateApiKeyFromClient(credentials.getName(), decodedClientId, credentials.getTenantId(), accessToken, null, null);
     }
 
-    public Mono<Auth0Client> rotateClientMetadata(@NonNull Credentials credentials, @NonNull ApiKey apiKey) {
+    public Mono<Auth0Client> rotateClientMetadata(@NonNull Credentials credentials, @NonNull ApiKey apiKey, @NonNull String accessToken) {
         String decodedClientId = getDecryptClientId(credentials);
-        return getManagementAccessToken()
-                .flatMap(accessToken -> authorizationServerWrapper.updateApiKeyFromClient(credentials.getName(), decodedClientId, credentials.getTenantId(),
-                        accessToken, apiKey.clientId(), apiKey.clientSecret()));
+        return authorizationServerWrapper.updateApiKeyFromClient(credentials.getName(), decodedClientId, credentials.getTenantId(), accessToken, apiKey.clientId(), apiKey.clientSecret());
     }
 
     private String getDecryptClientId(Credentials credentials) {

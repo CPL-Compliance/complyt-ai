@@ -29,7 +29,7 @@ public class CredentialsRepository {
         Criteria clientIdCriteria = Criteria.where("complytClientId").is(complytClientId);
         Query query = Query.query(new Criteria().andOperator(clientIdCriteria, statusCriteria));
 
-        return ContextLogger.observeCtx("Searching for credentials by complytClientId " + complytClientId, log::info)
+        return ContextLogger.observeCtx("Searching for active/rotated credentials by complytClientId " + complytClientId, log::info)
                 .then(reactiveMongoTemplate.findOne(query, Credentials.class));
     }
 
@@ -38,7 +38,7 @@ public class CredentialsRepository {
         Criteria clientIdCriteria = Criteria.where("complytClientId").is(complytClientId);
         Query query = Query.query(new Criteria().andOperator(clientIdCriteria, statusCriteria));
 
-        return ContextLogger.observeCtx("Searching for credentials by complytClientId " + complytClientId, log::info)
+        return ContextLogger.observeCtx("Searching for active credentials by complytClientId " + complytClientId, log::info)
                 .then(reactiveMongoTemplate.findOne(query, Credentials.class));
     }
 

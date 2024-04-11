@@ -68,7 +68,7 @@ class ApiKeyFacadeTest {
         when(credentialsService.saveCredentials(credentials, expectedApiKey, tenantId, name)).thenReturn(Mono.just(credentials));
 
         // Then
-        Mono<ApiKey> actualApiKey = apiKeyFacade.generateAndSaveNewCredentials(credentials);
+        Mono<ApiKey> actualApiKey = apiKeyFacade.saveNewCredentials(credentials);
 
         StepVerifier.create(actualApiKey).expectNext(expectedApiKey).verifyComplete();
     }
@@ -84,7 +84,7 @@ class ApiKeyFacadeTest {
         when(authorizationService.getTenantIdAndClientName(credentials)).thenReturn(Mono.error(new ComplytAuth0Exception()));
 
         // Then
-        Mono<ApiKey> actualApiKey = apiKeyFacade.generateAndSaveNewCredentials(credentials);
+        Mono<ApiKey> actualApiKey = apiKeyFacade.saveNewCredentials(credentials);
 
         StepVerifier.create(actualApiKey).expectError(ComplytAuth0Exception.class).verify();
     }
@@ -180,7 +180,7 @@ class ApiKeyFacadeTest {
     void saveCredentials_credentialsIsNull_throwNullException() {
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            apiKeyFacade.generateAndSaveNewCredentials(null);
+            apiKeyFacade.saveNewCredentials(null);
         });
 
         assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");

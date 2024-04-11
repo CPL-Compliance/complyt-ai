@@ -38,11 +38,11 @@ import java.lang.annotation.Target;
                         ),
                         responses = {
                                 @ApiResponse(
-                                        responseCode = "204",
+                                        responseCode = "201",
                                         description = "Successful operation"),
                                 @ApiResponse(
-                                        responseCode = "500",
-                                        description = "Internal Error"
+                                        responseCode = "401",
+                                        description = "Unauthorized Error"
                                 )
                         }))
 })

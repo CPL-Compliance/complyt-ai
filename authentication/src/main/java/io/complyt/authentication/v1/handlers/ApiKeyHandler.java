@@ -48,7 +48,7 @@ public class ApiKeyHandler {
         Mono<ApiKeyDto> value = ContextLogger.observeCtx(logStr, log::info)
                 .then(credentialsDtoValidationHandler.handle(serverRequest))
                 .map(CredentialsMapper.INSTANCE::credentialsDtoTocredentials)
-                .flatMap(apiKeyFacade::generateAndSaveNewCredentials)
+                .flatMap(apiKeyFacade::saveNewCredentials)
                 .map(ApiKeyMapper.INSTANCE::apiKeyToApiKeyDto)
                 .flatMap(apiKeyDto -> ContextLogger.observeCtx("<-- Returned Body: " + apiKeyDto.toString(), log::info).thenReturn(apiKeyDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));

@@ -6,6 +6,7 @@ import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import io.complyt.authentication.repositories.CredentialsRepository;
 import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
+import io.complyt.authentication.v1.exceptions.types.ApiKeyNotValidException;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -74,17 +75,13 @@ public class CredentialsService {
         return credentialsRepository.findActiveCredentialsByComplytClientId(apiKey.clientId())
 //                .flatMap(this::updateStatusAndTTLToOldCredentials)
                 .flatMap(credentialsRepository::save)
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(Mono.error(new ApiKeyNotValidException()));
     }
 
     private Mono<Credentials> updateStatusAndTTLToOldCredentials(@NonNull Credentials credentials) {
         Credentials updatedCredentials = credentials.withStatus(ApiKeyStatus.ROTATED)
-                .withExpiredAt(getDocumentExpirationDateTime());
+                .withExpiredAt(LocalDateTime.now().plusSeconds(credentialsExpirationSec));
         return Mono.just(updatedCredentials);
-    }
-
-    private LocalDateTime getDocumentExpirationDateTime() {
-        return LocalDateTime.now().plusSeconds(credentialsExpirationSec);
     }
 
     private Credentials prepareCredentialsForSave(Credentials credentials, ApiKey apiKey, String tenantId, String name) {

@@ -78,7 +78,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
         ApiKeyDto apiKeyDto = ApiKeyMapper.INSTANCE.apiKeyToApiKeyDto(apiKey);
 
         // When
-        when(apiKeyFacade.generateAndSaveNewCredentials(credentials)).thenReturn(Mono.just(apiKey));
+        when(apiKeyFacade.saveNewCredentials(credentials)).thenReturn(Mono.just(apiKey));
 
         // Then
         webTestClient
@@ -100,7 +100,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     @WithMockUser
     public void post_DoesntExist_Returns401() {
         // When
-        when(apiKeyFacade.generateAndSaveNewCredentials(credentials)).thenReturn(Mono.empty());
+        when(apiKeyFacade.saveNewCredentials(credentials)).thenReturn(Mono.empty());
 
         // Then
         webTestClient
@@ -120,7 +120,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     @WithMockUser
     public void post_InternalServerError_Returns500() {
         // When
-        when(apiKeyFacade.generateAndSaveNewCredentials(credentials)).thenThrow(OperationFailedException.class);
+        when(apiKeyFacade.saveNewCredentials(credentials)).thenThrow(OperationFailedException.class);
 
         // Then
         webTestClient

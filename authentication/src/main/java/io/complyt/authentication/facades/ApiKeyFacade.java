@@ -29,7 +29,7 @@ public class ApiKeyFacade {
     @NonNull
     AuthorizationService authorizationService;
 
-    public Mono<ApiKey> generateAndSaveNewCredentials(@NonNull final Credentials credentials) {
+    public Mono<ApiKey> saveNewCredentials(@NonNull final Credentials credentials) {
         ApiKey apiKey = apiKeyService.generate();
         return authorizationService.getTenantIdAndClientName(credentials)
                 .flatMap(tenantIdAndNameObject -> credentialsService.saveCredentials(credentials, apiKey, tenantIdAndNameObject.getTenantId(), tenantIdAndNameObject.getName()).thenReturn(apiKey));
@@ -47,8 +47,9 @@ public class ApiKeyFacade {
     public Mono<ApiKey> rotateCredentials(@NonNull final ApiKey apiKey) {
         return credentialsService.rotateOldCredentials(apiKey)
                 .flatMap(credentials -> generateAndSaveNewCredentialsByExisting(credentials)
-                        .flatMap(newApiKey -> authorizationService.rotateClientMetadata(credentials, newApiKey)
-                                .thenReturn(newApiKey)));
+                        .flatMap(newApiKey -> authorizationService.getManagementAccessToken()
+                                .flatMap(accessToken -> authorizationService.rotateClientMetadata(credentials, newApiKey, accessToken)
+                                .thenReturn(newApiKey))));
     }
 
     public Mono<ApiKey> generateAndSaveNewCredentialsByExisting(@NonNull final Credentials credentials) {
