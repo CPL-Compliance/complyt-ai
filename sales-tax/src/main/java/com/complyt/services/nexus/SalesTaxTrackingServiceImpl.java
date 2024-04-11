@@ -91,7 +91,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     @Override
-    public Mono<SalesTaxTracking> findByCountryAndState(@NonNull String country, String state) {
+    public Mono<SalesTaxTracking> findByCountryStateAndSubsidiary(@NonNull String country, String state, String subsidiaryId) {
         return salesTaxTrackingRepository.findByCountryAndState(country, state);
     }
 
@@ -184,4 +184,5 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return (salesTaxTracking.getRegistered() == RegisteredType.REGISTERED && salesTaxTracking.getRegistrationDate() == null) ?
                 injectRegisteredDateToSalesTaxTracking(salesTaxTracking) : Mono.just(salesTaxTracking);
     }
+
 }

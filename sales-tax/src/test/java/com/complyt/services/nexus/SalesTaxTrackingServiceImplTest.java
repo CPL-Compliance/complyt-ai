@@ -195,10 +195,11 @@ public class SalesTaxTrackingServiceImplTest {
         // Given
         String country = salesTaxTracking.getCountry();
         String state = salesTaxTracking.getState().getAbbreviation();
+        String subsidiaryId = salesTaxTracking.getSubsidiary().subsidiaryId();
 
         // When
         when(salesTaxTrackingRepository.findByCountryAndState(country, state)).thenReturn(Mono.just(salesTaxTracking));
-        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.findByCountryAndState(country, state);
+        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.findByCountryStateAndSubsidiary(country, state, subsidiaryId);
 
         // Then
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
@@ -209,11 +210,12 @@ public class SalesTaxTrackingServiceImplTest {
         // Given
 
         String nullCountry = null;
+        String subsidiaryId = "subsidiary";
         String state = "";
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.findByCountryAndState(nullCountry, state);
+            salesTaxTrackingService.findByCountryStateAndSubsidiary(nullCountry, state, subsidiaryId);
         });
 
         // Then
@@ -223,7 +225,7 @@ public class SalesTaxTrackingServiceImplTest {
     @Test
     void findAll_FindsAll_ReturnsAll() {
         // Given
-        List<SalesTaxTracking> salesTaxTrackingList = new ArrayList<SalesTaxTracking>() {{
+        List<SalesTaxTracking> salesTaxTrackingList = new ArrayList<>() {{
             add(salesTaxTracking);
         }};
 

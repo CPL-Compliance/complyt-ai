@@ -47,7 +47,7 @@ public class TransactionFacade {
         return transactionService.checkTransactionNotHavingComplytId(transaction)
                 .flatMap(checkedTransaction -> getCustomerByTransaction(transaction)
                         .flatMap(customer -> transactionService.injectDataToNewTransaction(checkedTransaction)
-                                .flatMap(setTransaction -> salesTaxTrackingService.findByCountryAndState(setTransaction.getShippingAddress().country(), setTransaction.getShippingAddress().state())
+                                .flatMap(setTransaction -> salesTaxTrackingService.findByCountryStateAndSubsidiary(setTransaction.getShippingAddress().country(), setTransaction.getShippingAddress().state(), setTransaction.getSubsidiary().subsidiaryId())
                                         .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking)
                                                 .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus()
                                                         ? handleSalesTaxCalculationAndSave(setTransaction, salesTaxTrackingWithNexusInfo, customer)
@@ -80,7 +80,7 @@ public class TransactionFacade {
         return transactionService.checkComplytIdOfModifiedEqualsToOriginal(modifiedTransaction, originalTransaction)
                 .flatMap(checkedModifiedTransaction -> getCustomerByTransaction(modifiedTransaction)
                         .flatMap(customer -> transactionService.injectDataToModifiedTransaction(checkedModifiedTransaction, originalTransaction)
-                                .flatMap(setTransaction -> salesTaxTrackingService.findByCountryAndState(setTransaction.getShippingAddress().country(), setTransaction.getShippingAddress().state())
+                                .flatMap(setTransaction -> salesTaxTrackingService.findByCountryStateAndSubsidiary(setTransaction.getShippingAddress().country(), setTransaction.getShippingAddress().state(), setTransaction.getSubsidiary().subsidiaryId())
                                         .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking)
                                                 .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
                                                         handleSalesTaxCalculationAndUpdate(externalId, source, setTransaction, salesTaxTrackingWithNexusInfo, customer) :
@@ -131,7 +131,7 @@ public class TransactionFacade {
         return transactionService.markAsCancelled(externalId, source)
                 .flatMap(transaction -> getCustomerByTransaction(transaction)
                         .map(transaction::withCustomer))
-                .flatMap(transaction -> salesTaxTrackingService.findByCountryAndState(transaction.getShippingAddress().country(), transaction.getShippingAddress().state())
+                .flatMap(transaction -> salesTaxTrackingService.findByCountryStateAndSubsidiary(transaction.getShippingAddress().country(), transaction.getShippingAddress().state(), transaction.getSubsidiary().subsidiaryId())
                         .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking))
                         .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ? Mono.empty() :
                                 nexusService.removeFromNexusTracking(transaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()).flatMap(salesTaxTrackingService::save))

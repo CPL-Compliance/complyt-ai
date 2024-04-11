@@ -32,8 +32,8 @@ public class SalesTaxTrackingFacade {
     @NonNull
     private TransactionService transactionService;
 
-    public Mono<SalesTaxTracking> findByCountryAndState(@NonNull String country, String state) {
-        return salesTaxTrackingService.findByCountryAndState(country, state)
+    public Mono<SalesTaxTracking> findByCountryAndState(@NonNull String country, String state, String subsidiaryId) {
+        return salesTaxTrackingService.findByCountryStateAndSubsidiary(country, state, subsidiaryId)
                 .flatMap(recalculateCurrentNexusSummaryIfNeeded());
     }
 
@@ -71,8 +71,8 @@ public class SalesTaxTrackingFacade {
                 : Mono.just(salesTaxTracking);
     }
 
-    public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull String country, String state, @NonNull LocalDate refreshDate) {
-        return salesTaxTrackingService.findByCountryAndState(country, state)
+    public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull String country, String state, @NonNull LocalDate refreshDate, String subsidiaryId) {
+        return salesTaxTrackingService.findByCountryStateAndSubsidiary(country, state, subsidiaryId)
                 .flatMap(extractedSalesTaxTracking -> nexusService.hasNexus(extractedSalesTaxTracking)
                         .flatMap(salesTaxTrackingWithNexusInfo -> !salesTaxTrackingWithNexusInfo.isHasNexus()
                                 ? salesTaxTrackingService.addClientAndStateDetails(salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
@@ -80,7 +80,7 @@ public class SalesTaxTrackingFacade {
                                         .flatMapMany(transactionService::getTransactionsByQuery)
                                         .flatMap(
                                                 transaction -> customerService.findByComplytId(transaction.getCustomerId())
-                                                .map(transaction::withCustomer))
+                                                        .map(transaction::withCustomer))
                                         .collectList()
                                         .flatMap(transactions -> nexusService.refreshNexusSummary(salesTaxTracking, transactions, refreshDate))
                                         .flatMap(salesTaxTrackingService::save))

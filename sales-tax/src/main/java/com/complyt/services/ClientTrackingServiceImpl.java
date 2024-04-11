@@ -44,7 +44,7 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
     }
 
     @Override
-    public Mono<ClientTracking> saveByTenantId(@NonNull ClientTracking clientTracking,@NonNull String tenantId) {
+    public Mono<ClientTracking> saveByTenantId(@NonNull ClientTracking clientTracking, @NonNull String tenantId) {
         return clientTrackingRepository.saveByTenantId(clientTracking.withTenantId(tenantId), tenantId);
     }
 
@@ -88,6 +88,7 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
     private Function<ClientTracking, ClientTracking> createFunctionUpdatedClientTracking(final ClientTracking clientTracking) {
         return clientTrackingInfo ->
                 new ClientTracking(clientTrackingInfo.getId(), clientTrackingInfo.getTenantId(),
-                        clientTracking.getNexus(), clientTracking.getName(), clientTracking.getInternalTimestamps());
+                        clientTracking.getNexus(), clientTracking.getName(), clientTracking.getInternalTimestamps(),
+                        clientTracking.getSubsidiaries());
     }
 }

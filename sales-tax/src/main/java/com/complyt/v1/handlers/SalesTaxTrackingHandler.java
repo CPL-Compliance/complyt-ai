@@ -56,12 +56,13 @@ public class SalesTaxTrackingHandler {
     public Mono<ServerResponse> getOne(ServerRequest serverRequest) {
         String country = serverRequest.queryParam("country").orElse("");
         String state = serverRequest.queryParam("state").orElse("");
+        String subsidiary = serverRequest.queryParam("subsidiary").orElse("0");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(salesTaxTrackingDtoValidationHandler.validateQueryParam("country", country))
                 .then(CountryIsUsaChecker.isCountryUsa(country) ? salesTaxTrackingDtoValidationHandler.validateQueryParam("state", state) : Mono.just(""))
-                .then(Mono.defer(() -> salesTaxTrackingFacade.findByCountryAndState(country, state)
+                .then(Mono.defer(() -> salesTaxTrackingFacade.findByCountryAndState(country, state, subsidiary)
                         .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
                         .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()))));
 
@@ -93,6 +94,7 @@ public class SalesTaxTrackingHandler {
 
                     String country = salesTaxTrackingDto.country();
                     String stateName = null;
+                    String subsidiary = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
                     StringBuilder resourceURI = new StringBuilder(SalesTaxTrackingRouter.BASE_URL + "?country=" + country);
 
                     if (salesTaxTrackingDto.state() != null) {
@@ -101,7 +103,7 @@ public class SalesTaxTrackingHandler {
                     }
 
                     SalesTaxTracking receivedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto);
-                    return salesTaxTrackingFacade.findByCountryAndState(country, stateName)
+                    return salesTaxTrackingFacade.findByCountryAndState(country, stateName, subsidiary)
                             .flatMap(originalSalesTaxTracking -> salesTaxTrackingFacade.update(receivedSalesTaxTracking, originalSalesTaxTracking))
                             .flatMap(updatedSalesTaxTracking ->
                                     ServerResponse.status(HttpStatus.OK).bodyValue(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(updatedSalesTaxTracking)))
@@ -133,18 +135,17 @@ public class SalesTaxTrackingHandler {
     public Mono<ServerResponse> refreshNexusSummaryByDate(ServerRequest serverRequest) {
         String country = serverRequest.queryParam("country").orElse("");
         String state = serverRequest.queryParam("state").orElse("");
+        String subsidiary = serverRequest.queryParam("subsidiary").orElse("0");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(dateWrapperDtoValidationHandler.handle(serverRequest)
                         .map(DateWrapperToLocalDateMapper.INSTANCE::dateWrapperToLocalDate)
-                        .flatMap(date -> {
-                            return salesTaxTrackingDtoValidationHandler.validateQueryParam("country", country)
-                                    .then(CountryIsUsaChecker.isCountryUsa(country) ? salesTaxTrackingDtoValidationHandler.validateQueryParam("state", state) : Mono.empty())
-                                    .then(Mono.defer(() -> salesTaxTrackingFacade.refreshNexusSummary(country, state, date)
-                                            .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                                            .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new))));
-                        }));
+                        .flatMap(date -> salesTaxTrackingDtoValidationHandler.validateQueryParam("country", country)
+                                .then(CountryIsUsaChecker.isCountryUsa(country) ? salesTaxTrackingDtoValidationHandler.validateQueryParam("state", state) : Mono.empty())
+                                .then(Mono.defer(() -> salesTaxTrackingFacade.refreshNexusSummary(country, state, date, subsidiary)
+                                        .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
+                                        .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new))))));
 
         return ServerResponse.ok().body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
     }
@@ -153,12 +154,13 @@ public class SalesTaxTrackingHandler {
     public Mono<ServerResponse> patch(ServerRequest serverRequest) {
         String country = serverRequest.queryParam("country").orElse("");
         String state = serverRequest.queryParam("state").orElse("");
+        String subsidiary = serverRequest.queryParam("subsidiary").orElse("0");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(salesTaxTrackingDtoValidationHandler.validateQueryParam("country", country))
                 .then(CountryIsUsaChecker.isCountryUsa(country) ? salesTaxTrackingDtoValidationHandler.validateQueryParam("state", state) : Mono.just(""))
-                .then(Mono.defer(() -> salesTaxTrackingFacade.findByCountryAndState(country, state))
+                .then(Mono.defer(() -> salesTaxTrackingFacade.findByCountryAndState(country, state, subsidiary))
                         .flatMap(existingSalesTaxTracking -> serverRequest.bodyToMono(Map.class)
                                 .map(map -> salesTaxTrackingPatcher.patch(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(existingSalesTaxTracking), map))
                                 .switchIfEmpty(Mono.error(new InvalidPatchFieldException()))
