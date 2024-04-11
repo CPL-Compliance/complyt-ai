@@ -162,9 +162,11 @@ public class Auth0AuthorizationServerWrapperTest {
         String contentTypeHeaderValue = "application/json";
         Auth0Client auth0Client = TestUtilities.createAuth0Client();
 
-        String json = "{ \"name\": \"" + clientName +
-                "\", \"client_metadata\": { \"tenant_id\": \"" + tenantId +
-                "\", \"clientId\": " + newClientId + ", \"clientSecret\": " + newClientSecret + " } }";
+        String json =  "{ \"name\": \"" + clientName +
+                "\", \"client_metadata\": { " +
+                "\"tenant_id\": \"" + tenantId +
+                "\", \"clientId\": \"" + newClientId + "\"" +
+                ", \"clientSecret\": \"" + newClientSecret + "\" } }";
 
         // When
         when(webClient.patch()).thenReturn(requestBodyUriSpecMock);
@@ -188,9 +190,11 @@ public class Auth0AuthorizationServerWrapperTest {
         // Given
         String contentTypeHeaderValue = "application/json";
 
-        String json = "{ \"name\": \"" + clientName +
-                "\", \"client_metadata\": { \"tenant_id\": \"" + tenantId +
-                "\", \"clientId\": " + newClientId + ", \"clientSecret\": " + newClientSecret + " } }";
+        String json =  "{ \"name\": \"" + clientName +
+                "\", \"client_metadata\": { " +
+                "\"tenant_id\": \"" + tenantId +
+                "\", \"clientId\": \"" + newClientId + "\"" +
+                ", \"clientSecret\": \"" + newClientSecret + "\" } }";
 
         // When
         when(webClient.patch()).thenReturn(requestBodyUriSpecMock);
@@ -221,10 +225,11 @@ public class Auth0AuthorizationServerWrapperTest {
 
         Auth0Client auth0Client = TestUtilities.createAuth0Client();
 
-        String json = "{ \"name\": \"" + clientName +
-                "\", \"client_metadata\": { \"tenant_id\": \"" + tenantId +
-                "\", \"clientId\": " + newClientId + ", \"clientSecret\": " + newClientSecret + " } }";
-
+        String json =   "{ \"name\": \"" + clientName +
+                "\", \"client_metadata\": { " +
+                "\"tenant_id\": \"" + tenantId +
+                "\", \"clientId\": \"" + newClientId + "\"" +
+                ", \"clientSecret\": \"" + newClientSecret + "\" } }";
         // When
         when(webClient.patch()).thenReturn(requestBodyUriSpecMock);
         when(requestBodyUriSpecMock.uri("/api/v2/clients/" + clientId)).thenReturn(requestBodyUriSpecMock);
@@ -249,9 +254,11 @@ public class Auth0AuthorizationServerWrapperTest {
         String contentTypeHeaderValue = "application/json";
         Auth0Client auth0Client = TestUtilities.createAuth0Client();
 
-        String json = "{ \"name\": \"" + clientName +
-                "\", \"client_metadata\": { \"tenant_id\": \"" + tenantId +
-                "\", \"clientId\": " + newClientId + ", \"clientSecret\": " + newClientSecret + " } }";
+        String json =  "{ \"name\": \"" + clientName +
+                "\", \"client_metadata\": { " +
+                "\"tenant_id\": \"" + tenantId +
+                "\", \"clientId\": \"" + newClientId + "\"" +
+                ", \"clientSecret\": \"" + newClientSecret + "\" } }";
 
         // When
         when(webClient.patch()).thenReturn(requestBodyUriSpecMock);
