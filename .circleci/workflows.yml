@@ -47,16 +47,16 @@ jobs:
         type: string
         default: ""
 
-    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: ubuntu-vm
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
+      - checkout
       - run:
           name: Execute
-          command: ./mvnw clean package -Dmaven.test.skip
+          command: |
+            cd <<parameters.service_directory>>
+            ./mvnw clean package -Dmaven.test.skip
       - persist_to_workspace:
-          root: ~/complyt_work_directory
+          root: .
           paths:
             - <<parameters.service_directory>>/target/*.jar
 
@@ -66,7 +66,6 @@ jobs:
         type: string
         default: ""
 
-#    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: ubuntu-vm
     steps:
       - checkout
@@ -138,11 +137,9 @@ jobs:
         type: string
         default: ""
 
-#    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: openjdk-image
     steps:
       - checkout
-#          path: ~/complyt_work_directory
       - attach_workspace:
           at: <<parameters.service_directory>>/target
       - run:
