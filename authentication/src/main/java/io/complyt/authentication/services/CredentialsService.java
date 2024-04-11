@@ -7,7 +7,6 @@ import io.complyt.authentication.repositories.CredentialsRepository;
 import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
 import io.complyt.authentication.v1.exceptions.types.ApiKeyNotValidException;
-import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
