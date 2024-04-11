@@ -162,13 +162,13 @@ jobs:
         type: string
         default: ""
 
-    working_directory: ~/complyt_work_directory/<<parameters.service_name>>
+#    working_directory: ~/complyt_work_directory/<<parameters.service_name>>
     executor: python-image
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
-      - attach_workspace:
-          at: .
+      - checkout
+#          path: ~/complyt_work_directory
+#      - attach_workspace:
+#          at: .
       - run:
           name: Set image tag as env variable
           command: |
