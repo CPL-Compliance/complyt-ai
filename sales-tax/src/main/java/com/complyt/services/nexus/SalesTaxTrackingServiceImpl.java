@@ -143,7 +143,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                                 salesTaxTrackingWithDetails.getApprovalDate(),
                                 salesTaxTrackingWithDetails.getFilingFrequency(),
                                 salesTaxTrackingWithDetails.getRegistered(),
-                                salesTaxTrackingWithDetails.getRegistrationDate()));
+                                salesTaxTrackingWithDetails.getRegistrationDate(),
+                                salesTaxTrackingWithDetails.getSubsidiary()));
     }
 
     @Override
