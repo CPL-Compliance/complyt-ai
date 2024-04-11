@@ -47,16 +47,16 @@ jobs:
         type: string
         default: ""
 
-    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: ubuntu-vm
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
+      - checkout
       - run:
           name: Execute
-          command: ./mvnw clean package -Dmaven.test.skip
+          command: |
+            cd <<parameters.service_directory>>
+            ./mvnw clean package -Dmaven.test.skip
       - persist_to_workspace:
-          root: ~/complyt_work_directory
+          root: .
           paths:
             - <<parameters.service_directory>>/target/*.jar
 
@@ -66,18 +66,21 @@ jobs:
         type: string
         default: ""
 
-    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+#    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: ubuntu-vm
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
+      - checkout
+#          path: ~/complyt_work_directory
       - attach_workspace:
-          at: ~/complyt_work_directory
+          at: .
+#          at: ~/complyt_work_directory
       - run:
           name: Execute
-          command: ./mvnw clean verify
+          command: |
+            cd <<parameters.service_directory>>
+            ./mvnw clean verify
       - persist_to_workspace:
-          root: target
+          root: <<parameters.service_directory>>/target
           paths:
             - coverage-reports
             - failsafe-reports
@@ -89,14 +92,15 @@ jobs:
       service_directory:
         type: string
         default: ""
-    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+#    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: ubuntu-vm
 
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
+      - checkout
+#          path: ~/complyt_work_directory
       - attach_workspace:
-          at: ~/complyt_work_directory
+          at: .
+#          at: ~/complyt_work_directory
       - add_ssh_keys:
           fingerprints:
             - "8d:a9:53:20:ea:7a:b2:1d:e5:d8:af:d4:fc:e0:81:16"
@@ -119,7 +123,7 @@ jobs:
             bash ../.circleci/git_commands.sh <<parameters.service_directory>> "$PROJECT_VERSION"
 
       - persist_to_workspace:
-          root: .
+          root: ./<<parameters.service_directory>>
           paths:
             - bash.env
 
@@ -137,13 +141,13 @@ jobs:
         type: string
         default: ""
 
-    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+#    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: openjdk-image
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
+      - checkout
+#          path: ~/complyt_work_directory
       - attach_workspace:
-          at: target
+          at: <<parameters.service_directory>>/target
       - run:
           name: Save test results
           command: |
@@ -151,9 +155,9 @@ jobs:
             find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
           when: always
       - store_test_results:
-          path: test-results/
+          path: <<parameters.service_directory>>/test-results/
       - codecov/upload:
-          file: target/site/jacoco-ut/jacoco.xml
+          file: <<parameters.service_directory>>/target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
           flags: <<parameters.service_directory>>
 
@@ -163,13 +167,13 @@ jobs:
         type: string
         default: ""
 
-    working_directory: ~/complyt_work_directory/<<parameters.service_name>>
+#    working_directory: ~/complyt_work_directory/<<parameters.service_name>>
     executor: python-image
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
+      - checkout
+#          path: ~/complyt_work_directory
       - attach_workspace:
-          at: .
+          at: ./<<parameters.service_directory>>
       - run:
           name: Set image tag as env variable
           command: |
@@ -192,7 +196,6 @@ jobs:
           container-image-name-updates: "container=demo-<<parameters.service_name>>-container, tag=<<parameters.service_name>>-latest"
           family: "demo-<<parameters.service_name>>-task-definition"
           service-name: "demo-<<parameters.service_name>>-service"
-
 
 workflows:
   sales-tax-workflow:
