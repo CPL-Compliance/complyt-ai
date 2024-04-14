@@ -143,7 +143,6 @@ jobs:
       - run:
           name: Save test results
           command: |
-#            cd <<parameters.service_directory>>
             mkdir -p test-results
             find . -type f -regex ".*/surefire-reports/.*xml" -exec cp {} test-results/ \;
           when: always
