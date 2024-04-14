@@ -138,21 +138,23 @@ jobs:
         type: string
         default: ""
 
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: openjdk-image
     steps:
+      - checkout:
+          path: ~/complyt_work_directory
       - attach_workspace:
-          at: <<parameters.service_directory>>/target
+          at: target
       - run:
           name: Save test results
           command: |
-            cd <<parameters.service_directory>>
             mkdir -p test-results
             find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
           when: always
       - store_test_results:
-          path: <<parameters.service_directory>>/test-results/
+          path: test-results/
       - codecov/upload:
-          file: <<parameters.service_directory>>/target/site/jacoco-ut/jacoco.xml
+          file: target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
           flags: <<parameters.service_directory>>
 
