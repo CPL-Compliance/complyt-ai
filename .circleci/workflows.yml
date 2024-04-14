@@ -89,14 +89,13 @@ jobs:
       service_directory:
         type: string
         default: ""
-    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+
     executor: ubuntu-vm
 
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
+      - checkout
       - attach_workspace:
-          at: ~/complyt_work_directory
+          at: .
       - add_ssh_keys:
           fingerprints:
             - "8d:a9:53:20:ea:7a:b2:1d:e5:d8:af:d4:fc:e0:81:16"
@@ -104,6 +103,7 @@ jobs:
       - run:
           name: Export Environment variables for access to image_tag
           command: |
+            cd <<parameters.service_directory>>
             image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
             export IMAGE_TAG=$image_tag
             env >> bash.env
@@ -111,6 +111,7 @@ jobs:
       - run:
           name: Release
           command: |
+            cd <<parameters.service_directory>>
             PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEXT_DEVELOPMENT_VERSION=$(echo "$PROJECT_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
             git checkout -b "<<parameters.service_directory>>-$PROJECT_VERSION"
@@ -119,12 +120,12 @@ jobs:
             bash ../.circleci/git_commands.sh <<parameters.service_directory>> "$PROJECT_VERSION"
 
       - persist_to_workspace:
-          root: .
+          root: ./<<parameters.service_directory>>
           paths:
             - bash.env
 
       - persist_to_workspace:
-          root: target
+          root: <<parameters.service_directory>>/target
           paths:
             - coverage-test-service
             - failsafe-test-service
