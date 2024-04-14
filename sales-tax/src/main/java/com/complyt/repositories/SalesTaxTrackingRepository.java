@@ -1,7 +1,6 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.transaction.Address;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.utils.query.CountryAndStateCriteriaBuilder;
@@ -39,15 +38,21 @@ public class SalesTaxTrackingRepository {
     @NonNull
     CountryAndStateCriteriaBuilder countryQueryBuilder;
 
-    public Mono<SalesTaxTracking> findByCountryAndState(@NonNull String country, String state) {
+    public Mono<SalesTaxTracking> findByCountryAndState(@NonNull String country, String state, String subsidiaryId) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Criteria addressSearchQuery = countryQueryBuilder.build(country, state);
 
                     Query query = Query.query(addressSearchQuery.and("tenantId").is(tenantId));
 
+                    query.addCriteria(Criteria.where("subsidiary.subsidiaryId").is(subsidiaryId != null && !subsidiaryId.isBlank() ? subsidiaryId : "0"));
+
+//                    if (subsidiaryId != null && !subsidiaryId.isBlank()) {
+//                        query.addCriteria(Criteria.where("subsidiary.subsidiaryId").is(subsidiaryId));
+//                    }
+
                     StringBuilder stringBuilder = new StringBuilder("Searching for sales tax tracking with country " + country);
-                    stringBuilder = state != null? stringBuilder.append(" and with state " + state) : stringBuilder;
+                    stringBuilder = state != null ? stringBuilder.append(" and with state " + state) : stringBuilder;
                     stringBuilder.append(" and tenant ID " + tenantId);
 
                     return ContextLogger.observeCtx(stringBuilder.toString(), log::info)

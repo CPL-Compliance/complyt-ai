@@ -92,7 +92,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> findByCountryStateAndSubsidiary(@NonNull String country, String state, String subsidiaryId) {
-        return salesTaxTrackingRepository.findByCountryAndState(country, state);
+        return salesTaxTrackingRepository.findByCountryAndState(country, state, subsidiaryId);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking) {
         String state = salesTaxTracking.getState() != null ? salesTaxTracking.getState().getName() : "";
-        return salesTaxTrackingRepository.findByCountryAndState(salesTaxTracking.getCountry(), state) //todo: check
+        return salesTaxTrackingRepository.findByCountryAndState(salesTaxTracking.getCountry(), state, salesTaxTracking.getSubsidiary().subsidiaryId()) //todo: check
                 .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with country " + salesTaxTracking.getCountry())))
                 .flatMap(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
                 .flatMap(this::upsertWithoutNexusSummaryIfNeeded);

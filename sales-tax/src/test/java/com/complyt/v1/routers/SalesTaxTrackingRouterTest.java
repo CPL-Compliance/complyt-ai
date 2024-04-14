@@ -81,7 +81,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
         String country = expectedSalesTaxTrackingDto.country();
         String state = expectedSalesTaxTrackingDto.state().name();
-        String subsidiaryId = expectedSalesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = expectedSalesTaxTrackingDto.subsidiary().subsidiaryId();
 
         when(salesTaxTrackingFacade.findByCountryAndState(country, state, subsidiaryId)).thenReturn(Mono.just(salesTaxTracking));
 
@@ -108,7 +108,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking)
                         .withCountry("Canada");
         String country = expectedSalesTaxTrackingDto.country();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
         String state = "null";
 
         when(salesTaxTrackingFacade.findByCountryAndState(country, state, subsidiaryId)).thenReturn(Mono.just(salesTaxTracking.withCountry("Canada")));
@@ -136,7 +136,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
         String state = "NoneState";
         String country = expectedSalesTaxTrackingDto.country();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
 
         when(salesTaxTrackingFacade.findByCountryAndState(country, state, subsidiaryId)).thenReturn(Mono.just(salesTaxTracking));
 
@@ -164,7 +164,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
         String country = newSalesTaxTrackingDto.country();
         String state = newSalesTaxTracking.getState().getName();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
 
         SalesTaxTracking receivedSalesTaxTrackingWithId = newSalesTaxTracking
                 .withId(UUID.randomUUID().toString());
@@ -205,7 +205,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTracking newSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(newSalesTaxTrackingDto);
 
         String country = newSalesTaxTrackingDto.country();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
 
         SalesTaxTracking receivedSalesTaxTrackingWithId = newSalesTaxTracking
                 .withId(UUID.randomUUID().toString());
@@ -284,7 +284,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
         String country = salesTaxTrackingDto.country();
         String state = salesTaxTracking.getState().getName();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
 
         when(salesTaxTrackingFacade.findByCountryAndState(country, state, subsidiaryId)).thenReturn(Mono.empty());
 
@@ -348,7 +348,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
         String country = salesTaxTrackingDto.country();
         String state = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
 
         when(salesTaxTrackingFacade.findByCountryAndState(country, state, subsidiaryId)).thenReturn(Mono.error(new OperationFailedException()));
 
@@ -703,7 +703,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTracking originalSalesTaxTracking = mappedSalesTaxTracking.withComplytId(complytId);
 
         String country = givenSalesTaxTrackingDto.country();
-        String subsidiaryId = givenSalesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = givenSalesTaxTrackingDto.subsidiary().subsidiaryId();
         when(salesTaxTrackingFacade.findByCountryAndState(country, givenSalesTaxTrackingDto.state().name(), subsidiaryId)).thenReturn(Mono.just(originalSalesTaxTracking));
         when(salesTaxTrackingFacade.save(mappedSalesTaxTracking)).thenReturn(Mono.empty());
         when(salesTaxTrackingFacade.update(mappedSalesTaxTracking, originalSalesTaxTracking)).thenReturn(Mono.just(mappedSalesTaxTracking.withComplytId(complytId)));
@@ -758,7 +758,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         // Given
         String country = salesTaxTrackingDto.country();
         String stateName = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
         UUID differentComplytId = UUID.randomUUID();
         SalesTaxTracking differentSalesTaxTracking = salesTaxTracking.withComplytId(differentComplytId);
 
@@ -792,7 +792,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         // Given
         String country = salesTaxTrackingDto.country();
         String stateName = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
 
         // When
         when(salesTaxTrackingFacade.findByCountryAndState(country, stateName, subsidiaryId)).thenReturn(Mono.empty());
@@ -823,7 +823,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         // Given
         String stateName = salesTaxTrackingDto.state().name();
         String country = salesTaxTrackingDto.country();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
         SalesTaxTrackingDto salesTaxTrackingConflictedDto = salesTaxTrackingDto.withRegistered(null)
                 .withRegistrationDate(LocalDateTime.now());
 
@@ -951,7 +951,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         // Given
         String country = salesTaxTrackingDto.country();
         String stateName = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
 
         // When
         when(salesTaxTrackingFacade.findByCountryAndState(country, stateName, subsidiaryId)).thenReturn(Mono.error(new OperationFailedException()));
@@ -1428,7 +1428,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         // Given
         String country = salesTaxTrackingDto.country();
         String stateName = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto.withComment("");
         SalesTaxTracking mappedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(givenSalesTaxTrackingDto);
 
@@ -1461,7 +1461,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         LocalDate localDate = LocalDate.now();
         String country = salesTaxTrackingDto.country();
         String stateName = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
         SalesTaxTrackingDto resultedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
 
         // When
@@ -1492,7 +1492,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         LocalDate localDate = LocalDate.now();
         String country = "Canada";
         String stateName = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
         SalesTaxTrackingDto resultedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
 
         // When
@@ -1524,7 +1524,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTracking salesTaxTrackingToSend = salesTaxTracking.withCountry("Canada").withState(null);
         String country = salesTaxTrackingDto.country();
         String stateName = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
         SalesTaxTrackingDto resultedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTrackingToSend);
 
         // When
@@ -1555,7 +1555,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         LocalDate localDate = LocalDate.now();
         String country = salesTaxTrackingDto.country();
         String stateName = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
 
         // When
         when(salesTaxTrackingFacade.refreshNexusSummary(country, stateName, localDate, subsidiaryId)).thenReturn(Mono.empty());
@@ -1581,7 +1581,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         LocalDate localDate = LocalDate.now();
         String country = salesTaxTrackingDto.country();
         String stateName = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
 
         // When
         when(salesTaxTrackingFacade.refreshNexusSummary(country, stateName, localDate, subsidiaryId)).thenReturn(Mono.just(salesTaxTracking));
@@ -1612,7 +1612,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         LocalDate localDate = LocalDate.now();
         String country = salesTaxTrackingDto.country();
         String stateName = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
 
         // When
         when(salesTaxTrackingFacade.refreshNexusSummary(country, stateName, localDate, subsidiaryId)).thenReturn(Mono.just(salesTaxTracking));
@@ -1640,7 +1640,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         LocalDate localDate = LocalDate.now();
         String stateName = salesTaxTrackingDto.state().name();
         String country = salesTaxTrackingDto.country();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
 
         // When
         when(salesTaxTrackingFacade.refreshNexusSummary(country, stateName, localDate, subsidiaryId)).thenReturn(Mono.just(salesTaxTracking));
@@ -1673,7 +1673,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         LocalDate localDate = LocalDate.now();
         String country = salesTaxTrackingDto.country();
         String stateName = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
 
         // When
         when(salesTaxTrackingFacade.refreshNexusSummary(country, stateName, localDate, subsidiaryId)).thenReturn(Mono.just(salesTaxTracking));
@@ -1698,7 +1698,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         LocalDate localDate = LocalDate.now();
         String country = salesTaxTrackingDto.country();
         String stateName = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
         String state = "null";
 
         // When
@@ -1727,7 +1727,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         LocalDate localDate = LocalDate.now();
         String country = salesTaxTrackingDto.country();
         String stateName = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
 
         // When
         when(salesTaxTrackingFacade.refreshNexusSummary(country, stateName, localDate, subsidiaryId)).thenReturn(Mono.error(RuntimeException::new));
@@ -1770,7 +1770,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         // Given
         String stateName = salesTaxTrackingDto.state().name();
         String country = salesTaxTrackingDto.country();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(null);
         Set<String> expectedErrors = Set.of(DtoErrorMessages.STATE_MUST_NOT_BE_NULL_USA);
@@ -1798,7 +1798,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         // Given
         String stateName = salesTaxTrackingDto.state().name();
         String country = salesTaxTrackingDto.country();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("", "code", "name"));
         Set<String> expectedErrors = Set.of(
@@ -2063,7 +2063,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
         String country = salesTaxTrackingDto.country();
         String state = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingDto.subsidiary().subsidiaryId();
 
         SalesTaxTracking expectedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(expectedSalesTaxTrackingDto);
         SalesTaxTracking originalSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto);
@@ -2106,7 +2106,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
         String country = salesTaxTrackingOutsideOfUSA.country();
         String state = salesTaxTrackingOutsideOfUSA.state().name();
-        String subsidiaryId = salesTaxTrackingOutsideOfUSA.subsidiaryDto().subsidiaryId();
+        String subsidiaryId = salesTaxTrackingOutsideOfUSA.subsidiary().subsidiaryId();
 
         SalesTaxTracking expectedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(expectedSalesTaxTrackingDto);
         SalesTaxTracking originalSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingOutsideOfUSA);

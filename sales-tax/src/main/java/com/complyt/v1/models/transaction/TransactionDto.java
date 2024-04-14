@@ -3,6 +3,7 @@ package com.complyt.v1.models.transaction;
 import com.complyt.v1.api_info.FieldsDescriptions;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
+import com.complyt.v1.models.SubsidiaryDto;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.checkables.ExternalIdCheckable;
 import com.complyt.v1.models.checkables.SourceCheckable;
@@ -46,6 +47,7 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(description = FieldsDescriptions.TOTAL_DISCOUNT) BigDecimal totalDiscount,
                              @Schema(description = FieldsDescriptions.FINAL_TRANSACTION_AMOUNT) BigDecimal finalTransactionAmount,
                              @Schema(description = FieldsDescriptions.TRANSACTION_FILING_STATUS) TransactionFilingStatusDto transactionFilingStatus,
-                             @Schema(description = FieldsDescriptions.CURRENCY) String currency)
+                             @Schema(description = FieldsDescriptions.CURRENCY) String currency,
+                             SubsidiaryDto subsidiary)
         implements SourceCheckable, ExternalIdCheckable {
 }

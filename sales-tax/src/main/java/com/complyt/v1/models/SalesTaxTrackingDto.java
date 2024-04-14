@@ -38,6 +38,6 @@ public record SalesTaxTrackingDto(
         @Schema(description = FieldsDescriptions.FILING_FREQUENCY) FilingFrequencyDto filingFrequency,
         RegisteredType registered,
         LocalDateTime registrationDate,
-        SubsidiaryDto subsidiaryDto)
+        SubsidiaryDto subsidiary)
         implements StateCheckable, CountryCheckable {
 }

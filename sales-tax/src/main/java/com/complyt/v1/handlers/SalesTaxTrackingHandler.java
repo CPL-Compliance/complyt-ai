@@ -94,7 +94,7 @@ public class SalesTaxTrackingHandler {
 
                     String country = salesTaxTrackingDto.country();
                     String stateName = null;
-                    String subsidiary = salesTaxTrackingDto.subsidiaryDto().subsidiaryId();
+                    String subsidiary = salesTaxTrackingDto.subsidiary().subsidiaryId();
                     StringBuilder resourceURI = new StringBuilder(SalesTaxTrackingRouter.BASE_URL + "?country=" + country);
 
                     if (salesTaxTrackingDto.state() != null) {

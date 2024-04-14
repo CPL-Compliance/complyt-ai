@@ -78,9 +78,8 @@ public class SalesTaxTrackingFacade {
                                 ? salesTaxTrackingService.addClientAndStateDetails(salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
                                 .flatMap(salesTaxTracking -> nexusService.getTransactionsQueryByNexusCalculation(salesTaxTracking.getNexusStateRule(), salesTaxTracking.getClientTracking(), refreshDate)
                                         .flatMapMany(transactionService::getTransactionsByQuery)
-                                        .flatMap(
-                                                transaction -> customerService.findByComplytId(transaction.getCustomerId())
-                                                        .map(transaction::withCustomer))
+                                        .flatMap(transaction -> customerService.findByComplytId(transaction.getCustomerId())
+                                                .map(transaction::withCustomer))
                                         .collectList()
                                         .flatMap(transactions -> nexusService.refreshNexusSummary(salesTaxTracking, transactions, refreshDate))
                                         .flatMap(salesTaxTrackingService::save))
