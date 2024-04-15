@@ -1,5 +1,8 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
+import com.complyt.business.tax.sales_tax.sales_tax_rates.ItemsSalesTaxRatesProvider;
+import com.complyt.business.tax.sales_tax.sales_tax_rates.ShippingFeeSalesTaxRatesProvider;
+import com.complyt.business.tax.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.Item;
@@ -59,7 +62,7 @@ public class TransactionSalesTaxRatesHandlerTest {
         Transaction expectedTransaction = transaction.withItems(modifiedItems);
 
         // When
-        when(itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRates, address)).thenReturn(modifiedItems);
+        when(itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRates, transaction.getShippingAddress())).thenReturn(modifiedItems);
         Mono<Transaction> actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates);
 
         // Then
@@ -69,7 +72,7 @@ public class TransactionSalesTaxRatesHandlerTest {
     @Test
     void setRates_SetsRatesToTransactionWithShippingFee_ReturnsModifiedTransaction() {
         // Given
-        ShippingFee shippingFee = testUtilities.createShippingFee(false, false);
+        ShippingFee shippingFee = testUtilities.createShippingFee(false, false, false);
         Transaction transaction = testUtilities.createTransaction(null).withShippingFee(shippingFee);
         SalesTaxRates salesTaxRates = testUtilities.createSalesTaxRates();
         Item itemWithRates = transaction.getItems().get(0).withSalesTaxRates(salesTaxRates);

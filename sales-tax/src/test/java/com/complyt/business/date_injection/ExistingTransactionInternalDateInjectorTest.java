@@ -31,20 +31,21 @@ class ExistingTransactionInternalDateInjectorTest {
 
     @BeforeEach
     void setup() {
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = createTransaction();
         existingTransactionInternalTimestampsInjector = new ExistingTransactionInternalTimestampsInjector(transaction);
     }
 
     private Transaction createTransaction() {
-        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         String tenantId = UUID.randomUUID().toString();
         LocalDateTime localDateTime_now = LocalDateTime.now();
         Timestamps internalTimeStamps = new Timestamps(localDateTime_now, localDateTime_now);
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip", false);
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
-        List<Item> items = testUtilities.createItems(true, true);
+        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip", "",false);
+        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", "", false);
+
+        List<Item> items = testUtilities.createItems(true, false, true);
 
         return Transaction.builder()
                 .id(id)

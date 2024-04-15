@@ -10,7 +10,10 @@ import lombok.With;
 @Schema(name = "State")
 @With
 public record StateDto(
-        @NotNull(message = "State.abbreviation " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "State.abbreviation " + StringErrorMessages.MINMAX_256_ERROR) String abbreviation,
-        @NotNull(message = "State.code " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "State.code " + StringErrorMessages.MINMAX_256_ERROR) String code,
-        @NotNull(message = "State.name " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "State.name " + StringErrorMessages.MINMAX_256_ERROR) String name) {
+        @NotNull(message = "State.abbreviation " + DtoErrorMessages.NOT_NULL_ERROR)
+        @Size(min = 1, max = 256, message = "State.abbreviation " + StringErrorMessages.MINMAX_256_ERROR) String abbreviation,
+        @NotNull(message = "State.code " + DtoErrorMessages.NOT_NULL_ERROR)
+        @Size(min = 1, max = 256, message = "State.code " + StringErrorMessages.MINMAX_256_ERROR) String code,
+        @NotNull(message = "State.name " + DtoErrorMessages.NOT_NULL_ERROR)
+        @Size(min = 1, max = 256, message = "State.name " + StringErrorMessages.MINMAX_256_ERROR) String name) {
 }

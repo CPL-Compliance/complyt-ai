@@ -26,6 +26,7 @@ public class SalesTaxTracking implements ComplytIdProperty {
     UUID complytId;
     @Id
     String id;
+    String country;
     State state;
     String tenantId;
     String comment;

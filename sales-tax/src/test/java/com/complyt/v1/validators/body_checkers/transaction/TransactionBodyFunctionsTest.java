@@ -20,7 +20,7 @@ class TransactionBodyFunctionsTest {
     @BeforeEach
     void setup() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        itemDto = testUtilities.createItemDtos(true, true)
+        itemDto = testUtilities.createItemDtos(true, false,true)
                 .get(0);
     }
 

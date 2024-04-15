@@ -1,5 +1,6 @@
 package com.complyt.business.sales_tax.checker;
 
+import com.complyt.business.tax.sales_tax.checker.SalesTaxApplyCheck;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.Transaction;

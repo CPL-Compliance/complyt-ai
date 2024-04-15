@@ -18,7 +18,8 @@ import java.util.UUID;
 @Schema(name = "Exemption", description = FieldsDescriptions.EXEMPTION)
 public record ExemptionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID + "exemption") UUID complytId,
                            @Schema(description = FieldsDescriptions.CUSTOMER_ID + "exemption") @NotNull(message = "customerId " + DtoErrorMessages.NOT_NULL_ERROR) UUID customerId,
-                           @Valid @NotNull(message = "state " + DtoErrorMessages.NOT_NULL_ERROR) StateDto state,
+                           @Valid @NotNull(message = "country " + DtoErrorMessages.NOT_NULL_ERROR) String country,
+                           @Valid StateDto state,
                            @Valid @NotNull(message = "classification " + DtoErrorMessages.NOT_NULL_ERROR) ClassificationDto classification,
                            @Valid @NotNull(message = "validationDates " + DtoErrorMessages.NOT_NULL_ERROR) ValidationDatesDto validationDates,
                            @Schema(ref = "internalTimestamps") @Valid TimestampsDto internalTimestamps,

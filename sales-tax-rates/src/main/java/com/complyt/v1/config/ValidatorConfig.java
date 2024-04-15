@@ -1,6 +1,7 @@
 package com.complyt.v1.config;
 
 import com.complyt.v1.model.AddressDto;
+import com.complyt.v1.model.gt.GtAddressDto;
 import com.complyt.v1.validators.DataConflictChecksProvider;
 import com.complyt.v1.validators.ValidationHandler;
 import com.complyt.v1.validators.query_params.QueryParamsExtractor;
@@ -21,6 +22,16 @@ public class ValidatorConfig {
                 AddressDto.class, springValidatorAdapter,
                 new DataConflictChecksProvider(BodyCheckConfig.ADDRESS_BODY_CHECK, Map.of()),
                 addressDtoQueryParamsExtractor
+        );
+    }
+
+    @Bean
+    public ValidationHandler<GtAddressDto, SpringValidatorAdapter> gtAddressDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter,
+                                                                                                 @Autowired QueryParamsExtractor gtAddressQueryParamsExtractor) {
+        return new ValidationHandler<>(
+                GtAddressDto.class, springValidatorAdapter,
+                new DataConflictChecksProvider(null, Map.of()),
+                gtAddressQueryParamsExtractor
         );
     }
 }

@@ -667,7 +667,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", testUtilities.stringWithLength(101), "state", "street", "zip", false);
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", testUtilities.stringWithLength(101), "state", "street", "zip", "",false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.county " + StringErrorMessages.MAX_100_ERROR));
 
         // When + Then
@@ -691,7 +691,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", "street", testUtilities.stringWithLength(21), false);
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", "street", testUtilities.stringWithLength(21), "",false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.zip " + StringErrorMessages.MAX_20_ERROR));
 
         // When + Then
@@ -715,7 +715,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         /// Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", testUtilities.stringWithLength(51), "county", "state", "street", "zip", false);
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", testUtilities.stringWithLength(51), "county", "state", "street", "","zip", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.country " + StringErrorMessages.MAX_50_ERROR));
 
         // When + Then
@@ -739,7 +739,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto(testUtilities.stringWithLength(101), "country", "county", "state", "street", "zip", false);
+        OptionalAddressDto givenAddress = new OptionalAddressDto(testUtilities.stringWithLength(101), "country", "county", "state", "street", "","zip", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.city " + StringErrorMessages.MAX_100_ERROR));
 
         // When + Then
@@ -763,7 +763,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", testUtilities.stringWithLength(101), "street", "zip", false);
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", testUtilities.stringWithLength(101), "street", "","zip", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.state " + StringErrorMessages.MAX_100_ERROR));
         // When + Then
         webTestClient
@@ -786,7 +786,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", testUtilities.stringWithLength(201), "zip", false);
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", testUtilities.stringWithLength(201), "","zip", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.street" + StringErrorMessages.MAX_200_ERROR));
 
         // When + Then
@@ -944,7 +944,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Test
     @Override
     @WithUserDetails
-    public void getByComplytId_PathVariableInvalid_Returns400() {
+    public void getByComplytId_QueryParamInvalid_Returns400() {
         // Given
         String complytId = "uuidError";
         UUID complytIdUUID = customerDto.complytId();

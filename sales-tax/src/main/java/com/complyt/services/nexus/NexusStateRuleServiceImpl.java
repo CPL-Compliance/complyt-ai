@@ -19,7 +19,7 @@ public class NexusStateRuleServiceImpl implements NexusStateRuleService {
 
     @Override
     public Mono<NexusStateRule> save(NexusStateRule nexusStateRule) {
-        return nexusStateRuleRepository.save(nexusStateRule);
+        return nexusStateRuleRepository.save(nexusStateRule.withCountry(nexusStateRule.country().toUpperCase()));
     }
 
     @Override
@@ -33,7 +33,7 @@ public class NexusStateRuleServiceImpl implements NexusStateRuleService {
     }
 
     @Override
-    public Mono<NexusStateRule> findByState(@NonNull String state) {
-        return nexusStateRuleRepository.findByState(state);
+    public Mono<NexusStateRule> findByCountryAndState(@NonNull String country, String state) {
+        return nexusStateRuleRepository.findByCountryAndState(country.toUpperCase(), state);
     }
 }

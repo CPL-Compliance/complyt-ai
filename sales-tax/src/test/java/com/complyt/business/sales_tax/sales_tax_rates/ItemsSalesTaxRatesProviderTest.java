@@ -1,5 +1,7 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
+import com.complyt.business.tax.sales_tax.sales_tax_rates.ItemsSalesTaxRatesProvider;
+import com.complyt.business.tax.sales_tax.sales_tax_rates.SalesTaxRatesProvider;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;
@@ -35,9 +37,9 @@ public class ItemsSalesTaxRatesProviderTest {
     SalesTaxRatesProvider salesTaxRateCalculator;
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     SalesTaxRates salesTaxRates;
-
     UnitTestUtilities testUtilities;
     Address address;
+    List<Item> items;
 
     @BeforeEach
     void setUp() {
@@ -45,7 +47,9 @@ public class ItemsSalesTaxRatesProviderTest {
         jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
         salesTaxRates = testUtilities.createSalesTaxRates();
         address = testUtilities.createAddress();
-    }
+        items = testUtilities.createItems(true, false, false);
+    } //note gt is null
+
 
     private List<Item> setRatesToItems(List<Item> items) {
         return items.stream().map(item -> item.withSalesTaxRates(salesTaxRates)).collect(Collectors.toList());
@@ -54,12 +58,12 @@ public class ItemsSalesTaxRatesProviderTest {
     @Test
     void setSalesTaxRates_SetsRatesToItems_ReturnsModifiedItems() {
         // Given
-        List<Item> items = testUtilities.createItems(true,true);
-        List<Item> itemsWithRates = setRatesToItems(items);
+        List<Item> itemList = items;
+        List<Item> itemsWithRates = setRatesToItems(itemList);
 
         // When
         when(salesTaxRateCalculator.provide(jurisdictionalSalesTaxRules, salesTaxRates, address)).thenReturn(salesTaxRates);
-        List<Item> actualItems = itemsSalesTaxRatesProvider.setSalesTaxRates(items, salesTaxRates, address);
+        List<Item> actualItems = itemsSalesTaxRatesProvider.setSalesTaxRates(itemList, salesTaxRates, address);
 
         // Then
         assertEquals(itemsWithRates, actualItems);

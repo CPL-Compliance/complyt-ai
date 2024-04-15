@@ -28,6 +28,7 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(description = FieldsDescriptions.SOURCE) @NotNull(message = "source " + DtoErrorMessages.NOT_NULL_ERROR) @Pattern(regexp = "[1-9]", message = "source " + StringErrorMessages.SINGLE_DIGIT_ERROR) String source,
                              @Schema(description = FieldsDescriptions.DOCUMENT_NAME) @Size(max = 50, message = "documentName " + StringErrorMessages.MAX_50_ERROR) String documentName,
                              @ArraySchema(schema = @Schema(description = FieldsDescriptions.ITEM)) @NotEmpty(message = "items" + DtoErrorMessages.LIST_NOT_EMPTY_ERROR) @NotNull(message = "items " + DtoErrorMessages.NOT_NULL_ERROR) List<@Valid ItemDto> items,
+                             @Schema(description = FieldsDescriptions.IS_TAX_INCLUSIVE) boolean isTaxInclusive,
                              @Schema(ref = "billingAddress") @Valid OptionalAddressDto billingAddress,
                              @Schema(ref = "shippingAddress") @Valid @NotNull(message = "shippingAddress " + DtoErrorMessages.NOT_NULL_ERROR) MandatoryAddressDto shippingAddress,
                              @Schema(description = FieldsDescriptions.CUSTOMER_ID + "transaction") @NotNull(message = "customerId " + DtoErrorMessages.NOT_NULL_ERROR) UUID customerId,
@@ -43,6 +44,8 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(description = FieldsDescriptions.TANGIBLE_ITEMS_AMOUNT) BigDecimal tangibleItemsAmount,
                              @Schema(description = FieldsDescriptions.TOTAL_ITEMS_AMOUNT) BigDecimal totalItemsAmount,
                              @Schema(description = FieldsDescriptions.TOTAL_DISCOUNT) BigDecimal totalDiscount,
-                             @Schema(description = FieldsDescriptions.TRANSACTION_FILING_STATUS) TransactionFilingStatusDto transactionFilingStatus)
+                             @Schema(description = FieldsDescriptions.FINAL_TRANSACTION_AMOUNT) BigDecimal finalTransactionAmount,
+                             @Schema(description = FieldsDescriptions.TRANSACTION_FILING_STATUS) TransactionFilingStatusDto transactionFilingStatus,
+                             @Schema(description = FieldsDescriptions.CURRENCY) String currency)
         implements SourceCheckable, ExternalIdCheckable {
 }

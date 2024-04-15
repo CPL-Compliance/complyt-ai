@@ -1,5 +1,6 @@
 package com.complyt.v1.routers;
 
+import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.facades.TransactionFacade;
@@ -84,6 +85,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         source = testUtilities.getUnifiedSource();
     }
 
+    private MandatoryAddressDto changeShippingAddressToUsa(MandatoryAddressDto shippingAddress) {
+        return shippingAddress.withCountry("USA");
+    }
+
+
     @Override
     @Test
     @WithMockUser
@@ -133,8 +139,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        SalesTaxDto salesTaxDto = new SalesTaxDto(BigDecimal.ZERO, new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
-                BigDecimal.ZERO, new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.ZERO)));
+        SalesTaxDto salesTaxDto = new SalesTaxDto(BigDecimal.ZERO, BigDecimal.ZERO, new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
+                BigDecimal.ZERO, new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.ZERO)), null);
         TransactionDto transactionDtoWithSalesTax = transactionDto.withSalesTax(salesTaxDto);
         Transaction returnedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDtoWithSalesTax);
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(returnedTransaction));
@@ -285,10 +291,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
         Transaction firstTransaction = transaction.withExternalId(firstId);
         Transaction secondTransaction = transaction.withExternalId(secondId);
-        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>() {{
-            add(transactionNoId);
-            add(secondTransactionNoId);
-        }};
 
         // When
         when(transactionFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.just(firstTransaction, secondTransaction));
@@ -555,7 +557,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void getByComplytId_PathVariableInvalid_Returns400() {
+    public void getByComplytId_QueryParamInvalid_Returns400() {
         // Given
         UUID complytId = transaction.getComplytId();
         String complytIdError = "null";
@@ -633,6 +635,182 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().is5xxServerError();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_WithShippingFeeAndOutsideOfUsaAndDoesntExists_Returns201() {
+        // Given
+        List<ItemDto> items = testUtilities.createItemDtos(false, true, true);
+        ShippingFeeDto shippingFeeDto = testUtilities.createShippingFeeDto(false, true);
+        TransactionDto transactionDtoWithShippingFee = transactionDto.withShippingFee(shippingFeeDto).withItems(items);
+        Transaction transactionWithShippingFee = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDtoWithShippingFee);
+
+        JurisdictionalTaxRules jurisdictionalTaxRules = testUtilities.createJurisdictionalTaxRules();
+        Transaction transactionWithShippingFeeWithRules = transactionWithShippingFee.withShippingFee(transactionWithShippingFee.getShippingFee().withJurisdictionalTaxRules(jurisdictionalTaxRules));
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithShippingFeeWithRules);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(transactionDtoWithShippingFee.externalId(), source)).thenReturn(Mono.empty());
+        when(transactionFacade.saveTransaction(transactionWithShippingFee)).thenReturn(Mono.just(transactionWithShippingFeeWithRules));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + transactionDtoWithShippingFee.externalId())
+                        .build())
+                .bodyValue(transactionDtoWithShippingFee)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDtoItem -> transactionDtoItem, equalTo(expectedTransaction));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NonUseTransactionWithShippingFeeAndDoesntExists_Returns201() {
+        // Given
+        List<ItemDto> items = testUtilities.createItemDtos(false, true, true);
+
+        TransactionDto transactionDtoToSend = transactionDto.withShippingAddress(transactionDto.shippingAddress().withCountry("Canada"))
+                .withExternalId("nonUsaWithShipping")
+                .withShippingFee(testUtilities.createShippingFeeDto(false, true));
+        Transaction sentTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDtoToSend);
+
+        TransactionDto transactionDtoWithItemsAndShippingFee = transactionDtoToSend.withItems(items)
+                .withShippingFee(testUtilities.createShippingFeeGtRateDto(true, false));
+        Transaction transactionWithItems = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDtoWithItemsAndShippingFee);
+
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithItems);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(transactionDtoToSend.externalId(), source)).thenReturn(Mono.empty());
+        when(transactionFacade.saveTransaction(sentTransaction)).thenReturn(Mono.just(transactionWithItems));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + transactionDtoWithItemsAndShippingFee.externalId())
+                        .build())
+                .bodyValue(transactionDtoToSend)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDtoItem -> {
+                            assertEquals(transactionDtoItem, expectedTransaction);
+                        }
+                );
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NonUseTransactionAndDoesntExists_Returns201() {
+        // Given
+        List<ItemDto> items = testUtilities.createItemDtos(false, true, true);
+
+        TransactionDto transactionDtoToSend = transactionDto.withShippingAddress(transactionDto.shippingAddress().withCountry("Canada"));
+        Transaction sentTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDtoToSend);
+
+        TransactionDto transactionDtoWithItems = transactionDtoToSend.withItems(items);
+        Transaction transactionWithItems = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDtoWithItems);
+
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithItems);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(transactionDtoToSend.externalId(), source)).thenReturn(Mono.empty());
+        when(transactionFacade.saveTransaction(sentTransaction)).thenReturn(Mono.just(transactionWithItems));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + transactionDtoWithItems.externalId())
+                        .build())
+                .bodyValue(transactionDtoToSend)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDtoItem -> transactionDtoItem, equalTo(expectedTransaction));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NonUseTransactionWithNonSupportedCountry_Returns400() {
+        // Given + When
+        TransactionDto transactionDtoToSend = transactionDto.withShippingAddress(transactionDto.shippingAddress().withCountry("Canadaa"));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + transactionDtoToSend.externalId())
+                        .build())
+                .bodyValue(transactionDtoToSend)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_TransactionWithUnsupportedCurrency_Returns400() {
+        // Given
+        TransactionDto transactionDtoToSend = transactionDto.withCurrency("Non existing currency");
+        Set<String> expectedErrors = Set.of(DtoErrorMessages.CURRENCY_IS_NOT_SUPPORTED);
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + transactionDtoToSend.externalId())
+                        .build())
+                .bodyValue(transactionDtoToSend)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_DoesntExistsAndNullCurrency_Returns201() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto transactionDtoToSend = transactionDto.withCurrency(null);
+        Transaction sentTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDtoToSend);
+        UUID complytId = UUID.randomUUID();
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
+        when(transactionFacade.saveTransaction(sentTransaction)).thenReturn(Mono.just(sentTransaction.withComplytId(complytId)));
+        TransactionDto expectedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(sentTransaction.withComplytId(complytId))
+                .withComplytId(complytId);
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(transactionDtoToSend)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDtoItem -> transactionDtoItem, equalTo(expectedTransactionDto));
     }
 
     @Override
@@ -1418,7 +1596,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry(null);
         Set<String> expectedErrors = Set.of(
-                "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR);
 
         // When + Then
         webTestClient
@@ -1431,17 +1609,19 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+                .value(
+                        map -> testUtilities.checkErrorMessages(map, expectedErrors)
+                );
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_NullCityShippingAddress_Returns400ValidationError() {
+    public void upsert_UsaAddressNullCityShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(null);
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(null).withCountry("USA");
         Set<String> expectedErrors = Set.of(
                 "Address.city " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
 
@@ -1462,13 +1642,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_NullStateShippingAddress_Returns400ValidationError() {
+    public void upsert_CountryUsaNullStateShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(null);
         Set<String> expectedErrors = Set.of(
-                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR);
+                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
 
         // When + Then
         webTestClient
@@ -1491,7 +1671,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(null);
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(null).withCountry("USA");
         Set<String> expectedErrors = Set.of(
                 "Address.street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
 
@@ -1518,7 +1698,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip(null);
         Set<String> expectedErrors = Set.of(
-                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR);
+                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
 
         // When + Then
         webTestClient
@@ -1543,7 +1723,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry("");
         Set<String> expectedErrors = Set.of(
-                "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR);
 
         // When + Then
         webTestClient
@@ -1593,7 +1773,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState("");
         Set<String> expectedErrors = Set.of(
-                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR);
+                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
 
         // When + Then
         webTestClient
@@ -1616,6 +1796,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
+        transactionDto = transactionDto.withShippingAddress(changeShippingAddressToUsa(transactionDto.shippingAddress()));
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet("");
         Set<String> expectedErrors = Set.of(
                 "Address.street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
@@ -1643,7 +1824,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("");
         Set<String> expectedErrors = Set.of(
-                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR);
+                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
 
         // When + Then
         webTestClient
@@ -1969,10 +2150,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress()
                 .withState(null)
+                .withCountry("USA")
                 .withPartial(true);
 
         Set<String> expectedErrors = Set.of(
-                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR);
+                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
 
         // When + Then
         webTestClient
@@ -2000,7 +2182,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .withPartial(true);
 
         Set<String> expectedErrors = Set.of(
-                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR);
+                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
 
         // When + Then
         webTestClient
@@ -2096,7 +2278,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        List<ItemDto> items = testUtilities.createItemDtos(true, true);
+        List<ItemDto> items = testUtilities.createItemDtos(true, false, true);
         items.add(testUtilities
                 .createItemDtoWithNegativeAmount(true, true).withUnitPrice(BigDecimal.valueOf(2000)));
         TransactionDto sentTransaction = transactionDto.withItems(items);
@@ -2148,7 +2330,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsert_ItemWithNegativeAmountAndTotalTransactionAmountIsAboveZero_Returns200() {
         // Given
         String externalId = transactionDto.externalId();
-        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, true);
+        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, false, true);
         itemsDto.add(testUtilities.createItemDtoWithNegativeAmount(true, true));
 
         TransactionDto givenTransactionDto = transactionDto.withItems(itemsDto);
@@ -2181,8 +2363,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsertByExternalIdAndSource_ItemDiscountIsEqualsToTotal_Returns200() {
         // Given
         String externalId = transactionDto.externalId();
-        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, true);
-        itemsDto.add(testUtilities.createItemDtos(true, true)
+        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, false, true);
+        itemsDto.add(testUtilities.createItemDtos(true, false, true)
                 .get(0).withDiscount(itemsDto.get(0).totalPrice()));
 
         TransactionDto givenTransactionDto = transactionDto.withItems(itemsDto);
@@ -2215,8 +2397,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsertByExternalIdAndSource_ItemDiscountIsEqualsToUnitPriceMultiplyByQuantity_Returns200() {
         // Given
         String externalId = transactionDto.externalId();
-        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, true);
-        itemsDto.add(testUtilities.createItemDtos(true, true)
+        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, false, true);
+        itemsDto.add(testUtilities.createItemDtos(true, false, true)
                 .get(0)
                 .withTotalPrice(null)
                 .withDiscount(itemsDto.get(0).quantity().multiply(itemsDto.get(0).unitPrice())));
@@ -2251,8 +2433,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsertByExternalIdAndSource_ConflictingItemHasNoUnitPriceAndQuantityAndTotal_Returns400ConflictedData() {
         // Given
         String externalId = transactionDto.externalId();
-        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, true);
-        itemsDto.add(testUtilities.createItemDtos(true, true)
+        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, false, true);
+        itemsDto.add(testUtilities.createItemDtos(true, false, true)
                 .get(0)
                 .withTotalPrice(null)
                 .withUnitPrice(null)
@@ -2281,8 +2463,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsertByExternalIdAndSource_ConflictingItemHasNegativeTotalAndDiscount_Returns400ConflictedData() {
         // Given
         String externalId = transactionDto.externalId();
-        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, true);
-        itemsDto.add(testUtilities.createItemDtos(true, true)
+        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, false, true);
+        itemsDto.add(testUtilities.createItemDtos(true, false, true)
                 .get(0)
                 .withTotalPrice(BigDecimal.valueOf(-500))
                 .withUnitPrice(BigDecimal.valueOf(-500))
@@ -2311,8 +2493,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsertByExternalIdAndSource_ConflictingItemHasNegativeUnitPriceAndQuantityAndDiscount_Returns400ConflictedData() {
         // Given
         String externalId = transactionDto.externalId();
-        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, true);
-        itemsDto.add(testUtilities.createItemDtos(true, true)
+        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, false, true);
+        itemsDto.add(testUtilities.createItemDtos(true, false, true)
                 .get(0)
                 .withTotalPrice(BigDecimal.valueOf(-500))
                 .withUnitPrice(BigDecimal.valueOf(-500))
@@ -2341,8 +2523,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsertByExternalIdAndSource_ConflictingItemHasNegativeDiscount_Returns400ConflictedData() {
         // Given
         String externalId = transactionDto.externalId();
-        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, true);
-        itemsDto.add(testUtilities.createItemDtos(true, true)
+        List<ItemDto> itemsDto = testUtilities.createItemDtos(true, false, true);
+        itemsDto.add(testUtilities.createItemDtos(true, false, true)
                 .get(0)
                 .withDiscount(BigDecimal.valueOf(-1)));
 
@@ -2370,7 +2552,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        SalesTaxDto salesTax = new SalesTaxDto(new BigDecimal("-0.1"), testUtilities.createSalesTaxRatesDto());
+        SalesTaxDto salesTax = new SalesTaxDto(new BigDecimal("-0.1"), testUtilities.createSalesTaxRatesDto().taxRate(), testUtilities.createSalesTaxRatesDto(), null);
         Set<String> expectedErrors = Set.of(
                 "SalesTax.amount " + NumericErrorMessages.NOT_NEGATIVE_ERROR);
 
@@ -2502,7 +2684,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String lengthOf101City = testUtilities.stringWithLength(101);
         CustomerDto invalidCustomerDto = testUtilities.createCustomerDto(UUID.randomUUID().toString())
                 .withSource("")
-                .withAddress(new OptionalAddressDto(lengthOf101City, "country", null, "state", "street", "zip", false));
+                .withAddress(new OptionalAddressDto(lengthOf101City, "country", null, "state", "street", "", "zip", false));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4632,7 +4814,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("-200"), new BigDecimal("5000"),
                 null, "desc", "HW Installation Services", "C1S1",
-                null, null, false, BigDecimal.ZERO,
+                null, null, null, false, BigDecimal.ZERO,
                 null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
@@ -4660,7 +4842,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", null, "C1S1", null,
-                null, false, BigDecimal.ZERO, null, null, null));
+                null, null, false, BigDecimal.ZERO, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4688,7 +4870,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", null, "C1S1", null,
-                null, false, BigDecimal.ZERO, null, null, null));
+                null, null, false, BigDecimal.ZERO, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4716,7 +4898,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", "", "C1S1", null,
-                null, false, BigDecimal.ZERO, null, null, null));
+                null, null, false, BigDecimal.ZERO, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4744,7 +4926,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", testUtilities.stringWithLength(257), "C1S1",
-                null, null, false, BigDecimal.ZERO,
+                null, null, null, false, BigDecimal.ZERO,
                 null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
@@ -4773,7 +4955,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"), null,
                 "desc", "HW Installation Services", null, null,
-                null, false, BigDecimal.ZERO,
+                null, null, false, BigDecimal.ZERO,
                 null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
@@ -4802,7 +4984,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"), null,
                 "desc", "HW Installation Services", testUtilities.stringWithLength(257),
-                null, null, false, BigDecimal.ZERO,
+                null, null, null, false, BigDecimal.ZERO,
                 null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
@@ -4831,7 +5013,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", "HW Installation Services", "C1S1", null,
-                null, false, new BigDecimal("-0.5"),
+                null, null, false, new BigDecimal("-0.5"),
                 null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
@@ -4860,7 +5042,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", "HW Installation Services", "C1S1",
-                null, null, false, new BigDecimal("0.5"),
+                null, null, null, false, new BigDecimal("0.5"),
                 null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
@@ -4911,7 +5093,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NegativeManualSalesRateTaxInShippingFee_Returns400ValidationError() {
         // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("-0.5"), new BigDecimal("5000"), BigDecimal.ZERO, null, testUtilities.createSalesTaxRatesDto(), "C1S1", null, null);
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("-0.5"), new BigDecimal("5000"), BigDecimal.ZERO, null, testUtilities.createSalesTaxRatesDto(), null, "C1S1", null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4936,7 +5118,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NegativeTotalPriceInShippingFee_Returns400ValidationError() {
         // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("-5000"), BigDecimal.ZERO, null, testUtilities.createSalesTaxRatesDto(), "C1S1", null, null);
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("-5000"), BigDecimal.ZERO, null, testUtilities.createSalesTaxRatesDto(), null, "C1S1", null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4961,7 +5143,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NullTaxCodeInShippingFee_Returns400ValidationError() {
         // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("5000"), BigDecimal.ZERO, null, testUtilities.createSalesTaxRatesDto(), null, null, null);
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("5000"), BigDecimal.ZERO, null, testUtilities.createSalesTaxRatesDto(), null, null, null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4986,7 +5168,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_LengthGreaterThan256TaxCodeInShippingFee_Returns400ValidationError() {
         // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("5000"), BigDecimal.ZERO, null, testUtilities.createSalesTaxRatesDto(), testUtilities.stringWithLength(257), null, null);
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("5000"), BigDecimal.ZERO, null, testUtilities.createSalesTaxRatesDto(), null, testUtilities.stringWithLength(257), null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(

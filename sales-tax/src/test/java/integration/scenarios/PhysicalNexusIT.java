@@ -53,7 +53,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
     private WebTestClient webTestClient;
 
     private final LocalDateTime referenceDate = LocalDateTime.parse("2020-10-01T07:00:00");
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Atlanta", "US", null, "GA", "50 Upper Alabama St", "30303", false);
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Atlanta", "US", null, "GA", "50 Upper Alabama St", "","30303", false);
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private final String source = "1";
 
@@ -104,7 +104,9 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
         // Then
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getAbbreviation())
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", referenceAddress.country())
+                        .queryParam("state", state.getAbbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -117,7 +119,9 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                                 .mutateWith(csrf())
                                 .put()
                                 .uri(uriBuilder -> uriBuilder
-                                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getName())
+                                        .path(SalesTaxTrackingRouter.BASE_URL)
+                                        .queryParam("country", referenceAddress.country())
+                                        .queryParam("state", state.getName())
                                         .build())
                                 .bodyValue(salesTaxTrackingDto
                                         .withApproved(true)
@@ -195,7 +199,9 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
         // Then
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getAbbreviation())
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", referenceAddress.country())
+                        .queryParam("state", state.getAbbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -208,7 +214,9 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                                 .mutateWith(csrf())
                                 .put()
                                 .uri(uriBuilder -> uriBuilder
-                                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getName())
+                                        .path(SalesTaxTrackingRouter.BASE_URL)
+                                        .queryParam("country", referenceAddress.country())
+                                        .queryParam("state", state.getName())
                                         .build())
                                 .bodyValue(salesTaxTrackingDto
                                         .withApprovalDate(referenceDate.minusMonths(1)))
@@ -257,7 +265,9 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
         // Then
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getAbbreviation())
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", referenceAddress.country())
+                        .queryParam("state", state.getAbbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -270,7 +280,9 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                                 .mutateWith(csrf())
                                 .put()
                                 .uri(uriBuilder -> uriBuilder
-                                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getName())
+                                        .path(SalesTaxTrackingRouter.BASE_URL)
+                                        .queryParam("country", referenceAddress.country())
+                                        .queryParam("state", state.getName())
                                         .build())
                                 .bodyValue(salesTaxTrackingDto
                                         .withEnforcesSalesTax(false))

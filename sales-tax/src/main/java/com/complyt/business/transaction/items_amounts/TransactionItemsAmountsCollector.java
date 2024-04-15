@@ -35,18 +35,19 @@ public class TransactionItemsAmountsCollector implements TransactionAmountsColle
         BigDecimal taxableItemsAmount = taxableItemsAmountCalculator.calculate(taxables);
         BigDecimal tangibleItemsAmount = tangibleItemsAmountCalculator.calculate(taxables);
         BigDecimal totalItemsAmount = totalItemsAmountCalculator.calculate(taxables);
+        BigDecimal finalTransactionAmount = totalItemsAmount; //copying the totalItemsAmount, in case of not reducing/accumulating it later with taxes
+
 
         return new Transaction(
                 transaction.getComplytId(), transaction.getId(),
                 transaction.getExternalId(), transaction.getSource(), transaction.getDocumentName(),
-                transaction.getItems(), transaction.getBillingAddress(),
+                transaction.getItems(), transaction.getIsTaxInclusive(), transaction.getBillingAddress(),
                 transaction.getShippingAddress(), transaction.getCustomerId(), transaction.getCustomer(),
                 transaction.getSalesTax(), transaction.getTransactionStatus(),
                 transaction.getTenantId(), transaction.getInternalTimestamps(),
                 transaction.getExternalTimestamps(), transaction.getTransactionType(),
                 transaction.getShippingFee(), transaction.getCreatedFrom(),
-                taxableItemsAmount, tangibleItemsAmount, totalItemsAmount,transaction.getTotalDiscount(),
-                transaction.getTransactionFilingStatus()
-        );
+                taxableItemsAmount, tangibleItemsAmount, totalItemsAmount, finalTransactionAmount,transaction.getTotalDiscount(),
+                transaction.getTransactionFilingStatus(), transaction.getCurrency());
     }
 }

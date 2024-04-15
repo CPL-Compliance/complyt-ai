@@ -10,7 +10,7 @@ public interface DtoErrorMessages {
 
     String CONFLICTED_WITH_URL_ERROR = "in body and path should be identical";
 
-    String STATE_CONFLICTED_WITH_URL_ERROR = "in path should be same as the name or abbreviation in body";
+    String CONFLICTED_WITH_QUERY_PARAM_IN_URL_ERROR = "in query param should be same as the name or abbreviation in body";
 
     String LIST_NOT_EMPTY_ERROR = "list cannot be empty";
 
@@ -37,11 +37,19 @@ public interface DtoErrorMessages {
 
     String STATE_FORMAT_ERROR = "invalid state provided. Please provide a valid state name or abbreviation.\";";
 
+    String NOT_SUPPORTED_COUNTRY_FORMAT_ERROR = "invalid country provided. Please provide a valid country name or abbreviation.\";";
+
+    String COUNTRY_FORMAT_ERROR = "country must not be null\";";
+
     String TOTAL_AMOUNT_AFTER_DISCOUNT_IS_BELOW_ZERO = "total transaction price cannot be negative. please create a credit memo/refund with a positive price";
 
     String ITEM_WITH_NEGATIVE_TOTAL_CANNOT_HAVE_A_DISCOUNT = "item with negative price cannot have a discount";
 
+    String STATE_MUST_NOT_BE_NULL_USA = "in usa addresses state must not be null";
+
     String ONE_OF_THE_ITEMS_IS_UNALIGNED = "At least one of the item's total price does not have the same sign as the amount (one is negative and the other one is positive)";
+
+    String CURRENCY_IS_NOT_SUPPORTED = "The currency entedted is not supported";
 
     String TENANT_ID_FORMAT = "invalid tenantId provided. please provide a valid parameter";
 

@@ -22,7 +22,7 @@ public class TransactionTest {
     void testingAmountOfPropertiesInTransaction() {
         /* In case there is a new property added, If its of type Taxable - handle rates and amount calculation for it */
         Field[] fields = Transaction.class.getDeclaredFields();
-        Assertions.assertEquals(23, fields.length);
+        Assertions.assertEquals(26, fields.length);
     }
 
     @BeforeEach
@@ -42,6 +42,7 @@ public class TransactionTest {
                 ", source=" + transaction.getSource() +
                 ", documentName=" + transaction.getDocumentName() +
                 ", items=" + transaction.getItems() +
+                ", isTaxInclusive=" + transaction.getIsTaxInclusive() +
                 ", billingAddress=" + transaction.getBillingAddress() +
                 ", shippingAddress=" + transaction.getShippingAddress() +
                 ", customerId=" + transaction.getCustomerId() +
@@ -57,8 +58,11 @@ public class TransactionTest {
                 ", taxableItemsAmount=" + transaction.getTaxableItemsAmount() +
                 ", tangibleItemsAmount=" + transaction.getTangibleItemsAmount() +
                 ", totalItemsAmount=" + transaction.getTotalItemsAmount() +
+                ", finalTransactionAmount=" + transaction.getFinalTransactionAmount() +
                 ", totalDiscount=" + transaction.getTotalDiscount() +
-                ", transactionFilingStatus=" + transaction.getTransactionFilingStatus() + ")";
+                ", transactionFilingStatus=" + transaction.getTransactionFilingStatus() +
+                ", currency=" + transaction.getCurrency() +
+                ")";
 
         // When
         String actualString = transaction.toString();
@@ -96,6 +100,7 @@ public class TransactionTest {
                 .source(transaction.getSource())
                 .documentName(transaction.getDocumentName())
                 .items(transaction.getItems())
+                .isTaxInclusive(transaction.getIsTaxInclusive())
                 .billingAddress(transaction.getBillingAddress())
                 .shippingAddress(transaction.getShippingAddress())
                 .customerId(transaction.getCustomerId())
@@ -110,7 +115,11 @@ public class TransactionTest {
                 .tangibleItemsAmount(transaction.getTangibleItemsAmount())
                 .taxableItemsAmount(transaction.getTaxableItemsAmount())
                 .totalItemsAmount(transaction.getTotalItemsAmount())
-                .transactionFilingStatus(transaction.getTransactionFilingStatus()).build();
+                .transactionFilingStatus(transaction.getTransactionFilingStatus())
+                .finalTransactionAmount(transaction.getFinalTransactionAmount())
+                .totalDiscount(transaction.getTotalDiscount())
+                .currency(transaction.getCurrency())
+                .build();
 
         // Then
         assertEquals(transaction, actualTransaction);

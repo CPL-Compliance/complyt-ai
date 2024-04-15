@@ -1,7 +1,7 @@
 package com.example.complyt.repositores;
 
 import com.complyt.domain.Address;
-import com.complyt.repositories.AddressQueryBuilder;
+import com.complyt.repositories.UnitedStatesAddressQueryBuilder;
 import com.complyt.repositories.QueryBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,7 @@ public class AddressQueryBuilderTest {
 
     @BeforeEach
     void setUp() {
-        addressQueryBuilder = new AddressQueryBuilder();
+        addressQueryBuilder = new UnitedStatesAddressQueryBuilder();
         fullAddressNoCountyAddress = TestUtilities.createAddressInCalifornia();
         fullAddressWithCountyAddress = fullAddressNoCountyAddress.withCounty("county");
         partialAddress = fullAddressNoCountyAddress

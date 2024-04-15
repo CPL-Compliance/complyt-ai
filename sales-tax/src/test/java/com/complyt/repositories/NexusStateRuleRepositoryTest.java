@@ -2,6 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.utils.query.CountryAndStateCriteriaBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +39,9 @@ public class NexusStateRuleRepositoryTest {
 
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
+
+    @Mock
+    CountryAndStateCriteriaBuilder countryQueryBuilder;
 
     NexusStateRule nexusStateRule;
     UnitTestUtilities testUtilities;
@@ -76,31 +80,74 @@ public class NexusStateRuleRepositoryTest {
     }
 
     @Test
-    void findByState_FindsRule_ReturnsRule() {
+    void findByCountryAndState_FindsRule_ReturnsRule() {
         // Given
+        String country = nexusStateRule.country();
         String state = nexusStateRule.state().getAbbreviation();
-        Criteria stateSearchCriteria = new Criteria()
-                .orOperator(Criteria.where("state.abbreviation").is(state),
-                        Criteria.where("state.name").is(state));
-        Query query = Query.query(stateSearchCriteria);
+        Criteria criteria = new Criteria().orOperator(Criteria.where("state.abbreviation").is(state),
+                        Criteria.where("state.name").is(state))
+                .andOperator(Criteria.where("country").is("USA"));
+        Query query = Query.query(criteria);
 
         // When
+        when(countryQueryBuilder.build(country, state)).thenReturn(criteria);
         when(reactiveMongoTemplate.findOne(query, NexusStateRule.class)).thenReturn(Mono.just(nexusStateRule));
-        Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.findByState(state);
+        Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.findByCountryAndState(country, state);
 
         // Then
         StepVerifier.create(actualStateRule).expectNext(nexusStateRule).verifyComplete();
     }
 
     @Test
-    void findMostRecentByState_Finds2Rule_ReturnsFirstRule() {
+    void findByCountryAndState_FindsRuleWithNullState_ReturnsRule() {
+        // Given
+        String country = nexusStateRule.country();
+        String state = null;
+        Criteria criteria = new Criteria().orOperator(Criteria.where("state.abbreviation").is(state),
+                        Criteria.where("state.name").is(state))
+                .andOperator(Criteria.where("country").is("USA"));
+        Query query = Query.query(criteria);
+
+        // When
+        when(countryQueryBuilder.build(country, state)).thenReturn(criteria);
+        when(reactiveMongoTemplate.findOne(query, NexusStateRule.class)).thenReturn(Mono.just(nexusStateRule));
+        Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.findByCountryAndState(country, state);
+
+        // Then
+        StepVerifier.create(actualStateRule).expectNext(nexusStateRule).verifyComplete();
+    }
+
+    @Test
+    void findMostRecentByState_Finds2RuleWithNullState_ReturnsFirstRule() {
         // Given
         NexusStateRule mostRecentNexusStateRule = nexusStateRule.withAppliedDate(LocalDateTime.now()).withEnforcesSalesTax(false);
-        String state = nexusStateRule.state().getAbbreviation();
+        String country = nexusStateRule.country();
+        String state = null;
+        Criteria criteria = new Criteria().orOperator(Criteria.where("state.abbreviation").is(nexusStateRule.state().getAbbreviation()),
+                Criteria.where("state.name").is(nexusStateRule.state().getName()));
 
         // When
         when(reactiveMongoTemplate.aggregate(any(), eq(NexusStateRule.class))).thenReturn(Flux.just(mostRecentNexusStateRule, nexusStateRule));
-        Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.findMostRecentByState(state);
+        when(countryQueryBuilder.build(country, state)).thenReturn(criteria);
+        Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.findMostRecentByCountryAndState(country, state);
+
+        // Then
+        StepVerifier.create(actualStateRule).expectNext(mostRecentNexusStateRule).verifyComplete();
+    }
+
+    @Test
+    void findMostRecentByState_Finds2Rule_ReturnsFirstRule() {
+        // Given
+        NexusStateRule mostRecentNexusStateRule = nexusStateRule.withAppliedDate(LocalDateTime.now()).withEnforcesSalesTax(false);
+        String country = nexusStateRule.country();
+        String state = nexusStateRule.state().getAbbreviation();
+        Criteria criteria = new Criteria().orOperator(Criteria.where("state.abbreviation").is(nexusStateRule.state().getAbbreviation()),
+                Criteria.where("state.name").is(nexusStateRule.state().getName()));
+
+        // When
+        when(reactiveMongoTemplate.aggregate(any(), eq(NexusStateRule.class))).thenReturn(Flux.just(mostRecentNexusStateRule, nexusStateRule));
+        when(countryQueryBuilder.build(country, state)).thenReturn(criteria);
+        Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.findMostRecentByCountryAndState(country, state);
 
         // Then
         StepVerifier.create(actualStateRule).expectNext(mostRecentNexusStateRule).verifyComplete();
@@ -108,27 +155,29 @@ public class NexusStateRuleRepositoryTest {
 
     @SuppressWarnings("ConstantConditions")
     @Test
-    void findByState_NullStatePassed_ThrowsException() {
+    void findByCountryANdState_NullCountryPassed_ThrowsException() {
         // Given
-        String nullStateAbbreviation = null;
+        String nullCountry = null;
+        String state = "";
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> nexusStateRuleRepository.findByState(nullStateAbbreviation));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> nexusStateRuleRepository.findByCountryAndState(nullCountry, state));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "country is marked non-null but is null");
     }
 
     @Test
-    void findMostRecentByState_NullStatePassed_ThrowsException() {
+    void findMostRecentByCountryAndState_NullCountryPassed_ThrowsException() {
         // Given
-        String nullStateAbbreviation = null;
+        String nullCountry = null;
+        String state = "";
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> nexusStateRuleRepository.findMostRecentByState(nullStateAbbreviation));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> nexusStateRuleRepository.findMostRecentByCountryAndState(nullCountry, state));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "country is marked non-null but is null");
     }
 
     @Test

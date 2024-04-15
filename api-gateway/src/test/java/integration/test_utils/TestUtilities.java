@@ -10,7 +10,8 @@ public class TestUtilities {
     public static final String CLIENT_TRACKING_BASE_URL = "/v1/clientTracking";
     public static final String SALES_TAX_TRACKING_BASE_URL = "/v1/nexus";
     public static final String EXEMPTION_BASE_URL = "/v1/exemptions";
-    public static final String SALES_TAX_RATES_BASE_URL = "/v1/sales_tax_rates";
+    public static final String COMPLYT_SALES_TAX_RATES_BASE_URL = "/v1/sales_tax_rates";
+    public static final String COMPLYT_GT_RATES_BASE_URL = "/v1/gt_rates";
     public static final String FILES_BASE_URL = "/v1/files";
     public static final String TOKEN_BASE_URL = "/v1/token";
     public static final String API_KEY_BASE_URL = "/v1/api_key";
@@ -37,12 +38,17 @@ public class TestUtilities {
 
     public static final String NULL_STRING = "null";
 
+
     public static String unvalidatedSalesTaxTrackingJsonExample(String stateName, String stateAbbreviation) {
-        return salesTaxTrackingJsonExample(stateName, stateAbbreviation, null, false);
+        return salesTaxTrackingJsonExample("USA", true, stateName, stateAbbreviation, null, false, "2000-12-31T22:00:00", null, null);
     }
 
     public static String salesTaxTrackingJsonExample(String stateName, String stateAbbreviation, String complytId) {
-        return salesTaxTrackingJsonExample(stateName, stateAbbreviation, complytId, true);
+        return salesTaxTrackingJsonExample("USA", true, stateName, stateAbbreviation, complytId, true, "2000-12-31T22:00:00", null, null);
+    }
+
+    public static String salesTaxTrackingWithRegistrationJsonExample(String registered, String registrationDate) {
+        return salesTaxTrackingJsonExample("USA", true, "Hawaii", "HI", null, true, "2022-08-02T16:12:00", registered, registrationDate);
     }
 
     public static String clientTrackingJsonExample(String name, String tenantId) {
@@ -56,15 +62,25 @@ public class TestUtilities {
     }
 
 
-    private static String salesTaxTrackingJsonExample(String stateName, String stateAbbreviation, String complytId, boolean isValidated) {
+    public static String salesTaxTrackingJsonExample(String country, Boolean hasState, String stateName, String stateAbbreviation, String complytId, boolean isValidated, String establishedDate, String registered, String registrationDate) {
+
+        // state is not mandatory
+        String stateObject = hasState ?
+                String.format("""
+                                {
+                                    "abbreviation": "%s",
+                                    %s
+                                    "name": "%s"
+                                }""",
+                        stateAbbreviation,
+                        isValidated ? "\"code\": \"06\"," : "",
+                        stateName) : null;
+
         return String.format("""
                         {
                              %s
-                             "state": {
-                                 "abbreviation": "%s",
-                                 %s
-                                 "name": "%s"
-                             },
+                             "country": "%s",
+                             "state": %s,
                              "enforcesSalesTax": true,
                              "physicalNexusTracker": {
                                  %s
@@ -77,48 +93,19 @@ public class TestUtilities {
                              "comment": "a comment",
                              "appliedDate": "2015-08-02T16:12:00",
                              "approvalDate": "2015-06-22T13:57:00",
-                             "approved": true
+                             "approved": true,
+                             "registered": %s,
+                             "registrationDate": %s
                          }
                          """,
                 complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
-                stateAbbreviation,
-                isValidated ? "\"code\": \"06\"," : "",
-                stateName,
-                isValidated ? "\"establishedDate\": \"2000-12-31T22:00:00\"," : ""
-        );
-    }
-
-
-    public static String salesTaxTrackingWithRegistrationJsonExample(String registered, String registrationDate) {
-        return String.format("""
-                       {
-                            "state": {
-                                "abbreviation": "HI",
-                                 "code": "06",
-                                 "name": "Hawaii"
-                            },
-                            "enforcesSalesTax": true,
-                            "physicalNexusTracker": {
-                                "establishedDate": "2022-08-02T16:12:00",
-                                "established": false
-                            },
-                            "economicNexusTracker": {
-                                "established": true,
-                                "establishedDate": "2022-08-02T16:12:00"
-                            },
-                            "comment": "a comment",
-                            "appliedDate": "2015-08-02T16:12:00",
-                            "approvalDate": "2015-06-22T13:57:00",
-                            "approved": true,
-                            "registered": %s,
-                            "registrationDate": %s
-                    }
-                    """,
+                country,
+                stateObject,
+                isValidated ? "\"establishedDate\": " + "\"" + establishedDate + "\"" + "," : "",
                 registered != null ? "\"" + registered + "\"" : null,
                 registrationDate != null ? "\"" + registrationDate + "\"" : null
         );
     }
-
 
     public static String customerJsonExample(String externalId, String complytId) {
         return customerJsonExample(externalId, complytId, true);
@@ -166,6 +153,11 @@ public class TestUtilities {
 
     public static String transactionJsonExample(String externalId, String customerId, String state, String createdDate) {
         return transactionJsonExample(externalId, customerId, null, true, state, createdDate);
+    }
+
+    public static String transactionJsonExample(String externalId, String customerId, String country, String state, String zip, String region, boolean isTaxInclusive, String... items) {
+        return  transactionWithCustomItems(externalId, customerId, null, true, country, state, zip, region, isTaxInclusive,
+                items);
     }
 
     public static String existingTransactionJsonExample(String externalId, String customerId, String complytId, String createdDate) {
@@ -408,7 +400,7 @@ public class TestUtilities {
                 discount);
     }
 
-    public static String transactionWithCustomItems(String externalId, String customerId, String complytId, boolean isValidated, String state,
+    public static String transactionWithCustomItems(String externalId, String customerId, String complytId, boolean isValidated, String country, String state, String zip, String region,boolean isTaxInclusive,
                                                     String... items) {
         return String.format("""
                         {
@@ -418,10 +410,11 @@ public class TestUtilities {
                             "items": %s,
                             "shippingAddress": {
                                 "city": "Los Angeles",
-                                "country": "US",
+                                "country": "%s",
                                 "state": "%s",
                                 "street": "10 5th Ave",
-                                "zip": "90210",
+                                "zip": "%s",
+                                "region": "%s",
                                 "isPartial": "false"
                             },
                             "customerId": "%s",
@@ -432,20 +425,25 @@ public class TestUtilities {
                             },
                             %s
                             "shippingFee": {
-                                "manualSalesTax": true,
+                                "manualSalesTax": false,
                                 "manualSalesTaxRate": 0,
                                 "totalPrice": 0,
                                 "taxCode": "C6S1"
-                            }
+                            },
+                            "isTaxInclusive":%s
                         }
                         """,
                 complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
                 externalId,
                 isValidated ? "\"source\": \"1\"," : "",
                 Arrays.toString(items),
+                country,
                 state != null ? state : "CA",
+                zip != null ? state : "90210",
+                region,
                 customerId,
-                isValidated ? "\"transactionType\": \"INVOICE\"," : ""
+                isValidated ? "\"transactionType\": \"INVOICE\"," : "",
+                isTaxInclusive
         );
     }
 
@@ -494,6 +492,65 @@ public class TestUtilities {
                     }
                 }
                 """;
+    }
+
+    public static String exemptionJsonExample(String country, boolean hasState, String stateName, String stateAbbreviation, String stateCode) {
+        // state is not mandatory
+        String stateObject = hasState ?
+                String.format("""
+                                {
+                                    "abbreviation": "%s",
+                                    "code": "%s",
+                                    "name": "%s"
+                                }""",
+                        stateAbbreviation,
+                        stateCode,
+                        stateName) : null;
+
+
+        String exemptionWrapper =  String.format("""
+                        {
+                          "exemption": {
+                                  "customerId": "81e5475d-3297-40bc-875c-95b44075ab3b",
+                                  "country":"%s",
+                                  "state": %s,
+                                  "classification": {
+                                      "code": "code",
+                                      "description": "description"
+                                  },
+                                  "validationDates": {
+                                      "toDate": "1984-11-01T02:00:00",
+                                      "fromDate": "1984-11-01T02:00:00"
+                                  },
+                                  "internalTimestamps": {
+                                      "createdDate": "2022-12-29T10:24:54.577",
+                                      "updatedDate": "2022-12-29T10:24:54.577"
+                                  },
+                                  "status": {
+                                      "code": "code",
+                                      "name": "name"
+                                  },
+                                  "certificate": {
+                                      "certificateId": "id",
+                                      "url": "url",
+                                      "name": "name"
+                                  },
+                                  "exemptionType": "FULLY",
+                                  "exemptionStatus": "ACTIVE"
+                          },
+                          "states": [
+                                          {
+                                              "abbreviation": "CO",
+                                              "code": "06",
+                                              "name": "Colorado"
+                                          }
+                                      ]
+                          }
+                          """,
+                country,
+                stateObject
+        );
+        return exemptionWrapper;
     }
 
     public static String salesTaxTrackingRegisteredPatchJsonExample() {

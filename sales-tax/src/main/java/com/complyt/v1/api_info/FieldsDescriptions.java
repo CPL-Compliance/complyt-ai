@@ -44,7 +44,7 @@ public interface FieldsDescriptions {
 
     String SHIPPING_ADDRESS = "The shipping address for the transaction";
 
-    String SALES_TAX = "The sales tax breakdown for the transaction, including the amount and rates by jurisdictions";
+    String SALES_TAX = "The sales tax breakdown for the transaction, including the amount and rates by jurisdictions. if tax may apply, contains either salestax rates or gt rates";
 
     String TRANSACTION_STATUS = "The status of the transaction";
 
@@ -61,11 +61,17 @@ public interface FieldsDescriptions {
 
     String TOTAL_ITEMS_AMOUNT = "The total amount of items in the transaction. tax and discount excluded";
 
+    String FINAL_TRANSACTION_AMOUNT = "The total amount of the transaction after discounts taxes";
+
     String TANGIBLE_ITEMS_AMOUNT = "The amount of tangible items in the transaction";
 
     String SHIPPING_FEE = "The shipping fee for the transaction";
 
     String TOTAL_DISCOUNT = "The total discount of all the items combined. calculated on save";
+
+    String IS_TAX_INCLUSIVE = "Indicates whether tax is included in the total items price (true) or added as a separate charge (false).";
+
+    String CURRENCY = "The currency of the transaction. not mandatory";
 
     // In Customer
 

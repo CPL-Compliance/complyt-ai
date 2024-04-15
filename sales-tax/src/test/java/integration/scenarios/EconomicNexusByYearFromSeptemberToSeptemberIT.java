@@ -55,7 +55,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
 
     // Given
     private final LocalDateTime referenceDate = LocalDateTime.parse("2019-10-01T07:00:00");
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("West Haven", "US", null, "CT", "300 Boston Post Rd", "06516", false);
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("West Haven", "US", null, "CT", "300 Boston Post Rd","", "06516", false);
     private final UUID customerId = UUID.fromString("49755739-892a-4807-882c-68b0e209a980"); // complytId of an existing customer in the database
     private final String source = "1";
 
@@ -82,7 +82,9 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
                 .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state)
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
+                        .queryParam("country", referenceAddress.country())
+                        .queryParam("state", state)
                         .queryParam("date", referenceDate.toLocalDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -160,7 +162,9 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
                 .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", referenceAddress.country())
+                        .queryParam("state", referenceAddress.state())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -214,7 +218,9 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
                 .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", referenceAddress.country())
+                        .queryParam("state", referenceAddress.state())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -231,7 +237,9 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
                             .mutateWith(csrf())
                             .put()
                             .uri(uriBuilder -> uriBuilder
-                                    .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                                    .path(SalesTaxTrackingRouter.BASE_URL)
+                                    .queryParam("country", referenceAddress.country())
+                                    .queryParam("state", referenceAddress.state())
                                     .build())
                             .bodyValue(receivedSalesTaxTracking.withApproved(true))
                             .accept(MediaType.APPLICATION_JSON)

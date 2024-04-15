@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class ItemsTotalCalculator {
-    public Mono<Transaction> injectRecalculatedTotal(@NonNull Transaction transaction) { //todo: is this name ok? sometimes it's not recalculating. and this is before the discount
+    public Mono<Transaction> injectRecalculatedTotal(@NonNull Transaction transaction) {
         return Mono.just(transaction.withItems(
                 recalculateItems(transaction.getItems())
         )).map(recalulatedTransaction -> recalulatedTransaction.getShippingFee() != null ?

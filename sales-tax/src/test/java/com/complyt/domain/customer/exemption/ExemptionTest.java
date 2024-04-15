@@ -40,6 +40,7 @@ class ExemptionTest {
                 ", id=" + exemption.getId() +
                 ", tenantId=" + exemption.getTenantId() +
                 ", customerId=" + exemption.getCustomerId() +
+                ", country=" + exemption.getCountry() +
                 ", state=" + exemption.getState() +
                 ", classification=" + exemption.getClassification() +
                 ", validationDates=" + exemption.getValidationDates() +
@@ -72,6 +73,7 @@ class ExemptionTest {
                 .certificate(exemption.getCertificate())
                 .exemptionType(exemption.getExemptionType())
                 .exemptionStatus(ExemptionStatus.ACTIVE)
+                .country(exemption.getCountry())
                 .build();
 
         // Then

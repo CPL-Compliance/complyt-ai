@@ -3,6 +3,7 @@ package com.complyt.v1.config;
 import com.complyt.v1.models.ClientTrackingDtoTenant;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.checkables.ComplytIdCheckable;
+import com.complyt.v1.models.checkables.CountryCheckable;
 import com.complyt.v1.models.checkables.StateCheckable;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
@@ -13,7 +14,9 @@ import com.complyt.v1.validators.DataConflictChecksProvider;
 import com.complyt.v1.validators.ParameterChecksProvider;
 import com.complyt.v1.validators.ShouldCallValidate;
 import com.complyt.v1.validators.ValidationHandler;
+import com.complyt.v1.validators.body_checkers.exemption.ExemptionCountryAndStateChecker;
 import com.complyt.v1.validators.body_checkers.sales_tax_tracking.RegisteredChecker;
+import com.complyt.v1.validators.body_checkers.sales_tax_tracking.SalesTaxTrackingCountryAndStateChecker;
 import com.complyt.v1.validators.body_checkers.transaction.*;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractorEmpty;
 import com.complyt.v1.validators.custom_body.DateWrapperDtoCustomBodyExtractor;
@@ -35,21 +38,24 @@ public class ValidatorConfig {
             "source", ParamCheckerFunctions.SOURCE_CHECK,
             "externalId", ParamCheckerFunctions.EXTERNAL_ID_NOT_NULL_CHECK,
             "state", ParamCheckerFunctions.STATE_CHECK,
+            "country", ParamCheckerFunctions.COUNTRY_CHECK,
             "tenantId", ParamCheckerFunctions.TENANT_ID_CHECK,
             "name", ParamCheckerFunctions.NAME_CHECK));
 
     ParameterChecksProvider queryParamChecker = new ParameterChecksProvider(Map.of(
             "page", ParamCheckerFunctions.PAGE_CHECK,
             "size", ParamCheckerFunctions.SIZE_CHECK,
-            "date", ParamCheckerFunctions.DATE_CHECK));
+            "date", ParamCheckerFunctions.DATE_CHECK,
+            "state", ParamCheckerFunctions.STATE_CHECK,
+            "country", ParamCheckerFunctions.COUNTRY_CHECK));
 
     ShouldCallValidate shouldCallValidate = new ShouldCallValidate(Map.of(
             HttpMethod.PUT, "^/v1/transactions/source/[^/]+/externalId/[^/]+$|"
                     + "^/v1/customers/source/[^/]+/externalId/[^/]+$|"
                     + "^/v1/exemptions/complytId/[^/]+$|"
-                    + "^/v1/nexus/state/[^/]+$|"
+                    + "^/v1/nexus($|\\?.*)|"
                     + "^/v1/clientTracking/tenantId/[^/]+$",
-            HttpMethod.POST, "^/v1/nexus/refresh/state/[^/]+$|"
+            HttpMethod.POST, "^/v1/nexus/refresh[^/]*$|"
                     + "^/v1/exemptions$"));
 
     @Bean
@@ -76,7 +82,8 @@ public class ValidatorConfig {
                                 new TransactionTotalAmountChecker(),
                                 new ItemHaveEitherTotalOrUnitPriceAndQuantityChecker(),
                                 new ItemsAlignmentChecker(),
-                                new NegativeItemsNotHavingDiscountChecker()
+                                new NegativeItemsNotHavingDiscountChecker(),
+                                new CurrencyChecker()
                         )).entityDtoFluxFunction()),
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,
@@ -89,7 +96,9 @@ public class ValidatorConfig {
         return new ValidationHandler<>(ExemptionDto.class, springValidatorAdapter,
                 new DataConflictChecksProvider(Map.of(
                         "complytId", ComplytIdCheckable.COMPLYT_ID_CONFLICT_CHECK),
-                        null),
+                        new BodyCheckConfig<ExemptionDto>(List.of(
+                                new ExemptionCountryAndStateChecker()
+                        )).entityDtoFluxFunction()),
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,
                 queryParamChecker,
@@ -101,9 +110,11 @@ public class ValidatorConfig {
     ValidationHandler<SalesTaxTrackingDto, SpringValidatorAdapter> salesTaxTrackingDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
         return new ValidationHandler<>(SalesTaxTrackingDto.class, springValidatorAdapter,
                 new DataConflictChecksProvider(Map.of(
+                        "country", CountryCheckable.COUNTRY_CONFLICT_CHECK,
                         "state", StateCheckable.STATE_CONFLICT_CHECK),
                         new BodyCheckConfig<SalesTaxTrackingDto>(List.of(
-                                new RegisteredChecker()
+                                new RegisteredChecker(),
+                                new SalesTaxTrackingCountryAndStateChecker()
                         )).entityDtoFluxFunction()),
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,
@@ -130,7 +141,7 @@ public class ValidatorConfig {
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,
                 queryParamChecker,
-                shouldCallValidate);
+                shouldCallValidate); //todo: add body check for state if usa
     }
 
     @Bean

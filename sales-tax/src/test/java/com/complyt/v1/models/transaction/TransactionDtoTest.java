@@ -29,6 +29,7 @@ class TransactionDtoTest {
                 ", source=" + transactionDto.source() +
                 ", documentName=" + transactionDto.documentName() +
                 ", items=" + transactionDto.items() +
+                ", isTaxInclusive=" + transactionDto.isTaxInclusive() +
                 ", billingAddress=" + transactionDto.billingAddress() +
                 ", shippingAddress=" + transactionDto.shippingAddress() +
                 ", customerId=" + transactionDto.customerId() +
@@ -44,7 +45,9 @@ class TransactionDtoTest {
                 ", tangibleItemsAmount=" + transactionDto.tangibleItemsAmount() +
                 ", totalItemsAmount=" + transactionDto.totalItemsAmount() +
                 ", totalDiscount=" + transactionDto.totalDiscount() +
-                ", transactionFilingStatus=" + transactionDto.transactionFilingStatus() + "]";
+                ", finalTransactionAmount=" + transactionDto.finalTransactionAmount() +
+                ", transactionFilingStatus=" + transactionDto.transactionFilingStatus() +
+                ", currency=" + transactionDto.currency() + "]";
 
         // When
         String actualString = transactionDto.toString();

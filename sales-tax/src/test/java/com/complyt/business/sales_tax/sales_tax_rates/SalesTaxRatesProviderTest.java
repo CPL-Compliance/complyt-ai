@@ -1,7 +1,9 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
+import com.complyt.business.tax.sales_tax.sales_tax_rates.SalesTaxRatesProvider;
+import com.complyt.business.tax.sales_tax.sales_tax_rates.TaxRatesCalculator;
 import com.complyt.domain.sales_tax.SalesTaxRates;
-import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
+import com.complyt.domain.sales_tax.product_classification.SubJurisdictionalTaxRules;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.transaction.Address;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,10 +30,10 @@ class SalesTaxRatesProviderTest {
     SalesTaxRatesProvider salesTaxRatesProvider;
 
     @Mock
-    SalesTaxRatesCalculator<JurisdictionalSalesTaxRules> stateLevelSalesTaxRatesCalculator;
+    TaxRatesCalculator<JurisdictionalSalesTaxRules> stateLevelSalesTaxRatesCalculator;
 
     @Mock
-    SalesTaxRatesCalculator<CitySalesTaxRules> cityLevelSalesTaxRatesCalculator;
+    TaxRatesCalculator<SubJurisdictionalTaxRules> cityLevelSalesTaxRatesCalculator;
 
     private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
 
@@ -64,7 +66,7 @@ class SalesTaxRatesProviderTest {
     @Test
     void provide_CityDoesNotExistInCitiesMap_ReturnsSalesTaxRatesCalculatedByStateRate() {
         // Given
-        CitySalesTaxRules citySalesTaxRules = testUtilities.createCitySalesTaxRules().withTaxable(false);
+        SubJurisdictionalTaxRules citySalesTaxRules = testUtilities.createCitySalesTaxRules().withTaxable(false);
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRulesWithCity = jurisdictionalSalesTaxRules.withCities(
                 new HashMap<>() {{
                     put(address.city() + "UNEQUAL_SUFFIX", citySalesTaxRules);
@@ -83,7 +85,7 @@ class SalesTaxRatesProviderTest {
     @Test
     void provide_CalculatesSalesTaxRatesForStateAndCityLevels_ReturnsSalesTaxRates() {
         // Given
-        CitySalesTaxRules citySalesTaxRules = testUtilities.createCitySalesTaxRules().withTaxable(false);
+        SubJurisdictionalTaxRules citySalesTaxRules = testUtilities.createCitySalesTaxRules().withTaxable(false);
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRulesWithCity = jurisdictionalSalesTaxRules.withCities(
                 new HashMap<>() {{
                     put(address.city(), citySalesTaxRules);

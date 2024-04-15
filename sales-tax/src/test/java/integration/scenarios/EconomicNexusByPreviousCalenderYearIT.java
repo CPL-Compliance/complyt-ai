@@ -49,7 +49,7 @@ public class EconomicNexusByPreviousCalenderYearIT extends TestContainersInitial
 
     //Given
     private final LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T07:00:00");
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Miami", "US", null, "FL", "2100 NW 42nd Ave", "33142", false);
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Miami", "US", null, "FL", "2100 NW 42nd Ave", "", "33142", false);
     private final UUID customerId = UUID.fromString("59e5b878-3f3d-42f9-a639-e3bbe5665148"); // complytId of an existing customer in the database
     private final UUID customerIdOfReseller = UUID.fromString("b351f97d-d605-4eaa-bf69-b246865b0ca3"); // complytId of an existing customer in the database
     private final String source = "1";
@@ -73,6 +73,7 @@ public class EconomicNexusByPreviousCalenderYearIT extends TestContainersInitial
     @Override
     @WithMockUser
     public void refreshSalesTaxTrackingByStateAndDate_CheckEconomicNexusNotPassed_Returns200() {
+        String country = "USA";
         String state = "FL";
 
         // Then
@@ -81,7 +82,9 @@ public class EconomicNexusByPreviousCalenderYearIT extends TestContainersInitial
                 .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state)
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh") // + "/refresh/state/" + state
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .queryParam("date", referenceDate.toLocalDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -229,10 +232,14 @@ public class EconomicNexusByPreviousCalenderYearIT extends TestContainersInitial
     @Override
     @WithMockUser
     public void getSalesTaxTracking_CheckEconomicNexusNotPassed_Returns200() {
+        String country = referenceAddress.country();
+        String state = referenceAddress.state();
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -278,10 +285,15 @@ public class EconomicNexusByPreviousCalenderYearIT extends TestContainersInitial
     @Override
     @WithMockUser
     public void upsertSalesTaxTracking_ApproveEconomicNexus_Returns200() {
+        String country = referenceAddress.country();
+        String state = referenceAddress.state();
+
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -298,7 +310,9 @@ public class EconomicNexusByPreviousCalenderYearIT extends TestContainersInitial
                             .mutateWith(csrf())
                             .put()
                             .uri(uriBuilder -> uriBuilder
-                                    .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                                    .path(SalesTaxTrackingRouter.BASE_URL)
+                                    .queryParam("country", country)
+                                    .queryParam("state", state)
                                     .build())
                             .bodyValue(receivedSalesTaxTracking.withApproved(true))
                             .accept(MediaType.APPLICATION_JSON)

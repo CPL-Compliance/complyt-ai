@@ -17,8 +17,8 @@ import java.util.function.Function;
 public class ParameterChecksProvider {
     Map<String, Function<String, Mono<String>>> paramChecksMap;
 
-    public Mono<Function<String, Mono<String>>> getFunctionCheck(@NonNull String pathVariable) {
-        Function<String, Mono<String>> check = paramChecksMap.get(pathVariable);
+    public Mono<Function<String, Mono<String>>> getFunctionCheck(@NonNull String uriVariable) {
+        Function<String, Mono<String>> check = paramChecksMap.get(uriVariable);
         return Mono.just(check == null ? (param) -> Mono.empty() : check);
     }
 

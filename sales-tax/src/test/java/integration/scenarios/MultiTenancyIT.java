@@ -1,7 +1,7 @@
 package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
-import com.complyt.business.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
+import com.complyt.business.tax.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
@@ -42,6 +42,8 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     private final JwtMutator differentTenantMutatorWithoutClientTracking = mockJwt().jwt(ITUtilities.stubJwt().claim("tenant_id", "dump_tenant").build());
     private final JwtMutator defaultTenantMutator = mockJwt().jwt(ITUtilities.stubJwt().build());
     private final String source = "1";
+    private final String usaCountry = "USA";
+
     @Mock
     ComplytSalesTaxRatesClientWrapper complytSalesTaxRatesClientWrapper;
     @Autowired
@@ -122,7 +124,9 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                 .mutateWith(differentTenantMutator)
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", stateName)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -132,7 +136,9 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                 .mutateWith(defaultTenantMutator)
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", stateName)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -222,7 +228,9 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                 .mutateWith(defaultTenantMutator)
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.name())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state.name())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -235,7 +243,9 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                                 .mutateWith(differentTenantMutator)
                                 .put()
                                 .uri(uriBuilder -> uriBuilder
-                                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.name())
+                                        .path(SalesTaxTrackingRouter.BASE_URL)
+                                        .queryParam("country", usaCountry)
+                                        .queryParam("state", state.name())
                                         .build())
                                 .accept(MediaType.APPLICATION_JSON)
                                 .bodyValue(salesTaxTrackingDto)
@@ -368,7 +378,9 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                 .mutateWith(defaultTenantMutator)
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.abbreviation())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state.abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -381,7 +393,9 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                             .mutateWith(differentTenantMutator)
                             .put()
                             .uri(uriBuilder -> uriBuilder
-                                    .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.abbreviation())
+                                    .path(SalesTaxTrackingRouter.BASE_URL)
+                                    .queryParam("country", usaCountry)
+                                    .queryParam("state", state.abbreviation())
                                     .build())
                             .accept(MediaType.APPLICATION_JSON)
                             .bodyValue(salesTaxTrackingDto.withComplytId(null))
@@ -394,7 +408,9 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                             .mutateWith(defaultTenantMutator)
                             .get()
                             .uri(uriBuilder -> uriBuilder
-                                    .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.abbreviation())
+                                    .path(SalesTaxTrackingRouter.BASE_URL)
+                                    .queryParam("country", usaCountry)
+                                    .queryParam("state", state.abbreviation())
                                     .build())
                             .accept(MediaType.APPLICATION_JSON)
                             .exchange()
@@ -474,7 +490,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Override
     public void putSalesTaxTracking_ClientTrackingNotFoundForTenant_Returns404NoClientTracking() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(new StateDto("CA", "3463456", "California"));
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, new StateDto("CA", "3463456", "California"));
 
         // Then
         webTestClient
@@ -482,7 +498,9 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                 .mutateWith(differentTenantMutatorWithoutClientTracking)
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().name())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", salesTaxTrackingDto.state().name())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)

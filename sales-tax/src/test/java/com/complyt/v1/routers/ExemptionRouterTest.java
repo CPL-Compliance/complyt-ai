@@ -20,7 +20,6 @@ import com.complyt.v1.mappers.ExemptionWrapperMapper;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.customer.exemption.*;
-import com.complyt.v1.validators.Patcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +95,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @Test
     @Override
     @WithUserDetails()
-    public void getByComplytId_PathVariableInvalid_Returns400() {
+    public void getByComplytId_QueryParamInvalid_Returns400() {
         // Given
         String complytId = "null";
         String url = ExemptionRouter.BASE_URL + "/complytId/" + complytId;
@@ -465,6 +464,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
@@ -1748,6 +1748,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"internalTimestamps\": {\n" +
                         "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
@@ -1800,6 +1801,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
@@ -1855,6 +1857,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
@@ -1909,6 +1912,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
@@ -1964,6 +1968,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
@@ -2019,6 +2024,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
@@ -2074,6 +2080,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
@@ -2197,6 +2204,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
@@ -2252,6 +2260,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
@@ -2515,6 +2524,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
@@ -2539,7 +2549,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR));
+                "Timestamps.updatedDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR,
+                "country " + GenericErrorMessages.NOT_NULL));
 
         // When + Then
         webTestClient
@@ -2907,6 +2918,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"toDate\": \"2023-02-28T02:00:00\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\"\n" +
                         "}"
                 )
@@ -2984,6 +2996,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"toDate\": \"\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\"\n" +
                         "}"
                 )
@@ -3035,6 +3048,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"toDate\": \"2023-02-28T02:00:00\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\"\n" +
                         "}"
                 )
@@ -3082,6 +3096,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2023-02-29T02:00:00\",\n" +
@@ -3137,6 +3152,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
@@ -3265,6 +3281,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"toDate\": \"2023-02-28T02:00:00\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\"\n" +
                         "}"
                 )
@@ -3316,6 +3333,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"toDate\": \"2023-02-28T02:00:00.0000000000\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\"\n" +
                         "}"
                 )
@@ -3565,6 +3583,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00+18:01\",\n" +
@@ -3620,6 +3639,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"country\": \"USA\",\n" +
                         "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
@@ -3674,6 +3694,64 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
+    public void upsert_NonUsaCountrySent_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withCountry("Canada");
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
+
+        // When
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_UnSupportedNonUsaCountrySent_Returns400() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withCountry("Canadaa");
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
+
+        // When
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
     public void upsert_JustDateWithNoTimeOffsetFromDateInValidationDates_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3722,7 +3800,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         Exemption expectedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(expectedExemptionDto);
 
         when(exemptionFacade.findByComplytId(exemptionDto.complytId())).thenReturn(Mono.just(ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto)));
-        when(exemptionFacade.update(expectedExemption,exemptionDto.complytId())).thenReturn(Mono.just(expectedExemption));
+        when(exemptionFacade.update(expectedExemption, exemptionDto.complytId())).thenReturn(Mono.just(expectedExemption));
 
         // When + Then
         webTestClient

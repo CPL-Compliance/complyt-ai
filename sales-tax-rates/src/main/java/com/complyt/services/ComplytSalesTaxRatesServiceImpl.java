@@ -6,7 +6,7 @@ import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
 import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.domain.SalesTaxData;
-import com.complyt.domain.StatesMap;
+import com.complyt.business.collection_fetcher.UsaStatesMap;
 import com.complyt.repositories.ComplytSalesTaxRatesRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
-public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesService {
+public class ComplytSalesTaxRatesServiceImpl<T extends ComplytSalesTaxRates> implements ComplytSalesTaxRatesService {
 
     @NonNull
     ComplytSalesTaxRatesRepository complytSalesTaxRatesRepository;
@@ -38,7 +38,7 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
 
     @Override
     public Mono<ComplytSalesTaxRates> findByAddress(@NonNull Address address) {
-        String collection = StatesMap.statesToCollections.get(address.state());
+        String collection = UsaStatesMap.statesToCollections.get(address.state());
 
         return complytSalesTaxRatesRepository.findByAddress(address, collection)
                 .switchIfEmpty(Mono.defer(() -> getBestMatchWebClientWrapper.findByAddress(address)

@@ -52,6 +52,7 @@ public class CustomerPatcherFunctionsTest {
             put("city", addressToPatch.city());
             put("county", addressToPatch.county());
             put("zip", addressToPatch.zip());
+            put("region", addressToPatch.region());
             put("isPartial", addressToPatch.isPartial());
         }};
 

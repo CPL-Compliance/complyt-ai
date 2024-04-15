@@ -73,6 +73,7 @@
         "read:exemption",
         "delete:exemption",
         "read:sales_tax_rates",
+        "read:global_tax_rates",
         "read:link",
         "read:state"
       ]
@@ -169,6 +170,10 @@
     },
     {
       "name": "read:sales_tax_rates",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "read:global_tax_rates",
       "protocol": "openid-connect"
     },
     {

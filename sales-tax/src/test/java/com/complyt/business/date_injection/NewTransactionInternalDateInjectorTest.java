@@ -26,7 +26,6 @@ class NewTransactionInternalDateInjectorTest {
 
     private UnitTestUtilities testUtilities;
     private NewTransactionInternalTimestampsInjector newTransactionInternalDateInjector;
-
     private Transaction transaction;
 
     @BeforeEach
@@ -41,9 +40,9 @@ class NewTransactionInternalDateInjectorTest {
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
         String tenantId = UUID.randomUUID().toString();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip", false);
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
-        List<Item> items = testUtilities.createItems(true, true);
+        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip", "",false);
+        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", "",false);
+        List<Item> items = testUtilities.createItems(true, false, true);
 
         return Transaction.builder()
                 .id(id)
@@ -71,7 +70,6 @@ class NewTransactionInternalDateInjectorTest {
         assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isAfter(beforeActionTime));
         assertTrue(actualTransaction.getInternalTimestamps().getCreatedDate().isBefore(afterActionTime));
         assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isBefore(afterActionTime));
-
     }
 
 }

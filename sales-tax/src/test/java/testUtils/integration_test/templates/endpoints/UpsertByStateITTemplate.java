@@ -6,7 +6,7 @@ public interface UpsertByStateITTemplate extends SalesTaxTrackingRegisteredITTem
 
     void upsertByState_Exists_Returns200();
 
-    void upsertByState_PathVariableInvalid_Returns400();
+    void upsertByCountryAndState_StateQueryParamInvalid_Returns400();
 
     void upsertByState_DoesntExists_Returns201();
 

@@ -17,7 +17,7 @@ public class SalesTaxTrackingRouter {
     @GetSalesTaxTrackingByStateApiInfo
     public RouterFunction<ServerResponse> getSalesTaxTrackingByStateRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
         RequestPredicate getSalesTaxTrackingRoute = RequestPredicates
-                .GET(BASE_URL + "/state/{state}")
+                .GET(BASE_URL)
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(getSalesTaxTrackingRoute, salesTaxTrackingHandler::getOne);
@@ -37,7 +37,7 @@ public class SalesTaxTrackingRouter {
     @GetAllSalesTaxtrackingApiInfo
     public RouterFunction<ServerResponse> getAllSalesTaxTrackingRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
         RequestPredicate getSalesTaxTrackingRoute = RequestPredicates
-                .GET(BASE_URL)
+                .GET(BASE_URL + "/all")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(getSalesTaxTrackingRoute, salesTaxTrackingHandler::getAll);
@@ -47,16 +47,17 @@ public class SalesTaxTrackingRouter {
     @UpsertSalesTaxTrackingByStateApiInfo
     public RouterFunction<ServerResponse> upsertSalesTaxTrackingRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
         RequestPredicate getSalesTaxTrackingRoute = RequestPredicates
-                .PUT(BASE_URL + "/state/{state}")
+                .PUT(BASE_URL)
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(getSalesTaxTrackingRoute, salesTaxTrackingHandler::upsert);
     }
+
     @Bean
     @RefreshSalesTaxTrackingByStateApiInfo
     public RouterFunction<ServerResponse> refreshNexusSummaryByDateRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
         RequestPredicate refreshNexusSummaryByDateRoute = RequestPredicates
-                .POST(BASE_URL + "/refresh/state/{state}")
+                .POST(BASE_URL + "/refresh")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(refreshNexusSummaryByDateRoute, salesTaxTrackingHandler::refreshNexusSummaryByDate);
@@ -66,7 +67,7 @@ public class SalesTaxTrackingRouter {
     @PatchSalesTaxTrackingByStateApiInfo
     public RouterFunction<ServerResponse> patchSalesTaxTrackingRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
         RequestPredicate deleteSalesTaxTrackingRoute = RequestPredicates
-                .PATCH(BASE_URL + "/state/{state}")
+                .PATCH(BASE_URL)
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(deleteSalesTaxTrackingRoute, salesTaxTrackingHandler::patch);

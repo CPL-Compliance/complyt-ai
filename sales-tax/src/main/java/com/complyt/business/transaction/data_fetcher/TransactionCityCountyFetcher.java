@@ -1,6 +1,6 @@
 package com.complyt.business.transaction.data_fetcher;
 
-import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
+import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.CityCountyWrapper;
@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 public class TransactionCityCountyFetcher implements CityCountyFetcher {
 
     @NonNull
-    private SalesTaxWebClientWrapper<ComplytSalesTaxRates> salesTaxWebClientWrapper;
+    private SalesTaxRatesWebClientWrapper<ComplytSalesTaxRates> salesTaxWebClientWrapper;
 
     @Override
     public Mono<CityCountyWrapper> fetch(Address address) {

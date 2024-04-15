@@ -7,9 +7,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
-
 
 @EqualsAndHashCode
 @AllArgsConstructor
@@ -17,10 +17,7 @@ import java.util.Map;
 @Slf4j
 public abstract class TransactionShippingFeeInjectionChecker implements TransactionDataInjector<Map<String, ProductClassification>> {
 
-    @NonNull
-    protected final Transaction transaction;
-
-    public boolean shouldInject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
+    public boolean shouldInject(Map<String, ProductClassification> mapTaxCodesToClassifications, Transaction transaction) {
         if (transaction.getShippingFee() == null) {
             log.debug("Transaction doesn't have shipping fee");
             return false;

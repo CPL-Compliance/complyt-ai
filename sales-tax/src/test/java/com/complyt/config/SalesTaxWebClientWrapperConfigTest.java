@@ -1,9 +1,11 @@
 package com.complyt.config;
 
-import com.complyt.business.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
-import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.business.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
+import com.complyt.business.tax.gt.gt_tax_web_client.GtWebClientWrapper;
+import com.complyt.business.tax.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
+import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
+import com.complyt.business.tax.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
+import com.complyt.domain.transaction.tax.ComplytGtRates;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +28,7 @@ public class SalesTaxWebClientWrapperConfigTest {
     void complytSalesTaxRatesClientWrapper_CreateInstance_ReturnInstance() {
         // Given
         ComplytSalesTaxRatesClientWrapper expectedComplytSalesTaxRatesClientWrapper = new ComplytSalesTaxRatesClientWrapper(salesTaxRatesServiceProxy);
-        SalesTaxWebClientWrapper<ComplytSalesTaxRates> actualComplytSalesTaxRatesClientWrapper = salesTaxWebClientWrapperConfig.complytSalesTaxRatesClientWrapper(salesTaxRatesServiceProxy);
+        SalesTaxRatesWebClientWrapper<ComplytSalesTaxRates> actualComplytSalesTaxRatesClientWrapper = salesTaxWebClientWrapperConfig.complytSalesTaxRatesClientWrapper(salesTaxRatesServiceProxy);
 
         // When + Then
         assertEquals(expectedComplytSalesTaxRatesClientWrapper, actualComplytSalesTaxRatesClientWrapper);
@@ -36,10 +38,20 @@ public class SalesTaxWebClientWrapperConfigTest {
     void stubComplytSalesTaxRatesClientWrapper_CreateInstance_ReturnInstance() {
         // Given
         StubComplytSalesTaxRatesClientWrapper expectedStubComplytSalesTaxRatesClientWrapper = new StubComplytSalesTaxRatesClientWrapper();
-        SalesTaxWebClientWrapper<ComplytSalesTaxRates> actualStubComplytSalesTaxRatesClientWrapper = salesTaxWebClientWrapperConfig.stubComplytSalesTaxRatesClientWrapper();
+        SalesTaxRatesWebClientWrapper<ComplytSalesTaxRates> actualStubComplytSalesTaxRatesClientWrapper = salesTaxWebClientWrapperConfig.stubComplytSalesTaxRatesClientWrapper();
 
         // When + Then
         assertEquals(expectedStubComplytSalesTaxRatesClientWrapper, actualStubComplytSalesTaxRatesClientWrapper);
+    }
+
+    @Test
+    void gtWebClientWrapper_CreateInstance_ReturnInstance() {
+        // Given
+        GtWebClientWrapper expectedGtWebClientWrapper = new GtWebClientWrapper(salesTaxRatesServiceProxy);
+        SalesTaxRatesWebClientWrapper<ComplytGtRates> actualGtWebClientWrapper = salesTaxWebClientWrapperConfig.gtWebClientWrapper(salesTaxRatesServiceProxy);
+
+        // When + Then
+        assertEquals(expectedGtWebClientWrapper, actualGtWebClientWrapper);
     }
 
 }

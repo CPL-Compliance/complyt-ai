@@ -35,6 +35,7 @@ class NexusStateRuleTest {
     }
 
     private NexusStateRule createNexusStateRule() {
+        String country = "USA";
         State state = new State("CA", "02", "California");
         List<TaxableCategory> taxableCategories = new ArrayList<>() {{
             add(TaxableCategory.TAXABLE);
@@ -50,7 +51,7 @@ class NexusStateRuleTest {
 
         NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(1000), 2, Definition.AMOUNT_OR_COUNT);
 
-        return new NexusStateRule(id, true, state, taxableCategories, tangibleCategories, customerTypes,
+        return new NexusStateRule(id, true, country, state, taxableCategories, tangibleCategories, customerTypes,
                 TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold, null);
     }
 
@@ -59,6 +60,7 @@ class NexusStateRuleTest {
         // Given
         String expectedString = "NexusStateRule[id=" + nexusStateRule.id() +
                 ", enforcesSalesTax=" + nexusStateRule.enforcesSalesTax() +
+                ", country=" + nexusStateRule.country() +
                 ", state=" + nexusStateRule.state() +
                 ", taxableCategories=" + nexusStateRule.taxableCategories() +
                 ", tangibleCategories=" + nexusStateRule.tangibleCategories() +

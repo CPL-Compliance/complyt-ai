@@ -57,10 +57,9 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
     private WebTestClient webTestClient;
 
     private final LocalDateTime referenceDate = LocalDateTime.parse("2020-10-01T07:00:00");
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Cape Elizabeth", "US", null, "ME", "12 Captain Strout Cir", "04107", false);
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Cape Elizabeth", "US", null, "ME", "12 Captain Strout Cir", "", "04107", false);
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private final String source = "1";
-
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -176,7 +175,9 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
         // Then
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.name())
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", referenceAddress.country())
+                        .queryParam("state", state.name())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -199,7 +200,9 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", referenceAddress.country())
+                        .queryParam("state", referenceAddress.state())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -211,7 +214,9 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
                                 .mutateWith(csrf())
                                 .put()
                                 .uri(uriBuilder -> uriBuilder
-                                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                                        .path(SalesTaxTrackingRouter.BASE_URL)
+                                        .queryParam("country", referenceAddress.country())
+                                        .queryParam("state", referenceAddress.state())
                                         .build())
                                 .bodyValue(receivedSalesTaxTracking
                                         .withApproved(true)

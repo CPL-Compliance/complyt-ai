@@ -1,14 +1,19 @@
 package com.complyt.domain.transaction;
 
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.TaxRates;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
+import com.complyt.domain.transaction.tax.GtRates;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,19 +22,23 @@ public class ShippingFeeTest {
 
     private ShippingFee shippingFee;
 
+    private UnitTestUtilities testUtilities;
+
+
     @BeforeEach
     void setUp() {
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         shippingFee = createShippingFee();
     }
 
     private ShippingFee createShippingFee() {
-        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), rules, SalesTaxRates.zeroSalesTaxRate(), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE, null);
-    }
-
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true,
-                false, CalculationType.FIXED, "description", BigDecimal.ZERO, null);
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules().withCalculationValue(BigDecimal.ZERO);
+        JurisdictionalTaxRules jurisdictionalTaxRules = testUtilities.createJurisdictionalTaxRules().withCalculationValue(BigDecimal.ZERO);
+        return testUtilities.createShippingFee(false, false, true)
+                .withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules)
+                .withJurisdictionalTaxRules(jurisdictionalTaxRules)
+                .withSalesTaxRates(SalesTaxRates.zeroSalesTaxRate())
+                .withGtRates(GtRates.zeroGtRates());
     }
 
     @Test
@@ -110,7 +119,9 @@ public class ShippingFeeTest {
                 ", manualSalesTaxRate=" + shippingFee.getManualSalesTaxRate() +
                 ", totalPrice=" + shippingFee.getTotalPrice() +
                 ", jurisdictionalSalesTaxRules=" + shippingFee.getJurisdictionalSalesTaxRules() +
+                ", jurisdictionalTaxRules=" + shippingFee.getJurisdictionalTaxRules() +
                 ", salesTaxRates=" + shippingFee.getSalesTaxRates() +
+                ", gtRates=" + shippingFee.getGtRates() +
                 ", taxCode=" + shippingFee.getTaxCode() +
                 ", taxableCategory=" + shippingFee.getTaxableCategory() +
                 ", tangibleCategory=" + shippingFee.getTangibleCategory() +
@@ -171,4 +182,18 @@ public class ShippingFeeTest {
         assertEquals(new BigDecimal("10"), actualTotalPrice);
     }
 
+    @Test
+    void getTaxRate_GtRatesAreSet_ReturnsItemsGtRates(){
+        // Given
+        GtRates gtRates = testUtilities.createGtRates();
+        ShippingFee shippingFeeWithGtRates = shippingFee
+                .withGtRates(gtRates)
+                .withSalesTaxRates(null);
+
+        // When
+        TaxRates actualGtRates = shippingFeeWithGtRates.getTaxRates();
+
+        // Then
+        Assertions.assertEquals(gtRates,actualGtRates);
+    }
 }

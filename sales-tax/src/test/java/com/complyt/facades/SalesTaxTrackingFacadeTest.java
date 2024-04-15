@@ -121,7 +121,7 @@ public class SalesTaxTrackingFacadeTest {
         Query query = new Query();
 
         // When
-        when(salesTaxTrackingService.findByState(salesTaxTracking.getState().getName())).thenReturn(Mono.just(salesTaxTrackingWithId));
+        when(salesTaxTrackingService.findByCountryAndState(salesTaxTracking.getCountry(), salesTaxTracking.getState().getName())).thenReturn(Mono.just(salesTaxTrackingWithId));
         when(nexusService.hasNexus(salesTaxTrackingWithId)).thenReturn(Mono.just(new SalesTaxTrackingWithNexusInfo(salesTaxTrackingWithId, false)));
         when(salesTaxTrackingService.addClientAndStateDetails(salesTaxTrackingWithId)).thenReturn(Mono.just(salesTaxTrackingWithId));
         when(nexusService.getTransactionsQueryByNexusCalculation(salesTaxTrackingWithId.getNexusStateRule(), salesTaxTrackingWithId.getClientTracking(), referenceDate)).thenReturn(Mono.just(query));
@@ -130,7 +130,7 @@ public class SalesTaxTrackingFacadeTest {
         when(nexusService.refreshNexusSummary(salesTaxTrackingWithId, transactionsWithCustomers, referenceDate)).thenReturn(Mono.just(salesTaxTrackingWithSummary));
         when(salesTaxTrackingService.save(salesTaxTrackingWithSummary)).thenReturn(Mono.just(salesTaxTrackingWithSummary));
 
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.refreshNexusSummary(salesTaxTracking.getState().getName(), referenceDate);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.refreshNexusSummary(salesTaxTracking.getCountry(), salesTaxTracking.getState().getName(), referenceDate);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithSummary).verifyComplete();
@@ -143,10 +143,10 @@ public class SalesTaxTrackingFacadeTest {
         LocalDate referenceDate = LocalDate.now();
 
         // When
-        when(salesTaxTrackingService.findByState(salesTaxTracking.getState().getName())).thenReturn(Mono.just(salesTaxTrackingWithId));
+        when(salesTaxTrackingService.findByCountryAndState(salesTaxTracking.getCountry(), salesTaxTracking.getState().getName())).thenReturn(Mono.just(salesTaxTrackingWithId));
         when(nexusService.hasNexus(salesTaxTrackingWithId)).thenReturn(Mono.just(new SalesTaxTrackingWithNexusInfo(salesTaxTrackingWithId, true)));
 
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.refreshNexusSummary(salesTaxTracking.getState().getName(), referenceDate);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.refreshNexusSummary(salesTaxTracking.getCountry(), salesTaxTracking.getState().getName(), referenceDate);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithId).verifyComplete();
@@ -155,13 +155,14 @@ public class SalesTaxTrackingFacadeTest {
     @Test
     void findByState_FindsSalesTaxTracking_ReturnsSalesTaxTracking() {
         // Given
+        String country = salesTaxTracking.getCountry();
         String state = salesTaxTracking.getState().getName();
 
         // When
         when(nexusService.getNexusSummaryDate(eq(salesTaxTracking), any())).thenReturn(Mono.just(dateRange));
         when(nexusService.recalculationOfNexusSummaryIfRequired(eq(salesTaxTracking), any())).thenReturn(Mono.just(salesTaxTracking));
-        when(salesTaxTrackingService.findByState(state)).thenReturn(Mono.just(salesTaxTracking));
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.findByState(state);
+        when(salesTaxTrackingService.findByCountryAndState(country, state)).thenReturn(Mono.just(salesTaxTracking));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.findByCountryAndState(country, state);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
@@ -170,12 +171,13 @@ public class SalesTaxTrackingFacadeTest {
     @Test
     void findByState_FindsSalesTaxTrackingWithNoStateRule_ReturnsSalesTaxTrackingWithoutRecalculationOfSummary() {
         // Given
+        String country = salesTaxTracking.getCountry();
         String state = salesTaxTracking.getState().getName();
         SalesTaxTracking salesTaxTrackingWithNoStateRule = salesTaxTracking.withNexusStateRule(null);
 
         // When
-        when(salesTaxTrackingService.findByState(state)).thenReturn(Mono.just(salesTaxTrackingWithNoStateRule));
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.findByState(state);
+        when(salesTaxTrackingService.findByCountryAndState(country, state)).thenReturn(Mono.just(salesTaxTrackingWithNoStateRule));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.findByCountryAndState(country, state);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithNoStateRule).verifyComplete();
@@ -251,15 +253,16 @@ public class SalesTaxTrackingFacadeTest {
     }
 
     @Test
-    void findByState_NullStatePassed_ThrowsException() {
+    void findByState_NullCountryPassed_ThrowsException() {
         // Given
-        String nullState = null;
+        String country = null;
+        String state = "";
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.findByState(nullState));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.findByCountryAndState(country, state));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "country is marked non-null but is null");
     }
 
     @Test
@@ -287,15 +290,16 @@ public class SalesTaxTrackingFacadeTest {
     }
 
     @Test
-    void refresh_NullStatePassed_ThrowsException() {
+    void refresh_NullCountryPassed_ThrowsException() {
         // Given
-        String state = null;
+        String nullCountry = null;
+        String state = salesTaxTracking.getState().getName();
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.refreshNexusSummary(state, LocalDate.now()));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.refreshNexusSummary(nullCountry, state, LocalDate.now()));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "country is marked non-null but is null");
     }
 
     @Test
@@ -304,7 +308,7 @@ public class SalesTaxTrackingFacadeTest {
         LocalDate date = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.refreshNexusSummary("state", date));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.refreshNexusSummary("country", "state", date));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "refreshDate is marked non-null but is null");

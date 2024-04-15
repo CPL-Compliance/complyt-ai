@@ -1,5 +1,6 @@
 package com.complyt.v1.handlers;
 
+import com.complyt.business.address.CountryIsUsaChecker;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
 import com.complyt.repositories.Constants.RepositoryConstant;
@@ -53,14 +54,16 @@ public class SalesTaxTrackingHandler {
 
     @NexusReadPermission
     public Mono<ServerResponse> getOne(ServerRequest serverRequest) {
-        String state = serverRequest.pathVariable("state");
+        String country = serverRequest.queryParam("country").orElse("");
+        String state = serverRequest.queryParam("state").orElse("");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
-                .then(salesTaxTrackingDtoValidationHandler.handle(serverRequest))
-                .switchIfEmpty(Mono.defer(() -> salesTaxTrackingFacade.findByState(state))
+                .then(salesTaxTrackingDtoValidationHandler.validateQueryParam("country", country))
+                .then(CountryIsUsaChecker.isCountryUsa(country) ? salesTaxTrackingDtoValidationHandler.validateQueryParam("state", state) : Mono.just(""))
+                .then(Mono.defer(() -> salesTaxTrackingFacade.findByCountryAndState(country, state)
                         .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
 
@@ -82,21 +85,29 @@ public class SalesTaxTrackingHandler {
 
     @NexusUpdatePermission
     public Mono<ServerResponse> upsert(ServerRequest serverRequest) {
-        String state = serverRequest.pathVariable("state");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
-        String resourceURI = SalesTaxTrackingRouter.BASE_URL + "/state/" + state;
 
         return ContextLogger.observeCtx(logStr, log::info)
                 .then(salesTaxTrackingDtoValidationHandler.handle(serverRequest))
                 .flatMap(salesTaxTrackingDto -> {
+
+                    String country = salesTaxTrackingDto.country();
+                    String stateName = null;
+                    StringBuilder resourceURI = new StringBuilder(SalesTaxTrackingRouter.BASE_URL + "?country=" + country);
+
+                    if (salesTaxTrackingDto.state() != null) {
+                        resourceURI.append("&state=" + salesTaxTrackingDto.state().name());
+                        stateName = salesTaxTrackingDto.state().name();
+                    }
+
                     SalesTaxTracking receivedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto);
-                    return salesTaxTrackingFacade.findByState(state)
+                    return salesTaxTrackingFacade.findByCountryAndState(country, stateName)
                             .flatMap(originalSalesTaxTracking -> salesTaxTrackingFacade.update(receivedSalesTaxTracking, originalSalesTaxTracking))
                             .flatMap(updatedSalesTaxTracking ->
                                     ServerResponse.status(HttpStatus.OK).bodyValue(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(updatedSalesTaxTracking)))
                             .switchIfEmpty(salesTaxTrackingFacade.save(receivedSalesTaxTracking)
                                     .flatMap(salesTaxTracking ->
-                                            ServerResponse.created(URI.create(resourceURI)).bodyValue(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking))));
+                                            ServerResponse.created(URI.create(resourceURI.toString())).bodyValue(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking))));
                 });
     }
 
@@ -120,27 +131,34 @@ public class SalesTaxTrackingHandler {
 
     @NexusUpdatePermission
     public Mono<ServerResponse> refreshNexusSummaryByDate(ServerRequest serverRequest) {
-        String state = serverRequest.pathVariable("state");
+        String country = serverRequest.queryParam("country").orElse("");
+        String state = serverRequest.queryParam("state").orElse("");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(dateWrapperDtoValidationHandler.handle(serverRequest)
                         .map(DateWrapperToLocalDateMapper.INSTANCE::dateWrapperToLocalDate)
-                        .flatMap(date -> salesTaxTrackingFacade.refreshNexusSummary(state, date)
-                                .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                                .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new))));
+                        .flatMap(date -> {
+                            return salesTaxTrackingDtoValidationHandler.validateQueryParam("country", country)
+                                    .then(CountryIsUsaChecker.isCountryUsa(country) ? salesTaxTrackingDtoValidationHandler.validateQueryParam("state", state) : Mono.empty())
+                                    .then(Mono.defer(() -> salesTaxTrackingFacade.refreshNexusSummary(country, state, date)
+                                            .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
+                                            .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new))));
+                        }));
 
         return ServerResponse.ok().body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
     }
 
     @NexusUpdatePermission
     public Mono<ServerResponse> patch(ServerRequest serverRequest) {
-        String state = serverRequest.pathVariable("state");
+        String country = serverRequest.queryParam("country").orElse("");
+        String state = serverRequest.queryParam("state").orElse("");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
-                .then(salesTaxTrackingDtoValidationHandler.validateParam("state", state))
-                .then(Mono.defer(() -> salesTaxTrackingFacade.findByState(state))
+                .then(salesTaxTrackingDtoValidationHandler.validateQueryParam("country", country))
+                .then(CountryIsUsaChecker.isCountryUsa(country) ? salesTaxTrackingDtoValidationHandler.validateQueryParam("state", state) : Mono.just(""))
+                .then(Mono.defer(() -> salesTaxTrackingFacade.findByCountryAndState(country, state))
                         .flatMap(existingSalesTaxTracking -> serverRequest.bodyToMono(Map.class)
                                 .map(map -> salesTaxTrackingPatcher.patch(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(existingSalesTaxTracking), map))
                                 .switchIfEmpty(Mono.error(new InvalidPatchFieldException()))

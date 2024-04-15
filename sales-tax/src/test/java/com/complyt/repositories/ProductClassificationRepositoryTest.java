@@ -38,7 +38,7 @@ public class ProductClassificationRepositoryTest {
     UnitTestUtilities testUtilities;
 
     @BeforeEach
-    void setUp() {
+    void setUp() { //todo: this hold product calisfication of nukk tax rate rules - fix to test vat
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
         Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<>() {{
@@ -46,7 +46,7 @@ public class ProductClassificationRepositoryTest {
         }};
 
         productClassification = new ProductClassification(UUID.randomUUID().toString(), "C1S1", "description",
-                "title", jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
+                "title", jurisdictionalSalesTaxRulesList, null, TangibleCategory.TANGIBLE);
     }
 
     @Test

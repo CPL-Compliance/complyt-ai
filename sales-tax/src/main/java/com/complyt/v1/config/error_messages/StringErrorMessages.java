@@ -15,4 +15,6 @@ public interface StringErrorMessages {
     String MAX_20_ERROR = "should be up to 20 characters maximum";
 
     String NOT_BE_BLANK_ERROR = "may not be blank";
+
+    String NOT_BE_BLANK_IN_A_NON_PARTIAL_ADDRESS = "may not be blank in a non partial address";
 }

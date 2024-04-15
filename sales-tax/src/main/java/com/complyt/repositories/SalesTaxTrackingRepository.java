@@ -1,8 +1,10 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.transaction.Address;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
+import com.complyt.utils.query.CountryAndStateCriteriaBuilder;
 import com.complyt.utils.update.SalesTaxTrackingUpdateQueryBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -34,17 +36,21 @@ public class SalesTaxTrackingRepository {
     @NonNull
     SalesTaxTrackingUpdateQueryBuilder updateQueryBuilder;
 
-    public Mono<SalesTaxTracking> findByState(@NonNull String state) {
+    @NonNull
+    CountryAndStateCriteriaBuilder countryQueryBuilder;
+
+    public Mono<SalesTaxTracking> findByCountryAndState(@NonNull String country, String state) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
-                    Criteria stateSearchCriteria = new Criteria()
-                            .orOperator(Criteria.where("state.abbreviation").is(state),
-                                    Criteria.where("state.name").is(state));
+                    Criteria addressSearchQuery = countryQueryBuilder.build(country, state);
 
-                    Query query = Query.query(stateSearchCriteria.and("tenantId").is(tenantId));
+                    Query query = Query.query(addressSearchQuery.and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for sales tax tracking with state "
-                                    + state + " and tenant ID " + tenantId, log::info)
+                    StringBuilder stringBuilder = new StringBuilder("Searching for sales tax tracking with country " + country);
+                    stringBuilder = state != null? stringBuilder.append(" and with state " + state) : stringBuilder;
+                    stringBuilder.append(" and tenant ID " + tenantId);
+
+                    return ContextLogger.observeCtx(stringBuilder.toString(), log::info)
                             .then(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class));
                 });
     }

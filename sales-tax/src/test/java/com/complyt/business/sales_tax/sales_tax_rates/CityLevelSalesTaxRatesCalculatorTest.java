@@ -1,8 +1,9 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
+import com.complyt.business.tax.sales_tax.sales_tax_rates.CityLevelSalesTaxRatesCalculator;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
-import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
+import com.complyt.domain.sales_tax.product_classification.SubJurisdictionalTaxRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
@@ -18,7 +19,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
 
     CityLevelSalesTaxRatesCalculator cityLevelSalesTaxRatesCalculator;
     UnitTestUtilities testUtilities;
-    CitySalesTaxRules citySalesTaxRules;
+    SubJurisdictionalTaxRules citySalesTaxRules;
     SalesTaxRates salesTaxRates;
 
     @BeforeEach
@@ -33,7 +34,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     @Test
     void calculate_CityRuleIsNotTaxable_ReturnsZeroCityRate() {
         // Given
-        CitySalesTaxRules nonTaxableCityRule = citySalesTaxRules.withTaxable(false);
+        SubJurisdictionalTaxRules nonTaxableCityRule = citySalesTaxRules.withTaxable(false);
         SalesTaxRates expectedSalesTaxRate = salesTaxRates.withCityRate(BigDecimal.ZERO);
 
         // When
@@ -46,7 +47,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     @Test
     void calculate_CityRuleIsTaxable_ReturnsTaxableCityRate() {
         // Given
-        CitySalesTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true);
+        SubJurisdictionalTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true);
 
         // When
         SalesTaxRates actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(taxableCityRule, salesTaxRates);
@@ -58,7 +59,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     @Test
     void calculate_CityRuleIsTaxable_ReturnsTaxableCityRateWithRemainingRatesAsZero() {
         // Given
-        CitySalesTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true);
+        SubJurisdictionalTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true);
         SalesTaxRates zeroSalesTaxRateWithCityRate = SalesTaxRates.zeroSalesTaxRate().withCityRate(salesTaxRates.cityRate());
         SalesTaxRates expectedSalesTaxRate = zeroSalesTaxRateWithCityRate.withTaxRate(salesTaxRates.cityRate());
 
@@ -72,7 +73,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     @Test
     void calculate_CityRuleIsNonTaxable_ReturnsZeroRates() {
         // Given
-        CitySalesTaxRules taxableCityRule = citySalesTaxRules.withTaxable(false);
+        SubJurisdictionalTaxRules taxableCityRule = citySalesTaxRules.withTaxable(false);
         SalesTaxRates zeroSalesTaxRateWithCityRate = SalesTaxRates.zeroSalesTaxRate().withCityRate(salesTaxRates.cityRate());
         SalesTaxRates expectedSalesTaxRate = SalesTaxRates.zeroSalesTaxRate();
 
@@ -86,7 +87,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     @Test
     void calculate_SpecialTreatmentByFixed_ReturnsFixedCityRate() {
         // Given
-        CitySalesTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true).withSpecialTreatment(true);
+        SubJurisdictionalTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true).withSpecialTreatment(true);
         BigDecimal newCityRate = taxableCityRule.getCalculationValue();
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates()
                 .withCityRate(newCityRate);
@@ -105,7 +106,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     @Test
     void calculate_SpecialTreatmentByPercentage_ReturnsPercentageCityRate() {
         // Given
-        CitySalesTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true)
+        SubJurisdictionalTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true)
                 .withSpecialTreatment(true)
                 .withCalculationType(CalculationType.PERCENTAGE);
         SalesTaxRates originalSalesTaxRate = UnitTestUtilities.createCaliforniaSalesTaxRates().withCityRate(new BigDecimal("0.05"));
@@ -125,7 +126,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     @Test
     void calculate_NullCitySalesTaxRulesPassed_ThrowsException() {
         // Given
-        CitySalesTaxRules nullCitySalesTaxRules = null;
+        SubJurisdictionalTaxRules nullCitySalesTaxRules = null;
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {

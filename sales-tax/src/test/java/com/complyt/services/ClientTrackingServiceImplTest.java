@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-class clientTrackingServiceImpImplTest {
+class ClientTrackingServiceImplTest {
 
     @InjectMocks
     ClientTrackingServiceImpl clientTrackingServiceImp;

@@ -25,7 +25,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/all")
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -44,7 +44,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/all")
                         .queryParam("page", "null")
                         .build())
                 .headers(headers -> {
@@ -63,7 +63,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/all")
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN_DIFFERENT_TENANT);
@@ -143,13 +143,16 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     public void getByStateName_Exists_Returns200() {
         // Given
+        String country = "USA";
         String existingStateName = "California";
 
         // Then
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + existingStateName)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", existingStateName)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -166,13 +169,16 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     public void getByStateName_PathVariableInvalid_Returns400() {
         // Given
-        String StateName = "null";
+        String country = "USA";
+        String stateName = "null";
 
         // Then
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + StateName)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", stateName)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -187,13 +193,16 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     public void getByStateAbbreviation_Exists_Returns200() {
         // Given
+        String country = "USA";
         String existingStateAbbreviation = "CA";
 
         // Then
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + existingStateAbbreviation)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", existingStateAbbreviation)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -243,11 +252,17 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     public void upsertByState_DoesntExists_Returns201() {
+        // Given
+        String country = "USA";
+        String state = "Nevada";
+
         // Then
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Nevada")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -262,10 +277,15 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     public void upsertByState_Exists_Returns200() {
+        String country = "USA";
+        String state = "Hawaii";
+
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Hawaii")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -282,10 +302,15 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     public void upsertByState_PathVariableInvalid_Returns400() {
+        String country = "USA";
+        String state = "null";
+
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/null")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -300,10 +325,15 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     public void upsertByState_DoesntExistsWithComplytId_Returns400ConflictedData() {
+        String country = "USA";
+        String state = "CA";
+
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/CA")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -318,10 +348,14 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     public void upsertByState_ConflictingState_Returns400ConflictedData() {
+        String country = "USA";
+
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/dope")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", "dope")
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -336,10 +370,15 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     public void upsertByState_DoesntPassValidation_Returns400CValidationError() {
+        String country = "USA";
+        String state = "CA";
+
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/CA")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -354,7 +393,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                     String[] errors = message.substring(1, message.length() - 1).split(", ");
                     assertEquals(2, errors.length);
                 });
-        ;
     }
 
     @Order(1)
@@ -362,13 +400,16 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     public void upsertByState_NoBody_Returns400() {
         // Given
+        String country = "USA";
         String state = "CA";
 
         // Then
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + state)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -429,10 +470,14 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     public void put_InsufficientScopes_Returns403() {
+        String country = "USA";
+
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/dummy")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", "dummy")
                         .build())
                 .headers(headers -> headers.setBearerAuth(TOKEN_NO_SCOPES))
                 .exchange()
@@ -442,8 +487,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(4)
     @Test
     @Override
-    public void refresh_EverythingExists_Returns200WithSummary() {
+    public void refresh_UsaEverythingExists_Returns200WithSummary() {
         // Given
+        String country = "USA";
         String existingStateAbbreviation = "CA";
         LocalDate now = LocalDate.now();
         LocalDate summaryDate = LocalDate.parse("2023-12-21");
@@ -452,7 +498,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + existingStateAbbreviation)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", existingStateAbbreviation)
                         .queryParam("date", now)
                         .build())
                 .headers(headers -> {
@@ -467,14 +515,132 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .jsonPath("$.nexusCalculationSummaries['%s'].count".formatted(summaryDate)).isEqualTo(0);
     }
 
+    @Order(5)
+    @Test
+    @Override
+    public void refresh_NonUsaEverythingExists_Returns200WithSummary() {
+        // Given
+        String country = "Brazil";
+        LocalDate now = LocalDate.now();
+        LocalDate summaryDate = LocalDate.parse("2023-12-21");
+
+        // Then
+        WEB_TEST_CLIENT
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/refresh")
+                        .queryParam("country", country)
+                        .queryParam("date", now)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Order(6)
+    @Test
+    @Override
+    public void getOne_NonUsaEverythingExists_Returns200WithSummary() {
+        // Given
+        String country = "Brazil";
+        LocalDate summaryDate = LocalDate.parse("2023-12-21");
+
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+
+    @Order(4)
+    @Test
+    @Override
+    public void upsertByCountryAndState_UsaCountryNoState_Returns400() {
+        String country = "USA";
+
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.salesTaxTrackingJsonExample(country, false, null, null, null, true, "2000-12-31T22:00:00", null, null))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(4)
+    @Test
+    @Override
+    public void upsertByCountryAndState_NonUsaCountryNonSupportedCountry_Returns400() {
+        String country = "NoSupport";
+
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.salesTaxTrackingJsonExample(country, false, null, null, null, true, "2000-12-31T22:00:00", null, null))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(4)
+    @Test
+    @Override
+    public void upsertByCountry_NonUsaCountry_Returns200() {
+        String country = "Brazil";
+
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(TestUtilities.salesTaxTrackingJsonExample(country, false, null, null, null, true, "2000-12-31T22:00:00", null, null))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.country").isEqualTo(country.toUpperCase());
+    }
+
     @Order(1)
     @Test
     @Override
     public void post_NoAccessToken_Returns401() {
+        String country = "USA";
+
         WEB_TEST_CLIENT
                 .post()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/refresh/state/dummy")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", "dummy")
                         .build())
                 .headers(headers -> headers.setContentType(MediaType.APPLICATION_JSON))
                 .exchange()
@@ -485,10 +651,14 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     public void post_InsufficientScopes_Returns403() {
+        String country = "USA";
+
         WEB_TEST_CLIENT
                 .post()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/refresh/state/dummy")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/refresh")
+                        .queryParam("country", country)
+                        .queryParam("state", "dummy")
                         .build())
                 .headers(headers -> headers.setBearerAuth(TOKEN_NO_SCOPES))
                 .exchange()
@@ -504,7 +674,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/all")
                         .queryParam("size", size)
                         .build())
                 .headers(headers -> {
@@ -528,7 +698,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/all")
                         .queryParam("page", page)
                         .queryParam("size", size)
                         .build())
@@ -551,7 +721,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/all")
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -568,13 +738,17 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     public void getByStateNameToPatch_Exists_Returns200() {
         // Given
+        String country = "USA";
+
         String existingStateName = "Virginia";
 
         // Then
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + existingStateName)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", existingStateName)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -590,6 +764,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     @Test
     public void patch_PatchesOneField_ReturnsPatchedResource() {
+        String country = "USA";
         String state = "VA";
         String map = """
                 {
@@ -600,7 +775,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         WEB_TEST_CLIENT
                 .patch()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + state)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -617,12 +794,15 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     @Test
     public void patch_PatchesTwoFields_ReturnsPatchedResource() {
+        String country = "USA";
         String state = "VA";
 
         WEB_TEST_CLIENT
                 .patch()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + state)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -641,12 +821,20 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     public void patch_PatchesRegistered_ReturnsPatchedResource() {
+        String country = "USA";
         String state = "VA";
+
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("registered", "REGISTERED");
+        }};
+
 
         WEB_TEST_CLIENT
                 .patch()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + state)
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -666,12 +854,17 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     public void upsertByState_RegisteredAndDateNull_ReturnsSalesTaxTrackingWithDate() {
+        String country = "USA";
+        String state = "Hawaii";
+
         String registered = "REGISTERED";
 
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Hawaii")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -693,17 +886,20 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     public void upsertByState_RegisteredAndDate_ReturnsSalesTaxTrackingWithGivenDate() {
         String registrationDate = "2024-03-20T14:15:20";
         String registered = "REGISTERED";
+        String country = "USA";
+        String state = "Hawaii";
 
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Hawaii")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
-                })
-                .bodyValue(TestUtilities.salesTaxTrackingWithRegistrationJsonExample(registered, registrationDate))
+                }).bodyValue(TestUtilities.salesTaxTrackingWithRegistrationJsonExample(registered, registrationDate))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(LinkedHashMap.class)
@@ -719,11 +915,16 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     public void upsertByState_NonRegisteredAndDateNull_ReturnsSalesTaxTracking() {
         String registrationDate = null;
         String registered = null;
+        String country = "USA";
+        String state = "Hawaii";
+
 
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Hawaii")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -745,11 +946,15 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     public void upsertByState_NonRegisteredAndDate_Returns400() {
         String registrationDate = LocalDateTime.now().toString();
         String registered = null;
+        String country = "USA";
+        String state = "Hawaii";
 
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Hawaii")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);

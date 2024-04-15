@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,27 +30,17 @@ public class TangibleItemsAmountCalculatorTest {
 
     @BeforeEach
     void setUp() {
-//        items = createItems();
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
 
-        items = new ArrayList<>(testUtilities.setCalculatedTotalOnItemList(testUtilities.createItems(true, true)));
+        items = new ArrayList<>(testUtilities.setCalculatedTotalOnItemList(testUtilities.createItems(true, false, true)));
         tangibleItemsAmountCalculator = new TangibleItemsAmountCalculator();
     }
 
     private List<Taxable> createItems() {
-        return new ArrayList<>() {
-            {
-                SalesTaxRates salesTaxRates = new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null);
-                Item item = new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000),
-                        null, "description", "name", "C1S1",
-                        null, salesTaxRates, false, BigDecimal.ZERO,
-                        null, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
+        List<Item> itemList = testUtilities.createItemsWithSalesTaxRate(false, false, true);
+        itemList.add(2, itemList.get(0).withTangibleCategory(TangibleCategory.INTANGIBLE));
 
-                add(item.withName("name"));
-                add(item.withName("name"));
-                add(item.withName("name"));
-            }
-        };
+        return new ArrayList<>(itemList);
     }
 
     @Test

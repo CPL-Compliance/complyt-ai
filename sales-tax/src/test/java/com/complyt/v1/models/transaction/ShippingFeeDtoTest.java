@@ -6,8 +6,11 @@ import com.complyt.v1.models.TangibleCategoryDto;
 import com.complyt.v1.models.TaxableCategoryDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,25 +18,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ShippingFeeDtoTest {
     private ShippingFeeDto shippingFeeDto;
 
+    private UnitTestUtilities testUtilities;
+
+
+
     @BeforeEach
     void setup() {
-        shippingFeeDto = createShippingFeeDto();
-    }
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
 
-    private ShippingFeeDto createShippingFeeDto() {
-        JurisdictionalSalesTaxRulesDto rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal("1000"), BigDecimal.ZERO, rules, null, "C6S1", TaxableCategoryDto.TAXABLE, TangibleCategoryDto.INTANGIBLE);
-    }
-
-    private JurisdictionalSalesTaxRulesDto createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRulesDto("California", "CA", true,
-                false, CalculationType.FIXED, "description", BigDecimal.ZERO, null);
+        shippingFeeDto = testUtilities.createShippingFeeDto(true, true);
     }
 
     @Test
     void Equals_sameShippingFeeDto_ReturnsTrue() {
         // Given
-        ShippingFeeDto givenShippingFeeDto = createShippingFeeDto();
+        ShippingFeeDto givenShippingFeeDto = testUtilities.createShippingFeeDto(true, true);
 
         // When
         boolean isEquals = shippingFeeDto.equals(givenShippingFeeDto);
@@ -51,6 +50,7 @@ class ShippingFeeDtoTest {
                 ", calculatedTotal=" + shippingFeeDto.calculatedTotal() +
                 ", jurisdictionalSalesTaxRules=" + shippingFeeDto.jurisdictionalSalesTaxRules() +
                 ", salesTaxRates=" + shippingFeeDto.salesTaxRates() +
+                ", gtRates=" + shippingFeeDto.gtRates() +
                 ", taxCode=" + shippingFeeDto.taxCode() +
                 ", taxableCategory=" + shippingFeeDto.taxableCategory() +
                 ", tangibleCategory=" + shippingFeeDto.tangibleCategory() + "]";
@@ -61,5 +61,4 @@ class ShippingFeeDtoTest {
         // Then
         assertEquals(expectedString, actualString);
     }
-
 }

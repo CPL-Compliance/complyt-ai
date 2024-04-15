@@ -1,0 +1,56 @@
+package com.complyt.business.collection_fetcher;
+
+public interface CollectionsNames {
+    String ALABAMA = "alabama";
+    String ALASKA = "alaska";
+    String ARIZONA = "arizona";
+    String ARKANSAS = "arkansas";
+    String CALIFORNIA = "california";
+    String CONNECTICUT = "connecticut";
+    String DELAWARE = "delaware";
+    String DISTRICT_OF_COLOMBIA = "district_of_columbia";
+    String FLORIDA = "florida";
+    String GEORGIA = "georgia";
+    String HAWAII = "hawaii";
+    String IDAHO = "idaho";
+    String INDIANA = "indiana";
+    String IOWA = "iowa";
+    String KANSAS = "kansas";
+    String KENTUCKY = "kentucky";
+    String LOUISIANA = "louisiana";
+    String MAINE = "maine";
+    String MARYLAND = "maryland";
+    String MASSACHUSETTS = "massachusetts";
+    String MICHIGAN = "michigan";
+    String MINNESOTA = "minnesota";
+    String MISSISSIPPI = "mississippi";
+    String MISSOURI = "missouri";
+    String MONTANA = "montana";
+    String NEBRASKA = "nebraska";
+    String NEVADA = "nevada";
+    String NEW_HAMPSHIRE = "new_hampshire";
+    String NEW_JERSEY = "new_jersey";
+    String NEW_MEXICO = "new_mexico";
+    String NEW_YORK = "new_york";
+    String NORTH_CAROLINA = "north_carolina";
+    String NORTH_DAKOTA = "north_dakota";
+    String OHIO = "ohio";
+    String OKLAHOMA = "oklahoma";
+    String OREGON = "oregon";
+    String PENNSYLVANIA = "pennsylvania";
+    String RHODE_ISLAND = "rhode_island";
+    String SOUTH_CAROLINA = "south_carolina";
+    String SOUTH_DAKOTA = "south_dakota";
+    String TENNESSEE = "tennessee";
+    String TEXAS = "texas";
+    String UTAH = "utah";
+    String VERMONT = "vermont";
+    String VIRGINIA = "virginia";
+    String WASHINGTON = "washington";
+    String WEST_VIRGINIA = "west_virginia";
+    String WISCONSIN = "wisconsin";
+    String WYOMING = "wyoming";
+    String ILLINOIS = "illinois";
+    String COLORADO = "colorado";
+
+}

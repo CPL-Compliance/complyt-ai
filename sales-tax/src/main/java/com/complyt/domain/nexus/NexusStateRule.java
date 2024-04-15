@@ -18,6 +18,7 @@ public record NexusStateRule(
         @Id
         String id,
         boolean enforcesSalesTax,
+        String country,
         State state,
         List<TaxableCategory> taxableCategories,
         List<TangibleCategory> tangibleCategories,

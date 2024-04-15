@@ -10,10 +10,10 @@ class TransactionDataInjectorTest {
     void shouldInject_ReturnTrue() {
         // Given
         Object genericObject = new Object();
-        TransactionDataInjector<Object> genericDataInjector = t -> null;
+        TransactionDataInjector<Object> genericDataInjector = (t, s) -> null;
 
         // When
-        boolean shouldBeInjected = genericDataInjector.shouldInject(genericObject);
+        boolean shouldBeInjected = genericDataInjector.shouldInject(genericObject, null);
 
         // Then
         assertTrue(shouldBeInjected);

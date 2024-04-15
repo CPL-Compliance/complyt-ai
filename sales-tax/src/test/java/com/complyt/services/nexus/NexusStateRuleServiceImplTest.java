@@ -49,6 +49,7 @@ class NexusStateRuleServiceImplTest {
     }
 
     private NexusStateRule createNexusStateRule() {
+        String country = "USA";
         State state = new State("CA", "02", "California");
         List<TaxableCategory> taxableCategories = new ArrayList<TaxableCategory>() {{
             add(TaxableCategory.TAXABLE);
@@ -64,7 +65,7 @@ class NexusStateRuleServiceImplTest {
 
         NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(1000), 2, Definition.AMOUNT_OR_COUNT);
 
-        return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
+        return new NexusStateRule(UUID.randomUUID().toString(), true, country, state, taxableCategories, tangibleCategories, customerTypes,
                 TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold, LocalDateTime.now());
     }
 
@@ -138,9 +139,9 @@ class NexusStateRuleServiceImplTest {
 
     @Test
     void findByState_FindsRule_ReturnsRule() {
-        when(nexusStateRuleRepository.findByState(nexusStateRule.state().getAbbreviation())).thenReturn(Mono.just(nexusStateRule));
+        when(nexusStateRuleRepository.findByCountryAndState(nexusStateRule.country(), nexusStateRule.state().getAbbreviation())).thenReturn(Mono.just(nexusStateRule));
 
-        Mono<NexusStateRule> result = nexusStateRuleServiceImpl.findByState(nexusStateRule.state().getAbbreviation());
+        Mono<NexusStateRule> result = nexusStateRuleServiceImpl.findByCountryAndState(nexusStateRule.country(), nexusStateRule.state().getAbbreviation());
 
         StepVerifier.create(result).expectNext(nexusStateRule).verifyComplete();
     }
@@ -148,15 +149,16 @@ class NexusStateRuleServiceImplTest {
     @Test
     void findByState_NullStatePassed_ThrowsException() {
         // Given
-        String nullState = null;
+        String nullCountry = null;
+        String state = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusStateRuleServiceImpl.findByState(nullState);
+            nexusStateRuleServiceImpl.findByCountryAndState(nullCountry, state);
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "country is marked non-null but is null");
     }
 
 }

@@ -1,6 +1,6 @@
 package com.complyt.business.transaction.data_fetcher;
 
-import com.complyt.business.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
+import com.complyt.business.tax.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.CityCountyWrapper;

@@ -2,6 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.utils.observability.ContextLogger;
+import com.complyt.utils.query.CountryAndStateCriteriaBuilder;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -25,32 +26,40 @@ public class NexusStateRuleRepository {
     @NonNull
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
+    @NonNull
+    CountryAndStateCriteriaBuilder countryQueryBuilder;
+
     public Mono<NexusStateRule> findById(@NonNull String id) {
         return ContextLogger.observeCtx("Searching for nexus state rule with ID " + id, log::info)
                 .then(reactiveMongoTemplate.findById(id, NexusStateRule.class));
     }
 
-    public Mono<NexusStateRule> findByState(@NonNull String state) {
-        Criteria stateSearchCriteria = new Criteria()
-                .orOperator(Criteria.where("state.abbreviation").is(state),
-                        Criteria.where("state.name").is(state));
+    public Mono<NexusStateRule> findByCountryAndState(@NonNull String country, String state) {
+
+        countryQueryBuilder.build(country, state);
+
+        Criteria stateSearchCriteria = countryQueryBuilder.build(country, state);
 
         Query query = Query.query(stateSearchCriteria);
 
-        return ContextLogger.observeCtx("Searching for nexus state rule with state " + state, log::info)
+        String stateInfoIfStateExists = state != null ? " and in state " + state : "";
+
+        return ContextLogger.observeCtx("Searching for nexus state rule with country " + country + stateInfoIfStateExists, log::info)
                 .then(reactiveMongoTemplate.findOne(query, NexusStateRule.class));
     }
 
-    public Mono<NexusStateRule> findMostRecentByState(@NonNull String state) {
+    public Mono<NexusStateRule> findMostRecentByCountryAndState(@NonNull String country, String state) {
+        Criteria stateSearchCriteria = countryQueryBuilder.build(country, state);
+
         TypedAggregation<NexusStateRule> aggregation = newAggregation(NexusStateRule.class,
-                Aggregation.match(new Criteria()
-                        .orOperator(Criteria.where("state.abbreviation").is(state),
-                                Criteria.where("state.name").is(state))),
+                Aggregation.match(stateSearchCriteria),
                 Aggregation.sort(Sort.Direction.DESC, "appliedDate"),
                 Aggregation.limit(1));
 
 
-        return ContextLogger.observeCtx("Searching for nexus state rule with state " + state, log::info)
+        String stateInfoIfStateExists = state != null ? " and in state " + state : "";
+
+        return ContextLogger.observeCtx("Searching for nexus state rule with country " + country + stateInfoIfStateExists, log::info)
                 .then(reactiveMongoTemplate.aggregate(aggregation, NexusStateRule.class).next());
     }
 

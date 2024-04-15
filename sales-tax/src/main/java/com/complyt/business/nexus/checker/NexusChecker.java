@@ -29,7 +29,9 @@ public class NexusChecker {
     public boolean hasNexus(@NonNull SalesTaxTracking salesTaxTracking) {
         boolean hasNexus = salesTaxEnforcementChecker.check(salesTaxTracking) &&
                            (physicalNexusChecker.check(salesTaxTracking) || economicNexusChecker.check(salesTaxTracking));
-        log.debug("Checking if client has nexus in state : " + salesTaxTracking.getState().getAbbreviation()
+
+        String stateInfoIfStateExists = salesTaxTracking.getState() != null ? " and in state " + salesTaxTracking.getState().getName() : "";
+        log.debug("Checking if client has nexus in in country : " + salesTaxTracking.getCountry() + stateInfoIfStateExists
                   + " Has given a result of : " + hasNexus);
 
         return hasNexus;
@@ -39,8 +41,9 @@ public class NexusChecker {
         NexusCalculationSummary nexusCalculationSummary = salesTaxTracking.getNexusCalculationSummaries().get(dateRange.getEnd().toLocalDate());
         if (nexusCalculationSummary == null) return false;
         boolean passedThreshold = nexusThresholdChecker.check(new Pair<>(nexusCalculationSummary, salesTaxTracking.getNexusStateRule()));
-        log.debug("Checking if client passed nexus' threshold in state : " + salesTaxTracking.getNexusStateRule().state().getAbbreviation()
-                  + " Has given a result of : " + passedThreshold);
+        String stateInfoIfStateExists = salesTaxTracking.getNexusStateRule().state() != null ? " and in state " + salesTaxTracking.getNexusStateRule().state().getAbbreviation() : "";
+        log.debug("Checking if client passed nexus' threshold in country : " + salesTaxTracking.getCountry() + stateInfoIfStateExists
+                + " Has given a result of : " + passedThreshold);
 
         return passedThreshold;
     }

@@ -4,10 +4,7 @@ import com.complyt.domain.customer.Customer;
 import com.complyt.domain.properties.ComplytIdProperty;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.timestamps.Timestamps;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Value;
-import lombok.With;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -18,8 +15,8 @@ import java.util.UUID;
 @Value
 @Builder
 @With
-@Document(collection = "transaction")
 @AllArgsConstructor
+@Document(collection = "transaction")
 public class Transaction implements ComplytIdProperty {
 
     UUID complytId;
@@ -29,6 +26,7 @@ public class Transaction implements ComplytIdProperty {
     String source;
     String documentName;
     List<Item> items;
+    Boolean isTaxInclusive; //todo:make work with get change name to isTaxInclusive
     Address billingAddress;
     Address shippingAddress;
     UUID customerId;
@@ -44,6 +42,8 @@ public class Transaction implements ComplytIdProperty {
     BigDecimal taxableItemsAmount;
     BigDecimal tangibleItemsAmount;
     BigDecimal totalItemsAmount;
+    BigDecimal finalTransactionAmount; //todo: this field name might change - depends on sky
     BigDecimal totalDiscount;
     TransactionFilingStatus transactionFilingStatus;
+    String currency;
 }

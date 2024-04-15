@@ -1,5 +1,7 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
+import com.complyt.business.tax.sales_tax.sales_tax_rates.SalesTaxRatesProvider;
+import com.complyt.business.tax.sales_tax.sales_tax_rates.ShippingFeeSalesTaxRatesProvider;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.transaction.Address;
@@ -40,7 +42,7 @@ public class ShippingFeeSalesTaxRatesProviderTest {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules().withSpecialTreatment(true);
         salesTaxRates = testUtilities.createSalesTaxRates();
-        shippingFee = testUtilities.createShippingFee(false, false);
+        shippingFee = testUtilities.createShippingFee(false, false, false);
         address = testUtilities.createAddress();
     }
 

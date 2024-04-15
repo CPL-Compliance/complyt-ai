@@ -1,7 +1,6 @@
 package com.complyt.facades;
 
 import com.complyt.domain.ClientTracking;
-import com.complyt.domain.customer.Customer;
 import com.complyt.services.ClientTrackingService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

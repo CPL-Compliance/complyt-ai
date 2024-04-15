@@ -51,7 +51,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
     // Given
     private final LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T07:00:00");
     private final UUID customerId = UUID.fromString("9ff0912a-2d60-4e8a-a6ba-1a9e7385338e"); // complytId of an existing customer in the database
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("New York", "US", null, "NY", "20 W 34th St.", "10001", false);
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("New York", "US", null, "NY", "20 W 34th St.", "","10001", false);
     private final String source = "1";
     @MockBean
     private TenantResolver tenantResolver;
@@ -81,7 +81,9 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
                 .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state)
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
+                        .queryParam("country", referenceAddress.country())
+                        .queryParam("state", state)
                         .queryParam("date", referenceDate.toLocalDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -168,7 +170,9 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", referenceAddress.country())
+                        .queryParam("state", referenceAddress.state())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -216,7 +220,9 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", referenceAddress.country())
+                        .queryParam("state", referenceAddress.state())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -268,7 +274,9 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", referenceAddress.country())
+                        .queryParam("state", referenceAddress.state())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -285,7 +293,9 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
                             .mutateWith(csrf())
                             .put()
                             .uri(uriBuilder -> uriBuilder
-                                    .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                                    .path(SalesTaxTrackingRouter.BASE_URL)
+                                    .queryParam("country", referenceAddress.country())
+                                    .queryParam("state", referenceAddress.state())
                                     .build())
                             .bodyValue(receivedSalesTaxTracking.withApproved(true))
                             .accept(MediaType.APPLICATION_JSON)

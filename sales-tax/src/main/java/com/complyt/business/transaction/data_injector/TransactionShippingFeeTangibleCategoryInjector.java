@@ -6,24 +6,26 @@ import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
-
 @EqualsAndHashCode(callSuper = true)
 @Getter
+@Component
 @Slf4j
 public class TransactionShippingFeeTangibleCategoryInjector extends TransactionShippingFeeInjectionChecker {
 
-    public TransactionShippingFeeTangibleCategoryInjector(Transaction transaction) {
-        super(transaction);
+    public TransactionShippingFeeTangibleCategoryInjector() {
+        super();
     }
 
     @Override
-    public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
-        if (!shouldInject(mapTaxCodesToClassifications)) {
+    public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications, @NonNull Transaction transaction) {
+        if (!shouldInject(mapTaxCodesToClassifications, transaction)) {
             return Mono.just(transaction);
         }
 

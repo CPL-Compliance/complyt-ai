@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TaxableItemsAmountCalculatorTest {
 
-    UnitTestUtilities unitTestUtilities;
+    private UnitTestUtilities unitTestUtilities;
     private TaxableItemsAmountCalculator taxableItemsAmountCalculator;
 
     List<Taxable> items;
@@ -33,7 +33,7 @@ public class TaxableItemsAmountCalculatorTest {
 //        items = createItems();
         unitTestUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
 
-        items = new ArrayList<>(unitTestUtilities.setCalculatedTotalOnItemList(unitTestUtilities.createItems(true, true)));
+        items = new ArrayList<>(unitTestUtilities.setCalculatedTotalOnItemList(unitTestUtilities.createItems(true,false,  true)));
         taxableItemsAmountCalculator = new TaxableItemsAmountCalculator();
     }
 
@@ -74,7 +74,7 @@ public class TaxableItemsAmountCalculatorTest {
     void calculate_ItemsWithDiscountPassedBothTaxable_ReturnsAmount() {
         // Before
         List<Taxable> discountedItems = new ArrayList<>(unitTestUtilities.setCalculatedTotalOnItemList(
-                unitTestUtilities.createItems(true, true)
+                unitTestUtilities.createItems(true,false, true)
                         .stream().map(item -> item
                                 .withDiscount(BigDecimal.valueOf(500)))
                         .collect(Collectors.toList())));

@@ -5,8 +5,8 @@ import com.complyt.domain.ComplytSalesTaxRates;
 import lombok.NonNull;
 import reactor.core.publisher.Mono;
 
-public interface ComplytSalesTaxRatesService {
-    Mono<ComplytSalesTaxRates> findByAddress(@NonNull Address address);
+public interface ComplytSalesTaxRatesService<T> {
+    Mono<T> findByAddress(@NonNull Address address);
 
     Mono<ComplytSalesTaxRates> save(@NonNull ComplytSalesTaxRates complytSalesTaxRates, @NonNull String collection);
 }
