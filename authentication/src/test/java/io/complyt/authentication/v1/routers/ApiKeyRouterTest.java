@@ -292,6 +292,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @Override
+    @WithMockUser
     public void delete_NullHandler_ThrowsNullPointerException() {
         // Given
         ApiKeyRouter apiKeyRouter = new ApiKeyRouter();
@@ -307,6 +308,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @Override
+    @WithMockUser
     public void rotate_NullHandler_ThrowsNullPointerException() {
         // Given
         ApiKeyRouter apiKeyRouter = new ApiKeyRouter();
@@ -318,6 +320,123 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
         // Then
         assertEquals("apiKeyHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void rotate_SentAsURLEncoded_Exists_return201() {
+        // When
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
+
+        when(apiKeyFacade.rotateCredentials(apiKey)).thenReturn(Mono.just(apiKey));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.POST)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL + "/rotate")
+                        .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().isCreated();
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void rotate_SentAsJson_Exists_return201() {
+        // When
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
+
+        when(apiKeyFacade.rotateCredentials(apiKey)).thenReturn(Mono.just(apiKey));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.POST)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL + "/rotate")
+                        .build())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(apiKeyDto)
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().isCreated();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void rotate_DoesntExists_return401() {
+        // When
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
+
+        when(apiKeyFacade.rotateCredentials(apiKey)).thenReturn(Mono.empty());
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.POST)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL + "/rotate")
+                        .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void rotate_InternalServerError_Returns500() {
+        // When
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
+
+        when(apiKeyFacade.rotateCredentials(apiKey)).thenThrow(OperationFailedException.class);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.POST)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL + "/rotate")
+                        .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void rotate_UnsupportedMediaType_Returns415() {
+        // When
+        when(apiKeyFacade.rotateCredentials(apiKey)).thenThrow(OperationFailedException.class);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.POST)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL + "/rotate")
+                        .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("{}")
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().is4xxClientError();
     }
 
     @Test
