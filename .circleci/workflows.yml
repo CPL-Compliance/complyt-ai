@@ -47,16 +47,16 @@ jobs:
         type: string
         default: ""
 
-    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: ubuntu-vm
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
+      - checkout
       - run:
           name: Execute
-          command: ./mvnw clean package -Dmaven.test.skip
+          command: |
+            cd <<parameters.service_directory>>
+            ./mvnw clean package -Dmaven.test.skip
       - persist_to_workspace:
-          root: ~/complyt_work_directory
+          root: .
           paths:
             - <<parameters.service_directory>>/target/*.jar
 
@@ -66,18 +66,16 @@ jobs:
         type: string
         default: ""
 
-    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: ubuntu-vm
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
-      - attach_workspace:
-          at: ~/complyt_work_directory
+      - checkout
       - run:
           name: Execute
-          command: ./mvnw clean verify
+          command: |
+            cd <<parameters.service_directory>>
+            ./mvnw clean verify
       - persist_to_workspace:
-          root: target
+          root: <<parameters.service_directory>>/target
           paths:
             - coverage-reports
             - failsafe-reports
@@ -89,14 +87,11 @@ jobs:
       service_directory:
         type: string
         default: ""
-    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+
     executor: ubuntu-vm
 
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
-      - attach_workspace:
-          at: ~/complyt_work_directory
+      - checkout
       - add_ssh_keys:
           fingerprints:
             - "8d:a9:53:20:ea:7a:b2:1d:e5:d8:af:d4:fc:e0:81:16"
@@ -104,6 +99,7 @@ jobs:
       - run:
           name: Export Environment variables for access to image_tag
           command: |
+            cd <<parameters.service_directory>>
             image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
             export IMAGE_TAG=$image_tag
             env >> bash.env
@@ -111,6 +107,7 @@ jobs:
       - run:
           name: Release
           command: |
+            cd <<parameters.service_directory>>
             PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEXT_DEVELOPMENT_VERSION=$(echo "$PROJECT_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
             git checkout -b "<<parameters.service_directory>>-$PROJECT_VERSION"
@@ -119,12 +116,12 @@ jobs:
             bash ../.circleci/git_commands.sh <<parameters.service_directory>> "$PROJECT_VERSION"
 
       - persist_to_workspace:
-          root: .
+          root: ./<<parameters.service_directory>>
           paths:
             - bash.env
 
       - persist_to_workspace:
-          root: target
+          root: <<parameters.service_directory>>/target
           paths:
             - coverage-test-service
             - failsafe-test-service
@@ -137,23 +134,21 @@ jobs:
         type: string
         default: ""
 
-    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: openjdk-image
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
+      - checkout
       - attach_workspace:
-          at: target
+          at: .
       - run:
           name: Save test results
           command: |
-            mkdir -p test-results
-            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
+            mkdir -p test-results/junit/
+            find . -type f -regex ".*/surefire-reports/.*xml" -exec cp {} ./test-results/junit/ \;
           when: always
       - store_test_results:
-          path: test-results/
+          path: ./test-results
       - codecov/upload:
-          file: target/site/jacoco-ut/jacoco.xml
+          file: site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
           flags: <<parameters.service_directory>>
 
@@ -163,13 +158,8 @@ jobs:
         type: string
         default: ""
 
-    working_directory: ~/complyt_work_directory/<<parameters.service_name>>
     executor: python-image
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
-      - attach_workspace:
-          at: .
       - run:
           name: Set image tag as env variable
           command: |
