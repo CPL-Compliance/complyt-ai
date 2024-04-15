@@ -137,13 +137,14 @@ jobs:
 #    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: openjdk-image
     steps:
-#      - checkout
+      - checkout
 #          path: ~/complyt_work_directory
       - attach_workspace:
           at: .
       - run:
           name: Save test results
           command: |
+            ls -la
             cd <<parameters.service_directory>>
             mkdir -p test-results
             find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
