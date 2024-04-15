@@ -72,7 +72,7 @@ public class CredentialsService {
 
     public Mono<Credentials> rotateOldCredentials(@NonNull ApiKey apiKey) {
         return credentialsRepository.findActiveCredentialsByComplytClientId(apiKey.clientId())
-//                .flatMap(this::updateStatusAndTTLToOldCredentials)
+                .flatMap(this::updateStatusAndTTLToOldCredentials)
                 .flatMap(credentialsRepository::save)
                 .switchIfEmpty(Mono.error(new ApiKeyNotValidException()));
     }

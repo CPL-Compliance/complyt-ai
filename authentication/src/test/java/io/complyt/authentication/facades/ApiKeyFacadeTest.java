@@ -195,4 +195,40 @@ class ApiKeyFacadeTest {
 
         assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
     }
+
+    @Test
+    void rotateCredentials_SuccessfulRotation_ReturnsNewApiKey() {
+        // Given
+        String expectedApiKeyClientIdStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1ec";
+        String expectedApiKeyClientSecretStr = "3572db2e-486b-480a-995b-2e4d2b9104fa";
+        ApiKey newApiKey = new ApiKey(expectedApiKeyClientIdStr, expectedApiKeyClientSecretStr);
+        String managementAccessToken = TestUtilities.createManagementAccessToken().accessToken();
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Auth0Client auth0Client = TestUtilities.createAuth0Client();
+        Credentials newCredentials = credentials.withComplytClientId(apiKey.clientId())
+                .withComplytClientSecret(apiKey.clientSecret());
+
+        // When
+        when(apiKeyService.generate()).thenReturn(newApiKey);
+        when(credentialsService.rotateOldCredentials(apiKey)).thenReturn(Mono.just(credentials));
+        when(authorizationService.getManagementAccessToken()).thenReturn(Mono.just(managementAccessToken));
+        when(authorizationService.rotateClientMetadata(credentials, newApiKey, managementAccessToken)).thenReturn(Mono.just(auth0Client));
+        when(credentialsService.saveCredentialsByExistingCredentials(credentials, apiKey)).thenReturn(Mono.just(newCredentials));
+
+        // Then
+        Mono<ApiKey> resultMono = apiKeyFacade.rotateCredentials(apiKey);
+
+        StepVerifier.create(resultMono)
+                .expectNext(newApiKey)
+                .verifyComplete();
+    }
+
+    @Test
+    public void rotateCredentials_ApiKeyIsNull_ThrowsNullPointerException() {
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            apiKeyFacade.rotateCredentials(null);
+        });
+
+        assertEquals("apiKey is marked non-null but is null", exception.getMessage());
+    }
 }

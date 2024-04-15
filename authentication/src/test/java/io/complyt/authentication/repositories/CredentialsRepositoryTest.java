@@ -33,17 +33,20 @@ class CredentialsRepositoryTest {
     ReactiveMongoTemplate reactiveMongoTemplate;
 
     Credentials credentials;
+    String complytClientId;
 
     @BeforeEach
     void setup() {
-        credentials = TestUtilities.createCredentials();
+        complytClientId = "complytClientId";
+        credentials = TestUtilities.createCredentials();;
     }
 
     @Test
     void findByComplytClientId_credentialsWithComplytClientIdExists_returnsCredentials() {
         // Given
-        String complytClientId = "complytClientId";
-        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
+        Criteria statusCriteria = Criteria.where("status").in(ApiKeyStatus.ACTIVE, ApiKeyStatus.ROTATED);
+        Criteria clientIdCriteria = Criteria.where("complytClientId").is(complytClientId);
+        Query query = Query.query(new Criteria().andOperator(clientIdCriteria, statusCriteria));
 
         // When
         when(reactiveMongoTemplate.findOne(query, Credentials.class)).thenReturn(Mono.just(credentials));
@@ -56,8 +59,9 @@ class CredentialsRepositoryTest {
     @Test
     void findByComplytClientId_credentialsWithComplytClientIdNotExists_returnsMonoEmpty() {
         // Given
-        String complytClientId = "complytClientId";
-        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
+        Criteria statusCriteria = Criteria.where("status").in(ApiKeyStatus.ACTIVE, ApiKeyStatus.ROTATED);
+        Criteria clientIdCriteria = Criteria.where("complytClientId").is(complytClientId);
+        Query query = Query.query(new Criteria().andOperator(clientIdCriteria, statusCriteria));
 
         // When
         when(reactiveMongoTemplate.findOne(query, Credentials.class)).thenReturn(Mono.empty());
@@ -65,6 +69,43 @@ class CredentialsRepositoryTest {
         // Then
         Mono<Credentials> credentialsMono = credentialsRepository.findByComplytClientId(complytClientId);
         StepVerifier.create(credentialsMono).verifyComplete();
+    }
+
+    @Test
+    void findActiveCredentialsByComplytClientId_credentialsWithComplytClientIdNotExists_returnsMonoEmpty() {
+        Criteria statusCriteria = Criteria.where("status").is(ApiKeyStatus.ACTIVE);
+        Criteria clientIdCriteria = Criteria.where("complytClientId").is(complytClientId);
+        Query query = Query.query(new Criteria().andOperator(clientIdCriteria, statusCriteria));
+
+        // When
+        when(reactiveMongoTemplate.findOne(query, Credentials.class)).thenReturn(Mono.empty());
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsRepository.findActiveCredentialsByComplytClientId(complytClientId);
+        StepVerifier.create(credentialsMono).verifyComplete();
+    }
+
+    @Test
+    void findActiveCredentialsByComplytClientId_credentialsWithComplytClientIdExists_returnsCredentials() {
+        Criteria statusCriteria = Criteria.where("status").is(ApiKeyStatus.ACTIVE);
+        Criteria clientIdCriteria = Criteria.where("complytClientId").is(complytClientId);
+        Query query = Query.query(new Criteria().andOperator(clientIdCriteria, statusCriteria));
+
+        // When
+        when(reactiveMongoTemplate.findOne(query, Credentials.class)).thenReturn(Mono.just(credentials));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsRepository.findActiveCredentialsByComplytClientId(complytClientId);
+        StepVerifier.create(credentialsMono).expectNext(credentials).verifyComplete();
+    }
+
+    @Test
+    void findActiveCredentialsByComplytClientId_credentialsIsNull_ThrowsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsRepository.findActiveCredentialsByComplytClientId(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "complytClientId is marked non-null but is null");
     }
 
     @Test
@@ -114,7 +155,6 @@ class CredentialsRepositoryTest {
     @Test
     void markAsCancelled_complytClientIdNotExists_returnsMonoEmpty() {
         // Given
-        String complytClientId = "complytClientId";
         Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
         Update update = Update.update("status", ApiKeyStatus.CANCELLED);
 

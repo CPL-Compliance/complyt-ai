@@ -170,6 +170,21 @@ public class TestUtilities {
                 .build();
     }
 
+    public static Credentials createEncryptedCredentialsByExistingCredentials(@NonNull ApiKey apiKey,
+                                                         @NonNull Credentials existingCredentials,
+                                                         @NonNull String complytClientSecret) {
+        return Credentials.builder().clientId(existingCredentials.getClientId())
+                .clientIdIv(existingCredentials.getClientIdIv())
+                .clientSecret(existingCredentials.getClientSecret())
+                .clientSecretIv(existingCredentials.getClientSecretIv())
+                .audience(existingCredentials.getAudience()).grantType("grantType")
+                .tenantId(existingCredentials.getTenantId())
+                .name(existingCredentials.getTenantId())
+                .status(ApiKeyStatus.ACTIVE)
+                .complytClientId(apiKey.clientId())
+                .complytClientSecret(complytClientSecret).build();
+    }
+
     public static Token createEncryptedToken(@NonNull Token token, @NonNull EncryptedData accessTokenEncryptedData,
                                              @NonNull EncryptedData scopeEncryptedData) {
         return Token.builder()
