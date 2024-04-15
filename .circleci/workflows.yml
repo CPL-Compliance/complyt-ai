@@ -142,13 +142,13 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Save test results
-          command: |
-            ls -la
-#            cd <<parameters.service_directory>>
-            mkdir -p test-results
-            find . -type f -regex "surefire-reports/.*.xml" -exec cp {} test-results/ \;
-          when: always
+            name: Save test results
+            command: |
+              ls -la
+  #            cd <<parameters.service_directory>>
+              mkdir -p test-results
+              find . -type f -regex "surefire-reports/.*.xml" -exec cp {} test-results/ \;
+            when: always
       - store_test_results:
           path: test-results/
       - codecov/upload:
