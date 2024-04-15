@@ -144,8 +144,6 @@ jobs:
           command: |
             mkdir -p test-results/junit/
             find . -type f -regex ".*/surefire-reports/.*xml" -exec cp {} ./test-results/junit/ \;
-            cat site/jacoco-ut/jacoco.xml
-            ls -la
           when: always
       - store_test_results:
           path: ./test-results
