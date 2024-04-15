@@ -142,11 +142,11 @@ jobs:
           name: Save test results
           command: |
             mkdir -p test-results
-            ls -la
-            find . -type f -regex "surefire-reports/.*.xml" -exec cp {} test-results/junit/ \;
+            find . -type f -regex "surefire-reports/.*.xml" -exec cp {} ./test-results/junit/ \;
+            ls -la ./test-results/junit/
           when: always
       - store_test_results:
-          path: test-results/
+          path: ./test-results
       - codecov/upload:
           file: site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
