@@ -136,6 +136,7 @@ jobs:
 
     executor: openjdk-image
     steps:
+      - checkout
       - attach_workspace:
           at: .
       - run:
