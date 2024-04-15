@@ -349,6 +349,7 @@ class AuthorizationServiceTest {
         String managementToken = TestUtilities.createManagementAccessToken().accessToken();
         EncryptedData encryptedClientId  = TestUtilities.createEncryptedClientId(credentials);
         Auth0Client expectedAuth0Client = TestUtilities.createAuth0Client();
+        ApiKey apiKey = TestUtilities.createApiKey();
 
         // When
         when(cryptoAesGcmNoPadding.decrypt(encryptedClientId)).thenReturn("decryptedClientId");
@@ -357,7 +358,7 @@ class AuthorizationServiceTest {
                 .thenReturn(Mono.just(expectedAuth0Client));
 
         // Then
-        Mono<Auth0Client> resultMono = authorizationService.deleteClientMetadata(credentials, managementToken);
+        Mono<Auth0Client> resultMono = authorizationService.rotateClientMetadata(credentials, apiKey, managementToken);
         StepVerifier.create(resultMono).expectNext(expectedAuth0Client).verifyComplete();
     }
 }
