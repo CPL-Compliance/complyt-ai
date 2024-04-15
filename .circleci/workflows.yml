@@ -137,7 +137,7 @@ jobs:
 #    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: openjdk-image
     steps:
-      - checkout
+#      - checkout
 #          path: ~/complyt_work_directory
       - attach_workspace:
           at: .
