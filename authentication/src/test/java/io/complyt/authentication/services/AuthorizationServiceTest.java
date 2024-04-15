@@ -354,7 +354,7 @@ class AuthorizationServiceTest {
         // When
         when(cryptoAesGcmNoPadding.decrypt(encryptedClientId)).thenReturn("decryptedClientId");
         when(authorizationServerWrapper.updateApiKeyFromClient(
-                credentials.getName(), "decryptedClientId", credentials.getTenantId(), managementToken, null, null))
+                credentials.getName(), "decryptedClientId", credentials.getTenantId(), managementToken, apiKey.clientId(), apiKey.clientSecret()))
                 .thenReturn(Mono.just(expectedAuth0Client));
 
         // Then
