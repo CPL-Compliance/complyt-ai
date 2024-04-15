@@ -147,7 +147,7 @@ jobs:
       - store_test_results:
           path: ./test-results
       - codecov/upload:
-          file: site/jacoco-ut/jacoco.xml
+          file: ./site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
           flags: <<parameters.service_directory>>
 
