@@ -4,6 +4,7 @@ import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.auth0_client.Auth0Client;
 import io.complyt.authentication.business.authorization.AuthorizationServerWrapper;
 import io.complyt.authentication.business.exceptions.ComplytAuth0Exception;
+import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.Token;
@@ -304,5 +305,59 @@ class AuthorizationServiceTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "accessToken is marked non-null but is null");
+    }
+
+    @Test
+    void rotateClientMetadata_credentialsIsNull_ThrowsNullException() {
+        ApiKey apiKey = TestUtilities.createApiKey();
+        String accessToken = "access-token";
+
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            authorizationService.rotateClientMetadata(null, apiKey, accessToken);
+        });
+
+        assertEquals("credentials is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void rotateClientMetadata_apiKeyIsNull_ThrowsNullException() {
+        Credentials credentials = TestUtilities.createCredentials();
+        String accessToken = "access-token";
+
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            authorizationService.rotateClientMetadata(credentials, null, accessToken);
+        });
+
+        assertEquals("apiKey is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void rotateClientMetadata_accessTokenIsNull_ThrowsNullException() {
+        Credentials credentials = TestUtilities.createCredentials();
+        ApiKey apiKey = new ApiKey("clientId", "clientSecret");
+
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            authorizationService.rotateClientMetadata(credentials, apiKey, null);
+        });
+
+        assertEquals("accessToken is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void rotateClientMetadata_validInputs_returnAuth0Client() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        Credentials credentials = TestUtilities.createCredentials();
+        String managementToken = TestUtilities.createManagementAccessToken().accessToken();
+        EncryptedData encryptedClientId  = TestUtilities.createEncryptedClientId(credentials);
+        Auth0Client expectedAuth0Client = TestUtilities.createAuth0Client();
+
+        // When
+        when(cryptoAesGcmNoPadding.decrypt(encryptedClientId)).thenReturn("decryptedClientId");
+        when(authorizationServerWrapper.updateApiKeyFromClient(
+                credentials.getName(), "decryptedClientId", credentials.getTenantId(), managementToken, null, null))
+                .thenReturn(Mono.just(expectedAuth0Client));
+
+        // Then
+        Mono<Auth0Client> resultMono = authorizationService.deleteClientMetadata(credentials, managementToken);
+        StepVerifier.create(resultMono).expectNext(expectedAuth0Client).verifyComplete();
     }
 }

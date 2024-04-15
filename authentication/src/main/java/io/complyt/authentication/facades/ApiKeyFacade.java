@@ -52,7 +52,7 @@ public class ApiKeyFacade {
                                 .thenReturn(newApiKey))));
     }
 
-    private Mono<ApiKey> generateAndSaveNewCredentialsByExisting(@NonNull final Credentials credentials) {
+    private Mono<ApiKey> generateAndSaveNewCredentialsByExisting(Credentials credentials) {
         ApiKey apiKey = apiKeyService.generate();
         return credentialsService.saveCredentialsByExistingCredentials(credentials, apiKey).thenReturn(apiKey);
     }

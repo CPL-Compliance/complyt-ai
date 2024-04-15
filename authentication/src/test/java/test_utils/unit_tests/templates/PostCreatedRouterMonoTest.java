@@ -18,4 +18,7 @@ public interface PostCreatedRouterMonoTest {
 
     @Test
     void post_UnsupportedMediaType_Returns415();
+
+    @Test
+    void rotate_NullHandler_ThrowsNullPointerException();
 }

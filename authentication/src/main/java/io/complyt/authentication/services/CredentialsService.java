@@ -77,7 +77,7 @@ public class CredentialsService {
                 .switchIfEmpty(Mono.error(new ApiKeyNotValidException()));
     }
 
-    private Mono<Credentials> updateStatusAndTTLToOldCredentials(@NonNull Credentials credentials) {
+    private Mono<Credentials> updateStatusAndTTLToOldCredentials(Credentials credentials) {
         Credentials updatedCredentials = credentials.withStatus(ApiKeyStatus.ROTATED)
                 .withExpiredAt(LocalDateTime.now().plusSeconds(credentialsExpirationSec));
         return Mono.just(updatedCredentials);

@@ -305,6 +305,20 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
         assertEquals("apiKeyHandler is marked non-null but is null", exception.getMessage());
     }
 
+    @Test
+    @Override
+    public void rotate_NullHandler_ThrowsNullPointerException() {
+        // Given
+        ApiKeyRouter apiKeyRouter = new ApiKeyRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            apiKeyRouter.rotateApiKeyRouterFunction(null);
+        });
+
+        // Then
+        assertEquals("apiKeyHandler is marked non-null but is null", exception.getMessage());
+    }
 
     @Test
     @Override
