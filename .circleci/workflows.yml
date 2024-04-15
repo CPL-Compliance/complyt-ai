@@ -160,6 +160,8 @@ jobs:
 
     executor: python-image
     steps:
+      - attach_workspace:
+          at: .
       - run:
           name: Set image tag as env variable
           command: |

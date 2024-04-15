@@ -184,7 +184,6 @@
         <!-- Other -->
     </dependencies>
     <build>
-        <!-- test -->
         <plugins>
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
