@@ -20,10 +20,6 @@ executors:
     docker:
       - image: 'cimg/python:3.9.1'
 
-  arm64-ubuntu-22-lts-corretto-21-vm:
-    machine: true
-    resource_class: complyt/arm64-ubuntu-22-lts-corretto-21
-
 parameters:
   run-sales-tax-workflow:
     type: boolean
@@ -51,16 +47,16 @@ jobs:
         type: string
         default: ""
 
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: ubuntu-vm
     steps:
-      - checkout
+      - checkout:
+          path: ~/complyt_work_directory
       - run:
           name: Execute
-          command: |
-            cd <<parameters.service_directory>>
-            ./mvnw clean package -Dmaven.test.skip
+          command: ./mvnw clean package -Dmaven.test.skip
       - persist_to_workspace:
-          root: .
+          root: ~/complyt_work_directory
           paths:
             - <<parameters.service_directory>>/target/*.jar
 
@@ -70,16 +66,18 @@ jobs:
         type: string
         default: ""
 
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: ubuntu-vm
     steps:
-      - checkout
+      - checkout:
+          path: ~/complyt_work_directory
+      - attach_workspace:
+          at: ~/complyt_work_directory
       - run:
           name: Execute
-          command: |
-            cd <<parameters.service_directory>>
-            ./mvnw clean verify
+          command: ./mvnw clean verify
       - persist_to_workspace:
-          root: <<parameters.service_directory>>/target
+          root: target
           paths:
             - coverage-reports
             - failsafe-reports
@@ -91,10 +89,14 @@ jobs:
       service_directory:
         type: string
         default: ""
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+    executor: ubuntu-vm
 
-    executor: arm64-ubuntu-22-lts-corretto-21-vm
     steps:
-      - checkout
+      - checkout:
+          path: ~/complyt_work_directory
+      - attach_workspace:
+          at: ~/complyt_work_directory
       - add_ssh_keys:
           fingerprints:
             - "8d:a9:53:20:ea:7a:b2:1d:e5:d8:af:d4:fc:e0:81:16"
@@ -102,7 +104,6 @@ jobs:
       - run:
           name: Export Environment variables for access to image_tag
           command: |
-            cd <<parameters.service_directory>>
             image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
             export IMAGE_TAG=$image_tag
             env >> bash.env
@@ -110,8 +111,7 @@ jobs:
       - run:
           name: Release
           command: |
-            cd <<parameters.service_directory>>
-            PROJECT_VERSION=$(./mvnw -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+            PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEXT_DEVELOPMENT_VERSION=$(echo "$PROJECT_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
             git checkout -b "<<parameters.service_directory>>-$PROJECT_VERSION"
             ./mvnw --settings ../.circleci/settings.xml clean release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
@@ -119,12 +119,12 @@ jobs:
             bash ../.circleci/git_commands.sh <<parameters.service_directory>> "$PROJECT_VERSION"
 
       - persist_to_workspace:
-          root: ./<<parameters.service_directory>>
+          root: .
           paths:
             - bash.env
 
       - persist_to_workspace:
-          root: <<parameters.service_directory>>/target
+          root: target
           paths:
             - coverage-test-service
             - failsafe-test-service
@@ -137,21 +137,23 @@ jobs:
         type: string
         default: ""
 
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: openjdk-image
     steps:
-      - checkout
+      - checkout:
+          path: ~/complyt_work_directory
       - attach_workspace:
-          at: .
+          at: target
       - run:
           name: Save test results
           command: |
-            mkdir -p test-results/junit/
-            find . -type f -regex ".*/surefire-reports/.*xml" -exec cp {} ./test-results/junit/ \;
+            mkdir -p test-results
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
           when: always
       - store_test_results:
-          path: ./test-results
+          path: test-results/
       - codecov/upload:
-          file: site/jacoco-ut/jacoco.xml
+          file: target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
           flags: <<parameters.service_directory>>
 
@@ -161,8 +163,11 @@ jobs:
         type: string
         default: ""
 
+    working_directory: ~/complyt_work_directory/<<parameters.service_name>>
     executor: python-image
     steps:
+      - checkout:
+          path: ~/complyt_work_directory
       - attach_workspace:
           at: .
       - run:
