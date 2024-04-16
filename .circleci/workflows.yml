@@ -20,6 +20,10 @@ executors:
     docker:
       - image: 'cimg/python:3.9.1'
 
+  arm64-ubuntu-22-lts-corretto-21-vm:
+    machine: true
+    resource_class: complyt/arm64-ubuntu-22-lts-corretto-21
+
 parameters:
   run-sales-tax-workflow:
     type: boolean
@@ -66,7 +70,7 @@ jobs:
         type: string
         default: ""
 
-    executor: ubuntu-vm
+    executor: arm64-ubuntu-22-lts-corretto-21-vm
     steps:
       - checkout
       - run:
@@ -88,8 +92,7 @@ jobs:
         type: string
         default: ""
 
-    executor: ubuntu-vm
-
+    executor: arm64-ubuntu-22-lts-corretto-21-vm
     steps:
       - checkout
       - add_ssh_keys:
@@ -108,7 +111,7 @@ jobs:
           name: Release
           command: |
             cd <<parameters.service_directory>>
-            PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+            PROJECT_VERSION=$(./mvnw -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEXT_DEVELOPMENT_VERSION=$(echo "$PROJECT_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
             git checkout -b "<<parameters.service_directory>>-$PROJECT_VERSION"
             ./mvnw --settings ../.circleci/settings.xml clean release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
@@ -160,6 +163,8 @@ jobs:
 
     executor: python-image
     steps:
+      - attach_workspace:
+          at: .
       - run:
           name: Set image tag as env variable
           command: |

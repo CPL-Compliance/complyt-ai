@@ -1,5 +1,6 @@
 package io.complyt.authentication.repositories;
 
+import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import io.complyt.authentication.utils.observability.ContextLogger;
@@ -55,5 +56,4 @@ public class CredentialsRepository {
         return ContextLogger.observeCtx("Updating credentials status to cancelled for complytClientId " + complytClientId, log::info)
                 .then(reactiveMongoTemplate.findAndModify(query, update, Credentials.class));
     }
-
 }

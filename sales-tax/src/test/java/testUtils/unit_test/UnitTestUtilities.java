@@ -601,6 +601,7 @@ public class UnitTestUtilities {
 
         return salesTaxTrackingDto;
     }
+<<<<<<< Updated upstream
 
     public SalesTaxTrackingDto createSalesTaxTrackingDtoGt() {
         String country = "Armenia";
@@ -621,13 +622,21 @@ public class UnitTestUtilities {
     }
 
 
+=======
+>>>>>>> Stashed changes
     public ClientTrackingDtoTenant createClientTrackingDtoTenant(String tenantId) {
-        TimestampsDto internalTimestamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
+        String date = localDateTime.toString();
+        TimestampsDto internalTimestamps =  new TimestampsDto(date,date);
         return new ClientTrackingDtoTenant(new NexusDto(localDateTime), "client dope", internalTimestamps, tenantId);
     }
 
     public ClientTrackingDto createClientTrackingDto() {
+<<<<<<< Updated upstream
         TimestampsDto internalTimestamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
+=======
+        String date = localDateTime.toString();
+        TimestampsDto internalTimestamps =  new TimestampsDto(date,date);
+>>>>>>> Stashed changes
         return new ClientTrackingDto(new NexusDto(localDateTime), "client dope", internalTimestamps);
     }
 
