@@ -34,7 +34,7 @@
         <java.version>17</java.version>
         <!-- Dependencies -->
         <mapstruct.version>1.5.1.Final</mapstruct.version>
-        <lombok.version>1.18.24</lombok.version>
+        <lombok.version>1.18.32</lombok.version>
         <java-tuples.version>1.2</java-tuples.version>
         <reactor-test.version>3.4.18</reactor-test.version>
         <spring-security-test.version>6.0.2</spring-security-test.version>
