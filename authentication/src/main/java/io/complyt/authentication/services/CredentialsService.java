@@ -75,8 +75,7 @@ public class CredentialsService {
         return credentialsRepository.findActiveCredentialsByComplytClientId(apiKey.clientId())
                 .flatMap(this::updateStatusAndTTLToOldCredentials)
                 .flatMap(credentialsRepository::save)
-                //todo change invalid
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(Mono.error(new ApiKeyNotValidException()));
     }
 
     private Mono<Credentials> updateStatusAndTTLToOldCredentials(Credentials credentials) {
