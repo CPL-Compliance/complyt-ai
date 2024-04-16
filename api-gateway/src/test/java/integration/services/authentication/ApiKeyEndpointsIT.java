@@ -157,4 +157,35 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                 .exchange()
                 .expectStatus().is4xxClientError();
     }
+
+    @Test
+    public void authentication_apiKey_rotate_sentAsURLEncoded_clientApiKeyExists_SuccessfulRotation_Returns201() {
+        String apiKey = TestUtilities.apiKey5UrlEncodedExample();
+
+        WEB_TEST_CLIENT
+                .method(HttpMethod.POST)
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.API_KEY_BASE_URL + "/rotate")
+                        .build())
+                .headers(headers -> headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(apiKey)
+                .exchange()
+                .expectStatus().isCreated();
+    }
+
+    @Test
+    public void authentication_apiKey_rotate_sentAsURLEncoded_ApiKeyIsValid_ReturnsClientError() {
+        String apiKey = TestUtilities.apiKeyUrlEncodedExample();
+
+        WEB_TEST_CLIENT
+                .method(HttpMethod.POST)
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.API_KEY_BASE_URL + "/rotate")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(apiKey)
+                .exchange()
+                .expectStatus().is4xxClientError();
+    }
 }

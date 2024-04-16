@@ -36,6 +36,10 @@ public class TestUtilities {
     public static final String API_KEY_CLIENT_ID4 = "35b0163d-6161-451b-afda-d4f5476cd81a";
     public static final String API_KEY_CLIENT_SECRET4 = "27efbba1-2a52-4561-a7c9-ddc54c166331";
 
+    public static final String API_KEY_CLIENT_ID5 = "d9cc4e03-96d7-4f6b-8189-23d51936d491";
+
+    public static final String API_KEY_CLIENT_SECRET5 = "310e4c1d-0fa5-4b72-b860-31a73f068aa9";
+
     public static final String NULL_STRING = "null";
 
 
@@ -268,6 +272,11 @@ public class TestUtilities {
     public static String apiKey3UrlEncodedExample() {
         return "clientId=" + API_KEY_CLIENT_ID3 +
                 "&clientSecret=" + API_KEY_CLIENT_SECRET3;
+    }
+
+    public static String apiKey5UrlEncodedExample() {
+        return "clientId=" + API_KEY_CLIENT_ID5 +
+                "&clientSecret=" + API_KEY_CLIENT_SECRET5;
     }
 
     public static String transactionItemIsNotAligned(String externalId, String customerId, String complytId, boolean isValidated, String state) {
