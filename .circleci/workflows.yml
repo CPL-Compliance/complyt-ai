@@ -70,7 +70,7 @@ jobs:
         type: string
         default: ""
 
-    executor: arm64-ubuntu-22-lts-corretto-21-vm
+    executor: ubuntu-vm
     steps:
       - checkout
       - run:

@@ -177,7 +177,7 @@ public class ClientTrackingRepositoryTest {
         when(reactiveMongoTemplate.save(clientTrackingNoId)).thenReturn(Mono.just(clientTracking));
 
         // Then
-        Mono<ClientTracking> actualClientTracking = clientTrackingRepository.saveByTenantId(clientTrackingNoId, tenantId);
+        Mono<ClientTracking> actualClientTracking = clientTrackingRepository.saveWithoutTenant(clientTrackingNoId);
 
         StepVerifier.create(actualClientTracking).expectNext(clientTracking).verifyComplete();
     }
@@ -189,7 +189,7 @@ public class ClientTrackingRepositoryTest {
         ClientTracking nullClientTrackingNoId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> clientTrackingRepository.saveByTenantId(nullClientTrackingNoId, tenantId));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> clientTrackingRepository.saveWithoutTenant(nullClientTrackingNoId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "clientTracking is marked non-null but is null");
@@ -198,13 +198,13 @@ public class ClientTrackingRepositoryTest {
     @Test
     void saveByTenantId_NullTenantIdPassed_ThrowsException() {
         // Given
-        String tenantId = null;
+        ClientTracking clientTracking = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> clientTrackingRepository.saveByTenantId(clientTracking, tenantId));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> clientTrackingRepository.saveWithoutTenant(clientTracking));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "tenantId is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "clientTracking is marked non-null but is null");
     }
 
     @Test
