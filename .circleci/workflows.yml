@@ -66,8 +66,8 @@ jobs:
         type: string
         default: ""
 
-    executor:
-      - resource_class: complyt/arm64-ubuntu-22-lts-corretto-21
+    machine: true
+    resource_class: complyt/arm64-ubuntu-22-lts-corretto-21
 
     steps:
       - checkout
