@@ -98,6 +98,9 @@ jobs:
     executor: arm64-ubuntu-22-lts-corretto-21-vm
     steps:
       - checkout
+      - attach_workspace:
+          at: .
+
       - add_ssh_keys:
           fingerprints:
             - "8d:a9:53:20:ea:7a:b2:1d:e5:d8:af:d4:fc:e0:81:16"
