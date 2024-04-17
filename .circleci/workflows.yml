@@ -73,11 +73,14 @@ jobs:
     executor: arm64-ubuntu-22-lts-corretto-21-vm
     steps:
       - checkout
+      - attach_workspace:
+            at: .
       - run:
           name: Execute
           command: |
             cd <<parameters.service_directory>>
             ./mvnw clean verify
+
       - persist_to_workspace:
           root: <<parameters.service_directory>>/target
           paths:
