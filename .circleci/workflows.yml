@@ -73,6 +73,7 @@ jobs:
     executor: arm64-ubuntu-22-lts-corretto-21-vm
     steps:
       - checkout
+  #We must use attach_workspace to gain access to the artifacts that we build on previous steps (of our services)
       - attach_workspace:
             at: .
       - run:
@@ -98,6 +99,7 @@ jobs:
     executor: arm64-ubuntu-22-lts-corretto-21-vm
     steps:
       - checkout
+      #We must use attach_workspace to gain access to the artifacts that we build on previous steps (of our services)
       - attach_workspace:
           at: .
 
