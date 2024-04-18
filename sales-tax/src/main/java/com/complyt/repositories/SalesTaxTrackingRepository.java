@@ -5,6 +5,7 @@ import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.utils.query.CountryAndStateCriteriaBuilder;
 import com.complyt.utils.update.SalesTaxTrackingUpdateQueryBuilder;
+import com.mongodb.client.result.UpdateResult;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -104,7 +105,7 @@ public class SalesTaxTrackingRepository {
                         .then(Mono.just(salesTaxTracking.withTenantId(tenantId))));
     }
 
-    public Mono<SalesTaxTracking> updateMultipleEconomicNexuses(@NonNull SalesTaxTracking salesTaxTracking) {
+    public Mono<UpdateResult> updateMultipleEconomicNexuses(@NonNull SalesTaxTracking salesTaxTracking) {
         Query query = new Query(Criteria.where("tenantId").is(salesTaxTracking.getTenantId()));
         query.addCriteria(new Criteria().orOperator(Criteria.where("state.abbreviation").is(salesTaxTracking.getState().getAbbreviation()),
                 Criteria.where("state.name").is(salesTaxTracking.getState().getName())));
@@ -117,7 +118,7 @@ public class SalesTaxTrackingRepository {
 
         return tenantResolver.resolve()
                 .flatMap(tenantId -> ContextLogger.observeCtx("Updating sales tax tracking Fields: " + update + ", With Query: " + query, log::info)
-                        .then(reactiveMongoTemplate.updateMulti(query, update, SalesTaxTracking.class))
-                        .then(Mono.just(salesTaxTracking.withTenantId(tenantId))));
+                        .then(reactiveMongoTemplate.updateMulti(query, update, SalesTaxTracking.class)));
+
     }
 }

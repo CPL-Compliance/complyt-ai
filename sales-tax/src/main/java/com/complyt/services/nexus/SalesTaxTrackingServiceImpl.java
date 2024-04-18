@@ -69,7 +69,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> updateEconomicNexus(SalesTaxTracking salesTaxTracking) {
         return salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking)
-                .flatMap(salesTaxTrackingRepository::updateMultipleEconomicNexuses);
+                .flatMap(updatedSalesTaxTracking -> salesTaxTrackingRepository.updateMultipleEconomicNexuses(updatedSalesTaxTracking)
+                        .thenReturn(updatedSalesTaxTracking));
     }
 
     @Override
