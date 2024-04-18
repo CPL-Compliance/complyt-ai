@@ -73,11 +73,15 @@ jobs:
     executor: arm64-ubuntu-22-lts-corretto-21-vm
     steps:
       - checkout
+  #We must use attach_workspace to gain access to the artifacts that we build on previous steps (of our services)
+      - attach_workspace:
+            at: .
       - run:
           name: Execute
           command: |
             cd <<parameters.service_directory>>
             ./mvnw clean verify
+
       - persist_to_workspace:
           root: <<parameters.service_directory>>/target
           paths:
@@ -95,6 +99,10 @@ jobs:
     executor: arm64-ubuntu-22-lts-corretto-21-vm
     steps:
       - checkout
+      #We must use attach_workspace to gain access to the artifacts that we build on previous steps (of our services)
+      - attach_workspace:
+          at: .
+
       - add_ssh_keys:
           fingerprints:
             - "8d:a9:53:20:ea:7a:b2:1d:e5:d8:af:d4:fc:e0:81:16"
@@ -329,12 +337,12 @@ workflows:
       - update-ecs-service:
           requires:
             - release
-          service_name: "discovery-service-az-1a"
+          service_name: "discovery-az-1a"
 
       - update-ecs-service:
           requires:
             - release
-          service_name: "discovery-service-az-1b"
+          service_name: "discovery-az-1b"
 
   sales-tax-rates-workflow:
     when: << pipeline.parameters.run-sales-tax-rates-workflow >>
