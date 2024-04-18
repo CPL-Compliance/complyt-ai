@@ -223,7 +223,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     @Test
     @WithMockUser
     public void rotate_SentAsJson_Exists_Returns201() {
-        String complytId = "ca71c285-5e09-449a-94c3-b46eb7345ce8";
+        String complytClientId = "ca71c285-5e09-449a-94c3-b46eb7345ce8";
         String complytSecret = "6f0bc65e-5a8e-4aaa-83ff-76d8ec81db23";
 
         ApiKeyDto apiKeyDto = new ApiKeyDto(complytId, complytSecret);
