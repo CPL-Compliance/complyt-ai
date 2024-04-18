@@ -22,7 +22,7 @@ public interface SalesTaxTrackingEndpointsITemplate extends
 
     void getByCountry_Exists_Returns200();
 
-    void refreshByCountryAndStateAndDate_NonUsaCountryExistsAndHasNexus_Returns200NoSummary();
+    void refreshByCountryAndDate_NonUsaCountryExistsAndHasNexus_Returns200NoSummary();
 
     void upsertByCountryAndState_StateIsNull_Returns400();
 

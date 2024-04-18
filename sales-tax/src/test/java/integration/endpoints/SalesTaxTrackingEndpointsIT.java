@@ -9,6 +9,7 @@ import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
+import com.complyt.v1.models.SubsidiaryDto;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import integration.TestContainersInitializerIT;
@@ -278,7 +279,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     @WithMockUser
-    public void refreshByCountryAndStateAndDate_NonUsaCountryExistsAndHasNexus_Returns200NoSummary() {
+    public void refreshByCountryAndDate_NonUsaCountryExistsAndHasNexus_Returns200NoSummary() {
         LocalDate localDate = LocalDate.now();
         LocalDate summaryDate = localDate.isAfter(localDate.withDayOfMonth(1).withMonth(6))
                 ? LocalDate.of(localDate.getYear() + 1, 6, 1)
@@ -623,7 +624,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @WithMockUser
     public void upsertByState_DoesntExists_Returns201() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, newState);
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, newState)
+                .withSubsidiary("subsidiary");
 
         // Then
         webTestClient
@@ -654,7 +656,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @WithMockUser
     public void upsertByState_Exists_Returns200() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, newState).withComment("a new comment");
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, newState).withComment("a new comment")
+                .withSubsidiary("subsidiary");
 
         // Then
         webTestClient

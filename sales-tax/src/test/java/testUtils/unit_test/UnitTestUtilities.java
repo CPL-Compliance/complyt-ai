@@ -232,7 +232,7 @@ public class UnitTestUtilities {
                 createCustomerDto(customerIdOtherDomains.toString()), null,
                 TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE,
                 shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD");
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD", null);
     }
 
     public List<Item> createItems(boolean withJurisdictionalSalesTaxRules, boolean withJurisdictionalGtTaxRules, boolean withTangibleCategory) {
@@ -559,7 +559,7 @@ public class UnitTestUtilities {
                 localDateTime,
                 true, localDateTime,
                 FilingFrequency.MONTHLY,
-                null, null, null);
+                null, null, null, null);
     }
 
     public SalesTaxTracking createSalesTaxTrackingGT(String id) {
@@ -576,7 +576,7 @@ public class UnitTestUtilities {
                 localDateTime,
                 true, localDateTime,
                 FilingFrequency.MONTHLY,
-                null, null, null);
+                null, null, null, null);
     }
 
     public ClientTracking createClientTracking(String tenantId) {
@@ -587,7 +587,8 @@ public class UnitTestUtilities {
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
         String country = "USA";
         StateDto state = new StateDto("CA", "02", "California");
-        SalesTaxTrackingDto salesTaxTrackingDto = new SalesTaxTrackingDto(UUID.randomUUID(), country, state,
+
+        return new SalesTaxTrackingDto(UUID.randomUUID(), country, state,
                 "comment", true,
                 new PhysicalNexusTrackerDto(false, localDateTime),
                 new EconomicNexusTrackerDto(false, localDateTime),
@@ -597,9 +598,7 @@ public class UnitTestUtilities {
                 localDateTime,
                 true, localDateTime,
                 FilingFrequencyDto.MONTHLY,
-                null, null, new SubsidiaryDto("0", "subsidiary"));
-
-        return salesTaxTrackingDto;
+                null, null, null, null);
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDtoGt() {
@@ -615,7 +614,7 @@ public class UnitTestUtilities {
                 localDateTime,
                 true, localDateTime,
                 FilingFrequencyDto.MONTHLY,
-                null, null, null);
+                null, null, null, null);
 
         return salesTaxTrackingDto;
     }

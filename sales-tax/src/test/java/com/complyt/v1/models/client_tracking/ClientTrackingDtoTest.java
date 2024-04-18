@@ -44,6 +44,7 @@ public class ClientTrackingDtoTest {
         String expectedString = "ClientTrackingDto[nexus=" + clientTrackingDto.nexus() +
                 ", name=" + clientTrackingDto.name() +
                 ", internalTimestamps=" + clientTrackingDto.internalTimestamps() +
+                ", subsidiaries=" + clientTrackingDto.subsidiaries() +
                 "]";
 
         // When

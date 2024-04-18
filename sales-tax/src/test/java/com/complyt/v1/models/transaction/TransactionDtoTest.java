@@ -47,7 +47,8 @@ class TransactionDtoTest {
                 ", totalDiscount=" + transactionDto.totalDiscount() +
                 ", finalTransactionAmount=" + transactionDto.finalTransactionAmount() +
                 ", transactionFilingStatus=" + transactionDto.transactionFilingStatus() +
-                ", currency=" + transactionDto.currency() + "]";
+                ", currency=" + transactionDto.currency() +
+                ", subsidiary=" + transactionDto.subsidiary() + "]";
 
         // When
         String actualString = transactionDto.toString();

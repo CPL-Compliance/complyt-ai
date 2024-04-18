@@ -1,10 +1,8 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.transaction.Address;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.query.CountryAndStateCriteriaBuilder;
-import com.complyt.utils.query.QueryBuilder;
 import com.complyt.utils.update.SalesTaxTrackingUpdateQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,6 +71,7 @@ public class SalesTaxTrackingRepositoryTest {
                 .andOperator(Criteria.where("country").is("USA"));
 
         Query query = Query.query(usaAndStateSearchCriteria.and("tenantId").is(salesTaxTracking.getTenantId()));
+        query.addCriteria(Criteria.where("subsidiary").is(salesTaxTracking.getSubsidiary()));
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
@@ -80,7 +79,7 @@ public class SalesTaxTrackingRepositoryTest {
         when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
 
         // Then
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingRepository.findByCountryAndState(country, state);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, salesTaxTracking.getSubsidiary());
 
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
     }
@@ -95,6 +94,7 @@ public class SalesTaxTrackingRepositoryTest {
                 .andOperator(Criteria.where("country").is("USA"));
 
         Query query = Query.query(usaAndStateSearchCriteria.and("tenantId").is(salesTaxTracking.getTenantId()));
+        query.addCriteria(Criteria.where("subsidiary").is(salesTaxTracking.getSubsidiary()));
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
@@ -102,7 +102,7 @@ public class SalesTaxTrackingRepositoryTest {
         when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
 
         // Then
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingRepository.findByCountryAndState(country, state);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, salesTaxTracking.getSubsidiary());
 
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
     }
@@ -115,7 +115,7 @@ public class SalesTaxTrackingRepositoryTest {
         String nullStateAbbreviation = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingRepository.findByCountryAndState(nullCountry, nullStateAbbreviation));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingRepository.findByCountryStateAndSubsidiary(nullCountry, nullStateAbbreviation, salesTaxTracking.getSubsidiary()));
 
         assertEquals(nullPointerException.getMessage(), "country is marked non-null but is null");
     }

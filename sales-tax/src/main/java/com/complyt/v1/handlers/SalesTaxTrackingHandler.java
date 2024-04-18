@@ -56,7 +56,7 @@ public class SalesTaxTrackingHandler {
     public Mono<ServerResponse> getOne(ServerRequest serverRequest) {
         String country = serverRequest.queryParam("country").orElse("");
         String state = serverRequest.queryParam("state").orElse("");
-        String subsidiary = serverRequest.queryParam("subsidiary").orElse("0");
+        String subsidiary = serverRequest.queryParam("subsidiary").orElse(null);
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
@@ -94,7 +94,7 @@ public class SalesTaxTrackingHandler {
 
                     String country = salesTaxTrackingDto.country();
                     String stateName = null;
-                    String subsidiary = salesTaxTrackingDto.subsidiary().subsidiaryId();
+                    String subsidiary = salesTaxTrackingDto.subsidiary();
                     StringBuilder resourceURI = new StringBuilder(SalesTaxTrackingRouter.BASE_URL + "?country=" + country);
 
                     if (salesTaxTrackingDto.state() != null) {
@@ -135,7 +135,7 @@ public class SalesTaxTrackingHandler {
     public Mono<ServerResponse> refreshNexusSummaryByDate(ServerRequest serverRequest) {
         String country = serverRequest.queryParam("country").orElse("");
         String state = serverRequest.queryParam("state").orElse("");
-        String subsidiary = serverRequest.queryParam("subsidiary").orElse("0");
+        String subsidiary = serverRequest.queryParam("subsidiary").orElse(null);
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)
@@ -154,7 +154,7 @@ public class SalesTaxTrackingHandler {
     public Mono<ServerResponse> patch(ServerRequest serverRequest) {
         String country = serverRequest.queryParam("country").orElse("");
         String state = serverRequest.queryParam("state").orElse("");
-        String subsidiary = serverRequest.queryParam("subsidiary").orElse("0");
+        String subsidiary = serverRequest.queryParam("subsidiary").orElse(null);
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info)

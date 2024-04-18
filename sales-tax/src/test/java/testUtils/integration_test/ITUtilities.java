@@ -31,7 +31,7 @@ public interface ITUtilities {
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
                 false, null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false), customerId,
                 null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
-                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD");
+                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD", null);
     } // note isTaxInclusive is false, finalTransactionAmount is zero
 
 
@@ -52,7 +52,7 @@ public interface ITUtilities {
                 new PhysicalNexusTrackerDto(false, LocalDateTime.now()),
                 new EconomicNexusTrackerDto(false, LocalDateTime.now()),
                 null, null, stubClientTrackingDto(),
-                LocalDateTime.now(), false, LocalDateTime.now(), FilingFrequencyDto.MONTHLY, null, null, null);
+                LocalDateTime.now(), false, LocalDateTime.now(), FilingFrequencyDto.MONTHLY, null, null, null, null);
     }
 
     static SalesTaxTrackingDto stubSalesTaxTrackingNonUsaDto(String country) {

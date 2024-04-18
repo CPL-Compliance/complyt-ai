@@ -68,7 +68,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> updateEconomicNexus(SalesTaxTracking salesTaxTracking) {
-        return salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking);
+        return salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking)
+                .flatMap(salesTaxTrackingRepository::updateMultipleEconomicNexuses);
     }
 
     @Override
@@ -92,7 +93,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> findByCountryStateAndSubsidiary(@NonNull String country, String state, String subsidiaryId) {
-        return salesTaxTrackingRepository.findByCountryAndState(country, state, subsidiaryId);
+        return salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiaryId);
     }
 
     @Override
@@ -122,7 +123,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking) {
         String state = salesTaxTracking.getState() != null ? salesTaxTracking.getState().getName() : "";
-        return salesTaxTrackingRepository.findByCountryAndState(salesTaxTracking.getCountry(), state, salesTaxTracking.getSubsidiary().subsidiaryId()) //todo: check
+        return salesTaxTrackingRepository.findByCountryStateAndSubsidiary(salesTaxTracking.getCountry(), state, salesTaxTracking.getSubsidiary()) //todo: check
                 .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with country " + salesTaxTracking.getCountry())))
                 .flatMap(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
                 .flatMap(this::upsertWithoutNexusSummaryIfNeeded);
@@ -144,7 +145,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                                 salesTaxTrackingWithDetails.getFilingFrequency(),
                                 salesTaxTrackingWithDetails.getRegistered(),
                                 salesTaxTrackingWithDetails.getRegistrationDate(),
-                                salesTaxTrackingWithDetails.getSubsidiary()));
+                                salesTaxTrackingWithDetails.getSubsidiary(),
+                                salesTaxTrackingWithDetails.getEstablishedBy()));
     }
 
     @Override

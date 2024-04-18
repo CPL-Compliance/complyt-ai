@@ -46,6 +46,7 @@ class ClientTrackingTest {
                 ", nexus=" + clientTracking.getNexus() +
                 ", name=" + clientTracking.getName() +
                 ", internalTimestamps=" + clientTracking.getInternalTimestamps() +
+                ", subsidiaries=" + clientTracking.getSubsidiaries() +
                 ")";
 
         // When

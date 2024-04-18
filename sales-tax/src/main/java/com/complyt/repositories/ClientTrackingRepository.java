@@ -57,7 +57,7 @@ public class ClientTrackingRepository {
     }
 
     public Mono<ClientTracking> saveByTenantId(@NonNull ClientTracking clientTracking, @NonNull String tenantId) {
-        return ContextLogger.observeCtx("Saving client tracking " + clientTracking.toString(), log::info)
+        return ContextLogger.observeCtx("Saving client tracking " + clientTracking, log::info)
                 .then(reactiveMongoTemplate.save(clientTracking));
     }
 
