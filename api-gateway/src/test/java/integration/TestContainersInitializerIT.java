@@ -202,7 +202,7 @@ public abstract class TestContainersInitializerIT {
                 new ImageFromDockerfile()
                         .withFileFromPath(".", Path.of(targetPath(service)))
                         .withDockerfileFromBuilder(builder -> builder
-                                .from("amazoncorretto:17-al2023-jdk")
+                                .from("amazoncorretto:21-al2023")
                                 .add(JAR_FILE_MAP.get(service), "app.jar")
                                 .run("sh -c 'touch app.jar'")
                                 .entryPoint(entrypoint)
