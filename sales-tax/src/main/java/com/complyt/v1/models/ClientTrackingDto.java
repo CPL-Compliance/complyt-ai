@@ -15,5 +15,5 @@ public record ClientTrackingDto(
         @Valid @NotNull(message = "ClientTracking.nexus " + DtoErrorMessages.NOT_NULL_ERROR) NexusDto nexus,
         @NotNull(message = "ClientTracking.name " + DtoErrorMessages.NOT_NULL_ERROR) @Size(max = 256, message = "ClientTracking.name " + StringErrorMessages.MAX_256_ERROR) String name,
         @Valid TimestampsDto internalTimestamps,
-        List<SubsidiaryDto> subsidiaries) {
+        List<String> subsidiaries) {
 }

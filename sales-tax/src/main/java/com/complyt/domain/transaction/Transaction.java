@@ -1,7 +1,6 @@
 package com.complyt.domain.transaction;
 
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.nexus.Subsidiary;
 import com.complyt.domain.properties.ComplytIdProperty;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.timestamps.Timestamps;

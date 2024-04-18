@@ -9,7 +9,6 @@ import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.SubsidiaryDto;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import integration.TestContainersInitializerIT;
