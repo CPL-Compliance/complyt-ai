@@ -226,7 +226,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
         String complytClientId = "ca71c285-5e09-449a-94c3-b46eb7345ce8";
         String complytSecret = "6f0bc65e-5a8e-4aaa-83ff-76d8ec81db23";
 
-        ApiKeyDto apiKeyDto = new ApiKeyDto(complytId, complytSecret);
+        ApiKeyDto apiKeyDto = new ApiKeyDto(complytClientId, complytSecret);
 
         webTestClient
                 .mutateWith(csrf())
