@@ -50,7 +50,7 @@ public class CredentialsService {
         return credentialsRepository.findByComplytClientId(apiKey.clientId())
                 .filter(credentials -> passwordEncoder.matches(apiKey.clientSecret(),
                         credentials.getComplytClientSecret()))
-                .filter(credentials -> credentials.getStatus().equals(ApiKeyStatus.ACTIVE) || credentials.getStatus().equals(ApiKeyStatus.ROTATED))
+                .filter(credentials -> isValidStatus(credentials.getStatus()))
                 .switchIfEmpty(Mono.empty())
                 .flatMap(this::decrypt);
     }
@@ -157,5 +157,9 @@ public class CredentialsService {
                 .status(ApiKeyStatus.ACTIVE)
                 .complytClientId(apiKey.clientId())
                 .complytClientSecret(complytClientSecret).build());
+    }
+
+    private boolean isValidStatus(ApiKeyStatus status) {
+        return ApiKeyStatus.ACTIVE.equals(status) || ApiKeyStatus.ROTATED.equals(status);
     }
 }
