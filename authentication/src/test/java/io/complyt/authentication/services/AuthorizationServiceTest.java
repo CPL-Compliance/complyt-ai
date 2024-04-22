@@ -141,7 +141,7 @@ class AuthorizationServiceTest {
                 .thenReturn(Mono.just(expectedAuth0Client));
 
         // Then
-        Mono<Auth0Client> resultMono = authorizationService.deleteClientMetadata(credentials, managementToken);
+        Mono<Auth0Client> resultMono = authorizationService.updateClientMetadata(credentials, managementToken, null, null);
         StepVerifier.create(resultMono).expectNext(expectedAuth0Client).verifyComplete();
     }
 
@@ -160,7 +160,7 @@ class AuthorizationServiceTest {
 
         // Then
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            authorizationService.deleteClientMetadata(credentials, managementToken);
+            authorizationService.updateClientMetadata(credentials, managementToken, null, null);
         });
 
         assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
@@ -180,7 +180,7 @@ class AuthorizationServiceTest {
 
         // Then
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            authorizationService.deleteClientMetadata(credentials, managementToken);
+            authorizationService.updateClientMetadata(credentials, managementToken, null, null);
         });
 
         assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
@@ -200,7 +200,7 @@ class AuthorizationServiceTest {
 
         // Then
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            authorizationService.deleteClientMetadata(credentials, managementToken);
+            authorizationService.updateClientMetadata(credentials, managementToken, null, null);
         });
 
         assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
@@ -220,7 +220,7 @@ class AuthorizationServiceTest {
 
         // Then
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            authorizationService.deleteClientMetadata(credentials, managementToken);
+            authorizationService.updateClientMetadata(credentials, managementToken, null, null);
         });
 
         assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
@@ -240,7 +240,7 @@ class AuthorizationServiceTest {
 
         // Then
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            authorizationService.deleteClientMetadata(credentials, managementToken);
+            authorizationService.updateClientMetadata(credentials, managementToken, null, null);
         });
 
         assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
@@ -260,7 +260,7 @@ class AuthorizationServiceTest {
 
         // Then
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            authorizationService.deleteClientMetadata(credentials, managementToken);
+            authorizationService.updateClientMetadata(credentials, managementToken, null, null);
         });
 
         assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
@@ -290,7 +290,7 @@ class AuthorizationServiceTest {
         String managementToken = TestUtilities.createManagementAccessToken().accessToken();
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            authorizationService.deleteClientMetadata(null, managementToken);
+            authorizationService.updateClientMetadata(null, managementToken, null, null);
         });
 
         assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");
@@ -301,7 +301,7 @@ class AuthorizationServiceTest {
         Credentials credentials = TestUtilities.createCredentials();
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            authorizationService.deleteClientMetadata(credentials, null);
+            authorizationService.updateClientMetadata(credentials, null, null, null);
         });
 
         assertEquals(nullPointerException.getMessage(), "accessToken is marked non-null but is null");
@@ -313,22 +313,10 @@ class AuthorizationServiceTest {
         String accessToken = "access-token";
 
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            authorizationService.rotateClientMetadata(null, apiKey, accessToken);
+            authorizationService.updateClientMetadata(null, accessToken, apiKey.clientId(), apiKey.clientSecret());
         });
 
         assertEquals("credentials is marked non-null but is null", exception.getMessage());
-    }
-
-    @Test
-    void rotateClientMetadata_apiKeyIsNull_ThrowsNullException() {
-        Credentials credentials = TestUtilities.createCredentials();
-        String accessToken = "access-token";
-
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            authorizationService.rotateClientMetadata(credentials, null, accessToken);
-        });
-
-        assertEquals("apiKey is marked non-null but is null", exception.getMessage());
     }
 
     @Test
@@ -337,7 +325,7 @@ class AuthorizationServiceTest {
         ApiKey apiKey = new ApiKey("clientId", "clientSecret");
 
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            authorizationService.rotateClientMetadata(credentials, apiKey, null);
+            authorizationService.updateClientMetadata(credentials, null, apiKey.clientId(), apiKey.clientSecret());
         });
 
         assertEquals("accessToken is marked non-null but is null", exception.getMessage());
@@ -358,7 +346,7 @@ class AuthorizationServiceTest {
                 .thenReturn(Mono.just(expectedAuth0Client));
 
         // Then
-        Mono<Auth0Client> resultMono = authorizationService.rotateClientMetadata(credentials, apiKey, managementToken);
+        Mono<Auth0Client> resultMono = authorizationService.updateClientMetadata(credentials, managementToken, apiKey.clientId(), apiKey.clientSecret());
         StepVerifier.create(resultMono).expectNext(expectedAuth0Client).verifyComplete();
     }
 }

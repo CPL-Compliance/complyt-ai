@@ -44,9 +44,8 @@ class CredentialsRepositoryTest {
     @Test
     void findByComplytClientId_credentialsWithComplytClientIdExists_returnsCredentials() {
         // Given
-        Criteria statusCriteria = Criteria.where("status").in(ApiKeyStatus.ACTIVE, ApiKeyStatus.ROTATED);
-        Criteria clientIdCriteria = Criteria.where("complytClientId").is(complytClientId);
-        Query query = Query.query(new Criteria().andOperator(clientIdCriteria, statusCriteria));
+        String complytClientId = "complytClientId";
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
 
         // When
         when(reactiveMongoTemplate.findOne(query, Credentials.class)).thenReturn(Mono.just(credentials));
@@ -59,9 +58,8 @@ class CredentialsRepositoryTest {
     @Test
     void findByComplytClientId_credentialsWithComplytClientIdNotExists_returnsMonoEmpty() {
         // Given
-        Criteria statusCriteria = Criteria.where("status").in(ApiKeyStatus.ACTIVE, ApiKeyStatus.ROTATED);
-        Criteria clientIdCriteria = Criteria.where("complytClientId").is(complytClientId);
-        Query query = Query.query(new Criteria().andOperator(clientIdCriteria, statusCriteria));
+        String complytClientId = "complytClientId";
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
 
         // When
         when(reactiveMongoTemplate.findOne(query, Credentials.class)).thenReturn(Mono.empty());
@@ -70,6 +68,7 @@ class CredentialsRepositoryTest {
         Mono<Credentials> credentialsMono = credentialsRepository.findByComplytClientId(complytClientId);
         StepVerifier.create(credentialsMono).verifyComplete();
     }
+
 
     @Test
     void findActiveCredentialsByComplytClientId_credentialsWithComplytClientIdNotExists_returnsMonoEmpty() {

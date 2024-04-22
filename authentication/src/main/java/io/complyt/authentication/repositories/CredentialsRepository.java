@@ -1,6 +1,5 @@
 package io.complyt.authentication.repositories;
 
-import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import io.complyt.authentication.utils.observability.ContextLogger;
@@ -25,12 +24,9 @@ public class CredentialsRepository {
     ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Mono<Credentials> findByComplytClientId(final @NonNull String complytClientId) {
-        // Criteria to filter out documents with the status CANCELLED
-        Criteria statusCriteria = Criteria.where("status").in(ApiKeyStatus.ACTIVE, ApiKeyStatus.ROTATED);
-        Criteria clientIdCriteria = Criteria.where("complytClientId").is(complytClientId);
-        Query query = Query.query(new Criteria().andOperator(clientIdCriteria, statusCriteria));
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
 
-        return ContextLogger.observeCtx("Searching for active/rotated credentials by complytClientId " + complytClientId, log::info)
+        return ContextLogger.observeCtx("Searching for credentials by complytClientId " + complytClientId, log::info)
                 .then(reactiveMongoTemplate.findOne(query, Credentials.class));
     }
 

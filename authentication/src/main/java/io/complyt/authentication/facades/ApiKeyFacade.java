@@ -1,5 +1,6 @@
 package io.complyt.authentication.facades;
 
+import io.complyt.authentication.auth0_client.Auth0Client;
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.services.ApiKeyService;
@@ -36,24 +37,26 @@ public class ApiKeyFacade {
     }
 
     public Mono<Credentials> markAsCancelled(@NonNull final ApiKey apiKey) {
-
         return credentialsService.markAsCancelled(apiKey)
-                .flatMap(credentials -> authorizationService.getManagementAccessToken()
-                        .flatMap(accessToken -> authorizationService.deleteClientMetadata(credentials, accessToken)
+                .flatMap(credentials -> fetchAccessTokenAndUpdateClientMetadata(credentials, null, null)
                                 .then(tokenService.deleteToken(apiKey)
-                                        .thenReturn(credentials))));
+                                        .thenReturn(credentials)));
     }
 
     public Mono<ApiKey> rotateCredentials(@NonNull final ApiKey apiKey) {
         return credentialsService.rotateOldCredentials(apiKey)
                 .flatMap(credentials -> generateAndSaveNewCredentialsByExisting(credentials)
-                        .flatMap(newApiKey -> authorizationService.getManagementAccessToken()
-                                .flatMap(accessToken -> authorizationService.rotateClientMetadata(credentials, newApiKey, accessToken)
-                                .thenReturn(newApiKey))));
+                        .flatMap(newApiKey -> fetchAccessTokenAndUpdateClientMetadata(credentials, apiKey.clientId(), apiKey.clientSecret())
+                                .thenReturn(newApiKey)));
     }
 
     private Mono<ApiKey> generateAndSaveNewCredentialsByExisting(Credentials credentials) {
         ApiKey apiKey = apiKeyService.generate();
         return credentialsService.saveCredentialsByExistingCredentials(credentials, apiKey).thenReturn(apiKey);
+    }
+
+    private Mono<Auth0Client> fetchAccessTokenAndUpdateClientMetadata(Credentials credentials, String clientId, String clientSecret) {
+        return authorizationService.getManagementAccessToken()
+                .flatMap(accessToken -> authorizationService.updateClientMetadata(credentials, accessToken, clientId, clientSecret));
     }
 }

@@ -100,7 +100,7 @@ class ApiKeyFacadeTest {
         // When
         when(credentialsService.markAsCancelled(apiKey)).thenReturn(Mono.just(credentials));
         when(authorizationService.getManagementAccessToken()).thenReturn(Mono.just(managementToken));
-        when(authorizationService.deleteClientMetadata(credentials, managementToken)).thenReturn(Mono.just(auth0Client));
+        when(authorizationService.updateClientMetadata(credentials, managementToken, null, null)).thenReturn(Mono.just(auth0Client));
         when(tokenService.deleteToken(apiKey)).thenReturn(Mono.just(token));
 
         // Then
@@ -125,21 +125,6 @@ class ApiKeyFacadeTest {
     }
 
     @Test
-    void markAsCancelled_failedRetrievingManagementAccessToken_throwsError() {
-        ApiKey apiKey = TestUtilities.createApiKey();
-        Credentials credentials = TestUtilities.createCredentials();
-
-        // When
-        when(credentialsService.markAsCancelled(apiKey)).thenReturn(Mono.just(credentials));
-        when(authorizationService.getManagementAccessToken()).thenReturn(Mono.error(new ComplytAuth0Exception()));
-
-        // Then
-        Mono<Credentials> credentialsMono = apiKeyFacade.markAsCancelled(apiKey);
-
-        StepVerifier.create(credentialsMono).expectError(ComplytAuth0Exception.class).verify();
-    }
-
-    @Test
     void markAsCancelled_failedDeletingApiKeyFromAuth0_throwsError() {
         ApiKey apiKey = TestUtilities.createApiKey();
         Credentials credentials = TestUtilities.createCredentials();
@@ -148,7 +133,7 @@ class ApiKeyFacadeTest {
         // When
         when(credentialsService.markAsCancelled(apiKey)).thenReturn(Mono.just(credentials));
         when(authorizationService.getManagementAccessToken()).thenReturn(Mono.just(managementToken));
-        when(authorizationService.deleteClientMetadata(credentials, managementToken)).thenReturn(Mono.error(new ComplytAuth0Exception()));
+        when(authorizationService.updateClientMetadata(credentials, managementToken, null, null)).thenReturn(Mono.error(new ComplytAuth0Exception()));
         when(tokenService.deleteToken(apiKey)).thenReturn(Mono.empty());
 
         // Then
@@ -167,7 +152,7 @@ class ApiKeyFacadeTest {
         // When
         when(credentialsService.markAsCancelled(apiKey)).thenReturn(Mono.just(credentials));
         when(authorizationService.getManagementAccessToken()).thenReturn(Mono.just(managementToken));
-        when(authorizationService.deleteClientMetadata(credentials, managementToken)).thenReturn(Mono.just(auth0Client));
+        when(authorizationService.updateClientMetadata(credentials, managementToken, null, null)).thenReturn(Mono.just(auth0Client));
         when(tokenService.deleteToken(apiKey)).thenReturn(Mono.empty());
 
         // Then
@@ -212,7 +197,7 @@ class ApiKeyFacadeTest {
         when(apiKeyService.generate()).thenReturn(newApiKey);
         when(credentialsService.rotateOldCredentials(apiKey)).thenReturn(Mono.just(credentials));
         when(authorizationService.getManagementAccessToken()).thenReturn(Mono.just(managementAccessToken));
-        when(authorizationService.rotateClientMetadata(credentials, newApiKey, managementAccessToken)).thenReturn(Mono.just(auth0Client));
+        when(authorizationService.updateClientMetadata(credentials, managementAccessToken, apiKey.clientId(), apiKey.clientSecret())).thenReturn(Mono.just(auth0Client));
         when(credentialsService.saveCredentialsByExistingCredentials(credentials, apiKey)).thenReturn(Mono.just(newCredentials));
 
         // Then

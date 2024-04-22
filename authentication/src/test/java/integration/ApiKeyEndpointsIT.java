@@ -217,7 +217,9 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                 .bodyValue(body)
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
                 .exchange()
-                .expectStatus().isCreated();
+                .expectStatus().isCreated()
+                .expectBody(ApiKeyDto.class)
+                .returnResult();;
     }
 
     @Test
@@ -238,7 +240,9 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(apiKeyDto)
                 .exchange()
-                .expectStatus().isCreated();
+                .expectStatus().isCreated()
+                .expectBody(ApiKeyDto.class)
+                .returnResult();;
     }
 
     @Test

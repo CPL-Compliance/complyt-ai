@@ -343,7 +343,9 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
                 .bodyValue(body)
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
                 .exchange()
-                .expectStatus().isCreated();
+                .expectStatus().isCreated()
+                .expectBody(ApiKeyDto.class)
+                .isEqualTo(apiKeyDto);
     }
 
     @Test
@@ -367,7 +369,9 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
                 .bodyValue(apiKeyDto)
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
                 .exchange()
-                .expectStatus().isCreated();
+                .expectStatus().isCreated()
+                .expectBody(ApiKeyDto.class)
+                .isEqualTo(apiKeyDto);
     }
 
     @Test

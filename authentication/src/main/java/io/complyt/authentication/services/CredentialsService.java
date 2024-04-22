@@ -7,7 +7,6 @@ import io.complyt.authentication.repositories.CredentialsRepository;
 import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
 import io.complyt.authentication.v1.exceptions.types.ApiKeyNotValidException;
-import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -51,6 +50,7 @@ public class CredentialsService {
         return credentialsRepository.findByComplytClientId(apiKey.clientId())
                 .filter(credentials -> passwordEncoder.matches(apiKey.clientSecret(),
                         credentials.getComplytClientSecret()))
+                .filter(credentials -> credentials.getStatus().equals(ApiKeyStatus.ACTIVE) || credentials.getStatus().equals(ApiKeyStatus.ROTATED))
                 .switchIfEmpty(Mono.empty())
                 .flatMap(this::decrypt);
     }
@@ -67,7 +67,7 @@ public class CredentialsService {
     public Mono<Credentials> saveCredentialsByExistingCredentials(@NonNull Credentials credentials, @NonNull ApiKey apiKey) {
         String complytClientSecret = apiKey.clientSecret();
         String complytClientSecretEncoded = passwordEncoder.encode(complytClientSecret);
-        return  Mono.just(createEncryptedCredentialsByExistingCredentials(apiKey, credentials, complytClientSecretEncoded))
+        return  createNewCredentialsByExistingCredentials(apiKey, credentials, complytClientSecretEncoded)
                 .flatMap(credentialsRepository::save);
     }
 
@@ -147,8 +147,8 @@ public class CredentialsService {
                 .complytClientSecret(clientSecretEncoded).build();
     }
 
-    private Credentials createEncryptedCredentialsByExistingCredentials(ApiKey apiKey, Credentials existingCredentials, String complytClientSecret) {
-        return Credentials.builder().clientId(existingCredentials.getClientId())
+    private Mono<Credentials> createNewCredentialsByExistingCredentials(ApiKey apiKey, Credentials existingCredentials, String complytClientSecret) {
+       return Mono.just(Credentials.builder().clientId(existingCredentials.getClientId())
                 .clientIdIv(existingCredentials.getClientIdIv())
                 .clientSecret(existingCredentials.getClientSecret())
                 .clientSecretIv(existingCredentials.getClientSecretIv()).audience(audience).grantType(grantType)
@@ -156,6 +156,6 @@ public class CredentialsService {
                 .name(existingCredentials.getTenantId())
                 .status(ApiKeyStatus.ACTIVE)
                 .complytClientId(apiKey.clientId())
-                .complytClientSecret(complytClientSecret).build();
+                .complytClientSecret(complytClientSecret).build());
     }
 }
