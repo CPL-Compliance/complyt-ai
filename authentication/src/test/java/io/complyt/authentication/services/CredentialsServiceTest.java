@@ -111,6 +111,28 @@ class CredentialsServiceTest {
     }
 
     @Test
+    void getCredentialsByApiKeyAndDecrypt_credentialsRotatedExists_returnsCredentials()
+            throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
+            BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Credentials credentials = TestUtilities.createCredentials().withStatus(ApiKeyStatus.ROTATED);
+        Credentials decryptedCreds = TestUtilities.createDecryptedCreds(credentials);
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
+                .thenReturn(true);
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientIdIv(),
+                credentials.getClientId()))).thenReturn(credentials.getClientId());
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientSecretIv(),
+                credentials.getClientSecret()))).thenReturn(credentials.getClientSecret());
+
+        // Then
+        Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
+        StepVerifier.create(credentialsByApiKeyMono).expectNext(decryptedCreds).verifyComplete();
+    }
+    @Test
     void getCredentialsByApiKeyAndDecrypt_decryptionThrowsBadPaddingException_throwsRuntimeException()
             throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
             BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {

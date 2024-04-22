@@ -171,7 +171,10 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue(apiKey)
                 .exchange()
-                .expectStatus().isCreated();
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.clientId").exists()
+                .jsonPath("$.clientSecret").exists();
     }
 
     @Test

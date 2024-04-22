@@ -150,7 +150,7 @@ public class TestUtilities {
     public static Credentials createDecryptedCreds(Credentials credentials) {
         return Credentials.builder().clientId(credentials.getClientId()).clientSecret(credentials.getClientSecret())
                 .audience(credentials.getAudience())
-                .grantType(credentials.getGrantType()).complytClientId(credentials.getComplytClientId()).status(ApiKeyStatus.ACTIVE)
+                .grantType(credentials.getGrantType()).complytClientId(credentials.getComplytClientId()).status(credentials.getStatus())
                 .complytClientSecret(credentials.getComplytClientSecret()).build();
     }
 
