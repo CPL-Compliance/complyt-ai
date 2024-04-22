@@ -120,7 +120,7 @@ class CredentialsServiceTest {
         Credentials decryptedCreds = TestUtilities.createDecryptedCreds(credentials);
 
         // When
-        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials.withStatus(ApiKeyStatus.ROTATED)));
         when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
                 .thenReturn(true);
         when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientIdIv(),
