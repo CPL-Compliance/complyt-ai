@@ -92,6 +92,31 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
     @Test
     @WithMockUser
     @Order(0)
+    public void upsert_SecondTransactionWithNonExistingSubsidiary_AddsCalculationToNullSubsidiary_DidNotPassNexus() {
+        // Given
+        String externalId = "secondTransactionWithNonExistingSubsidiary";
+        TransactionDto givenTransaction = transactionDto.withExternalId(externalId)
+                .withSubsidiary("nonExistingSubsidiary");
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNull(transactionDto.salesTax()));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    @Order(0)
     public void upsert_FirstTransactionToSubsidiaryA_AddsCalculationToSubsidiaryA_DidNotPassNexus() {
         // Given
         String externalId = "firstTransactionSubsidiaryA";
@@ -304,6 +329,31 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
         String externalId = "thirdTransactionSubsidiaryC";
         TransactionDto givenTransaction = transactionDto.withExternalId(externalId)
                 .withSubsidiary("C");
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    @Order(2)
+    public void upsert_TransactionWithNonExistingSubsidiary_TransactionReturnedWithSalesTax() {
+        // Given
+        String externalId = "transactionWithNonExistingSubsidiary";
+        TransactionDto givenTransaction = transactionDto.withExternalId(externalId)
+                .withSubsidiary("NonExistingSubsidiary");
 
         // Then
         webTestClient
