@@ -30,5 +30,5 @@ public class Credentials {
     String tenantId;
     String name;
     ApiKeyStatus status;
-    LocalDateTime expiredAt;
+    LocalDateTime expireAt;
 }

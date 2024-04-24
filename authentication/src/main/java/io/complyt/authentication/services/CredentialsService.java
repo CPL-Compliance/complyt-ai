@@ -80,7 +80,7 @@ public class CredentialsService {
 
     private Mono<Credentials> updateStatusAndTTLToOldCredentials(Credentials credentials) {
         Credentials updatedCredentials = credentials.withStatus(ApiKeyStatus.ROTATED)
-                .withExpiredAt(LocalDateTime.now().plusSeconds(credentialsExpirationSec));
+                .withExpireAt(LocalDateTime.now().plusSeconds(credentialsExpirationSec));
         return Mono.just(updatedCredentials);
     }
 
