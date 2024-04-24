@@ -134,26 +134,20 @@ class CredentialsServiceTest {
     }
 
     @Test
-    void getCredentialsByApiKeyAndDecrypt_credentialsExistsButCancelled_returnsMonoEmpty()
-            throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
-            BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    void getCredentialsByApiKeyAndDecrypt_credentialsExistsButCancelled_returnsMonoEmpty() {
         // Given
         ApiKey apiKey = TestUtilities.createApiKey();
         Credentials credentials = TestUtilities.createCredentials().withStatus(ApiKeyStatus.CANCELLED);
-        Credentials decryptedCreds = TestUtilities.createDecryptedCreds(credentials);
 
         // When
         when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
         when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
                 .thenReturn(true);
-        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientIdIv(),
-                credentials.getClientId()))).thenReturn(credentials.getClientId());
-        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientSecretIv(),
-                credentials.getClientSecret()))).thenReturn(credentials.getClientSecret());
+
 
         // Then
         Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
-        StepVerifier.create(credentialsByApiKeyMono).expectNext(decryptedCreds).verifyComplete();
+        StepVerifier.create(credentialsByApiKeyMono).verifyComplete();
     }
 
     @Test
