@@ -134,21 +134,22 @@ class CredentialsServiceTest {
     }
 
     @Test
-    void test_rotated()
+    void getCredentialsByApiKeyAndDecrypt_credentialsExistsButCancelled_returnsMonoEmpty()
             throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
             BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         // Given
         ApiKey apiKey = TestUtilities.createApiKey();
-        Credentials cred = TestUtilities.credRotated();
-        Credentials decryptedCreds = TestUtilities.createDecryptedCreds(cred);
+        Credentials credentials = TestUtilities.createCredentials().withStatus(ApiKeyStatus.CANCELLED);
+        Credentials decryptedCreds = TestUtilities.createDecryptedCreds(credentials);
+
         // When
-        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(cred));
-        when(passwordEncoder.matches(apiKey.clientSecret(), cred.getComplytClientSecret()))
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
                 .thenReturn(true);
-        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(cred.getClientIdIv(),
-                cred.getClientId()))).thenReturn(cred.getClientId());
-        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(cred.getClientSecretIv(),
-                cred.getClientSecret()))).thenReturn(cred.getClientSecret());
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientIdIv(),
+                credentials.getClientId()))).thenReturn(credentials.getClientId());
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientSecretIv(),
+                credentials.getClientSecret()))).thenReturn(credentials.getClientSecret());
 
         // Then
         Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);

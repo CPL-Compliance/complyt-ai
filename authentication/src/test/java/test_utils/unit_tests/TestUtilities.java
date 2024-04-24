@@ -92,12 +92,6 @@ public class TestUtilities {
                 "audience", "Grant Type", "TenantId", "Name", ApiKeyStatus.ACTIVE, null);
     }
 
-    public static Credentials credRotated() {
-        return new Credentials("id", "complytClientId", "complytClientSecret",
-                "ClientID", "ClientSecret", "Audience", "GrantType",
-                "audience", "Grant Type", "TenantId", "Name", ApiKeyStatus.ROTATED, null);
-    }
-
     public static Auth0Client createAuth0Client() {
         return new Auth0Client("tenant", false, false, "name", new ClientMetadata("tenantId", "ClientId", "clientSecret"),
                 true, true, false, false,null, null, "clientId", true, "clientSecret",
