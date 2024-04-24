@@ -93,7 +93,7 @@ class CredentialsServiceTest {
             BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         // Given
         ApiKey apiKey = TestUtilities.createApiKey();
-        Credentials credentials = TestUtilities.createCredentials();
+        Credentials credentials = TestUtilities.createCredentials().withStatus(ApiKeyStatus.ACTIVE);
         Credentials decryptedCreds = TestUtilities.createDecryptedCreds(credentials);
 
         // When
@@ -127,6 +127,29 @@ class CredentialsServiceTest {
                 credentials.getClientId()))).thenReturn(credentials.getClientId());
         when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientSecretIv(),
                 credentials.getClientSecret()))).thenReturn(credentials.getClientSecret());
+
+        // Then
+        Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
+        StepVerifier.create(credentialsByApiKeyMono).expectNext(decryptedCreds).verifyComplete();
+    }
+
+    @Test
+    void test_rotated()
+            throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
+            BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Credentials cred = TestUtilities.createCredentials().withStatus(ApiKeyStatus.ROTATED);
+        Credentials decryptedCreds = TestUtilities.createDecryptedCreds(cred);
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(cred));
+        when(passwordEncoder.matches(apiKey.clientSecret(), cred.getComplytClientSecret()))
+                .thenReturn(true);
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(cred.getClientIdIv(),
+                cred.getClientId()))).thenReturn(cred.getClientId());
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(cred.getClientSecretIv(),
+                cred.getClientSecret()))).thenReturn(cred.getClientSecret());
 
         // Then
         Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
