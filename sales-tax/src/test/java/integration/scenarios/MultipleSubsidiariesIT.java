@@ -2,9 +2,11 @@ package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
+import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
+import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
@@ -27,8 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -63,6 +64,60 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
     }
+
+    @Override
+    @Test
+    @WithMockUser
+    @Order(0)
+    public void getOneSalesTaxTracking_NullSubsidiary_EstablishedByIsNullAndEconomicNexusEstablishedIsFalse() {
+        // Given
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("state", "ID")
+                        .queryParam("country", "US")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> {
+                    assertNull(salesTaxTrackingDto.establishedBy());
+                    assertFalse(salesTaxTrackingDto.economicNexusTracker().established());
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    @Order(0)
+    public void getOneSalesTaxTracking_SubsidiaryB_EstablishedByIsNullAndEconomicNexusEstablishedIsFalse() {
+        // Given
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("state", "ID")
+                        .queryParam("country", "US")
+                        .queryParam("subsidiary", "B")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> {
+                    assertNull(salesTaxTrackingDto.establishedBy());
+                    assertFalse(salesTaxTrackingDto.economicNexusTracker().established());
+                });
+    }
+
 
     @Override
     @Test
@@ -368,6 +423,104 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    @Order(3)
+    public void getOneSalesTaxTracking_SubsidiaryA_EstablishedBySubsidiaryB() {
+        // Given
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("state", "ID")
+                        .queryParam("country", "US")
+                        .queryParam("subsidiary", "A")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.establishedBy(), "B"));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    @Order(3)
+    public void getOneSalesTaxTracking_SubsidiaryB_EstablishedBySubsidiaryB() {
+        // Given
+        String externalId = "transactionWithNonExistingSubsidiary";
+        TransactionDto givenTransaction = transactionDto.withExternalId(externalId)
+                .withSubsidiary("NonExistingSubsidiary");
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("state", "ID")
+                        .queryParam("country", "US")
+                        .queryParam("subsidiary", "B")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.establishedBy(), "B"));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    @Order(3)
+    public void getOneSalesTaxTracking_SubsidiaryC_EstablishedBySubsidiaryB() {
+        // Given
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("state", "ID")
+                        .queryParam("country", "US")
+                        .queryParam("subsidiary", "C")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.establishedBy(), "B"));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    @Order(3)
+    public void getOneSalesTaxTracking_NullSubsidiary_EstablishedBySubsidiaryB() {
+        // Given
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("state", "ID")
+                        .queryParam("country", "US")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.establishedBy(), "B"));
     }
 
 }

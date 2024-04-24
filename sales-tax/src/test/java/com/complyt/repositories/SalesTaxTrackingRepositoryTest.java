@@ -4,6 +4,7 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.query.CountryAndStateCriteriaBuilder;
 import com.complyt.utils.update.SalesTaxTrackingUpdateQueryBuilder;
+import com.mongodb.client.result.UpdateResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -157,6 +158,31 @@ public class SalesTaxTrackingRepositoryTest {
         Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking);
 
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void updateMultipleEconomicNexuses_Updates3SalesTaxTracking_ReturnsUpdateResult() {
+        // Given
+        Query query = new Query(Criteria.where("tenantId").is(salesTaxTracking.getTenantId()));
+        query.addCriteria(new Criteria().orOperator(Criteria.where("state.abbreviation").is(salesTaxTracking.getState().getAbbreviation()),
+                Criteria.where("state.name").is(salesTaxTracking.getState().getName())));
+
+        Update update = new Update();
+
+        update.set("economicNexusTracker", salesTaxTracking.getEconomicNexusTracker());
+        update.set("appliedDate", salesTaxTracking.getAppliedDate());
+        update.set("establishedBy", salesTaxTracking.getSubsidiary());
+
+        UpdateResult expectedUpdateResult = UpdateResult.acknowledged(3, 3L, null);
+
+        // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
+        when(reactiveMongoTemplate.updateMulti(query, update, SalesTaxTracking.class)).thenReturn(Mono.just(expectedUpdateResult));
+
+        // Then
+        Mono<UpdateResult> actualUpdateResult = salesTaxTrackingRepository.updateMultipleEconomicNexuses(salesTaxTracking);
+
+        StepVerifier.create(actualUpdateResult).expectNext(expectedUpdateResult).verifyComplete();
     }
 
     @Test
