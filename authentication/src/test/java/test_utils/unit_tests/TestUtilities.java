@@ -89,7 +89,7 @@ public class TestUtilities {
     public static Credentials createCredentials() {
         return new Credentials("id", "complytClientId", "complytClientSecret",
                 "ClientID", "ClientSecret", "Audience", "GrantType",
-                "audience", "Grant Type", "TenantId", "Name", ApiKeyStatus.ACTIVE);
+                "audience", "Grant Type", "TenantId", "Name", ApiKeyStatus.ACTIVE, null);
     }
 
     public static Auth0Client createAuth0Client() {
@@ -150,7 +150,7 @@ public class TestUtilities {
     public static Credentials createDecryptedCreds(Credentials credentials) {
         return Credentials.builder().clientId(credentials.getClientId()).clientSecret(credentials.getClientSecret())
                 .audience(credentials.getAudience())
-                .grantType(credentials.getGrantType()).complytClientId(credentials.getComplytClientId()).status(ApiKeyStatus.ACTIVE)
+                .grantType(credentials.getGrantType()).complytClientId(credentials.getComplytClientId()).status(credentials.getStatus())
                 .complytClientSecret(credentials.getComplytClientSecret()).build();
     }
 
@@ -168,6 +168,21 @@ public class TestUtilities {
                 .tenantId(tenantId)
                 .status(ApiKeyStatus.ACTIVE)
                 .build();
+    }
+
+    public static Credentials createEncryptedCredentialsByExistingCredentials(@NonNull ApiKey apiKey,
+                                                         @NonNull Credentials existingCredentials,
+                                                         @NonNull String complytClientSecret) {
+        return Credentials.builder().clientId(existingCredentials.getClientId())
+                .clientIdIv(existingCredentials.getClientIdIv())
+                .clientSecret(existingCredentials.getClientSecret())
+                .clientSecretIv(existingCredentials.getClientSecretIv())
+                .audience(existingCredentials.getAudience()).grantType("grantType")
+                .tenantId(existingCredentials.getTenantId())
+                .name(existingCredentials.getTenantId())
+                .status(ApiKeyStatus.ACTIVE)
+                .complytClientId(apiKey.clientId())
+                .complytClientSecret(complytClientSecret).build();
     }
 
     public static Token createEncryptedToken(@NonNull Token token, @NonNull EncryptedData accessTokenEncryptedData,

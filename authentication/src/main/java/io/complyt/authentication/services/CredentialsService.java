@@ -22,6 +22,7 @@ import javax.crypto.NoSuchPaddingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -43,11 +44,13 @@ public class CredentialsService {
     @NonNull
     String audience;
 
+    int credentialsExpirationSec;
+
     public Mono<Credentials> getCredentialsByApiKeyAndDecrypt(final @NonNull ApiKey apiKey) {
         return credentialsRepository.findByComplytClientId(apiKey.clientId())
                 .filter(credentials -> passwordEncoder.matches(apiKey.clientSecret(),
                         credentials.getComplytClientSecret()))
-                .filter(credentials -> credentials.getStatus().equals(ApiKeyStatus.ACTIVE))
+                .filter(credentials -> isValidStatus(credentials.getStatus()))
                 .switchIfEmpty(Mono.empty())
                 .flatMap(this::decrypt);
     }
@@ -56,10 +59,29 @@ public class CredentialsService {
         return credentialsRepository.markAsCancelled(apiKey.clientId());
     }
 
-
     public Mono<Credentials> saveCredentials(@NonNull Credentials credentials, @NonNull ApiKey apiKey, @NonNull String tenantId, @NonNull String name) {
         return Mono.fromSupplier(() -> prepareCredentialsForSave(credentials, apiKey, tenantId, name))
                 .flatMap(credentialsRepository::save);
+    }
+
+    public Mono<Credentials> saveCredentialsByExistingCredentials(@NonNull Credentials credentials, @NonNull ApiKey apiKey) {
+        String complytClientSecret = apiKey.clientSecret();
+        String complytClientSecretEncoded = passwordEncoder.encode(complytClientSecret);
+        return  createNewCredentialsByExistingCredentials(apiKey, credentials, complytClientSecretEncoded)
+                .flatMap(credentialsRepository::save);
+    }
+
+    public Mono<Credentials> rotateOldCredentials(@NonNull ApiKey apiKey) {
+        return credentialsRepository.findActiveCredentialsByComplytClientId(apiKey.clientId())
+                .flatMap(this::updateStatusAndTTLToOldCredentials)
+                .flatMap(credentialsRepository::save)
+                .switchIfEmpty(Mono.error(new ApiKeyNotValidException()));
+    }
+
+    private Mono<Credentials> updateStatusAndTTLToOldCredentials(Credentials credentials) {
+        Credentials updatedCredentials = credentials.withStatus(ApiKeyStatus.ROTATED)
+                .withExpireAt(LocalDateTime.now().plusSeconds(credentialsExpirationSec));
+        return Mono.just(updatedCredentials);
     }
 
     private Credentials prepareCredentialsForSave(Credentials credentials, ApiKey apiKey, String tenantId, String name) {
@@ -123,5 +145,21 @@ public class CredentialsService {
                 .status(ApiKeyStatus.ACTIVE)
                 .complytClientId(apiKey.clientId())
                 .complytClientSecret(clientSecretEncoded).build();
+    }
+
+    private Mono<Credentials> createNewCredentialsByExistingCredentials(ApiKey apiKey, Credentials existingCredentials, String complytClientSecret) {
+       return Mono.just(Credentials.builder().clientId(existingCredentials.getClientId())
+                .clientIdIv(existingCredentials.getClientIdIv())
+                .clientSecret(existingCredentials.getClientSecret())
+                .clientSecretIv(existingCredentials.getClientSecretIv()).audience(audience).grantType(grantType)
+                .tenantId(existingCredentials.getTenantId())
+                .name(existingCredentials.getTenantId())
+                .status(ApiKeyStatus.ACTIVE)
+                .complytClientId(apiKey.clientId())
+                .complytClientSecret(complytClientSecret).build());
+    }
+
+    private boolean isValidStatus(ApiKeyStatus status) {
+        return ApiKeyStatus.ACTIVE.equals(status) || ApiKeyStatus.ROTATED.equals(status);
     }
 }

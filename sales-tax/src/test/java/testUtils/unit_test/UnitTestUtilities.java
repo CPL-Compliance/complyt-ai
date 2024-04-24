@@ -620,9 +620,9 @@ public class UnitTestUtilities {
         return salesTaxTrackingDto;
     }
 
-
     public ClientTrackingDtoTenant createClientTrackingDtoTenant(String tenantId) {
-        TimestampsDto internalTimestamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
+        String date = localDateTime.toString();
+        TimestampsDto internalTimestamps =  new TimestampsDto(date,date);
         return new ClientTrackingDtoTenant(new NexusDto(localDateTime), "client dope", internalTimestamps, tenantId);
     }
 

@@ -136,12 +136,12 @@ class AuthorizationServiceTest {
 
         // When
         when(cryptoAesGcmNoPadding.decrypt(encryptedClientId)).thenReturn("decryptedClientId");
-        when(authorizationServerWrapper.removeApiKeyFromClient(
+        when(authorizationServerWrapper.updateApiKeyFromClient(
                 credentials.getName(), "decryptedClientId", credentials.getTenantId(), managementToken, null, null))
                 .thenReturn(Mono.just(expectedAuth0Client));
 
         // Then
-        Mono<Auth0Client> resultMono = authorizationService.deleteApiKey(credentials, managementToken);
+        Mono<Auth0Client> resultMono = authorizationService.updateClientMetadata(credentials, managementToken, null, null);
         StepVerifier.create(resultMono).expectNext(expectedAuth0Client).verifyComplete();
     }
 
@@ -160,7 +160,7 @@ class AuthorizationServiceTest {
 
         // Then
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            authorizationService.deleteApiKey(credentials, managementToken);
+            authorizationService.updateClientMetadata(credentials, managementToken, null, null);
         });
 
         assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
@@ -180,7 +180,7 @@ class AuthorizationServiceTest {
 
         // Then
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            authorizationService.deleteApiKey(credentials, managementToken);
+            authorizationService.updateClientMetadata(credentials, managementToken, null, null);
         });
 
         assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
@@ -200,7 +200,7 @@ class AuthorizationServiceTest {
 
         // Then
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            authorizationService.deleteApiKey(credentials, managementToken);
+            authorizationService.updateClientMetadata(credentials, managementToken, null, null);
         });
 
         assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
@@ -220,7 +220,7 @@ class AuthorizationServiceTest {
 
         // Then
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            authorizationService.deleteApiKey(credentials, managementToken);
+            authorizationService.updateClientMetadata(credentials, managementToken, null, null);
         });
 
         assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
@@ -240,7 +240,7 @@ class AuthorizationServiceTest {
 
         // Then
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            authorizationService.deleteApiKey(credentials, managementToken);
+            authorizationService.updateClientMetadata(credentials, managementToken, null, null);
         });
 
         assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
@@ -260,7 +260,7 @@ class AuthorizationServiceTest {
 
         // Then
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            authorizationService.deleteApiKey(credentials, managementToken);
+            authorizationService.updateClientMetadata(credentials, managementToken, null, null);
         });
 
         assertEquals(runtimeException.getMessage(), "Failed to decrypt credentials.");
@@ -290,7 +290,7 @@ class AuthorizationServiceTest {
         String managementToken = TestUtilities.createManagementAccessToken().accessToken();
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            authorizationService.deleteApiKey(null, managementToken);
+            authorizationService.updateClientMetadata(null, managementToken, null, null);
         });
 
         assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");
@@ -301,9 +301,52 @@ class AuthorizationServiceTest {
         Credentials credentials = TestUtilities.createCredentials();
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            authorizationService.deleteApiKey(credentials, null);
+            authorizationService.updateClientMetadata(credentials, null, null, null);
         });
 
         assertEquals(nullPointerException.getMessage(), "accessToken is marked non-null but is null");
+    }
+
+    @Test
+    void rotateClientMetadata_credentialsIsNull_ThrowsNullException() {
+        ApiKey apiKey = TestUtilities.createApiKey();
+        String accessToken = "access-token";
+
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            authorizationService.updateClientMetadata(null, accessToken, apiKey.clientId(), apiKey.clientSecret());
+        });
+
+        assertEquals("credentials is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void rotateClientMetadata_accessTokenIsNull_ThrowsNullException() {
+        Credentials credentials = TestUtilities.createCredentials();
+        ApiKey apiKey = new ApiKey("clientId", "clientSecret");
+
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            authorizationService.updateClientMetadata(credentials, null, apiKey.clientId(), apiKey.clientSecret());
+        });
+
+        assertEquals("accessToken is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void rotateClientMetadata_validInputs_returnAuth0Client() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        Credentials credentials = TestUtilities.createCredentials();
+        String managementToken = TestUtilities.createManagementAccessToken().accessToken();
+        EncryptedData encryptedClientId  = TestUtilities.createEncryptedClientId(credentials);
+        Auth0Client expectedAuth0Client = TestUtilities.createAuth0Client();
+        ApiKey apiKey = TestUtilities.createApiKey();
+
+        // When
+        when(cryptoAesGcmNoPadding.decrypt(encryptedClientId)).thenReturn("decryptedClientId");
+        when(authorizationServerWrapper.updateApiKeyFromClient(
+                credentials.getName(), "decryptedClientId", credentials.getTenantId(), managementToken, apiKey.clientId(), apiKey.clientSecret()))
+                .thenReturn(Mono.just(expectedAuth0Client));
+
+        // Then
+        Mono<Auth0Client> resultMono = authorizationService.updateClientMetadata(credentials, managementToken, apiKey.clientId(), apiKey.clientSecret());
+        StepVerifier.create(resultMono).expectNext(expectedAuth0Client).verifyComplete();
     }
 }

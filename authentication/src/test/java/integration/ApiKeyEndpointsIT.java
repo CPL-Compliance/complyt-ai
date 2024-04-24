@@ -1,6 +1,7 @@
 package integration;
 
 import io.complyt.authentication.AuthenticationApplication;
+import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.v1.config.error_messages.GenericErrorMessages;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
@@ -197,5 +198,111 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
                 .bodyValue(apiKeyDto)
                 .exchange()
                 .expectStatus().isNoContent();
+    }
+
+    @Test
+    @WithMockUser
+    public void rotate_SentAsFormURLEncoded_Exists_Returns201() {
+        String body = "clientId=d9cc4e03-96d7-4f6b-8189-23d51936d491" +
+                "&clientSecret=310e4c1d-0fa5-4b72-b860-31a73f068aa9";
+
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.POST)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL + "/rotate")
+                        .build()
+                )
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(ApiKeyDto.class);
+    }
+
+    @Test
+    @WithMockUser
+    public void rotate_SentAsJson_Exists_Returns201() {
+        String complytClientId = "ca71c285-5e09-449a-94c3-b46eb7345ce8";
+        String complytSecret = "6f0bc65e-5a8e-4aaa-83ff-76d8ec81db23";
+
+        ApiKeyDto apiKeyDto = new ApiKeyDto(complytClientId, complytSecret);
+
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.POST)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL + "/rotate")
+                        .build()
+                )
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(apiKeyDto)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(ApiKeyDto.class);
+    }
+
+    @Test
+    @WithMockUser
+    public void rotate_SentAsFormURLEncoded_HasContentTypeHeaderButNoApiKeyProvided_Returns415() {
+        String expectedMassage = "401 Unauthorized";
+
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.POST)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL + "/rotate")
+                        .build()
+                )
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("{}")
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(expectedMassage, map.get("message")));
+    }
+
+    @Test
+    @WithMockUser
+    public void rotate_SentAsFormURLEncoded_NoContentTypeHeaderButValidApiKeyProvided_Returns415() {
+        ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
+
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
+
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.POST)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL + "/rotate")
+                        .build()
+                )
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(body)
+                .exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Test
+    @WithMockUser
+    public void rotate_SentAsJson_HasContentTypeHeaderButNoApiKeyProvided_Returns415() {
+        String expectedMassage = "401 Unauthorized";
+
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.POST)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL + "/rotate")
+                        .build()
+                )
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("{}")
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(expectedMassage, map.get("message")));
     }
 }

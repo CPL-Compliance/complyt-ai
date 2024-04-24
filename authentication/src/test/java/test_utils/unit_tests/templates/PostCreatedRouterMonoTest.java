@@ -18,4 +18,24 @@ public interface PostCreatedRouterMonoTest {
 
     @Test
     void post_UnsupportedMediaType_Returns415();
+
+    @Test
+    void rotate_NullHandler_ThrowsNullPointerException();
+
+    @Test
+    void rotate_SentAsURLEncoded_Exists_return201();
+
+    @Test
+    void rotate_SentAsJson_Exists_return201();
+
+    @Test
+    void rotate_DoesntExists_return401();
+
+    @Test
+    void rotate_InternalServerError_Returns500();
+
+    @Test
+    void rotate_UnsupportedMediaType_Returns415();
+
+
 }

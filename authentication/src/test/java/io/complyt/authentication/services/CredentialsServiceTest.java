@@ -7,7 +7,6 @@ import io.complyt.authentication.repositories.CredentialsRepository;
 import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
 import io.complyt.authentication.v1.exceptions.types.ApiKeyNotValidException;
-import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,10 +25,10 @@ import javax.crypto.NoSuchPaddingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -51,8 +50,9 @@ class CredentialsServiceTest {
     void setUp() {
         String grantType = "grantType";
         String audience = "audience";
+        int expirationCredentials = 100;
         credentialsService = new CredentialsService(credentialsRepository, passwordEncoder, cryptoAesGcmNoPadding,
-                grantType, audience);
+                grantType, audience, expirationCredentials);
     }
 
     @Test
@@ -62,13 +62,12 @@ class CredentialsServiceTest {
     void getCredentialsByApiKeyAndDecrypt_credentialsExistsWithStatusCancelled_returnsMonoEmpty() {
         // Given
         Credentials credentials = TestUtilities.createCredentials();
-        Credentials cancelledCcredentials = credentials.withStatus(ApiKeyStatus.CANCELLED);
 
         ApiKey apiKey = TestUtilities.createApiKey();
 
         // When
-        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(cancelledCcredentials));
-        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret())).thenReturn(true);
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret())).thenReturn(false);
 
         // Then
         Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
@@ -94,7 +93,7 @@ class CredentialsServiceTest {
             BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         // Given
         ApiKey apiKey = TestUtilities.createApiKey();
-        Credentials credentials = TestUtilities.createCredentials();
+        Credentials credentials = TestUtilities.createCredentials().withStatus(ApiKeyStatus.ACTIVE);
         Credentials decryptedCreds = TestUtilities.createDecryptedCreds(credentials);
 
         // When
@@ -109,6 +108,46 @@ class CredentialsServiceTest {
         // Then
         Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
         StepVerifier.create(credentialsByApiKeyMono).expectNext(decryptedCreds).verifyComplete();
+    }
+
+    @Test
+    void getCredentialsByApiKeyAndDecrypt_credentialsRotatedExists_returnsCredentials()
+            throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
+            BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Credentials credentials = TestUtilities.createCredentials().withStatus(ApiKeyStatus.ROTATED);
+        Credentials decryptedCreds = TestUtilities.createDecryptedCreds(credentials);
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
+                .thenReturn(true);
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientIdIv(),
+                credentials.getClientId()))).thenReturn(credentials.getClientId());
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientSecretIv(),
+                credentials.getClientSecret()))).thenReturn(credentials.getClientSecret());
+
+        // Then
+        Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
+        StepVerifier.create(credentialsByApiKeyMono).expectNext(decryptedCreds).verifyComplete();
+    }
+
+    @Test
+    void getCredentialsByApiKeyAndDecrypt_credentialsExistsButCancelled_returnsMonoEmpty() {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Credentials credentials = TestUtilities.createCredentials().withStatus(ApiKeyStatus.CANCELLED);
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(passwordEncoder.matches(apiKey.clientSecret(), credentials.getComplytClientSecret()))
+                .thenReturn(true);
+
+
+        // Then
+        Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
+        StepVerifier.create(credentialsByApiKeyMono).verifyComplete();
     }
 
     @Test
@@ -383,6 +422,90 @@ class CredentialsServiceTest {
         Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey, tenantId, name);
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveCredentialsByExistingCredentials_saveCredentials_returnCredentials() {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Credentials credentials = TestUtilities.createCredentials();
+        String encodedClientSecret = "encoded";
+        Credentials encryptedCredentialsByExisting = TestUtilities.createEncryptedCredentialsByExistingCredentials(apiKey, credentials, encodedClientSecret);
+
+        // When
+        when(passwordEncoder.encode(apiKey.clientSecret())).thenReturn(encodedClientSecret);
+        when(credentialsRepository.save(encryptedCredentialsByExisting)).thenReturn(Mono.just(credentials));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentialsByExistingCredentials(credentials, apiKey);
+
+        StepVerifier.create(credentialsMono).expectNext(credentials).verifyComplete();
+    }
+
+    @Test
+    void saveCredentialsByExistingCredentials_apiKeyIsNull_throwsNullException() {
+        Credentials existingCredentials = TestUtilities.createCredentials(); // Assumes a utility method to create non-null credentials
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsService.saveCredentialsByExistingCredentials(existingCredentials, null);
+        });
+
+        assertEquals("apiKey is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void saveCredentialsByExistingCredentials_credentialsIsNull_throwsNullException() {
+        ApiKey apiKey = TestUtilities.createApiKey(); // Assumes a utility method to create a non-null ApiKey
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsService.saveCredentialsByExistingCredentials(null, apiKey);
+        });
+
+        assertEquals("credentials is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void rotateOldCredentials_activeCredentialsFound_returnsOldCredentials() {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Credentials credentials = TestUtilities.createCredentials();
+        Credentials updatedCredentials = credentials.withStatus(ApiKeyStatus.ROTATED);
+
+        // When
+        when(credentialsRepository.findActiveCredentialsByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(credentialsRepository.save(any())).thenReturn(Mono.just(updatedCredentials));
+
+        // Then
+        Mono<Credentials> result = credentialsService.rotateOldCredentials(apiKey);
+
+        StepVerifier.create(result)
+                .expectNext(updatedCredentials)
+                .verifyComplete();
+    }
+
+    @Test
+    void rotateOldCredentials_noActiveCredentialsFound_throwsApiKeyNotValidException() {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+
+        // When
+        when(credentialsRepository.findActiveCredentialsByComplytClientId(apiKey.clientId())).thenReturn(Mono.empty());
+
+        // Then
+        Mono<Credentials> result = credentialsService.rotateOldCredentials(apiKey);
+
+        StepVerifier.create(result)
+                .expectError(ApiKeyNotValidException.class)
+                .verify();
+    }
+
+    @Test
+    void rotateOldCredentials_apiKeyIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsService.rotateOldCredentials(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
     }
 
     @Test

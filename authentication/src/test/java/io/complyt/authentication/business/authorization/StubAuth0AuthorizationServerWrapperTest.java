@@ -172,7 +172,7 @@ class StubAuth0AuthorizationServerWrapperTest {
         Auth0Client expectedAuth0client = TestUtilities.createAuth0Client();
 
         // When
-        Mono<Auth0Client> auth0ClientMono = auth0AuthorizationServerWrapper.removeApiKeyFromClient(clientName, clientId, tenantId, managementToken, newClientId, newClientSecret);
+        Mono<Auth0Client> auth0ClientMono = auth0AuthorizationServerWrapper.updateApiKeyFromClient(clientName, clientId, tenantId, managementToken, newClientId, newClientSecret);
 
         // Then
         StepVerifier.create(auth0ClientMono).expectNext(expectedAuth0client).verifyComplete();
@@ -183,7 +183,7 @@ class StubAuth0AuthorizationServerWrapperTest {
         StubAuth0AuthorizationServerWrapper auth0AuthorizationServerWrapper = new StubAuth0AuthorizationServerWrapper();
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            auth0AuthorizationServerWrapper.removeApiKeyFromClient(null,
+            auth0AuthorizationServerWrapper.updateApiKeyFromClient(null,
                     "client ID", "tenant ID", "management Access Token", "New Client ID", "New Client Secret");
         });
 
@@ -195,7 +195,7 @@ class StubAuth0AuthorizationServerWrapperTest {
         StubAuth0AuthorizationServerWrapper auth0AuthorizationServerWrapper = new StubAuth0AuthorizationServerWrapper();
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            auth0AuthorizationServerWrapper.removeApiKeyFromClient("client Name",
+            auth0AuthorizationServerWrapper.updateApiKeyFromClient("client Name",
                     null, "tenant ID", "management Access Token", "New Client ID", "New Client Secret");
         });
 
@@ -207,7 +207,7 @@ class StubAuth0AuthorizationServerWrapperTest {
         StubAuth0AuthorizationServerWrapper auth0AuthorizationServerWrapper = new StubAuth0AuthorizationServerWrapper();
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            auth0AuthorizationServerWrapper.removeApiKeyFromClient("client Name",
+            auth0AuthorizationServerWrapper.updateApiKeyFromClient("client Name",
                     "client ID", null, "management Access Token", "New Client ID", "New Client Secret");
         });
 
@@ -219,7 +219,7 @@ class StubAuth0AuthorizationServerWrapperTest {
         StubAuth0AuthorizationServerWrapper auth0AuthorizationServerWrapper = new StubAuth0AuthorizationServerWrapper();
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            auth0AuthorizationServerWrapper.removeApiKeyFromClient("client Name",
+            auth0AuthorizationServerWrapper.updateApiKeyFromClient("client Name",
                     "client ID", "tenant ID", null, "New Client ID", "New Client Secret");
         });
 

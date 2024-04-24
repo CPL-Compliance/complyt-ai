@@ -19,5 +19,8 @@ token-service:
   token-expiration-safe-window-sec: 60
 
 
+credentials-service:
+  credentials-rotated-expiration-sec: 3600
+
 
 

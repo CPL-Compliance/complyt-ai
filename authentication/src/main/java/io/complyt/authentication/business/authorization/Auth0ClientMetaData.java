@@ -14,12 +14,10 @@ public class Auth0ClientMetaData {
     final ClientMetadata client_metadata;
 
     public String getAsJson() {
-        String json = "{ \"name\": \"" + clientName +
+        return "{ \"name\": \"" + clientName +
                 "\", \"client_metadata\": { " +
-                    "\"tenant_id\": \"" + client_metadata.getTenant_id() +
-                    "\", \"clientId\": " + client_metadata.getClientId() +
-                    ", \"clientSecret\": " + client_metadata.getClientSecret() + " } }";
-
-        return json;
+                "\"tenant_id\": \"" + client_metadata.getTenant_id() +
+                "\", \"clientId\": \"" + client_metadata.getClientId() + "\"" +
+                ", \"clientSecret\": \"" + client_metadata.getClientSecret() + "\" } }";
     }
 }
