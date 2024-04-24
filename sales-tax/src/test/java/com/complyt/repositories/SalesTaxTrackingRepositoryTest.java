@@ -363,4 +363,16 @@ public class SalesTaxTrackingRepositoryTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
     }
+
+    @Test
+    void updateMultipleEconomicNexuses_NullSalesTaxTracking_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingRepository.updateMultipleEconomicNexuses(nullSalesTaxTracking));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
 }
