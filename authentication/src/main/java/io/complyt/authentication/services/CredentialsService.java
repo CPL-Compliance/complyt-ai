@@ -153,7 +153,7 @@ public class CredentialsService {
                 .clientSecret(existingCredentials.getClientSecret())
                 .clientSecretIv(existingCredentials.getClientSecretIv()).audience(audience).grantType(grantType)
                 .tenantId(existingCredentials.getTenantId())
-                .name(existingCredentials.getTenantId())
+                .name(existingCredentials.getName())
                 .status(ApiKeyStatus.ACTIVE)
                 .complytClientId(apiKey.clientId())
                 .complytClientSecret(complytClientSecret).build());
