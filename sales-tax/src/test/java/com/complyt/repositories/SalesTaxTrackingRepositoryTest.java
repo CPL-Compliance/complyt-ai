@@ -70,13 +70,17 @@ public class SalesTaxTrackingRepositoryTest {
                         Criteria.where("state.name").is(state))
                 .andOperator(Criteria.where("country").is("USA"));
 
-        Query query = Query.query(usaAndStateSearchCriteria.and("tenantId").is(salesTaxTracking.getTenantId()));
-        query.addCriteria(Criteria.where("subsidiary").is(salesTaxTracking.getSubsidiary()));
+        Criteria baseCriteria = Criteria.where("tenantId").is(salesTaxTracking.getTenantId()).andOperator(usaAndStateSearchCriteria);
+
+        Query queryNoSubsidiary = Query.query(baseCriteria);
+
+        Query queryWithSubsidiary = Query.query(Criteria.where("subsidiary").is(salesTaxTracking.getSubsidiary()).andOperator(baseCriteria));
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
         when(unitedStatesAddressQueryBuilder.build(country, state)).thenReturn(usaAndStateSearchCriteria);
-        when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
+        when(reactiveMongoTemplate.findOne(queryWithSubsidiary, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
+        when(reactiveMongoTemplate.findOne(queryNoSubsidiary, SalesTaxTracking.class)).thenReturn(Mono.empty());
 
         // Then
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, salesTaxTracking.getSubsidiary());
@@ -89,17 +93,20 @@ public class SalesTaxTrackingRepositoryTest {
         // Given
         String country = salesTaxTracking.getCountry();
         String state = null;
-        Criteria usaAndStateSearchCriteria = new Criteria().orOperator(Criteria.where("state.abbreviation").is(state),
+        Criteria addressSearchCriteria = new Criteria().orOperator(Criteria.where("state.abbreviation").is(state),
                         Criteria.where("state.name").is(state))
                 .andOperator(Criteria.where("country").is("USA"));
+        Criteria baseCriteria = Criteria.where("tenantId").is(salesTaxTracking.getTenantId()).andOperator(addressSearchCriteria);
 
-        Query query = Query.query(usaAndStateSearchCriteria.and("tenantId").is(salesTaxTracking.getTenantId()));
-        query.addCriteria(Criteria.where("subsidiary").is(salesTaxTracking.getSubsidiary()));
+        Query queryNoSubsidiary = Query.query(baseCriteria);
+
+        Query queryWithSubsidiary = Query.query(Criteria.where("subsidiary").is(salesTaxTracking.getSubsidiary()).andOperator(baseCriteria));
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
-        when(unitedStatesAddressQueryBuilder.build(country, state)).thenReturn(usaAndStateSearchCriteria);
-        when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
+        when(unitedStatesAddressQueryBuilder.build(country, state)).thenReturn(addressSearchCriteria);
+        when(reactiveMongoTemplate.findOne(queryWithSubsidiary, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
+        when(reactiveMongoTemplate.findOne(queryNoSubsidiary, SalesTaxTracking.class)).thenReturn(Mono.empty());
 
         // Then
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, salesTaxTracking.getSubsidiary());

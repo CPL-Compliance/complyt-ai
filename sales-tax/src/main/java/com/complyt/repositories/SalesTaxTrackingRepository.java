@@ -42,18 +42,19 @@ public class SalesTaxTrackingRepository {
     public Mono<SalesTaxTracking> findByCountryStateAndSubsidiary(@NonNull String country, String state, String subsidiaryId) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
-                    Criteria addressSearchQuery = countryQueryBuilder.build(country, state);
+                    Criteria addressSearchCriteria = countryQueryBuilder.build(country, state);
+                    Criteria baseCriteria = Criteria.where("tenantId").is(tenantId).andOperator(addressSearchCriteria);
 
-                    Query query = Query.query(addressSearchQuery.and("tenantId").is(tenantId));
-
-                    query.addCriteria(Criteria.where("subsidiary").is(subsidiaryId));
+                    Query queryNoSubsidiary = Query.query(baseCriteria);
+                    Query queryWithSubsidiary = Query.query(Criteria.where("subsidiary").is(subsidiaryId).andOperator(baseCriteria));
 
                     StringBuilder stringBuilder = new StringBuilder("Searching for sales tax tracking with country " + country);
                     stringBuilder = state != null ? stringBuilder.append(" and with state " + state) : stringBuilder;
                     stringBuilder.append(" and tenant ID " + tenantId);
 
                     return ContextLogger.observeCtx(stringBuilder.toString(), log::info)
-                            .then(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class));
+                            .then(reactiveMongoTemplate.findOne(queryWithSubsidiary, SalesTaxTracking.class))
+                            .switchIfEmpty(reactiveMongoTemplate.findOne(queryNoSubsidiary, SalesTaxTracking.class));
                 });
     }
 
