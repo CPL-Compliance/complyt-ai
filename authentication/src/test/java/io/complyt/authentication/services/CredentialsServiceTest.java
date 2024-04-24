@@ -141,7 +141,6 @@ class CredentialsServiceTest {
         ApiKey apiKey = TestUtilities.createApiKey();
         Credentials cred = TestUtilities.createCredentials().withStatus(ApiKeyStatus.ROTATED);
         Credentials decryptedCreds = TestUtilities.createDecryptedCreds(cred);
-
         // When
         when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(cred));
         when(passwordEncoder.matches(apiKey.clientSecret(), cred.getComplytClientSecret()))
@@ -155,6 +154,7 @@ class CredentialsServiceTest {
         Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey);
         StepVerifier.create(credentialsByApiKeyMono).expectNext(decryptedCreds).verifyComplete();
     }
+    
     @Test
     void getCredentialsByApiKeyAndDecrypt_decryptionThrowsBadPaddingException_throwsRuntimeException()
             throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
