@@ -179,7 +179,7 @@ public class TestUtilities {
                 .clientSecretIv(existingCredentials.getClientSecretIv())
                 .audience(existingCredentials.getAudience()).grantType("grantType")
                 .tenantId(existingCredentials.getTenantId())
-                .name(existingCredentials.getTenantId())
+                .name(existingCredentials.getName())
                 .status(ApiKeyStatus.ACTIVE)
                 .complytClientId(apiKey.clientId())
                 .complytClientSecret(complytClientSecret).build();
