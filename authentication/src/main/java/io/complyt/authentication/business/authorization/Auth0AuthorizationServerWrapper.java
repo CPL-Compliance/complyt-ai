@@ -6,7 +6,10 @@ import io.complyt.authentication.business.exceptions.ComplytAuth0Exception;
 import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.mappers.Auth0AccessTokenToAccessToken;
 import io.complyt.authentication.utils.observability.ContextLogger;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -57,7 +60,7 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
     /*
     When newClientId/newClientSecret is null the metadata is deleted, otherwise it changes the metadata
      */
-    public Mono<Auth0Client> removeApiKeyFromClient(final @NonNull String clientName, final @NonNull String clientId,
+    public Mono<Auth0Client> updateApiKeyFromClient(final @NonNull String clientName, final @NonNull String clientId,
                                                     final @NonNull String tenantId, final @NonNull String accessToken,
                                                     final String newClientId, final String newClientSecret) {
 

@@ -68,7 +68,7 @@ class ApiKeyFacadeTest {
         when(credentialsService.saveCredentials(credentials, expectedApiKey, tenantId, name)).thenReturn(Mono.just(credentials));
 
         // Then
-        Mono<ApiKey> actualApiKey = apiKeyFacade.saveCredentials(credentials);
+        Mono<ApiKey> actualApiKey = apiKeyFacade.saveNewCredentials(credentials);
 
         StepVerifier.create(actualApiKey).expectNext(expectedApiKey).verifyComplete();
     }
@@ -84,7 +84,7 @@ class ApiKeyFacadeTest {
         when(authorizationService.getTenantIdAndClientName(credentials)).thenReturn(Mono.error(new ComplytAuth0Exception()));
 
         // Then
-        Mono<ApiKey> actualApiKey = apiKeyFacade.saveCredentials(credentials);
+        Mono<ApiKey> actualApiKey = apiKeyFacade.saveNewCredentials(credentials);
 
         StepVerifier.create(actualApiKey).expectError(ComplytAuth0Exception.class).verify();
     }
@@ -100,7 +100,7 @@ class ApiKeyFacadeTest {
         // When
         when(credentialsService.markAsCancelled(apiKey)).thenReturn(Mono.just(credentials));
         when(authorizationService.getManagementAccessToken()).thenReturn(Mono.just(managementToken));
-        when(authorizationService.deleteApiKey(credentials, managementToken)).thenReturn(Mono.just(auth0Client));
+        when(authorizationService.updateClientMetadata(credentials, managementToken, null, null)).thenReturn(Mono.just(auth0Client));
         when(tokenService.deleteToken(apiKey)).thenReturn(Mono.just(token));
 
         // Then
@@ -125,21 +125,6 @@ class ApiKeyFacadeTest {
     }
 
     @Test
-    void markAsCancelled_failedRetrievingManagementAccessToken_throwsError() {
-        ApiKey apiKey = TestUtilities.createApiKey();
-        Credentials credentials = TestUtilities.createCredentials();
-
-        // When
-        when(credentialsService.markAsCancelled(apiKey)).thenReturn(Mono.just(credentials));
-        when(authorizationService.getManagementAccessToken()).thenReturn(Mono.error(new ComplytAuth0Exception()));
-
-        // Then
-        Mono<Credentials> credentialsMono = apiKeyFacade.markAsCancelled(apiKey);
-
-        StepVerifier.create(credentialsMono).expectError(ComplytAuth0Exception.class).verify();
-    }
-
-    @Test
     void markAsCancelled_failedDeletingApiKeyFromAuth0_throwsError() {
         ApiKey apiKey = TestUtilities.createApiKey();
         Credentials credentials = TestUtilities.createCredentials();
@@ -148,7 +133,7 @@ class ApiKeyFacadeTest {
         // When
         when(credentialsService.markAsCancelled(apiKey)).thenReturn(Mono.just(credentials));
         when(authorizationService.getManagementAccessToken()).thenReturn(Mono.just(managementToken));
-        when(authorizationService.deleteApiKey(credentials, managementToken)).thenReturn(Mono.error(new ComplytAuth0Exception()));
+        when(authorizationService.updateClientMetadata(credentials, managementToken, null, null)).thenReturn(Mono.error(new ComplytAuth0Exception()));
         when(tokenService.deleteToken(apiKey)).thenReturn(Mono.empty());
 
         // Then
@@ -167,7 +152,7 @@ class ApiKeyFacadeTest {
         // When
         when(credentialsService.markAsCancelled(apiKey)).thenReturn(Mono.just(credentials));
         when(authorizationService.getManagementAccessToken()).thenReturn(Mono.just(managementToken));
-        when(authorizationService.deleteApiKey(credentials, managementToken)).thenReturn(Mono.just(auth0Client));
+        when(authorizationService.updateClientMetadata(credentials, managementToken, null, null)).thenReturn(Mono.just(auth0Client));
         when(tokenService.deleteToken(apiKey)).thenReturn(Mono.empty());
 
         // Then
@@ -180,7 +165,7 @@ class ApiKeyFacadeTest {
     void saveCredentials_credentialsIsNull_throwNullException() {
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            apiKeyFacade.saveCredentials(null);
+            apiKeyFacade.saveNewCredentials(null);
         });
 
         assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");
@@ -194,5 +179,41 @@ class ApiKeyFacadeTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
+    }
+
+    @Test
+    void rotateCredentials_SuccessfulRotation_ReturnsNewApiKey() {
+        // Given
+        String expectedApiKeyClientIdStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1ec";
+        String expectedApiKeyClientSecretStr = "3572db2e-486b-480a-995b-2e4d2b9104fa";
+        ApiKey newApiKey = new ApiKey(expectedApiKeyClientIdStr, expectedApiKeyClientSecretStr);
+        String managementAccessToken = TestUtilities.createManagementAccessToken().accessToken();
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Auth0Client auth0Client = TestUtilities.createAuth0Client();
+        Credentials newCredentials = credentials.withComplytClientId(apiKey.clientId())
+                .withComplytClientSecret(apiKey.clientSecret());
+
+        // When
+        when(apiKeyService.generate()).thenReturn(newApiKey);
+        when(credentialsService.rotateOldCredentials(apiKey)).thenReturn(Mono.just(credentials));
+        when(authorizationService.getManagementAccessToken()).thenReturn(Mono.just(managementAccessToken));
+        when(authorizationService.updateClientMetadata(credentials, managementAccessToken, apiKey.clientId(), apiKey.clientSecret())).thenReturn(Mono.just(auth0Client));
+        when(credentialsService.saveCredentialsByExistingCredentials(credentials, apiKey)).thenReturn(Mono.just(newCredentials));
+
+        // Then
+        Mono<ApiKey> resultMono = apiKeyFacade.rotateCredentials(apiKey);
+
+        StepVerifier.create(resultMono)
+                .expectNext(newApiKey)
+                .verifyComplete();
+    }
+
+    @Test
+    public void rotateCredentials_ApiKeyIsNull_ThrowsNullPointerException() {
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            apiKeyFacade.rotateCredentials(null);
+        });
+
+        assertEquals("apiKey is marked non-null but is null", exception.getMessage());
     }
 }

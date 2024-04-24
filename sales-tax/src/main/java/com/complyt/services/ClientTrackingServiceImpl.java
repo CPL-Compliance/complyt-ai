@@ -45,7 +45,7 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
 
     @Override
     public Mono<ClientTracking> saveByTenantId(@NonNull ClientTracking clientTracking, @NonNull String tenantId) {
-        return clientTrackingRepository.saveByTenantId(clientTracking.withTenantId(tenantId), tenantId);
+        return clientTrackingRepository.saveWithoutTenant(clientTracking.withTenantId(tenantId));
     }
 
     @Override

@@ -30,6 +30,15 @@ public class CredentialsRepository {
                 .then(reactiveMongoTemplate.findOne(query, Credentials.class));
     }
 
+    public Mono<Credentials> findActiveCredentialsByComplytClientId(final @NonNull String complytClientId) {
+        Criteria statusCriteria = Criteria.where("status").is(ApiKeyStatus.ACTIVE);
+        Criteria clientIdCriteria = Criteria.where("complytClientId").is(complytClientId);
+        Query query = Query.query(new Criteria().andOperator(clientIdCriteria, statusCriteria));
+
+        return ContextLogger.observeCtx("Searching for active credentials by complytClientId " + complytClientId, log::info)
+                .then(reactiveMongoTemplate.findOne(query, Credentials.class));
+    }
+
     public Mono<Credentials> save(final @NonNull Credentials credentials) {
         return ContextLogger.observeCtx("Saving Credentials", log::info)
                 .then(reactiveMongoTemplate.save(credentials));
@@ -43,5 +52,4 @@ public class CredentialsRepository {
         return ContextLogger.observeCtx("Updating credentials status to cancelled for complytClientId " + complytClientId, log::info)
                 .then(reactiveMongoTemplate.findAndModify(query, update, Credentials.class));
     }
-
 }

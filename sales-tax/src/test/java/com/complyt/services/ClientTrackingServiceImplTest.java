@@ -5,7 +5,6 @@ import com.complyt.domain.ClientTracking;
 import com.complyt.domain.Nexus;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.ClientTrackingRepository;
-import feign.Client;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -112,7 +111,7 @@ class ClientTrackingServiceImplTest {
         // Given
         String tenantId = "org_12345";
         // When
-        when(clientTrackingRepository.saveByTenantId(clientTracking.withTenantId(tenantId), tenantId)).thenReturn(Mono.just(clientTracking));
+        when(clientTrackingRepository.saveWithoutTenant(clientTracking.withTenantId(tenantId))).thenReturn(Mono.just(clientTracking));
 
         Mono<ClientTracking> clientTrackingMono = clientTrackingServiceImp.saveByTenantId(clientTracking, tenantId);
 

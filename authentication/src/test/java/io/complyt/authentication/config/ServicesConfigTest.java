@@ -37,13 +37,15 @@ class ServicesConfigTest {
         Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
         String grantType = "Grant Type";
         String issuerUri = "Issuer Uri";
+        int credentials_expiration_sec = 100;
+
 
         // When
         CredentialsService expectedCredentialsService = new CredentialsService(credentialsRepository,
-                passwordEncoder, cryptoAesGcmNoPadding, grantType, issuerUri);
+                passwordEncoder, cryptoAesGcmNoPadding, grantType, issuerUri, credentials_expiration_sec);
 
         CredentialsService actualCredentialsService = servicesConfig.credentialsService(credentialsRepository,
-                passwordEncoder, cryptoAesGcmNoPadding, grantType, issuerUri);
+                passwordEncoder, cryptoAesGcmNoPadding, grantType, issuerUri, credentials_expiration_sec);
 
         // Then
         assertEquals(expectedCredentialsService, actualCredentialsService);
@@ -127,11 +129,12 @@ class ServicesConfigTest {
         Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
         String grantType = "Grant Type";
         String audience = "audience";
+        int credentials_expiration_sec = 100;
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             servicesConfig.credentialsService(null, passwordEncoder, cryptoAesGcmNoPadding,
-                    grantType, audience);
+                    grantType, audience, credentials_expiration_sec);
         });
 
         assertEquals(nullPointerException.getMessage(), "credentialsRepository is marked non-null but is null");
@@ -144,11 +147,12 @@ class ServicesConfigTest {
         Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
         String grantType = "Grant Type";
         String audience = "audience";
+        int credentials_expiration_sec = 100;
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             servicesConfig.credentialsService(credentialsRepository, null, cryptoAesGcmNoPadding,
-                    grantType, audience);
+                    grantType, audience, credentials_expiration_sec);
         });
 
         assertEquals(nullPointerException.getMessage(), "passwordEncoder is marked non-null but is null");
@@ -161,11 +165,12 @@ class ServicesConfigTest {
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
         String grantType = "Grant Type";
         String audience = "audience";
+        int credentials_expiration_sec = 100;
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             servicesConfig.credentialsService(credentialsRepository, passwordEncoder, null,
-                    grantType, audience);
+                    grantType, audience, credentials_expiration_sec);
         });
 
         assertEquals(nullPointerException.getMessage(), "cryptoAesGcmNoPadding " +
@@ -179,11 +184,12 @@ class ServicesConfigTest {
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
         Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
         String audience = "audience";
+        int credentials_expiration_sec = 100;
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             servicesConfig.credentialsService(credentialsRepository, passwordEncoder, cryptoAesGcmNoPadding,
-                    null, audience);
+                    null, audience, credentials_expiration_sec);
         });
 
         assertEquals(nullPointerException.getMessage(), "grantType is marked non-null but is null");
@@ -196,11 +202,12 @@ class ServicesConfigTest {
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
         Crypto cryptoAesGcmNoPadding = mock(Crypto.class);
         String grantType = "Grant Type";
+        int credentials_expiration_sec = 100;
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             servicesConfig.credentialsService(credentialsRepository, passwordEncoder, cryptoAesGcmNoPadding,
-                    grantType, null);
+                    grantType, null, credentials_expiration_sec);
         });
 
         assertEquals(nullPointerException.getMessage(), "audience is marked non-null but is null");

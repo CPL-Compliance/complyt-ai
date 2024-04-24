@@ -53,19 +53,20 @@ public class AuthorizationService {
                 .build();
     }
 
-    public Mono<Auth0Client> deleteApiKey(@NonNull Credentials credentials, @NonNull String accessToken) {
+    public Mono<Auth0Client> updateClientMetadata(@NonNull Credentials credentials, @NonNull String accessToken, String clientId, String clientSecret) {
+        String decodedClientId = getDecryptClientId(credentials);
+        return authorizationServerWrapper.updateApiKeyFromClient(credentials.getName(), decodedClientId, credentials.getTenantId(), accessToken, clientId, clientSecret);
+    }
 
-        String decodedClientId;
+    private String getDecryptClientId(Credentials credentials) {
         EncryptedData encryptedClientId = new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
         try {
-            decodedClientId = cryptoAesGcmNoPadding.decrypt(encryptedClientId);
+            return cryptoAesGcmNoPadding.decrypt(encryptedClientId);
         } catch (IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException |
                  InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Failed to decrypt credentials.");
         }
-        return authorizationServerWrapper.removeApiKeyFromClient(credentials.getName(), decodedClientId, credentials.getTenantId(), accessToken, null, null);
     }
-
 
     public Mono<TenantIdAndNameObject> getTenantIdAndClientName(@NonNull Credentials credentials) {
         return authorizationServerWrapper
