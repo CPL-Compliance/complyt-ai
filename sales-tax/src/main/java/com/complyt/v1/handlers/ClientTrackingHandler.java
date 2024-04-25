@@ -90,7 +90,6 @@ public class ClientTrackingHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
         String resourceURI = ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId;
 
-
         return ContextLogger.observeCtx(logStr, log::info)
                 .then(ClientTrackingDtoTenantValidationHandler.handle(serverRequest))
                 .map(ClientTrackingMapper.INSTANCE::clientTrackingDtoTenantToClientTracking)

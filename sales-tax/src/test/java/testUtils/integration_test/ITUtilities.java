@@ -208,7 +208,7 @@ public interface ITUtilities {
 
     static ClientTrackingDtoTenant stubClientTrackingDtoTenant(String tenantId, String name) {
         TimestampsDto internalTimestamps = new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString());
-        return new ClientTrackingDtoTenant(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), name, internalTimestamps, tenantId);
+        return new ClientTrackingDtoTenant(new NexusDto(LocalDateTime.parse("2015-06-01T00:00")), name, internalTimestamps, tenantId, null);
     }
 
     static NexusStateRuleDto stubAlabamaNexusStateRuleDto() {

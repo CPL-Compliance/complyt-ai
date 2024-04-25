@@ -622,7 +622,7 @@ public class UnitTestUtilities {
     public ClientTrackingDtoTenant createClientTrackingDtoTenant(String tenantId) {
         String date = localDateTime.toString();
         TimestampsDto internalTimestamps =  new TimestampsDto(date,date);
-        return new ClientTrackingDtoTenant(new NexusDto(localDateTime), "client dope", internalTimestamps, tenantId);
+        return new ClientTrackingDtoTenant(new NexusDto(localDateTime), "client dope", internalTimestamps, tenantId, null);
     }
 
     public ClientTrackingDto createClientTrackingDto() {

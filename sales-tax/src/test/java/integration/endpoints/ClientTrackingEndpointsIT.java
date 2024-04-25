@@ -25,7 +25,9 @@ import testUtils.integration_test.ITUtilities;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,7 +40,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = SalesTaxApplication.class)
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ClientTrackingEndpointsIT extends TestContainersInitializerIT implements ClientTrackingEndpointsITTemplate{
+public class ClientTrackingEndpointsIT extends TestContainersInitializerIT implements ClientTrackingEndpointsITTemplate {
 
     @MockBean
     TenantResolver tenantResolver;
@@ -259,7 +261,8 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
-                .value(map -> assertTrue(map.get("message").toString().contains(GenericErrorMessages.MAX_256_ERROR)));;
+                .value(map -> assertTrue(map.get("message").toString().contains(GenericErrorMessages.MAX_256_ERROR)));
+        ;
     }
 
     @Order(2)
@@ -400,11 +403,12 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Test
     @Override
     @WithMockUser
-    public void upsertByTenantId_DoesntExists_Returns201() {
+    public void upsertByTenantId_DoesntExistsAndHasListOfSubsidiaries_Returns201() {
         // Given
         String tenantId = "org_12345";
         String name = "RAZ";
-        ClientTrackingDtoTenant clientTrackingDtoTenant = ITUtilities.stubClientTrackingDtoTenant(tenantId, name);
+        List<String> subsidiaries = List.of("A", "B", "C");
+        ClientTrackingDtoTenant clientTrackingDtoTenant = ITUtilities.stubClientTrackingDtoTenant(tenantId, name).withSubsidiaries(subsidiaries);
 
         // Then
         webTestClient
@@ -416,7 +420,10 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
                 .bodyValue(clientTrackingDtoTenant)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isCreated();
+                .expectStatus()
+                .isCreated()
+                .expectBody(ClientTrackingDtoTenant.class)
+                .value(returnedClientTrackingDtoTenant -> Assertions.assertEquals(subsidiaries, returnedClientTrackingDtoTenant.subsidiaries()));
     }
 
     @Order(2)
