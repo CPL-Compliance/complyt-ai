@@ -125,6 +125,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking) {
         String state = salesTaxTracking.getState() != null ? salesTaxTracking.getState().getName() : "";
         return salesTaxTrackingRepository.findByCountryStateAndSubsidiary(salesTaxTracking.getCountry(), state, salesTaxTracking.getSubsidiary()) //todo: check
+                .switchIfEmpty(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(salesTaxTracking.getCountry(), state, null))
                 .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with country " + salesTaxTracking.getCountry())))
                 .flatMap(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
                 .flatMap(this::upsertWithoutNexusSummaryIfNeeded);
