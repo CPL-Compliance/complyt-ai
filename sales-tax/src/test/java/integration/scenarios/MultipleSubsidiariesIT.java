@@ -428,6 +428,31 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
     @Override
     @Test
     @WithMockUser
+    @Order(2)
+    public void upsert_TransactionWithNullSubsidiary_TransactionReturnedWithSalesTax() {
+        // Given
+        String externalId = "TransactionWithNullSubsidiaryAndSalesTax";
+        TransactionDto givenTransaction = transactionDto.withExternalId(externalId)
+                .withSubsidiary("NonExistingSubsidiary");
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
     @Order(3)
     public void getOneSalesTaxTracking_SubsidiaryA_EstablishedBySubsidiaryB() {
         // Given

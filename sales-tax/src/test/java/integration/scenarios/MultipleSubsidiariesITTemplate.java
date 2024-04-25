@@ -37,4 +37,6 @@ public interface MultipleSubsidiariesITTemplate {
     void getOneSalesTaxTracking_SubsidiaryC_EstablishedBySubsidiaryB();
 
     void getOneSalesTaxTracking_NullSubsidiary_EstablishedBySubsidiaryB();
+
+    void upsert_TransactionWithNullSubsidiary_TransactionReturnedWithSalesTax();
 }
