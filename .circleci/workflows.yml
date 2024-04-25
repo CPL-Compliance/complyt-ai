@@ -191,11 +191,10 @@ jobs:
           service_name: "<<parameters.service_name>>"
       ## Deploy to demo cluster
       - aws-ecs/update_service:
-          cluster: "demo"
-          container_image_name_updates: "container=demo-<<parameters.service_name>>-container, tag=<<parameters.service_name>>-latest"
-          family: "demo-<<parameters.service_name>>-task-definition"
-          service_name: "demo-<<parameters.service_name>>-service"
-
+          cluster: "complyt-demo"
+          container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
+          family: "<<parameters.service_name>>-complyt-demo"
+          service_name: "<<parameters.service_name>>"
 
 workflows:
   sales-tax-workflow:
