@@ -25,7 +25,7 @@ public class NexusTransactionsSearchQueryBuilder {
     @NonNull
     private TimeFrameQueryBuilder timeFrameQueryBuilder;
 
-    public Query buildNexusTransactionsSearch(@NonNull Nexus nexusInfo, @NonNull NexusStateRule nexusStateRule, @NonNull LocalDateTime referenceDate) {
+    public Query buildNexusTransactionsSearch(@NonNull Nexus nexusInfo, @NonNull NexusStateRule nexusStateRule, @NonNull LocalDateTime referenceDate, String subsidiary) {
         Query timeFrameQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, nexusStateRule, referenceDate);
         timeFrameQuery = CountryIsUsaChecker.isCountryUsa(nexusStateRule.country()) ?
                 timeFrameQuery
@@ -33,6 +33,7 @@ public class NexusTransactionsSearchQueryBuilder {
                                 Criteria.where("shippingAddress.state").is(nexusStateRule.state().getAbbreviation())
                                 , Criteria.where("shippingAddress.state").is(nexusStateRule.state().getName())))) :
                 timeFrameQuery.addCriteria(new Criteria().orOperator(listOfNonUsaAbbreviationCriteria(nexusStateRule.country())));
+                timeFrameQuery.addCriteria(Criteria.where("subsidiary").is(subsidiary));
 
         return timeFrameQuery;
     }

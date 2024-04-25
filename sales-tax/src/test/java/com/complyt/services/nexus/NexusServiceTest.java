@@ -257,8 +257,8 @@ class NexusServiceTest {
         Query query = new Query();
 
         // When
-        when(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(salesTaxTracking.getClientTracking().getNexus(), salesTaxTracking.getNexusStateRule(), LocalDateTime.of(referenceDate, LocalTime.of(23, 59, 59)))).thenReturn(query);
-        Mono<Query> queryMono = nexusService.getTransactionsQueryByNexusCalculation(salesTaxTracking.getNexusStateRule(), salesTaxTracking.getClientTracking(), referenceDate);
+        when(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(salesTaxTracking.getClientTracking().getNexus(), salesTaxTracking.getNexusStateRule(), LocalDateTime.of(referenceDate, LocalTime.of(23, 59, 59)), salesTaxTracking.getSubsidiary())).thenReturn(query);
+        Mono<Query> queryMono = nexusService.getTransactionsQueryByNexusCalculation(salesTaxTracking.getNexusStateRule(), salesTaxTracking.getClientTracking(), referenceDate, salesTaxTracking.getSubsidiary());
 
         // Then
         StepVerifier.create(queryMono).expectNext(query).verifyComplete();
@@ -379,7 +379,7 @@ class NexusServiceTest {
     void getTransactionsQueryByNexusCalculation_NullStateRulePassed_ThrowsException() {
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> nexusService.getTransactionsQueryByNexusCalculation(null, salesTaxTracking.getClientTracking(), LocalDate.now()));
+                () -> nexusService.getTransactionsQueryByNexusCalculation(null, salesTaxTracking.getClientTracking(), LocalDate.now(), salesTaxTracking.getSubsidiary()));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
@@ -389,7 +389,7 @@ class NexusServiceTest {
     void getTransactionsQueryByNexusCalculation_NullClientTrackingPassed_ThrowsException() {
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> nexusService.getTransactionsQueryByNexusCalculation(salesTaxTracking.getNexusStateRule(), null, LocalDate.now()));
+                () -> nexusService.getTransactionsQueryByNexusCalculation(salesTaxTracking.getNexusStateRule(), null, LocalDate.now(), salesTaxTracking.getSubsidiary()));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "clientTracking is marked non-null but is null");
@@ -399,7 +399,7 @@ class NexusServiceTest {
     void getTransactionsQueryByNexusCalculation_NullReferenceDatePassed_ThrowsException() {
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> nexusService.getTransactionsQueryByNexusCalculation(salesTaxTracking.getNexusStateRule(), salesTaxTracking.getClientTracking(), null));
+                () -> nexusService.getTransactionsQueryByNexusCalculation(salesTaxTracking.getNexusStateRule(), salesTaxTracking.getClientTracking(), null, salesTaxTracking.getSubsidiary()));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");

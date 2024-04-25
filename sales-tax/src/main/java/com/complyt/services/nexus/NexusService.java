@@ -93,9 +93,9 @@ public class NexusService {
     }
 
 
-    public Mono<Query> getTransactionsQueryByNexusCalculation(@NonNull NexusStateRule nexusStateRule, @NonNull ClientTracking clientTracking, @NonNull LocalDate referenceDate) {
+    public Mono<Query> getTransactionsQueryByNexusCalculation(@NonNull NexusStateRule nexusStateRule, @NonNull ClientTracking clientTracking, @NonNull LocalDate referenceDate, String subsidiary) {
         return Mono.just(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(
-                clientTracking.getNexus(), nexusStateRule, LocalDateTime.of(referenceDate, LocalTime.of(23, 59, 59))));
+                clientTracking.getNexus(), nexusStateRule, LocalDateTime.of(referenceDate, LocalTime.of(23, 59, 59)), subsidiary));
     }
 
     public Mono<SalesTaxTracking> upsertToNexusTracking(@NonNull Transaction updatedTransaction, @NonNull SalesTaxTracking salesTaxTracking) {
