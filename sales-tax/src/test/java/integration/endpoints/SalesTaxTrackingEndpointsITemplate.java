@@ -31,4 +31,8 @@ public interface SalesTaxTrackingEndpointsITemplate extends
     void upsertByCountryAndState_UsaAndStateIsDifferentInBody_Returns400ConflictedData();
 
     void upsertByCountryAndState_CountryInQueryAndBodyAreDifferent_Returns400ConflictedData();
+
+    public void getByCountryStateAndSubsidiary_DoesntExists_Returns404();
+
+    public void getByCountryStateAndSubsidiary_Exists_Returns200();
 }

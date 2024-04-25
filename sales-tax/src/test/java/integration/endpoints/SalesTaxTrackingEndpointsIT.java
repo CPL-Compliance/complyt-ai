@@ -600,6 +600,45 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isNotFound();
     }
 
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void getByCountryStateAndSubsidiary_DoesntExists_Returns404() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", "ID")
+                        .queryParam("subsidiary", "D")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Override
+    @Order(0)
+    @Test
+    @WithMockUser
+    public void getByCountryStateAndSubsidiary_Exists_Returns200() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", "ID")
+                        .queryParam("subsidiary", "B")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> Assertions.assertEquals(salesTaxTrackingDto.subsidiary(), "B"));
+    }
+
     @Order(2)
     @Test
     @Override
