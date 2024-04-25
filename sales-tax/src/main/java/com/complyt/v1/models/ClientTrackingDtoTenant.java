@@ -2,13 +2,10 @@ package com.complyt.v1.models;
 
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
-import com.complyt.v1.config.regex.ISO8601Regex;
 import com.complyt.v1.models.checkables.TenantIdCheckable;
 import com.complyt.v1.models.nexus.NexusDto;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.With;
 
