@@ -46,4 +46,5 @@ public class Transaction implements ComplytIdProperty {
     BigDecimal totalDiscount;
     TransactionFilingStatus transactionFilingStatus;
     String currency;
+    String subsidiary;
 }

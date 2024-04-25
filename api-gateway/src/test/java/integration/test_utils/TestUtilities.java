@@ -159,8 +159,8 @@ public class TestUtilities {
         return transactionJsonExample(externalId, customerId, null, true, state, createdDate);
     }
 
-    public static String transactionJsonExample(String externalId, String customerId, String country, String state, String zip, String region, boolean isTaxInclusive, String... items) {
-        return  transactionWithCustomItems(externalId, customerId, null, true, country, state, zip, region, isTaxInclusive,
+    public static String transactionJsonExample(String externalId, String customerId, String country, String state, String zip, String region, boolean isTaxInclusive, String subsidiary, String... items) {
+        return transactionWithCustomItems(externalId, customerId, null, true, country, state, zip, region, isTaxInclusive, subsidiary,
                 items);
     }
 
@@ -409,10 +409,11 @@ public class TestUtilities {
                 discount);
     }
 
-    public static String transactionWithCustomItems(String externalId, String customerId, String complytId, boolean isValidated, String country, String state, String zip, String region,boolean isTaxInclusive,
+    public static String transactionWithCustomItems(String externalId, String customerId, String complytId, boolean isValidated, String country, String state, String zip, String region, boolean isTaxInclusive, String subsidiary,
                                                     String... items) {
         return String.format("""
                         {
+                            %s
                             %s
                             "externalId": "%s",
                             %s
@@ -443,6 +444,7 @@ public class TestUtilities {
                         }
                         """,
                 complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
+                subsidiary != null ? "\"subsidiary\": \"" + subsidiary + "\"," : "",
                 externalId,
                 isValidated ? "\"source\": \"1\"," : "",
                 Arrays.toString(items),
@@ -517,7 +519,7 @@ public class TestUtilities {
                         stateName) : null;
 
 
-        String exemptionWrapper =  String.format("""
+        String exemptionWrapper = String.format("""
                         {
                           "exemption": {
                                   "customerId": "81e5475d-3297-40bc-875c-95b44075ab3b",

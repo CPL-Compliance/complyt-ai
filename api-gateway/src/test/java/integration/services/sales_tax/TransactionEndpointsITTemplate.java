@@ -62,4 +62,7 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_UsaCountryNoZipNoSupportedState_Returns400();
 
     void upsertByExternalIdAndSource_NotSupportedNonUsaCountryNo_Returns400();
+
+    void upsertByExternalIdAndSource_TransactionWithSubsidiaryA_Returns201AndPassesNexus();
+    void upsertByExternalIdAndSource_TransactionWithSubsidiaryB_Returns201AndHasSalesTax();
 }

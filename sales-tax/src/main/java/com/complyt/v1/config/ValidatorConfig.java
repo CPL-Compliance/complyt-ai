@@ -103,7 +103,6 @@ public class ValidatorConfig {
                 pathVariableChecker,
                 queryParamChecker,
                 shouldCallValidate);
-
     }
 
     @Bean

@@ -16,6 +16,7 @@ import com.complyt.domain.transaction.TransactionType;
 import com.complyt.repositories.ClientTrackingRepository;
 import com.complyt.repositories.NexusStateRuleRepository;
 import com.complyt.repositories.SalesTaxTrackingRepository;
+import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -168,8 +169,12 @@ public class SalesTaxTrackingServiceImplTest {
 
     @Test
     void updateEconomicNexus_UpdatesSalesTaxTracking_ReturnsSalesTaxTracking() {
-        // Given + When
+        // Given
+        UpdateResult updateResult = UpdateResult.acknowledged (0, null, null);
+
+        // When
         when(salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingRepository.updateMultipleEconomicNexuses(salesTaxTracking)).thenReturn(Mono.just(updateResult));
         Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.updateEconomicNexus(salesTaxTracking);
 
         // Then
@@ -195,10 +200,11 @@ public class SalesTaxTrackingServiceImplTest {
         // Given
         String country = salesTaxTracking.getCountry();
         String state = salesTaxTracking.getState().getAbbreviation();
+        String subsidiary = salesTaxTracking.getSubsidiary();
 
         // When
-        when(salesTaxTrackingRepository.findByCountryAndState(country, state)).thenReturn(Mono.just(salesTaxTracking));
-        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.findByCountryAndState(country, state);
+        when(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiary)).thenReturn(Mono.just(salesTaxTracking));
+        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.findByCountryStateAndSubsidiary(country, state, subsidiary);
 
         // Then
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
@@ -209,11 +215,12 @@ public class SalesTaxTrackingServiceImplTest {
         // Given
 
         String nullCountry = null;
+        String subsidiary = "subsidiary";
         String state = "";
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.findByCountryAndState(nullCountry, state);
+            salesTaxTrackingService.findByCountryStateAndSubsidiary(nullCountry, state, subsidiary);
         });
 
         // Then
@@ -223,7 +230,7 @@ public class SalesTaxTrackingServiceImplTest {
     @Test
     void findAll_FindsAll_ReturnsAll() {
         // Given
-        List<SalesTaxTracking> salesTaxTrackingList = new ArrayList<SalesTaxTracking>() {{
+        List<SalesTaxTracking> salesTaxTrackingList = new ArrayList<>() {{
             add(salesTaxTracking);
         }};
 
@@ -258,11 +265,12 @@ public class SalesTaxTrackingServiceImplTest {
                 withEconomicNexusTracker(new EconomicNexusTracker(true, LocalDateTime.now()));
         String country = newSalesTaxTracking.getCountry();
         String state = newSalesTaxTracking.getState().getName();
+        String subsidiary = newSalesTaxTracking.getSubsidiary();
 
         // When
         when(nexusStateRuleRepository.findMostRecentByCountryAndState(country, state)).thenReturn(Mono.just(nexusStateRule));
         when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
-        when(salesTaxTrackingRepository.findByCountryAndState(country, state)).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiary)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingRepository.save(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(newSalesTaxTracking);
 
@@ -278,11 +286,12 @@ public class SalesTaxTrackingServiceImplTest {
                 .withState(null);
         String country = newSalesTaxTracking.getCountry();
         String state = "";
+        String subsidiary = newSalesTaxTracking.getSubsidiary();
 
         // When
         when(nexusStateRuleRepository.findMostRecentByCountryAndState(country, state)).thenReturn(Mono.just(nexusStateRule));
         when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
-        when(salesTaxTrackingRepository.findByCountryAndState(country, state)).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiary)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingRepository.save(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(newSalesTaxTracking);
 
@@ -298,11 +307,12 @@ public class SalesTaxTrackingServiceImplTest {
                 .withState(salesTaxTracking.getState().withName(null));
         String country = newSalesTaxTracking.getCountry();
         String state = null;
+        String subsidiary = newSalesTaxTracking.getSubsidiary();
 
         // When
         when(nexusStateRuleRepository.findMostRecentByCountryAndState(country, state)).thenReturn(Mono.just(nexusStateRule));
         when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
-        when(salesTaxTrackingRepository.findByCountryAndState(country, state)).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiary)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingRepository.save(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(newSalesTaxTracking);
 
@@ -549,9 +559,10 @@ public class SalesTaxTrackingServiceImplTest {
         // Given
         String country = salesTaxTracking.getCountry();
         String state = salesTaxTracking.getState().getName();
+        String subsidiary = salesTaxTracking.getSubsidiary();
 
         // When
-        when(salesTaxTrackingRepository.findByCountryAndState(country, state)).thenReturn(Mono.empty());
+        when(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiary)).thenReturn(Mono.empty());
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(salesTaxTracking);
 
         // Then
@@ -562,10 +573,12 @@ public class SalesTaxTrackingServiceImplTest {
     void handleSalesTaxTrackingAfterTransactionCalculated_SalesTaxTrackingWithEconomicNexusEstablished_UpdatesSalesTaxTracking() {
         // Given
         EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(true, LocalDateTime.now());
+        UpdateResult updateResult = UpdateResult.acknowledged (0, null, null);
         SalesTaxTracking salesTaxTrackingWithEconomicNexusEstablished = salesTaxTracking.withEconomicNexusTracker(economicNexusTracker);
 
         // When
         when(salesTaxTrackingRepository.updateEconomicNexus(salesTaxTrackingWithEconomicNexusEstablished)).thenReturn(Mono.just(salesTaxTrackingWithEconomicNexusEstablished));
+        when(salesTaxTrackingRepository.updateMultipleEconomicNexuses(salesTaxTrackingWithEconomicNexusEstablished)).thenReturn(Mono.just(updateResult));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTrackingWithEconomicNexusEstablished);
 
         // Then

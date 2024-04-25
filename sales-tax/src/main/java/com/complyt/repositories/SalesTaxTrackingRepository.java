@@ -1,11 +1,11 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.transaction.Address;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.utils.query.CountryAndStateCriteriaBuilder;
 import com.complyt.utils.update.SalesTaxTrackingUpdateQueryBuilder;
+import com.mongodb.client.result.UpdateResult;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -39,15 +39,16 @@ public class SalesTaxTrackingRepository {
     @NonNull
     CountryAndStateCriteriaBuilder countryQueryBuilder;
 
-    public Mono<SalesTaxTracking> findByCountryAndState(@NonNull String country, String state) {
+    public Mono<SalesTaxTracking> findByCountryStateAndSubsidiary(@NonNull String country, String state, String subsidiary) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
-                    Criteria addressSearchQuery = countryQueryBuilder.build(country, state);
+                    Criteria addressSearchCriteria = countryQueryBuilder.build(country, state);
+                    Criteria baseCriteria = Criteria.where("tenantId").is(tenantId).andOperator(addressSearchCriteria);
 
-                    Query query = Query.query(addressSearchQuery.and("tenantId").is(tenantId));
+                    Query query = Query.query(Criteria.where("subsidiary").is(subsidiary).andOperator(baseCriteria));
 
                     StringBuilder stringBuilder = new StringBuilder("Searching for sales tax tracking with country " + country);
-                    stringBuilder = state != null? stringBuilder.append(" and with state " + state) : stringBuilder;
+                    stringBuilder = state != null ? stringBuilder.append(" and with state " + state) : stringBuilder;
                     stringBuilder.append(" and tenant ID " + tenantId);
 
                     return ContextLogger.observeCtx(stringBuilder.toString(), log::info)
@@ -101,5 +102,22 @@ public class SalesTaxTrackingRepository {
                 .flatMap(tenantId -> ContextLogger.observeCtx("Updating sales tax tracking Fields: " + update + ", With Query: " + query, log::info)
                         .then(reactiveMongoTemplate.findAndModify(query, update, SalesTaxTracking.class))
                         .then(Mono.just(salesTaxTracking.withTenantId(tenantId))));
+    }
+
+    public Mono<UpdateResult> updateMultipleEconomicNexuses(@NonNull SalesTaxTracking salesTaxTracking) {
+        Query query = new Query(Criteria.where("tenantId").is(salesTaxTracking.getTenantId()));
+        query.addCriteria(new Criteria().orOperator(Criteria.where("state.abbreviation").is(salesTaxTracking.getState().getAbbreviation()),
+                Criteria.where("state.name").is(salesTaxTracking.getState().getName())));
+
+        Update update = new Update();
+
+        update.set("economicNexusTracker", salesTaxTracking.getEconomicNexusTracker());
+        update.set("appliedDate", salesTaxTracking.getAppliedDate());
+        update.set("establishedBy", salesTaxTracking.getSubsidiary());
+
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> ContextLogger.observeCtx("Updating sales tax tracking Fields: " + update + ", With Query: " + query, log::info)
+                        .then(reactiveMongoTemplate.updateMulti(query, update, SalesTaxTracking.class)));
+
     }
 }

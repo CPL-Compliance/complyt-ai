@@ -96,17 +96,17 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
         return injectCommonDataToNewAndModifiedTransaction(transaction)
-                .map(x -> complytIdHandler.insertComplytIdToNew(x))
-                .map(y->new NewTransactionInternalTimestampsInjector(y))
-                .map(z -> z.inject());
+                .map(complytIdHandler::insertComplytIdToNew)
+                .map(NewTransactionInternalTimestampsInjector::new)
+                .map(NewTransactionInternalTimestampsInjector::inject);
     }
 
     private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
         return itemsTotalCalculator.injectRecalculatedTotal(transaction)
                 .flatMap(transactionWithCalculatedItems ->
                         productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItems)
-                                .map(x -> transactionDiscountCollector.collect(x))
-                                .map(y ->transactionItemsAmountsCollector.collect(y))
+                                .map(transactionDiscountCollector::collect)
+                                .map(transactionItemsAmountsCollector::collect)
                                 .flatMap(transactionWithAmounts -> CountryIsUsaChecker.isCountryUsa(transactionWithAmounts.getShippingAddress()) ? //todo: make sure addressInUsaChecker is needed here is is the right thing to do here
                                         cityCountyProvider.provide(transactionWithAmounts) :
                                         Mono.just(transactionWithAmounts))); //todo: fix - this causes error if not usa state
@@ -133,11 +133,9 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findAllByQuery(query);
     }
 
-
     public Flux<Transaction> findAll(int page, int size) {
         return transactionRepository.findAll(page, size);
     }
-
 
     public Flux<Transaction> findAllBySource(@NonNull final String source) {
         return transactionRepository.findAllBySource(source);
@@ -154,7 +152,8 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.getExternalTimestamps(), transaction.getTransactionType(), transaction.getShippingFee(),
                         transaction.getCreatedFrom(), transaction.getTaxableItemsAmount(),
                         transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount(), transaction.getFinalTransactionAmount(), transaction.getTotalDiscount(),
-                        transaction.getTransactionFilingStatus(), transaction.getCurrency()
+                        transaction.getTransactionFilingStatus(), transaction.getCurrency(),
+                        transaction.getSubsidiary()
                 );
     }
 

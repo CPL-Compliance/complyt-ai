@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
@@ -24,7 +23,7 @@ public class CountryAndStateCriteriaBuilderImpl implements CountryAndStateCriter
     public Criteria build(@NonNull String country, String state) {
         Criteria criteria = CountryIsUsaChecker.isCountryUsa(country) ?
                 new Criteria().andOperator(new Criteria().orOperator(Criteria.where("state.abbreviation").is(state), Criteria.where("state.name").is(state)),
-                                new Criteria().orOperator(listOfUsaAbbreviationsOptionsCriteria())) :
+                        new Criteria().orOperator(listOfUsaAbbreviationsOptionsCriteria())) :
                 new Criteria().orOperator(listOfNonUsaAbbreviationCriteria(country));
 
         return criteria;
