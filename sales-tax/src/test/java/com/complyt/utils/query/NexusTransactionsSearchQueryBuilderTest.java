@@ -83,14 +83,17 @@ public class NexusTransactionsSearchQueryBuilderTest {
                 Criteria.where("shippingAddress.state").is(nexusStateRule.state().getName())
         );
 
-        return query.addCriteria(new Criteria().andOperator(usaAbbreviationsCriteria, stateCriteria));
+        query.addCriteria(new Criteria().andOperator(usaAbbreviationsCriteria, stateCriteria));
+        return query.addCriteria(Criteria.where("subsidiary").is(null));
     }
 
     private Query createExpectedQueryInANonUsa(LocalDateTime start, LocalDateTime end, NexusStateRule nexusStateRule) {
         Query query = new Query(Criteria.where("externalTimestamps.createdDate")
                 .gte(start).lte(end));
 
-        return query.addCriteria(new Criteria().orOperator(listOfNonUsaAbbreviationCriteria(nexusStateRule.country().toUpperCase())));
+        query.addCriteria(new Criteria().orOperator(listOfNonUsaAbbreviationCriteria(nexusStateRule.country().toUpperCase())));
+
+        return query.addCriteria(Criteria.where("subsidiary").is(null));
     }
 
     private Query createQueryToSend(LocalDateTime start, LocalDateTime end) {
@@ -108,7 +111,7 @@ public class NexusTransactionsSearchQueryBuilderTest {
                 .thenReturn(createQueryToSend(startOfYear, endOfYear));
 
         // When
-        Query actualQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRule, dateReference);
+        Query actualQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRule, dateReference, null);
 
         // Then
         assertEquals(expectedQuery, actualQuery);
@@ -126,7 +129,7 @@ public class NexusTransactionsSearchQueryBuilderTest {
                 .thenReturn(createQueryToSend(startOfYear, endOfYear));
 
         // When
-        Query actualQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRuleToSend, dateReference);
+        Query actualQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRuleToSend, dateReference, null);
 
         // Then
         assertEquals(expectedQuery, actualQuery);
@@ -139,7 +142,7 @@ public class NexusTransactionsSearchQueryBuilderTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nullNexusInfo, nexusStateRule, dateReference);
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nullNexusInfo, nexusStateRule, dateReference, null);
         });
 
         // Then
@@ -153,7 +156,7 @@ public class NexusTransactionsSearchQueryBuilderTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nullNexusStateRule, dateReference);
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nullNexusStateRule, dateReference, null);
         });
 
         // Then
@@ -167,7 +170,7 @@ public class NexusTransactionsSearchQueryBuilderTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRule, nullLocalDateTime);
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRule, nullLocalDateTime, null);
         });
 
         // Then

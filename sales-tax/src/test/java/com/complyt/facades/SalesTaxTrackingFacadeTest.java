@@ -124,7 +124,7 @@ public class SalesTaxTrackingFacadeTest {
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(salesTaxTracking.getCountry(), salesTaxTracking.getState().getName(), salesTaxTracking.getSubsidiary())).thenReturn(Mono.just(salesTaxTrackingWithId));
         when(nexusService.hasNexus(salesTaxTrackingWithId)).thenReturn(Mono.just(new SalesTaxTrackingWithNexusInfo(salesTaxTrackingWithId, false)));
         when(salesTaxTrackingService.addClientAndStateDetails(salesTaxTrackingWithId)).thenReturn(Mono.just(salesTaxTrackingWithId));
-        when(nexusService.getTransactionsQueryByNexusCalculation(salesTaxTrackingWithId.getNexusStateRule(), salesTaxTrackingWithId.getClientTracking(), referenceDate)).thenReturn(Mono.just(query));
+        when(nexusService.getTransactionsQueryByNexusCalculation(salesTaxTrackingWithId.getNexusStateRule(), salesTaxTrackingWithId.getClientTracking(), referenceDate,salesTaxTracking.getSubsidiary())).thenReturn(Mono.just(query));
         when(transactionService.getTransactionsByQuery(query)).thenReturn(Flux.just(transaction));
         when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(nexusService.refreshNexusSummary(salesTaxTrackingWithId, transactionsWithCustomers, referenceDate)).thenReturn(Mono.just(salesTaxTrackingWithSummary));
