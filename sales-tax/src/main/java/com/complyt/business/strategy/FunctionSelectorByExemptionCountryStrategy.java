@@ -13,7 +13,7 @@ public abstract class FunctionSelectorByExemptionCountryStrategy implements Stra
      * even though, when getting usa/non usa country, the result of this function will be identical
      * we don't want to couple the logic, so for every strategt decition, this function will be run
      *
-     * @param transaction - to be getting the address and parameters from to inject into a function
+     * @param exemptionWrapper - to be getting the country and parameters from, to inject into a function
      * @return a function, either with usa or non usa logic, with the transaction details injected into the logic
      */
     @Override
