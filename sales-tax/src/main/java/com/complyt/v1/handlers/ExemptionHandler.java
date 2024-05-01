@@ -72,7 +72,8 @@ public class ExemptionHandler {
         String complytId = serverRequest.pathVariable("complytId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info).then(exemptionDtoValidationHandler.handle(serverRequest))
+        Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info)
+                .then(exemptionDtoValidationHandler.handle(serverRequest))
                 .flatMap(exemptionDto -> {
                     Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
                     return exemptionFacade.update(receivedExemption, UUID.fromString(complytId));
@@ -88,7 +89,8 @@ public class ExemptionHandler {
     public Mono<ServerResponse> create(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Flux<ExemptionDto> exemptionDtoFlux = ContextLogger.observeCtx(logStr, log::info).then(exemptionWrapperDtoValidationHandler.handle(serverRequest))
+        Flux<ExemptionDto> exemptionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
+                .then(exemptionWrapperDtoValidationHandler.handle(serverRequest))
                 .flatMapMany(exemptionWrapperDto -> {
                     ExemptionWrapper receivedExemptionWrapper = ExemptionWrapperMapper.INSTANCE.exemptionWrapperDtoToExemptionWrapper(exemptionWrapperDto);
                     return exemptionFacade.save(receivedExemptionWrapper);

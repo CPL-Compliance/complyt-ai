@@ -71,7 +71,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-
     public void upsertByExternalIdAndSource_DoesntExistsAndSaleTaxTrackingDoesntExists_Returns500() {
         // Given
         String externalId = "10003";
@@ -1577,4 +1576,33 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(map -> assertNotNull(map.get("salesTax")));
     }
 
+    @Order(0)
+    @Test
+    @Override
+    /*
+     This transaction's customer has an exemption in state PA with validation dates of:
+     fromDate: 2025-01-01, toDate: 26-01-01, therefore transaction is sales-tax exempt
+    */
+    public void upsertByExternalIdAndSource_CustomerIsExemptByNonUsaCountryAndDate_ReturnsNonTaxableTransaction() {
+        String externalId = "nonExistingTransactionIDIsrael";
+        String createdDate = "2023-01-02";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, null, true,null, "Il", createdDate))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertNull(map.get("salesTax"));
+                });
+    }
 }

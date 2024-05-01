@@ -1,6 +1,7 @@
 package com.complyt.utils.query;
 
 import com.complyt.business.address.CountryIsUsaChecker;
+import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.address.SupportedNonUsCountries;
 import com.complyt.business.address.UsaAbbreviations;
 import com.complyt.domain.Nexus;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,22 +29,18 @@ public class NexusTransactionsSearchQueryBuilder {
         Query timeFrameQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, nexusStateRule, referenceDate);
         timeFrameQuery = CountryIsUsaChecker.isCountryUsa(nexusStateRule.country()) ?
                 timeFrameQuery
-                        .addCriteria(new Criteria().andOperator(new Criteria().orOperator(listOfUsaAbbreviationsOptionsCriteria()), new Criteria().orOperator(
+                        .addCriteria(new Criteria().andOperator(countrySearchCriteria(nexusStateRule.country()), new Criteria().orOperator(
                                 Criteria.where("shippingAddress.state").is(nexusStateRule.state().getAbbreviation())
                                 , Criteria.where("shippingAddress.state").is(nexusStateRule.state().getName())))) :
-                timeFrameQuery.addCriteria(new Criteria().orOperator(listOfNonUsaAbbreviationCriteria(nexusStateRule.country())));
-                timeFrameQuery.addCriteria(Criteria.where("subsidiary").is(subsidiary));
+                timeFrameQuery.addCriteria(countrySearchCriteria(nexusStateRule.country()));
+        timeFrameQuery.addCriteria(Criteria.where("subsidiary").is(subsidiary));
 
         return timeFrameQuery;
     }
 
-    private List<Criteria> listOfUsaAbbreviationsOptionsCriteria() {
-        return UsaAbbreviations.usaAbbreviationsList.stream()
-                .map(abbreviation -> Criteria.where("shippingAddress.country").is(abbreviation.toUpperCase())).collect(Collectors.toList());
-    }
+    private Criteria countrySearchCriteria(String country) {
+        String searchTermCountry = CountryToStandardizedCountry.standardize(country);
 
-    private List<Criteria> listOfNonUsaAbbreviationCriteria(String country) {
-        return SupportedNonUsCountries.nonUsaCountriesAbbreviations.get(country.toUpperCase()).stream()
-                .map(name -> Criteria.where("shippingAddress.country").is(name.toUpperCase())).collect(Collectors.toList());
+        return Criteria.where("shippingAddress.country").is(searchTermCountry);
     }
 }

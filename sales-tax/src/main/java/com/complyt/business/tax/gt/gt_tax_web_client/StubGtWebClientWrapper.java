@@ -17,7 +17,7 @@ public class StubGtWebClientWrapper implements SalesTaxRatesWebClientWrapper<Com
     @Override
     public Mono<ComplytGtRates> findByAddress(String state, String country, String county, String city, String street, String zip, String region, boolean isPartial) {
         return Mono.fromCallable(() -> {
-            String json = "{\"gtAddress\": {\"country\": \"Canada\",\"region\": \"Quebec\"},\"gtRates\": {\"taxRate\": \"0.14975\",\"countryRate\": \"0.05\",\"regionRate\": \"0.0975\"}}";
+            String json = "{\"gtAddress\": {\"country\": \"CANADA\",\"region\": \"Quebec\"},\"gtRates\": {\"taxRate\": \"0.14975\",\"countryRate\": \"0.05\",\"regionRate\": \"0.0975\"}}";
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(json, ComplytGtRates.class);
         });
@@ -26,7 +26,7 @@ public class StubGtWebClientWrapper implements SalesTaxRatesWebClientWrapper<Com
     @Override
     public Mono<ComplytGtRates> findByAddress(@NonNull Address address) {
         return Mono.fromCallable(() -> {
-            String json = "{\"gtAddress\": {\"country\": \"Canada\",\"region\": \"Quebec\"},\"gtRates\": {\"taxRate\": \"0.14975\",\"countryRate\": \"0.05\",\"regionRate\": \"0.0975\"}}";
+            String json = "{\"gtAddress\": {\"country\": \"CANADA\",\"region\": \"Quebec\"},\"gtRates\": {\"taxRate\": \"0.14975\",\"countryRate\": \"0.05\",\"regionRate\": \"0.0975\"}}";
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(json, ComplytGtRates.class);
         });

@@ -33,6 +33,7 @@ import com.complyt.v1.models.sales_tax.gt.GtRatesDto;
 import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.validators.body_checkers.transaction.*;
 import org.springframework.data.mongodb.core.query.Update;
+import reactor.core.publisher.Flux;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -117,6 +118,14 @@ public class UnitTestUtilities {
         for (State state : exemptionWrapper.states()) {
             exemptionList.add(exemptionWrapper.exemption().withState(state));
         }
+
+        return exemptionList;
+    }
+
+    public static List<Exemption> createNonUsaExemptionsListFromWrapper(ExemptionWrapper exemptionWrapper) {
+        List<Exemption> exemptionList = new ArrayList<>(){{
+            add(exemptionWrapper.exemption().withState(null));
+        }};
 
         return exemptionList;
     }
@@ -466,6 +475,40 @@ public class UnitTestUtilities {
                 false, CalculationType.FIXED, "description", new BigDecimal("0.5"));
     }
 
+    public ExemptionWrapper createExemptionWrapper(String id) {
+        return new ExemptionWrapper(createExemption(id), List.of(new State(
+                "CO", "04", "Colorado"
+        )));
+    }
+
+    public ExemptionWrapper createNonUsaExemptionWrapper(String id) {
+        return new ExemptionWrapper(createNonUsaExemption(id), List.of());
+    }
+
+    public Exemption createNonUsaExemption(String id) {
+        Exemption exemption = createExemption(id);
+
+        return exemption.withCountry("CANADA").withState(null);
+    }
+
+    public ExemptionWrapperDto createExemptionWrapperDto() {
+        return new ExemptionWrapperDto(createExemptionDto(), List.of(new StateDto(
+                "CO", "04", "Colorado"
+        )));
+    }
+
+    public ExemptionWrapperDto createNonUsaExemptionWrapperDto() {
+        return new ExemptionWrapperDto(createNonUsaExemptionDto(), List.of());
+    }
+
+    public ExemptionDto createNonUsaExemptionDto() {
+        ExemptionDto exemptionDto = createExemptionDto();
+
+        return exemptionDto.withCountry("canada").withState(null);
+    }
+
+
+
     public Exemption createExemption(String id) {
         String country = "USA";
         State state = new State("CA", "02", "California");
@@ -478,6 +521,7 @@ public class UnitTestUtilities {
                 country, state, classification, validationDates, internalTimestamps,
                 status, certificate, ExemptionType.FULLY, ExemptionStatus.ACTIVE);
     }
+
 
     public ExemptionDto createExemptionDto() {
         String country = "USA";

@@ -1,6 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
+import com.complyt.business.strategy.StrategySelector;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.business.transaction.CityCountyProvider;
@@ -15,7 +16,6 @@ import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.repositories.TransactionRepository;
-import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,6 +65,9 @@ class TransactionServiceImplTest {
 
     @Mock
     ItemsTotalCalculator itemsTotalCalculator;
+
+    @Mock
+    StrategySelector shippingAddressCountryAlignmentStrategy;
 
     Transaction transaction;
     Customer customer;
@@ -361,6 +364,7 @@ class TransactionServiceImplTest {
 
         // When
         when(itemsTotalCalculator.injectRecalculatedTotal(transaction)).thenReturn(Mono.just(transactionWithItemsCalculatedTotal));
+        when(shippingAddressCountryAlignmentStrategy.select(transaction)).thenReturn(transaction -> (Transaction) transactionWithItemsCalculatedTotal);
         when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotal)).thenReturn(Mono.just(transactionWithProductClassification));
         when(cityCountyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
@@ -406,6 +410,7 @@ class TransactionServiceImplTest {
 
         // When
         when(itemsTotalCalculator.injectRecalculatedTotal(transactionToSend)).thenReturn(Mono.just(transactionWithItemsCalculatedTotal));
+        when(shippingAddressCountryAlignmentStrategy.select(transactionToSend)).thenReturn(transaction -> (Transaction) transactionWithItemsCalculatedTotal);
         when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassification)).thenReturn(transactionWithAllInjectedData);
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotal)).thenReturn(Mono.just(transactionWithProductClassification));
         when(cityCountyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassification));
@@ -453,6 +458,7 @@ class TransactionServiceImplTest {
 
         // When
         when(itemsTotalCalculator.injectRecalculatedTotal(newTransaction)).thenReturn(Mono.just(transactionWithItemsCalculatedTotal));
+        when(shippingAddressCountryAlignmentStrategy.select(newTransaction)).thenReturn(transaction -> (Transaction) transactionWithItemsCalculatedTotal);
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotal)).thenReturn(Mono.just(transactionWithProductClassification));
         when(cityCountyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
         when(transactionAmountsCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);

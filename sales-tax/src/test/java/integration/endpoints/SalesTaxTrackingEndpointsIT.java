@@ -232,7 +232,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @WithMockUser
     public void upsertByCountryAndState_NonUsaCountryDoesntExists_Returns201() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingNonUsaDto(nonUsaCountry.toUpperCase());
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingNonUsaDto(nonUsaCountry);
 
         // Then
         webTestClient
@@ -252,6 +252,38 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                                 .withComplytId(resultSalesTaxTrackingDto.complytId())
                                 .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
                                 .withNexusStateRule(ITUtilities.stubBrazilNexusStateRuleDto())
+                                .withCountry(nonUsaCountry.toUpperCase())
+                        , resultSalesTaxTrackingDto)
+                );
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByCountryAndState_NonUsaCountryAbbreviation_Returns200() {
+        // Given
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingNonUsaDto("BR");
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", nonUsaCountry)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(resultSalesTaxTrackingDto -> assertEquals(
+                        salesTaxTrackingDto
+                                .withComplytId(resultSalesTaxTrackingDto.complytId())
+                                .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
+                                .withNexusStateRule(ITUtilities.stubBrazilNexusStateRuleDto())
+                                .withCountry(nonUsaCountry.toUpperCase())
                         , resultSalesTaxTrackingDto)
                 );
     }
@@ -273,6 +305,25 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.country(), nonUsaCountry.toUpperCase()));
     }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void getByCountryAbbreviation_Exists_Returns200() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", "BR")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.country(), nonUsaCountry.toUpperCase()));
+    }
+
 
     @Order(2)
     @Test

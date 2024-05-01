@@ -2,6 +2,7 @@ package com.complyt.services;
 
 import com.complyt.business.address.CountryIsUsaChecker;
 import com.complyt.business.complyt_id.ComplytIdHandler;
+import com.complyt.business.strategy.StrategySelector;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.business.transaction.CityCountyProvider;
@@ -50,6 +51,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @NonNull
     ItemsTotalCalculator itemsTotalCalculator;
+
+    @NonNull
+    StrategySelector shippingAddressAlignmentStrategy;
 
     @Override
     public Mono<Transaction> save(Transaction transaction) {
@@ -103,14 +107,16 @@ public class TransactionServiceImpl implements TransactionService {
 
     private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
         return itemsTotalCalculator.injectRecalculatedTotal(transaction)
-                .flatMap(transactionWithCalculatedItems ->
-                        productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItems)
+                .map(transactionWithCalculatedItems ->
+                        (Transaction) shippingAddressAlignmentStrategy.select(transaction).apply(transactionWithCalculatedItems))
+                .flatMap(transactionWithCalculatedItemsAndShippingAddress ->
+                        productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItemsAndShippingAddress)
                                 .map(transactionDiscountCollector::collect)
                                 .map(transactionItemsAmountsCollector::collect)
-                                .flatMap(transactionWithAmounts -> CountryIsUsaChecker.isCountryUsa(transactionWithAmounts.getShippingAddress()) ? //todo: make sure addressInUsaChecker is needed here is is the right thing to do here
+                                .flatMap(transactionWithAmounts -> CountryIsUsaChecker.isCountryUsa(transactionWithAmounts.getShippingAddress()) ?
                                         cityCountyProvider.provide(transactionWithAmounts) :
-                                        Mono.just(transactionWithAmounts))); //todo: fix - this causes error if not usa state
-    } //todo: also - county can be null, fails is not null
+                                        Mono.just(transactionWithAmounts)));
+    }
 
     @Deprecated
     @Override

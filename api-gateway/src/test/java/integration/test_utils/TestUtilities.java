@@ -152,11 +152,11 @@ public class TestUtilities {
     }
 
     public static String unvalidatedTransactionJsonExample(String externalId, String customerId, String createdDate) {
-        return transactionJsonExample(externalId, customerId, null, false, null, createdDate);
+        return transactionJsonExample(externalId, customerId, null, false, null, "US", createdDate);
     }
 
     public static String transactionJsonExample(String externalId, String customerId, String state, String createdDate) {
-        return transactionJsonExample(externalId, customerId, null, true, state, createdDate);
+        return transactionJsonExample(externalId, customerId, null, true, state, "US", createdDate);
     }
 
     public static String transactionJsonExample(String externalId, String customerId, String country, String state, String zip, String region, boolean isTaxInclusive, String subsidiary, String... items) {
@@ -165,14 +165,14 @@ public class TestUtilities {
     }
 
     public static String existingTransactionJsonExample(String externalId, String customerId, String complytId, String createdDate) {
-        return transactionJsonExample(externalId, customerId, complytId, true, null, createdDate);
+        return transactionJsonExample(externalId, customerId, complytId, true, null, "US",createdDate);
     }
 
     public static String transactionJsonExampleWithState(String externalId, String customerId, String state, String createdDate) {
-        return transactionJsonExample(externalId, customerId, null, true, state, createdDate);
+        return transactionJsonExample(externalId, customerId, null, true, state, "US", createdDate);
     }
 
-    private static String transactionJsonExample(String externalId, String customerId, String complytId, boolean isValidated, String state, String createdDate) {
+    public static String transactionJsonExample(String externalId, String customerId, String complytId, boolean isValidated, String state, String country, String createdDate) {
         return String.format("""
                         {
                             %s
@@ -192,7 +192,7 @@ public class TestUtilities {
                             ],
                             "shippingAddress": {
                                 "city": "Los Angeles",
-                                "country": "US",
+                                "country": "%s",
                                 "state": "%s",
                                 "street": "10 5th Ave",
                                 "zip": "90210",
@@ -216,6 +216,7 @@ public class TestUtilities {
                 complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
                 externalId,
                 isValidated ? "\"source\": \"1\"," : "",
+                country,
                 state,
                 customerId,
                 createdDate,
@@ -505,7 +506,7 @@ public class TestUtilities {
                 """;
     }
 
-    public static String exemptionJsonExample(String country, boolean hasState, String stateName, String stateAbbreviation, String stateCode) {
+    public static String exemptionJsonExample(String country, boolean hasState, boolean hasStateList, String stateName, String stateAbbreviation, String stateCode) {
         // state is not mandatory
         String stateObject = hasState ?
                 String.format("""
@@ -517,6 +518,17 @@ public class TestUtilities {
                         stateAbbreviation,
                         stateCode,
                         stateName) : null;
+
+        String statesList = hasStateList ?
+                String.format("""
+                        [
+                           {
+                               "abbreviation": "CO",
+                               "code": "06",
+                               "name": "Colorado"
+                            }
+                        ]
+                        """) : null;
 
 
         String exemptionWrapper = String.format("""
@@ -549,17 +561,12 @@ public class TestUtilities {
                                   "exemptionType": "FULLY",
                                   "exemptionStatus": "ACTIVE"
                           },
-                          "states": [
-                                          {
-                                              "abbreviation": "CO",
-                                              "code": "06",
-                                              "name": "Colorado"
-                                          }
-                                      ]
+                          "states": %s
                           }
                           """,
                 country,
-                stateObject
+                stateObject,
+                statesList
         );
         return exemptionWrapper;
     }

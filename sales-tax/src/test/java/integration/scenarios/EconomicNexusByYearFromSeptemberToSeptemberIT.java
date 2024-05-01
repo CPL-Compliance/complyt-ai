@@ -90,7 +90,9 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk().expectBody(SalesTaxTrackingDto.class)
-                .value(salesTaxTrackingDto -> LOGGER.info(String.valueOf(salesTaxTrackingDto)));
+                .value(salesTaxTrackingDto ->
+                        LOGGER.info(String.valueOf(salesTaxTrackingDto))
+                );
     }
 
     @Order(1)

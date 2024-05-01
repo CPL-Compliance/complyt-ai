@@ -1,5 +1,6 @@
 package com.complyt.services.nexus;
 
+import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.business.timestamps_injection.SalesTaxTrackingRegisteredDateTimestampsInjector;
@@ -135,7 +136,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return salesTaxTrackingInfo ->
                 addClientAndStateDetails(salesTaxTracking)
                         .map(salesTaxTrackingWithDetails -> new SalesTaxTracking(
-                                salesTaxTrackingInfo.getComplytId(), salesTaxTrackingInfo.getId(), salesTaxTrackingWithDetails.getCountry().toUpperCase(),
+                                salesTaxTrackingInfo.getComplytId(), salesTaxTrackingInfo.getId(),
+                                CountryToStandardizedCountry.standardize(salesTaxTrackingWithDetails.getCountry()),
                                 salesTaxTrackingWithDetails.getState(),
                                 salesTaxTrackingInfo.getTenantId(), salesTaxTrackingWithDetails.getComment(),
                                 salesTaxTrackingWithDetails.isEnforcesSalesTax(),
@@ -171,7 +173,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> injectDataToNewSalesTaxTracking(@NonNull SalesTaxTracking salesTaxTracking) {
         return updateRegisteredDateIfIsRegisteredModified(salesTaxTracking)
-                .map(updatedSalesTaxTracking -> updatedSalesTaxTracking.withCountry(updatedSalesTaxTracking.getCountry().toUpperCase()))
+                .map(updatedSalesTaxTracking -> updatedSalesTaxTracking.withCountry(
+                        CountryToStandardizedCountry.standardize(updatedSalesTaxTracking.getCountry())))
                 .flatMap(this::addClientAndStateDetails)
                 .map(complytIdHandler::insertComplytIdToNew);
     }

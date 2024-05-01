@@ -13,21 +13,11 @@ import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL, uses = {TimestampsMapper.class})
-public interface ItemMapper {
+public interface ItemMapper extends JurisdictionalSalesTaxRuleMapper {
     ItemMapper INSTANCE = Mappers.getMapper(ItemMapper.class);
 
     Item itemDtoToItem(ItemDto itemDto);
 
     @Mapping(target = "jurisdictionalSalesTaxRules", expression = "java(combineJurisdictionalRules(item.getJurisdictionalSalesTaxRules(), item.getJurisdictionalTaxRules()))")
     ItemDto itemToItemDto(Item item);
-
-    default JurisdictionalSalesTaxRulesDto combineJurisdictionalRules(JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, JurisdictionalTaxRules jurisdictionalTaxRules) {
-        return jurisdictionalSalesTaxRules != null ?
-                new JurisdictionalSalesTaxRulesDto(jurisdictionalSalesTaxRules.getName(), jurisdictionalSalesTaxRules.getAbbreviation(),
-                        jurisdictionalSalesTaxRules.isTaxable(), jurisdictionalSalesTaxRules.isSpecialTreatment(), jurisdictionalSalesTaxRules.getCalculationType(),
-                        jurisdictionalSalesTaxRules.getDescription(), jurisdictionalSalesTaxRules.getCalculationValue(), jurisdictionalSalesTaxRules.getCities(), null) :
-                new JurisdictionalSalesTaxRulesDto(jurisdictionalTaxRules.getName(), jurisdictionalTaxRules.getAbbreviation(),
-                        jurisdictionalTaxRules.isTaxable(), jurisdictionalTaxRules.isSpecialTreatment(), jurisdictionalTaxRules.getCalculationType(),
-                        jurisdictionalTaxRules.getDescription(), jurisdictionalTaxRules.getCalculationValue(), null, jurisdictionalTaxRules.getRegions());
-    }
 }

@@ -20,7 +20,11 @@ public interface SalesTaxTrackingEndpointsITemplate extends
 
     void upsertByCountryAndState_NonUsaCountryDoesntExists_Returns201();
 
+    void upsertByCountryAndState_NonUsaCountryAbbreviation_Returns200();
+
     void getByCountry_Exists_Returns200();
+
+    void getByCountryAbbreviation_Exists_Returns200();
 
     void refreshByCountryAndDate_NonUsaCountryExistsAndHasNexus_Returns200NoSummary();
 

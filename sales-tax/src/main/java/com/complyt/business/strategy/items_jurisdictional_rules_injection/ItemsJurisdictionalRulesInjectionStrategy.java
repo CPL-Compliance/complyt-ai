@@ -1,15 +1,12 @@
 package com.complyt.business.strategy.items_jurisdictional_rules_injection;
 
-import com.complyt.business.strategy.FunctionSelectorByAddressStrategy;
-import com.complyt.business.strategy.transaction_rates_injection.RatesTransactionInjector;
-import com.complyt.domain.sales_tax.ComplytInternalRates;
+import com.complyt.business.strategy.FunctionSelectorByTransactionAddressStrategy;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +14,7 @@ import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-public class ItemsJurisdictionalRulesInjectionStrategy extends FunctionSelectorByAddressStrategy {
+public class ItemsJurisdictionalRulesInjectionStrategy extends FunctionSelectorByTransactionAddressStrategy {
 
     @NonNull
     ItemsJurisdictionalInjector usaAddressItemsJurisdictionalRulesInjector;

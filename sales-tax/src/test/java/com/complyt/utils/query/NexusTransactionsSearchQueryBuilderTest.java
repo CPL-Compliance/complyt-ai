@@ -19,9 +19,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
@@ -62,9 +60,9 @@ public class NexusTransactionsSearchQueryBuilderTest {
                 TimeFrame.CURRENT_CALENDER_YEAR, null, LocalDateTime.now());
     }
 
-    private List<Criteria> listOfNonUsaAbbreviationCriteria(@NonNull String country) {
-        return SupportedNonUsCountries.nonUsaCountriesAbbreviations.get(country.toUpperCase()).stream()
-                .map(name -> Criteria.where("shippingAddress.country").is(name.toUpperCase())).collect(Collectors.toList());
+    private Criteria nonUsaAbbreviationCriteria(@NonNull String country) {
+        String searchTermCountry = SupportedNonUsCountries.nonUsaCountriesAbbreviations.get(country.toUpperCase());
+        return Criteria.where("shippingAddress.country").is(searchTermCountry);
     }
 
     private Nexus createNexusInfo() {
@@ -74,9 +72,8 @@ public class NexusTransactionsSearchQueryBuilderTest {
     private Query createExpectedQuery(LocalDateTime start, LocalDateTime end) {
         Query query = new Query(Criteria.where("externalTimestamps.createdDate")
                 .gte(start).lte(end));
-        Criteria usaAbbreviationsCriteria = new Criteria().orOperator(
-                UsaAbbreviations.usaAbbreviationsList.stream()
-                        .map(abbreviation -> Criteria.where("shippingAddress.country").is(abbreviation.toUpperCase())).collect(Collectors.toList()));
+
+        Criteria usaAbbreviationsCriteria = Criteria.where("shippingAddress.country").is("USA");
 
         Criteria stateCriteria = new Criteria().orOperator(
                 Criteria.where("shippingAddress.state").is(nexusStateRule.state().getAbbreviation()),
@@ -91,9 +88,8 @@ public class NexusTransactionsSearchQueryBuilderTest {
         Query query = new Query(Criteria.where("externalTimestamps.createdDate")
                 .gte(start).lte(end));
 
-        query.addCriteria(new Criteria().orOperator(listOfNonUsaAbbreviationCriteria(nexusStateRule.country().toUpperCase())));
-
-        return query.addCriteria(Criteria.where("subsidiary").is(null));
+        return query.addCriteria(nonUsaAbbreviationCriteria(nexusStateRule.country().toUpperCase()))
+                .addCriteria(Criteria.where("subsidiary").is(null));
     }
 
     private Query createQueryToSend(LocalDateTime start, LocalDateTime end) {

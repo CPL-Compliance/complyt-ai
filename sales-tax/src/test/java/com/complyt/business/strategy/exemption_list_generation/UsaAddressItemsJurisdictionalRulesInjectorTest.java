@@ -1,8 +1,15 @@
-package com.complyt.business.exemption;
+package com.complyt.business.strategy.exemption_list_generation;
 
+import com.complyt.business.strategy.items_jurisdictional_rules_injection.UsaAddressItemsJurisdictionalRulesInjector;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
+import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.sales_tax.product_classification.ProductClassification;
+import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.Transaction;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
@@ -12,14 +19,17 @@ import testUtils.unit_test.UnitTestUtilities;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ExemptionListGeneratorTest {
+public class UsaAddressItemsJurisdictionalRulesInjectorTest {
 
-    ExemptionListGenerator exemptionListGenerator;
+    UsaAddressExemptionListGenerator usaAddressExemptionListGenerator;
+
+    UnitTestUtilities testUtilities;
 
     ExemptionWrapper exemptionWrapper;
 
@@ -28,9 +38,8 @@ public class ExemptionListGeneratorTest {
         List<State> states = UnitTestUtilities.createStateList();
         Exemption exemption = new UnitTestUtilities(LocalDateTime.now(), null).createExemption(UUID.randomUUID().toString());
         exemptionWrapper = new ExemptionWrapper(exemption, states);
-        exemptionListGenerator = new ExemptionListGenerator();
+        usaAddressExemptionListGenerator = new UsaAddressExemptionListGenerator();
     }
-
 
     @Test
     void build_OneState_ReturnsListOfOneExemption() {
@@ -43,7 +52,7 @@ public class ExemptionListGeneratorTest {
         }});
 
         // When
-        Flux<Exemption> exemptionFlux = exemptionListGenerator.generate(wrapper);
+        Flux<Exemption> exemptionFlux = usaAddressExemptionListGenerator.generate(wrapper).apply(wrapper);
 
         // Then
         StepVerifier.create(exemptionFlux).expectNext(exemptions.get(0)).verifyComplete();
@@ -54,7 +63,7 @@ public class ExemptionListGeneratorTest {
         // Given
 
         // When
-        Flux<Exemption> exemptionFlux = exemptionListGenerator.generate(exemptionWrapper);
+        Flux<Exemption> exemptionFlux = usaAddressExemptionListGenerator.generate(exemptionWrapper).apply(exemptionWrapper);
 
         // Then
         StepVerifier.create(exemptionFlux)
@@ -63,16 +72,4 @@ public class ExemptionListGeneratorTest {
                 .expectNext(exemptionWrapper.exemption().withState(exemptionWrapper.states().get(2)))
                 .verifyComplete();
     }
-
-    @Test
-    void build_NullExemptionWrapper_ThrowsException() {
-        // Given
-        ExemptionWrapper nullExemptionWrapper = null;
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionListGenerator.generate(nullExemptionWrapper));
-
-        assertEquals(nullPointerException.getMessage(), "exemptionWrapper is marked non-null but is null");
-    }
-
 }

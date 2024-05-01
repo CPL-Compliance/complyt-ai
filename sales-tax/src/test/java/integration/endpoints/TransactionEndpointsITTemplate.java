@@ -1,8 +1,5 @@
 package integration.endpoints;
 
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.springframework.security.test.context.support.WithMockUser;
 import testUtils.integration_test.templates.endpoints.*;
 
 public interface TransactionEndpointsITTemplate extends
@@ -19,6 +16,12 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_NonUsaCountryAndRegion_ReturnsTaxableTransaction();
 
     void upsertByExternalIdAndSource_UsaCountryTaxInclusive_Returns200();
+
+    void upsertByExternalIdAndSource_UsaCountryButSentAsAbbreviation_Returns201();
+
+    void upsertByExternalIdAndSource_NonUsaCountryButSentAsAbbreviationReturnUpperCase_Returns201();
+
+    void upsertByExternalIdAndSource_NonUsaCountryButSentLowerCaseReturnsUpperCase_Returns201();
 
     void upsertByExternalIdAndSource_NonUsaCountryAndRegionTaxInclusive_ReturnsTaxableTransaction();
 

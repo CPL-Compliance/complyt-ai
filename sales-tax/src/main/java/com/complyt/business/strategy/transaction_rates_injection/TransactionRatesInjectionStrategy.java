@@ -1,7 +1,7 @@
 package com.complyt.business.strategy.transaction_rates_injection;
 
 import com.complyt.annotations.Generated;
-import com.complyt.business.strategy.FunctionSelectorByAddressStrategy;
+import com.complyt.business.strategy.FunctionSelectorByTransactionAddressStrategy;
 import com.complyt.domain.sales_tax.ComplytInternalRates;
 import com.complyt.domain.transaction.Transaction;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.function.Function;
 @Component
 @AllArgsConstructor
 @Generated
-public class TransactionRatesInjectionStrategy extends FunctionSelectorByAddressStrategy {
+public class TransactionRatesInjectionStrategy extends FunctionSelectorByTransactionAddressStrategy {
 
     @NonNull
     RatesTransactionInjector complytSalesTaxRatesTransactionInjector;
