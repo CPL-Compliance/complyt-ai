@@ -252,7 +252,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                                 .withComplytId(resultSalesTaxTrackingDto.complytId())
                                 .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
                                 .withNexusStateRule(ITUtilities.stubBrazilNexusStateRuleDto())
-                                .withCountry(nonUsaCountry.toUpperCase())
+                                .withCountry(nonUsaCountry)
                         , resultSalesTaxTrackingDto)
                 );
     }
@@ -283,7 +283,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                                 .withComplytId(resultSalesTaxTrackingDto.complytId())
                                 .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
                                 .withNexusStateRule(ITUtilities.stubBrazilNexusStateRuleDto())
-                                .withCountry(nonUsaCountry.toUpperCase())
+                                .withCountry(nonUsaCountry)
                         , resultSalesTaxTrackingDto)
                 );
     }
@@ -303,7 +303,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
-                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.country(), nonUsaCountry.toUpperCase()));
+                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.country(), nonUsaCountry));
     }
 
     @Order(2)
@@ -321,7 +321,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
-                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.country(), nonUsaCountry.toUpperCase()));
+                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.country(), nonUsaCountry));
     }
 
 

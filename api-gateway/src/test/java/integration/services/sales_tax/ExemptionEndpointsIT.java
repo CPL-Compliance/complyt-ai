@@ -113,7 +113,7 @@ public class ExemptionEndpointsIT extends TestContainersInitializerIT implements
                 .expectStatus().isCreated()
                 .expectBodyList(LinkedHashMap.class)
                 .value(exemptions -> {
-                    assertEquals("BRAZIL", exemptions.get(0).get("country"));
+                    assertEquals("Brazil", exemptions.get(0).get("country"));
                     assertNull(exemptions.get(0).get("state"));
                 });
     }

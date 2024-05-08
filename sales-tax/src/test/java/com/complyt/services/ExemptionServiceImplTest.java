@@ -324,7 +324,7 @@ public class ExemptionServiceImplTest {
     void saveOne_SavesNonUsaExemptions_ReturnsExemptions() {
         // Given
         List<State> states = UnitTestUtilities.createStateList();
-        Exemption exemptionNoIds = exemption.withComplytId(null).withId(null).withCountry("CANADA");
+        Exemption exemptionNoIds = exemption.withComplytId(null).withId(null).withCountry("Canada");
         ExemptionWrapper exemptionWrapper = new ExemptionWrapper(exemptionNoIds, states);
         List<Exemption> exemptions = UnitTestUtilities.createNonUsaExemptionsListFromWrapper(exemptionWrapper);
 

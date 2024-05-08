@@ -225,7 +225,7 @@ public interface ITUtilities {
     static NexusStateRuleDto stubBrazilNexusStateRuleDto() {
         return stubAlabamaNexusStateRuleDto()
                 .withState(null)
-                .withCountry("BRAZIL")
+                .withCountry("Brazil")
                 .withAppliedDate(LocalDateTime.of(2022, 1, 1, 0, 0, 0));
     }
 

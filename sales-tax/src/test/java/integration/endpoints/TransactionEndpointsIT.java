@@ -255,7 +255,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
                     assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000.0000")));
-                    assertEquals("CANADA", transactionDto.shippingAddress().country());
+                    assertEquals("Canada", transactionDto.shippingAddress().country());
                 });
     }
 
@@ -287,7 +287,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
                     assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000.0000")));
-                    assertEquals("CANADA", transactionDto.shippingAddress().country());
+                    assertEquals("Canada", transactionDto.shippingAddress().country());
                 });
     }
 

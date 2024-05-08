@@ -44,7 +44,7 @@ public class GtWebClientWrapperTest {
         // Given
         ComplytGtRates complytGtRates = testUtilities.createComplytGtRates();
         ComplytGtRatesDto complytGtRatesDto = ComplytGtRatesMapper.INSTANCE.complytGtRatesToComplytGtRatesDto(complytGtRates);
-        Address addressAsGtAddress = new Address(null, gtAddress.country().toUpperCase(), null, null, null, null, gtAddress.region(), false);
+        Address addressAsGtAddress = new Address(null, gtAddress.country(), null, null, null, null, gtAddress.region(), false);
 
         // When
         when(salesTaxRatesServiceProxy.findGstByAddress(addressAsGtAddress.country(), addressAsGtAddress.region())).thenReturn(Mono.just(complytGtRatesDto));
@@ -58,7 +58,7 @@ public class GtWebClientWrapperTest {
     @Test
     void findByAddress_RatesServiceIsUnavailable_is10RetriesExhausted() {
         // Given + When
-        when(salesTaxRatesServiceProxy.findGstByAddress(gtAddress.country().toUpperCase(), gtAddress.region()))
+        when(salesTaxRatesServiceProxy.findGstByAddress(gtAddress.country(), gtAddress.region()))
                 .thenReturn(Mono.error(new ComplytSalesTaxRatesException()));
         Mono<ComplytGtRates> actualComplytGtRates = gtWebClientWrapper
                 .findByAddress(null, gtAddress.country(), null, null, null, null, gtAddress.region(), false);
@@ -74,11 +74,11 @@ public class GtWebClientWrapperTest {
     @Test
     void findByAddress_invalidAddress_ReturnsObjectNotFoundApiException() {
         // Given + When
-        when(salesTaxRatesServiceProxy.findGstByAddress(gtAddress.country().toUpperCase(), gtAddress.region()))
+        when(salesTaxRatesServiceProxy.findGstByAddress(gtAddress.country(), gtAddress.region()))
                 .thenReturn(Mono.error(new ObjectNotFoundApiException()));
 
         Mono<ComplytGtRates> actualComplytGtRates = gtWebClientWrapper
-                .findByAddress(null, gtAddress.country().toUpperCase(), null, null, null, null, gtAddress.region(), false);
+                .findByAddress(null, gtAddress.country(), null, null, null, null, gtAddress.region(), false);
 
         // Then
         StepVerifier.create(actualComplytGtRates).expectError(ObjectNotFoundApiException.class).verify();
@@ -87,7 +87,7 @@ public class GtWebClientWrapperTest {
     @Test
     void findByAddress_Returns500InternalError_ThrowsAnError() {
         // Given + When
-        when(salesTaxRatesServiceProxy.findGstByAddress(gtAddress.country().toUpperCase(), gtAddress.region()))
+        when(salesTaxRatesServiceProxy.findGstByAddress(gtAddress.country(), gtAddress.region()))
                 .thenReturn(Mono.error(new ComplytSalesTaxRatesException()));
         Mono<ComplytGtRates> actualComplytGtRates = gtWebClientWrapper
                 .findByAddress(null, gtAddress.country(), null, null, null, null, gtAddress.region(), false);

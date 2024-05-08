@@ -1,7 +1,6 @@
 package com.complyt.utils.query;
 
 import com.complyt.business.address.SupportedNonUsCountries;
-import com.complyt.business.address.UsaAbbreviations;
 import com.complyt.domain.Nexus;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -20,7 +19,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import static java.time.temporal.TemporalAdjusters.lastDayOfYear;

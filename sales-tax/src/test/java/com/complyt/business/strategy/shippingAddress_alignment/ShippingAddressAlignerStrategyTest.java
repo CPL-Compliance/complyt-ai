@@ -58,7 +58,7 @@ public class ShippingAddressAlignerStrategyTest {
         Transaction givenTransaction = transaction.withShippingAddress(nonUsaAbbreviationWithStateAddress);
 
         Address expectedAddress = transaction.getShippingAddress()
-                .withCountry("BRAZIL");
+                .withCountry("Brazil");
         Transaction exepctedTransaction = transaction.withShippingAddress(expectedAddress);
 
         // When + Then
@@ -74,7 +74,7 @@ public class ShippingAddressAlignerStrategyTest {
         Transaction givenTransaction = transaction.withShippingAddress(nonUsaAbbreviationWithStateAddress);
 
         Address expectedAddress = transaction.getShippingAddress()
-                .withCountry("BRAZIL");
+                .withCountry("Brazil");
         Transaction exepctedTransaction = transaction.withShippingAddress(expectedAddress);
 
         // When + Then
