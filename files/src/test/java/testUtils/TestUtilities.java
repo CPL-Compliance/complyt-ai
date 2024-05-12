@@ -1,7 +1,9 @@
 package testUtils;
 
+import org.bson.Document;
 import io.complyt.files.domain.File;
 import io.complyt.files.v1.models.FileDto;
+import org.bson.types.Binary;
 import org.bson.types.ObjectId;
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -31,5 +33,13 @@ public interface TestUtilities {
 
     static FileDto createFileDto(UUID complytId) {
         return new FileDto(complytId, linkStr);
+    }
+
+    static Document fileDocument() {
+        return new Document()
+                .append("complytId", new Binary((byte) 0x04, UUID.randomUUID().toString().getBytes())) // UUID as binary data
+                .append("id", "tokenId")  // Typically this would be set automatically by MongoDB if using ObjectIds
+                .append("tenantId", "tenantIdExample")
+                .append("link", "http://example.com/token");
     }
 }

@@ -6,7 +6,6 @@ import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.ClientTrackingDtoTenant;
 import com.complyt.v1.routers.ClientTrackingRouter;
 import integration.TestContainersInitializerIT;
-import org.apache.commons.math.stat.inference.TestUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

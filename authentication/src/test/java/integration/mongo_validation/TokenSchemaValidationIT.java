@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -55,7 +56,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_MissingComplytClientId_throwsValidationError() {
         token.remove("complytClientId");
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -63,7 +64,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_MissingComplytClientSecret_throwsValidationError() {
         token.remove("complytClientSecret");
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -71,7 +72,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_MissingAccessToken_throwsValidationError() {
         token.remove("accessToken");
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -79,7 +80,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_MissingAccessTokenIv_throwsValidationError() {
         token.remove("accessTokenIv");
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -87,7 +88,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_MissingScope_throwsValidationError() {
         token.remove("scope");
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -95,7 +96,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_MissingScopeIv_throwsValidationError() {
         token.remove("scopeIv");
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -103,7 +104,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_MissingExpiresIn_throwsValidationError() {
         token.remove("expiresIn");
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -111,7 +112,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_MissingTokenType_throwsValidationError() {
         token.remove("tokenType");
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -119,7 +120,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_MissingCreatedAt_throwsValidationError() {
         token.remove("createdAt");
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -127,7 +128,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_MissingExpireAt_throwsValidationError() {
         token.remove("expireAt");
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -135,7 +136,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_InvalidComplytClientIdType_throwsValidationError() {
         token.put("complytClientId", 123);
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -143,7 +144,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_InvalidComplytClientSecretType_throwsValidationError() {
         token.put("complytClientSecret", new Document());
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -151,7 +152,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_InvalidAccessTokenType_throwsValidationError() {
         token.put("accessToken", false);
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -159,15 +160,15 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_InvalidAccessTokenIvType_throwsValidationError() {
         token.put("accessTokenIv", 456);
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveToken_InvalidScopeType_throwsValidationError() {
-        token.put("scope", new Object());
+        token.put("scope", 123);
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -175,7 +176,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_InvalidScopeIvType_throwsValidationError() {
         token.put("scopeIv", 789);
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -183,7 +184,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_InvalidExpiresInType_throwsValidationError() {
         token.put("expiresIn", "notAnInteger");
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -191,7 +192,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_InvalidTokenType_throwsValidationError() {
         token.put("tokenType", 123);
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -199,7 +200,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_InvalidCreatedAtType_throwsValidationError() {
         token.put("createdAt", "notADate");
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -207,7 +208,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_InvalidExpireAtType_throwsValidationError() {
         token.put("expireAt", 123456);
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -215,7 +216,7 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
     public void saveToken_InvalidClassType_throwsValidationError() {
         token.put("_class", 123);
         StepVerifier.create(reactiveMongoTemplate.save(token, "token"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 }

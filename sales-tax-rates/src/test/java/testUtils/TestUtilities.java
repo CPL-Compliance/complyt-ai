@@ -16,6 +16,8 @@ import com.complyt.v1.model.SalesTaxRatesDto;
 import com.complyt.v1.model.gt.ComplytGtRatesDto;
 import com.complyt.v1.model.gt.GtAddressDto;
 import com.complyt.v1.model.gt.GtRatesDto;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -167,4 +169,36 @@ public interface TestUtilities {
         return new ComplytGtRatesDto(gtAddress, gtRates);
     }
 
+    static Document salesTaxRatesDocument() {
+        return new Document("_id", new ObjectId())
+                .append("address", new Document("city", "LOCUST FORK")
+                        .append("country", "US")
+                        .append("county", "BLOUNT")
+                        .append("state", "AL")
+                        .append("zip", "35097")
+                        .append("isPartial", true))
+                .append("salesTaxRates", new Document("cityRate", "0.02")
+                        .append("countyRate", "0.03")
+                        .append("stateRate", "0.04")
+                        .append("taxRate", "0.09")
+                        .append("combinedDistrictRate", "0")
+                        .append("ratesMetaData", new Document("cityDistrictRate", "0")
+                                .append("countyDistrictRate", "0")))
+                .append("createdDate", LocalDateTime.now())
+                .append("expireAt", LocalDateTime.now().plusYears(1))
+                .append("_class", "com.complyt.domain.ComplytSalesTaxRates")
+                .append("requestAddress", new Document("city", "LOCUST FORK")
+                        .append("country", "US")
+                        .append("county", "BLOUNT")
+                        .append("state", "AL")
+                        .append("zip", "35097")
+                        .append("isPartial", true));
+    }
+
+    static Document gtRatesDocument() {
+        return new Document("_id", new ObjectId())
+                .append("gtAddress", new Document("country", "Armenia"))
+                .append("gtRates", new Document("taxRate", "0.18")
+                        .append("countryRate", "0.18"));
+    }
 }

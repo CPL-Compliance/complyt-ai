@@ -14,10 +14,15 @@ import com.complyt.v1.models.customer.exemption.ClassificationDto;
 import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
+import org.bson.Document;
+import org.bson.types.Binary;
+import org.bson.types.ObjectId;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -231,4 +236,82 @@ public interface ITUtilities {
     static ClassificationDto createClassificationDto() {
         return new ClassificationDto("new code", "new description");
     }
+
+    static Document clientTrackingDocument() {
+        return new Document("_id", new ObjectId())
+                .append("nexus", new Document("taxableDate", LocalDateTime.now()))
+                .append("tenantId", "other_it_tenant")
+                .append("name", "Bestclient TM")
+                .append("internalTimestamps", new Document("createdDate", LocalDateTime.now())
+                        .append("updatedDate", LocalDateTime.now()));
+    }
+
+    static Document customerDocument() {
+        return new Document("_id", new ObjectId("62c5672583479c0adfa2c4a4"))
+                .append("externalId", "1586")
+                .append("name", "Bestcompany Com")
+                .append("address", new Document("city", "Phoenix")
+                        .append("country", "US")
+                        .append("state", "AZ")
+                        .append("street", "3400 E Sky Harbor Blvd")
+                        .append("zip", "85034")
+                        .append("isPartial", false))
+                .append("_class", "com.complyt.domain.Customer")
+                .append("customerType", "RETAIL")
+                .append("tenantId", "it_tenant")
+                .append("externalTimestamps", new Document("createdDate", LocalDateTime.now())
+                        .append("updatedDate", LocalDateTime.now()))
+                .append("internalTimestamps", new Document("createdDate", LocalDateTime.now())
+                        .append("updatedDate", LocalDateTime.now()))
+                .append("complytId", new Binary((byte) 0x04, Base64.getDecoder().decode("TPu/C9PlSVSKkMnC6DLl9Q==")))
+                .append("source", "1")
+                .append("email", "captain@dope.com");
+    }
+
+    static Document exemptionDocument() {
+        return new Document("_id", new ObjectId("6372009a6887300e852749e4"))
+                .append("customerId", new Binary((byte) 0x04, Base64.getDecoder().decode("TPu/C9PlSVSKkMnC6DLl9Q==")))
+                .append("state", new Document("abbreviation", "AZ")
+                        .append("code", "04")
+                        .append("name", "Arizona"))
+                .append("classification", new Document("code", "code")
+                        .append("description", "description"))
+                .append("validationDates", new Document("fromDate", LocalDateTime.now())
+                        .append("toDate", LocalDateTime.now()))
+                .append("status", new Document("code", "code")
+                        .append("name", "name"))
+                .append("certificate", new Document("certificateId", "id")
+                        .append("url", "url")
+                        .append("name", "name"))
+                .append("exemptionType", "FULLY")
+                .append("tenantId", "it_tenant")
+                .append("complytId", new Binary((byte) 0x04, Base64.getDecoder().decode("KqWAnzAdRPOQgbTzJhNGPA==")))
+                .append("exemptionStatus", "ACTIVE")
+                .append("internalTimestamps", new Document("createdDate", LocalDateTime.now())
+                        .append("updatedDate", LocalDateTime.now()));
+    }
+
+    static Document salesTaxTrackingDocument() {
+        return new Document("_id", new ObjectId("642415ce6632165b050b01ab"))
+                .append("complytId", new Binary((byte) 0x04, Base64.getDecoder().decode("bqoTPN+cT4i7qW3ThFyAOg==")))
+                .append("state", new Document("abbreviation", "NY")
+                        .append("code", "36")
+                        .append("name", "New York"))
+                .append("tenantId", "it_tenant")
+                .append("enforcesSalesTax", true)
+                .append("physicalNexusTracker", new Document("established", false)
+                        .append("establishedDate", LocalDateTime.now()))
+                .append("economicNexusTracker", new Document("established", false)
+                        .append("establishedDate", LocalDateTime.now()))
+                .append("appliedDate", LocalDateTime.now())
+                .append("approved", false)
+                .append("approvalDate", LocalDateTime.now())
+                .append("_class", "com.complyt.domain.nexus.SalesTaxTracking")
+                .append("transactionNexusSummaries", new Document())
+                .append("nexusCalculationSummaries", new Document())
+                .append("registered", null)
+                .append("registrationDate", null);
+    }
+
+
 }

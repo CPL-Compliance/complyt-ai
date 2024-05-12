@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -59,7 +60,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.remove("complytClientId");
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -68,8 +69,8 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.remove("complytClientSecret");
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
-                .verify();
+                .expectError(DataIntegrityViolationException.class)
+                . verify();
     }
 
     @Test
@@ -77,7 +78,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.remove("clientId");
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -86,7 +87,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.remove("clientSecret");
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -95,7 +96,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.remove("clientIdIv");
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -104,7 +105,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.remove("clientSecretIv");
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -113,7 +114,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.remove("audience");
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -122,7 +123,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.remove("grantType");
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -131,7 +132,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.remove("tenantId");
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -140,7 +141,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.remove("name");
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -149,7 +150,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.remove("status");
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -158,7 +159,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.put("tenantId", 123);
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -167,16 +168,15 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.put("name", 456);
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_InvalidStatusType_throwsValidationError() {
-        credentials.put("status", new Object());
-
+        credentials.put("status", 123);
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -185,7 +185,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.put("clientId", false);
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -194,7 +194,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.put("clientSecretIv", 123);
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -203,7 +203,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.put("audience", 789);
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -212,7 +212,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.put("grantType", new Date());
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -221,7 +221,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.put("clientSecret", 123);
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -230,7 +230,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.put("complytClientId", new Date());
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -239,7 +239,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.put("complytClientSecret", true);
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -248,7 +248,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.put("clientIdIv", 456);
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
@@ -257,7 +257,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
         credentials.put("expireAt", "invalidDate");
 
         StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
-                .expectError()
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 }
