@@ -5,7 +5,7 @@ import com.complyt.domain.transaction.Transaction;
 
 import java.util.function.Function;
 
-public abstract class FunctionSelectorByAddressStrategy implements StrategySelector<Transaction> {
+public abstract class FunctionSelectorByTransactionAddressStrategy implements StrategySelector<Transaction> {
 
     /**
      * this function is the strategy to decided between working with salestax rates and gt rates

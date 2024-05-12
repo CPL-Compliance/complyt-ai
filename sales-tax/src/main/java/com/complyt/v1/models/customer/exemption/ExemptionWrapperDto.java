@@ -10,6 +10,5 @@ import java.util.List;
 
 public record ExemptionWrapperDto(
         @Valid @NotNull(message = "exemption " + DtoErrorMessages.NOT_NULL_ERROR) ExemptionDto exemption,
-        @NotEmpty(message = "states " + DtoErrorMessages.LIST_NOT_EMPTY_ERROR) List<StateDto> states) {
-
+        List<StateDto> states) {
 }

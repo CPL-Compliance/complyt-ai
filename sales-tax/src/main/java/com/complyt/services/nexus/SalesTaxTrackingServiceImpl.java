@@ -1,5 +1,6 @@
 package com.complyt.services.nexus;
 
+import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.business.timestamps_injection.SalesTaxTrackingRegisteredDateTimestampsInjector;
@@ -68,7 +69,9 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> updateEconomicNexus(SalesTaxTracking salesTaxTracking) {
-        return salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking);
+        return salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking)
+                .flatMap(updatedSalesTaxTracking -> salesTaxTrackingRepository.updateMultipleEconomicNexuses(updatedSalesTaxTracking)
+                        .thenReturn(updatedSalesTaxTracking));
     }
 
     @Override
@@ -91,8 +94,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     @Override
-    public Mono<SalesTaxTracking> findByCountryAndState(@NonNull String country, String state) {
-        return salesTaxTrackingRepository.findByCountryAndState(country, state);
+    public Mono<SalesTaxTracking> findByCountryStateAndSubsidiary(@NonNull String country, String state, String subsidiaryId) {
+        return salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiaryId);
     }
 
     @Override
@@ -122,7 +125,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking) {
         String state = salesTaxTracking.getState() != null ? salesTaxTracking.getState().getName() : "";
-        return salesTaxTrackingRepository.findByCountryAndState(salesTaxTracking.getCountry(), state) //todo: check
+        return salesTaxTrackingRepository.findByCountryStateAndSubsidiary(salesTaxTracking.getCountry(), state, salesTaxTracking.getSubsidiary()) //todo: check
+                .switchIfEmpty(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(salesTaxTracking.getCountry(), state, null))
                 .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with country " + salesTaxTracking.getCountry())))
                 .flatMap(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
                 .flatMap(this::upsertWithoutNexusSummaryIfNeeded);
@@ -132,7 +136,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return salesTaxTrackingInfo ->
                 addClientAndStateDetails(salesTaxTracking)
                         .map(salesTaxTrackingWithDetails -> new SalesTaxTracking(
-                                salesTaxTrackingInfo.getComplytId(), salesTaxTrackingInfo.getId(), salesTaxTrackingWithDetails.getCountry().toUpperCase(),
+                                salesTaxTrackingInfo.getComplytId(), salesTaxTrackingInfo.getId(),
+                                CountryToStandardizedCountry.standardize(salesTaxTrackingWithDetails.getCountry()),
                                 salesTaxTrackingWithDetails.getState(),
                                 salesTaxTrackingInfo.getTenantId(), salesTaxTrackingWithDetails.getComment(),
                                 salesTaxTrackingWithDetails.isEnforcesSalesTax(),
@@ -143,7 +148,9 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                                 salesTaxTrackingWithDetails.getApprovalDate(),
                                 salesTaxTrackingWithDetails.getFilingFrequency(),
                                 salesTaxTrackingWithDetails.getRegistered(),
-                                salesTaxTrackingWithDetails.getRegistrationDate()));
+                                salesTaxTrackingWithDetails.getRegistrationDate(),
+                                salesTaxTrackingWithDetails.getSubsidiary(),
+                                salesTaxTrackingWithDetails.getEstablishedBy()));
     }
 
     @Override
@@ -166,7 +173,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> injectDataToNewSalesTaxTracking(@NonNull SalesTaxTracking salesTaxTracking) {
         return updateRegisteredDateIfIsRegisteredModified(salesTaxTracking)
-                .map(updatedSalesTaxTracking -> updatedSalesTaxTracking.withCountry(updatedSalesTaxTracking.getCountry().toUpperCase()))
+                .map(updatedSalesTaxTracking -> updatedSalesTaxTracking.withCountry(
+                        CountryToStandardizedCountry.standardize(updatedSalesTaxTracking.getCountry())))
                 .flatMap(this::addClientAndStateDetails)
                 .map(complytIdHandler::insertComplytIdToNew);
     }
@@ -183,4 +191,5 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return (salesTaxTracking.getRegistered() == RegisteredType.REGISTERED && salesTaxTracking.getRegistrationDate() == null) ?
                 injectRegisteredDateToSalesTaxTracking(salesTaxTracking) : Mono.just(salesTaxTracking);
     }
+
 }

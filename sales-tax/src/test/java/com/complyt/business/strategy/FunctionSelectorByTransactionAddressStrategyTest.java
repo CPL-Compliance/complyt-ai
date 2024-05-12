@@ -14,7 +14,7 @@ import java.util.function.Function;
 import static org.junit.Assert.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class FunctionSelectorByAddressStrategyTest {
+public class FunctionSelectorByTransactionAddressStrategyTest {
     UnitTestUtilities testUtilities;
 
     @BeforeEach
@@ -24,7 +24,7 @@ public class FunctionSelectorByAddressStrategyTest {
     }
 
     // Concrete subclass for testing the abstract class
-    private static class TestableFunctionSelectorByAddressStrategy extends FunctionSelectorByAddressStrategy {
+    private static class TestableFunctionSelectorByAddressStrategy extends FunctionSelectorByTransactionAddressStrategy {
         @Override
         protected Function<String, String> getFunctionForNonUsaOption(Transaction transaction) {
             return (someString) -> "Non-USA Function";
@@ -40,7 +40,7 @@ public class FunctionSelectorByAddressStrategyTest {
     void testSelectForUsaAddress() {
         Transaction transaction = testUtilities.createTransaction("");
 
-        FunctionSelectorByAddressStrategy strategy = new TestableFunctionSelectorByAddressStrategy();
+        FunctionSelectorByTransactionAddressStrategy strategy = new TestableFunctionSelectorByAddressStrategy();
 
         assertEquals("USA Function", strategy.select(transaction).apply("string"));
     }
@@ -51,7 +51,7 @@ public class FunctionSelectorByAddressStrategyTest {
         transaction = transaction.
                 withShippingAddress(transaction.getShippingAddress().withCountry("CANADA"));
 
-        FunctionSelectorByAddressStrategy strategy = new TestableFunctionSelectorByAddressStrategy();
+        FunctionSelectorByTransactionAddressStrategy strategy = new TestableFunctionSelectorByAddressStrategy();
 
         assertEquals("Non-USA Function", strategy.select(transaction).apply("string"));
     }

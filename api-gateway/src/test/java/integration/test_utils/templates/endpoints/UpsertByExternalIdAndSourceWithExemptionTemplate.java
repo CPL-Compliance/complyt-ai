@@ -9,4 +9,5 @@ public interface UpsertByExternalIdAndSourceWithExemptionTemplate {
     void upsertByExternalIdAndSource_CustomerIsNotNoExempt_NoExempted();
     void upsertByExternalIdAndSource_NotActiveExemptionAndFullyExempt_Exempted();
     void upsertByExternalIdAndSource_NotActiveExemption_NoExempted();
+    void upsertByExternalIdAndSource_CustomerIsExemptByNonUsaCountryAndDate_ReturnsNonTaxableTransaction();
 }

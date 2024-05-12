@@ -1,6 +1,6 @@
 package com.complyt.business.strategy.sales_tax_rates_web_client;
 
-import com.complyt.business.strategy.FunctionSelectorByAddressStrategy;
+import com.complyt.business.strategy.FunctionSelectorByTransactionAddressStrategy;
 import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.transaction.Address;
@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-public class SalesTaxRatesWrapperStrategy extends FunctionSelectorByAddressStrategy {
+public class SalesTaxRatesWrapperStrategy extends FunctionSelectorByTransactionAddressStrategy {
     @NonNull
     SalesTaxRatesWebClientWrapper<ComplytSalesTaxRates> salesTaxWebClientWrapper;
     @NonNull

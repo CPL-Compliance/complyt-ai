@@ -2,6 +2,7 @@ package com.complyt.services;
 
 import com.complyt.business.address.CountryIsUsaChecker;
 import com.complyt.business.complyt_id.ComplytIdHandler;
+import com.complyt.business.strategy.StrategySelector;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.business.transaction.CityCountyProvider;
@@ -51,6 +52,9 @@ public class TransactionServiceImpl implements TransactionService {
     @NonNull
     ItemsTotalCalculator itemsTotalCalculator;
 
+    @NonNull
+    StrategySelector shippingAddressAlignmentStrategy;
+
     @Override
     public Mono<Transaction> save(Transaction transaction) {
         return transactionRepository.save(transaction);
@@ -96,21 +100,23 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
         return injectCommonDataToNewAndModifiedTransaction(transaction)
-                .map(x -> complytIdHandler.insertComplytIdToNew(x))
-                .map(y->new NewTransactionInternalTimestampsInjector(y))
-                .map(z -> z.inject());
+                .map(complytIdHandler::insertComplytIdToNew)
+                .map(NewTransactionInternalTimestampsInjector::new)
+                .map(NewTransactionInternalTimestampsInjector::inject);
     }
 
     private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
         return itemsTotalCalculator.injectRecalculatedTotal(transaction)
-                .flatMap(transactionWithCalculatedItems ->
-                        productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItems)
-                                .map(x -> transactionDiscountCollector.collect(x))
-                                .map(y ->transactionItemsAmountsCollector.collect(y))
-                                .flatMap(transactionWithAmounts -> CountryIsUsaChecker.isCountryUsa(transactionWithAmounts.getShippingAddress()) ? //todo: make sure addressInUsaChecker is needed here is is the right thing to do here
+                .map(transactionWithCalculatedItems ->
+                        (Transaction) shippingAddressAlignmentStrategy.select(transaction).apply(transactionWithCalculatedItems))
+                .flatMap(transactionWithCalculatedItemsAndShippingAddress ->
+                        productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItemsAndShippingAddress)
+                                .map(transactionDiscountCollector::collect)
+                                .map(transactionItemsAmountsCollector::collect)
+                                .flatMap(transactionWithAmounts -> CountryIsUsaChecker.isCountryUsa(transactionWithAmounts.getShippingAddress()) ?
                                         cityCountyProvider.provide(transactionWithAmounts) :
-                                        Mono.just(transactionWithAmounts))); //todo: fix - this causes error if not usa state
-    } //todo: also - county can be null, fails is not null
+                                        Mono.just(transactionWithAmounts)));
+    }
 
     @Deprecated
     @Override
@@ -133,11 +139,9 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findAllByQuery(query);
     }
 
-
     public Flux<Transaction> findAll(int page, int size) {
         return transactionRepository.findAll(page, size);
     }
-
 
     public Flux<Transaction> findAllBySource(@NonNull final String source) {
         return transactionRepository.findAllBySource(source);
@@ -154,7 +158,8 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.getExternalTimestamps(), transaction.getTransactionType(), transaction.getShippingFee(),
                         transaction.getCreatedFrom(), transaction.getTaxableItemsAmount(),
                         transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount(), transaction.getFinalTransactionAmount(), transaction.getTotalDiscount(),
-                        transaction.getTransactionFilingStatus(), transaction.getCurrency()
+                        transaction.getTransactionFilingStatus(), transaction.getCurrency(),
+                        transaction.getSubsidiary()
                 );
     }
 

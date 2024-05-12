@@ -43,6 +43,6 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     @Override
     public Mono<Transaction> calculate(@NonNull Transaction transaction) {
         return ((Mono<ComplytInternalRates>) salesTaxRatesWrapperStrategy.select(transaction).apply(transaction.getShippingAddress()))
-                .flatMap(complytInternalRates -> (Mono<Transaction>)transactionRatesInjectionStrategy.select(transaction).apply(complytInternalRates));
+                .flatMap(complytInternalRates -> (Mono<Transaction>) transactionRatesInjectionStrategy.select(transaction).apply(complytInternalRates));
     }
 }

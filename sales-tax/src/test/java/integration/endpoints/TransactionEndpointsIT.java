@@ -194,40 +194,135 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     @WithMockUser
-    public void upsertByExternalIdAndSource_NonUsaCountryAndRegionTaxInclusive_ReturnsTaxableTransaction() {
+    public void upsertByExternalIdAndSource_UsaCountryButSentAsAbbreviation_Returns201() {
+        String externalId = "newNonExistingTransactionIDUsaAbbreviation";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withTaxInclusive(true);
+
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO")
+                .withCountry("US")); //salestaxtracking is approved and physical
+
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775.0000"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(expectedSalesTax, transactionDto.salesTax());
+                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
+                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
+                    assertTrue(transactionDto.isTaxInclusive());
+                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("9225.0000")));
+                    assertEquals("USA", transactionDto.shippingAddress().country());
+                });
     }
 
-//    @Order(1)
-//    @Test
-//    @Override
-//    @WithMockUser
-//    public void upsertByExternalIdAndSource_NonUsaCountryAndRegionTaxInclusive_ReturnsTaxableTransaction() {
-//        String externalId = "newNonExistingTransactionID";
-//        TransactionDto givenTransaction = ITUtilities.stubTransactionDtoNonUsaCountry(externalId, customerId)
-//                .withTaxInclusive(true);
-//
-//        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1497.50000"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
-//
-//        // Then
-//        webTestClient
-//                .mutateWith(csrf())
-//                .put()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-//                        .build())
-//                .bodyValue(givenTransaction)
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isCreated()
-//                .expectBody(TransactionDto.class)
-//                .value(transactionDto -> {
-//                    assertEquals(expectedSalesTax, transactionDto.salesTax());
-//                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
-//                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
-//                    assertTrue(transactionDto.isTaxInclusive());
-//                    assertEquals( 0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("8502.50000")));
-//                });
-//    }
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NonUsaCountryButSentAsAbbreviationReturnUpperCase_Returns201() {
+        String externalId = "newNonExistingTransactionIDNonUsaAbbreviation";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto(null, "CA", null, null, "", "", null, false));
+
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1497.50000"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(expectedSalesTax, transactionDto.salesTax());
+                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
+                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
+                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000.0000")));
+                    assertEquals("Canada", transactionDto.shippingAddress().country());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NonUsaCountryButSentLowerCaseReturnsUpperCase_Returns201() {
+        String externalId = "newNonExistingTransactionIDNonUsaLowercase";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto(null, "canada", null, null, "", "", null, false));
+
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1497.50000"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(expectedSalesTax, transactionDto.salesTax());
+                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
+                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
+                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000.0000")));
+                    assertEquals("Canada", transactionDto.shippingAddress().country());
+                });
+    }
+
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NonUsaCountryAndRegionTaxInclusive_ReturnsTaxableTransaction() {
+        String externalId = "newNonExistingTransactionIDC";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDtoNonUsaCountry(externalId, customerId)
+                .withTaxInclusive(true);
+
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1475.0000"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(expectedSalesTax, transactionDto.salesTax());
+                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
+                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
+                    assertTrue(transactionDto.isTaxInclusive());
+                    assertEquals( 0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("8525.0000")));
+                });
+    }
 
     @Order(1)
     @Test

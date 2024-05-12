@@ -46,6 +46,7 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(description = FieldsDescriptions.TOTAL_DISCOUNT) BigDecimal totalDiscount,
                              @Schema(description = FieldsDescriptions.FINAL_TRANSACTION_AMOUNT) BigDecimal finalTransactionAmount,
                              @Schema(description = FieldsDescriptions.TRANSACTION_FILING_STATUS) TransactionFilingStatusDto transactionFilingStatus,
-                             @Schema(description = FieldsDescriptions.CURRENCY) String currency)
+                             @Schema(description = FieldsDescriptions.CURRENCY) String currency,
+                             String subsidiary)
         implements SourceCheckable, ExternalIdCheckable {
 }

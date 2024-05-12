@@ -1,7 +1,8 @@
 package com.complyt.services;
 
+import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.complyt_id.ComplytIdHandler;
-import com.complyt.business.exemption.ExemptionListGenerator;
+import com.complyt.business.strategy.StrategySelector;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
@@ -30,7 +31,7 @@ public class ExemptionServiceImpl implements ExemptionService {
     private ComplytIdHandler<Exemption> complytIdHandler;
 
     @NonNull
-    private ExemptionListGenerator exemptionListGenerator;
+    private StrategySelector exemptionListGeneratorStrategy;
 
     @Override
     public Mono<Exemption> findFullyExempted(@NonNull final Transaction transaction) {
@@ -95,7 +96,8 @@ public class ExemptionServiceImpl implements ExemptionService {
     @Override
     public Mono<Exemption> injectDataToNewExemption(@NonNull Exemption exemption) {
         return Mono.just(exemption).map(complytIdHandler::insertComplytIdToNew)
-                .map(exemptionWithComplytId -> exemptionWithComplytId.withCountry(exemptionWithComplytId.getCountry().toUpperCase()));
+                .map(exemptionWithComplytId -> exemptionWithComplytId
+                        .withCountry(CountryToStandardizedCountry.standardize(exemptionWithComplytId.getCountry())));
     }
 
     @Override
@@ -110,7 +112,7 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @Override
     public Flux<Exemption> saveMany(@NonNull ExemptionWrapper exemptionWrapper) {
-        return exemptionListGenerator.generate(exemptionWrapper)
+        return ((Flux<Exemption>) exemptionListGeneratorStrategy.select(exemptionWrapper).apply(exemptionWrapper))
                 .flatMap(this::save);
     }
 
@@ -125,6 +127,6 @@ public class ExemptionServiceImpl implements ExemptionService {
                 .withCertificate(exemption.getCertificate())
                 .withExemptionType(exemption.getExemptionType())
                 .withExemptionStatus(exemption.getExemptionStatus())
-                .withCountry(exemption.getCountry().toUpperCase());
+                .withCountry(CountryToStandardizedCountry.standardize(exemption.getCountry()));
     }
 }

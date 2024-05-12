@@ -1,5 +1,6 @@
 package com.complyt.business.tax.gt.gt_tax_web_client;
 
+import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.exceptions.ComplytSalesTaxRatesException;
 import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
 import com.complyt.domain.transaction.Address;
@@ -25,7 +26,9 @@ public class GtWebClientWrapper implements SalesTaxRatesWebClientWrapper<Complyt
 
     @Override
     public Mono<ComplytGtRates> findByAddress(String state, String country, String county, String city, String street, String zip, String region, boolean isPartial) {
-        return salesTaxRatesServiceProxy.findGstByAddress(country, region)
+        String standardizedCountry = CountryToStandardizedCountry.standardize(country);
+
+        return salesTaxRatesServiceProxy.findGstByAddress(standardizedCountry, region)
                 .retryWhen(Retry.backoff(5, Duration.ofMillis(10))
                         .filter(throwable -> !(throwable instanceof ObjectNotFoundApiException))
                         .onRetryExhaustedThrow(

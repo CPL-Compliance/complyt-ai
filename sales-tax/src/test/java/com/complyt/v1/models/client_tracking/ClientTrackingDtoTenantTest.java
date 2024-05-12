@@ -46,6 +46,7 @@ public class ClientTrackingDtoTenantTest {
                 ", name=" + ClientTrackingDtoTenant.name() +
                 ", internalTimestamps=" + ClientTrackingDtoTenant.internalTimestamps() +
                 ", tenantId=" + ClientTrackingDtoTenant.tenantId() +
+                ", subsidiaries=" + ClientTrackingDtoTenant.subsidiaries() +
                 "]";
 
         // When

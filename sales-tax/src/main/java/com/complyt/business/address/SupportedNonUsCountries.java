@@ -1,994 +1,987 @@
 package com.complyt.business.address;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public interface SupportedNonUsCountries {
-    Map<String, List<String>> nonUsaCountriesAbbreviations = new HashMap<>() {{
-        put("AFGHANISTAN", List.of("AFGHANISTAN", "AF", "AFG"));
-        put("AF", List.of("AFGHANISTAN", "AF", "AFG"));
-        put("AFG", List.of("AFGHANISTAN", "AF", "AFG"));
-
-        put("ALBANIA", List.of("ALBANIA", "AL", "ALB"));
-        put("AL", List.of("ALBANIA", "AL", "ALB"));
-        put("ALB", List.of("ALBANIA", "AL", "ALB"));
-
-        put("ALGERIA", List.of("ALGERIA", "DZ", "DZA"));
-        put("DZ", List.of("ALGERIA", "DZ", "DZA"));
-        put("DZA", List.of("ALGERIA", "DZ", "DZA"));
-
-        put("AMERICAN SAMOA", List.of("AMERICAN SAMOA", "AS", "ASM"));
-        put("AS", List.of("AMERICAN SAMOA", "AS", "ASM"));
-        put("ASM", List.of("AMERICAN SAMOA", "AS", "ASM"));
-
-        put("ANDORRA", List.of("ANDORRA", "AD", "AND"));
-        put("AD", List.of("ANDORRA", "AD", "AND"));
-        put("AND", List.of("ANDORRA", "AD", "AND"));
-
-        put("ANGOLA", List.of("ANGOLA", "AO", "AGO"));
-        put("AO", List.of("ANGOLA", "AO", "AGO"));
-        put("AGO", List.of("ANGOLA", "AO", "AGO"));
-
-        put("ANGUILLA", List.of("ANGUILLA", "AI", "AIA"));
-        put("AI", List.of("ANGUILLA", "AI", "AIA"));
-        put("AIA", List.of("ANGUILLA", "AI", "AIA"));
-
-        put("ANTARCTICA", List.of("ANTARCTICA", "AQ", "ATA"));
-        put("AQ", List.of("ANTARCTICA", "AQ", "ATA"));
-        put("ATA", List.of("ANTARCTICA", "AQ", "ATA"));
-
-        put("ANTIGUA AND BARBUDA", List.of("ANTIGUA AND BARBUDA", "AG", "ATG"));
-        put("AG", List.of("ANTIGUA AND BARBUDA", "AG", "ATG"));
-        put("ATG", List.of("ANTIGUA AND BARBUDA", "AG", "ATG"));
-
-        put("ARGENTINA", List.of("ARGENTINA", "AR", "ARG"));
-        put("AR", List.of("ARGENTINA", "AR", "ARG"));
-        put("ARG", List.of("ARGENTINA", "AR", "ARG"));
-
-        put("ARMENIA", List.of("ARMENIA", "AM", "ARM"));
-        put("AM", List.of("ARMENIA", "AM", "ARM"));
-        put("ARM", List.of("ARMENIA", "AM", "ARM"));
-
-        put("ARUBA", List.of("ARUBA", "AW", "ABW"));
-        put("AW", List.of("ARUBA", "AW", "ABW"));
-        put("ABW", List.of("ARUBA", "AW", "ABW"));
-
-        put("AUSTRALIA", List.of("AUSTRALIA", "AU", "AUS"));
-        put("AU", List.of("AUSTRALIA", "AU", "AUS"));
-        put("AUS", List.of("AUSTRALIA", "AU", "AUS"));
-
-        put("AUSTRIA", List.of("AUSTRIA", "AT", "AUT"));
-        put("AT", List.of("AUSTRIA", "AT", "AUT"));
-        put("AUT", List.of("AUSTRIA", "AT", "AUT"));
-
-        put("AZERBAIJAN", List.of("AZERBAIJAN", "AZ", "AZE"));
-        put("AZ", List.of("AZERBAIJAN", "AZ", "AZE"));
-        put("AZE", List.of("AZERBAIJAN", "AZ", "AZE"));
-
-        put("THE BAHAMAS", List.of("THE BAHAMAS", "BAHAMAS", "BS", "BHS"));
-        put("BAHAMAS", List.of("THE BAHAMAS", "BAHAMAS", "BS", "BHS"));
-        put("BS", List.of("THE BAHAMAS", "BAHAMAS", "BS", "BHS"));
-        put("BHS", List.of("THE BAHAMAS", "BAHAMAS", "BS", "BHS"));
-
-        put("BAHRAIN", List.of("BAHRAIN", "BH", "BHR"));
-        put("BH", List.of("BAHRAIN", "BH", "BHR"));
-        put("BHR", List.of("BAHRAIN", "BH", "BHR"));
-
-        put("BANGLADESH", List.of("BANGLADESH", "BD", "BGD"));
-        put("BD", List.of("BANGLADESH", "BD", "BGD"));
-        put("BGD", List.of("BANGLADESH", "BD", "BGD"));
-
-        put("BARBADOS", List.of("BARBADOS", "BB", "BRB"));
-        put("BB", List.of("BARBADOS", "BB", "BRB"));
-        put("BRB", List.of("BARBADOS", "BB", "BRB"));
-
-        put("BELARUS", List.of("BELARUS", "BY", "BLR"));
-        put("BY", List.of("BELARUS", "BY", "BLR"));
-        put("BLR", List.of("BELARUS", "BY", "BLR"));
-
-        put("BELGIUM", List.of("BELGIUM", "BE", "BEL"));
-        put("BE", List.of("BELGIUM", "BE", "BEL"));
-        put("BEL", List.of("BELGIUM", "BE", "BEL"));
-
-        put("BELIZE", List.of("BELIZE", "BZ", "BLZ"));
-        put("BZ", List.of("BELIZE", "BZ", "BLZ"));
-        put("BLZ", List.of("BELIZE", "BZ", "BLZ"));
-
-        put("BENIN", List.of("BENIN", "BJ", "BEN"));
-        put("BJ", List.of("BENIN", "BJ", "BEN"));
-        put("BEN", List.of("BENIN", "BJ", "BEN"));
-
-        put("BERMUDA", List.of("BERMUDA", "BM", "BMU"));
-        put("BM", List.of("BERMUDA", "BM", "BMU"));
-        put("BMU", List.of("BERMUDA", "BM", "BMU"));
-
-        put("BHUTAN", List.of("BHUTAN", "BT", "BTN"));
-        put("BT", List.of("BHUTAN", "BT", "BTN"));
-        put("BTN", List.of("BHUTAN", "BT", "BTN"));
-
-        put("BOLIVIA", List.of("BOLIVIA", "BO", "BOL"));
-        put("BO", List.of("BOLIVIA", "BO", "BOL"));
-        put("BOL", List.of("BOLIVIA", "BO", "BOL"));
-
-        put("BONAIRE, SINT EUSTATIUS AND SABA", List.of("BONAIRE, SINT EUSTATIUS AND SABA", "BQ", "BES"));
-        put("BQ", List.of("BONAIRE, SINT EUSTATIUS AND SABA", "BQ", "BES"));
-        put("BES", List.of("BONAIRE, SINT EUSTATIUS AND SABA", "BQ", "BES"));
-
-        put("BOSNIA AND HERZEGOVINA", List.of("BOSNIA AND HERZEGOVINA", "BA", "BIH"));
-        put("BA", List.of("BOSNIA AND HERZEGOVINA", "BA", "BIH"));
-        put("BIH", List.of("BOSNIA AND HERZEGOVINA", "BA", "BIH"));
-
-        put("BOTSWANA", List.of("BOTSWANA", "BW", "BWA"));
-        put("BW", List.of("BOTSWANA", "BW", "BWA"));
-        put("BWA", List.of("BOTSWANA", "BW", "BWA"));
-
-        put("BOUVET ISLAND", List.of("BOUVET ISLAND", "BV", "BVT"));
-        put("BV", List.of("BOUVET ISLAND", "BV", "BVT"));
-        put("BVT", List.of("BOUVET ISLAND", "BV", "BVT"));
-
-        put("BRAZIL", List.of("BRAZIL", "BR", "BRA"));
-        put("BR", List.of("BRAZIL", "BR", "BRA"));
-        put("BRA", List.of("BRAZIL", "BR", "BRA"));
-
-        put("BRITISH INDIAN OCEAN TERRITORY", List.of("BRITISH INDIAN OCEAN TERRITORY", "IO", "IOT"));
-        put("IO", List.of("BRITISH INDIAN OCEAN TERRITORY", "IO", "IOT"));
-        put("IOT", List.of("BRITISH INDIAN OCEAN TERRITORY", "IO", "IOT"));
-
-        put("BRUNEI DARUSSALAM", List.of("BRUNEI DARUSSALAM", "BN", "BRN"));
-        put("BN", List.of("BRUNEI DARUSSALAM", "BN", "BRN"));
-        put("BRN", List.of("BRUNEI DARUSSALAM", "BN", "BRN"));
-
-        put("BULGARIA", List.of("BULGARIA", "BG", "BGR"));
-        put("BG", List.of("BULGARIA", "BG", "BGR"));
-        put("BGR", List.of("BULGARIA", "BG", "BGR"));
-
-        put("BURKINA FASO", List.of("BURKINA FASO", "BF", "BFA"));
-        put("BF", List.of("BURKINA FASO", "BF", "BFA"));
-        put("BFA", List.of("BURKINA FASO", "BF", "BFA"));
-
-        put("BURUNDI", List.of("BURUNDI", "BI", "BDI"));
-        put("BI", List.of("BURUNDI", "BI", "BDI"));
-        put("BDI", List.of("BURUNDI", "BI", "BDI"));
-
-        put("CABO VERDE", List.of("CABO VERDE", "CV", "CPV"));
-        put("CV", List.of("CABO VERDE", "CV", "CPV"));
-        put("CPV", List.of("CABO VERDE", "CV", "CPV"));
-
-        put("CAMBODIA", List.of("CAMBODIA", "KH", "KHM"));
-        put("KH", List.of("CAMBODIA", "KH", "KHM"));
-        put("KHM", List.of("CAMBODIA", "KH", "KHM"));
-
-        put("CAMEROON", List.of("CAMEROON", "CM", "CMR"));
-        put("CM", List.of("CAMEROON", "CM", "CMR"));
-        put("CMR", List.of("CAMEROON", "CM", "CMR"));
-
-        put("CANADA", List.of("CANADA", "CA", "CAN"));
-        put("CA", List.of("CANADA", "CA", "CAN"));
-        put("CAN", List.of("CANADA", "CA", "CAN"));
-
-        put("THE CAYMAN ISLANDS", List.of("THE CAYMAN ISLANDS", "CAYMAN ISLANDS", "KY", "CYM"));
-        put("CAYMAN ISLANDS", List.of("THE CAYMAN ISLANDS", "CAYMAN ISLANDS", "KY", "CYM"));
-        put("KY", List.of("THE CAYMAN ISLANDS", "CAYMAN ISLANDS", "KY", "CYM"));
-        put("CYM", List.of("THE CAYMAN ISLANDS", "CAYMAN ISLANDS", "KY", "CYM"));
-
-        put("THE CENTRAL AFRICAN REPUBLIC", List.of("THE CENTRAL AFRICAN REPUBLIC", "CENTRAL AFRICAN REPUBLIC", "CF", "CAF"));
-        put("CENTRAL AFRICAN REPUBLIC", List.of("THE CENTRAL AFRICAN REPUBLIC", "CENTRAL AFRICAN REPUBLIC", "CF", "CAF"));
-        put("CF", List.of("THE CENTRAL AFRICAN REPUBLIC", "CENTRAL AFRICAN REPUBLIC", "CF", "CAF"));
-        put("CAF", List.of("THE CENTRAL AFRICAN REPUBLIC", "CENTRAL AFRICAN REPUBLIC", "CF", "CAF"));
-
-        put("CHAD", List.of("CHAD", "TD", "TCD"));
-        put("TD", List.of("CHAD", "TD", "TCD"));
-        put("TCD", List.of("CHAD", "TD", "TCD"));
-
-        put("CHILE", List.of("CHILE", "CL", "CHL"));
-        put("CL", List.of("CHILE", "CL", "CHL"));
-        put("CHL", List.of("CHILE", "CL", "CHL"));
-
-        put("CHINA", List.of("CHINA", "CN", "CHN"));
-        put("CN", List.of("CHINA", "CN", "CHN"));
-        put("CHN", List.of("CHINA", "CN", "CHN"));
-
-        put("CHRISTMAS ISLAND", List.of("CHRISTMAS ISLAND", "CX", "CXR"));
-        put("CX", List.of("CHRISTMAS ISLAND", "CX", "CXR"));
-        put("CXR", List.of("CHRISTMAS ISLAND", "CX", "CXR"));
-
-        put("COCOS ISLANDS", List.of("COCOS ISLANDS", "CC", "CCK"));
-        put("CC", List.of("COCOS ISLANDS", "CC", "CCK"));
-        put("CCK", List.of("COCOS ISLANDS", "CC", "CCK"));
-
-        put("COLOMBIA", List.of("COLOMBIA", "CO", "COL"));
-        put("CO", List.of("COLOMBIA", "CO", "COL"));
-        put("COL", List.of("COLOMBIA", "CO", "COL"));
-
-        put("THE COMOROS", List.of("THE COMOROS", "COMOROS", "KM", "COM"));
-        put("COMOROS", List.of("THE COMOROS", "COMOROS", "KM", "COM"));
-        put("KM", List.of("THE COMOROS", "COMOROS", "KM", "COM"));
-        put("COM", List.of("THE COMOROS", "COMOROS", "KM", "COM"));
-
-        put("THE DEMOCRATIC REPUBLIC OF THE CONGO", List.of("THE DEMOCRATIC REPUBLIC OF THE CONGO", "CONGO", "CD", "COD"));
-        put("CD", List.of("THE DEMOCRATIC REPUBLIC OF THE CONGO", "CD", "COD"));
-        put("COD", List.of("THE DEMOCRATIC REPUBLIC OF THE CONGO", "CD", "COD"));
-
-        put("REPUBLIC OF CONGO", List.of("REPUBLIC OF CONGO", "THE REPUBLIC OF THE CONGO", "THE CONGO", "CG", "COG"));
-        put("THE REPUBLIC OF THE CONGO", List.of("REPUBLIC OF CONGO", "THE REPUBLIC OF THE CONGO", "THE CONGO", "CG", "COG"));
-        put("THE CONGO", List.of("REPUBLIC OF CONGO", "THE REPUBLIC OF THE CONGO", "THE CONGO", "CG", "COG"));
-        put("CG", List.of("REPUBLIC OF CONGO", "THE REPUBLIC OF THE CONGO", "THE CONGO", "CG", "COG"));
-        put("COG", List.of("REPUBLIC OF CONGO", "THE REPUBLIC OF THE CONGO", "THE CONGO", "CG", "COG"));
-
-        put("THE COOK ISLANDS", List.of("THE COOK ISLANDS", "COOK ISLANDS", "CK", "COK"));
-        put("COOK ISLANDS", List.of("THE COOK ISLANDS", "COOK ISLANDS", "CK", "COK"));
-        put("CK", List.of("THE COOK ISLANDS", "COOK ISLANDS", "CK", "COK"));
-        put("COK", List.of("THE COOK ISLANDS", "COOK ISLANDS", "CK", "COK"));
-
-        put("COSTA RICA", List.of("COSTA RICA", "CR", "CRI"));
-        put("CR", List.of("COSTA RICA", "CR", "CRI"));
-        put("CRI", List.of("COSTA RICA", "CR", "CRI"));
-
-        put("CROATIA", List.of("CROATIA", "HR", "HRV"));
-        put("HR", List.of("CROATIA", "HR", "HRV"));
-        put("HRV", List.of("CROATIA", "HR", "HRV"));
-
-        put("CUBA", List.of("CUBA", "CU", "CUB"));
-        put("CU", List.of("CUBA", "CU", "CUB"));
-        put("CUB", List.of("CUBA", "CU", "CUB"));
-
-        put("CURAÇAO", List.of("CURAÇAO", "CW", "CUW"));
-        put("CW", List.of("CURAÇAO", "CW", "CUW"));
-        put("CUW", List.of("CURAÇAO", "CW", "CUW"));
-
-        put("CYPRUS", List.of("CYPRUS", "CY", "CYP"));
-        put("CY", List.of("CYPRUS", "CY", "CYP"));
-        put("CYP", List.of("CYPRUS", "CY", "CYP"));
-
-        put("CZECHIA", List.of("CZECHIA", "CZ", "CZE"));
-        put("CZ", List.of("CZECHIA", "CZ", "CZE"));
-        put("CZE", List.of("CZECHIA", "CZ", "CZE"));
-
-        put("CÔTE D'IVOIRE", List.of("CÔTE D'IVOIRE", "CI", "CIV"));
-        put("CI", List.of("CÔTE D'IVOIRE", "CI", "CIV"));
-        put("CIV", List.of("CÔTE D'IVOIRE", "CI", "CIV"));
-
-        put("DENMARK", List.of("DENMARK", "DK", "DNK"));
-        put("DK", List.of("DENMARK", "DK", "DNK"));
-        put("DNK", List.of("DENMARK", "DK", "DNK"));
-
-        put("DJIBOUTI", List.of("DJIBOUTI", "DJ", "DJI"));
-        put("DJ", List.of("DJIBOUTI", "DJ", "DJI"));
-        put("DJI", List.of("DJIBOUTI", "DJ", "DJI"));
-
-        put("DOMINICA", List.of("DOMINICA", "DM", "DMA"));
-        put("DM", List.of("DOMINICA", "DM", "DMA"));
-        put("DMA", List.of("DOMINICA", "DM", "DMA"));
-
-        put("THE DOMINICAN REPUBLIC", List.of("THE DOMINICAN REPUBLIC", "DOMINICAN REPUBLIC", "DO", "DOM"));
-        put("DOMINICAN REPUBLIC", List.of("THE DOMINICAN REPUBLIC", "DOMINICAN REPUBLIC", "DO", "DOM"));
-        put("DO", List.of("THE DOMINICAN REPUBLIC", "DOMINICAN REPUBLIC", "DO", "DOM"));
-        put("DOM", List.of("THE DOMINICAN REPUBLIC", "DOMINICAN REPUBLIC", "DO", "DOM"));
-
-        put("ECUADOR", List.of("ECUADOR", "EC", "ECU"));
-        put("EC", List.of("ECUADOR", "EC", "ECU"));
-        put("ECU", List.of("ECUADOR", "EC", "ECU"));
-
-        put("EGYPT", List.of("EGYPT", "EG", "EGY"));
-        put("EG", List.of("EGYPT", "EG", "EGY"));
-        put("EGY", List.of("EGYPT", "EG", "EGY"));
-
-        put("EL SALVADOR", List.of("EL SALVADOR", "SV", "SLV"));
-        put("SV", List.of("EL SALVADOR", "SV", "SLV"));
-        put("SLV", List.of("EL SALVADOR", "SV", "SLV"));
-
-        put("EQUATORIAL GUINEA", List.of("EQUATORIAL GUINEA", "GQ", "GNQ"));
-        put("GQ", List.of("EQUATORIAL GUINEA", "GQ", "GNQ"));
-        put("GNQ", List.of("EQUATORIAL GUINEA", "GQ", "GNQ"));
-
-        put("ERITREA", List.of("ERITREA", "ER", "ERI"));
-        put("ER", List.of("ERITREA", "ER", "ERI"));
-        put("ERI", List.of("ERITREA", "ER", "ERI"));
-
-        put("ESTONIA", List.of("ESTONIA", "EE", "EST"));
-        put("EE", List.of("ESTONIA", "EE", "EST"));
-        put("EST", List.of("ESTONIA", "EE", "EST"));
-
-        put("ESWATINI", List.of("ESWATINI", "SZ", "SWZ"));
-        put("SZ", List.of("ESWATINI", "SZ", "SWZ"));
-        put("SWZ", List.of("ESWATINI", "SZ", "SWZ"));
-
-        put("ETHIOPIA", List.of("ETHIOPIA", "ET", "ETH"));
-        put("ET", List.of("ETHIOPIA", "ET", "ETH"));
-        put("ETH", List.of("ETHIOPIA", "ET", "ETH"));
-
-        put("THE FAROE ISLANDS", List.of("THE FAROE ISLANDS", "FAROE ISLANDS", "FO", "FRO"));
-        put("FAROE ISLANDS", List.of("THE FAROE ISLANDS", "FAROE ISLANDS", "FO", "FRO"));
-        put("FO", List.of("THE FAROE ISLANDS", "FAROE ISLANDS", "FO", "FRO"));
-        put("FRO", List.of("THE FAROE ISLANDS", "FAROE ISLANDS", "FO", "FRO"));
-
-        put("FIJI", List.of("FIJI", "FJ", "FJI"));
-        put("FJ", List.of("FIJI", "FJ", "FJI"));
-        put("FJI", List.of("FIJI", "FJ", "FJI"));
-
-        put("FINLAND", List.of("FINLAND", "FI", "FIN"));
-        put("FI", List.of("FINLAND", "FI", "FIN"));
-        put("FIN", List.of("FINLAND", "FI", "FIN"));
-
-        put("FRANCE", List.of("FRANCE", "FR", "FRA"));
-        put("FR", List.of("FRANCE", "FR", "FRA"));
-        put("FRA", List.of("FRANCE", "FR", "FRA"));
-
-        put("FRENCH GUIANA", List.of("FRENCH GUIANA", "GF", "GUF"));
-        put("GF", List.of("FRENCH GUIANA", "GF", "GUF"));
-        put("GUF", List.of("FRENCH GUIANA", "GF", "GUF"));
-
-        put("FRENCH POLYNESIA", List.of("FRENCH POLYNESIA", "PF", "PYF"));
-        put("PF", List.of("FRENCH POLYNESIA", "PF", "PYF"));
-        put("PYF", List.of("FRENCH POLYNESIA", "PF", "PYF"));
-
-        put("THE FRENCH SOUTHERN TERRITORIES", List.of("THE FRENCH SOUTHERN TERRITORIES", "FRENCH SOUTHERN TERRITORIES", "TF", "ATF"));
-        put("FRENCH SOUTHERN TERRITORIES", List.of("THE FRENCH SOUTHERN TERRITORIES", "FRENCH SOUTHERN TERRITORIES", "TF", "ATF"));
-        put("TF", List.of("THE FRENCH SOUTHERN TERRITORIES", "FRENCH SOUTHERN TERRITORIES", "TF", "ATF"));
-        put("ATF", List.of("THE FRENCH SOUTHERN TERRITORIES", "FRENCH SOUTHERN TERRITORIES", "TF", "ATF"));
-
-        put("GABON", List.of("GABON", "GA", "GAB"));
-        put("GA", List.of("GABON", "GA", "GAB"));
-        put("GAB", List.of("GABON", "GA", "GAB"));
-
-        put("THE GAMBIA", List.of("THE GAMBIA", "GAMBIA", "GM", "GMB"));
-        put("GAMBIA",  List.of("THE GAMBIA", "GAMBIA", "GM", "GMB"));
-        put("GM",  List.of("THE GAMBIA", "GAMBIA", "GM", "GMB"));
-        put("GMB",  List.of("THE GAMBIA", "GAMBIA", "GM", "GMB"));
-
-        put("GEORGIA", List.of("GEORGIA", "GE", "GEO"));
-        put("GE", List.of("GEORGIA", "GE", "GEO"));
-        put("GEO", List.of("GEORGIA", "GE", "GEO"));
-
-        put("GERMANY", List.of("GERMANY", "DE", "DEU"));
-        put("DE", List.of("GERMANY", "DE", "DEU"));
-        put("DEU", List.of("GERMANY", "DE", "DEU"));
-
-        put("GHANA", List.of("GHANA", "GH", "GHA"));
-        put("GH", List.of("GHANA", "GH", "GHA"));
-        put("GHA", List.of("GHANA", "GH", "GHA"));
-
-        put("GIBRALTAR", List.of("GIBRALTAR", "GI", "GIB"));
-        put("GI", List.of("GIBRALTAR", "GI", "GIB"));
-        put("GIB", List.of("GIBRALTAR", "GI", "GIB"));
-
-        put("GREECE", List.of("GREECE", "GR", "GRC"));
-        put("GR", List.of("GREECE", "GR", "GRC"));
-        put("GRC", List.of("GREECE", "GR", "GRC"));
-
-        put("GREENLAND", List.of("GREENLAND", "GL", "GRL"));
-        put("GL", List.of("GREENLAND", "GL", "GRL"));
-        put("GRL", List.of("GREENLAND", "GL", "GRL"));
-
-        put("GRENADA", List.of("GRENADA", "GD", "GRD"));
-        put("GD", List.of("GRENADA", "GD", "GRD"));
-        put("GRD", List.of("GRENADA", "GD", "GRD"));
-
-        put("GUADELOUPE", List.of("GUADELOUPE", "GP", "GLP"));
-        put("GP", List.of("GUADELOUPE", "GP", "GLP"));
-        put("GLP", List.of("GUADELOUPE", "GP", "GLP"));
-
-        put("GUAM", List.of("GUAM", "GU", "GUM"));
-        put("GU", List.of("GUAM", "GU", "GUM"));
-        put("GUM", List.of("GUAM", "GU", "GUM"));
-
-        put("GUATEMALA", List.of("GUATEMALA", "GT", "GTM"));
-        put("GT", List.of("GUATEMALA", "GT", "GTM"));
-        put("GTM", List.of("GUATEMALA", "GT", "GTM"));
-
-        put("GUERNSEY", List.of("GUERNSEY", "GG", "GGY"));
-        put("GG", List.of("GUERNSEY", "GG", "GGY"));
-        put("GGY", List.of("GUERNSEY", "GG", "GGY"));
-
-        put("GUINEA", List.of("GUINEA", "GN", "GIN"));
-        put("GN", List.of("GUINEA", "GN", "GIN"));
-        put("GIN", List.of("GUINEA", "GN", "GIN"));
-
-        put("GUINEA BISSAU", List.of("GUINEA BISSAU","GUINEA-BISSAU", "GW", "GNB"));
-        put("GUINEA-BISSAU", List.of("GUINEA BISSAU","GUINEA-BISSAU", "GW", "GNB"));
-        put("GW", List.of("GUINEA BISSAU","GUINEA-BISSAU", "GW", "GNB"));
-        put("GNB", List.of("GUINEA BISSAU","GUINEA-BISSAU", "GW", "GNB"));
-
-        put("GUYANA", List.of("GUYANA", "GY", "GUY"));
-        put("GY", List.of("GUYANA", "GY", "GUY"));
-        put("GUY", List.of("GUYANA", "GY", "GUY"));
-
-        put("HAITI", List.of("HAITI", "HT", "HTI"));
-        put("HT", List.of("HAITI", "HT", "HTI"));
-        put("HTI", List.of("HAITI", "HT", "HTI"));
-
-        put("HEARD ISLAND AND MCDONALD ISLANDS", List.of("HEARD ISLAND AND MCDONALD ISLANDS", "HM", "HMD"));
-        put("HM", List.of("HEARD ISLAND AND MCDONALD ISLANDS", "HM", "HMD"));
-        put("HMD", List.of("HEARD ISLAND AND MCDONALD ISLANDS", "HM", "HMD"));
-
-        put("THE HOLY SEE", List.of("THE HOLY SEE","HOLY SEE", "VA", "VAT"));
-        put("HOLY SEE", List.of("THE HOLY SEE","HOLY SEE", "VA", "VAT"));
-        put("VA", List.of("THE HOLY SEE","HOLY SEE", "VA", "VAT"));
-        put("VAT", List.of("THE HOLY SEE","HOLY SEE", "VA", "VAT"));
-
-        put("HONDURAS", List.of("HONDURAS", "HN", "HND"));
-        put("HN", List.of("HONDURAS", "HN", "HND"));
-        put("HND", List.of("HONDURAS", "HN", "HND"));
-
-        put("HONG KONG", List.of("HONG KONG", "HK", "HKG"));
-        put("HK", List.of("HONG KONG", "HK", "HKG"));
-        put("HKG", List.of("HONG KONG", "HK", "HKG"));
-
-        put("HUNGARY", List.of("HUNGARY", "HU", "HUN"));
-        put("HU", List.of("HUNGARY", "HU", "HUN"));
-        put("HUN", List.of("HUNGARY", "HU", "HUN"));
-
-        put("ICELAND", List.of("ICELAND", "IS", "ISL"));
-        put("IS", List.of("ICELAND", "IS", "ISL"));
-        put("ISL", List.of("ICELAND", "IS", "ISL"));
-
-        put("INDIA", List.of("INDIA", "IN", "IND"));
-        put("IN", List.of("INDIA", "IN", "IND"));
-        put("IND", List.of("INDIA", "IN", "IND"));
-
-        put("INDONESIA", List.of("INDONESIA", "ID", "IDN"));
-        put("ID", List.of("INDONESIA", "ID", "IDN"));
-        put("IDN", List.of("INDONESIA", "ID", "IDN"));
-
-        put("IRAQ", List.of("IRAQ", "IQ", "IRQ"));
-        put("IQ", List.of("IRAQ", "IQ", "IRQ"));
-        put("IRQ", List.of("IRAQ", "IQ", "IRQ"));
-
-        put("IRELAND", List.of("IRELAND", "IE", "IRL"));
-        put("IE", List.of("IRELAND", "IE", "IRL"));
-        put("IRL", List.of("IRELAND", "IE", "IRL"));
-
-        put("ISLE OF MAN", List.of("ISLE OF MAN", "IM", "IMN"));
-        put("IM", List.of("ISLE OF MAN", "IM", "IMN"));
-        put("IMN", List.of("ISLE OF MAN", "IM", "IMN"));
-
-        put("ISRAEL", List.of("ISRAEL", "IL", "ISR"));
-        put("IL", List.of("ISRAEL", "IL", "ISR"));
-        put("ISR", List.of("ISRAEL", "IL", "ISR"));
-
-        put("ITALY", List.of("ITALY", "IT", "ITA"));
-        put("IT", List.of("ITALY", "IT", "ITA"));
-        put("ITA", List.of("ITALY", "IT", "ITA"));
-
-        put("JAMAICA", List.of("JAMAICA", "JM", "JAM"));
-        put("JM", List.of("JAMAICA", "JM", "JAM"));
-        put("JAM", List.of("JAMAICA", "JM", "JAM"));
-
-        put("JAPAN", List.of("JAPAN", "JP", "JPN"));
-        put("JP", List.of("JAPAN", "JP", "JPN"));
-        put("JPN", List.of("JAPAN", "JP", "JPN"));
-
-        put("JERSEY", List.of("JERSEY", "JE", "JEY"));
-        put("JE", List.of("JERSEY", "JE", "JEY"));
-        put("JEY", List.of("JERSEY", "JE", "JEY"));
-
-        put("JORDAN", List.of("JORDAN", "JO", "JOR"));
-        put("JO", List.of("JORDAN", "JO", "JOR"));
-        put("JOR", List.of("JORDAN", "JO", "JOR"));
-
-        put("KAZAKHSTAN", List.of("KAZAKHSTAN", "KZ", "KAZ"));
-        put("KZ", List.of("KAZAKHSTAN", "KZ", "KAZ"));
-        put("KAZ", List.of("KAZAKHSTAN", "KZ", "KAZ"));
-
-        put("KENYA", List.of("KENYA", "KE", "KEN"));
-        put("KE", List.of("KENYA", "KE", "KEN"));
-        put("KEN", List.of("KENYA", "KE", "KEN"));
-
-        put("KIRIBATI", List.of("KIRIBATI", "KI", "KIR"));
-        put("KI", List.of("KIRIBATI", "KI", "KIR"));
-        put("KIR", List.of("KIRIBATI", "KI", "KIR"));
-
-        put("THE DEMOCRATIC PEOPLE'S REPUBLIC OF KOREA", List.of("THE DEMOCRATIC PEOPLE'S REPUBLIC OF KOREA", "KOREA", "KP", "PRK"));
-        put("KOREA", List.of("THE DEMOCRATIC PEOPLE'S REPUBLIC OF KOREA", "KOREA", "KP", "PRK"));
-        put("KP", List.of("THE DEMOCRATIC PEOPLE'S REPUBLIC OF KOREA", "KOREA", "KP", "PRK"));
-        put("PRK", List.of("THE DEMOCRATIC PEOPLE'S REPUBLIC OF KOREA", "KOREA", "KP", "PRK"));
-
-        put("KUWAIT", List.of("KUWAIT", "KW", "KWT"));
-        put("KW", List.of("KUWAIT", "KW", "KWT"));
-        put("KWT", List.of("KUWAIT", "KW", "KWT"));
-
-        put("KYRGYZSTAN", List.of("KYRGYZSTAN", "KG", "KGZ"));
-        put("KG", List.of("KYRGYZSTAN", "KG", "KGZ"));
-        put("KGZ", List.of("KYRGYZSTAN", "KG", "KGZ"));
-
-        put("THE LAO PEOPLE'S DEMOCRATIC REPUBLIC", List.of("THE LAO PEOPLE'S DEMOCRATIC REPUBLIC", "LAO PEOPLE'S DEMOCRATIC REPUBLIC", "LA", "LAO"));
-        put("LAO PEOPLE'S DEMOCRATIC REPUBLIC", List.of("THE LAO PEOPLE'S DEMOCRATIC REPUBLIC", "LAO PEOPLE'S DEMOCRATIC REPUBLIC", "LA", "LAO"));
-        put("LA", List.of("THE LAO PEOPLE'S DEMOCRATIC REPUBLIC", "LAO PEOPLE'S DEMOCRATIC REPUBLIC", "LA", "LAO"));
-        put("LAO", List.of("THE LAO PEOPLE'S DEMOCRATIC REPUBLIC", "LAO PEOPLE'S DEMOCRATIC REPUBLIC", "LA", "LAO"));
-
-        put("LATVIA", List.of("LATVIA", "LV", "LVA"));
-        put("LV", List.of("LATVIA", "LV", "LVA"));
-        put("LVA", List.of("LATVIA", "LV", "LVA"));
-
-        put("LEBANON", List.of("LEBANON", "LB", "LBN"));
-        put("LB", List.of("LEBANON", "LB", "LBN"));
-        put("LBN", List.of("LEBANON", "LB", "LBN"));
-
-        put("LESOTHO", List.of("LESOTHO", "LS", "LSO"));
-        put("LS", List.of("LESOTHO", "LS", "LSO"));
-        put("LSO", List.of("LESOTHO", "LS", "LSO"));
-
-        put("LIBERIA", List.of("LIBERIA", "LR", "LBR"));
-        put("LR", List.of("LIBERIA", "LR", "LBR"));
-        put("LBR", List.of("LIBERIA", "LR", "LBR"));
-
-        put("LIBYA", List.of("LIBYA", "LY", "LBY"));
-        put("LY", List.of("LIBYA", "LY", "LBY"));
-        put("LBY", List.of("LIBYA", "LY", "LBY"));
-
-        put("LIECHTENSTEIN", List.of("LIECHTENSTEIN", "LI", "LIE"));
-        put("LI", List.of("LIECHTENSTEIN", "LI", "LIE"));
-        put("LIE", List.of("LIECHTENSTEIN", "LI", "LIE"));
-
-        put("LITHUANIA", List.of("LITHUANIA", "LT", "LTU"));
-        put("LT", List.of("LITHUANIA", "LT", "LTU"));
-        put("LTU", List.of("LITHUANIA", "LT", "LTU"));
-
-        put("LUXEMBOURG", List.of("LUXEMBOURG", "LU", "LUX"));
-        put("LU", List.of("LUXEMBOURG", "LU", "LUX"));
-        put("LUX", List.of("LUXEMBOURG", "LU", "LUX"));
-
-        put("MACAO", List.of("MACAO", "MO", "MAC"));
-        put("MO", List.of("MACAO", "MO", "MAC"));
-        put("MAC", List.of("MACAO", "MO", "MAC"));
-
-        put("MADAGASCAR", List.of("MADAGASCAR", "MG", "MDG"));
-        put("MG", List.of("MADAGASCAR", "MG", "MDG"));
-        put("MDG", List.of("MADAGASCAR", "MG", "MDG"));
-
-        put("MALAWI", List.of("MALAWI", "MW", "MWI"));
-        put("MW", List.of("MALAWI", "MW", "MWI"));
-        put("MWI", List.of("MALAWI", "MW", "MWI"));
-
-        put("MALAYSIA", List.of("MALAYSIA", "MY", "MYS"));
-        put("MY", List.of("MALAYSIA", "MY", "MYS"));
-        put("MYS", List.of("MALAYSIA", "MY", "MYS"));
-
-        put("MALDIVES", List.of("MALDIVES", "MV", "MDV"));
-        put("MV", List.of("MALDIVES", "MV", "MDV"));
-        put("MDV", List.of("MALDIVES", "MV", "MDV"));
-
-        put("MALI", List.of("MALI", "ML", "MLI"));
-        put("ML", List.of("MALI", "ML", "MLI"));
-        put("MLI", List.of("MALI", "ML", "MLI"));
-
-        put("MALTA", List.of("MALTA", "MT", "MLT"));
-        put("MT", List.of("MALTA", "MT", "MLT"));
-        put("MLT", List.of("MALTA", "MT", "MLT"));
-
-        put("THE MARSHALL ISLANDS", List.of("THE MARSHALL ISLANDS", "MARSHALL ISLANDS", "MH", "MHL"));
-        put("MARSHALL ISLANDS", List.of("THE MARSHALL ISLANDS", "MARSHALL ISLANDS", "MH", "MHL"));
-        put("MH", List.of("THE MARSHALL ISLANDS", "MARSHALL ISLANDS", "MH", "MHL"));
-        put("MHL", List.of("THE MARSHALL ISLANDS", "MARSHALL ISLANDS", "MH", "MHL"));
-
-        put("MARTINIQUE", List.of("MARTINIQUE", "MQ", "MTQ"));
-        put("MQ", List.of("MARTINIQUE", "MQ", "MTQ"));
-        put("MTQ", List.of("MARTINIQUE", "MQ", "MTQ"));
-
-        put("MAURITANIA", List.of("MAURITANIA", "MR", "MRT"));
-        put("MR", List.of("MAURITANIA", "MR", "MRT"));
-        put("MRT", List.of("MAURITANIA", "MR", "MRT"));
-
-        put("MAURITIUS", List.of("MAURITIUS", "MU", "MUS"));
-        put("MU", List.of("MAURITIUS", "MU", "MUS"));
-        put("MUS", List.of("MAURITIUS", "MU", "MUS"));
-
-        put("MAYOTTE", List.of("MAYOTTE", "YT", "MYT"));
-        put("YT", List.of("MAYOTTE", "YT", "MYT"));
-        put("MYT", List.of("MAYOTTE", "YT", "MYT"));
-
-        put("MEXICO", List.of("MEXICO", "MX", "MEX"));
-        put("MX", List.of("MEXICO", "MX", "MEX"));
-        put("MEX", List.of("MEXICO", "MX", "MEX"));
-
-        put("FEDERATED STATES OF MICRONESIA", List.of("FEDERATED STATES OF MICRONESIA","MICRONESIA", "FM", "FSM"));
-        put("MICRONESIA", List.of("FEDERATED STATES OF MICRONESIA","MICRONESIA", "FM", "FSM"));
-        put("FM", List.of("FEDERATED STATES OF MICRONESIA","MICRONESIA", "FM", "FSM"));
-        put("FSM", List.of("FEDERATED STATES OF MICRONESIA","MICRONESIA", "FM", "FSM"));
-
-        put("THE REPUBLIC OF MOLDOVA", List.of("THE REPUBLIC OF MOLDOVA", "MOLDOVA", "MD", "MDA"));
-        put("MOLDOVA", List.of("THE REPUBLIC OF MOLDOVA", "MOLDOVA", "MD", "MDA"));
-        put("MD", List.of("THE REPUBLIC OF MOLDOVA", "MOLDOVA", "MD", "MDA"));
-        put("MDA", List.of("THE REPUBLIC OF MOLDOVA", "MOLDOVA", "MD", "MDA"));
-
-        put("MONACO", List.of("MONACO", "MC", "MCO"));
-        put("MC", List.of("MONACO", "MC", "MCO"));
-        put("MCO", List.of("MONACO", "MC", "MCO"));
-
-        put("MONGOLIA", List.of("MONGOLIA", "MN", "MNG"));
-        put("MN", List.of("MONGOLIA", "MN", "MNG"));
-        put("MNG", List.of("MONGOLIA", "MN", "MNG"));
-
-        put("MONTENEGRO", List.of("MONTENEGRO", "ME", "MNE"));
-        put("ME", List.of("MONTENEGRO", "ME", "MNE"));
-        put("MNE", List.of("MONTENEGRO", "ME", "MNE"));
-
-        put("MONTSERRAT", List.of("MONTSERRAT", "MS", "MSR"));
-        put("MS", List.of("MONTSERRAT", "MS", "MSR"));
-        put("MSR", List.of("MONTSERRAT", "MS", "MSR"));
-
-        put("MOROCCO", List.of("MOROCCO", "MA", "MAR"));
-        put("MA", List.of("MOROCCO", "MA", "MAR"));
-        put("MAR", List.of("MOROCCO", "MA", "MAR"));
-
-        put("MOZAMBIQUE", List.of("MOZAMBIQUE", "MZ", "MOZ"));
-        put("MZ", List.of("MOZAMBIQUE", "MZ", "MOZ"));
-        put("MOZ", List.of("MOZAMBIQUE", "MZ", "MOZ"));
-
-        put("MYANMAR", List.of("MYANMAR", "MM", "MMR"));
-        put("MM", List.of("MYANMAR", "MM", "MMR"));
-        put("MMR", List.of("MYANMAR", "MM", "MMR"));
-
-        put("NAMIBIA", List.of("NAMIBIA", "NA", "NAM"));
-        put("NA", List.of("NAMIBIA", "NA", "NAM"));
-        put("NAM", List.of("NAMIBIA", "NA", "NAM"));
-
-        put("NAURU", List.of("NAURU", "NR", "NRU"));
-        put("NR", List.of("NAURU", "NR", "NRU"));
-        put("NRU", List.of("NAURU", "NR", "NRU"));
-
-        put("NEPAL", List.of("NEPAL", "NP", "NPL"));
-        put("NP", List.of("NEPAL", "NP", "NPL"));
-        put("NPL", List.of("NEPAL", "NP", "NPL"));
-
-        put("THE NETHERLANDS", List.of("THE NETHERLANDS", "NETHERLANDS", "NL", "NLD"));
-        put("NETHERLANDS", List.of("THE NETHERLANDS", "NETHERLANDS", "NL", "NLD"));
-        put("NL", List.of("THE NETHERLANDS", "NETHERLANDS", "NL", "NLD"));
-        put("NLD", List.of("THE NETHERLANDS", "NETHERLANDS", "NL", "NLD"));
-
-        put("NEW CALEDONIA", List.of("NEW CALEDONIA", "NC", "NCL"));
-        put("NC", List.of("NEW CALEDONIA", "NC", "NCL"));
-        put("NCL", List.of("NEW CALEDONIA", "NC", "NCL"));
-
-        put("NEW ZEALAND", List.of("NEW ZEALAND", "NZ", "NZL"));
-        put("NZ", List.of("NEW ZEALAND", "NZ", "NZL"));
-        put("NZL", List.of("NEW ZEALAND", "NZ", "NZL"));
-
-        put("NICARAGUA", List.of("NICARAGUA", "NI", "NIC"));
-        put("NI", List.of("NICARAGUA", "NI", "NIC"));
-        put("NIC", List.of("NICARAGUA", "NI", "NIC"));
-
-        put("THE NIGER", List.of("THE NIGER", "NIGER", "NE", "NER"));
-        put("NIGER", List.of("THE NIGER", "NIGER", "NE", "NER"));
-        put("NE", List.of("THE NIGER", "NIGER", "NE", "NER"));
-        put("NER", List.of("THE NIGER", "NIGER", "NE", "NER"));
-
-        put("NIGERIA", List.of("NIGERIA", "NG", "NGA"));
-        put("NG", List.of("NIGERIA", "NG", "NGA"));
-        put("NGA", List.of("NIGERIA", "NG", "NGA"));
-
-        put("NIUE", List.of("NIUE", "NU", "NIU"));
-        put("NU", List.of("NIUE", "NU", "NIU"));
-        put("NIU", List.of("NIUE", "NU", "NIU"));
-
-        put("NORFOLK ISLAND", List.of("NORFOLK ISLAND", "NF", "NFK"));
-        put("NF", List.of("NORFOLK ISLAND", "NF", "NFK"));
-        put("NFK", List.of("NORFOLK ISLAND", "NF", "NFK"));
-
-        put("THE NORTHERN MARIANA ISLANDS", List.of("THE NORTHERN MARIANA ISLANDS", "NORTHERN MARIANA ISLANDS", "MP", "MNP"));
-        put("NORTHERN MARIANA ISLANDS", List.of("THE NORTHERN MARIANA ISLANDS", "NORTHERN MARIANA ISLANDS", "MP", "MNP"));
-        put("MP", List.of("THE NORTHERN MARIANA ISLANDS", "NORTHERN MARIANA ISLANDS", "MP", "MNP"));
-        put("MNP", List.of("THE NORTHERN MARIANA ISLANDS", "NORTHERN MARIANA ISLANDS", "MP", "MNP"));
-
-        put("NORWAY", List.of("NORWAY", "NO", "NOR"));
-        put("NO", List.of("NORWAY", "NO", "NOR"));
-        put("NOR", List.of("NORWAY", "NO", "NOR"));
-
-        put("OMAN", List.of("OMAN", "OM", "OMN"));
-        put("OM", List.of("OMAN", "OM", "OMN"));
-        put("OMN", List.of("OMAN", "OM", "OMN"));
-
-        put("PAKISTAN", List.of("PAKISTAN", "PK", "PAK"));
-        put("PK", List.of("PAKISTAN", "PK", "PAK"));
-        put("PAK", List.of("PAKISTAN", "PK", "PAK"));
-
-        put("PALAU", List.of("PALAU", "PW", "PLW"));
-        put("PW", List.of("PALAU", "PW", "PLW"));
-        put("PLW", List.of("PALAU", "PW", "PLW"));
-
-        put("PANAMA", List.of("PANAMA", "PA", "PAN"));
-        put("PA", List.of("PANAMA", "PA", "PAN"));
-        put("PAN", List.of("PANAMA", "PA", "PAN"));
-
-        put("PAPUA NEW GUINEA", List.of("PAPUA NEW GUINEA", "PG", "PNG"));
-        put("PG", List.of("PAPUA NEW GUINEA", "PG", "PNG"));
-        put("PNG", List.of("PAPUA NEW GUINEA", "PG", "PNG"));
-
-        put("PARAGUAY", List.of("PARAGUAY", "PY", "PRY"));
-        put("PY", List.of("PARAGUAY", "PY", "PRY"));
-        put("PRY", List.of("PARAGUAY", "PY", "PRY"));
-
-        put("PERU", List.of("PERU", "PE", "PER"));
-        put("PE", List.of("PERU", "PE", "PER"));
-        put("PER", List.of("PERU", "PE", "PER"));
-
-        put("THE PHILIPPINES", List.of("THE PHILIPPINES", "PHILIPPINES", "PH", "PHL"));
-        put("PHILIPPINES", List.of("THE PHILIPPINES", "PHILIPPINES", "PH", "PHL"));
-        put("PH", List.of("THE PHILIPPINES", "PHILIPPINES", "PH", "PHL"));
-        put("PHL", List.of("THE PHILIPPINES", "PHILIPPINES", "PH", "PHL"));
-
-        put("PITCAIRN", List.of("PITCAIRN", "PN", "PCN"));
-        put("PN", List.of("PITCAIRN", "PN", "PCN"));
-        put("PCN", List.of("PITCAIRN", "PN", "PCN"));
-
-        put("POLAND", List.of("POLAND", "PL", "POL"));
-        put("PL", List.of("POLAND", "PL", "POL"));
-        put("POL", List.of("POLAND", "PL", "POL"));
-
-        put("PORTUGAL", List.of("PORTUGAL", "PT", "PRT"));
-        put("PT", List.of("PORTUGAL", "PT", "PRT"));
-        put("PRT", List.of("PORTUGAL", "PT", "PRT"));
-
-        put("PUERTO RICO", List.of("PUERTO RICO", "PR", "PRI"));
-        put("PR", List.of("PUERTO RICO", "PR", "PRI"));
-        put("PRI", List.of("PUERTO RICO", "PR", "PRI"));
-
-        put("QATAR", List.of("QATAR", "QA", "QAT"));
-        put("QA", List.of("QATAR", "QA", "QAT"));
-        put("QAT", List.of("QATAR", "QA", "QAT"));
-
-        put("REPUBLIC OF NORTH MACEDONIA", List.of("REPUBLIC OF NORTH MACEDONIA", "MK", "MKD"));
-        put("MK", List.of("REPUBLIC OF NORTH MACEDONIA", "MK", "MKD"));
-        put("MKD", List.of("REPUBLIC OF NORTH MACEDONIA", "MK", "MKD"));
-
-        put("ROMANIA", List.of("ROMANIA", "RO", "ROU"));
-        put("RO", List.of("ROMANIA", "RO", "ROU"));
-        put("ROU", List.of("ROMANIA", "RO", "ROU"));
-
-        put("THE RUSSIAN FEDERATION", List.of("THE RUSSIAN FEDERATION", "RUSSIAN FEDERATION", "RU", "RUS"));
-        put("RUSSIAN FEDERATION", List.of("THE RUSSIAN FEDERATION", "RUSSIAN FEDERATION", "RU", "RUS"));
-        put("RU", List.of("THE RUSSIAN FEDERATION", "RUSSIAN FEDERATION", "RU", "RUS"));
-        put("RUS", List.of("THE RUSSIAN FEDERATION", "RUSSIAN FEDERATION", "RU", "RUS"));
-
-        put("RWANDA", List.of("RWANDA", "RW", "RWA"));
-        put("RW", List.of("RWANDA", "RW", "RWA"));
-        put("RWA", List.of("RWANDA", "RW", "RWA"));
-
-        put("RÉUNION", List.of("RÉUNION", "RE", "REU"));
-        put("RE", List.of("RÉUNION", "RE", "REU"));
-        put("REU", List.of("RÉUNION", "RE", "REU"));
-
-        put("SAINT BARTHÉLEMY", List.of("SAINT BARTHÉLEMY", "BL", "BLM"));
-        put("BL", List.of("SAINT BARTHÉLEMY", "BL", "BLM"));
-        put("BLM", List.of("SAINT BARTHÉLEMY", "BL", "BLM"));
-
-        put("SAINT HELENA, ASCENSION AND TRISTAN DA CUNHA", List.of("SAINT HELENA, ASCENSION AND TRISTAN DA CUNHA", "SH", "SHN"));
-        put("SH", List.of("SAINT HELENA, ASCENSION AND TRISTAN DA CUNHA", "SH", "SHN"));
-        put("SHN", List.of("SAINT HELENA, ASCENSION AND TRISTAN DA CUNHA", "SH", "SHN"));
-
-        put("SAINT KITTS AND NEVIS", List.of("SAINT KITTS AND NEVIS", "KN", "KNA"));
-        put("KN", List.of("SAINT KITTS AND NEVIS", "KN", "KNA"));
-        put("KNA", List.of("SAINT KITTS AND NEVIS", "KN", "KNA"));
-
-        put("SAINT LUCIA", List.of("SAINT LUCIA", "LC", "LCA"));
-        put("LC", List.of("SAINT LUCIA", "LC", "LCA"));
-        put("LCA", List.of("SAINT LUCIA", "LC", "LCA"));
-
-        put("SAINT PIERRE AND MIQUELON", List.of("SAINT PIERRE AND MIQUELON", "PM", "SPM"));
-        put("PM", List.of("SAINT PIERRE AND MIQUELON", "PM", "SPM"));
-        put("SPM", List.of("SAINT PIERRE AND MIQUELON", "PM", "SPM"));
-
-        put("SAINT VINCENT AND THE GRENADINES", List.of("SAINT VINCENT AND THE GRENADINES", "VC", "VCT"));
-        put("VC", List.of("SAINT VINCENT AND THE GRENADINES", "VC", "VCT"));
-        put("VCT", List.of("SAINT VINCENT AND THE GRENADINES", "VC", "VCT"));
-
-        put("SAMOA", List.of("SAMOA", "WS", "WSM"));
-        put("WS", List.of("SAMOA", "WS", "WSM"));
-        put("WSM", List.of("SAMOA", "WS", "WSM"));
-
-        put("SAN MARINO", List.of("SAN MARINO", "SM", "SMR"));
-        put("SM", List.of("SAN MARINO", "SM", "SMR"));
-        put("SMR", List.of("SAN MARINO", "SM", "SMR"));
-
-        put("SAO TOME AND PRINCIPE", List.of("SAO TOME AND PRINCIPE", "ST", "STP"));
-        put("ST", List.of("SAO TOME AND PRINCIPE", "ST", "STP"));
-        put("STP", List.of("SAO TOME AND PRINCIPE", "ST", "STP"));
-
-        put("SAUDI ARABIA", List.of("SAUDI ARABIA", "SA", "SAU"));
-        put("SA", List.of("SAUDI ARABIA", "SA", "SAU"));
-        put("SAU", List.of("SAUDI ARABIA", "SA", "SAU"));
-
-        put("SENEGAL", List.of("SENEGAL", "SN", "SEN"));
-        put("SN", List.of("SENEGAL", "SN", "SEN"));
-        put("SEN", List.of("SENEGAL", "SN", "SEN"));
-
-        put("SERBIA", List.of("SERBIA", "RS", "SRB"));
-        put("RS", List.of("SERBIA", "RS", "SRB"));
-        put("SRB", List.of("SERBIA", "RS", "SRB"));
-
-        put("SEYCHELLES", List.of("SEYCHELLES", "SC", "SYC"));
-        put("SC", List.of("SEYCHELLES", "SC", "SYC"));
-        put("SYC", List.of("SEYCHELLES", "SC", "SYC"));
-
-        put("SIERRA LEONE", List.of("SIERRA LEONE", "SL", "SLE"));
-        put("SL", List.of("SIERRA LEONE", "SL", "SLE"));
-        put("SLE", List.of("SIERRA LEONE", "SL", "SLE"));
-
-        put("SINGAPORE", List.of("SINGAPORE", "SG", "SGP"));
-        put("SG", List.of("SINGAPORE", "SG", "SGP"));
-        put("SGP", List.of("SINGAPORE", "SG", "SGP"));
-
-        put("SLOVAKIA", List.of("SLOVAKIA", "SK", "SVK"));
-        put("SK", List.of("SLOVAKIA", "SK", "SVK"));
-        put("SVK", List.of("SLOVAKIA", "SK", "SVK"));
-
-        put("SLOVENIA", List.of("SLOVENIA", "SI", "SVN"));
-        put("SI", List.of("SLOVENIA", "SI", "SVN"));
-        put("SVN", List.of("SLOVENIA", "SI", "SVN"));
-
-        put("SOLOMON ISLANDS", List.of("SOLOMON ISLANDS", "SB", "SLB"));
-        put("SB", List.of("SOLOMON ISLANDS", "SB", "SLB"));
-        put("SLB", List.of("SOLOMON ISLANDS", "SB", "SLB"));
-
-        put("SOMALIA", List.of("SOMALIA", "SO", "SOM"));
-        put("SO", List.of("SOMALIA", "SO", "SOM"));
-        put("SOM", List.of("SOMALIA", "SO", "SOM"));
-
-        put("SOUTH AFRICA", List.of("SOUTH AFRICA", "ZA", "ZAF"));
-        put("ZA", List.of("SOUTH AFRICA", "ZA", "ZAF"));
-        put("ZAF", List.of("SOUTH AFRICA", "ZA", "ZAF"));
-
-        put("SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS", List.of("SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS", "GS", "SGS"));
-        put("GS", List.of("SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS", "GS", "SGS"));
-        put("SGS", List.of("SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS", "GS", "SGS"));
-
-        put("SOUTH SUDAN", List.of("SOUTH SUDAN", "SS", "SSD"));
-        put("SS", List.of("SOUTH SUDAN", "SS", "SSD"));
-        put("SSD", List.of("SOUTH SUDAN", "SS", "SSD"));
-
-        put("SPAIN", List.of("SPAIN", "ES", "ESP"));
-        put("ES", List.of("SPAIN", "ES", "ESP"));
-        put("ESP", List.of("SPAIN", "ES", "ESP"));
-
-        put("SRI LANKA", List.of("SRI LANKA", "LK", "LKA"));
-        put("LK", List.of("SRI LANKA", "LK", "LKA"));
-        put("LKA", List.of("SRI LANKA", "LK", "LKA"));
-
-        put("THE SUDAN", List.of("THE SUDAN", "SUDAN", "SD", "SDN"));
-        put("SUDAN", List.of("THE SUDAN", "SUDAN", "SD", "SDN"));
-        put("SD", List.of("THE SUDAN", "SUDAN", "SD", "SDN"));
-        put("SDN", List.of("THE SUDAN", "SUDAN", "SD", "SDN"));
-
-        put("SURINAME", List.of("SURINAME", "SR", "SUR"));
-        put("SR", List.of("SURINAME", "SR", "SUR"));
-        put("SUR", List.of("SURINAME", "SR", "SUR"));
-
-        put("SVALBARD AND JAN MAYEN", List.of("SVALBARD AND JAN MAYEN", "SJ", "SJM"));
-        put("SJ", List.of("SVALBARD AND JAN MAYEN", "SJ", "SJM"));
-        put("SJM", List.of("SVALBARD AND JAN MAYEN", "SJ", "SJM"));
-
-        put("SWEDEN", List.of("SWEDEN", "SE", "SWE"));
-        put("SE", List.of("SWEDEN", "SE", "SWE"));
-        put("SWE", List.of("SWEDEN", "SE", "SWE"));
-
-        put("SWITZERLAND", List.of("SWITZERLAND", "CH", "CHE"));
-        put("CH", List.of("SWITZERLAND", "CH", "CHE"));
-        put("CHE", List.of("SWITZERLAND", "CH", "CHE"));
-
-        put("SYRIAN ARAB REPUBLIC", List.of("SYRIAN ARAB REPUBLIC", "SY", "SYR"));
-        put("SY", List.of("SYRIAN ARAB REPUBLIC", "SY", "SYR"));
-        put("SYR", List.of("SYRIAN ARAB REPUBLIC", "SY", "SYR"));
-
-        put("TAJIKISTAN", List.of("TAJIKISTAN", "TJ", "TJK"));
-        put("TJ", List.of("TAJIKISTAN", "TJ", "TJK"));
-        put("TJK", List.of("TAJIKISTAN", "TJ", "TJK"));
-
-        put("TANZANIA, UNITED REPUBLIC OF", List.of("TANZANIA, UNITED REPUBLIC OF", "TZ", "TZA"));
-        put("TZ", List.of("TANZANIA, UNITED REPUBLIC OF", "TZ", "TZA"));
-        put("TZA", List.of("TANZANIA, UNITED REPUBLIC OF", "TZ", "TZA"));
-
-        put("THAILAND", List.of("THAILAND", "TH", "THA"));
-        put("TH", List.of("THAILAND", "TH", "THA"));
-        put("THA", List.of("THAILAND", "TH", "THA"));
-
-        put("TIMOR-LESTE", List.of("TIMOR-LESTE", "TL", "TLS"));
-        put("TL", List.of("TIMOR-LESTE", "TL", "TLS"));
-        put("TLS", List.of("TIMOR-LESTE", "TL", "TLS"));
-
-        put("TOGO", List.of("TOGO", "TG", "TGO"));
-        put("TG", List.of("TOGO", "TG", "TGO"));
-        put("TGO", List.of("TOGO", "TG", "TGO"));
-
-        put("TOKELAU", List.of("TOKELAU", "TK", "TKL"));
-        put("TK", List.of("TOKELAU", "TK", "TKL"));
-        put("TKL", List.of("TOKELAU", "TK", "TKL"));
-
-        put("TONGA", List.of("TONGA", "TO", "TON"));
-        put("TO", List.of("TONGA", "TO", "TON"));
-        put("TON", List.of("TONGA", "TO", "TON"));
-
-        put("TRINIDAD AND TOBAGO", List.of("TRINIDAD AND TOBAGO", "TT", "TTO"));
-        put("TT", List.of("TRINIDAD AND TOBAGO", "TT", "TTO"));
-        put("TTO", List.of("TRINIDAD AND TOBAGO", "TT", "TTO"));
-
-        put("TUNISIA", List.of("TUNISIA", "TN", "TUN"));
-        put("TN", List.of("TUNISIA", "TN", "TUN"));
-        put("TUN", List.of("TUNISIA", "TN", "TUN"));
-
-        put("TURKEY", List.of("TURKEY", "TR", "TUR"));
-        put("TR", List.of("TURKEY", "TR", "TUR"));
-        put("TUR", List.of("TURKEY", "TR", "TUR"));
-
-        put("TURKMENISTAN", List.of("TURKMENISTAN", "TM", "TKM"));
-        put("TM", List.of("TURKMENISTAN", "TM", "TKM"));
-        put("TKM", List.of("TURKMENISTAN", "TM", "TKM"));
-
-        put("THE TURKS AND CAICOS ISLANDS", List.of("THE TURKS AND CAICOS ISLANDS", "TURKS AND CAICOS ISLANDS", "TC", "TCA"));
-        put("TURKS AND CAICOS ISLANDS", List.of("THE TURKS AND CAICOS ISLANDS", "TURKS AND CAICOS ISLANDS", "TC", "TCA"));
-        put("TC", List.of("THE TURKS AND CAICOS ISLANDS", "TURKS AND CAICOS ISLANDS", "TC", "TCA"));
-        put("TCA", List.of("THE TURKS AND CAICOS ISLANDS", "TURKS AND CAICOS ISLANDS", "TC", "TCA"));
-
-        put("TUVALU", List.of("TUVALU", "TV", "TUV"));
-        put("TV", List.of("TUVALU", "TV", "TUV"));
-        put("TUV", List.of("TUVALU", "TV", "TUV"));
-
-        put("UGANDA", List.of("UGANDA", "UG", "UGA"));
-        put("UG", List.of("UGANDA", "UG", "UGA"));
-        put("UGA", List.of("UGANDA", "UG", "UGA"));
-
-        put("UKRAINE", List.of("UKRAINE", "UA", "UKR"));
-        put("UA", List.of("UKRAINE", "UA", "UKR"));
-        put("UKR", List.of("UKRAINE", "UA", "UKR"));
-
-        put("THE UNITED ARAB EMIRATES", List.of("THE UNITED ARAB EMIRATES", "UNITED ARAB EMIRATES", "AE", "ARE"));
-        put("UNITED ARAB EMIRATES", List.of("THE UNITED ARAB EMIRATES", "UNITED ARAB EMIRATES", "AE", "ARE"));
-        put("AE", List.of("THE UNITED ARAB EMIRATES", "UNITED ARAB EMIRATES", "AE", "ARE"));
-        put("ARE", List.of("THE UNITED ARAB EMIRATES", "UNITED ARAB EMIRATES", "AE", "ARE"));
-
-        put("UNITED KINGDOM", List.of("UNITED KINGDOM", "THE UNITED KINGDOM","GREAT BRITAIN","UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", "GB", "GBR"));
-        put("THE UNITED KINGDOM", List.of("UNITED KINGDOM", "THE UNITED KINGDOM","GREAT BRITAIN","UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", "GB", "GBR"));
-        put("GREAT BRITAIN", List.of("UNITED KINGDOM", "THE UNITED KINGDOM","GREAT BRITAIN","UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", "GB", "GBR"));
-        put("UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", List.of("UNITED KINGDOM", "THE UNITED KINGDOM","GREAT BRITAIN","UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", "GB", "GBR"));
-        put("THE UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", List.of("UNITED KINGDOM", "THE UNITED KINGDOM","GREAT BRITAIN","UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", "GB", "GBR"));
-        put("GB", List.of("UNITED KINGDOM", "THE UNITED KINGDOM","GREAT BRITAIN","UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", "GB", "GBR"));
-        put("GBR", List.of("UNITED KINGDOM", "THE UNITED KINGDOM","GREAT BRITAIN","UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", "GB", "GBR"));
-
-        put("THE UNITED STATES MINOR OUTLYING ISLANDS", List.of("THE UNITED STATES MINOR OUTLYING ISLANDS", "UNITED STATES MINOR OUTLYING ISLANDS", "UM", "UMI"));
-        put("UNITED STATES MINOR OUTLYING ISLANDS", List.of("THE UNITED STATES MINOR OUTLYING ISLANDS", "UNITED STATES MINOR OUTLYING ISLANDS", "UM", "UMI"));
-        put("UM",List.of("THE UNITED STATES MINOR OUTLYING ISLANDS", "UNITED STATES MINOR OUTLYING ISLANDS", "UM", "UMI"));
-        put("UMI", List.of("THE UNITED STATES MINOR OUTLYING ISLANDS", "UNITED STATES MINOR OUTLYING ISLANDS", "UM", "UMI"));
-
-        put("URUGUAY", List.of("URUGUAY", "UY", "URY"));
-        put("UY", List.of("URUGUAY", "UY", "URY"));
-        put("URY", List.of("URUGUAY", "UY", "URY"));
-
-        put("UZBEKISTAN", List.of("UZBEKISTAN", "UZ", "UZB"));
-        put("UZ", List.of("UZBEKISTAN", "UZ", "UZB"));
-        put("UZB", List.of("UZBEKISTAN", "UZ", "UZB"));
-
-        put("VANUATU", List.of("VANUATU", "VU", "VUT"));
-        put("VU", List.of("VANUATU", "VU", "VUT"));
-        put("VUT", List.of("VANUATU", "VU", "VUT"));
-
-        put("BOLIVARIAN REPUBLIC OF VENEZUELA", List.of("BOLIVARIAN REPUBLIC OF VENEZUELA", "VENEZUELA", "VE", "VEN"));
-        put("VENEZUELA", List.of("BOLIVARIAN REPUBLIC OF VENEZUELA", "VENEZUELA", "VE", "VEN"));
-        put("VE", List.of("BOLIVARIAN REPUBLIC OF VENEZUELA", "VENEZUELA", "VE", "VEN"));
-        put("VEN", List.of("BOLIVARIAN REPUBLIC OF VENEZUELA", "VENEZUELA", "VE", "VEN"));
-
-        put("VIETNAM", List.of("VIETNAM","VIET NAM", "VN", "VNM"));
-        put("VIET NAM", List.of("VIETNAM","VIET NAM", "VN", "VNM"));
-        put("VN", List.of("VIETNAM","VIET NAM", "VN", "VNM"));
-        put("VNM", List.of("VIETNAM","VIET NAM", "VN", "VNM"));
-
-        put("WALLIS AND FUTUNA", List.of("WALLIS AND FUTUNA", "WF", "WLF"));
-        put("WF", List.of("WALLIS AND FUTUNA", "WF", "WLF"));
-        put("WLF", List.of("WALLIS AND FUTUNA", "WF", "WLF"));
-
-        put("WESTERN SAHARA", List.of("WESTERN SAHARA", "EH", "ESH"));
-        put("EH", List.of("WESTERN SAHARA", "EH", "ESH"));
-        put("ESH", List.of("WESTERN SAHARA", "EH", "ESH"));
-
-        put("YEMEN", List.of("YEMEN", "YE", "YEM"));
-        put("YE", List.of("YEMEN", "YE", "YEM"));
-        put("YEM", List.of("YEMEN", "YE", "YEM"));
-
-        put("ZAMBIA", List.of("ZAMBIA", "ZM", "ZMB"));
-        put("ZM", List.of("ZAMBIA", "ZM", "ZMB"));
-        put("ZMB", List.of("ZAMBIA", "ZM", "ZMB"));
-
-        put("ZIMBABWE", List.of("ZIMBABWE", "ZW", "ZWE"));
-        put("ZW", List.of("ZIMBABWE", "ZW", "ZWE"));
-        put("ZWE", List.of("ZIMBABWE", "ZW", "ZWE"));
+    Map<String, String> nonUsaCountriesAbbreviations = new HashMap<>() {{
+        put("AFGHANISTAN", "Afghanistan");
+        put("AF", "Afghanistan");
+        put("AFG", "Afghanistan");
+
+        put("ALBANIA", "Albania");
+        put("AL", "Albania");
+        put("ALB", "Albania");
+
+        put("ALGERIA", "Algeria");
+        put("DZ", "Algeria");
+        put("DZA", "Algeria");
+
+        put("AMERICAN SAMOA", "American samoa");
+        put("AS", "American samoa");
+        put("ASM", "American samoa");
+
+        put("ANDORRA", "Andorra");
+        put("AD", "Andorra");
+        put("AND", "Andorra");
+
+        put("ANGOLA", "Angola");
+        put("AO", "Angola");
+        put("AGO", "Angola");
+
+        put("ANGUILLA", "Anguilla");
+        put("AI", "Anguilla");
+        put("AIA", "Anguilla");
+
+        put("ANTARCTICA", "Antarctica");
+        put("AQ", "Antarctica");
+        put("ATA", "Antarctica");
+
+        put("ANTIGUA AND BARBUDA", "Antigua and barbuda");
+        put("AG", "Antigua and barbuda");
+        put("ATG", "Antigua and barbuda");
+
+        put("ARGENTINA", "Argentina");
+        put("AR", "Argentina");
+        put("ARG", "Argentina");
+
+        put("ARMENIA", "Armenia");
+        put("AM", "Armenia");
+        put("ARM", "Armenia");
+
+        put("ARUBA", "Aruba");
+        put("AW", "Aruba");
+        put("ABW", "Aruba");
+
+        put("AUSTRALIA", "Australia");
+        put("AU", "Australia");
+        put("AUS", "Australia");
+
+        put("AUSTRIA", "Austria");
+        put("AT", "Austria");
+        put("AUT", "Austria");
+
+        put("AZERBAIJAN", "Azerbaijan");
+        put("AZ", "Azerbaijan");
+        put("AZE", "Azerbaijan");
+
+        put("BAHAMAS", "Bahamas");
+        put("BS", "Bahamas");
+        put("BHS", "Bahamas");
+
+        put("BAHRAIN", "Bahrain");
+        put("BH", "Bahrain");
+        put("BHR", "Bahrain");
+
+        put("BANGLADESH", "Bangladesh");
+        put("BD", "Bangladesh");
+        put("BGD", "Bangladesh");
+
+        put("BARBADOS", "Barbados");
+        put("BB", "Barbados");
+        put("BRB", "Barbados");
+
+        put("BELARUS", "Belarus");
+        put("BY", "Belarus");
+        put("BLR", "Belarus");
+
+        put("BELGIUM", "Belgium");
+        put("BE", "Belgium");
+        put("BEL", "Belgium");
+
+        put("BELIZE", "Belize");
+        put("BZ", "Belize");
+        put("BLZ", "Belize");
+
+        put("BENIN", "Benin");
+        put("BJ", "Benin");
+        put("BEN", "Benin");
+
+        put("BERMUDA", "Bermuda");
+        put("BM", "Bermuda");
+        put("BMU", "Bermuda");
+
+        put("BHUTAN", "Bhutan");
+        put("BT", "Bhutan");
+        put("BTN", "Bhutan");
+
+        put("BOLIVIA", "Bolivia");
+        put("BO", "Bolivia");
+        put("BOL", "Bolivia");
+
+        put("BONAIRE, SINT EUSTATIUS AND SABA", "Bonaire, sint eustatius and saba");
+        put("BQ", "Bonaire, sint eustatius and saba");
+        put("BES", "Bonaire, sint eustatius and saba");
+
+        put("BOSNIA AND HERZEGOVINA", "Bosnia and herzegovina");
+        put("BA", "Bosnia and herzegovina");
+        put("BIH", "Bosnia and herzegovina");
+
+        put("BOTSWANA", "Botswana");
+        put("BW", "Botswana");
+        put("BWA", "Botswana");
+
+        put("BOUVET ISLAND", "Bouvet island");
+        put("BV", "Bouvet island");
+        put("BVT", "Bouvet island");
+
+        put("BRAZIL", "Brazil");
+        put("BR", "Brazil");
+        put("BRA", "Brazil");
+
+        put("BRITISH INDIAN OCEAN TERRITORY", "British indian ocean territory");
+        put("IO", "British indian ocean territory");
+        put("IOT", "British indian ocean territory");
+
+        put("BRUNEI DARUSSALAM", "Brunei darussalam");
+        put("BN", "Brunei darussalam");
+        put("BRN", "Brunei darussalam");
+
+        put("BULGARIA", "Bulgaria");
+        put("BG", "Bulgaria");
+        put("BGR", "Bulgaria");
+
+        put("BURKINA FASO", "Burkina faso");
+        put("BF", "Burkina faso");
+        put("BFA", "Burkina faso");
+
+        put("BURUNDI", "Burundi");
+        put("BI", "Burundi");
+        put("BDI", "Burundi");
+
+        put("CABO VERDE", "Cabo verde");
+        put("CV", "Cabo verde");
+        put("CPV", "Cabo verde");
+
+        put("CAMBODIA", "Cambodia");
+        put("KH", "Cambodia");
+        put("KHM", "Cambodia");
+
+        put("CAMEROON", "Cameroon");
+        put("CM", "Cameroon");
+        put("CMR", "Cameroon");
+
+        put("CANADA", "Canada");
+        put("CA", "Canada");
+        put("CAN", "Canada");
+
+        put("CAYMAN ISLANDS", "Cayman islands");
+        put("KY", "Cayman islands");
+        put("CYM", "Cayman islands");
+
+        put("CENTRAL AFRICAN REPUBLIC", "Central african republic");
+        put("CF", "Central african republic");
+        put("CAF", "Central african republic");
+
+        put("CHAD", "Chad");
+        put("TD", "Chad");
+        put("TCD", "Chad");
+
+        put("CHILE", "Chile");
+        put("CL", "Chile");
+        put("CHL", "Chile");
+
+        put("CHINA", "China");
+        put("CN", "China");
+        put("CHN", "China");
+
+        put("CHRISTMAS ISLAND", "Christmas island");
+        put("CX", "Christmas island");
+        put("CXR", "Christmas island");
+
+        put("COCOS ISLANDS", "Cocos islands");
+        put("CC", "Cocos islands");
+        put("CCK", "Cocos islands");
+
+        put("COLOMBIA", "Colombia");
+        put("CO", "Colombia");
+        put("COL", "Colombia");
+
+        put("COMOROS", "Comoros");
+        put("KM", "Comoros");
+        put("COM", "Comoros");
+
+        put("CONGO, DEMOCRATIC REPUBLIC OF THE", "Congo, democratic republic of the");
+        put("CD", "Congo, democratic republic of the");
+        put("COD", "Congo, democratic republic of the");
+
+        put("CONGO", "Congo");
+        put("CG", "Congo");
+        put("COG", "Congo");
+
+        put("COOK ISLANDS", "Cook islands");
+        put("CK", "Cook islands");
+        put("COK", "Cook islands");
+
+        put("COSTA RICA", "Costa rica");
+        put("CR", "Costa rica");
+        put("CRI", "Costa rica");
+
+        put("CÔTE D'IVOIRE", "Côte d'ivoire");
+        put("CI", "Côte d'ivoire");
+        put("CIV", "Côte d'ivoire");
+
+        put("CROATIA", "Croatia");
+        put("HR", "Croatia");
+        put("HRV", "Croatia");
+
+        put("CUBA", "Cuba");
+        put("CU", "Cuba");
+        put("CUB", "Cuba");
+
+        put("CURAÇAO", "Curaçao");
+        put("CW", "Curaçao");
+        put("CUW", "Curaçao");
+
+        put("CYPRUS", "Cyprus");
+        put("CY", "Cyprus");
+        put("CYP", "Cyprus");
+
+        put("CZECHIA", "Czechia");
+        put("CZ", "Czechia");
+        put("CZE", "Czechia");
+
+        put("DENMARK", "Denmark");
+        put("DK", "Denmark");
+        put("DNK", "Denmark");
+
+        put("DJIBOUTI", "Djibouti");
+        put("DJ", "Djibouti");
+        put("DJI", "Djibouti");
+
+        put("DOMINICA", "Dominica");
+        put("DM", "Dominica");
+        put("DMA", "Dominica");
+
+        put("DOMINICAN REPUBLIC", "Dominican republic");
+        put("DO", "Dominican republic");
+        put("DOM", "Dominican republic");
+
+        put("ECUADOR", "Ecuador");
+        put("EC", "Ecuador");
+        put("ECU", "Ecuador");
+
+        put("EGYPT", "Egypt");
+        put("EG", "Egypt");
+        put("EGY", "Egypt");
+
+        put("EL SALVADOR", "El salvador");
+        put("SV", "El salvador");
+        put("SLV", "El salvador");
+
+        put("EQUATORIAL GUINEA", "Equatorial guinea");
+        put("GQ", "Equatorial guinea");
+        put("GNQ", "Equatorial guinea");
+
+        put("ERITREA", "Eritrea");
+        put("ER", "Eritrea");
+        put("ERI", "Eritrea");
+
+        put("ESTONIA", "Estonia");
+        put("EE", "Estonia");
+        put("EST", "Estonia");
+
+        put("ESWATINI", "Eswatini");
+        put("SZ", "Eswatini");
+        put("SWZ", "Eswatini");
+
+        put("ETHIOPIA", "Ethiopia");
+        put("ET", "Ethiopia");
+        put("ETH", "Ethiopia");
+
+        put("FALKLAND ISLANDS", "Falkland islands");
+        put("FK", "Falkland islands");
+        put("FLK", "Falkland islands");
+
+        put("FAROE ISLANDS", "Faroe islands");
+        put("FO", "Faroe islands");
+        put("FRO", "Faroe islands");
+
+        put("FIJI", "Fiji");
+        put("FJ", "Fiji");
+        put("FJI", "Fiji");
+
+        put("FINLAND", "Finland");
+        put("FI", "Finland");
+        put("FIN", "Finland");
+
+        put("FRANCE", "France");
+        put("FR", "France");
+        put("FRA", "France");
+
+        put("FRENCH GUIANA", "French guiana");
+        put("GF", "French guiana");
+        put("GUF", "French guiana");
+
+        put("FRENCH POLYNESIA", "French polynesia");
+        put("PF", "French polynesia");
+        put("PYF", "French polynesia");
+
+        put("FRENCH SOUTHERN TERRITORIES", "French southern territories");
+        put("TF", "French southern territories");
+        put("ATF", "French southern territories");
+
+        put("GABON", "Gabon");
+        put("GA", "Gabon");
+        put("GAB", "Gabon");
+
+        put("GAMBIA", "Gambia");
+        put("GM", "Gambia");
+        put("GMB", "Gambia");
+
+        put("GEORGIA", "Georgia");
+        put("GE", "Georgia");
+        put("GEO", "Georgia");
+
+        put("GERMANY", "Germany");
+        put("DE", "Germany");
+        put("DEU", "Germany");
+
+        put("GHANA", "Ghana");
+        put("GH", "Ghana");
+        put("GHA", "Ghana");
+
+        put("GIBRALTAR", "Gibraltar");
+        put("GI", "Gibraltar");
+        put("GIB", "Gibraltar");
+
+        put("GREECE", "Greece");
+        put("GR", "Greece");
+        put("GRC", "Greece");
+
+        put("GREENLAND", "Greenland");
+        put("GL", "Greenland");
+        put("GRL", "Greenland");
+
+        put("GRENADA", "Grenada");
+        put("GD", "Grenada");
+        put("GRD", "Grenada");
+
+        put("GUADELOUPE", "Guadeloupe");
+        put("GP", "Guadeloupe");
+        put("GLP", "Guadeloupe");
+
+        put("GUAM", "Guam");
+        put("GU", "Guam");
+        put("GUM", "Guam");
+
+        put("GUATEMALA", "Guatemala");
+        put("GT", "Guatemala");
+        put("GTM", "Guatemala");
+
+        put("GUERNSEY", "Guernsey");
+        put("GG", "Guernsey");
+        put("GGY", "Guernsey");
+
+        put("GUINEA", "Guinea");
+        put("GN", "Guinea");
+        put("GIN", "Guinea");
+
+        put("GUINEA BISSAU", "Guinea-bissau");
+        put("GUINEA-BISSAU", "Guinea-bissau");
+        put("GW", "Guinea-bissau");
+        put("GNB", "Guinea-bissau");
+
+        put("GUYANA", "Guyana");
+        put("GY", "Guyana");
+        put("GUY", "Guyana");
+
+        put("HAITI", "Haiti");
+        put("HT", "Haiti");
+        put("HTI", "Haiti");
+
+        put("HEARD ISLAND AND MCDONALD ISLANDS", "Heard island and mcdonald islands");
+        put("HM", "Heard island and mcdonald islands");
+        put("HMD", "Heard island and mcdonald islands");
+
+        put("THE HOLY SEE", "Holy see");
+        put("HOLY SEE", "Holy see");
+        put("VA", "Holy see");
+        put("VAT", "Holy see");
+
+        put("HONDURAS", "Honduras");
+        put("HN", "Honduras");
+        put("HND", "Honduras");
+
+        put("HONG KONG", "Hong kong");
+        put("HK", "Hong kong");
+        put("HKG", "Hong kong");
+
+        put("HUNGARY", "Hungary");
+        put("HU", "Hungary");
+        put("HUN", "Hungary");
+
+        put("ICELAND", "Iceland");
+        put("IS", "Iceland");
+        put("ISL", "Iceland");
+
+        put("INDIA", "India");
+        put("IN", "India");
+        put("IND", "India");
+
+        put("INDONESIA", "Indonesia");
+        put("ID", "Indonesia");
+        put("IDN", "Indonesia");
+
+        put("IRAQ", "Iraq");
+        put("IQ", "Iraq");
+        put("IRQ", "Iraq");
+
+        put("IRELAND", "Ireland");
+        put("IE", "Ireland");
+        put("IRL", "Ireland");
+
+        put("ISLE OF MAN", "Isle of man");
+        put("IM", "Isle of man");
+        put("IMN", "Isle of man");
+
+        put("ISRAEL", "Israel");
+        put("IL", "Israel");
+        put("ISR", "Israel");
+
+        put("ITALY", "Italy");
+        put("IT", "Italy");
+        put("ITA", "Italy");
+
+        put("JAMAICA", "Jamaica");
+        put("JM", "Jamaica");
+        put("JAM", "Jamaica");
+
+        put("JAPAN", "Japan");
+        put("JP", "Japan");
+        put("JPN", "Japan");
+
+        put("JERSEY", "Jersey");
+        put("JE", "Jersey");
+        put("JEY", "Jersey");
+
+        put("JORDAN", "Jordan");
+        put("JO", "Jordan");
+        put("JOR", "Jordan");
+
+        put("KAZAKHSTAN", "Kazakhstan");
+        put("KZ", "Kazakhstan");
+        put("KAZ", "Kazakhstan");
+
+        put("KENYA", "Kenya");
+        put("KE", "Kenya");
+        put("KEN", "Kenya");
+
+        put("KIRIBATI", "Kiribati");
+        put("KI", "Kiribati");
+        put("KIR", "Kiribati");
+
+        put("THE DEMOCRATIC PEOPLE'S REPUBLIC OF KOREA", "Korea");
+        put("KOREA", "Korea");
+        put("KP", "Korea");
+        put("PRK", "Korea");
+
+        put("KUWAIT", "Kuwait");
+        put("KW", "Kuwait");
+        put("KWT", "Kuwait");
+
+        put("KYRGYZSTAN", "Kyrgyzstan");
+        put("KG", "Kyrgyzstan");
+        put("KGZ", "Kyrgyzstan");
+
+        put("THE LAO PEOPLE'S DEMOCRATIC REPUBLIC", "Lao people's democratic republic");
+        put("LAO PEOPLE'S DEMOCRATIC REPUBLIC", "Lao people's democratic republic");
+        put("LA", "Lao people's democratic republic");
+        put("LAO", "Lao people's democratic republic");
+
+        put("LATVIA", "Latvia");
+        put("LV", "Latvia");
+        put("LVA", "Latvia");
+
+        put("LEBANON", "Lebanon");
+        put("LB", "Lebanon");
+        put("LBN", "Lebanon");
+
+        put("LESOTHO", "Lesotho");
+        put("LS", "Lesotho");
+        put("LSO", "Lesotho");
+
+        put("LIBERIA", "Liberia");
+        put("LR", "Liberia");
+        put("LBR", "Liberia");
+
+        put("LIBYA", "Libya");
+        put("LY", "Libya");
+        put("LBY", "Libya");
+
+        put("LIECHTENSTEIN", "Liechtenstein");
+        put("LI", "Liechtenstein");
+        put("LIE", "Liechtenstein");
+
+        put("LITHUANIA", "Lithuania");
+        put("LT", "Lithuania");
+        put("LTU", "Lithuania");
+
+        put("LUXEMBOURG", "Luxembourg");
+        put("LU", "Luxembourg");
+        put("LUX", "Luxembourg");
+
+        put("MACAO", "Macao");
+        put("MO", "Macao");
+        put("MAC", "Macao");
+
+        put("MADAGASCAR", "Madagascar");
+        put("MG", "Madagascar");
+        put("MDG", "Madagascar");
+
+        put("MALAWI", "Malawi");
+        put("MW", "Malawi");
+        put("MWI", "Malawi");
+
+        put("MALAYSIA", "Malaysia");
+        put("MY", "Malaysia");
+        put("MYS", "Malaysia");
+
+        put("MALDIVES", "Maldives");
+        put("MV", "Maldives");
+        put("MDV", "Maldives");
+
+        put("MALI", "Mali");
+        put("ML", "Mali");
+        put("MLI", "Mali");
+
+        put("MALTA", "Malta");
+        put("MT", "Malta");
+        put("MLT", "Malta");
+
+        put("THE MARSHALL ISLANDS", "Marshall islands");
+        put("MARSHALL ISLANDS", "Marshall islands");
+        put("MH", "Marshall islands");
+        put("MHL", "Marshall islands");
+
+        put("MARTINIQUE", "Martinique");
+        put("MQ", "Martinique");
+        put("MTQ", "Martinique");
+
+        put("MAURITANIA", "Mauritania");
+        put("MR", "Mauritania");
+        put("MRT", "Mauritania");
+
+        put("MAURITIUS", "Mauritius");
+        put("MU", "Mauritius");
+        put("MUS", "Mauritius");
+
+        put("MAYOTTE", "Mayotte");
+        put("YT", "Mayotte");
+        put("MYT", "Mayotte");
+
+        put("MEXICO", "Mexico");
+        put("MX", "Mexico");
+        put("MEX", "Mexico");
+
+        put("FEDERATED STATES OF MICRONESIA", "Micronesia");
+        put("MICRONESIA", "Micronesia");
+        put("FM", "Micronesia");
+        put("FSM", "Micronesia");
+
+        put("THE REPUBLIC OF MOLDOVA", "Moldova");
+        put("MOLDOVA", "Moldova");
+        put("MD", "Moldova");
+        put("MDA", "Moldova");
+
+        put("MONACO", "Monaco");
+        put("MC", "Monaco");
+        put("MCO", "Monaco");
+
+        put("MONGOLIA", "Mongolia");
+        put("MN", "Mongolia");
+        put("MNG", "Mongolia");
+
+        put("MONTENEGRO", "Montenegro");
+        put("ME", "Montenegro");
+        put("MNE", "Montenegro");
+
+        put("MONTSERRAT", "Montserrat");
+        put("MS", "Montserrat");
+        put("MSR", "Montserrat");
+
+        put("MOROCCO", "Morocco");
+        put("MA", "Morocco");
+        put("MAR", "Morocco");
+
+        put("MOZAMBIQUE", "Mozambique");
+        put("MZ", "Mozambique");
+        put("MOZ", "Mozambique");
+
+        put("MYANMAR", "Myanmar");
+        put("MM", "Myanmar");
+        put("MMR", "Myanmar");
+
+        put("NAMIBIA", "Namibia");
+        put("NA", "Namibia");
+        put("NAM", "Namibia");
+
+        put("NAURU", "Nauru");
+        put("NR", "Nauru");
+        put("NRU", "Nauru");
+
+        put("NEPAL", "Nepal");
+        put("NP", "Nepal");
+        put("NPL", "Nepal");
+
+        put("THE NETHERLANDS", "Netherlands");
+        put("NETHERLANDS", "Netherlands");
+        put("NL", "Netherlands");
+        put("NLD", "Netherlands");
+
+        put("NEW CALEDONIA", "New caledonia");
+        put("NC", "New caledonia");
+        put("NCL", "New caledonia");
+
+        put("NEW ZEALAND", "New zealand");
+        put("NZ", "New zealand");
+        put("NZL", "New zealand");
+
+        put("NICARAGUA", "Nicaragua");
+        put("NI", "Nicaragua");
+        put("NIC", "Nicaragua");
+
+        put("THE NIGER", "Niger");
+        put("NIGER", "Niger");
+        put("NE", "Niger");
+        put("NER", "Niger");
+
+        put("NIGERIA", "Nigeria");
+        put("NG", "Nigeria");
+        put("NGA", "Nigeria");
+
+        put("NIUE", "Niue");
+        put("NU", "Niue");
+        put("NIU", "Niue");
+
+        put("NORFOLK ISLAND", "Norfolk island");
+        put("NF", "Norfolk island");
+        put("NFK", "Norfolk island");
+
+        put("THE NORTHERN MARIANA ISLANDS", "Northern mariana islands");
+        put("NORTHERN MARIANA ISLANDS", "Northern mariana islands");
+        put("MP", "Northern mariana islands");
+        put("MNP", "Northern mariana islands");
+
+        put("NORWAY", "Norway");
+        put("NO", "Norway");
+        put("NOR", "Norway");
+
+        put("OMAN", "Oman");
+        put("OM", "Oman");
+        put("OMN", "Oman");
+
+        put("PAKISTAN", "Pakistan");
+        put("PK", "Pakistan");
+        put("PAK", "Pakistan");
+
+        put("PALAU", "Palau");
+        put("PW", "Palau");
+        put("PLW", "Palau");
+
+        put("PANAMA", "Panama");
+        put("PA", "Panama");
+        put("PAN", "Panama");
+
+        put("PAPUA NEW GUINEA", "Papua new guinea");
+        put("PG", "Papua new guinea");
+        put("PNG", "Papua new guinea");
+
+        put("PARAGUAY", "Paraguay");
+        put("PY", "Paraguay");
+        put("PRY", "Paraguay");
+
+        put("PERU", "Peru");
+        put("PE", "Peru");
+        put("PER", "Peru");
+
+        put("THE PHILIPPINES", "Philippines");
+        put("PHILIPPINES", "Philippines");
+        put("PH", "Philippines");
+        put("PHL", "Philippines");
+
+        put("PITCAIRN", "Pitcairn");
+        put("PN", "Pitcairn");
+        put("PCN", "Pitcairn");
+
+        put("POLAND", "Poland");
+        put("PL", "Poland");
+        put("POL", "Poland");
+
+        put("PORTUGAL", "Portugal");
+        put("PT", "Portugal");
+        put("PRT", "Portugal");
+
+        put("PUERTO RICO", "Puerto rico");
+        put("PR", "Puerto rico");
+        put("PRI", "Puerto rico");
+
+        put("QATAR", "Qatar");
+        put("QA", "Qatar");
+        put("QAT", "Qatar");
+
+        put("REPUBLIC OF NORTH MACEDONIA", "Republic of north macedonia");
+        put("MK", "Republic of north macedonia");
+        put("MKD", "Republic of north macedonia");
+
+        put("ROMANIA", "Romania");
+        put("RO", "Romania");
+        put("ROU", "Romania");
+
+        put("THE RUSSIAN FEDERATION", "Russian federation");
+        put("RUSSIAN FEDERATION", "Russian federation");
+        put("RU", "Russian federation");
+        put("RUS", "Russian federation");
+
+        put("RWANDA", "Rwanda");
+        put("RW", "Rwanda");
+        put("RWA", "Rwanda");
+
+        put("RÉUNION", "Réunion");
+        put("RE", "Réunion");
+        put("REU", "Réunion");
+
+        put("SAINT BARTHÉLEMY", "Saint barthélemy");
+        put("BL", "Saint barthélemy");
+        put("BLM", "Saint barthélemy");
+
+        put("SAINT HELENA, ASCENSION AND TRISTAN DA CUNHA", "Saint helena, ascension and tristan da cunha");
+        put("SH", "Saint helena, ascension and tristan da cunha");
+        put("SHN", "Saint helena, ascension and tristan da cunha");
+
+        put("SAINT KITTS AND NEVIS", "Saint kitts and nevis");
+        put("KN", "Saint kitts and nevis");
+        put("KNA", "Saint kitts and nevis");
+
+        put("SAINT LUCIA", "Saint lucia");
+        put("LC", "Saint lucia");
+        put("LCA", "Saint lucia");
+
+        put("SAINT PIERRE AND MIQUELON", "Saint pierre and miquelon");
+        put("PM", "Saint pierre and miquelon");
+        put("SPM", "Saint pierre and miquelon");
+
+        put("SAINT VINCENT AND THE GRENADINES", "Saint vincent and the grenadines");
+        put("VC", "Saint vincent and the grenadines");
+        put("VCT", "Saint vincent and the grenadines");
+
+        put("SAMOA", "Samoa");
+        put("WS", "Samoa");
+        put("WSM", "Samoa");
+
+        put("SAN MARINO", "San marino");
+        put("SM", "San marino");
+        put("SMR", "San marino");
+
+        put("SAO TOME AND PRINCIPE", "Sao tome and principe");
+        put("ST", "Sao tome and principe");
+        put("STP", "Sao tome and principe");
+
+        put("SAUDI ARABIA", "Saudi arabia");
+        put("SA", "Saudi arabia");
+        put("SAU", "Saudi arabia");
+
+        put("SENEGAL", "Senegal");
+        put("SN", "Senegal");
+        put("SEN", "Senegal");
+
+        put("SERBIA", "Serbia");
+        put("RS", "Serbia");
+        put("SRB", "Serbia");
+
+        put("SEYCHELLES", "Seychelles");
+        put("SC", "Seychelles");
+        put("SYC", "Seychelles");
+
+        put("SIERRA LEONE", "Sierra leone");
+        put("SL", "Sierra leone");
+        put("SLE", "Sierra leone");
+
+        put("SINGAPORE", "Singapore");
+        put("SG", "Singapore");
+        put("SGP", "Singapore");
+
+        put("SLOVAKIA", "Slovakia");
+        put("SK", "Slovakia");
+        put("SVK", "Slovakia");
+
+        put("SLOVENIA", "Slovenia");
+        put("SI", "Slovenia");
+        put("SVN", "Slovenia");
+
+        put("SOLOMON ISLANDS", "Solomon islands");
+        put("SB", "Solomon islands");
+        put("SLB", "Solomon islands");
+
+        put("SOMALIA", "Somalia");
+        put("SO", "Somalia");
+        put("SOM", "Somalia");
+
+        put("SOUTH AFRICA", "South africa");
+        put("ZA", "South africa");
+        put("ZAF", "South africa");
+
+        put("SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS", "South georgia and the south sandwich islands");
+        put("GS", "South georgia and the south sandwich islands");
+        put("SGS", "South georgia and the south sandwich islands");
+
+        put("SOUTH SUDAN", "South sudan");
+        put("SS", "South sudan");
+        put("SSD", "South sudan");
+
+        put("SPAIN", "Spain");
+        put("ES", "Spain");
+        put("ESP", "Spain");
+
+        put("SRI LANKA", "Sri lanka");
+        put("LK", "Sri lanka");
+        put("LKA", "Sri lanka");
+
+        put("THE SUDAN", "Sudan");
+        put("SUDAN", "Sudan");
+        put("SD", "Sudan");
+        put("SDN", "Sudan");
+
+        put("SURINAME", "Suriname");
+        put("SR", "Suriname");
+        put("SUR", "Suriname");
+
+        put("SVALBARD AND JAN MAYEN", "Svalbard and jan mayen");
+        put("SJ", "Svalbard and jan mayen");
+        put("SJM", "Svalbard and jan mayen");
+
+        put("SWEDEN", "Sweden");
+        put("SE", "Sweden");
+        put("SWE", "Sweden");
+
+        put("SWITZERLAND", "Switzerland");
+        put("CH", "Switzerland");
+        put("CHE", "Switzerland");
+
+        put("SYRIAN ARAB REPUBLIC", "Syrian arab republic");
+        put("SY", "Syrian arab republic");
+        put("SYR", "Syrian arab republic");
+
+        put("TAJIKISTAN", "Tajikistan");
+        put("TJ", "Tajikistan");
+        put("TJK", "Tajikistan");
+
+        put("TANZANIA, UNITED REPUBLIC OF", "Tanzania, united republic of");
+        put("TZ", "Tanzania, united republic of");
+        put("TZA", "Tanzania, united republic of");
+
+        put("THAILAND", "Thailand");
+        put("TH", "Thailand");
+        put("THA", "Thailand");
+
+        put("TIMOR-LESTE", "Timor-leste");
+        put("TL", "Timor-leste");
+        put("TLS", "Timor-leste");
+
+        put("TOGO", "Togo");
+        put("TG", "Togo");
+        put("TGO", "Togo");
+
+        put("TOKELAU", "Tokelau");
+        put("TK", "Tokelau");
+        put("TKL", "Tokelau");
+
+        put("TONGA", "Tonga");
+        put("TO", "Tonga");
+        put("TON", "Tonga");
+
+        put("TRINIDAD AND TOBAGO", "Trinidad and tobago");
+        put("TT", "Trinidad and tobago");
+        put("TTO", "Trinidad and tobago");
+
+        put("TUNISIA", "Tunisia");
+        put("TN", "Tunisia");
+        put("TUN", "Tunisia");
+
+        put("TURKEY", "Turkey");
+        put("TR", "Turkey");
+        put("TUR", "Turkey");
+
+        put("TURKMENISTAN", "Turkmenistan");
+        put("TM", "Turkmenistan");
+        put("TKM", "Turkmenistan");
+
+        put("THE TURKS AND CAICOS ISLANDS", "Turks and caicos islands");
+        put("TURKS AND CAICOS ISLANDS", "Turks and caicos islands");
+        put("TC", "Turks and caicos islands");
+        put("TCA", "Turks and caicos islands");
+
+        put("TUVALU", "Tuvalu");
+        put("TV", "Tuvalu");
+        put("TUV", "Tuvalu");
+
+        put("UGANDA", "Uganda");
+        put("UG", "Uganda");
+        put("UGA", "Uganda");
+
+        put("UKRAINE", "Ukraine");
+        put("UA", "Ukraine");
+        put("UKR", "Ukraine");
+
+        put("THE UNITED ARAB EMIRATES", "United arab emirates");
+        put("UNITED ARAB EMIRATES", "United arab emirates");
+        put("AE", "United arab emirates");
+        put("ARE", "United arab emirates");
+        put("UAE", "United arab emirates");
+
+        put("UNITED KINGDOM", "United kingdom");
+        put("THE UNITED KINGDOM", "United kingdom");
+        put("GREAT BRITAIN", "United kingdom");
+        put("UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", "United kingdom");
+        put("THE UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", "United kingdom");
+        put("GB", "United kingdom");
+        put("GBR", "United kingdom");
+
+        put("THE UNITED STATES MINOR OUTLYING ISLANDS", "United states minor outlying islands");
+        put("UNITED STATES MINOR OUTLYING ISLANDS", "United states minor outlying islands");
+        put("UM", "United states minor outlying islands");
+        put("UMI", "United states minor outlying islands");
+
+        put("URUGUAY", "Uruguay");
+        put("UY", "Uruguay");
+        put("URY", "Uruguay");
+
+        put("UZBEKISTAN", "Uzbekistan");
+        put("UZ", "Uzbekistan");
+        put("UZB", "Uzbekistan");
+
+        put("VANUATU", "Vanuatu");
+        put("VU", "Vanuatu");
+        put("VUT", "Vanuatu");
+
+        put("BOLIVARIAN REPUBLIC OF VENEZUELA", "Venezuela");
+        put("VENEZUELA", "Venezuela");
+        put("VE", "Venezuela");
+        put("VEN", "Venezuela");
+
+        put("VIETNAM", "Vietnam");
+        put("VIET NAM", "Vietnam");
+        put("VN", "Vietnam");
+        put("VNM", "Vietnam");
+
+        put("WALLIS AND FUTUNA", "Wallis and futuna");
+        put("WF", "Wallis and futuna");
+        put("WLF", "Wallis and futuna");
+
+        put("WESTERN SAHARA", "Western sahara");
+        put("EH", "Western sahara");
+        put("ESH", "Western sahara");
+
+        put("YEMEN", "Yemen");
+        put("YE", "Yemen");
+        put("YEM", "Yemen");
+
+        put("ZAMBIA", "Zambia");
+        put("ZM", "Zambia");
+        put("ZMB", "Zambia");
+
+        put("ZIMBABWE", "Zimbabwe");
+        put("ZW", "Zimbabwe");
+        put("ZWE", "Zimbabwe");
     }};
 }

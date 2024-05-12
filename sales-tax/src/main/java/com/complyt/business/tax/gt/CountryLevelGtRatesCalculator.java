@@ -24,7 +24,7 @@ public class CountryLevelGtRatesCalculator implements GtTaxRatesCalculator<Juris
      * @param jurisdictionalTaxRules - Rules to declare how sales tax rate should be calculated
      * @param originalGtRate         - Gt tax rate given by external resource regarding the current transaction's address
      * @return
-     */ //todo: fix
+     */
     @Override //todo: this code is the same as state and city, they can be the same generic code
     public GtRates calculate(@NonNull JurisdictionalTaxRules jurisdictionalTaxRules, @NonNull GtRates originalGtRate) {
         if (!jurisdictionalTaxRules.isTaxable()) {

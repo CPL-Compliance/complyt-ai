@@ -616,7 +616,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
-                        .queryParam("country", country)
+                        .queryParam("country", country.toUpperCase())
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
@@ -626,7 +626,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
-                .jsonPath("$.country").isEqualTo(country.toUpperCase());
+                .jsonPath("$.country").isEqualTo(country);
     }
 
     @Order(1)

@@ -15,6 +15,7 @@ import com.complyt.v1.validators.ParameterChecksProvider;
 import com.complyt.v1.validators.ShouldCallValidate;
 import com.complyt.v1.validators.ValidationHandler;
 import com.complyt.v1.validators.body_checkers.exemption.ExemptionCountryAndStateChecker;
+import com.complyt.v1.validators.body_checkers.exemption.ExemptionWrapperCountryAndStateChecker;
 import com.complyt.v1.validators.body_checkers.sales_tax_tracking.RegisteredChecker;
 import com.complyt.v1.validators.body_checkers.sales_tax_tracking.SalesTaxTrackingCountryAndStateChecker;
 import com.complyt.v1.validators.body_checkers.transaction.*;
@@ -92,21 +93,6 @@ public class ValidatorConfig {
     }
 
     @Bean
-    ValidationHandler<ExemptionDto, SpringValidatorAdapter> exemptionDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
-        return new ValidationHandler<>(ExemptionDto.class, springValidatorAdapter,
-                new DataConflictChecksProvider(Map.of(
-                        "complytId", ComplytIdCheckable.COMPLYT_ID_CONFLICT_CHECK),
-                        new BodyCheckConfig<ExemptionDto>(List.of(
-                                new ExemptionCountryAndStateChecker()
-                        )).entityDtoFluxFunction()),
-                new CustomBodyExtractorEmpty<>(),
-                pathVariableChecker,
-                queryParamChecker,
-                shouldCallValidate);
-
-    }
-
-    @Bean
     ValidationHandler<SalesTaxTrackingDto, SpringValidatorAdapter> salesTaxTrackingDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
         return new ValidationHandler<>(SalesTaxTrackingDto.class, springValidatorAdapter,
                 new DataConflictChecksProvider(Map.of(
@@ -134,10 +120,27 @@ public class ValidatorConfig {
     }
 
     @Bean
+    ValidationHandler<ExemptionDto, SpringValidatorAdapter> exemptionDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
+        return new ValidationHandler<>(ExemptionDto.class, springValidatorAdapter,
+                new DataConflictChecksProvider(Map.of(
+                        "complytId", ComplytIdCheckable.COMPLYT_ID_CONFLICT_CHECK),
+                        new BodyCheckConfig<ExemptionDto>(List.of(
+                                new ExemptionCountryAndStateChecker()
+                        )).entityDtoFluxFunction()),
+                new CustomBodyExtractorEmpty<>(),
+                pathVariableChecker,
+                queryParamChecker,
+                shouldCallValidate);
+
+    }
+
+    @Bean
     ValidationHandler<ExemptionWrapperDto, SpringValidatorAdapter> exemptionWrapperDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
         return new ValidationHandler<>(ExemptionWrapperDto.class, springValidatorAdapter,
                 new DataConflictChecksProvider(Map.of(),
-                        null),
+                        new BodyCheckConfig<ExemptionWrapperCountryAndStateChecker>(List.of(
+                                new ExemptionWrapperCountryAndStateChecker(new ExemptionCountryAndStateChecker())
+                        )).entityDtoFluxFunction()),
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,
                 queryParamChecker,

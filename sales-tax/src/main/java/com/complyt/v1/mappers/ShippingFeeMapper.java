@@ -14,21 +14,11 @@ import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL, uses = {TimestampsMapper.class})
-public interface ShippingFeeMapper {
+public interface ShippingFeeMapper extends JurisdictionalSalesTaxRuleMapper {
     ShippingFeeMapper INSTANCE = Mappers.getMapper(ShippingFeeMapper.class);
 
     ShippingFeeDto shippingFeeDtoToShippingFee(ShippingFeeDto shippingFeeDto);
 
     @Mapping(target = "jurisdictionalSalesTaxRules", expression = "java(combineJurisdictionalRules(shippingFee.getJurisdictionalSalesTaxRules(), shippingFee.getJurisdictionalTaxRules()))")
     ShippingFeeDto shippingFeeToshippingFeeDto(ShippingFee shippingFee);
-
-    default JurisdictionalSalesTaxRulesDto combineJurisdictionalRules(JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, JurisdictionalTaxRules jurisdictionalTaxRules) {
-        return jurisdictionalSalesTaxRules != null ?
-                new JurisdictionalSalesTaxRulesDto(jurisdictionalSalesTaxRules.getName(), jurisdictionalSalesTaxRules.getAbbreviation(),
-                        jurisdictionalSalesTaxRules.isTaxable(), jurisdictionalSalesTaxRules.isSpecialTreatment(), jurisdictionalSalesTaxRules.getCalculationType(),
-                        jurisdictionalSalesTaxRules.getDescription(), jurisdictionalSalesTaxRules.getCalculationValue(), jurisdictionalSalesTaxRules.getCities(), null) :
-                new JurisdictionalSalesTaxRulesDto(jurisdictionalTaxRules.getName(), jurisdictionalTaxRules.getAbbreviation(),
-                        jurisdictionalTaxRules.isTaxable(), jurisdictionalTaxRules.isSpecialTreatment(), jurisdictionalTaxRules.getCalculationType(),
-                        jurisdictionalTaxRules.getDescription(), jurisdictionalTaxRules.getCalculationValue(), null, jurisdictionalTaxRules.getRegions());
-    }
 }

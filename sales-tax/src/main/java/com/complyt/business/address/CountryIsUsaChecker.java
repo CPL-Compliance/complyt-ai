@@ -11,6 +11,6 @@ public interface CountryIsUsaChecker {
     }
 
     static boolean isCountryUsa(@NonNull String country) {
-        return UsaAbbreviations.usaAbbreviationsList.contains(country.toUpperCase());
+        return UsaAbbreviations.usaAbbreviationsList.containsKey(country.toUpperCase());
     }
 }

@@ -1,11 +1,10 @@
 package com.complyt.services;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
-import com.complyt.business.exemption.ExemptionListGenerator;
+import com.complyt.business.strategy.StrategySelector;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.exemption.*;
-import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.ExemptionRepository;
 import com.mongodb.client.result.DeleteResult;
@@ -46,7 +45,7 @@ public class ExemptionServiceImplTest {
     ComplytIdHandler<Exemption> exemptionComplytIdHandler;
 
     @Mock
-    ExemptionListGenerator exemptionListGenerator;
+    StrategySelector exemptionListGeneratorStrategy;
 
     Transaction transaction;
     Exemption exemption;
@@ -296,7 +295,7 @@ public class ExemptionServiceImplTest {
         Exemption thirdExemptionWithIds = thirdExemptionWithComplytId.withId(UUID.randomUUID().toString());
 
         // When
-        when(exemptionListGenerator.generate(exemptionWrapper)).thenReturn(Flux.fromIterable(exemptions));
+        when(exemptionListGeneratorStrategy.select(exemptionWrapper)).thenReturn(wrapper -> Flux.fromIterable(exemptions));
 
         when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptions.get(0))).thenReturn(Mono.just(exemptions.get(0)));
         when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptions.get(1))).thenReturn(Mono.just(exemptions.get(1)));
@@ -319,6 +318,35 @@ public class ExemptionServiceImplTest {
                 .expectNext(thirdExemptionWithIds)
                 .verifyComplete();
 
+    }
+
+    @Test
+    void saveOne_SavesNonUsaExemptions_ReturnsExemptions() {
+        // Given
+        List<State> states = UnitTestUtilities.createStateList();
+        Exemption exemptionNoIds = exemption.withComplytId(null).withId(null).withCountry("Canada");
+        ExemptionWrapper exemptionWrapper = new ExemptionWrapper(exemptionNoIds, states);
+        List<Exemption> exemptions = UnitTestUtilities.createNonUsaExemptionsListFromWrapper(exemptionWrapper);
+
+        Exemption firstExemptionWithComplytId = exemptions.get(0).withComplytId(UUID.randomUUID());
+
+        Exemption firstExemptionWithIds = firstExemptionWithComplytId.withId(UUID.randomUUID().toString());
+
+        // When
+        when(exemptionListGeneratorStrategy.select(exemptionWrapper)).thenReturn(wrapper -> Flux.fromIterable(exemptions));
+
+        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptions.get(0))).thenReturn(Mono.just(exemptions.get(0)));
+
+        when(exemptionComplytIdHandler.insertComplytIdToNew(exemptions.get(0))).thenReturn(firstExemptionWithComplytId);
+
+        when(exemptionRepository.save(firstExemptionWithComplytId)).thenReturn(Mono.just(firstExemptionWithIds));
+
+        Flux<Exemption> exemptionFlux = exemptionService.saveMany(exemptionWrapper);
+
+        // Then
+        StepVerifier.create(exemptionFlux)
+                .expectNext(firstExemptionWithIds)
+                .verifyComplete();
     }
 
     @Test

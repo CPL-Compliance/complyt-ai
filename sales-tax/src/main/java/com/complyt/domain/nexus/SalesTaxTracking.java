@@ -43,4 +43,7 @@ public class SalesTaxTracking implements ComplytIdProperty {
     FilingFrequency filingFrequency;
     RegisteredType registered;
     LocalDateTime registrationDate;
+    String subsidiary;
+    String establishedBy;
+
 }

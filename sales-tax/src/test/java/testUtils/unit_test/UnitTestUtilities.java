@@ -33,6 +33,7 @@ import com.complyt.v1.models.sales_tax.gt.GtRatesDto;
 import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.validators.body_checkers.transaction.*;
 import org.springframework.data.mongodb.core.query.Update;
+import reactor.core.publisher.Flux;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -121,6 +122,14 @@ public class UnitTestUtilities {
         return exemptionList;
     }
 
+    public static List<Exemption> createNonUsaExemptionsListFromWrapper(ExemptionWrapper exemptionWrapper) {
+        List<Exemption> exemptionList = new ArrayList<>(){{
+            add(exemptionWrapper.exemption().withState(null));
+        }};
+
+        return exemptionList;
+    }
+
     public static List<ExemptionDto> createExemptionsDtoListFromWrapper(ExemptionWrapperDto exemptionWrapper) {
         List<ExemptionDto> exemptionList = new ArrayList<>();
         for (StateDto state : exemptionWrapper.states()) {
@@ -139,8 +148,8 @@ public class UnitTestUtilities {
     }
 
     public void checkErrorMessages(LinkedHashMap map, Set<String> expectedErrors) {
-            String message = (String) map.get("message");
-            String[] errors = message.substring(1, message.length() - 1).split(", ");
+        String message = (String) map.get("message");
+        String[] errors = message.substring(1, message.length() - 1).split(", ");
         assertEquals(expectedErrors.size(), errors.length);
         for (String err : errors) {
             assertTrue(expectedErrors.contains(err));
@@ -209,7 +218,7 @@ public class UnitTestUtilities {
                 customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()),
                 null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
                 TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, curreny);
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, curreny, null);
     }
 
     public Transaction createGtTransaction(String id) {
@@ -232,7 +241,7 @@ public class UnitTestUtilities {
                 createCustomerDto(customerIdOtherDomains.toString()), null,
                 TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE,
                 shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD");
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD", null);
     }
 
     public List<Item> createItems(boolean withJurisdictionalSalesTaxRules, boolean withJurisdictionalGtTaxRules, boolean withTangibleCategory) {
@@ -410,12 +419,12 @@ public class UnitTestUtilities {
 
     public ShippingFeeDto createShippingFeeDto(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRulesDto rules = createJurisdictionalSalesTaxRulesDto();
-        return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal(1000), BigDecimal.ZERO, withJurisdictionalRules ? rules : null, null,null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
+        return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal(1000), BigDecimal.ZERO, withJurisdictionalRules ? rules : null, null, null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
     }
 
     public ShippingFeeDto createShippingFeeGtRateDto(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRulesDto rules = createJurisdictionalSalesTaxRulesDto();
-        return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal(1000), BigDecimal.ZERO, withJurisdictionalRules ? rules : null, null,null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
+        return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal(1000), BigDecimal.ZERO, withJurisdictionalRules ? rules : null, null, null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
     }
 
     public JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
@@ -466,6 +475,40 @@ public class UnitTestUtilities {
                 false, CalculationType.FIXED, "description", new BigDecimal("0.5"));
     }
 
+    public ExemptionWrapper createExemptionWrapper(String id) {
+        return new ExemptionWrapper(createExemption(id), List.of(new State(
+                "CO", "04", "Colorado"
+        )));
+    }
+
+    public ExemptionWrapper createNonUsaExemptionWrapper(String id) {
+        return new ExemptionWrapper(createNonUsaExemption(id), List.of());
+    }
+
+    public Exemption createNonUsaExemption(String id) {
+        Exemption exemption = createExemption(id);
+
+        return exemption.withCountry("CANADA").withState(null);
+    }
+
+    public ExemptionWrapperDto createExemptionWrapperDto() {
+        return new ExemptionWrapperDto(createExemptionDto(), List.of(new StateDto(
+                "CO", "04", "Colorado"
+        )));
+    }
+
+    public ExemptionWrapperDto createNonUsaExemptionWrapperDto() {
+        return new ExemptionWrapperDto(createNonUsaExemptionDto(), List.of());
+    }
+
+    public ExemptionDto createNonUsaExemptionDto() {
+        ExemptionDto exemptionDto = createExemptionDto();
+
+        return exemptionDto.withCountry("canada").withState(null);
+    }
+
+
+
     public Exemption createExemption(String id) {
         String country = "USA";
         State state = new State("CA", "02", "California");
@@ -478,6 +521,7 @@ public class UnitTestUtilities {
                 country, state, classification, validationDates, internalTimestamps,
                 status, certificate, ExemptionType.FULLY, ExemptionStatus.ACTIVE);
     }
+
 
     public ExemptionDto createExemptionDto() {
         String country = "USA";
@@ -559,7 +603,7 @@ public class UnitTestUtilities {
                 localDateTime,
                 true, localDateTime,
                 FilingFrequency.MONTHLY,
-                null, null);
+                null, null, null, null);
     }
 
     public SalesTaxTracking createSalesTaxTrackingGT(String id) {
@@ -576,18 +620,19 @@ public class UnitTestUtilities {
                 localDateTime,
                 true, localDateTime,
                 FilingFrequency.MONTHLY,
-                null, null);
+                null, null, null, null);
     }
 
     public ClientTracking createClientTracking(String tenantId) {
         Timestamps internalTimestamp = new Timestamps(localDateTime, localDateTime);
-        return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope", internalTimestamp);
+        return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope", internalTimestamp, null);
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
         String country = "USA";
         StateDto state = new StateDto("CA", "02", "California");
-        SalesTaxTrackingDto salesTaxTrackingDto = new SalesTaxTrackingDto(UUID.randomUUID(), country, state,
+
+        return new SalesTaxTrackingDto(UUID.randomUUID(), country, state,
                 "comment", true,
                 new PhysicalNexusTrackerDto(false, localDateTime),
                 new EconomicNexusTrackerDto(false, localDateTime),
@@ -597,9 +642,7 @@ public class UnitTestUtilities {
                 localDateTime,
                 true, localDateTime,
                 FilingFrequencyDto.MONTHLY,
-                null, null);
-
-        return salesTaxTrackingDto;
+                null, null, null, null);
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDtoGt() {
@@ -615,7 +658,7 @@ public class UnitTestUtilities {
                 localDateTime,
                 true, localDateTime,
                 FilingFrequencyDto.MONTHLY,
-                null, null);
+                null, null, null, null);
 
         return salesTaxTrackingDto;
     }
@@ -623,12 +666,12 @@ public class UnitTestUtilities {
     public ClientTrackingDtoTenant createClientTrackingDtoTenant(String tenantId) {
         String date = localDateTime.toString();
         TimestampsDto internalTimestamps =  new TimestampsDto(date,date);
-        return new ClientTrackingDtoTenant(new NexusDto(localDateTime), "client dope", internalTimestamps, tenantId);
+        return new ClientTrackingDtoTenant(new NexusDto(localDateTime), "client dope", internalTimestamps, tenantId, null);
     }
 
     public ClientTrackingDto createClientTrackingDto() {
         TimestampsDto internalTimestamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
-        return new ClientTrackingDto(new NexusDto(localDateTime), "client dope", internalTimestamps);
+        return new ClientTrackingDto(new NexusDto(localDateTime), "client dope", internalTimestamps, null);
     }
 
     public Result createResult() {

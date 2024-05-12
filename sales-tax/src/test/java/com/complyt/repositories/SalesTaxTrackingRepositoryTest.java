@@ -1,11 +1,10 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.transaction.Address;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.query.CountryAndStateCriteriaBuilder;
-import com.complyt.utils.query.QueryBuilder;
 import com.complyt.utils.update.SalesTaxTrackingUpdateQueryBuilder;
+import com.mongodb.client.result.UpdateResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,45 +65,52 @@ public class SalesTaxTrackingRepositoryTest {
     @Test
     void findByState_FindsSalesTaxTracking_ReturnsSalesTaxTracking() {
         // Given
-        String country = salesTaxTracking.getCountry();
-        String state = salesTaxTracking.getState().getAbbreviation();
+        String subsidiary = "A";
+        SalesTaxTracking salesTaxTrackingWithSubsidiary = salesTaxTracking.withSubsidiary(subsidiary);
+        String country = salesTaxTrackingWithSubsidiary.getCountry();
+        String state = salesTaxTrackingWithSubsidiary.getState().getAbbreviation();
+
         Criteria usaAndStateSearchCriteria = new Criteria().orOperator(Criteria.where("state.abbreviation").is(state),
                         Criteria.where("state.name").is(state))
                 .andOperator(Criteria.where("country").is("USA"));
+        Criteria baseCriteria = Criteria.where("tenantId").is(salesTaxTrackingWithSubsidiary.getTenantId()).andOperator(usaAndStateSearchCriteria);
 
-        Query query = Query.query(usaAndStateSearchCriteria.and("tenantId").is(salesTaxTracking.getTenantId()));
+        Query query = Query.query(Criteria.where("subsidiary").is(subsidiary).andOperator(baseCriteria));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTrackingWithSubsidiary.getTenantId()));
         when(unitedStatesAddressQueryBuilder.build(country, state)).thenReturn(usaAndStateSearchCriteria);
-        when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
+        when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTrackingWithSubsidiary));
 
         // Then
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingRepository.findByCountryAndState(country, state);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiary);
 
-        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithSubsidiary).verifyComplete();
     }
 
     @Test
     void findByState_FindsSalesTaxTrackingAndStateIsNull_ReturnsSalesTaxTracking() {
         // Given
-        String country = salesTaxTracking.getCountry();
+        String subsidiary = "A";
+        SalesTaxTracking salesTaxTrackingWithSubsidiary = salesTaxTracking.withSubsidiary(subsidiary);
+        String country = salesTaxTrackingWithSubsidiary.getCountry();
         String state = null;
-        Criteria usaAndStateSearchCriteria = new Criteria().orOperator(Criteria.where("state.abbreviation").is(state),
+        Criteria addressSearchCriteria = new Criteria().orOperator(Criteria.where("state.abbreviation").is(state),
                         Criteria.where("state.name").is(state))
                 .andOperator(Criteria.where("country").is("USA"));
+        Criteria baseCriteria = Criteria.where("tenantId").is(salesTaxTrackingWithSubsidiary.getTenantId()).andOperator(addressSearchCriteria);
 
-        Query query = Query.query(usaAndStateSearchCriteria.and("tenantId").is(salesTaxTracking.getTenantId()));
+        Query query = Query.query(Criteria.where("subsidiary").is(subsidiary).andOperator(baseCriteria));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
-        when(unitedStatesAddressQueryBuilder.build(country, state)).thenReturn(usaAndStateSearchCriteria);
-        when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTrackingWithSubsidiary.getTenantId()));
+        when(unitedStatesAddressQueryBuilder.build(country, state)).thenReturn(addressSearchCriteria);
+        when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTrackingWithSubsidiary));
 
         // Then
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingRepository.findByCountryAndState(country, state);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiary);
 
-        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithSubsidiary).verifyComplete();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -115,7 +121,7 @@ public class SalesTaxTrackingRepositoryTest {
         String nullStateAbbreviation = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingRepository.findByCountryAndState(nullCountry, nullStateAbbreviation));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingRepository.findByCountryStateAndSubsidiary(nullCountry, nullStateAbbreviation, salesTaxTracking.getSubsidiary()));
 
         assertEquals(nullPointerException.getMessage(), "country is marked non-null but is null");
     }
@@ -150,6 +156,31 @@ public class SalesTaxTrackingRepositoryTest {
         Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking);
 
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void updateMultipleEconomicNexuses_Updates3SalesTaxTracking_ReturnsUpdateResult() {
+        // Given
+        Query query = new Query(Criteria.where("tenantId").is(salesTaxTracking.getTenantId()));
+        query.addCriteria(new Criteria().orOperator(Criteria.where("state.abbreviation").is(salesTaxTracking.getState().getAbbreviation()),
+                Criteria.where("state.name").is(salesTaxTracking.getState().getName())));
+
+        Update update = new Update();
+
+        update.set("economicNexusTracker", salesTaxTracking.getEconomicNexusTracker());
+        update.set("appliedDate", salesTaxTracking.getAppliedDate());
+        update.set("establishedBy", salesTaxTracking.getSubsidiary());
+
+        UpdateResult expectedUpdateResult = UpdateResult.acknowledged(3, 3L, null);
+
+        // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
+        when(reactiveMongoTemplate.updateMulti(query, update, SalesTaxTracking.class)).thenReturn(Mono.just(expectedUpdateResult));
+
+        // Then
+        Mono<UpdateResult> actualUpdateResult = salesTaxTrackingRepository.updateMultipleEconomicNexuses(salesTaxTracking);
+
+        StepVerifier.create(actualUpdateResult).expectNext(expectedUpdateResult).verifyComplete();
     }
 
     @Test
@@ -352,6 +383,18 @@ public class SalesTaxTrackingRepositoryTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingRepository.updateEconomicNexus(nullSalesTaxTracking));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void updateMultipleEconomicNexuses_NullSalesTaxTracking_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingRepository.updateMultipleEconomicNexuses(nullSalesTaxTracking));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
