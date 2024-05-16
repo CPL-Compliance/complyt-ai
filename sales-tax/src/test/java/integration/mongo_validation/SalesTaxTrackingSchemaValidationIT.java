@@ -46,5 +46,147 @@ public class SalesTaxTrackingSchemaValidationIT extends TestContainersInitialize
                 .verifyComplete();
     }
 
+    @Test
+    public void saveSalesTaxTracking_missingComplytId_Failure() {
+        salesTaxTrackingDocument.remove("complytId");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("complytId"))
+                .verify();
+    }
 
+    @Test
+    public void saveSalesTaxTracking_invalidComplytId_Failure() {
+        salesTaxTrackingDocument.put("complytId", "invalid_uuid");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("complytId"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_missingTenantId_Failure() {
+        salesTaxTrackingDocument.remove("tenantId");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("tenantId"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_invalidTenantId_Failure() {
+        salesTaxTrackingDocument.put("tenantId", 12345);
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("tenantId"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_missingEnforcesSalesTax_Failure() {
+        salesTaxTrackingDocument.remove("enforcesSalesTax");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("enforcesSalesTax"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_invalidEnforcesSalesTax_Failure() {
+        salesTaxTrackingDocument.put("enforcesSalesTax", "true");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("enforcesSalesTax"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_missingApproved_Failure() {
+        salesTaxTrackingDocument.remove("approved");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("approved"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_invalidApproved_Failure() {
+        salesTaxTrackingDocument.put("approved", "true");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("approved"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_missingApprovalDate_Failure() {
+        salesTaxTrackingDocument.remove("approvalDate");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("approvalDate"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_invalidApprovalDate_Failure() {
+        salesTaxTrackingDocument.put("approvalDate", "2024-01-01");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("approvalDate"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_missingAppliedDate_Failure() {
+        salesTaxTrackingDocument.remove("appliedDate");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("appliedDate"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_invalidAppliedDate_Failure() {
+        salesTaxTrackingDocument.put("appliedDate", "2024-01-01");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("appliedDate"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_missingPhysicalNexusTracker_Failure() {
+        salesTaxTrackingDocument.remove("physicalNexusTracker");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("physicalNexusTracker"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_invalidPhysicalNexusTracker_Failure() {
+        salesTaxTrackingDocument.put("physicalNexusTracker", "invalid_object");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("physicalNexusTracker"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_missingEconomicNexusTracker_Failure() {
+        salesTaxTrackingDocument.remove("economicNexusTracker");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("economicNexusTracker"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_invalidEconomicNexusTracker_Failure() {
+        salesTaxTrackingDocument.put("economicNexusTracker", "invalid_object");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("economicNexusTracker"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_missingClientTracking_Failure() {
+        salesTaxTrackingDocument.remove("clientTracking");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("clientTracking"))
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxTracking_invalidClientTracking_Failure() {
+        salesTaxTrackingDocument.put("clientTracking", "invalid_object");
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxTrackingDocument, "sales_tax_tracking"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("clientTracking"))
+                .verify();
+    }
 }

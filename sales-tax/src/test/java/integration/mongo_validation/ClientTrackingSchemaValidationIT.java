@@ -153,4 +153,49 @@ public class ClientTrackingSchemaValidationIT extends TestContainersInitializerI
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
+
+    @Test
+    public void saveClientTracking_AdditionalProperty_throwsValidationError() {
+        clientTracking.append("extraField", "extraValue"); // Adding an extra field
+
+        StepVerifier.create(reactiveMongoTemplate.save(clientTracking, "client_tracking"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveClientTracking_InvalidNexusType_throwsValidationError() {
+        clientTracking.put("nexus", "invalidType"); // nexus should be an object
+
+        StepVerifier.create(reactiveMongoTemplate.save(clientTracking, "client_tracking"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveClientTracking_InvalidSubsidiariesType_throwsValidationError() {
+        clientTracking.put("subsidiaries", "invalidType");
+
+        StepVerifier.create(reactiveMongoTemplate.save(clientTracking, "client_tracking"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveClientTracking_InvalidSubsidiaryItemType_throwsValidationError() {
+        clientTracking.put("subsidiaries", new Document("subsidiaryId", 123));
+
+        StepVerifier.create(reactiveMongoTemplate.save(clientTracking, "client_tracking"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveClientTracking_InvalidClassType_throwsValidationError() {
+        clientTracking.put("_class", 123); // _class should be a string
+
+        StepVerifier.create(reactiveMongoTemplate.save(clientTracking, "client_tracking"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
 }

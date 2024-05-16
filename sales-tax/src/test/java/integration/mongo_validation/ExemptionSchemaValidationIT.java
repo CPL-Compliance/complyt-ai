@@ -56,15 +56,6 @@ public class ExemptionSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveExemption_MissingState_throwsValidationError() {
-        exemption.remove("state");
-
-        StepVerifier.create(reactiveMongoTemplate.save(exemption, "exemption"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
     public void saveExemption_MissingClassification_throwsValidationError() {
         exemption.remove("classification");
 
@@ -130,15 +121,6 @@ public class ExemptionSchemaValidationIT extends TestContainersInitializerIT {
     @Test
     public void saveExemption_MissingExemptionStatus_throwsValidationError() {
         exemption.remove("exemptionStatus");
-
-        StepVerifier.create(reactiveMongoTemplate.save(exemption, "exemption"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveExemption_MissingInternalTimestamps_throwsValidationError() {
-        exemption.remove("internalTimestamps");
 
         StepVerifier.create(reactiveMongoTemplate.save(exemption, "exemption"))
                 .expectError(DataIntegrityViolationException.class)

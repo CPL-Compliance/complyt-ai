@@ -287,6 +287,7 @@ public interface ITUtilities {
                 .append("exemptionType", "FULLY")
                 .append("tenantId", "it_tenant")
                 .append("complytId", new Binary((byte) 0x04, Base64.getDecoder().decode("KqWAnzAdRPOQgbTzJhNGPA==")))
+                .append("country", "USA")
                 .append("exemptionStatus", "ACTIVE")
                 .append("internalTimestamps", new Document("createdDate", LocalDateTime.now())
                         .append("updatedDate", LocalDateTime.now()));
@@ -311,7 +312,13 @@ public interface ITUtilities {
                 .append("transactionNexusSummaries", new Document())
                 .append("nexusCalculationSummaries", new Document())
                 .append("registered", null)
-                .append("registrationDate", null);
+                .append("registrationDate", null)
+                .append("clientTracking", new Document("_id", new ObjectId("649d6ecf86de4c7ec0ca6128"))
+                        .append("tenantId", "it_tenant")
+                        .append("nexus", new Document("taxableDate", LocalDateTime.now()))
+                        .append("name", "it_tenant")
+                        .append("internalTimestamps", new Document("createdDate", LocalDateTime.now())
+                                .append("updatedDate", LocalDateTime.now())));
     }
 
 
