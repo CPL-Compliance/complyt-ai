@@ -200,7 +200,7 @@ public class ExemptionSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveExemption_InvalidExemptionTypeType_throwsValidationError() {
+    public void saveExemption_InvalidExemptionType_throwsValidationError() {
         exemption.put("exemptionType", 123); // exemptionType should be a string
 
         StepVerifier.create(reactiveMongoTemplate.save(exemption, "exemption"))
@@ -252,4 +252,97 @@ public class ExemptionSchemaValidationIT extends TestContainersInitializerIT {
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
+
+    @Test
+    public void saveExemption_InvalidCertificateIdType_throwsValidationError() {
+        ((Document) exemption.get("certificate")).put("certificateId", 123); // certificateId should be a string
+
+        StepVerifier.create(reactiveMongoTemplate.save(exemption, "exemption"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveExemption_MissingCertificateId_throwsValidationError() {
+        ((Document) exemption.get("certificate")).remove("certificateId"); // certificateId is required
+
+        StepVerifier.create(reactiveMongoTemplate.save(exemption, "exemption"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveExemption_InvalidStatusCodeType_throwsValidationError() {
+        ((Document) exemption.get("status")).put("code", 123); // code should be a string
+
+        StepVerifier.create(reactiveMongoTemplate.save(exemption, "exemption"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveExemption_MissingStatusCode_throwsValidationError() {
+        ((Document) exemption.get("status")).remove("code"); // code is required
+
+        StepVerifier.create(reactiveMongoTemplate.save(exemption, "exemption"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveExemption_InvalidStateAbbreviationType_throwsValidationError() {
+        ((Document) exemption.get("state")).put("abbreviation", 123); // abbreviation should be a string
+
+        StepVerifier.create(reactiveMongoTemplate.save(exemption, "exemption"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveExemption_MissingStateAbbreviation_throwsValidationError() {
+        ((Document) exemption.get("state")).remove("abbreviation"); // abbreviation is required
+
+        StepVerifier.create(reactiveMongoTemplate.save(exemption, "exemption"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveExemption_InvalidClassificationCodeType_throwsValidationError() {
+        ((Document) exemption.get("classification")).put("code", 123); // code should be a string
+
+        StepVerifier.create(reactiveMongoTemplate.save(exemption, "exemption"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveExemption_MissingClassificationCode_throwsValidationError() {
+        ((Document) exemption.get("classification")).remove("code"); // code is required
+
+        StepVerifier.create(reactiveMongoTemplate.save(exemption, "exemption"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveExemption_InvalidValidationDatesFromDateType_throwsValidationError() {
+        ((Document) exemption.get("validationDates")).put("fromDate", "invalid_date"); // fromDate should be a date
+
+        StepVerifier.create(reactiveMongoTemplate.save(exemption, "exemption"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveExemption_MissingValidationDatesFromDate_throwsValidationError() {
+        ((Document) exemption.get("validationDates")).remove("fromDate"); // fromDate is required
+
+        StepVerifier.create(reactiveMongoTemplate.save(exemption, "exemption"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
 }
+
+
+

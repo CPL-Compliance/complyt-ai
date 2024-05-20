@@ -147,4 +147,12 @@ public class FileSchemaValidationIT extends TestContainersInitializerIT {
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
+
+    @Test
+    public void save_InvalidAdditionalProperties_throwsValidationError() {
+        file.put("additionalProperty", 123);
+        StepVerifier.create(reactiveMongoTemplate.save(file, "file"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
 }

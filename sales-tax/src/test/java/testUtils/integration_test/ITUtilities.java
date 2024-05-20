@@ -321,7 +321,7 @@ public interface ITUtilities {
                                 .append("updatedDate", LocalDateTime.now())));
     }
 
-    public static Document buildDocument() {
+    static Document transactionDocument() {
         return new Document("_id", new ObjectId("65b6a7f8f930555db9c7c246"))
                 .append("complytId", new Binary((byte) 0x04, Base64.getDecoder().decode("sxrpBJCNThmlyXaNzR0BqQ==")))
                 .append("externalId", "2c9d525b-e809-4916-831e-c50d08a22d92")
@@ -345,58 +345,7 @@ public interface ITUtilities {
                                 .append("manualSalesTaxRate", "0")
                                 .append("tangibleCategory", "TANGIBLE")
                                 .append("taxableCategory", "TAXABLE")
-                                .append("calculatedTotal", "12500"),
-                        new Document("unitPrice", "12500")
-                                .append("quantity", "1")
-                                .append("totalPrice", "12500")
-                                .append("description", "Quarterly Integration Fees")
-                                .append("name", "c6038a5c-ec85-4969-9f25-1e7b44cdc3d0")
-                                .append("taxCode", "")
-                                .append("jurisdictionalSalesTaxRules", new Document("name", "Texas")
-                                        .append("abbreviation", "TX")
-                                        .append("taxable", true)
-                                        .append("specialTreatment", false)
-                                        .append("calculationType", "PERCENTAGE")
-                                        .append("description", "description3")
-                                        .append("calculationValue", "0.8"))
-                                .append("manualSalesTax", true)
-                                .append("manualSalesTaxRate", "0")
-                                .append("tangibleCategory", "TANGIBLE")
-                                .append("taxableCategory", "TAXABLE")
-                                .append("calculatedTotal", "12500"),
-                        new Document("unitPrice", "18750")
-                                .append("quantity", "1")
-                                .append("totalPrice", "18750")
-                                .append("description", "Quarterly Software Licensing and Support")
-                                .append("name", "9d65ad41-ed59-4071-b4d1-870545466e24")
-                                .append("taxCode", "")
-                                .append("jurisdictionalSalesTaxRules", new Document("name", "Texas")
-                                        .append("abbreviation", "TX")
-                                        .append("taxable", true)
-                                        .append("specialTreatment", false)
-                                        .append("calculationType", "PERCENTAGE")
-                                        .append("description", "description3")
-                                        .append("calculationValue", "0.8"))
-                                .append("manualSalesTax", true)
-                                .append("manualSalesTaxRate", "0")
-                                .append("tangibleCategory", "TANGIBLE")
-                                .append("taxableCategory", "TAXABLE")
-                                .append("calculatedTotal", "18750"),
-                        new Document("description", "Period: July 1st 2023 to September 30th 2023")
-                                .append("name", "5b83dfcd-7639-4d75-8086-96beb898c1b6")
-                                .append("taxCode", "")
-                                .append("jurisdictionalSalesTaxRules", new Document("name", "Texas")
-                                        .append("abbreviation", "TX")
-                                        .append("taxable", true)
-                                        .append("specialTreatment", false)
-                                        .append("calculationType", "PERCENTAGE")
-                                        .append("description", "description3")
-                                        .append("calculationValue", "0.8"))
-                                .append("manualSalesTax", true)
-                                .append("manualSalesTaxRate", "0")
-                                .append("tangibleCategory", "TANGIBLE")
-                                .append("taxableCategory", "TAXABLE")
-                ))
+                                .append("calculatedTotal", "12500")))
                 .append("shippingAddress", new Document("city", "San Antonio")
                         .append("country", "USA")
                         .append("county", "Bexar")
@@ -416,7 +365,13 @@ public interface ITUtilities {
                 .append("tangibleItemsAmount", "43750")
                 .append("totalItemsAmount", "43750")
                 .append("_class", "com.complyt.domain.transaction.Transaction")
-                .append("totalDiscount", "0");
+                .append("totalDiscount", "0")
+                .append("billingAddress", new Document("street", "123 Main St")
+                        .append("zip", "12345")
+                        .append("country", "USA")
+                        .append("county", "SomeCounty")
+                        .append("state", "CA")
+                        .append("city", "SomeCity"));
     }
 
     public static Document nexusStateRuleDocument() {

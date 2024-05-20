@@ -213,4 +213,58 @@ public class ProductClassificationSchemaValidationIT extends TestContainersIniti
                 .expectErrorMatches(throwable -> throwable.getMessage().contains("abbreviation"))
                 .verify();
     }
+
+    @Test
+    public void saveProductClassification_invalidNameType_Failure() {
+        ((Document) productClassificationDocument.get("jurisdictionalSalesTaxRules")).get("CA", Document.class).put("name", 123); // name should be a string
+
+        StepVerifier.create(reactiveMongoTemplate.save(productClassificationDocument, "product_classification"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("name"))
+                .verify();
+    }
+
+    @Test
+    public void saveProductClassification_invalidTaxableType_Failure() {
+        ((Document) productClassificationDocument.get("jurisdictionalSalesTaxRules")).get("CA", Document.class).put("taxable", "true"); // taxable should be a bool
+
+        StepVerifier.create(reactiveMongoTemplate.save(productClassificationDocument, "product_classification"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("taxable"))
+                .verify();
+    }
+
+    @Test
+    public void saveProductClassification_invalidSpecialTreatmentType_Failure() {
+        ((Document) productClassificationDocument.get("jurisdictionalSalesTaxRules")).get("CA", Document.class).put("specialTreatment", "false"); // specialTreatment should be a bool
+
+        StepVerifier.create(reactiveMongoTemplate.save(productClassificationDocument, "product_classification"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("specialTreatment"))
+                .verify();
+    }
+
+    @Test
+    public void saveProductClassification_invalidCalculationType_Failure() {
+        ((Document) productClassificationDocument.get("jurisdictionalSalesTaxRules")).get("CA", Document.class).put("calculationType", 123); // calculationType should be a string
+
+        StepVerifier.create(reactiveMongoTemplate.save(productClassificationDocument, "product_classification"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("calculationType"))
+                .verify();
+    }
+
+    @Test
+    public void saveProductClassification_invalidCalculationValueType_Failure() {
+        ((Document) productClassificationDocument.get("jurisdictionalSalesTaxRules")).get("CA", Document.class).put("calculationValue", 123); // calculationValue should be a string
+
+        StepVerifier.create(reactiveMongoTemplate.save(productClassificationDocument, "product_classification"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("calculationValue"))
+                .verify();
+    }
+
+    @Test
+    public void saveProductClassification_invalidAbbreviationType_Failure() {
+        ((Document) productClassificationDocument.get("jurisdictionalSalesTaxRules")).get("CA", Document.class).put("abbreviation", 123); // abbreviation should be a string
+
+        StepVerifier.create(reactiveMongoTemplate.save(productClassificationDocument, "product_classification"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("abbreviation"))
+                .verify();
+    }
 }

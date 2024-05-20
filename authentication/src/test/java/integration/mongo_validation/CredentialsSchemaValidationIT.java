@@ -260,4 +260,12 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
+
+    @Test
+    public void saveCredentials_InvalidAdditionalProperties_throwsValidationError() {
+        credentials.put("additionalProperty", 123);
+        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
 }

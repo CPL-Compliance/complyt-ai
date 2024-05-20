@@ -200,7 +200,7 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveCustomer_InvalidCustomerTypeType_throwsValidationError() {
+    public void saveCustomer_InvalidCustomerType_throwsValidationError() {
         customer.put("customerType", 123); // customerType should be a string
 
         StepVerifier.create(reactiveMongoTemplate.save(customer, "customer"))
@@ -247,6 +247,24 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
     @Test
     public void saveCustomer_InvalidExternalTimestampsUpdatedDateType_throwsValidationError() {
         ((Document) customer.get("externalTimestamps")).put("updatedDate", "invalid_date"); // updatedDate should be a date
+
+        StepVerifier.create(reactiveMongoTemplate.save(customer, "customer"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveCustomer_InvalidAddressCountryType_throwsValidationError() {
+        ((Document) customer.get("address")).put("country", 123); // country should be a string
+
+        StepVerifier.create(reactiveMongoTemplate.save(customer, "customer"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveCustomer_InvalidAddressIsPartialType_throwsValidationError() {
+        ((Document) customer.get("address")).put("isPartial", "true"); // isPartial should be a bool
 
         StepVerifier.create(reactiveMongoTemplate.save(customer, "customer"))
                 .expectError(DataIntegrityViolationException.class)

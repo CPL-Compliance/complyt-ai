@@ -198,4 +198,13 @@ public class ClientTrackingSchemaValidationIT extends TestContainersInitializerI
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
+
+    @Test
+    public void saveClientTracking_InvalidAdditionalProperty_throwsValidationError() {
+        clientTracking.put("additionalProperty", 123); // _class should be a string
+
+        StepVerifier.create(reactiveMongoTemplate.save(clientTracking, "client_tracking"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
 }
