@@ -34,7 +34,7 @@ public class GTSchemaValidationIT extends MongoContainerInitializerIT {
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    Document gtRates;
+    Document gtRatesDocument;
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -43,102 +43,102 @@ public class GTSchemaValidationIT extends MongoContainerInitializerIT {
 
     @BeforeEach
     void setup() {
-        gtRates = TestUtilities.gtRatesDocument();
+        gtRatesDocument = TestUtilities.gtRatesDocument();
     }
 
     @Test
     public void saveGTRates_validGTRates_Success() {
-        StepVerifier.create(reactiveMongoTemplate.save(gtRates, "gt_rates"))
+        StepVerifier.create(reactiveMongoTemplate.save(gtRatesDocument, "gt_rates"))
                 .expectNextCount(1)
                 .verifyComplete();
     }
 
     @Test
     public void saveGTRates_MissingGtAddress_throwsValidationError() {
-        gtRates.remove("gtAddress");
+        gtRatesDocument.remove("gtAddress");
 
-        StepVerifier.create(reactiveMongoTemplate.save(gtRates, "gt_rates"))
+        StepVerifier.create(reactiveMongoTemplate.save(gtRatesDocument, "gt_rates"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveGTRates_MissingGtRates_throwsValidationError() {
-        gtRates.remove("gtRates");
+        gtRatesDocument.remove("gtRates");
 
-        StepVerifier.create(reactiveMongoTemplate.save(gtRates, "gt_rates"))
+        StepVerifier.create(reactiveMongoTemplate.save(gtRatesDocument, "gt_rates"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveGTRates_MissingGtRatesCountryRate_throwsValidationError() {
-        ((Document) gtRates.get("gtRates")).remove("countryRate");
+        ((Document) gtRatesDocument.get("gtRates")).remove("countryRate");
 
-        StepVerifier.create(reactiveMongoTemplate.save(gtRates, "gt_rates"))
+        StepVerifier.create(reactiveMongoTemplate.save(gtRatesDocument, "gt_rates"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveGTRates_MissingGtRatesTaxRate_throwsValidationError() {
-        ((Document) gtRates.get("gtRates")).remove("taxRate");
+        ((Document) gtRatesDocument.get("gtRates")).remove("taxRate");
 
-        StepVerifier.create(reactiveMongoTemplate.save(gtRates, "gt_rates"))
+        StepVerifier.create(reactiveMongoTemplate.save(gtRatesDocument, "gt_rates"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveGTRates_MissingGtAddressCountry_throwsValidationError() {
-        ((Document) gtRates.get("gtAddress")).remove("country");
+        ((Document) gtRatesDocument.get("gtAddress")).remove("country");
 
-        StepVerifier.create(reactiveMongoTemplate.save(gtRates, "gt_rates"))
+        StepVerifier.create(reactiveMongoTemplate.save(gtRatesDocument, "gt_rates"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveGTRates_InvalidGtAddressCountryType_throwsValidationError() {
-        ((Document) gtRates.get("gtAddress")).put("country", 123);
+        ((Document) gtRatesDocument.get("gtAddress")).put("country", 123);
 
-        StepVerifier.create(reactiveMongoTemplate.save(gtRates, "gt_rates"))
+        StepVerifier.create(reactiveMongoTemplate.save(gtRatesDocument, "gt_rates"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveGTRates_InvalidGtRatesTaxRateType_throwsValidationError() {
-        ((Document) gtRates.get("gtRates")).put("taxRate", 0.18);
+        ((Document) gtRatesDocument.get("gtRates")).put("taxRate", 0.18);
 
-        StepVerifier.create(reactiveMongoTemplate.save(gtRates, "gt_rates"))
+        StepVerifier.create(reactiveMongoTemplate.save(gtRatesDocument, "gt_rates"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveGTRates_InvalidGtRatesCountryRateType_throwsValidationError() {
-        ((Document) gtRates.get("gtRates")).put("countryRate", 0.18);
+        ((Document) gtRatesDocument.get("gtRates")).put("countryRate", 0.18);
 
-        StepVerifier.create(reactiveMongoTemplate.save(gtRates, "gt_rates"))
+        StepVerifier.create(reactiveMongoTemplate.save(gtRatesDocument, "gt_rates"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveGTRates_InvalidGtRatesRegionRateType_throwsValidationError() {
-        ((Document) gtRates.get("gtRates")).put("regionRate", 0.05);
+        ((Document) gtRatesDocument.get("gtRates")).put("regionRate", 0.05);
 
-        StepVerifier.create(reactiveMongoTemplate.save(gtRates, "gt_rates"))
+        StepVerifier.create(reactiveMongoTemplate.save(gtRatesDocument, "gt_rates"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveGTRates_InvalidGtAddressRegionType_throwsValidationError() {
-        ((Document) gtRates.get("gtAddress")).put("region", 123);
+        ((Document) gtRatesDocument.get("gtAddress")).put("region", 123);
 
-        StepVerifier.create(reactiveMongoTemplate.save(gtRates, "gt_rates"))
+        StepVerifier.create(reactiveMongoTemplate.save(gtRatesDocument, "gt_rates"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }

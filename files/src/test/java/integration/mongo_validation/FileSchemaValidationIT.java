@@ -25,7 +25,7 @@ public class FileSchemaValidationIT extends TestContainersInitializerIT {
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    Document file;
+    Document fileDocument;
 
     @DynamicPropertySource
     static void putProperties(DynamicPropertyRegistry registry) {
@@ -34,12 +34,12 @@ public class FileSchemaValidationIT extends TestContainersInitializerIT {
 
     @BeforeEach
     void putup() {
-        file = TestUtilities.fileDocument();
+        fileDocument = TestUtilities.fileDocument();
     }
 
     @Test
     public void saveToken_validFile_Success() {
-        StepVerifier.create(reactiveMongoTemplate.save(file, "file"))
+        StepVerifier.create(reactiveMongoTemplate.save(fileDocument, "file"))
                 .expectNextCount(1)
                 .verifyComplete();
     }
@@ -47,36 +47,36 @@ public class FileSchemaValidationIT extends TestContainersInitializerIT {
     @Test
     public void save_InvalidComplytIdFormat_throwsValidationError() {
         // Assuming you have a method to put a non-binary UUID format for testing
-        file.put("complytId", "not-a-binary-uuid");
+        fileDocument.put("complytId", "not-a-binary-uuid");
 
-        StepVerifier.create(reactiveMongoTemplate.save(file, "file"))
+        StepVerifier.create(reactiveMongoTemplate.save(fileDocument, "file"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void save_MissingTenantId_throwsValidationError() {
-        file.remove("tenantId");
+        fileDocument.remove("tenantId");
 
-        StepVerifier.create(reactiveMongoTemplate.save(file, "file"))
+        StepVerifier.create(reactiveMongoTemplate.save(fileDocument, "file"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void save_MissingLink_throwsValidationError() {
-        file.remove("link");
+        fileDocument.remove("link");
 
-        StepVerifier.create(reactiveMongoTemplate.save(file, "file"))
+        StepVerifier.create(reactiveMongoTemplate.save(fileDocument, "file"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void save_MissingComplytId_throwsValidationError() {
-        file.remove("complytId");
+        fileDocument.remove("complytId");
 
-        StepVerifier.create(reactiveMongoTemplate.save(file, "file"))
+        StepVerifier.create(reactiveMongoTemplate.save(fileDocument, "file"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
@@ -85,18 +85,18 @@ public class FileSchemaValidationIT extends TestContainersInitializerIT {
     public void save_ExceedsMaxLengthTenantId_throwsValidationError() {
         // Create a string longer than 100 characters
         String longString = new String(new char[101]).replace('\0', 'a');
-        file.put("tenantId", longString);
+        fileDocument.put("tenantId", longString);
 
-        StepVerifier.create(reactiveMongoTemplate.save(file, "file"))
+        StepVerifier.create(reactiveMongoTemplate.save(fileDocument, "file"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void save_InvalidLinkFormat_throwsValidationError() {
-        file.put("link", "htp://badurl.com");
+        fileDocument.put("link", "htp://badurl.com");
 
-        StepVerifier.create(reactiveMongoTemplate.save(file, "file"))
+        StepVerifier.create(reactiveMongoTemplate.save(fileDocument, "file"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
@@ -105,53 +105,53 @@ public class FileSchemaValidationIT extends TestContainersInitializerIT {
     public void save_ExceedsMaxLengthLink_throwsValidationError() {
         // Create a URL string longer than 2048 characters
         String longUrl = "http://" + new String(new char[2040]).replace('\0', 'a') + ".com";
-        file.put("link", longUrl);
+        fileDocument.put("link", longUrl);
 
-        StepVerifier.create(reactiveMongoTemplate.save(file, "file"))
+        StepVerifier.create(reactiveMongoTemplate.save(fileDocument, "file"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void save_InvalidComplytIdType_throwsValidationError() {
-        file.put("complytId", "123"); // Incorrect: String instead of Binary
+        fileDocument.put("complytId", "123"); // Incorrect: String instead of Binary
 
-        StepVerifier.create(reactiveMongoTemplate.save(file, "file"))
+        StepVerifier.create(reactiveMongoTemplate.save(fileDocument, "file"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void save_InvalidTenantIdType_throwsValidationError() {
-        file.put("tenantId", true); // Incorrect tenantId, String
+        fileDocument.put("tenantId", true); // Incorrect tenantId, String
 
-        StepVerifier.create(reactiveMongoTemplate.save(file, "file"))
+        StepVerifier.create(reactiveMongoTemplate.save(fileDocument, "file"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void save_InvalidLinkType_throwsValidationError() {
-        file.put("link", 123); // Incorrect URL format, invalid protocol
+        fileDocument.put("link", 123); // Incorrect URL format, invalid protocol
 
-        StepVerifier.create(reactiveMongoTemplate.save(file, "file"))
+        StepVerifier.create(reactiveMongoTemplate.save(fileDocument, "file"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void save_InvalidLinkPattern_throwsValidationError() {
-        file.put("link", "htttp:\\notavalidurl"); // Incorrect URL format, invalid protocol
+        fileDocument.put("link", "htttp:\\notavalidurl"); // Incorrect URL format, invalid protocol
 
-        StepVerifier.create(reactiveMongoTemplate.save(file, "file"))
+        StepVerifier.create(reactiveMongoTemplate.save(fileDocument, "file"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void save_InvalidAdditionalProperties_throwsValidationError() {
-        file.put("additionalProperty", 123);
-        StepVerifier.create(reactiveMongoTemplate.save(file, "file"))
+        fileDocument.put("additionalProperty", 123);
+        StepVerifier.create(reactiveMongoTemplate.save(fileDocument, "file"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }

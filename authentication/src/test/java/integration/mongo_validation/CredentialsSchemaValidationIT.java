@@ -36,7 +36,7 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    Document credentials;
+    Document credentialsDocument;
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -45,226 +45,226 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
 
     @BeforeEach
     void setup() {
-        credentials = TestUtilities.credentialsDocument();;
+        credentialsDocument = TestUtilities.credentialsDocument();;
     }
 
     @Test
     public void saveCredentials_validCredentials_Success() {
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectNextCount(1)
                 .verifyComplete();
     }
 
     @Test
     public void saveCredentials_MissingComplytClientId_throwsValidationError() {
-        credentials.remove("complytClientId");
+        credentialsDocument.remove("complytClientId");
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_MissingComplytClientSecret_throwsValidationError() {
-        credentials.remove("complytClientSecret");
+        credentialsDocument.remove("complytClientSecret");
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 . verify();
     }
 
     @Test
     public void saveCredentials_MissingClientId_throwsValidationError() {
-        credentials.remove("clientId");
+        credentialsDocument.remove("clientId");
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_MissingClientSecret_throwsValidationError() {
-        credentials.remove("clientSecret");
+        credentialsDocument.remove("clientSecret");
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_MissingClientIdIv_throwsValidationError() {
-        credentials.remove("clientIdIv");
+        credentialsDocument.remove("clientIdIv");
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_MissingClientSecretIv_throwsValidationError() {
-        credentials.remove("clientSecretIv");
+        credentialsDocument.remove("clientSecretIv");
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_MissingAudience_throwsValidationError() {
-        credentials.remove("audience");
+        credentialsDocument.remove("audience");
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_MissingGrantType_throwsValidationError() {
-        credentials.remove("grantType");
+        credentialsDocument.remove("grantType");
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_MissingTenantId_throwsValidationError() {
-        credentials.remove("tenantId");
+        credentialsDocument.remove("tenantId");
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_MissingName_throwsValidationError() {
-        credentials.remove("name");
+        credentialsDocument.remove("name");
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_MissingStatus_throwsValidationError() {
-        credentials.remove("status");
+        credentialsDocument.remove("status");
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_InvalidTenantIdType_throwsValidationError() {
-        credentials.put("tenantId", 123);
+        credentialsDocument.put("tenantId", 123);
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_InvalidNameType_throwsValidationError() {
-        credentials.put("name", 456);
+        credentialsDocument.put("name", 456);
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_InvalidStatusType_throwsValidationError() {
-        credentials.put("status", 123);
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        credentialsDocument.put("status", 123);
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_InvalidClientIdType_throwsValidationError() {
-        credentials.put("clientId", false);
+        credentialsDocument.put("clientId", false);
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_InvalidClientSecretIvType_throwsValidationError() {
-        credentials.put("clientSecretIv", 123);
+        credentialsDocument.put("clientSecretIv", 123);
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_InvalidAudienceType_throwsValidationError() {
-        credentials.put("audience", 789);
+        credentialsDocument.put("audience", 789);
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_InvalidGrantType_throwsValidationError() {
-        credentials.put("grantType", new Date());
+        credentialsDocument.put("grantType", new Date());
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_InvalidClientSecretType_throwsValidationError() {
-        credentials.put("clientSecret", 123);
+        credentialsDocument.put("clientSecret", 123);
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_InvalidComplytClientIdType_throwsValidationError() {
-        credentials.put("complytClientId", new Date());
+        credentialsDocument.put("complytClientId", new Date());
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_InvalidComplytClientSecretType_throwsValidationError() {
-        credentials.put("complytClientSecret", true);
+        credentialsDocument.put("complytClientSecret", true);
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_InvalidClientIdIvType_throwsValidationError() {
-        credentials.put("clientIdIv", 456);
+        credentialsDocument.put("clientIdIv", 456);
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_InvalidExpireAtType_throwsValidationError() {
-        credentials.put("expireAt", "invalidDate");
+        credentialsDocument.put("expireAt", "invalidDate");
 
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveCredentials_InvalidAdditionalProperties_throwsValidationError() {
-        credentials.put("additionalProperty", 123);
-        StepVerifier.create(reactiveMongoTemplate.save(credentials, "credentials"))
+        credentialsDocument.put("additionalProperty", 123);
+        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }

@@ -34,7 +34,7 @@ public class USStateSchemaValidationIT extends MongoContainerInitializerIT {
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    Document salesTaxRate;
+    Document salesTaxRateDocument;
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -43,111 +43,111 @@ public class USStateSchemaValidationIT extends MongoContainerInitializerIT {
 
     @BeforeEach
     void setup() {
-        salesTaxRate = TestUtilities.salesTaxRatesDocument();
+        salesTaxRateDocument = TestUtilities.salesTaxRatesDocument();
     }
 
     @Test
     public void saveSalesTaxRate_validSalesTaxRate_Success() {
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectNextCount(1)
                 .verifyComplete();
     }
 
     @Test
     public void saveSalesTaxRate_MissingCreatedDate_throwsValidationError() {
-        salesTaxRate.remove("createdDate");
+        salesTaxRateDocument.remove("createdDate");
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_MissingExpireAt_throwsValidationError() {
-        salesTaxRate.remove("expireAt");
+        salesTaxRateDocument.remove("expireAt");
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_MissingAddress_throwsValidationError() {
-        salesTaxRate.remove("address");
+        salesTaxRateDocument.remove("address");
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_MissingRequestAddress_throwsValidationError() {
-        salesTaxRate.remove("requestAddress");
+        salesTaxRateDocument.remove("requestAddress");
 
-                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_MissingSalesTaxRates_throwsValidationError() {
-        salesTaxRate.remove("salesTaxRates");
+        salesTaxRateDocument.remove("salesTaxRates");
 
-                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_MissingSalesTaxRatesCityRate_throwsValidationError() {
-        ((Document) salesTaxRate.get("salesTaxRates")).remove("cityRate");
+        ((Document) salesTaxRateDocument.get("salesTaxRates")).remove("cityRate");
 
-                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_MissingSalesTaxRatesCountyRate_throwsValidationError() {
-        ((Document) salesTaxRate.get("salesTaxRates")).remove("countyRate");
+        ((Document) salesTaxRateDocument.get("salesTaxRates")).remove("countyRate");
 
-                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_MissingSalesTaxRatesStateRate_throwsValidationError() {
-        ((Document) salesTaxRate.get("salesTaxRates")).remove("stateRate");
+        ((Document) salesTaxRateDocument.get("salesTaxRates")).remove("stateRate");
 
-                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_MissingSalesTaxRatesTaxRate_throwsValidationError() {
-        ((Document) salesTaxRate.get("salesTaxRates")).remove("taxRate");
+        ((Document) salesTaxRateDocument.get("salesTaxRates")).remove("taxRate");
 
-                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_MissingSalesTaxRatesCombinedDistrictRate_throwsValidationError() {
-        ((Document) salesTaxRate.get("salesTaxRates")).remove("combinedDistrictRate");
+        ((Document) salesTaxRateDocument.get("salesTaxRates")).remove("combinedDistrictRate");
 
-                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_MissingRatesMetaDataCityDistrictRate_throwsValidationError() {
-        ((Document) ((Document) salesTaxRate.get("salesTaxRates")).get("ratesMetaData")).remove("cityDistrictRate");
+        ((Document) ((Document) salesTaxRateDocument.get("salesTaxRates")).get("ratesMetaData")).remove("cityDistrictRate");
 
-                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
@@ -155,153 +155,153 @@ public class USStateSchemaValidationIT extends MongoContainerInitializerIT {
     // Similarly, add tests for required fields in requestAddress and address subdocuments
     @Test
     public void saveSalesTaxRate_MissingRequestAddressState_throwsValidationError() {
-        ((Document) salesTaxRate.get("requestAddress")).remove("state");
+        ((Document) salesTaxRateDocument.get("requestAddress")).remove("state");
 
-                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_MissingRequestAddressZip_throwsValidationError() {
-        ((Document) salesTaxRate.get("requestAddress")).remove("zip");
+        ((Document) salesTaxRateDocument.get("requestAddress")).remove("zip");
 
-                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_MissingAddressState_throwsValidationError() {
-        ((Document) salesTaxRate.get("address")).remove("state");
+        ((Document) salesTaxRateDocument.get("address")).remove("state");
 
-                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_MissingAddressZip_throwsValidationError() {
-        ((Document) salesTaxRate.get("address")).remove("zip");
+        ((Document) salesTaxRateDocument.get("address")).remove("zip");
 
-                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_InvalidCreatedDateType_throwsValidationError() {
-        salesTaxRate.put("createdDate", "invalidDate");
+        salesTaxRateDocument.put("createdDate", "invalidDate");
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_InvalidExpireAtType_throwsValidationError() {
-        salesTaxRate.put("expireAt", "invalidDate");
+        salesTaxRateDocument.put("expireAt", "invalidDate");
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_InvalidSalesTaxRatesType_throwsValidationError() {
-        salesTaxRate.put("salesTaxRates", "invalidType");
+        salesTaxRateDocument.put("salesTaxRates", "invalidType");
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_InvalidSalesTaxRatesCityRateType_throwsValidationError() {
-        ((Document) salesTaxRate.get("salesTaxRates")).put("cityRate", 0.02);
+        ((Document) salesTaxRateDocument.get("salesTaxRates")).put("cityRate", 0.02);
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_InvalidSalesTaxRatesCountyRateType_throwsValidationError() {
-        ((Document) salesTaxRate.get("salesTaxRates")).put("countyRate", 0.03);
+        ((Document) salesTaxRateDocument.get("salesTaxRates")).put("countyRate", 0.03);
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_InvalidSalesTaxRatesStateRateType_throwsValidationError() {
-        ((Document) salesTaxRate.get("salesTaxRates")).put("stateRate", 0.04);
+        ((Document) salesTaxRateDocument.get("salesTaxRates")).put("stateRate", 0.04);
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_InvalidSalesTaxRatesTaxRateType_throwsValidationError() {
-        ((Document) salesTaxRate.get("salesTaxRates")).put("taxRate", 0.09);
+        ((Document) salesTaxRateDocument.get("salesTaxRates")).put("taxRate", 0.09);
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_InvalidSalesTaxRatesCombinedDistrictRateType_throwsValidationError() {
-        ((Document) salesTaxRate.get("salesTaxRates")).put("combinedDistrictRate", 0);
+        ((Document) salesTaxRateDocument.get("salesTaxRates")).put("combinedDistrictRate", 0);
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_InvalidRatesMetaDataCityDistrictRateType_throwsValidationError() {
-        ((Document) ((Document) salesTaxRate.get("salesTaxRates")).get("ratesMetaData")).put("cityDistrictRate", 0);
+        ((Document) ((Document) salesTaxRateDocument.get("salesTaxRates")).get("ratesMetaData")).put("cityDistrictRate", 0);
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_InvalidRequestAddressStateType_throwsValidationError() {
-        ((Document) salesTaxRate.get("requestAddress")).put("state", 123);
+        ((Document) salesTaxRateDocument.get("requestAddress")).put("state", 123);
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_InvalidRequestAddressZipType_throwsValidationError() {
-        ((Document) salesTaxRate.get("requestAddress")).put("zip", 35097);
+        ((Document) salesTaxRateDocument.get("requestAddress")).put("zip", 35097);
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_InvalidAddressStateType_throwsValidationError() {
-        ((Document) salesTaxRate.get("address")).put("state", 123);
+        ((Document) salesTaxRateDocument.get("address")).put("state", 123);
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 
     @Test
     public void saveSalesTaxRate_InvalidAddressZipType_throwsValidationError() {
-        ((Document) salesTaxRate.get("address")).put("zip", 35097);
+        ((Document) salesTaxRateDocument.get("address")).put("zip", 35097);
 
-        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRate, "alabama"))
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
