@@ -1,5 +1,6 @@
 package com.complyt.v1.handlers;
 
+import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.permissions.transaction.TransactionCreatePermission;
@@ -119,12 +120,16 @@ public class TransactionHandler {
                         .map(TransactionMapper.INSTANCE::transactionDtoToTransaction)
                         .flatMap(receivedTransaction ->
                                 transactionFacade.findByExternalIdAndSource(externalId, source)
-                                        .flatMap(originalTransaction -> transactionFacade.updateIfModified(externalId, source, receivedTransaction, originalTransaction)
+                                        .flatMap(originalTransaction -> transactionFacade.update(externalId, source, receivedTransaction, originalTransaction)
                                                 .flatMap(savedTransaction -> ContextLogger.observeCtx("<-- Returned Body: " + savedTransaction, log::info).thenReturn(savedTransaction))
-                                                .flatMap(savedTransaction -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class)))
+                                                .flatMap(savedTransaction -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class))
+                                                .switchIfEmpty(ServerResponse.noContent().build()
+                                                        .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse))))
                                         .switchIfEmpty(Mono.defer(() -> transactionFacade.saveTransaction(receivedTransaction)
                                                 .flatMap(savedTransaction -> ContextLogger.observeCtx("<-- Returned Body: " + savedTransaction, log::info).thenReturn(savedTransaction))
-                                                .flatMap(savedTransaction -> ServerResponse.created(URI.create(resourceURI)).contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class))))));
+                                                .flatMap(savedTransaction -> ServerResponse.created(URI.create(resourceURI)).contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class))))
+                                                .switchIfEmpty(ServerResponse.noContent().build()
+                                                        .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse)))));
     }
 
     @TransactionDeletePermission

@@ -297,13 +297,13 @@ class NexusServiceTest {
     }
 
     @Test
-    void hasNexus_HasNexus_ReturnsHasNexus() {
+    void salesTaxTrackingWithNexusIndication_HasNexus_ReturnsHasNexus() {
         // Given
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
 
         // When
         when(nexusChecker.hasNexus(salesTaxTracking)).thenReturn(true);
-        Mono<SalesTaxTrackingWithNexusInfo> salesTaxTrackingDecoratorMono = nexusService.hasNexus(salesTaxTracking);
+        Mono<SalesTaxTrackingWithNexusInfo> salesTaxTrackingDecoratorMono = nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking);
 
         // Then
         StepVerifier.create(salesTaxTrackingDecoratorMono).expectNext(salesTaxTrackingDecorator).verifyComplete();
@@ -419,13 +419,13 @@ class NexusServiceTest {
     }
 
     @Test
-    void hasNexus_NullSalesTaxTrackingPassed_ThrowsException() {
+    void salesTaxTrackingWithNexusIndication_NullSalesTaxTrackingPassed_ThrowsException() {
         // Given
         SalesTaxTracking nullSalesTaxTracking = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> nexusService.hasNexus(nullSalesTaxTracking));
+                () -> nexusService.salesTaxTrackingWithNexusIndication(nullSalesTaxTracking));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");

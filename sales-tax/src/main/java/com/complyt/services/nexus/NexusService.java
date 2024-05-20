@@ -42,7 +42,7 @@ public class NexusService {
     private NexusTransactionsSearchQueryBuilder nexusTransactionsSearchQueryBuilder;
 
 
-    public Mono<SalesTaxTrackingWithNexusInfo> hasNexus(@NonNull SalesTaxTracking salesTaxTracking) {
+    public Mono<SalesTaxTrackingWithNexusInfo> salesTaxTrackingWithNexusIndication(@NonNull SalesTaxTracking salesTaxTracking) {
         return Mono.fromCallable(() ->
                 new SalesTaxTrackingWithNexusInfo(salesTaxTracking, nexusChecker.hasNexus(salesTaxTracking)));
     }
@@ -85,7 +85,7 @@ public class NexusService {
     }
 
     public Mono<SalesTaxTracking> recalculationOfNexusSummaryIfRequired(@NonNull SalesTaxTracking salesTaxTracking, @NonNull Mono<SalesTaxTracking> calculationMono) {
-        return hasNexus(salesTaxTracking)
+        return salesTaxTrackingWithNexusIndication(salesTaxTracking)
                 .flatMap(salesTaxTrackingWithNexusInfo -> !salesTaxTrackingWithNexusInfo.isHasNexus() &&
                         salesTaxTracking.getNexusStateRule().timeFrame().equals(TimeFrame.PREVIOUS_TWELVE_MONTHS)
                         ? calculationMono

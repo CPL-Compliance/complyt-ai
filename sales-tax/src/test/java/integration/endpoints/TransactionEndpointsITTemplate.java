@@ -70,4 +70,6 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_ConflictingItemHasNegativeUnitPriceAndQuantityAndDiscount_Returns400ConflictedData();
 
     void upsertByExternalIdAndSource_ConflictingItemHasNegativeDiscount_Returns400ConflictedData();
+
+    void upsertByExternalIdAndSource_TransactionWithStatusCancelled_Returns204();
 }

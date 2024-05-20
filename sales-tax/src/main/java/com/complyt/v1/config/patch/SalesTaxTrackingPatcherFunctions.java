@@ -1,11 +1,9 @@
 package com.complyt.v1.config.patch;
 
+import com.complyt.domain.FilingFrequency;
 import com.complyt.domain.sales_tax.RegisteredType;
 import com.complyt.utils.object_mapper.ComplytObjectMapper;
-import com.complyt.v1.models.EconomicNexusTrackerDto;
-import com.complyt.v1.models.PhysicalNexusTrackerDto;
-import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.StateDto;
+import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 
 import java.time.LocalDateTime;
@@ -64,6 +62,11 @@ public interface SalesTaxTrackingPatcherFunctions {
     BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchRegistrationDate = (salesTaxTrackingDto, registrationDate) -> {
         LocalDateTime convertedRegistrationDate = LocalDateTime.parse(registrationDate.toString());
         return salesTaxTrackingDto.withRegistrationDate(convertedRegistrationDate);
+    };
+
+    BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchFilingFrequency = (salesTaxTrackingDto, filingFrequency) -> {
+        FilingFrequencyDto convertedFilingFrequency = (FilingFrequencyDto) ComplytObjectMapper.mapObject(filingFrequency, FilingFrequencyDto.class);
+        return salesTaxTrackingDto.withFilingFrequency(convertedFilingFrequency);
     };
 
 }

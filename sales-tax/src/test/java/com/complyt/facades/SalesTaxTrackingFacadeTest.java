@@ -122,7 +122,7 @@ public class SalesTaxTrackingFacadeTest {
 
         // When
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(salesTaxTracking.getCountry(), salesTaxTracking.getState().getName(), salesTaxTracking.getSubsidiary())).thenReturn(Mono.just(salesTaxTrackingWithId));
-        when(nexusService.hasNexus(salesTaxTrackingWithId)).thenReturn(Mono.just(new SalesTaxTrackingWithNexusInfo(salesTaxTrackingWithId, false)));
+        when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTrackingWithId)).thenReturn(Mono.just(new SalesTaxTrackingWithNexusInfo(salesTaxTrackingWithId, false)));
         when(salesTaxTrackingService.addClientAndStateDetails(salesTaxTrackingWithId)).thenReturn(Mono.just(salesTaxTrackingWithId));
         when(nexusService.getTransactionsQueryByNexusCalculation(salesTaxTrackingWithId.getNexusStateRule(), salesTaxTrackingWithId.getClientTracking(), referenceDate,salesTaxTracking.getSubsidiary())).thenReturn(Mono.just(query));
         when(transactionService.getTransactionsByQuery(query)).thenReturn(Flux.just(transaction));
@@ -144,7 +144,7 @@ public class SalesTaxTrackingFacadeTest {
 
         // When
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(salesTaxTracking.getCountry(), salesTaxTracking.getState().getName(), salesTaxTracking.getSubsidiary())).thenReturn(Mono.just(salesTaxTrackingWithId));
-        when(nexusService.hasNexus(salesTaxTrackingWithId)).thenReturn(Mono.just(new SalesTaxTrackingWithNexusInfo(salesTaxTrackingWithId, true)));
+        when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTrackingWithId)).thenReturn(Mono.just(new SalesTaxTrackingWithNexusInfo(salesTaxTrackingWithId, true)));
 
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.refreshNexusSummary(salesTaxTracking.getCountry(), salesTaxTracking.getState().getName(), referenceDate, salesTaxTracking.getSubsidiary());
 

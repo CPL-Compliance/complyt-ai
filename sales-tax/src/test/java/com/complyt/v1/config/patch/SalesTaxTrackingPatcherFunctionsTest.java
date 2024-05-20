@@ -1,10 +1,9 @@
 package com.complyt.v1.config.patch;
 
+import com.complyt.domain.FilingFrequency;
 import com.complyt.domain.sales_tax.RegisteredType;
-import com.complyt.v1.models.EconomicNexusTrackerDto;
-import com.complyt.v1.models.PhysicalNexusTrackerDto;
-import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.StateDto;
+import com.complyt.domain.transaction.TransactionStatus;
+import com.complyt.v1.models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -159,6 +158,18 @@ public class SalesTaxTrackingPatcherFunctionsTest {
 
         // Then
         Assertions.assertEquals(LocalDateTime.parse("2024-03-20T12:00:00"), modifiedDto.registrationDate());
+    }
+
+    @Test
+    void patchFilingFrequency_patchesFilingFrequencyField_ReturnsModifiedSalesTaxTrackingDto() {
+        // Given
+        FilingFrequencyDto filingFrequency = FilingFrequencyDto.MONTHLY;
+
+        // When
+        SalesTaxTrackingDto modifiedDto = SalesTaxTrackingPatcherFunctions.patchFilingFrequency.apply(salesTaxTracking, filingFrequency);
+
+        // Then
+        Assertions.assertEquals(FilingFrequencyDto.MONTHLY, modifiedDto.filingFrequency());
     }
 
 }

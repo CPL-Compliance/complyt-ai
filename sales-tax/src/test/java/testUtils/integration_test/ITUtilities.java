@@ -29,8 +29,8 @@ public interface ITUtilities {
     static TransactionDto stubTransactionDto(String externalId, UUID customerId, ItemDto... items) {
         return new TransactionDto(null, externalId, "1", "INVUS1000",
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
-                false, null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false), customerId,
-                null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
+                false, null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false),
+                customerId, null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
                 TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD", null);
     } // note isTaxInclusive is false, finalTransactionAmount is zero
 
@@ -219,6 +219,17 @@ public interface ITUtilities {
                 List.of(CustomerTypeDto.RETAIL),
                 TimeFrameDto.PREVIOUS_TWELVE_MONTHS,
                 new NexusThresholdDto(BigDecimal.valueOf(250000), 0, DefinitionDto.AMOUNT),
+                LocalDateTime.of(1970, 1, 1, 0, 0, 0));
+    }
+
+    static NexusStateRuleDto stubMichiganNexusStateRuleDto() {
+        return new NexusStateRuleDto(true, "USA",
+                new StateDto("MI", "26" ,"Michigan"),
+                List.of(TaxableCategoryDto.TAXABLE, TaxableCategoryDto.NOT_TAXABLE),
+                List.of(TangibleCategoryDto.INTANGIBLE, TangibleCategoryDto.TANGIBLE),
+                List.of(CustomerTypeDto.RETAIL, CustomerTypeDto.MARKETPLACE, CustomerTypeDto.RESELLER),
+                TimeFrameDto.CURRENT_CALENDER_YEAR,
+                new NexusThresholdDto(BigDecimal.valueOf(100000), 200, DefinitionDto.AMOUNT_OR_COUNT),
                 LocalDateTime.of(1970, 1, 1, 0, 0, 0));
     }
 

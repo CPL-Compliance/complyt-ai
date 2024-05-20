@@ -11,10 +11,7 @@ import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.transaction.Item;
-import com.complyt.domain.transaction.ShippingFee;
-import com.complyt.domain.transaction.Transaction;
-import com.complyt.domain.transaction.TransactionStatus;
+import com.complyt.domain.transaction.*;
 import com.complyt.repositories.TransactionRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -686,5 +683,180 @@ class TransactionServiceImplTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+    }
+
+    @Test
+    void shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary_transactionsWithSameShippingAddress_ReturnsFalse() {
+        // Given
+        Transaction newTransaction = transaction.withComplytId(null);
+
+        // When
+        Boolean shouldRemoveTransaction = transactionService.shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary(newTransaction, transaction);
+
+        // Then
+        assertEquals(shouldRemoveTransaction, false);
+    }
+
+    @Test
+    void shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary_transactionsWithDifferentShippingAddress_ReturnsTrue() {
+        // Given
+        Address newYorkAddress = testUtilities.createAddressInNewYork();
+        Address californiaAddress = testUtilities.createAddressInCalifornia();
+        Transaction newYorkTransaction = transaction.withShippingAddress(newYorkAddress);
+        Transaction californiaTransaction = transaction.withShippingAddress(californiaAddress);
+
+        // When
+        Boolean shouldRemoveTransaction = transactionService.shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary(newYorkTransaction, californiaTransaction);
+
+        // Then
+        assertEquals(shouldRemoveTransaction, true);
+    }
+
+    @Test
+    void shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary_transactionsWithDifferentSubsidiary_ReturnsTrue() {
+        // Given
+        Transaction newTransaction = transaction.withSubsidiary("newSubsidiary");
+
+        // When
+        Boolean shouldRemoveTransaction = transactionService.shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary(newTransaction, transaction);
+
+        // Then
+        assertEquals(shouldRemoveTransaction, true);
+    }
+
+    @Test
+    void shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary_nullTransactionPassedFirst_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary(nullTransaction, transaction);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "modifiedTransaction is marked non-null but is null");
+    }
+
+    @Test
+    void shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary_nullTransactionPassedSecond_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary(transaction, nullTransaction);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "originalTransaction is marked non-null but is null");
+    }
+
+    @Test
+    void isTransactionWithStatusCancelled_transactionStatusActive_ReturnsFalse() {
+
+        // When
+        Boolean shouldRemoveTransaction = transactionService.isTransactionWithStatusCancelled(transaction);
+
+        // Then
+        assertEquals(shouldRemoveTransaction, false);
+    }
+
+    @Test
+    void isTransactionWithStatusCancelled_transactionStatusCancelled_ReturnsTrue() {
+        // Given
+        Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
+
+        // When
+        Boolean shouldRemoveTransaction = transactionService.isTransactionWithStatusCancelled(cancelledTransaction);
+
+        // Then
+        assertEquals(shouldRemoveTransaction, true);
+    }
+
+    @Test
+    void isTransactionWithStatusCancelled_nullTransactionPassed_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.isTransactionWithStatusCancelled(nullTransaction);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
+    }
+
+    @Test
+    void hasModifiedTransactionStatusChangedToCancelled_transactionStatusJustChangedToCancelled_ReturnsTrue() {
+        // Given
+        Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
+
+        // When
+        Boolean shouldRemoveTransaction = transactionService.hasModifiedTransactionStatusChangedToCancelled(cancelledTransaction, transaction);
+
+        // Then
+        assertEquals(shouldRemoveTransaction, true);
+    }
+
+    @Test
+    void hasModifiedTransactionStatusChangedToCancelled_transactionStatusJustChangedToCancelledFromPaid_ReturnsTrue() {
+        // Given
+        Transaction PaidTransaction = transaction.withTransactionStatus(TransactionStatus.PAID);
+        Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
+
+        // When
+        Boolean shouldRemoveTransaction = transactionService.hasModifiedTransactionStatusChangedToCancelled(cancelledTransaction, PaidTransaction);
+
+        // Then
+        assertEquals(shouldRemoveTransaction, true);
+    }
+
+    @Test
+    void hasModifiedTransactionStatusChangedToCancelled_transactionStatusIsActive_ReturnsFalse() {
+        // Given
+        Transaction newTransaction = transaction.withTransactionStatus(TransactionStatus.ACTIVE);
+
+        // When
+        Boolean shouldRemoveTransaction = transactionService.hasModifiedTransactionStatusChangedToCancelled(newTransaction, transaction);
+
+        // Then
+        assertEquals(shouldRemoveTransaction, false);
+    }
+
+    @Test
+    void hasModifiedTransactionStatusChangedToCancelled_sameTransactionWithCancelledStatus_ReturnsFalse() {
+        // Given
+        Transaction newTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
+
+        // When
+        Boolean shouldRemoveTransaction = transactionService.hasModifiedTransactionStatusChangedToCancelled(newTransaction, newTransaction);
+
+        // Then
+        assertEquals(shouldRemoveTransaction, false);
+    }
+
+    @Test
+    void hasModifiedTransactionStatusChangedToCancelled_nullTransactionPassedFirst_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.hasModifiedTransactionStatusChangedToCancelled(nullTransaction, transaction);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "modifiedTransaction is marked non-null but is null");
+    }
+
+    @Test
+    void hasModifiedTransactionStatusChangedToCancelled_nullTransactionPassedSecond_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.hasModifiedTransactionStatusChangedToCancelled(transaction, nullTransaction);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "originalTransaction is marked non-null but is null");
     }
 }

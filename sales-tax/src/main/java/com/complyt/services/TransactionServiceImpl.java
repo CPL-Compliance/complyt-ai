@@ -22,6 +22,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -161,6 +162,21 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.getTransactionFilingStatus(), transaction.getCurrency(),
                         transaction.getSubsidiary()
                 );
+    }
+
+    public Boolean shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction) {
+        return !Objects.equals(modifiedTransaction.getShippingAddress().country(), originalTransaction.getShippingAddress().country()) ||
+                !Objects.equals(modifiedTransaction.getShippingAddress().state(), originalTransaction.getShippingAddress().state()) ||
+                !Objects.equals(modifiedTransaction.getSubsidiary(), originalTransaction.getSubsidiary());
+    }
+
+    public Boolean isTransactionWithStatusCancelled(@NonNull final Transaction transaction) {
+        return transaction.getTransactionStatus() == TransactionStatus.CANCELLED;
+    }
+
+    public Boolean hasModifiedTransactionStatusChangedToCancelled(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction) {
+        return (originalTransaction.getTransactionStatus() == TransactionStatus.ACTIVE || originalTransaction.getTransactionStatus() == TransactionStatus.PAID) &&
+                modifiedTransaction.getTransactionStatus() == TransactionStatus.CANCELLED;
     }
 
 }
