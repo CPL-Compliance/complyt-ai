@@ -1,0 +1,491 @@
+{
+  $jsonSchema: {
+    required: [
+      'tenantId',
+      'complytId',
+      'customerId',
+      'externalId',
+      'source',
+      'transactionStatus',
+      'shippingAddress',
+      'items',
+      'internalTimestamps',
+      'externalTimestamps',
+      'transactionType',
+      'tangibleItemsAmount',
+      'taxableItemsAmount',
+      'totalItemsAmount',
+      'totalDiscount'
+    ],
+    properties: {
+      _class: {
+        bsonType: 'string',
+        description: 'The class. Must be an String and is required'
+      },
+      _id: {
+        bsonType: 'objectId'
+      },
+      subsidiary: {
+        description: 'Must be a string',
+        bsonType: 'string'
+      },
+      tenantId: {
+        description: 'Must be a string and is required',
+        bsonType: 'string'
+      },
+      internalTimestamps: {
+        required: [
+          'createdDate',
+          'updatedDate'
+        ],
+        properties: {
+          createdDate: {
+            description: 'Must be a date and is required',
+            bsonType: 'date'
+          },
+          updatedDate: {
+            description: 'Must be a date and is required',
+            bsonType: 'date'
+          }
+        },
+        bsonType: 'object'
+      },
+      taxableItemsAmount: {
+        bsonType: 'string',
+        description: 'Must be a string and is required'
+      },
+      transactionType: {
+        description: 'transactionType is required and must be a string which equals to one of the given enum values',
+        bsonType: 'string',
+        'enum': [
+          'INVOICE',
+          'REFUND',
+          'ESTIMATE',
+          'SALES_ORDER'
+        ]
+      },
+      source: {
+        description: 'Must be a string and is required',
+        bsonType: 'string',
+        maxLength: 1,
+        pattern: '[1-9]'
+      },
+      complytId: {
+        description: 'Must be an uuid and is required',
+        bsonType: 'binData'
+      },
+      billingAddress: {
+        properties: {
+          county: {
+            bsonType: 'string',
+            description: 'Must be a string and is required'
+          },
+          state: {
+            description: 'Must be a string and is required',
+            bsonType: 'string'
+          },
+          city: {
+            description: 'Must be a string and is required',
+            bsonType: 'string'
+          },
+          street: {
+            description: 'Must be a string and is required',
+            bsonType: 'string'
+          },
+          zip: {
+            description: 'Must be a string and is required',
+            bsonType: 'string'
+          },
+          country: {
+            bsonType: 'string',
+            description: 'Must be a string and is required'
+          }
+        },
+        bsonType: 'object'
+      },
+      shippingFee: {
+        properties: {
+          manualSalesTaxRate: {
+            bsonType: 'string',
+            description: 'Must be a string and is required'
+          },
+          tangibleCategory: {
+            description: 'Must be a string and is required',
+            bsonType: 'string',
+            'enum': [
+              'TANGIBLE',
+              'INTANGIBLE'
+            ]
+          },
+          taxableCategory: {
+            bsonType: 'string',
+            'enum': [
+              'TAXABLE',
+              'NOT_TAXABLE'
+            ],
+            description: 'Must be a string and is required'
+          },
+          taxCode: {
+            bsonType: 'string',
+            description: 'Must be a string and is required'
+          },
+          totalPrice: {
+            bsonType: 'string',
+            description: 'Must be a string and is required'
+          },
+          manualSalesTax: {
+            description: 'Must be a bool and is required',
+            bsonType: 'bool'
+          },
+          name: {
+            bsonType: 'string',
+            description: 'Must be a string and is required'
+          },
+          salesTaxRates: {
+            bsonType: 'object',
+            required: [
+              'taxRate'
+            ],
+            properties: {
+              cityRate: {
+                description: 'Must be a string and is required',
+                bsonType: 'string'
+              },
+              combinedDistrictRate: {
+                bsonType: 'string',
+                description: 'Must be a string and is required'
+              },
+              countyRate: {
+                description: 'Must be a string and is required',
+                bsonType: 'string'
+              },
+              stateRate: {
+                description: 'Must be a string and is required',
+                bsonType: 'string'
+              },
+              taxRate: {
+                bsonType: 'string',
+                description: 'Must be a string and is required'
+              },
+              ratesMetaData: {
+                bsonType: 'object',
+                description: 'Must be a object and is required',
+                required: [
+                  'cityDistrictRate',
+                  'countyDistrictRate'
+                ],
+                properties: {
+                  cityDistrictRate: {
+                    description: 'Must be a string and is required',
+                    bsonType: 'string'
+                  },
+                  countyDistrictRate: {
+                    bsonType: 'string',
+                    description: 'Must be a string and is required'
+                  }
+                }
+              }
+            }
+          },
+          jurisdictionalSalesTaxRules: {
+            bsonType: 'object',
+            required: [
+              'name',
+              'taxable',
+              'specialTreatment',
+              'calculationType',
+              'description',
+              'calculationValue',
+              'abbreviation'
+            ],
+            properties: {
+              name: {
+                description: 'Must be a string and is required',
+                bsonType: 'string'
+              },
+              taxable: {
+                description: 'Must be a bool and is required',
+                bsonType: 'bool'
+              },
+              specialTreatment: {
+                bsonType: 'bool',
+                description: 'Must be a bool and is required'
+              },
+              calculationType: {
+                'enum': [
+                  'FIXED',
+                  'PERCENTAGE'
+                ],
+                bsonType: 'string'
+              },
+              description: {
+                description: 'Must be a string and is required',
+                bsonType: 'string'
+              },
+              calculationValue: {
+                bsonType: 'string',
+                description: 'Must be a string and is required'
+              },
+              abbreviation: {
+                bsonType: 'string',
+                description: 'Must be a string and is required'
+              }
+            }
+          }
+        },
+        bsonType: 'object',
+        required: [
+          'taxCode',
+          'manualSalesTax',
+          'tangibleCategory',
+          'taxableCategory',
+          'jurisdictionalSalesTaxRules'
+        ]
+      },
+      externalId: {
+        bsonType: 'string',
+        description: 'Must be a string and is required'
+      },
+      customerId: {
+        bsonType: 'binData',
+        description: 'Must be an UUID and is required'
+      },
+      documentName: {
+        bsonType: 'string',
+        description: 'Must be a string and is required'
+      },
+      tangibleItemsAmount: {
+        description: 'Must be a string and is required',
+        bsonType: 'string'
+      },
+      totalItemsAmount: {
+        description: 'Must be a string and is required',
+        bsonType: 'string'
+      },
+      totalDiscount: {
+        description: 'Must be a string and is required',
+        bsonType: 'string'
+      },
+      transactionStatus: {
+        'enum': [
+          'ACTIVE',
+          'CANCELLED',
+          'IGNORE',
+          'PAID'
+        ],
+        description: 'transactionStatus is required and must be a string which equals to one of the given enum values',
+        bsonType: 'string'
+      },
+      externalTimestamps: {
+        required: [
+          'createdDate',
+          'updatedDate'
+        ],
+        properties: {
+          updatedDate: {
+            bsonType: 'date',
+            description: 'Must be a date and is required'
+          },
+          createdDate: {
+            bsonType: 'date',
+            description: 'Must be a date and is required'
+          }
+        },
+        bsonType: 'object'
+      },
+      shippingAddress: {
+        bsonType: 'object',
+        required: [
+          'county'
+        ],
+        properties: {
+          street: {
+            description: 'Must be a string and is required',
+            bsonType: 'string'
+          },
+          zip: {
+            description: 'Must be a string and is required',
+            bsonType: 'string'
+          },
+          country: {
+            bsonType: 'string',
+            description: 'Must be a string and is required'
+          },
+          county: {
+            bsonType: 'string',
+            description: 'Must be a string and is required'
+          },
+          state: {
+            bsonType: 'string',
+            description: 'Must be a string and is required'
+          },
+          city: {
+            description: 'Must be a string and is required',
+            bsonType: 'string'
+          }
+        }
+      },
+      items: {
+        bsonType: 'array',
+        items: {
+          bsonType: 'object',
+          required: [
+            'name',
+            'taxCode',
+            'calculatedTotal',
+            'manualSalesTax',
+            'manualSalesTaxRate',
+            'tangibleCategory',
+            'taxableCategory',
+            'jurisdictionalSalesTaxRules'
+          ],
+          properties: {
+            quantity: {
+              bsonType: 'string',
+              description: 'Must be a string and is required'
+            },
+            calculatedTotal: {
+              bsonType: 'string',
+              description: 'Must be a string and is required'
+            },
+            description: {
+              bsonType: 'string',
+              description: 'Must be a string and is required'
+            },
+            manualSalesTaxRate: {
+              description: 'Must be a string and is required',
+              bsonType: 'string'
+            },
+            tangibleCategory: {
+              'enum': [
+                'TANGIBLE',
+                'INTANGIBLE'
+              ],
+              description: 'Must be a string and is required',
+              bsonType: 'string'
+            },
+            taxableCategory: {
+              'enum': [
+                'TAXABLE',
+                'NOT_TAXABLE'
+              ],
+              description: 'Must be a string and is required',
+              bsonType: 'string'
+            },
+            salesTaxRates: {
+              bsonType: 'object',
+              required: [
+                'taxRate'
+              ],
+              properties: {
+                ratesMetaData: {
+                  bsonType: 'object',
+                  description: 'Must be a object and is required',
+                  required: [
+                    'cityDistrictRate',
+                    'countyDistrictRate'
+                  ],
+                  properties: {
+                    cityDistrictRate: {
+                      bsonType: 'string',
+                      description: 'Must be a string and is required'
+                    },
+                    countyDistrictRate: {
+                      bsonType: 'string',
+                      description: 'Must be a string and is required'
+                    }
+                  }
+                },
+                cityRate: {
+                  bsonType: 'string',
+                  description: 'Must be a string and is required'
+                },
+                combinedDistrictRate: {
+                  bsonType: 'string',
+                  description: 'Must be a string and is required'
+                },
+                countyRate: {
+                  description: 'Must be a string and is required',
+                  bsonType: 'string'
+                },
+                stateRate: {
+                  bsonType: 'string',
+                  description: 'Must be a string and is required'
+                },
+                taxRate: {
+                  bsonType: 'string',
+                  description: 'Must be a string and is required'
+                }
+              }
+            },
+            jurisdictionalSalesTaxRules: {
+              bsonType: 'object',
+              required: [
+                'name',
+                'taxable',
+                'specialTreatment',
+                'calculationType',
+                'description',
+                'calculationValue',
+                'abbreviation'
+              ],
+              properties: {
+                description: {
+                  description: 'Must be a string and is required',
+                  bsonType: 'string'
+                },
+                calculationValue: {
+                  bsonType: 'string',
+                  description: 'Must be a string and is required'
+                },
+                abbreviation: {
+                  description: 'Must be a string and is required',
+                  bsonType: 'string'
+                },
+                name: {
+                  description: 'Must be a string and is required',
+                  bsonType: 'string'
+                },
+                taxable: {
+                  description: 'Must be a bool and is required',
+                  bsonType: 'bool'
+                },
+                specialTreatment: {
+                  description: 'Must be a bool and is required',
+                  bsonType: 'bool'
+                },
+                calculationType: {
+                  bsonType: 'string',
+                  'enum': [
+                    'FIXED',
+                    'PERCENTAGE'
+                  ]
+                }
+              }
+            },
+            manualSalesTax: {
+              description: 'Must be a bool and is required',
+              bsonType: 'bool'
+            },
+            name: {
+              bsonType: 'string',
+              description: 'Must be a string and is required'
+            },
+            totalPrice: {
+              bsonType: 'string',
+              description: 'Must be a string and is required'
+            },
+            unitPrice: {
+              bsonType: 'string',
+              description: 'Must be a string and is required'
+            },
+            taxCode: {
+              bsonType: 'string',
+              description: 'Must be a string and is required'
+            }
+          }
+        }
+      }
+    }
+  }
+}
