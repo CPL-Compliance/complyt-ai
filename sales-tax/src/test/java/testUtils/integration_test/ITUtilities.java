@@ -15,14 +15,11 @@ import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
 import org.bson.Document;
-import org.bson.types.Binary;
 import org.bson.types.ObjectId;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -264,14 +261,14 @@ public interface ITUtilities {
                         .append("updatedDate", LocalDateTime.now()))
                 .append("internalTimestamps", new Document("createdDate", LocalDateTime.now())
                         .append("updatedDate", LocalDateTime.now()))
-                .append("complytId", new Binary((byte) 0x04, Base64.getDecoder().decode("TPu/C9PlSVSKkMnC6DLl9Q==")))
+                .append("complytId", UUID.randomUUID())
                 .append("source", "1")
                 .append("email", "captain@dope.com");
     }
 
     static Document exemptionDocument() {
         return new Document("_id", new ObjectId("6372009a6887300e852749e4"))
-                .append("customerId", new Binary((byte) 0x04, Base64.getDecoder().decode("TPu/C9PlSVSKkMnC6DLl9Q==")))
+                .append("customerId", UUID.randomUUID())
                 .append("state", new Document("abbreviation", "AZ")
                         .append("code", "04")
                         .append("name", "Arizona"))
@@ -286,7 +283,7 @@ public interface ITUtilities {
                         .append("name", "name"))
                 .append("exemptionType", "FULLY")
                 .append("tenantId", "it_tenant")
-                .append("complytId", new Binary((byte) 0x04, Base64.getDecoder().decode("KqWAnzAdRPOQgbTzJhNGPA==")))
+                .append("complytId", UUID.randomUUID())
                 .append("country", "USA")
                 .append("exemptionStatus", "ACTIVE")
                 .append("internalTimestamps", new Document("createdDate", LocalDateTime.now())
@@ -295,7 +292,7 @@ public interface ITUtilities {
 
     static Document salesTaxTrackingDocument() {
         return new Document("_id", new ObjectId("642415ce6632165b050b01ab"))
-                .append("complytId", new Binary((byte) 0x04, Base64.getDecoder().decode("bqoTPN+cT4i7qW3ThFyAOg==")))
+                .append("complytId", UUID.randomUUID())
                 .append("state", new Document("abbreviation", "NY")
                         .append("code", "36")
                         .append("name", "New York"))
@@ -323,7 +320,7 @@ public interface ITUtilities {
 
     static Document transactionDocument() {
         return new Document("_id", new ObjectId("65b6a7f8f930555db9c7c246"))
-                .append("complytId", new Binary((byte) 0x04, Base64.getDecoder().decode("sxrpBJCNThmlyXaNzR0BqQ==")))
+                .append("complytId", UUID.randomUUID())
                 .append("externalId", "2c9d525b-e809-4916-831e-c50d08a22d92")
                 .append("source", "6")
                 .append("documentName", "INV-0151")
@@ -353,7 +350,7 @@ public interface ITUtilities {
                         .append("street", "100 Montana Suite 3D01")
                         .append("zip", "78203")
                         .append("isPartial", false))
-                .append("customerId", new Binary((byte) 0x04, Base64.getDecoder().decode("xNUzPYEmSSmYGe7Dqj6hmA==")))
+                .append("customerId", UUID.randomUUID())
                 .append("transactionStatus", "ACTIVE")
                 .append("tenantId", "org_AHOc5X21mIdGLgrd")
                 .append("internalTimestamps", new Document("createdDate", LocalDateTime.now())

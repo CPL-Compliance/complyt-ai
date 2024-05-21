@@ -37,7 +37,7 @@ public interface TestUtilities {
 
     static Document fileDocument() {
         return new Document()
-                .append("complytId", new Binary((byte) 0x04, UUID.randomUUID().toString().getBytes())) // UUID as binary data
+                .append("complytId",UUID.randomUUID().toString().getBytes()) // UUID as binary data
                 .append("_id",  new ObjectId("65b6a7f8f930555db9c7c246"))  // Typically this would be set automatically by MongoDB if using ObjectIds
                 .append("tenantId", "tenantIdExample")
                 .append("link", "http://example.com/token");
