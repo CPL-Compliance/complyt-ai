@@ -14,7 +14,7 @@ public interface ComplytObjectMapper {
         try {
             return objectMapper.convertValue(o, patchingClass);
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new ClassCastException();
         }
     }
 

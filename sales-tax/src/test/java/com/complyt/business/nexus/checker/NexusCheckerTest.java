@@ -65,7 +65,7 @@ public class NexusCheckerTest {
     }
 
     @Test
-    void hasNexus_TrackingIndicatesThatClientHasPhysicalNexus_ReturnsTrue() {
+    void salesTaxTrackingWithNexusIndication_TrackingIndicatesThatClientHasPhysicalNexus_ReturnsTrue() {
         // Given
 
         // When
@@ -78,7 +78,7 @@ public class NexusCheckerTest {
     }
 
     @Test
-    void hasNexus_TrackingIndicatesThatClientHasPhysicalNexusWithNullState_ReturnsTrue() {
+    void salesTaxTrackingWithNexusIndication_TrackingIndicatesThatClientHasPhysicalNexusWithNullState_ReturnsTrue() {
         // Given
         SalesTaxTracking salesTaxTrackingToSend = salesTaxTracking.withState(null);
 
@@ -92,7 +92,7 @@ public class NexusCheckerTest {
     }
 
     @Test
-    void hasNexus_TrackingIndicatesThatClientHasEconomicNexus_ReturnsTrue() {
+    void salesTaxTrackingWithNexusIndication_TrackingIndicatesThatClientHasEconomicNexus_ReturnsTrue() {
         // Given
 
         // When
@@ -106,7 +106,7 @@ public class NexusCheckerTest {
     }
 
     @Test
-    void hasNexus_TrackingIndicatesThatClientDoesNotHaveNexus_ReturnsFalse() {
+    void salesTaxTrackingWithNexusIndication_TrackingIndicatesThatClientDoesNotHaveNexus_ReturnsFalse() {
         // Given
 
         // When
@@ -120,7 +120,7 @@ public class NexusCheckerTest {
     }
 
     @Test
-    void hasNexus_TrackingIndicatesThatStateDoesntChargeSalesTax_ReturnsFalse() {
+    void salesTaxTrackingWithNexusIndication_TrackingIndicatesThatStateDoesntChargeSalesTax_ReturnsFalse() {
         // Given
 
         // When
@@ -141,7 +141,7 @@ public class NexusCheckerTest {
     }
 
     @Test
-    void hasNexus_NullTrackingPassed_ThrowsException() {
+    void salesTaxTrackingWithNexusIndication_NullTrackingPassed_ThrowsException() {
         // Given
         SalesTaxTracking nullSalesTaxTracking = null;
 
@@ -208,7 +208,7 @@ public class NexusCheckerTest {
     }
 
     @Test
-    void hasNexus_NullSummaryPassed_ThrowsException() {
+    void salesTaxTrackingWithNexusIndication_NullSummaryPassed_ThrowsException() {
         // Given
         SalesTaxTracking salesTaxTracking = null;
 

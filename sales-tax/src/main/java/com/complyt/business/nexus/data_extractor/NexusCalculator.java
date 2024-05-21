@@ -42,6 +42,16 @@ public class NexusCalculator {
                 .defaultIfEmpty(salesTaxTracking);
     }
 
+    /**
+     *
+     * @param complytId
+     * @param salesTaxTracking
+     * @param summaryDateRange
+     *
+     * removes an existing transaction from the nexus summery by its complyt id, and reenter it with the updated values
+     *
+     * @return updated salestaxtracking
+     */
     public Mono<SalesTaxTracking> subtractTransactionFromNexusSummary(UUID complytId, SalesTaxTracking salesTaxTracking, DateRange summaryDateRange) {
         return Mono.justOrEmpty(salesTaxTracking.getTransactionNexusSummaries().remove(complytId))
                 .flatMap(transactionNexusSummary -> insertTransactionSummaryToCalculationSummary(salesTaxTracking, summaryDateRange,

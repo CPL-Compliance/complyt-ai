@@ -29,4 +29,10 @@ public interface TransactionService extends CrudService<Transaction, String> {
     Mono<Transaction> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction);
 
     Mono<Transaction> checkTransactionNotHavingComplytId(@NonNull final Transaction newTransaction);
+
+    Boolean shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction);
+
+    Boolean isTransactionWithStatusCancelled(@NonNull final Transaction transaction);
+
+    Boolean hasModifiedTransactionStatusChangedToCancelled(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction);
 }

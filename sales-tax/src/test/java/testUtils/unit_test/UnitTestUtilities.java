@@ -68,6 +68,10 @@ public class UnitTestUtilities {
         return new Address("Fresno", "US", "county", "CA", "7498 N Remington Ave", "93711-5508", "", false);
     }
 
+    public static Address createAddressInNewYork() {
+        return new Address("New York City", "US", "county", "NY", "160 Broadway", "10038", "", false);
+    }
+
     public static MandatoryAddressDto createAddressDtoInCalifornia() {
         return new MandatoryAddressDto("Fresno", "US", "county", "CA", "7498 N Remington Ave", "", "93711-5508", false);
     }

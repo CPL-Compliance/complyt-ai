@@ -27,7 +27,7 @@ public class Patcher<T> {
             }
 
             return object;
-        } catch (NullPointerException | ClassCastException exception) {
+        } catch (NullPointerException | ClassCastException | IllegalArgumentException exception) {
             log.error("Failed to patch", exception);
 
             throw new InvalidPatchFieldException();

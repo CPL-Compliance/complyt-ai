@@ -738,6 +738,30 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(transactionDto -> assertEquals(transactionDto.shippingAddress().state(), "AZ"));
     }
 
+
+    @Order(3)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_TransactionWithStatusCancelled_Returns204() {
+        // Given
+        String externalId = "10005"; // new externalID that does not exist
+        TransactionDto givenCancelledTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withTransactionStatus(TransactionStatusDto.CANCELLED);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCancelledTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
     @Order(2)
     @Test
     @Override

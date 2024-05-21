@@ -10,15 +10,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ComplytObjectMapperTest {
 
     @Test
-    void mapObject_FailsToConvert_ThrowsRunTimeException() {
+    void mapObject_FailsToConvert_ThrowsClassCastException() {
         // Given
         LocalDateTime time = LocalDateTime.now();
 
         // When
-        RuntimeException runtimeException = assertThrows(RuntimeException.class, () ->
+        ClassCastException classCastException = assertThrows(ClassCastException.class, () ->
                 ComplytObjectMapper.mapObject(time, Object.class));
 
         // Then
-        Assertions.assertEquals(runtimeException.getClass(), RuntimeException.class);
+        Assertions.assertEquals(ClassCastException.class, classCastException.getClass());
     }
 }

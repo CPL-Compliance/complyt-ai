@@ -6,6 +6,7 @@ import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
+import com.complyt.v1.models.FilingFrequencyDto;
 import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
@@ -1150,6 +1151,59 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                     assertEquals(returnedSalesTaxTrackingDto.registered(), RegisteredType.REGISTERED);
                     assertNotNull(returnedSalesTaxTrackingDto.registrationDate());
                 });
+    }
+
+    @Order(4)
+    @Test
+    @WithMockUser
+    public void patch_PatchesFilingFrequency_ReturnsPatchedResource() {
+        FilingFrequencyDto filingFrequencyDto = FilingFrequencyDto.MONTHLY;
+        String state = "NJ";
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("filingFrequency", filingFrequencyDto);
+        }};
+
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(returnedSalesTaxTrackingDto -> {
+                    assertEquals(returnedSalesTaxTrackingDto.filingFrequency(), FilingFrequencyDto.MONTHLY);
+                    assertNotNull(returnedSalesTaxTrackingDto.filingFrequency());
+                });
+    }
+
+    @Order(4)
+    @Test
+    @WithMockUser
+    public void patch_PatchesFilingFrequency_ReturnsError() {
+        String invalidFilingFrequency = "invalidFilingFrequency";
+        String state = "NJ";
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("filingFrequency", invalidFilingFrequency);
+        }};
+
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().is4xxClientError();
     }
 
 }

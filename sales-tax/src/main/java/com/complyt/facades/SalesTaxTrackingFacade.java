@@ -73,7 +73,7 @@ public class SalesTaxTrackingFacade {
 
     public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull String country, String state, @NonNull LocalDate refreshDate, String subsidiary) {
         return salesTaxTrackingService.findByCountryStateAndSubsidiary(country, state, subsidiary)
-                .flatMap(extractedSalesTaxTracking -> nexusService.hasNexus(extractedSalesTaxTracking)
+                .flatMap(extractedSalesTaxTracking -> nexusService.salesTaxTrackingWithNexusIndication(extractedSalesTaxTracking)
                         .flatMap(salesTaxTrackingWithNexusInfo -> !salesTaxTrackingWithNexusInfo.isHasNexus()
                                 ? salesTaxTrackingService.addClientAndStateDetails(salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
                                 .flatMap(salesTaxTracking -> nexusService.getTransactionsQueryByNexusCalculation(salesTaxTracking.getNexusStateRule(), salesTaxTracking.getClientTracking(), refreshDate, salesTaxTracking.getSubsidiary())
