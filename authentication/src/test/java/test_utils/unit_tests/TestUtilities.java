@@ -15,9 +15,12 @@ import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.models.TokenDto;
 import io.complyt.authentication.auth0_client.Auth0Client;
 import lombok.NonNull;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 public class TestUtilities {
@@ -87,7 +90,7 @@ public class TestUtilities {
     }
 
     public static Credentials createCredentials() {
-        return new Credentials("id", "complytClientId", "complytClientSecret",
+        return new Credentials(null, "complytClientId", "complytClientSecret",
                 "ClientID", "ClientSecret", "Audience", "GrantType",
                 "audience", "Grant Type", "TenantId", "Name", ApiKeyStatus.ACTIVE, null);
     }
@@ -205,5 +208,35 @@ public class TestUtilities {
     }
     public static TenantIdAndNameObject createTenantIdAndNameObject(Credentials credentials){
         return new TenantIdAndNameObject(credentials.getTenantId(), credentials.getName());
+    }
+
+    public static Document credentialsDocument() {
+        return new Document("_id", new ObjectId())
+                .append("complytClientId", "validClientId")
+                .append("complytClientSecret", "validClientSecret")
+                .append("clientId", "validClientId")
+                .append("clientSecret", "validClientSecret")
+                .append("clientIdIv", "validClientIdIv")
+                .append("clientSecretIv", "validClientSecretIv")
+                .append("audience", "validAudience")
+                .append("grantType", "client_credentials")
+                .append("tenantId", "validTenantId")
+                .append("name", "validName")
+                .append("status", "active")
+                .append("expireAt", new Date());
+    }
+
+    public static Document tokenDocument() {
+        return new Document("_id", new ObjectId())
+                .append("complytClientId", "exampleClientId")
+                .append("complytClientSecret", "exampleClientSecret")
+                .append("accessToken", "exampleAccessToken")
+                .append("accessTokenIv", "exampleAccessTokenIv")
+                .append("scope", "exampleScope")
+                .append("scopeIv", "exampleScopeIv")
+                .append("expiresIn", 3600)
+                .append("tokenType", "Bearer")
+                .append("createdAt", LocalDateTime.now())
+                .append("expireAt", LocalDateTime.now().plusHours(1));
     }
 }

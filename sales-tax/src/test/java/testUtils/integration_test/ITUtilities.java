@@ -14,6 +14,8 @@ import com.complyt.v1.models.customer.exemption.ClassificationDto;
 import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.math.BigDecimal;
@@ -242,5 +244,175 @@ public interface ITUtilities {
 
     static ClassificationDto createClassificationDto() {
         return new ClassificationDto("new code", "new description");
+    }
+
+    static Document clientTrackingDocument() {
+        return new Document("_id", new ObjectId())
+                .append("nexus", new Document("taxableDate", LocalDateTime.now()))
+                .append("tenantId", "other_it_tenant")
+                .append("name", "Bestclient TM")
+                .append("internalTimestamps", new Document("createdDate", LocalDateTime.now())
+                        .append("updatedDate", LocalDateTime.now()));
+    }
+
+    static Document customerDocument() {
+        return new Document("_id", new ObjectId("62c5672583479c0adfa2c4a4"))
+                .append("externalId", "1586")
+                .append("name", "Bestcompany Com")
+                .append("address", new Document("city", "Phoenix")
+                        .append("country", "US")
+                        .append("state", "AZ")
+                        .append("street", "3400 E Sky Harbor Blvd")
+                        .append("zip", "85034")
+                        .append("isPartial", false))
+                .append("_class", "com.complyt.domain.Customer")
+                .append("customerType", "RETAIL")
+                .append("tenantId", "it_tenant")
+                .append("externalTimestamps", new Document("createdDate", LocalDateTime.now())
+                        .append("updatedDate", LocalDateTime.now()))
+                .append("internalTimestamps", new Document("createdDate", LocalDateTime.now())
+                        .append("updatedDate", LocalDateTime.now()))
+                .append("complytId", UUID.randomUUID())
+                .append("source", "1")
+                .append("email", "captain@dope.com");
+    }
+
+    static Document exemptionDocument() {
+        return new Document("_id", new ObjectId("6372009a6887300e852749e4"))
+                .append("customerId", UUID.randomUUID())
+                .append("state", new Document("abbreviation", "AZ")
+                        .append("code", "04")
+                        .append("name", "Arizona"))
+                .append("classification", new Document("code", "code")
+                        .append("description", "description"))
+                .append("validationDates", new Document("fromDate", LocalDateTime.now())
+                        .append("toDate", LocalDateTime.now()))
+                .append("status", new Document("code", "code")
+                        .append("name", "name"))
+                .append("certificate", new Document("certificateId", "id")
+                        .append("url", "url")
+                        .append("name", "name"))
+                .append("exemptionType", "FULLY")
+                .append("tenantId", "it_tenant")
+                .append("complytId", UUID.randomUUID())
+                .append("country", "USA")
+                .append("exemptionStatus", "ACTIVE")
+                .append("internalTimestamps", new Document("createdDate", LocalDateTime.now())
+                        .append("updatedDate", LocalDateTime.now()));
+    }
+
+    static Document salesTaxTrackingDocument() {
+        return new Document("_id", new ObjectId("642415ce6632165b050b01ab"))
+                .append("complytId", UUID.randomUUID())
+                .append("state", new Document("abbreviation", "NY")
+                        .append("code", "36")
+                        .append("name", "New York"))
+                .append("tenantId", "it_tenant")
+                .append("enforcesSalesTax", true)
+                .append("physicalNexusTracker", new Document("established", false)
+                        .append("establishedDate", LocalDateTime.now()))
+                .append("economicNexusTracker", new Document("established", false)
+                        .append("establishedDate", LocalDateTime.now()))
+                .append("appliedDate", LocalDateTime.now())
+                .append("approved", false)
+                .append("approvalDate", LocalDateTime.now())
+                .append("_class", "com.complyt.domain.nexus.SalesTaxTracking")
+                .append("transactionNexusSummaries", new Document())
+                .append("nexusCalculationSummaries", new Document())
+                .append("registered", null)
+                .append("registrationDate", null)
+                .append("clientTracking", new Document("_id", new ObjectId("649d6ecf86de4c7ec0ca6128"))
+                        .append("tenantId", "it_tenant")
+                        .append("nexus", new Document("taxableDate", LocalDateTime.now()))
+                        .append("name", "it_tenant")
+                        .append("internalTimestamps", new Document("createdDate", LocalDateTime.now())
+                                .append("updatedDate", LocalDateTime.now())));
+    }
+
+    static Document transactionDocument() {
+        return new Document("_id", new ObjectId("65b6a7f8f930555db9c7c246"))
+                .append("complytId", UUID.randomUUID())
+                .append("externalId", "2c9d525b-e809-4916-831e-c50d08a22d92")
+                .append("source", "6")
+                .append("documentName", "INV-0151")
+                .append("items", List.of(
+                        new Document("unitPrice", "12500")
+                                .append("quantity", "1")
+                                .append("totalPrice", "12500")
+                                .append("description", "Quarterly Activation Fees")
+                                .append("name", "e7ec72ea-0b5b-45b8-b2d8-c8f6ab3e4603")
+                                .append("taxCode", "")
+                                .append("jurisdictionalSalesTaxRules", new Document("name", "Texas")
+                                        .append("abbreviation", "TX")
+                                        .append("taxable", true)
+                                        .append("specialTreatment", false)
+                                        .append("calculationType", "PERCENTAGE")
+                                        .append("description", "description3")
+                                        .append("calculationValue", "0.8"))
+                                .append("manualSalesTax", true)
+                                .append("manualSalesTaxRate", "0")
+                                .append("tangibleCategory", "TANGIBLE")
+                                .append("taxableCategory", "TAXABLE")
+                                .append("calculatedTotal", "12500")))
+                .append("shippingAddress", new Document("city", "San Antonio")
+                        .append("country", "USA")
+                        .append("county", "Bexar")
+                        .append("state", "TX")
+                        .append("street", "100 Montana Suite 3D01")
+                        .append("zip", "78203")
+                        .append("isPartial", false))
+                .append("customerId", UUID.randomUUID())
+                .append("transactionStatus", "ACTIVE")
+                .append("tenantId", "org_AHOc5X21mIdGLgrd")
+                .append("internalTimestamps", new Document("createdDate", LocalDateTime.now())
+                        .append("updatedDate", LocalDateTime.now()))
+                .append("externalTimestamps", new Document("createdDate", LocalDateTime.now())
+                        .append("updatedDate", LocalDateTime.now()))
+                .append("transactionType", "INVOICE")
+                .append("taxableItemsAmount", "43750")
+                .append("tangibleItemsAmount", "43750")
+                .append("totalItemsAmount", "43750")
+                .append("_class", "com.complyt.domain.transaction.Transaction")
+                .append("totalDiscount", "0")
+                .append("billingAddress", new Document("street", "123 Main St")
+                        .append("zip", "12345")
+                        .append("country", "USA")
+                        .append("county", "SomeCounty")
+                        .append("state", "CA")
+                        .append("city", "SomeCity"));
+    }
+
+    public static Document nexusStateRuleDocument() {
+        return new Document("_id", new ObjectId("62de9f8c2a864b00112ec127"))
+                .append("state", new Document("abbreviation", "GA")
+                        .append("name", "Georgia")
+                        .append("code", "13"))
+                .append("taxableCategories", List.of("TAXABLE", "NOT_TAXABLE"))
+                .append("customerTypes", List.of("RETAIL", "MARKETPLACE", "RESELLER"))
+                .append("timeFrame", "CURRENT_CALENDER_YEAR")
+                .append("nexusThreshold", new Document("amount", "100000")
+                        .append("count", 200)
+                        .append("definition", "AMOUNT_AND_COUNT"))
+                .append("tangibleCategories", List.of("TANGIBLE"))
+                .append("enforcesSalesTax", true)
+                .append("appliedDate", LocalDateTime.now())
+                .append("country", "USA");
+    }
+
+    static Document productClassificationDocument() {
+        return new Document("_id", new ObjectId("66474705627c74a48bd6ba0f"))
+                .append("taxCode", "R1S1")
+                .append("description", "Royalties")
+                .append("title", "Royalties")
+                .append("jurisdictionalSalesTaxRules", new Document("CA", new Document()
+                        .append("name", "California")
+                        .append("abbreviation", "CA")
+                        .append("taxable", false)
+                        .append("specialTreatment", false)
+                        .append("calculationType", "FIXED")
+                        .append("description", "description3")
+                        .append("calculationValue", "0")))
+                .append("tangibleCategory", "INTANGIBLE")
+                .append("jurisdictionalTaxRules", new Document());
     }
 }
