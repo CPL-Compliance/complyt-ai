@@ -92,8 +92,6 @@ public class TransactionRepository {
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId))
                             .limit(size).skip(calculatedOffset)
-
-
                             .with(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate"));
 
                     return ContextLogger.observeCtx("Searching for transactions by tenant ID" + tenantId + " with page " + page + " and size " + size, log::info)

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -166,7 +167,9 @@ class TransactionRepositoryTest {
 
 
         Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()))
-                .skip(calculatedOffset).limit(size);
+                .skip(calculatedOffset)
+                .limit(size)
+                .with(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate"));
 
         //When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
@@ -193,7 +196,8 @@ class TransactionRepositoryTest {
 
         Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()))
                 .skip(calculatedOffset)
-                .limit(size);
+                .limit(size)
+                .with(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate"));
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
@@ -216,7 +220,9 @@ class TransactionRepositoryTest {
         Transaction secondTransaction = transaction.withExternalId(externalId).withCustomerId(customerId);
 
         Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()))
-                .skip(calculatedOffset).limit(size);
+                .skip(calculatedOffset)
+                .limit(size)
+                .with(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate"));
 
         //When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));

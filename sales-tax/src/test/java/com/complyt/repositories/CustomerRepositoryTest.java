@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -207,7 +208,8 @@ class CustomerRepositoryTest {
         Customer secondCustomer = customer.withId(id).withExternalId(externalId);
 
         Query query = Query.query(Criteria.where("tenantId").is(tenantId))
-                .skip(calculatedOffset).limit(size);
+                .skip(calculatedOffset).limit(size)
+                .with(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate"));
 
         //When
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
@@ -234,7 +236,8 @@ class CustomerRepositoryTest {
 
         Query query = Query.query(Criteria.where("tenantId").is(tenantId))
                 .skip(calculatedOffset)
-                .limit(size);
+                .limit(size)
+                .with(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate"));
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
@@ -255,7 +258,9 @@ class CustomerRepositoryTest {
 
         Query query = Query.query(Criteria.where("tenantId").is(customer.getTenantId()))
                 .skip(CalculatedOffset)
-                .limit(size);
+                .limit(size)
+                .with(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate"));
+
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(customer.getTenantId()));
         when(reactiveMongoTemplate.find(eq(query), eq(Customer.class))).thenReturn(Flux.empty());
