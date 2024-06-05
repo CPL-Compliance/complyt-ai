@@ -22,7 +22,7 @@ public interface UpsertByExternalIdAndSourceRouterTestTemplate {
 
     void upsertByExternalIdAndSource_nonDigitSource_Returns400ValidationError();
 
-    void upsertByExternalIdAndSource_MoreThenOneDigitSource_Returns400ValidationError();
+    void upsertByExternalIdAndSource_SourceWithHigherValueThan10_Returns400ValidationError();
 
     void upsertByExternalIdAndSource_BlankExternalId_Returns400ValidationError();
 
