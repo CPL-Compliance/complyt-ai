@@ -1,9 +1,7 @@
 package com.complyt.v1.config.error_messages;
 
 public interface StringErrorMessages {
-
-    String SINGLE_DIGIT_ERROR = "should be a single digit";
-
+    
     String MINMAX_256_ERROR = "should be 1-256 characters maximum";
 
     String MAX_256_ERROR = "should be up to 256 characters maximum";
