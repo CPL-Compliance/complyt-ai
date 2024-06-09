@@ -6,10 +6,7 @@ import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
-import com.complyt.v1.models.FilingFrequencyDto;
-import com.complyt.v1.models.PhysicalNexusTrackerDto;
-import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.StateDto;
+import com.complyt.v1.models.*;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import integration.TestContainersInitializerIT;
@@ -1023,7 +1020,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     public void upsertByState_RegisteredAndDateNull_ReturnsSalesTaxTrackingWithDate() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", newState).withRegistered(RegisteredType.REGISTERED)
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", newState).withRegistered(RegisteredTypeDto.REGISTERED)
                 .withRegistrationDate(null);
 
         // Then
@@ -1049,7 +1046,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     public void upsertByState_RegisteredAndDate_ReturnsSalesTaxTrackingWithGivenDate() {
         // Given
         LocalDateTime registrationDate = LocalDateTime.now();
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", newState).withRegistered(RegisteredType.REGISTERED)
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", newState).withRegistered(RegisteredTypeDto.REGISTERED)
                 .withRegistrationDate(registrationDate);
 
         // Then
@@ -1148,7 +1145,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(returnedSalesTaxTrackingDto -> {
-                    assertEquals(returnedSalesTaxTrackingDto.registered(), RegisteredType.REGISTERED);
+                    assertEquals(returnedSalesTaxTrackingDto.registered(), RegisteredTypeDto.REGISTERED);
                     assertNotNull(returnedSalesTaxTrackingDto.registrationDate());
                 });
     }

@@ -1,6 +1,5 @@
 package com.complyt.v1.models;
 
-import com.complyt.domain.sales_tax.RegisteredType;
 import com.complyt.v1.api_info.FieldsDescriptions;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
@@ -36,7 +35,7 @@ public record SalesTaxTrackingDto(
         boolean approved,
         LocalDateTime approvalDate,
         @Schema(description = FieldsDescriptions.FILING_FREQUENCY) FilingFrequencyDto filingFrequency,
-        RegisteredType registered,
+        RegisteredTypeDto registered,
         LocalDateTime registrationDate,
         String subsidiary,
         String establishedBy)

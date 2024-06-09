@@ -1,8 +1,6 @@
 package com.complyt.v1.config.patch;
 
-import com.complyt.domain.FilingFrequency;
 import com.complyt.domain.sales_tax.RegisteredType;
-import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.v1.models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
@@ -145,7 +143,7 @@ public class SalesTaxTrackingPatcherFunctionsTest {
         SalesTaxTrackingDto modifiedDto = SalesTaxTrackingPatcherFunctions.patchRegistered.apply(salesTaxTracking, registeredValue);
 
         // Then
-        Assertions.assertEquals(RegisteredType.REGISTERED, modifiedDto.registered());
+        Assertions.assertEquals(RegisteredTypeDto.REGISTERED, modifiedDto.registered());
     }
 
     @Test
