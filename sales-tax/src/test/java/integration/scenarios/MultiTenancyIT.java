@@ -345,7 +345,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                                                     .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                                                     .build())
                                             .accept(MediaType.APPLICATION_JSON)
-                                            .bodyValue(transactionDto.withComplytId(null).withCustomerId(customerDto.complytId()))
+                                            .bodyValue(transactionDto.withComplytId(null).withCustomerId(customerDto.complytId()).withCustomer(null))
                                             .exchange()
                                             .expectStatus().isCreated()
                                             .expectBody(TransactionDto.class)

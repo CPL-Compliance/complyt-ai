@@ -32,7 +32,7 @@ public class TransactionSchemaValidationIT extends TestContainersInitializerIT {
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
+        registry.add("spring.data.mongodb.uri", () -> TestContainersInitializerIT.MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
     }
 
     @BeforeEach
@@ -40,36 +40,11 @@ public class TransactionSchemaValidationIT extends TestContainersInitializerIT {
         transactionDocument = ITUtilities.transactionDocument();
     }
 
-
     @Test
     public void saveTransaction_validTransaction_Success() {
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
                 .expectNextCount(1)
                 .verifyComplete();
-    }
-
-    @Test
-    public void saveTransaction_missingTenantId_Failure() {
-        transactionDocument.remove("tenantId");
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("tenantId"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_missingComplytId_Failure() {
-        transactionDocument.remove("complytId");
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("complytId"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_missingCustomerId_Failure() {
-        transactionDocument.remove("customerId");
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("customerId"))
-                .verify();
     }
 
     @Test
@@ -89,10 +64,10 @@ public class TransactionSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveTransaction_missingTransactionStatus_Failure() {
-        transactionDocument.remove("transactionStatus");
+    public void saveTransaction_missingItems_Failure() {
+        transactionDocument.remove("items");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("transactionStatus"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("items"))
                 .verify();
     }
 
@@ -105,10 +80,26 @@ public class TransactionSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveTransaction_missingItems_Failure() {
-        transactionDocument.remove("items");
+    public void saveTransaction_missingCustomerId_Failure() {
+        transactionDocument.remove("customerId");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("items"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("customerId"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_missingTransactionStatus_Failure() {
+        transactionDocument.remove("transactionStatus");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("transactionStatus"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_missingTenantId_Failure() {
+        transactionDocument.remove("tenantId");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("tenantId"))
                 .verify();
     }
 
@@ -129,10 +120,10 @@ public class TransactionSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveTransaction_missingTransactionType_Failure() {
-        transactionDocument.remove("transactionType");
+    public void saveTransaction_missingTaxableItemsAmount_Failure() {
+        transactionDocument.remove("taxableItemsAmount");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("transactionType"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("taxableItemsAmount"))
                 .verify();
     }
 
@@ -143,15 +134,7 @@ public class TransactionSchemaValidationIT extends TestContainersInitializerIT {
                 .expectErrorMatches(throwable -> throwable.getMessage().contains("tangibleItemsAmount"))
                 .verify();
     }
-
-    @Test
-    public void saveTransaction_missingTaxableItemsAmount_Failure() {
-        transactionDocument.remove("taxableItemsAmount");
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("taxableItemsAmount"))
-                .verify();
-    }
-
+    
     @Test
     public void saveTransaction_missingTotalItemsAmount_Failure() {
         transactionDocument.remove("totalItemsAmount");
@@ -160,319 +143,360 @@ public class TransactionSchemaValidationIT extends TestContainersInitializerIT {
                 .verify();
     }
 
+    // Additional Property : False
+
     @Test
-    public void saveTransaction_missingTotalDiscount_Failure() {
-        transactionDocument.remove("totalDiscount");
+    public void saveTransaction_mainSchema_withAdditionalPropertyFalse_Failure() {
+        transactionDocument.put("additionalProperty", "value");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("totalDiscount"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidIdType_Failure() {
-        transactionDocument.put("_id", "invalid_object_id");
+    public void saveTransaction_billingAddress_withAdditionalPropertyFalse_Failure() {
+        transactionDocument.get("billingAddress", Document.class).put("additionalProperty", "someValue");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("_id"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidComplytIdType_Failure() {
-        transactionDocument.put("complytId", "invalid_object");
+    public void saveTransaction_shippingAddress_withAdditionalPropertyFalse_Failure() {
+        transactionDocument.get("shippingAddress", Document.class).put("additionalProperty", "someValue");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("complytId"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("shippingAddress"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidCustomerIdType_Failure() {
-        transactionDocument.put("customerId", "invalid_object");
+    public void saveTransaction_salesTax_withAdditionalPropertyFalse_Failure() {
+        transactionDocument.get("salesTax", Document.class).put("additionalProperty", 123);
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("customerId"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperty"))
+                .verify();
+    }
+
+    // shippingFee - Sub fields PropertyFalse
+    @Test
+    public void saveTransaction_shippingFee_withAdditionalPropertyFalse_Failure() {
+        transactionDocument.get("shippingFee", Document.class).put("additionalProperty", "value");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidExternalIdType_Failure() {
-        transactionDocument.put("externalId", 123);
+    public void saveTransaction_ShippingFee_withAdditionalPropertyInJurisdictionalSalesTaxRules_Failure() {
+        transactionDocument.get("shippingFee", Document.class).get("jurisdictionalSalesTaxRules", Document.class).put("additionalProperty", "value");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("externalId"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidSourceType_Failure() {
-        transactionDocument.put("source", 6);
+    public void saveTransaction_ShippingFee_withAdditionalPropertyInJurisdictionalTaxRules_Failure() {
+        transactionDocument.get("shippingFee", Document.class).get("jurisdictionalTaxRules", Document.class).put("additionalProperty", "value");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("source"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidDocumentNameType_Failure() {
-        transactionDocument.put("documentName", 151);
+    public void saveTransaction_ShippingFee_withAdditionalPropertyInSalesTaxRates_Failure() {
+        transactionDocument.get("shippingFee", Document.class).get("salesTaxRates", Document.class).put("additionalProperty", "value");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("documentName"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidTransactionStatusType_Failure() {
-        transactionDocument.put("transactionStatus", 123);
+    public void saveTransaction_ShippingFee_withAdditionalPropertyInGtRates_Failure() {
+        transactionDocument.get("shippingFee", Document.class).get("gtRates", Document.class).put("additionalProperty", "value");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("transactionStatus"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
+                .verify();
+    }
+
+    // Item - Sub fields PropertyFalse
+    @Test
+    public void saveTransaction_items_withAdditionalPropertyFalse_Failure() {
+        Document transactionItem = ITUtilities.transactionItemDocument();
+        transactionItem.put("additionalProperty", "value");
+        transactionDocument.put("items", List.of(transactionItem));
+
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidTenantIdType_Failure() {
-        transactionDocument.put("tenantId", 123);
+    public void saveTransaction_items_withAdditionalPropertyInJurisdictionalSalesTaxRules_Failure() {
+        Document transactionItem = ITUtilities.transactionItemDocument();
+        transactionItem.get("jurisdictionalSalesTaxRules", Document.class).put("additionalProperty", "value");
+        transactionDocument.put("items", List.of(transactionItem));
+
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("tenantId"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidInternalTimestampsType_Failure() {
-        transactionDocument.put("internalTimestamps", "invalid_object");
+    public void saveTransaction_items_withAdditionalPropertyInJurisdictionalTaxRules_Failure() {
+        Document transactionItem = ITUtilities.transactionItemDocument();
+        transactionItem.get("jurisdictionalTaxRules", Document.class).put("additionalProperty", "value");
+        transactionDocument.put("items", List.of(transactionItem));
+
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("internalTimestamps"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidExternalTimestampsType_Failure() {
-        transactionDocument.put("externalTimestamps", "invalid_object");
+    public void saveTransaction_items_withAdditionalPropertyInSalesTaxRates_Failure() {
+        Document transactionItem = ITUtilities.transactionItemDocument();
+        transactionItem.get("salesTaxRates", Document.class).put("additionalProperty", "value");
+        transactionDocument.put("items", List.of(transactionItem));
+
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("externalTimestamps"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidTransactionTypeType_Failure() {
-        transactionDocument.put("transactionType", 123);
+    public void saveTransaction_items_withAdditionalPropertyInGtRates_Failure() {
+        Document transactionItem = ITUtilities.transactionItemDocument();
+        transactionItem.get("gtRates", Document.class).put("additionalProperty", "value");
+        transactionDocument.put("items", List.of(transactionItem));
+
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("transactionType"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
+                .verify();
+    }
+
+    // Required Nested-Sub-Fields
+    @Test
+    public void saveTransaction_salesTax_MissingAmount_Failure() {
+        transactionDocument.get("salesTax", Document.class).remove("amount");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("amount"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidTangibleItemsAmountType_Failure() {
-        transactionDocument.put("tangibleItemsAmount", 123);
+    public void saveTransaction_salesTax_MissingTaxCodeInSalesTaxRates_taxRateType_Failure() {
+        transactionDocument.get("salesTax", Document.class).get("salesTaxRates", Document.class).remove("taxRate");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("tangibleItemsAmount"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("taxRate"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidTaxableItemsAmountType_Failure() {
-        transactionDocument.put("taxableItemsAmount", 123);
+    public void saveTransaction_salesTax_MissingTaxCodeInGt_taxRateType_Failure() {
+        transactionDocument.get("salesTax", Document.class).get("gtRates", Document.class).remove("taxRate");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("taxableItemsAmount"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("taxRate"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidTotalItemsAmountType_Failure() {
-        transactionDocument.put("totalItemsAmount", 123);
+    public void saveTransaction_shippingFee_missingTaxCode_Failure() {
+        transactionDocument.get("shippingFee", Document.class).remove("taxCode");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("totalItemsAmount"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("taxCode"))
                 .verify();
     }
-
+    
+    
     @Test
-    public void saveTransaction_invalidTotalDiscountType_Failure() {
-        transactionDocument.put("totalDiscount", 123);
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("totalDiscount"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidItemsType_Failure() {
-        transactionDocument.put("items", "invalid_object");
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("items"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidClassType_Failure() {
-        transactionDocument.put("_class", 123);
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("_class"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidSubsidiaryType_Failure() {
-        transactionDocument.put("subsidiary", 123);
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("subsidiary"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidBillingAddressType_Failure() {
-        transactionDocument.put("billingAddress", "invalid_object");
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("billingAddress"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidBillingAddressStreetType_Failure() {
-        transactionDocument.get("billingAddress", Document.class).put("street", 123); // street should be a string
-
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("street"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidBillingAddressZipType_Failure() {
-        transactionDocument.get("billingAddress", Document.class).put("zip", 123); // zip should be a string
-
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("zip"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidBillingAddressCountryType_Failure() {
-        transactionDocument.get("billingAddress", Document.class).put("country", 123); // country should be a string
-
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("country"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidBillingAddressCountyType_Failure() {
-        transactionDocument.get("billingAddress", Document.class).put("county", 123); // county should be a string
-
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("county"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidBillingAddressStateType_Failure() {
-        transactionDocument.get("billingAddress", Document.class).put("state", 123); // state should be a string
-
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("state"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidBillingAddressCityType_Failure() {
-        transactionDocument.get("billingAddress", Document.class).put("city", 123); // city should be a string
-
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("city"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidJurisdictionalSalesTaxRulesType_Failure() {
-        transactionDocument.put("jurisdictionalSalesTaxRules", "invalid_object");
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("jurisdictionalSalesTaxRules"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidManualSalesTaxType_Failure() {
-        transactionDocument.put("manualSalesTax", "invalid_object");
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("manualSalesTax"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidNameType_Failure() {
-        transactionDocument.put("name", 123);
+    public void saveTransaction_item_missingName_Failure() {
+        transactionDocument.getList("items", Document.class).get(0).remove("name");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
                 .expectErrorMatches(throwable -> throwable.getMessage().contains("name"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidTotalPriceType_Failure() {
-        transactionDocument.put("totalPrice", 123);
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("totalPrice"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidUnitPriceType_Failure() {
-        transactionDocument.put("unitPrice", 123);
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("unitPrice"))
-                .verify();
-    }
-
-    @Test
-    public void saveTransaction_invalidTaxCodeType_Failure() {
-        transactionDocument.put("taxCode", 123);
+    public void saveTransaction_item_missingTaxCode_Failure() {
+        transactionDocument.getList("items", Document.class).get(0).remove("taxCode");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
                 .expectErrorMatches(throwable -> throwable.getMessage().contains("taxCode"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidItemNameType_Failure() {
-        Document invalidItem = new Document("name", 123);
-        transactionDocument.put("items", List.of(invalidItem));
+    public void saveTransaction_item_missingTangibleCategory_Failure() {
+        transactionDocument.getList("items", Document.class).get(0).remove("tangibleCategory");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("items"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("tangibleCategory"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidItemTaxCodeType_Failure() {
-        Document invalidItem = new Document("taxCode", 123);
-        transactionDocument.put("items", List.of(invalidItem));
+    public void saveTransaction_item_missingItemTaxableCategory_Failure() {
+        transactionDocument.getList("items", Document.class).get(0).remove("taxableCategory");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("items"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("taxableCategory"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidItemManualSalesTaxType_Failure() {
-        Document invalidItem = new Document("manualSalesTax", "invalid_object");
-        transactionDocument.put("items", List.of(invalidItem));
+    public void saveTransaction_item_missingCalculatedTotal_Failure() {
+        transactionDocument.getList("items", Document.class).get(0).remove("calculatedTotal");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("items"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("calculatedTotal"))
+                .verify();
+    }
+
+
+    @Test
+    public void saveTransaction_jurisdictionalSalesTaxRules_missingName_Failure() {
+        transactionDocument.getList("items", Document.class).get(0)
+                .get("jurisdictionalSalesTaxRules", Document.class).remove("name");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("name"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidItemManualSalesTaxRateType_Failure() {
-        Document invalidItem = new Document("manualSalesTaxRate", 123);
-        transactionDocument.put("items", List.of(invalidItem));
+    public void saveTransaction_jurisdictionalSalesTaxRules_missingAbbreviation_Failure() {
+        transactionDocument.getList("items", Document.class).get(0)
+                .get("jurisdictionalSalesTaxRules", Document.class).remove("abbreviation");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("items"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("abbreviation"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidItemTangibleCategoryType_Failure() {
-        Document invalidItem = new Document("tangibleCategory", 123);
-        transactionDocument.put("items", List.of(invalidItem));
+    public void saveTransaction_jurisdictionalSalesTaxRules_missingTaxable_Failure() {
+        transactionDocument.getList("items", Document.class).get(0)
+                .get("jurisdictionalSalesTaxRules", Document.class).remove("taxable");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("items"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("taxable"))
                 .verify();
     }
 
     @Test
-    public void saveTransaction_invalidItemTaxableCategoryType_Failure() {
-        Document invalidItem = new Document("taxableCategory", 123);
-        transactionDocument.put("items", List.of(invalidItem));
+    public void saveTransaction_jurisdictionalSalesTaxRules_missingSpecialTreatment_Failure() {
+        transactionDocument.getList("items", Document.class).get(0)
+                .get("jurisdictionalSalesTaxRules", Document.class).remove("specialTreatment");
         StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("items"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("specialTreatment"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_jurisdictionalSalesTaxRules_missingCalculationType_Failure() {
+        transactionDocument.getList("items", Document.class).get(0)
+                .get("jurisdictionalSalesTaxRules", Document.class).remove("calculationType");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("calculationType"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_jurisdictionalSalesTaxRules_missingCalculationValue_Failure() {
+        transactionDocument.getList("items", Document.class).get(0)
+                .get("jurisdictionalSalesTaxRules", Document.class).remove("calculationValue");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("calculationValue"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_item_missingJurisdictionalTaxRules_name_Failure() {
+        transactionDocument.getList("items", Document.class).get(0)
+                .get("jurisdictionalTaxRules", Document.class).remove("name");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("name"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_item_missingJurisdictionalTaxRules_abbreviation_Failure() {
+        transactionDocument.getList("items", Document.class).get(0)
+                .get("jurisdictionalTaxRules", Document.class).remove("abbreviation");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("abbreviation"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_item_missingJurisdictionalTaxRules_taxable_Failure() {
+        transactionDocument.getList("items", Document.class).get(0)
+                .get("jurisdictionalTaxRules", Document.class).remove("taxable");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("taxable"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_item_missingJurisdictionalTaxRules_specialTreatment_Failure() {
+        transactionDocument.getList("items", Document.class).get(0)
+                .get("jurisdictionalTaxRules", Document.class).remove("specialTreatment");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("specialTreatment"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_item_missingJurisdictionalTaxRules_calculationType_Failure() {
+        transactionDocument.getList("items", Document.class).get(0)
+                .get("jurisdictionalTaxRules", Document.class).remove("calculationType");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("calculationType"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_item_missingJurisdictionalTaxRules_calculationValue_Failure() {
+        transactionDocument.getList("items", Document.class).get(0)
+                .get("jurisdictionalTaxRules", Document.class).remove("calculationValue");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("calculationValue"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_item_MissingSalesTaxRateTaxCode_cityRateType_Failure() {
+        transactionDocument.getList("items", Document.class).get(0)
+                .get("salesTaxRates", Document.class).remove("taxRate");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("taxRate"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_item_MissingGtRatesTaxCode_Failure() {
+        transactionDocument.getList("items", Document.class).get(0)
+                .get("gtRates", Document.class).remove("taxRate");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("taxRate"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_ShippingAddress_missingCountry_Failure() {
+        transactionDocument.get("shippingAddress", Document.class).remove("country");
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("country"))
+                .verify();
+    }
+
+    // Random Invalid Fields
+    @Test
+    public void saveTransaction_invalidCreatedFromType_Failure() {
+        transactionDocument.put("createdFrom", 123); // Should Be String
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("createdFrom"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_invalidTransactionFilingStatusType_Failure() {
+        transactionDocument.put("transactionFilingStatus", "not valid"); // Should Be Bool
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("transactionFilingStatus"))
                 .verify();
     }
 }

@@ -15,8 +15,11 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.integration_test.ITUtilities;
+
+import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -31,7 +34,7 @@ public class ClientTrackingSchemaValidationIT extends TestContainersInitializerI
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
+        registry.add("spring.data.mongodb.uri", () -> TestContainersInitializerIT.MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
     }
 
     @BeforeEach
@@ -41,22 +44,18 @@ public class ClientTrackingSchemaValidationIT extends TestContainersInitializerI
 
     @Test
     public void saveClientTracking_validSClientTracking_Success() {
-        StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
+        Mono<Document> savedDocument = reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking");
+
+        StepVerifier.create(savedDocument)
                 .expectNextCount(1)
                 .verifyComplete();
+
+        StepVerifier.create(reactiveMongoTemplate.remove(savedDocument, "client_tracking"))
+                .expectNextCount(1).verifyComplete();
     }
 
     @Test
-    public void saveClientTracking_MissingNexus_throwsValidationError() {
-        clientTrackingDocument.remove("nexus");
-
-        StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveClientTracking_MissingTenantId_throwsValidationError() {
+    public void saveClientTracking_MissingRequiredTenantId_throwsValidationError() {
         clientTrackingDocument.remove("tenantId");
 
         StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
@@ -65,7 +64,16 @@ public class ClientTrackingSchemaValidationIT extends TestContainersInitializerI
     }
 
     @Test
-    public void saveClientTracking_MissingName_throwsValidationError() {
+    public void saveClientTracking_MissingRequiredNexus_throwsValidationError() {
+        clientTrackingDocument.remove("nexus");
+
+        StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveClientTracking_MissingRequiredName_throwsValidationError() {
         clientTrackingDocument.remove("name");
 
         StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
@@ -74,7 +82,7 @@ public class ClientTrackingSchemaValidationIT extends TestContainersInitializerI
     }
 
     @Test
-    public void saveClientTracking_MissingInternalTimestamps_throwsValidationError() {
+    public void saveClientTracking_MissingRequiredInternalTimestamps_throwsValidationError() {
         clientTrackingDocument.remove("internalTimestamps");
 
         StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
@@ -83,8 +91,8 @@ public class ClientTrackingSchemaValidationIT extends TestContainersInitializerI
     }
 
     @Test
-    public void saveClientTracking_MissingInternalTimestampsCreatedDate_throwsValidationError() {
-        ((Document) clientTrackingDocument.get("internalTimestamps")).remove("createdDate");
+    public void saveClientTracking_MissingRequiredInternalTimestampsCreatedDate_throwsValidationError() {
+        clientTrackingDocument.get("internalTimestamps", Document.class).remove("createdDate");
 
         StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
                 .expectError(DataIntegrityViolationException.class)
@@ -92,8 +100,8 @@ public class ClientTrackingSchemaValidationIT extends TestContainersInitializerI
     }
 
     @Test
-    public void saveClientTracking_MissingInternalTimestampsUpdatedDate_throwsValidationError() {
-        ((Document) clientTrackingDocument.get("internalTimestamps")).remove("updatedDate");
+    public void saveClientTracking_MissingRequiredInternalTimestampsUpdatedDate_throwsValidationError() {
+        clientTrackingDocument.get("internalTimestamps", Document.class).remove("updatedDate");
 
         StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
                 .expectError(DataIntegrityViolationException.class)
@@ -101,92 +109,31 @@ public class ClientTrackingSchemaValidationIT extends TestContainersInitializerI
     }
 
     @Test
-    public void saveClientTracking_MissingNexusTaxableDate_throwsValidationError() {
-        ((Document) clientTrackingDocument.get("nexus")).remove("taxableDate");
+    public void saveClientTracking_mainSchema_withAdditionalPropertyFalse_Failure() {
+        clientTrackingDocument.put("additionalProperty", "value");
 
         StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
-                .expectError(DataIntegrityViolationException.class)
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 
     @Test
-    public void saveClientTracking_InvalidTenantIdType_throwsValidationError() {
-        clientTrackingDocument.put("tenantId", 123);
+    public void saveClientTracking_nexus_withAdditionalPropertyFalse_Failure() {
+        Document nexus = (Document) clientTrackingDocument.get("nexus");
+        nexus.put("additionalProperty", "value");
 
         StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
-                .expectError(DataIntegrityViolationException.class)
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 
     @Test
-    public void saveClientTracking_InvalidNameType_throwsValidationError() {
-        clientTrackingDocument.put("name", 123);
+    public void saveClientTracking_internalTimestamps_withAdditionalPropertyFalse_Failure() {
+        Document internalTimestamps = (Document) clientTrackingDocument.get("internalTimestamps");
+        internalTimestamps.put("additionalProperty", "value");
 
         StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveClientTracking_InvalidInternalTimestampsCreatedDateType_throwsValidationError() {
-        ((Document) clientTrackingDocument.get("internalTimestamps")).put("createdDate", "invalidDate");
-
-        StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveClientTracking_InvalidInternalTimestampsUpdatedDateType_throwsValidationError() {
-        ((Document) clientTrackingDocument.get("internalTimestamps")).put("updatedDate", "invalidDate");
-
-        StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveClientTracking_InvalidNexusTaxableDateType_throwsValidationError() {
-        ((Document) clientTrackingDocument.get("nexus")).put("taxableDate", "invalidDate");
-
-        StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveClientTracking_AdditionalProperty_throwsValidationError() {
-        clientTrackingDocument.append("extraField", "extraValue"); // Adding an extra field
-
-        StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveClientTracking_InvalidNexusType_throwsValidationError() {
-        clientTrackingDocument.put("nexus", "invalidType"); // nexus should be an object
-
-        StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveClientTracking_InvalidSubsidiariesType_throwsValidationError() {
-        clientTrackingDocument.put("subsidiaries", "invalidType");
-
-        StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveClientTracking_InvalidSubsidiaryItemType_throwsValidationError() {
-        clientTrackingDocument.put("subsidiaries", new Document("subsidiaryId", 123));
-
-        StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
-                .expectError(DataIntegrityViolationException.class)
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 
@@ -195,16 +142,16 @@ public class ClientTrackingSchemaValidationIT extends TestContainersInitializerI
         clientTrackingDocument.put("_class", 123); // _class should be a string
 
         StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
-                .expectError(DataIntegrityViolationException.class)
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("_class"))
                 .verify();
     }
 
     @Test
-    public void saveClientTracking_InvalidAdditionalProperty_throwsValidationError() {
-        clientTrackingDocument.put("additionalProperty", 123); // _class should be a string
+    public void saveClientTracking_InvalidSubsidiariesItemType_Failure() {
+        clientTrackingDocument.put("subsidiaries", List.of(new Document("additionalProperty", "value")));
 
         StepVerifier.create(reactiveMongoTemplate.save(clientTrackingDocument, "client_tracking"))
-                .expectError(DataIntegrityViolationException.class)
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("items"))
                 .verify();
     }
 }

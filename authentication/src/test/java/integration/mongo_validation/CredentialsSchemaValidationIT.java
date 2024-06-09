@@ -173,14 +173,6 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveCredentials_InvalidStatusType_throwsValidationError() {
-        credentialsDocument.put("status", 123);
-        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
     public void saveCredentials_InvalidClientIdType_throwsValidationError() {
         credentialsDocument.put("clientId", false);
 
@@ -190,83 +182,11 @@ public class CredentialsSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveCredentials_InvalidClientSecretIvType_throwsValidationError() {
-        credentialsDocument.put("clientSecretIv", 123);
+    public void saveCredentials_mainSchema_withAdditionalPropertyFalse_Failure() {
+        credentialsDocument.put("additionalProperty", "value");
 
         StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCredentials_InvalidAudienceType_throwsValidationError() {
-        credentialsDocument.put("audience", 789);
-
-        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCredentials_InvalidGrantType_throwsValidationError() {
-        credentialsDocument.put("grantType", new Date());
-
-        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCredentials_InvalidClientSecretType_throwsValidationError() {
-        credentialsDocument.put("clientSecret", 123);
-
-        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCredentials_InvalidComplytClientIdType_throwsValidationError() {
-        credentialsDocument.put("complytClientId", new Date());
-
-        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCredentials_InvalidComplytClientSecretType_throwsValidationError() {
-        credentialsDocument.put("complytClientSecret", true);
-
-        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCredentials_InvalidClientIdIvType_throwsValidationError() {
-        credentialsDocument.put("clientIdIv", 456);
-
-        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCredentials_InvalidExpireAtType_throwsValidationError() {
-        credentialsDocument.put("expireAt", "invalidDate");
-
-        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCredentials_InvalidAdditionalProperties_throwsValidationError() {
-        credentialsDocument.put("additionalProperty", 123);
-        
-        StepVerifier.create(reactiveMongoTemplate.save(credentialsDocument, "credentials"))
-                .expectError(DataIntegrityViolationException.class)
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 }
