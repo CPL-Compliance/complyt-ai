@@ -599,7 +599,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(CustomerDto.class)
-                .value(customers -> assertEquals(customers.get(0).complytId().toString(), expectedComplyId))
+                .value(customers -> Assertions.assertEquals(customers.get(0).complytId().toString(), expectedComplyId))
                 .hasSize(size);
     }
 
