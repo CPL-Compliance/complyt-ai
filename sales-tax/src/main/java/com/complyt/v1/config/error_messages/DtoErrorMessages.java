@@ -27,7 +27,7 @@ public interface DtoErrorMessages {
 
     String COMPLYT_ID_FORMAT_ERROR = "complyt ID has to be in UUID format";
 
-    String SOURCE_FORMAT_ERROR = "source has to be in range 1-9";
+    String SOURCE_FORMAT_ERROR = "source has to be in range 1-10";
 
     String PAGE_FORMAT_ERROR = "page has to be numeric";
 

@@ -1102,13 +1102,12 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError() {
         // Given
         String externalId = "someId";
-        String differentExternalId = "differentId";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withInternalTimestamps(new TimestampsDto("", "2021-10-10T07:00:00"))
                 .withSource("");
         Set expectedErrors = new HashSet<>(List.of(
                 "Timestamps.createdDate " + DtoErrorMessages.ISO8601_FORMAT_ERROR,
-                "source " + StringErrorMessages.SINGLE_DIGIT_ERROR));
+                DtoErrorMessages.SOURCE_FORMAT_ERROR));
 
         // Then
         webTestClient

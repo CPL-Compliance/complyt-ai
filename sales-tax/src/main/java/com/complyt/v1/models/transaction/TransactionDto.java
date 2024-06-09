@@ -25,7 +25,7 @@ import java.util.UUID;
 @Schema(name = "transaction", description = FieldsDescriptions.TRANSACTION)
 public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID + "transaction") UUID complytId,
                              @Schema(description = FieldsDescriptions.EXTERNAL_ID) @NotNull(message = "externalId " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "externalId " + StringErrorMessages.MINMAX_256_ERROR) String externalId,
-                             @Schema(description = FieldsDescriptions.SOURCE) @NotNull(message = "source " + DtoErrorMessages.NOT_NULL_ERROR) @Pattern(regexp = "[1-9]", message = "source " + StringErrorMessages.SINGLE_DIGIT_ERROR) String source,
+                             @Schema(description = FieldsDescriptions.SOURCE) @NotNull(message = "source " + DtoErrorMessages.NOT_NULL_ERROR) @Pattern(regexp = "^(10|[1-9])$", message = DtoErrorMessages.SOURCE_FORMAT_ERROR) String source,
                              @Schema(description = FieldsDescriptions.DOCUMENT_NAME) @Size(max = 50, message = "documentName " + StringErrorMessages.MAX_50_ERROR) String documentName,
                              @ArraySchema(schema = @Schema(description = FieldsDescriptions.ITEM)) @NotEmpty(message = "items" + DtoErrorMessages.LIST_NOT_EMPTY_ERROR) @NotNull(message = "items " + DtoErrorMessages.NOT_NULL_ERROR) List<@Valid ItemDto> items,
                              @Schema(description = FieldsDescriptions.IS_TAX_INCLUSIVE) boolean isTaxInclusive,

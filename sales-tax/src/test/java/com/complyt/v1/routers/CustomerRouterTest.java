@@ -112,7 +112,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
                 "name " + StringErrorMessages.MINMAX_256_ERROR,
-                "source " + StringErrorMessages.SINGLE_DIGIT_ERROR,
+                DtoErrorMessages.SOURCE_FORMAT_ERROR,
                 "customerType " + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
@@ -295,7 +295,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         String invalidSource = "";
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "source " + StringErrorMessages.SINGLE_DIGIT_ERROR));
+                DtoErrorMessages.SOURCE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -319,7 +319,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         String invalidSource = "y";
-        Set<String> expectedErrors = new HashSet<>(List.of("source " + StringErrorMessages.SINGLE_DIGIT_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of(DtoErrorMessages.SOURCE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -338,12 +338,12 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Override
     @Test
     @WithMockUser
-    public void upsertByExternalIdAndSource_MoreThenOneDigitSource_Returns400ValidationError() {
+    public void upsertByExternalIdAndSource_SourceWithHigherValueThan10_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        String invalidSource = "10";
-        Set<String> expectedErrors = new HashSet<>(List.of("source " + StringErrorMessages.SINGLE_DIGIT_ERROR));
+        String invalidSource = "11";
+        Set<String> expectedErrors = new HashSet<>(List.of(DtoErrorMessages.SOURCE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
