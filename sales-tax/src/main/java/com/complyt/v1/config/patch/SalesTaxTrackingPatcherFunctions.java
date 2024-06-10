@@ -1,10 +1,8 @@
 package com.complyt.v1.config.patch;
 
-import com.complyt.domain.FilingFrequency;
 import com.complyt.domain.sales_tax.RegisteredType;
 import com.complyt.utils.object_mapper.ComplytObjectMapper;
 import com.complyt.v1.models.*;
-import com.complyt.v1.models.customer.CustomerTypeDto;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -55,7 +53,7 @@ public interface SalesTaxTrackingPatcherFunctions {
     };
 
     BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchRegistered = (salesTaxTrackingDto, registered) -> {
-        RegisteredType convertedRegisteredTypeDto = (RegisteredType) ComplytObjectMapper.mapObject(registered, RegisteredType.class);
+        RegisteredTypeDto convertedRegisteredTypeDto = (RegisteredTypeDto) ComplytObjectMapper.mapObject(registered, RegisteredTypeDto.class);
         return salesTaxTrackingDto.withRegistered(convertedRegisteredTypeDto);
     };
 

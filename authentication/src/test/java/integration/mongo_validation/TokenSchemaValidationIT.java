@@ -227,4 +227,13 @@ public class TokenSchemaValidationIT extends TestContainersInitializerIT {
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
+
+    @Test
+    public void saveToken_mainSchema_withAdditionalPropertyFalse_Failure() {
+        tokenDocument.put("additionalProperty", "value");
+
+        StepVerifier.create(reactiveMongoTemplate.save(tokenDocument, "credentials"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
+                .verify();
+    }
 }

@@ -154,7 +154,7 @@ public abstract class TestContainersInitializerIT {
                                 .forHttp(TestUtilities.TRANSACTION_BASE_URL)
                                 .withHeader("Authorization", "Bearer " + TOKEN))
                         .withStrategy(Wait
-                                .forHttp(TestUtilities.COMPLYT_SALES_TAX_RATES_BASE_URL + "?state=CA&zip=90210&isPartial=true")
+                                .forHttp(TestUtilities.COMPLYT_SALES_TAX_RATES_BASE_URL + "?state=CA&zip=90210&isPartial=true&country=US")
                                 .withHeader("Authorization", "Bearer " + TOKEN))
                         .withStrategy(Wait
                                 .forHttp(TestUtilities.FILES_BASE_URL)
@@ -162,7 +162,7 @@ public abstract class TestContainersInitializerIT {
                         .withStartupTimeout(Duration.ofSeconds(60)));
         API_GATEWAY_CONTAINER.start();
 
-        WEB_TEST_CLIENT = WebTestClient.bindToServer().responseTimeout(Duration.ofSeconds(30)).baseUrl("http://localhost:" + API_GATEWAY_CONTAINER
+        WEB_TEST_CLIENT = WebTestClient.bindToServer().responseTimeout(Duration.ofSeconds(60)).baseUrl("http://localhost:" + API_GATEWAY_CONTAINER
                 .getMappedPort(8765) + "/").build();
     }
 

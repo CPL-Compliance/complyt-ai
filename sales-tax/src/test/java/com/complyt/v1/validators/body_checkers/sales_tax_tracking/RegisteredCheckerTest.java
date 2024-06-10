@@ -1,7 +1,7 @@
 package com.complyt.v1.validators.body_checkers.sales_tax_tracking;
 
-import com.complyt.domain.sales_tax.RegisteredType;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.models.RegisteredTypeDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ public class RegisteredCheckerTest {
 
     @Test
     public void testRegisteredChecker_UnregisteredWithNonNullDate_ShouldReturnErrorMessage() {
-        SalesTaxTrackingDto salesTaxTrackingDtoUpdated = salesTaxTrackingDto.withRegistered(RegisteredType.REGISTERED)
+        SalesTaxTrackingDto salesTaxTrackingDtoUpdated = salesTaxTrackingDto.withRegistered(RegisteredTypeDto.REGISTERED)
                 .withRegistrationDate(null);
         Flux<String> result = registeredChecker.check(salesTaxTrackingDtoUpdated);
 
