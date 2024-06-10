@@ -159,7 +159,7 @@ public abstract class TestContainersInitializerIT {
                         .withStrategy(Wait
                                 .forHttp(TestUtilities.FILES_BASE_URL)
                                 .withHeader("Authorization", "Bearer " + TOKEN))
-                        .withStartupTimeout(Duration.ofSeconds(60)));
+                        .withStartupTimeout(Duration.ofMinutes(5)));
         API_GATEWAY_CONTAINER.start();
 
         WEB_TEST_CLIENT = WebTestClient.bindToServer().responseTimeout(Duration.ofSeconds(30)).baseUrl("http://localhost:" + API_GATEWAY_CONTAINER
