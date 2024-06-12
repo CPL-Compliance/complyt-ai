@@ -978,7 +978,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         String blankSource = "";
         Set<String> expectedErrors = Set.of(
-                "source " + StringErrorMessages.SINGLE_DIGIT_ERROR);
+                DtoErrorMessages.SOURCE_FORMAT_ERROR);
 
         // When + Then
         webTestClient
@@ -1002,7 +1002,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         String invalidSource = "d";
-        Set<String> expectedErrors = new HashSet<>(List.of("source " + StringErrorMessages.SINGLE_DIGIT_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of(DtoErrorMessages.SOURCE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -1021,12 +1021,12 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsertByExternalIdAndSource_MoreThenOneDigitSource_Returns400ValidationError() {
+    public void upsertByExternalIdAndSource_SourceWithHigherValueThan10_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String invalidSource = "10";
-        Set<String> expectedErrors = new HashSet<>(List.of("source " + StringErrorMessages.SINGLE_DIGIT_ERROR));
+        String invalidSource = "11";
+        Set<String> expectedErrors = new HashSet<>(List.of(DtoErrorMessages.SOURCE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -2688,7 +2688,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "source " + StringErrorMessages.SINGLE_DIGIT_ERROR,
+                DtoErrorMessages.SOURCE_FORMAT_ERROR,
                 "Address.city " + StringErrorMessages.MAX_100_ERROR);
 
         // When + Then

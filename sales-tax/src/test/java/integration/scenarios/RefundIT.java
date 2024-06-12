@@ -286,6 +286,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
                                         .build())
                                 .bodyValue(transactionDto
                                         .withComplytId(null)
+                                        .withCustomer(null)
                                         .withExternalId(externalIdOfRefund)
                                         .withTransactionType(TransactionTypeDto.REFUND)
                                         .withCreatedFrom(externalIdOfOriginal)

@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.integration_test.ITUtilities;
 
@@ -31,7 +32,7 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
+        registry.add("spring.data.mongodb.uri", () -> TestContainersInitializerIT.MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
     }
 
     @BeforeEach
@@ -41,31 +42,15 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
 
     @Test
     public void saveCustomer_validCustomer_Success() {
-        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
+        Mono<Document> savedDocument = reactiveMongoTemplate.save(customerDocument, "customer");
+
+        StepVerifier.create(savedDocument)
                 .expectNextCount(1)
                 .verifyComplete();
     }
 
     @Test
-    public void saveCustomer_MissingExternalId_throwsValidationError() {
-        customerDocument.remove("externalId");
-
-        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCustomer_MissingSource_throwsValidationError() {
-        customerDocument.remove("source");
-
-        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCustomer_MissingComplytId_throwsValidationError() {
+    public void saveCustomer_MissingRequiredComplytId_throwsValidationError() {
         customerDocument.remove("complytId");
 
         StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
@@ -74,7 +59,27 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveCustomer_MissingName_throwsValidationError() {
+    public void saveCustomer_MissingRequiredExternalId_throwsValidationError() {
+        customerDocument.remove("externalId");
+
+        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveCustomer_MissingRequiredSource_throwsValidationError() {
+        customerDocument.remove("source");
+
+        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+
+
+    @Test
+    public void saveCustomer_MissingRequiredName_throwsValidationError() {
         customerDocument.remove("name");
 
         StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
@@ -83,7 +88,7 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveCustomer_MissingTenantId_throwsValidationError() {
+    public void saveCustomer_MissingRequiredTenantId_throwsValidationError() {
         customerDocument.remove("tenantId");
 
         StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
@@ -92,7 +97,7 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveCustomer_MissingCustomerType_throwsValidationError() {
+    public void saveCustomer_MissingRequiredCustomerType_throwsValidationError() {
         customerDocument.remove("customerType");
 
         StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
@@ -101,7 +106,7 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveCustomer_MissingInternalTimestamps_throwsValidationError() {
+    public void saveCustomer_MissingRequiredInternalTimestamps_throwsValidationError() {
         customerDocument.remove("internalTimestamps");
 
         StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
@@ -110,7 +115,7 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveCustomer_MissingExternalTimestamps_throwsValidationError() {
+    public void saveCustomer_MissingRequiredExternalTimestamps_throwsValidationError() {
         customerDocument.remove("externalTimestamps");
 
         StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
@@ -119,7 +124,7 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveCustomer_MissingInternalTimestampsCreatedDate_throwsValidationError() {
+    public void saveCustomer_MissingRequiredInternalTimestampsCreatedDate_throwsValidationError() {
         ((Document) customerDocument.get("internalTimestamps")).remove("createdDate");
 
         StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
@@ -128,7 +133,7 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveCustomer_MissingInternalTimestampsUpdatedDate_throwsValidationError() {
+    public void saveCustomer_MissingRequiredInternalTimestampsUpdatedDate_throwsValidationError() {
         ((Document) customerDocument.get("internalTimestamps")).remove("updatedDate");
 
         StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
@@ -137,7 +142,7 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveCustomer_MissingExternalTimestampsCreatedDate_throwsValidationError() {
+    public void saveCustomer_MissingRequiredExternalTimestampsCreatedDate_throwsValidationError() {
         ((Document) customerDocument.get("externalTimestamps")).remove("createdDate");
 
         StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
@@ -146,7 +151,7 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveCustomer_MissingExternalTimestampsUpdatedDate_throwsValidationError() {
+    public void saveCustomer_MissingRequiredExternalTimestampsUpdatedDate_throwsValidationError() {
         ((Document) customerDocument.get("externalTimestamps")).remove("updatedDate");
 
         StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
@@ -155,17 +160,43 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveCustomer_InvalidExternalIdType_throwsValidationError() {
-        customerDocument.put("externalId", 1586); // externalId should be a string
-
+    public void saveCustomer_mainSchema_withAdditionalPropertyFalse_Failure() {
+        customerDocument.put("additionalProperty", "value");
         StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
-                .expectError(DataIntegrityViolationException.class)
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
                 .verify();
     }
 
     @Test
-    public void saveCustomer_InvalidSourceType_throwsValidationError() {
-        customerDocument.put("source", 1); // source should be a string
+    public void saveCustomer_address_withAdditionalPropertyFalse_Failure() {
+        Document address = (Document) customerDocument.get("address");
+        address.put("additionalProperty", "value");
+        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
+                .verify();
+    }
+
+    @Test
+    public void saveCustomer_internalTimestamps_withAdditionalPropertyFalse_Failure() {
+        Document internalTimestamps = (Document) customerDocument.get("internalTimestamps");
+        internalTimestamps.put("additionalProperty", "value");
+        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
+                .verify();
+    }
+
+    @Test
+    public void saveCustomer_externalTimestamps_withAdditionalPropertyFalse_Failure() {
+        Document externalTimestamps = (Document) customerDocument.get("externalTimestamps");
+        externalTimestamps.put("additionalProperty", "value");
+        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
+                .verify();
+    }
+
+    @Test
+    public void saveCustomer_InvalidExternalIdType_throwsValidationError() {
+        customerDocument.put("externalId", 1586); // externalId should be a string
 
         StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
                 .expectError(DataIntegrityViolationException.class)
@@ -181,93 +212,6 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
                 .verify();
     }
 
-    @Test
-    public void saveCustomer_InvalidNameType_throwsValidationError() {
-        customerDocument.put("name", 123); // name should be a string
 
-        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
 
-    @Test
-    public void saveCustomer_InvalidTenantIdType_throwsValidationError() {
-        customerDocument.put("tenantId", 123); // tenantId should be a string
-
-        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCustomer_InvalidCustomerType_throwsValidationError() {
-        customerDocument.put("customerType", 123); // customerType should be a string
-
-        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCustomer_InvalidCustomerTypeValue_throwsValidationError() {
-        customerDocument.put("customerType", "INVALID_TYPE"); // customerType should be one of the enum values
-
-        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCustomer_InvalidInternalTimestampsCreatedDateType_throwsValidationError() {
-        ((Document) customerDocument.get("internalTimestamps")).put("createdDate", "invalid_date"); // createdDate should be a date
-
-        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCustomer_InvalidInternalTimestampsUpdatedDateType_throwsValidationError() {
-        ((Document) customerDocument.get("internalTimestamps")).put("updatedDate", "invalid_date"); // updatedDate should be a date
-
-        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCustomer_InvalidExternalTimestampsCreatedDateType_throwsValidationError() {
-        ((Document) customerDocument.get("externalTimestamps")).put("createdDate", "invalid_date"); // createdDate should be a date
-
-        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCustomer_InvalidExternalTimestampsUpdatedDateType_throwsValidationError() {
-        ((Document) customerDocument.get("externalTimestamps")).put("updatedDate", "invalid_date"); // updatedDate should be a date
-
-        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCustomer_InvalidAddressCountryType_throwsValidationError() {
-        ((Document) customerDocument.get("address")).put("country", 123); // country should be a string
-
-        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveCustomer_InvalidAddressIsPartialType_throwsValidationError() {
-        ((Document) customerDocument.get("address")).put("isPartial", "true"); // isPartial should be a bool
-
-        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
 }

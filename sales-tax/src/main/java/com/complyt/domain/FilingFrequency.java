@@ -3,5 +3,10 @@ package com.complyt.domain;
 public enum FilingFrequency {
     MONTHLY,
     QUARTERLY,
-    ANNUALLY
+    ANNUALLY,
+    MONTHLY_PREPAY,
+    BI_MONTHLY,
+    OFF_QUARTERLY,
+    SEMI_ANNUALLY,
+    CASUAL
 }

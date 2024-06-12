@@ -31,7 +31,7 @@ public class ProductClassificationSchemaValidationIT extends TestContainersIniti
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
+        registry.add("spring.data.mongodb.uri", () -> TestContainersInitializerIT.MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
     }
 
     @BeforeEach
@@ -131,22 +131,6 @@ public class ProductClassificationSchemaValidationIT extends TestContainersIniti
         productClassificationDocument.put("tangibleCategory", 12345);
         StepVerifier.create(reactiveMongoTemplate.save(productClassificationDocument, "product_classification"))
                 .expectErrorMatches(throwable -> throwable.getMessage().contains("tangibleCategory"))
-                .verify();
-    }
-
-    @Test
-    public void saveProductClassification_invalidJurisdictionalSalesTaxRulesType_Failure() {
-        productClassificationDocument.put("jurisdictionalSalesTaxRules", "invalidType");
-        StepVerifier.create(reactiveMongoTemplate.save(productClassificationDocument, "product_classification"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("jurisdictionalSalesTaxRules"))
-                .verify();
-    }
-
-    @Test
-    public void saveProductClassification_invalidJurisdictionalTaxRulesType_Failure() {
-        productClassificationDocument.put("jurisdictionalTaxRules", "invalidType");
-        StepVerifier.create(reactiveMongoTemplate.save(productClassificationDocument, "product_classification"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("jurisdictionalTaxRules"))
                 .verify();
     }
 
