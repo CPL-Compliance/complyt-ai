@@ -503,7 +503,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "Canada", "", "", "", false,null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "Canada", "", "", "", false, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -556,6 +556,56 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "Canada", "", "", "", true, null, item))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(LinkedHashMap.class)
+                .value(transaction -> {
+                    assertNotNull(transaction.get("salesTax"));
+                    assertNull(((LinkedHashMap) transaction.get("salesTax")).get("salesTaxRates"));
+                    assertNotNull(((LinkedHashMap) transaction.get("salesTax")).get("gtRates"));
+                });
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_NonUsaCountryNotExistInGTDB_Returns404NotFound() {
+        String externalId = "ThirdNonExistingIdForExemptionChecks";
+        String item = TestUtilities.customItem(null, BigDecimal.valueOf(1000), BigDecimal.valueOf(1), null);
+
+
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "Ukraine", "", "", "", true, null, item))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_NonUsaCountryWithMisspellRegion_Returns200() {
+        String externalId = "ThirdNonExistingIdForExemptionChecks";
+        String item = TestUtilities.customItem(null, BigDecimal.valueOf(1000), BigDecimal.valueOf(1), null);
+
+
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "Canada", "", "", "QUEBEK", true, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -691,6 +741,36 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectBody(LinkedHashMap.class)
                 .value(map -> {
                     assertNotNull(map.get("salesTax"));
+                });
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_NonUsaCountryWithRegionThatDoesNotExist_Returns200TaxOfOnlyCountry() {
+        String externalId = "ThirdNonExistingIdForExemptionChecks";
+        String item = TestUtilities.customItem(null, BigDecimal.valueOf(1000), BigDecimal.valueOf(1), null);
+
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "Canada", "", "", "not_existing", true, null, item))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(LinkedHashMap.class)
+                .value(transaction -> {
+                    assertNotNull(transaction.get("salesTax"));
+                    assertNull(((LinkedHashMap) transaction.get("salesTax")).get("salesTaxRates"));
+                    assertNotNull(((LinkedHashMap) transaction.get("salesTax")).get("gtRates"));
+                    assertNull(((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("gtRates")).get("regionRate"));
+                    assertEquals(((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("gtRates")).get("countryRate"), 0.05);
+                    assertEquals(((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("gtRates")).get("taxRate"), 0.05);
                 });
     }
 
@@ -1593,7 +1673,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, null, true,null, "Il", createdDate))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, null, true, null, "Il", createdDate))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);

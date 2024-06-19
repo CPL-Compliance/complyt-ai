@@ -19,7 +19,7 @@ public interface SalesTaxRatesServiceProxy {
     );
 
     @GetMapping("/v1/gt_rates")
-    Mono<ComplytGtRatesDto> findGstByAddress(
+    Mono<ComplytGtRatesDto> findGtByAddress(
             @RequestParam(name = "country") String country,
             @RequestParam(name = "region") String region
     );

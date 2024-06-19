@@ -3,4 +3,7 @@ package integration.services.sales_tax_rates;
 public interface ComplytGtRatesEndpointsITTemplate {
     void findByAddress_FindsGtAddressWithCountryAndRegion_ReturnsComplytGtRates();
     void findByAddress_FindsGtAddressWithOnlyCountry_ReturnsComplytGtRates();
+    void findByAddress_FindsGtAddressWithCountryAndRegionMisspell_ReturnsComplytGtRates();
+    void findByAddress_FindsGtAddressWithCountryDoesNotExist_Return404NotFound();
+    void findByAddress_FindsGtAddressWithCountryAndRegionNotExist_ReturnsComplytGtRates();
 }

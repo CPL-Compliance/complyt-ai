@@ -29,6 +29,9 @@ public class ComplytGtRatesRepository {
 
 
         return ContextLogger.observeCtx("Searching for rates in gt_rates by requestAddress: " + query, log::info)
-                .then(reactiveMongoTemplate.findOne(query, ComplytGtRates.class));
+                .then(reactiveMongoTemplate.findOne(query, ComplytGtRates.class))
+                .doOnNext(complytGtRates -> log.info("Found gt rate: " + complytGtRates.toString()))
+                .switchIfEmpty(ContextLogger.observeCtx("GT rate with address " + gtAddress.toString() + " was not found", log::info)
+                        .then(Mono.empty()));
     }
 }

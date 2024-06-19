@@ -24,6 +24,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import testUtils.TestUtilities;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
@@ -97,4 +99,57 @@ public class ComplytGtRatesEnodpointsIT extends MongoContainerInitializerIT {
                 });
     }
 
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void findByAddress_FindsGtAddressWithCountryAndExsitingMispellRegion_ReturnsComplytGtRates() {
+        // Given
+        GtAddressDto canadaGtAddress = TestUtilities.createCanadaGtAddressDto();
+        ComplytGtRatesDto expectedComplytGtRatesDto = TestUtilities.createCanadaComplytGtRatesDto();
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(GtRatesRouter.BASE_URL)
+                        .queryParam("country", canadaGtAddress.country())
+                        .queryParam("region", "QUEBECQ")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ComplytGtRatesDto.class)
+                .value(returnedComplytGtRatesDto -> {
+                    assertEquals(returnedComplytGtRatesDto.gtAddress(), expectedComplytGtRatesDto.gtAddress());
+                    assertEquals(returnedComplytGtRatesDto.gtRates(), expectedComplytGtRatesDto.gtRates());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void findByAddress_FindsGtAddressWithCountryAndNotExistingMisspellRegion_ReturnsComplytGtRatesOnlyOfCountry() {
+        // Given
+        GtAddressDto canadaGtAddress = TestUtilities.createCanadaGtAddressDto();
+        ComplytGtRatesDto expectedComplytGtRatesDto = TestUtilities.createCanadaComplytGtRatesDto();
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(GtRatesRouter.BASE_URL)
+                        .queryParam("country", canadaGtAddress.country())
+                        .queryParam("region", "not_existing")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ComplytGtRatesDto.class)
+                .value(returnedComplytGtRatesDto -> {
+                    assertEquals(expectedComplytGtRatesDto.gtAddress().withRegion(null), returnedComplytGtRatesDto.gtAddress());
+                    assertEquals(expectedComplytGtRatesDto.gtRates()
+                            .withRegionRate(null)
+                            .withTaxRate(expectedComplytGtRatesDto.gtRates().countryRate()), returnedComplytGtRatesDto.gtRates());
+                });
+    }
 }

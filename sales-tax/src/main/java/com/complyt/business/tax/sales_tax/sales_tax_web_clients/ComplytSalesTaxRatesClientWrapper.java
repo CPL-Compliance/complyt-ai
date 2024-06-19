@@ -7,6 +7,7 @@ import com.complyt.domain.transaction.Address;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
+import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -29,12 +30,12 @@ public class ComplytSalesTaxRatesClientWrapper implements SalesTaxRatesWebClient
     public Mono<ComplytSalesTaxRates> findByAddress(String state, String country, String county, String city, String street, String zip, String region, boolean isPartial) {
         return salesTaxRatesServiceProxy.findByAddress(state, country, county, city, street, zip, isPartial)
                 .retryWhen(Retry.backoff(5, Duration.ofMillis(10))
-                        .filter(throwable -> !(throwable instanceof ObjectNotFoundApiException))
+                        .filter(throwable -> !(throwable instanceof FeignException.NotFound))
                         .onRetryExhaustedThrow(
                                 ((retryBackoffSpec, retrySignal) ->
                                         new ComplytSalesTaxRatesException(retrySignal.totalRetries() + " Retries Exhausted")
-                                )))
-                .map(ComplytSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesDtoToComplytSalesTaxRates);
+                                ))).map(ComplytSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesDtoToComplytSalesTaxRates)
+                .onErrorMap(FeignException.NotFound.class, notFound -> new ObjectNotFoundApiException());
     }
 
     @Override

@@ -32,6 +32,8 @@ import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.sales_tax.gt.GtRatesDto;
 import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.validators.body_checkers.transaction.*;
+import feign.FeignException;
+import feign.Request;
 import org.springframework.data.mongodb.core.query.Update;
 import reactor.core.publisher.Flux;
 
@@ -127,7 +129,7 @@ public class UnitTestUtilities {
     }
 
     public static List<Exemption> createNonUsaExemptionsListFromWrapper(ExemptionWrapper exemptionWrapper) {
-        List<Exemption> exemptionList = new ArrayList<>(){{
+        List<Exemption> exemptionList = new ArrayList<>() {{
             add(exemptionWrapper.exemption().withState(null));
         }};
 
@@ -512,7 +514,6 @@ public class UnitTestUtilities {
     }
 
 
-
     public Exemption createExemption(String id) {
         String country = "USA";
         State state = new State("CA", "02", "California");
@@ -669,7 +670,7 @@ public class UnitTestUtilities {
 
     public ClientTrackingDtoTenant createClientTrackingDtoTenant(String tenantId) {
         String date = localDateTime.toString();
-        TimestampsDto internalTimestamps =  new TimestampsDto(date,date);
+        TimestampsDto internalTimestamps = new TimestampsDto(date, date);
         return new ClientTrackingDtoTenant(new NexusDto(localDateTime), "client dope", internalTimestamps, tenantId, null);
     }
 
@@ -833,5 +834,12 @@ public class UnitTestUtilities {
             put("C6S1", item2ProductClassification);
             put("C3S1", item3ProductClassification);
         }};
+    }
+
+    public FeignException.NotFound create404NodFoundFeignException() {
+        return new FeignException.NotFound("not found",
+                Request.create(Request.HttpMethod.GET, "sales_tax_rates_uri",
+                        Map.of("Authorization", List.of("Dummy Bearer")),
+                        null, null, null), null, Map.of("Authorization", List.of("Dummy Bearer")));
     }
 }

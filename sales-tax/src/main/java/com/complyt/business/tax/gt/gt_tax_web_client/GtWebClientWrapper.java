@@ -8,6 +8,7 @@ import com.complyt.domain.transaction.tax.ComplytGtRates;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.ComplytGtRatesMapper;
+import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -28,13 +29,14 @@ public class GtWebClientWrapper implements SalesTaxRatesWebClientWrapper<Complyt
     public Mono<ComplytGtRates> findByAddress(String state, String country, String county, String city, String street, String zip, String region, boolean isPartial) {
         String standardizedCountry = CountryToStandardizedCountry.standardize(country);
 
-        return salesTaxRatesServiceProxy.findGstByAddress(standardizedCountry, region)
+        return salesTaxRatesServiceProxy.findGtByAddress(standardizedCountry, region)
                 .retryWhen(Retry.backoff(5, Duration.ofMillis(10))
-                        .filter(throwable -> !(throwable instanceof ObjectNotFoundApiException))
+                        .filter(throwable -> !(throwable instanceof FeignException.NotFound))
                         .onRetryExhaustedThrow(
                                 ((retryBackoffSpec, retrySignal) ->
                                         new ComplytSalesTaxRatesException(retrySignal.totalRetries() + " Retries Exhausted")
-                                ))).map(ComplytGtRatesMapper.INSTANCE::complytGtRatesDtoToComplytGtRates);
+                                ))).map(ComplytGtRatesMapper.INSTANCE::complytGtRatesDtoToComplytGtRates)
+                .onErrorMap(FeignException.NotFound.class, notFound -> new ObjectNotFoundApiException());
     }
 
     @Override
