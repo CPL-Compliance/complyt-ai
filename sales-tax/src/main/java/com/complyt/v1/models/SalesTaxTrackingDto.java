@@ -35,7 +35,7 @@ public record SalesTaxTrackingDto(
         boolean approved,
         LocalDateTime approvalDate,
         @Schema(description = FieldsDescriptions.FILING_FREQUENCY) FilingFrequencyDto filingFrequency,
-        RegisteredTypeDto registered,
+        @Schema(description = FieldsDescriptions.REGISTERED) RegisteredTypeDto registered,
         LocalDateTime registrationDate,
         String subsidiary,
         String establishedBy)

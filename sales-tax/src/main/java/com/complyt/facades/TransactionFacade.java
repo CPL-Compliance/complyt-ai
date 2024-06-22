@@ -9,6 +9,7 @@ import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
 import com.complyt.services.nexus.NexusService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
+import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -18,6 +19,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
+
+import static com.complyt.v1.mappers.StringToLocalDateTimeMapper.log;
 
 @AllArgsConstructor
 @Component
@@ -131,8 +134,7 @@ public class TransactionFacade {
 
     public Flux<Transaction> getAll(int page, int size) {
         return transactionService.findAll(page, size)
-                .flatMapSequential(transaction -> getCustomerByTransaction(transaction)
-                        .map(transaction::withCustomer));
+                .flatMapSequential(this::validateTransaction);
     }
 
     public Flux<Transaction> getAllBySource(String source) {
@@ -160,9 +162,9 @@ public class TransactionFacade {
     public Mono<Transaction> removeTransactionFromNexusTracking(Transaction transaction) {
         return findSalesTaxTrackingByTransaction(transaction)
                 .flatMap(salesTaxTracking -> nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking))
-                        .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ? Mono.empty() :
-                                nexusService.removeFromNexusTracking(transaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()).flatMap(salesTaxTrackingService::save))
-                        .thenReturn(transaction);
+                .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ? Mono.empty() :
+                        nexusService.removeFromNexusTracking(transaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()).flatMap(salesTaxTrackingService::save))
+                .thenReturn(transaction);
     }
 
     public Mono<SalesTaxTracking> findSalesTaxTrackingByTransaction(@NonNull Transaction transaction) {
@@ -170,5 +172,12 @@ public class TransactionFacade {
                 .switchIfEmpty(salesTaxTrackingService.findByCountryStateAndSubsidiary(transaction.getShippingAddress().country(), transaction.getShippingAddress().state(), null))
                 .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new));
 
+    }
+
+    private Mono<Transaction> validateTransaction(Transaction transaction) {
+        return Mono.justOrEmpty(transaction.getCustomer())
+                .switchIfEmpty(ContextLogger.observeCtx("Customer was not found: " + transaction, log::info)
+                        .then(Mono.error(new ObjectNotFoundApiException())))
+                .thenReturn(transaction);
     }
 }

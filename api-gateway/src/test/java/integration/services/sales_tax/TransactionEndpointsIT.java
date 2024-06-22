@@ -20,6 +20,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     private final String source = "1";
     private final String state = "CA";
     private final String createdDate = "2023-02-05";
+//    String createdDate = "2024-01-01T00:00:00.000+00:00";
     private final String exemptedState = "PA";
     private final String customerId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
 

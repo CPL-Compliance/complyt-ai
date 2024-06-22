@@ -93,6 +93,8 @@ public interface FieldsDescriptions {
 
     String FILING_FREQUENCY = "Tracks the filing frequency determined by the state";
 
+    String REGISTERED = "Tracks the registered status of the state";
+
     // In Item
 
     String UNIT_PRICE = "The price of one unit, can be positive and negative";

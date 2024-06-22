@@ -318,7 +318,6 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.findAll(0, allTransactions.size())).thenReturn(Flux.fromIterable(allTransactions));
-        when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
         Flux<Transaction> returnedCustomers = transactionFacade.getAll(0, allTransactions.size());
 
         // Then
@@ -708,11 +707,10 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.findAll(0, transactions.size())).thenReturn(Flux.fromIterable(transactions));
-        when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
         Flux<Transaction> transactionFlux = transactionFacade.getAll(0, transactions.size());
 
         // Then
-        StepVerifier.create(transactionFlux).expectNext(transaction.withCustomer(customer), anotherTransactionWithSameClientId.withCustomer(customer)).verifyComplete();
+        StepVerifier.create(transactionFlux).expectNext(transaction, anotherTransactionWithSameClientId).verifyComplete();
     }
 
     @Test
