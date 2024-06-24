@@ -64,5 +64,12 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_NotSupportedNonUsaCountryNo_Returns400();
 
     void upsertByExternalIdAndSource_TransactionWithSubsidiaryA_Returns201AndPassesNexus();
+
     void upsertByExternalIdAndSource_TransactionWithSubsidiaryB_Returns201AndHasSalesTax();
+
+    void upsertByExternalIdAndSource_NonUsaCountryWithRegionThatDoesNotExist_Returns200TaxOfOnlyCountry();
+
+    void upsertByExternalIdAndSource_NonUsaCountryWithMisspellRegion_Returns200();
+
+    void upsertByExternalIdAndSource_NonUsaCountryNotExistInGTDB_Returns404NotFound();
 }

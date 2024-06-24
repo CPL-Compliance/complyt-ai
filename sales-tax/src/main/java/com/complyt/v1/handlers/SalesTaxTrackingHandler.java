@@ -90,6 +90,7 @@ public class SalesTaxTrackingHandler {
 
         return ContextLogger.observeCtx(logStr, log::info)
                 .then(salesTaxTrackingDtoValidationHandler.handle(serverRequest))
+                .flatMap(salesTaxTrackingDto -> ContextLogger.observeCtx("--> Body: " + salesTaxTrackingDto, log::info).thenReturn(salesTaxTrackingDto))
                 .flatMap(salesTaxTrackingDto -> {
 
                     String country = salesTaxTrackingDto.country();

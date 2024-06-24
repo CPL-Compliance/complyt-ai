@@ -16,7 +16,7 @@
 
     <!-- Maven Coordinates -->
     <artifactId>authentication</artifactId>
-    <version>0.28.0-SNAPSHOT</version>
+    <version>0.29.0-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <name>authentication</name>
@@ -165,10 +165,6 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>

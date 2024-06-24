@@ -18,6 +18,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,9 +31,12 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
     @Mock
     SalesTaxRatesServiceProxy salesTaxRatesServiceProxy;
 
+    UnitTestUtilities testUtilities;
+
     @BeforeEach
     void setUp() {
-
+        testUtilities = new UnitTestUtilities(
+                LocalDateTime.now(), UUID.randomUUID().toString());
     }
 
     @Test
@@ -48,14 +54,30 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
         // Then
         StepVerifier.create(complytSalesTaxRatesMono).expectNext(complytSalesTaxRates).verifyComplete();
     }
+
     @Test
     void findByAddress_invalidAddress_ReturnsObjectNotFoundApiException() {
+        // Given
+        Address address = testUtilities.createAddressInCalifornia();
+
+        // When
+        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial()))
+                .thenReturn(Mono.error(testUtilities.create404NodFoundFeignException()));
+
+        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address);
+
+        // Then
+        StepVerifier.create(complytSalesTaxRatesMono).expectError(ObjectNotFoundApiException.class).verify();
+    }
+
+    @Test
+    void findByAddress_Returns404InternalError_ReturnsObjectNotFoundApiException() {
         // Given
         Address address = UnitTestUtilities.createAddressInCalifornia();
 
         // When
         when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial()))
-                .thenReturn(Mono.error(new ObjectNotFoundApiException()));
+                .thenReturn(Mono.error(testUtilities.create404NodFoundFeignException()));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address);
 
@@ -64,19 +86,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
     }
 
     @Test
-    void findByAddress_Returns500InternalError_ThrowsAnError() {
-        // Given
-        Address address = UnitTestUtilities.createAddressInCalifornia();
-
-        // When
-        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial())).thenReturn(Mono.error(new ObjectNotFoundApiException()));
-        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address);
-
-        // Then
-        StepVerifier.create(complytSalesTaxRatesMono).expectError(ObjectNotFoundApiException.class).verify();
-    }
-    @Test
-    void findByAddress_RatesServiceIsUnavailable_is10RetriesExhausted() {
+    void findByAddress_RatesServiceIsUnavailable_is5RetriesExhausted() {
         // Given
         Address address = UnitTestUtilities.createAddressInCalifornia();
 

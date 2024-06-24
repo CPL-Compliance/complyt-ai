@@ -49,7 +49,7 @@ public class SalesTaxTrackingRepository {
 
                     StringBuilder stringBuilder = new StringBuilder("Searching for sales tax tracking with country " + country);
                     stringBuilder = state != null ? stringBuilder.append(" and with state " + state) : stringBuilder;
-                    stringBuilder.append(" and tenant ID " + tenantId);
+                    stringBuilder.append(" and tenant ID " + tenantId + ", " + "and subsidiary: " + subsidiary);
 
                     return ContextLogger.observeCtx(stringBuilder.toString(), log::info)
                             .then(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class));
