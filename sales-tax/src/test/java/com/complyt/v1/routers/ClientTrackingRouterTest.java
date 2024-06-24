@@ -115,7 +115,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
                 .expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = map.get("message").toString();
-                    assertTrue(message.contains("page has to be numeric"));
+                    assertTrue(message.contains("Page number must be a non-negative integer"));
                 });
     }
 

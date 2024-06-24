@@ -29,9 +29,9 @@ public interface DtoErrorMessages {
 
     String SOURCE_FORMAT_ERROR = "source has to be in range 1-10";
 
-    String PAGE_FORMAT_ERROR = "page has to be numeric";
+    String PAGE_FORMAT_ERROR = "Page number must be a non-negative integer.";
 
-    String SIZE_FORMAT_ERROR = "size has to be numeric";
+    String SIZE_FORMAT_ERROR = "Size must be a positive integer.";
 
     String EXTERNAL_ID_NOT_NULL_ERROR = "externalId can not be null or undefined";
 
