@@ -106,9 +106,7 @@ public class TransactionRepository {
                                     .as("customer"),
                             Aggregation.unwind("customer",true))
                             .withOptions(newAggregationOptions().cursorBatchSize(size).build());
-
-                    System.out.println(calculatedOffset);
-                    System.out.println(aggregation);
+                    
                     return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId + " with page " + page + " and size " + size, log::info)
                             .thenMany(reactiveMongoTemplate.aggregate(aggregation, Transaction.class));
                 });
