@@ -572,6 +572,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
+    // ukraine is missing from gt_rates collection
     public void upsertByExternalIdAndSource_NonUsaCountryNotExistInGTDB_Returns404NotFound() {
         String externalId = "ThirdNonExistingIdForExemptionChecks";
         String item = TestUtilities.customItem(null, BigDecimal.valueOf(1000), BigDecimal.valueOf(1), null);
