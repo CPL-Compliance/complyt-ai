@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -28,8 +30,10 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregationOptions;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -155,7 +159,6 @@ class TransactionRepositoryTest {
         // Given
         int page = 1;
         int size = 2;
-        int calculatedOffset = 0;
 
         String externalId = UUID.randomUUID().toString();
         UUID customerId = UUID.randomUUID();
@@ -165,15 +168,9 @@ class TransactionRepositoryTest {
             add(secondTransaction);
         }};
 
-
-        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()))
-                .skip(calculatedOffset)
-                .limit(size)
-                .with(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate"));
-
         //When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
-        when(reactiveMongoTemplate.find(query, Transaction.class)).thenReturn(Flux.fromIterable(allTransactions));
+        when(reactiveMongoTemplate.aggregate(any(), eq(Transaction.class))).thenReturn(Flux.fromIterable(allTransactions));
         Flux<Transaction> transactionFlux = transactionRepository.findAll(page, size);
 
         //Then
@@ -194,14 +191,9 @@ class TransactionRepositoryTest {
         // Creating the expected list (list of 2-4 transaction objects)
         List<Transaction> expectedList = transactionList.subList(calculatedOffset, Math.min(calculatedOffset + size, transactionList.size()));
 
-        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()))
-                .skip(calculatedOffset)
-                .limit(size)
-                .with(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate"));
-
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
-        when(reactiveMongoTemplate.find(eq(query), eq(Transaction.class))).thenReturn(Flux.fromIterable(expectedList));
+        when(reactiveMongoTemplate.aggregate(any(), eq(Transaction.class))).thenReturn(Flux.fromIterable(expectedList));
 
         // Then
         Flux<Transaction> transactionFlux = transactionRepository.findAll(page, size);
@@ -213,20 +205,14 @@ class TransactionRepositoryTest {
         // Given
         int page = 1;
         int size = 1;
-        int calculatedOffset = 0;
 
         String externalId = UUID.randomUUID().toString();
         UUID customerId = UUID.randomUUID();
         Transaction secondTransaction = transaction.withExternalId(externalId).withCustomerId(customerId);
 
-        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()))
-                .skip(calculatedOffset)
-                .limit(size)
-                .with(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate"));
-
         //When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
-        when(reactiveMongoTemplate.find(query, Transaction.class)).thenReturn(Flux.just(secondTransaction));
+        when(reactiveMongoTemplate.aggregate(any(), eq(Transaction.class))).thenReturn(Flux.just(secondTransaction));
         Flux<Transaction> transactionFlux = transactionRepository.findAll(page, size);
 
         //Then
