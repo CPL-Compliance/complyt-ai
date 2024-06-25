@@ -1025,7 +1025,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String invalidSource = "11";
+        String invalidSource = "16";
         Set<String> expectedErrors = new HashSet<>(List.of(DtoErrorMessages.SOURCE_FORMAT_ERROR));
 
         // When + Then
