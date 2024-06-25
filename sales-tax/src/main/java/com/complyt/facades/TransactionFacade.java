@@ -172,11 +172,4 @@ public class TransactionFacade {
                 .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new));
 
     }
-
-    private Mono<Transaction> validateTransaction(Transaction transaction) {
-        return Mono.justOrEmpty(transaction.getCustomer())
-                .switchIfEmpty(ContextLogger.observeCtx("Customer was not found: " + transaction, log::info)
-                        .then(Mono.empty()))
-                .thenReturn(transaction);
-    }
 }
