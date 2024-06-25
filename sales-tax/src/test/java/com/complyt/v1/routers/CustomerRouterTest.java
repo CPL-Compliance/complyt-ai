@@ -342,7 +342,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        String invalidSource = "11";
+        String invalidSource = "16";
         Set<String> expectedErrors = new HashSet<>(List.of(DtoErrorMessages.SOURCE_FORMAT_ERROR));
 
         // When + Then
