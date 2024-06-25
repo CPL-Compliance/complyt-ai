@@ -1375,16 +1375,16 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isOk()
                 .expectBodyList(Transaction.class)
                 .value(transactions -> {
-            LocalDateTime lastDate = null;
-            for (Transaction transaction : transactions) {
-                LocalDateTime currentDate = transaction.getExternalTimestamps().getCreatedDate();
-                if (lastDate != null) {
-                    Assertions.assertTrue(currentDate.isBefore(lastDate) || currentDate.isEqual(lastDate),
-                            "Transactions should be sorted by creation date in descending order");
-                }
-                lastDate = currentDate;
-            }
-        });
+                    LocalDateTime lastDate = null;
+                    for (Transaction transaction : transactions) {
+                        LocalDateTime currentDate = transaction.getExternalTimestamps().getCreatedDate();
+                        if (lastDate != null) {
+                            Assertions.assertTrue(currentDate.isBefore(lastDate) || currentDate.isEqual(lastDate),
+                                    "Transactions should be sorted by creation date in descending order");
+                        }
+                        lastDate = currentDate;
+                    }
+                });
     }
 
 

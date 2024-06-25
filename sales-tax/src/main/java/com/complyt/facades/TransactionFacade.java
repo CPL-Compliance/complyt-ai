@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -132,8 +133,7 @@ public class TransactionFacade {
     }
 
     public Flux<Transaction> getAll(int page, int size) {
-        return transactionService.findAll(page, size)
-                .flatMapSequential(this::validateTransaction);
+        return transactionService.findAll(page, size);
     }
 
     public Flux<Transaction> getAllBySource(String source) {
@@ -176,7 +176,7 @@ public class TransactionFacade {
     private Mono<Transaction> validateTransaction(Transaction transaction) {
         return Mono.justOrEmpty(transaction.getCustomer())
                 .switchIfEmpty(ContextLogger.observeCtx("Customer was not found: " + transaction, log::info)
-                        .then(Mono.error(new ObjectNotFoundApiException())))
+                        .then(Mono.empty()))
                 .thenReturn(transaction);
     }
 }

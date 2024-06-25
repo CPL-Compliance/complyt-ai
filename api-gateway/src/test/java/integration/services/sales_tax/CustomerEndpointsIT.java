@@ -599,7 +599,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .expectBodyList(LinkedHashMap.class)
                 .value(customersList -> {
                     LocalDateTime lastDate = null;
-                    for (int i=0; i<= size; i++) {
+                    for (int i = 0; i <= size; i++) {
                         String dateString = (String) ((LinkedHashMap<?, ?>) customersList.get(i).get("externalTimestamps")).get("createdDate");
                         LocalDateTime currentDate = LocalDateTime.parse(dateString);
                         if (lastDate != null) {

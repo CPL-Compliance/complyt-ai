@@ -265,7 +265,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         }};
 
         // When
-        when(transactionFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM_AGG, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.just(firstTransaction, secondTransaction));
+        when(transactionFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.just(firstTransaction, secondTransaction));
 
         // Then
         webTestClient
@@ -315,7 +315,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
 
         // When
-        when(transactionFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM_AGG, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
+        when(transactionFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
 
         // Then
         webTestClient

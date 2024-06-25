@@ -94,17 +94,17 @@ public class TransactionRepository {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     TypedAggregation<Transaction> aggregation = Aggregation.newAggregation(Transaction.class,
-                            Aggregation.match(Criteria.where("tenantId").is(tenantId)),
-                            Aggregation.sort(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate")),
-                            Aggregation.skip(calculatedOffset),
-                            Aggregation.limit(size),
-                            Aggregation.lookup()
-                                    .from("customer")
-                                    .localField("customerId")
-                                    .foreignField("complytId")
-                                    .pipeline(Aggregation.match(Criteria.where("tenantId").is(tenantId)))
-                                    .as("customer"),
-                            Aggregation.unwind("customer",true))
+                                    Aggregation.match(Criteria.where("tenantId").is(tenantId)),
+                                    Aggregation.sort(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate")),
+                                    Aggregation.skip(calculatedOffset),
+                                    Aggregation.limit(size),
+                                    Aggregation.lookup()
+                                            .from("customer")
+                                            .localField("customerId")
+                                            .foreignField("complytId")
+                                            .pipeline(Aggregation.match(Criteria.where("tenantId").is(tenantId)))
+                                            .as("customer"),
+                                    Aggregation.unwind("customer", true))
                             .withOptions(newAggregationOptions().cursorBatchSize(size).build());
 
                     return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId + " with page " + page + " and size " + size, log::info)

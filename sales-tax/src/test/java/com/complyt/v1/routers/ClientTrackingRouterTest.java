@@ -81,7 +81,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     @WithMockUser
     public void getAll_Exists_Returns200WithList() {
         // When
-        when(clientTrackingFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(clientTrackingList));
+        when(clientTrackingFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(clientTrackingList));
 
         // Then
         webTestClient
@@ -129,7 +129,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     @WithMockUser
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         // When
-        when(clientTrackingFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(emptyClientTrackingList));
+        when(clientTrackingFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(emptyClientTrackingList));
 
         // Then
         webTestClient

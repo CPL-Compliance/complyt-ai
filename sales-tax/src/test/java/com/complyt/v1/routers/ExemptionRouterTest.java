@@ -605,7 +605,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         }};
 
         // When
-        when(exemptionFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(exemptions));
+        when(exemptionFacade.findAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(exemptions));
 
 
         // Then
@@ -665,7 +665,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         List<ExemptionDto> exemptionDtos = new ArrayList<>();
 
         // When
-        when(exemptionFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
+        when(exemptionFacade.findAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
 
         // Then
         webTestClient

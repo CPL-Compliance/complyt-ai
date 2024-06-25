@@ -28,7 +28,7 @@ public class NonUsaAddressItemsJurisdictionalRulesInjector implements ItemsJuris
                 JurisdictionalTaxRules rules = classification.getJurisdictionalTaxRules().get(jurisdiction);
                 Item itemWithRules = item.withJurisdictionalTaxRules(rules);
 
-                log.info("fetching jurisdictionalRules from product classification");
+                log.info("Fetching jurisdictionalRules from product classification");
                 TaxableCategory category = itemWithRules.getJurisdictionalTaxRules().isTaxable() ?
                         TaxableCategory.TAXABLE : TaxableCategory.NOT_TAXABLE;
                 Item itemWithCategory = itemWithRules.withTaxableCategory(category);

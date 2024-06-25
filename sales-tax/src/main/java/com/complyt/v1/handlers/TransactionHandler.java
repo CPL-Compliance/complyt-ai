@@ -65,7 +65,7 @@ public class TransactionHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         String page = serverRequest.queryParam("page")
-                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM_AGG));
+                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM));
         String size = serverRequest.queryParam("size")
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE));
 
