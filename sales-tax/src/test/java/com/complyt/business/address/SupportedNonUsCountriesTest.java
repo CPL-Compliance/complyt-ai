@@ -242,6 +242,7 @@ public class SupportedNonUsCountriesTest {
         Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("CZECHIA"), "Czechia");
         Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("CZ"), "Czechia");
         Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("CZE"), "Czechia");
+        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("CZECH REPUBLIC"), "Czechia");
 
         Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("DENMARK"), "Denmark");
         Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("DK"), "Denmark");
@@ -624,6 +625,7 @@ public class SupportedNonUsCountriesTest {
         Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("NPL"), "Nepal");
 
         Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("NETHERLANDS"), "Netherlands");
+        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("THE NETHERLANDS"), "Netherlands");
         Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("NL"), "Netherlands");
         Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("NLD"), "Netherlands");
 
@@ -922,13 +924,13 @@ public class SupportedNonUsCountriesTest {
         Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("ARE"), "United arab emirates");
         Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("UAE"), "United arab emirates");
 
-        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("UNITED KINGDOM"), "United kingdom");
-        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("THE UNITED KINGDOM"), "United kingdom");
-        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("GREAT BRITAIN"), "United kingdom");
-        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND"), "United kingdom");
-        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("THE UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND"), "United kingdom");
-        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("GB"), "United kingdom");
-        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("GBR"), "United kingdom");
+        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("UNITED KINGDOM"), "United Kingdom");
+        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("THE UNITED KINGDOM"), "United Kingdom");
+        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("GREAT BRITAIN"), "United Kingdom");
+        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND"), "United Kingdom");
+        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("THE UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND"), "United Kingdom");
+        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("GB"), "United Kingdom");
+        Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("GBR"), "United Kingdom");
 
         Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("THE UNITED STATES MINOR OUTLYING ISLANDS"), "United states minor outlying islands");
         Assertions.assertEquals(SupportedNonUsCountries.nonUsaCountriesAbbreviations.get("UNITED STATES MINOR OUTLYING ISLANDS"), "United states minor outlying islands");
@@ -980,6 +982,6 @@ public class SupportedNonUsCountriesTest {
 
     @Test
     void countriesMapCount() {
-        Assertions.assertEquals(740, SupportedNonUsCountries.nonUsaCountriesAbbreviations.size());
+        Assertions.assertEquals(741, SupportedNonUsCountries.nonUsaCountriesAbbreviations.size());
     }
 }

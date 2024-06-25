@@ -240,6 +240,7 @@ public interface SupportedNonUsCountries {
         put("CZECHIA", "Czechia");
         put("CZ", "Czechia");
         put("CZE", "Czechia");
+        put("CZECH REPUBLIC", "Czechia");
 
         put("DENMARK", "Denmark");
         put("DK", "Denmark");
@@ -929,13 +930,13 @@ public interface SupportedNonUsCountries {
         put("ARE", "United arab emirates");
         put("UAE", "United arab emirates");
 
-        put("UNITED KINGDOM", "United kingdom");
-        put("THE UNITED KINGDOM", "United kingdom");
-        put("GREAT BRITAIN", "United kingdom");
-        put("UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", "United kingdom");
-        put("THE UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", "United kingdom");
-        put("GB", "United kingdom");
-        put("GBR", "United kingdom");
+        put("UNITED KINGDOM", "United Kingdom");
+        put("THE UNITED KINGDOM", "United Kingdom");
+        put("GREAT BRITAIN", "United Kingdom");
+        put("UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", "United Kingdom");
+        put("THE UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND", "United Kingdom");
+        put("GB", "United Kingdom");
+        put("GBR", "United Kingdom");
 
         put("THE UNITED STATES MINOR OUTLYING ISLANDS", "United states minor outlying islands");
         put("UNITED STATES MINOR OUTLYING ISLANDS", "United states minor outlying islands");

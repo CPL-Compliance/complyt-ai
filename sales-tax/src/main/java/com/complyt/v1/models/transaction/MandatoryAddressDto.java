@@ -15,7 +15,7 @@ public record MandatoryAddressDto(
         @Size(max = 100, message = "Address.county " + StringErrorMessages.MAX_100_ERROR) String county,
         @Size(max = 100, message = "Address.state " + StringErrorMessages.MAX_100_ERROR) String state,
         @Size(max = 200, message = "Address.street " + StringErrorMessages.MAX_200_ERROR) String street,
-        @Size(max = 20, message = "Address.region " + StringErrorMessages.MAX_20_ERROR) String region,
+        @Size(max = 50, message = "Address.region " + StringErrorMessages.MAX_20_ERROR) String region,
         @Size(max = 20, message = "Address.zip " + StringErrorMessages.MAX_20_ERROR) String zip,
         @Schema(description = "whether country, city or street are necessary") boolean isPartial) {
 
