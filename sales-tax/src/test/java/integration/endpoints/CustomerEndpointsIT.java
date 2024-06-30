@@ -1,6 +1,8 @@
 package integration.endpoints;
 
 import com.complyt.SalesTaxApplication;
+import com.complyt.domain.customer.Customer;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
@@ -24,6 +26,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.UUID;
@@ -602,6 +605,34 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .value(customers -> Assertions.assertEquals(customers.get(0).complytId().toString(), expectedComplyId))
                 .hasSize(size);
     }
+
+    @Order(0)
+    @Test
+    @WithMockUser
+    public void getAll_SortedByExternalTimestampsCreatedDate_ReturnsSortedEntries() {
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(customers -> {
+                    LocalDateTime lastDate = null;
+                    for (CustomerDto customer : customers) {
+                        LocalDateTime currentDate = LocalDateTime.parse(customer.externalTimestamps().createdDate());
+                        if (lastDate != null) {
+                            Assertions.assertTrue(currentDate.isBefore(lastDate) || currentDate.isEqual(lastDate),
+                                    "Customer should be sorted by creation date in descending order");
+                        }
+                        lastDate = currentDate;
+                    }
+                });
+    }
+
 
     @Order(1)
     @Override

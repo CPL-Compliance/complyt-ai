@@ -9,15 +9,19 @@ import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
 import com.complyt.services.nexus.NexusService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
+import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
+
+import static com.complyt.v1.mappers.StringToLocalDateTimeMapper.log;
 
 @AllArgsConstructor
 @Component
@@ -128,11 +132,8 @@ public class TransactionFacade {
                         .map(transaction::withCustomer));
     }
 
-
     public Flux<Transaction> getAll(int page, int size) {
-        return transactionService.findAll(page, size)
-                .flatMapSequential(transaction -> getCustomerByTransaction(transaction)
-                        .map(transaction::withCustomer));
+        return transactionService.findAll(page, size);
     }
 
     public Flux<Transaction> getAllBySource(String source) {
@@ -160,9 +161,9 @@ public class TransactionFacade {
     public Mono<Transaction> removeTransactionFromNexusTracking(Transaction transaction) {
         return findSalesTaxTrackingByTransaction(transaction)
                 .flatMap(salesTaxTracking -> nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking))
-                        .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ? Mono.empty() :
-                                nexusService.removeFromNexusTracking(transaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()).flatMap(salesTaxTrackingService::save))
-                        .thenReturn(transaction);
+                .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ? Mono.empty() :
+                        nexusService.removeFromNexusTracking(transaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()).flatMap(salesTaxTrackingService::save))
+                .thenReturn(transaction);
     }
 
     public Mono<SalesTaxTracking> findSalesTaxTrackingByTransaction(@NonNull Transaction transaction) {

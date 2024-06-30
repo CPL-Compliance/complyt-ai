@@ -3,13 +3,11 @@ package integration.services.sales_tax;
 import integration.TestContainersInitializerIT;
 import integration.test_utils.TestUtilities;
 import integration.test_utils.templates.endpoints.RepositoryConstant;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.http.MediaType;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
@@ -573,6 +571,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
+    // ukraine is missing from gt_rates collection
     public void upsertByExternalIdAndSource_NonUsaCountryNotExistInGTDB_Returns404NotFound() {
         String externalId = "ThirdNonExistingIdForExemptionChecks";
         String item = TestUtilities.customItem(null, BigDecimal.valueOf(1000), BigDecimal.valueOf(1), null);
@@ -1363,7 +1362,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void getAll_GetByParamPage_ReturnsExpectedPage() {
         int page = 2;
         int size = 1;
-        String expectedComplyId = "607f3926-61d3-40a4-9b3a-a6bf7c3a1d95";
+        String expectedComplyId = "4cfbbf0b-d3e5-4954-8a90-c9c2ec32e5f5";
 
         WEB_TEST_CLIENT
                 .get()
@@ -1399,6 +1398,36 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(transaction -> assertEquals(transaction.get(0).get("complytId"), expectedComplyId))
                 .value(transactionLst -> assertTrue(transactionLst.size() <= RepositoryConstant.DEFAULT_SIZE));
     }
+
+    @Order(0)
+    @Test
+    public void getAll_SortedByExternalTimestampsCreatedDate_ReturnsSortedEntries() {
+        int size = 5;
+
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL)
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(transactionList -> {
+                    LocalDateTime lastDate = null;
+                    for (int i=0; i<= size; i++) {
+                        String dateString = (String) ((LinkedHashMap<?, ?>) transactionList.get(i).get("externalTimestamps")).get("createdDate");
+                        LocalDateTime currentDate = LocalDateTime.parse(dateString);
+                        if (lastDate != null) {
+                            Assertions.assertTrue(currentDate.isBefore(lastDate) || currentDate.isEqual(lastDate),
+                                    "Transaction should be sorted by creation date in descending order");
+                        }
+                        lastDate = currentDate;
+                    }
+                });
+    }
+
 
     @Order(0)
     @Test

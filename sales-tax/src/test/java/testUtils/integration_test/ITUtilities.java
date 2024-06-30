@@ -28,12 +28,14 @@ public interface ITUtilities {
 
     String NON_EXISTING_COMPLYT_ID = "d18068f0-6d98-4b0d-ba19-4536f0b4173a";
 
+    String localDateTime = "2024-01-01T00:00:00.000+00:00";
+
     // if no items provided, puts a default stub
     static TransactionDto stubTransactionDto(String externalId, UUID customerId, ItemDto... items) {
         return new TransactionDto(null, externalId, "1", "INVUS1000",
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
                 false, null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false),
-                customerId, null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
+                customerId, null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(localDateTime, localDateTime),
                 TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD", null);
     } // note isTaxInclusive is false, finalTransactionAmount is zero
 
@@ -47,7 +49,7 @@ public interface ITUtilities {
     static CustomerDto stubCustomerDto(String externalId) {
         return new CustomerDto(null, externalId, "1",
                 "stub customer", null, "captaindope@gg.com", CustomerTypeDto.RETAIL,
-                null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()), "comment");
+                null,new TimestampsDto(localDateTime, localDateTime), "comment");
     }
 
     static SalesTaxTrackingDto stubSalesTaxTrackingDto(String country, StateDto state) {

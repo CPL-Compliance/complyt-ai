@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -53,7 +54,10 @@ public class CustomerRepository {
         int calculatedOffset = (page - 1) * size;
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
-                    Query query = Query.query(Criteria.where("tenantId").is(tenantId)).skip(calculatedOffset).limit(size);
+                    Query query = Query.query(Criteria.where("tenantId").is(tenantId))
+                            .skip(calculatedOffset).limit(size)
+                            .with(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate"));
+
                     return ContextLogger.observeCtx("Searching for customers with tenant ID " + tenantId + " with page " + page + " and size " + size, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Customer.class));
                 });

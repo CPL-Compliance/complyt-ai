@@ -1123,7 +1123,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         }};
 
         // When
-        when(customerFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(allCustomers));
+        when(customerFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(allCustomers));
 
         // Then
         webTestClient
@@ -1172,7 +1172,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         List<Customer> emptyCustomerList = new ArrayList<>();
 
         // When
-        when(customerFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(emptyCustomerList));
+        when(customerFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(emptyCustomerList));
 
         // Then
         webTestClient

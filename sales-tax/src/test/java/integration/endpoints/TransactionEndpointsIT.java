@@ -35,6 +35,7 @@ import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -1320,14 +1321,16 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @WithMockUser
     public void getAll_GetByParamPage_ReturnsExpectedPage() {
         int page = 2;
+        int size = 1;
+        String expectedComplyId = "4cfbbf0b-d3e5-4954-8a90-c9c2ec32e5f5";
 
-        String expectedComplyId = "134c9970-15f7-41e7-84a9-43073c955566";
         webTestClient
                 .mutateWith(csrf())
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL) // Set your API endpoint
                         .queryParam("page", page)
+                        .queryParam("size", size)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1355,6 +1358,33 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectBodyList(Transaction.class)
                 .value(transactions -> Assertions.assertEquals(transactions.get(0).getComplytId().toString(), expectedComplyId))
                 .value(transactions -> Assertions.assertTrue(transactions.size() <= RepositoryConstant.DEFAULT_PAGE_SIZE));
+    }
+
+    @Order(0)
+    @Test
+    @WithMockUser
+    public void getAll_SortedByExternalTimestampsCreatedDate_ReturnsSortedEntries() {
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(Transaction.class)
+                .value(transactions -> {
+                    LocalDateTime lastDate = null;
+                    for (Transaction transaction : transactions) {
+                        LocalDateTime currentDate = transaction.getExternalTimestamps().getCreatedDate();
+                        if (lastDate != null) {
+                            Assertions.assertTrue(currentDate.isBefore(lastDate) || currentDate.isEqual(lastDate),
+                                    "Transactions should be sorted by creation date in descending order");
+                        }
+                        lastDate = currentDate;
+                    }
+                });
     }
 
 

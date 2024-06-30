@@ -93,7 +93,6 @@ public class RegionLevelGtRatesCalculatorTest {
         BigDecimal taxRate = newRegionRate.add(gtRates.countryRate());
 
         GtRates expectedSalesTaxRate = gtRates.withTaxRate(taxRate).withRegionRate(newRegionRate);
-        System.out.println("gtRates: " + gtRates);
         // When
         GtRates actualSalesTaxRate = regionLevelGtRatesCalculator.calculate(taxableRegionRule, gtRates);
 

@@ -81,7 +81,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     @WithMockUser
     public void getAll_Exists_Returns200WithList() {
         // When
-        when(clientTrackingFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(clientTrackingList));
+        when(clientTrackingFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(clientTrackingList));
 
         // Then
         webTestClient
@@ -115,7 +115,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
                 .expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = map.get("message").toString();
-                    assertTrue(message.contains("page has to be numeric"));
+                    assertTrue(message.contains("Page number must be a non-negative integer"));
                 });
     }
 
@@ -129,7 +129,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     @WithMockUser
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         // When
-        when(clientTrackingFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(emptyClientTrackingList));
+        when(clientTrackingFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(emptyClientTrackingList));
 
         // Then
         webTestClient

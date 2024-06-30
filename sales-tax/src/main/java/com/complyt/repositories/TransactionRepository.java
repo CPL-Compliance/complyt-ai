@@ -6,7 +6,10 @@ import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -16,6 +19,8 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregationOptions;
 
 @Repository
 @Slf4j
@@ -85,12 +90,25 @@ public class TransactionRepository {
 
     public Flux<Transaction> findAll(int page, int size) {
         int calculatedOffset = (page - 1) * size;
+
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
-                    Query query = Query.query(Criteria.where("tenantId").is(tenantId)).skip(calculatedOffset).limit(size);
+                    TypedAggregation<Transaction> aggregation = Aggregation.newAggregation(Transaction.class,
+                                    Aggregation.match(Criteria.where("tenantId").is(tenantId)),
+                                    Aggregation.sort(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate")),
+                                    Aggregation.skip(calculatedOffset),
+                                    Aggregation.limit(size),
+                                    Aggregation.lookup()
+                                            .from("customer")
+                                            .localField("customerId")
+                                            .foreignField("complytId")
+                                            .pipeline(Aggregation.match(Criteria.where("tenantId").is(tenantId)))
+                                            .as("customer"),
+                                    Aggregation.unwind("customer", true))
+                            .withOptions(newAggregationOptions().cursorBatchSize(size).build());
 
-                    return ContextLogger.observeCtx("Searching for transactions by tenant ID" + tenantId + " with page " + page + " and size " + size, log::info)
-                            .thenMany(reactiveMongoTemplate.find(query, Transaction.class));
+                    return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId + " with page " + page + " and size " + size, log::info)
+                            .thenMany(reactiveMongoTemplate.aggregate(aggregation, Transaction.class));
                 });
     }
 

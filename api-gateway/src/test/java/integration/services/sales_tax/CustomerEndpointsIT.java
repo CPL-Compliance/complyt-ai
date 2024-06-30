@@ -3,12 +3,11 @@ package integration.services.sales_tax;
 import integration.TestContainersInitializerIT;
 import integration.test_utils.TestUtilities;
 import integration.test_utils.templates.endpoints.RepositoryConstant;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -581,6 +580,35 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .expectStatus().isOk()
                 .expectBodyList(LinkedHashMap.class)
                 .value(customer -> assertEquals(customer.get(0).get("complytId"), expectedComplyId));
+    }
+
+    @Order(0)
+    @Test
+    public void getAll_SortedByExternalTimestampsCreatedDate_ReturnsSortedEntries() {
+        int size = 5;
+
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL)
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(customersList -> {
+                    LocalDateTime lastDate = null;
+                    for (int i = 0; i <= size; i++) {
+                        String dateString = (String) ((LinkedHashMap<?, ?>) customersList.get(i).get("externalTimestamps")).get("createdDate");
+                        LocalDateTime currentDate = LocalDateTime.parse(dateString);
+                        if (lastDate != null) {
+                            Assertions.assertTrue(currentDate.isBefore(lastDate) || currentDate.isEqual(lastDate),
+                                    "CustomersList should be sorted by creation date in descending order");
+                        }
+                        lastDate = currentDate;
+                    }
+                });
     }
 
     @Order(1)
