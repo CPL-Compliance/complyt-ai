@@ -1,10 +1,8 @@
 package com.complyt.business.transaction;
 
-import com.complyt.domain.Taxable;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,17 +14,16 @@ import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class ItemsTotalCalculatorTest {
+class ItemsDiscountCalculatorTest {
 
     @InjectMocks
-    ItemsTotalCalculator itemsTotalCalculator;
+    ItemsDiscountCalculator itemsDiscountCalculator;
 
     Transaction transaction;
 
@@ -39,16 +36,14 @@ class ItemsTotalCalculatorTest {
     }
 
     @Test
-    void injectRecalculatedTotal_ItemsWithNoDiscount_CalculatedValueSameAsTotal() {
+    void injectRecalculatedTotalAfterDiscount_ItemsWithNoDiscount_CalculatedValueSameAsTotal() {
         // Given
-        ShippingFee shippingFee = transaction.getShippingFee();
         Transaction transactionAfterCalculation = transaction
-                .withItems(testUtilities.setCalculatedTotalOnItemList(transaction.getItems()))
-                .withShippingFee(shippingFee.withCalculatedTotal(shippingFee.getTotalPrice()));
+                .withItems(testUtilities.setCalculatedTotalOnItemList(transaction.getItems()));
 
 
         // When
-        Mono<Transaction> actualTransactionMono = itemsTotalCalculator.injectRecalculatedTotal(transaction);
+        Mono<Transaction> actualTransactionMono = itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(transaction);
 
         // Then
         StepVerifier.create(actualTransactionMono).expectNext(transactionAfterCalculation)
@@ -56,7 +51,7 @@ class ItemsTotalCalculatorTest {
     }
 
     @Test
-    void injectRecalculatedTotal_Items1WithDiscount_CalculatedValues() {
+    void injectRecalculatedTotalAfterDiscount_ItemsWithDiscount_CalculatedValues() {
         // Given
         ShippingFee shippingFee = transaction.getShippingFee();
         List<Item> itemList = List.of(
@@ -67,12 +62,11 @@ class ItemsTotalCalculatorTest {
         Transaction transactionWithDiscount = transaction.withItems(itemList);
 
         Transaction transactionAfterCalculation = transactionWithDiscount
-                .withItems(testUtilities.setCalculatedTotalOnItemList(transactionWithDiscount.getItems()))
-                .withShippingFee(shippingFee.withCalculatedTotal(shippingFee.getTotalPrice()));
+                .withItems(testUtilities.setCalculatedTotalOnItemList(transactionWithDiscount.getItems()));
 
 
         // When
-        Mono<Transaction> actualTransactionMono = itemsTotalCalculator.injectRecalculatedTotal(transactionWithDiscount);
+        Mono<Transaction> actualTransactionMono = itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(transactionWithDiscount);
 
         // Then
         StepVerifier.create(actualTransactionMono).expectNext(transactionAfterCalculation)
@@ -80,7 +74,7 @@ class ItemsTotalCalculatorTest {
     }
 
     @Test
-    void injectRecalculatedTotal_Items1WithDiscountShippingFeeNull_CalculatedValues() {
+    void injectRecalculatedTotalAfterDiscount_ItemsWithDiscountShippingFeeNull_CalculatedValues() {
         // Given
         List<Item> itemList = List.of(
                 transaction.getItems().get(0),
@@ -95,7 +89,7 @@ class ItemsTotalCalculatorTest {
 
 
         // When
-        Mono<Transaction> actualTransactionMono = itemsTotalCalculator.injectRecalculatedTotal(transactionWithDiscount);
+        Mono<Transaction> actualTransactionMono = itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(transactionWithDiscount);
 
         // Then
         StepVerifier.create(actualTransactionMono).expectNext(transactionAfterCalculation)
@@ -103,13 +97,13 @@ class ItemsTotalCalculatorTest {
     }
 
     @Test
-    void injectRecalculatedTotal_NullTransactionPassed_ThrowsException() {
+    void injectRecalculatedTotalAfterDiscount_NullTransactionPassed_ThrowsException() {
         // Given
         Transaction nullTransaction = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () ->
-                itemsTotalCalculator.injectRecalculatedTotal(nullTransaction));
+                itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(nullTransaction));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");

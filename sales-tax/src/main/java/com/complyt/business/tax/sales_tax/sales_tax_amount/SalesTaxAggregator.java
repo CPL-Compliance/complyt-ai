@@ -1,5 +1,6 @@
 package com.complyt.business.tax.sales_tax.sales_tax_amount;
 
+import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.Taxable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -24,6 +25,6 @@ public class SalesTaxAggregator {
 
         log.debug("Sales tax amount calculated : " + amount);
 
-        return amount.get();
+        return BigDecimalProcessor.removeTrailingZeros(amount.get());
     }
 }

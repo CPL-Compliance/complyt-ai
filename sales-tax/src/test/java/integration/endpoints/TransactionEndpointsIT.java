@@ -1,6 +1,7 @@
 package integration.endpoints;
 
 import com.complyt.SalesTaxApplication;
+import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
@@ -12,6 +13,7 @@ import com.complyt.v1.models.sales_tax.RatesMetaDataDto;
 import com.complyt.v1.models.sales_tax.SalesTaxDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.sales_tax.gt.GtRatesDto;
+import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.transaction.TransactionStatusDto;
@@ -37,6 +39,7 @@ import testUtils.integration_test.ITUtilities;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -107,7 +110,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(new MandatoryAddressDto(null, "Canada", null, null, "", "", null, false));
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1497.50000"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 
         // Then
         webTestClient
@@ -133,7 +136,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDtoNonUsaCountry(externalId, customerId)
                 .withShippingFee(ITUtilities.stubShippingFeeDto());
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1548.7500"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1548.75"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
         GtRatesDto shippingGtRates = new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.1475));
 
         // Then
@@ -167,7 +170,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO")); //salestaxtracking is approved and physical
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775.0000"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
                 BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
 
         // Then
@@ -203,7 +206,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO")
                 .withCountry("US")); //salestaxtracking is approved and physical
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775.0000"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
                 BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
 
         // Then
@@ -237,7 +240,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(new MandatoryAddressDto(null, "CA", null, null, "", "", null, false));
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1497.50000"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 
         // Then
         webTestClient
@@ -269,7 +272,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(new MandatoryAddressDto(null, "canada", null, null, "", "", null, false));
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1497.50000"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 
         // Then
         webTestClient
@@ -302,7 +305,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDtoNonUsaCountry(externalId, customerId)
                 .withTaxInclusive(true);
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1475.0000"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1475"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 
         // Then
         webTestClient
@@ -1461,7 +1464,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
-        BigDecimal itemSalesTaxAmount = ITUtilities.stubItemDto().totalPrice().multiply(new BigDecimal("0.2"));
+        BigDecimal itemSalesTaxAmount = new BigDecimal(ITUtilities.stubItemDto().totalPrice().multiply(new BigDecimal("0.2")).stripTrailingZeros().toPlainString());
 
         // Then
         webTestClient
@@ -1844,5 +1847,75 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest();
+    }
+
+    @Order(3)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_TransactionWithTransactionLevelDiscount_Returns201() {
+        // Given
+        String externalId = "10006"; // new externalID that does not exist
+        BigDecimal givenDiscount = BigDecimal.valueOf(100);
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId)
+                .withTransactionLevelDiscount(givenDiscount);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    BigDecimal totalActualGivenTransactionDiscount = BigDecimalProcessor.removeTrailingZeros(transactionDto.items().stream().map(ItemDto::relativeTransactionDiscount).reduce(BigDecimal.ZERO, BigDecimal::add));
+                    BigDecimal totalTransactionAmountAfterDiscount = BigDecimalProcessor.removeTrailingZeros(transactionDto.items().stream().map(ItemDto::calculatedTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
+
+                    assertEquals(givenDiscount, transactionDto.transactionLevelDiscount());
+                    assertEquals(givenDiscount, totalActualGivenTransactionDiscount);
+                    assertEquals(totalTransactionAmountAfterDiscount, transactionDto.totalItemsAmount());
+                });;
+    }
+
+    @Order(3)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_TransactionWithBothItemAndTransactionDiscount_Returns201() {
+        // Given
+        String externalId = "10007"; // new externalID that does not exist
+        BigDecimal givenDiscount = BigDecimal.valueOf(100);
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId);
+        TransactionDto transactionWithBothItemAndTransactionDiscount = givenTransaction
+                .withItems(givenTransaction.items().stream().map(itemDto -> itemDto.withDiscount(BigDecimal.valueOf(50))).collect(Collectors.toList()))
+                .withTransactionLevelDiscount(givenDiscount);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(transactionWithBothItemAndTransactionDiscount)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    BigDecimal totalActualGivenTransactionDiscount = BigDecimalProcessor.removeTrailingZeros(transactionDto.items().stream().map(ItemDto::relativeTransactionDiscount).reduce(BigDecimal.ZERO, BigDecimal::add));
+                    BigDecimal totalTransactionAmountAfterDiscount = BigDecimalProcessor.removeTrailingZeros(transactionDto.items().stream().map(ItemDto::calculatedTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
+                    BigDecimal totalGivenDiscount = BigDecimalProcessor.removeTrailingZeros(transactionDto.items().stream().map(itemDto -> itemDto.totalPrice().subtract(itemDto.calculatedTotal())).reduce(BigDecimal.ZERO, BigDecimal::add));
+
+                    assertEquals(givenDiscount, transactionDto.transactionLevelDiscount());
+                    assertEquals(givenDiscount, totalActualGivenTransactionDiscount);
+                    assertEquals(totalTransactionAmountAfterDiscount, transactionDto.totalItemsAmount());
+                    assertEquals(BigDecimal.valueOf(250), totalGivenDiscount);
+                });;
     }
 }

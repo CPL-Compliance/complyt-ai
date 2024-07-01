@@ -275,7 +275,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(receivedTransaction -> assertEquals(new BigDecimal(775), receivedTransaction.salesTax().amount().stripTrailingZeros()));
+                .value(receivedTransaction -> assertEquals(new BigDecimal(775), receivedTransaction.salesTax().amount()));
     }
 
     @Order(5)

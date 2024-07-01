@@ -1,10 +1,9 @@
 package com.complyt.business.sales_tax.sales_tax_amount;
 
 import com.complyt.business.tax.sales_tax.sales_tax_amount.SalesTaxAggregator;
+import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.transaction.Item;
-import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +47,7 @@ public class SalesTaxAggregatorTest {
         // Given
         BigDecimal expectedItemsSalesTaxAmount = transaction.getItems().stream().map(item -> item.getSalesTaxRates().taxRate().multiply(item.getCalculatedTotal())).reduce(BigDecimal::add).get();
         BigDecimal expectedShippingFeeSalesTaxAmount = transaction.getShippingFee().getSalesTaxRates().taxRate().multiply(transaction.getShippingFee().getCalculatedTotal());
-        BigDecimal expectedAmount = expectedItemsSalesTaxAmount.add(expectedShippingFeeSalesTaxAmount);
+        BigDecimal expectedAmount = BigDecimalProcessor.removeTrailingZeros(expectedItemsSalesTaxAmount.add(expectedShippingFeeSalesTaxAmount));
         List<Taxable> taxAbles = testUtilities.createTaxables(transaction);
 
         // When

@@ -59,6 +59,7 @@ class ItemDtoTest {
                 ", manualSalesTax=" + itemDto.manualSalesTax() +
                 ", manualSalesTaxRate=" + itemDto.manualSalesTaxRate() +
                 ", discount=" + itemDto.discount() +
+                ", relativeTransactionDiscount=" + itemDto.relativeTransactionDiscount() +
                 ", tangibleCategory=" + itemDto.tangibleCategory() +
                 ", taxableCategory=" + itemDto.taxableCategory() + "]";
 

@@ -69,6 +69,8 @@ public interface FieldsDescriptions {
 
     String TOTAL_DISCOUNT = "The total discount of all the items combined. calculated on save";
 
+    String TRANSACTION_LEVEL_DISCOUNT = "Defines a discount amount that affects the transaction as a whole, not limited to specific items within the transaction";
+
     String IS_TAX_INCLUSIVE = "Indicates whether tax is included in the total items price (true) or added as a separate charge (false).";
 
     String CURRENCY = "The currency of the transaction. not mandatory";
@@ -104,6 +106,8 @@ public interface FieldsDescriptions {
     String TOTAL_PRICE = "The total price of the unit prices time the quantity, can be positive and negative, value is before discount and sales tax";
 
     String DISCOUNT = "The discount of the line items, must be positive";
+
+    String RELATIVE_TRANSACTION_DISCOUNT = "The relative part of the transaction discount applied on the item. calculated on save";
 
     String CALCULATED_TOTAL = "The calculated price of the items. represents the total price (or amount time quantity if not provided), after discount. calculated on run time";
 

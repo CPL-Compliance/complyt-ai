@@ -1,5 +1,6 @@
 package com.complyt.business.transaction.items_amounts;
 
+import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.Taxable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,6 @@ public class TotalItemsAmountCalculator implements AmountCalculator<List<Taxable
         }
         log.debug("Total Items price calculated: " + amount);
 
-        return amount;
+        return BigDecimalProcessor.removeTrailingZeros(amount);
     }
 }

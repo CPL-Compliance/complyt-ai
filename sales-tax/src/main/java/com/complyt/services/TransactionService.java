@@ -22,9 +22,9 @@ public interface TransactionService extends CrudService<Transaction, String> {
 
     Flux<Transaction> getTransactionsByQuery(@NonNull Query query);
 
-    Mono<Transaction> injectDataToModifiedTransaction(@NonNull Transaction newTransaction, @NonNull Transaction oldTransaction);
+    Mono<Transaction> injectDataToTransaction(@NonNull Transaction newTransaction, @NonNull Transaction oldTransaction);
 
-    Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction);
+    Mono<Transaction> injectDataToTransaction(@NonNull Transaction transaction);
 
     Mono<Transaction> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction);
 

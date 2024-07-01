@@ -1,5 +1,6 @@
 package com.complyt.business.transaction.items_amounts;
 
+import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import lombok.NonNull;
@@ -22,6 +23,6 @@ public class TangibleItemsAmountCalculator implements AmountCalculator<List<Taxa
         }
         log.debug("Total Tangible items price calculated: " + amount);
 
-        return amount;
+        return BigDecimalProcessor.removeTrailingZeros(amount);
     }
 }

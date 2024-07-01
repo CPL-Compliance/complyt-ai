@@ -45,6 +45,7 @@ class TransactionDtoTest {
                 ", tangibleItemsAmount=" + transactionDto.tangibleItemsAmount() +
                 ", totalItemsAmount=" + transactionDto.totalItemsAmount() +
                 ", totalDiscount=" + transactionDto.totalDiscount() +
+                ", transactionLevelDiscount=" + transactionDto.transactionLevelDiscount() +
                 ", finalTransactionAmount=" + transactionDto.finalTransactionAmount() +
                 ", transactionFilingStatus=" + transactionDto.transactionFilingStatus() +
                 ", currency=" + transactionDto.currency() +

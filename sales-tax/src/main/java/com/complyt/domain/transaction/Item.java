@@ -10,6 +10,7 @@ import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 
@@ -18,6 +19,8 @@ import java.math.BigDecimal;
 @ToString
 @With
 @AllArgsConstructor
+@Data
+@Accessors(chain = true)
 public class Item implements Taxable, Discountable {
     private BigDecimal unitPrice;
     private BigDecimal quantity;
@@ -32,7 +35,8 @@ public class Item implements Taxable, Discountable {
     private GtRates gtRates;
     private boolean manualSalesTax;
     private BigDecimal manualSalesTaxRate;
-    private BigDecimal discount;
+    private BigDecimal discount; // This is the item given discount
+    private BigDecimal relativeTransactionDiscount; // This is the relative part of the transaction discount that should be applied to the item
     private TangibleCategory tangibleCategory;
     private TaxableCategory taxableCategory;
 

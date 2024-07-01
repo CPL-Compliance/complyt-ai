@@ -32,7 +32,8 @@ public class ApiExceptionConfig {
                 ConflictedDataApiException.class, HttpStatus.BAD_REQUEST,
                 PathVariableErrorException.class, HttpStatus.BAD_REQUEST,
                 QueryParamErrorException.class, HttpStatus.BAD_REQUEST,
-                InvalidPatchFieldException.class, HttpStatus.BAD_REQUEST
+                InvalidPatchFieldException.class, HttpStatus.BAD_REQUEST,
+                InvalidDiscountAmountException.class, HttpStatus.BAD_REQUEST
         );
     }
 }

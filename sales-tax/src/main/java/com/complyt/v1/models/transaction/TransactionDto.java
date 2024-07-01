@@ -2,6 +2,7 @@ package com.complyt.v1.models.transaction;
 
 import com.complyt.v1.api_info.FieldsDescriptions;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.error_messages.NumericErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.checkables.ExternalIdCheckable;
@@ -11,10 +12,7 @@ import com.complyt.v1.models.sales_tax.SalesTaxDto;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.With;
 
 import java.math.BigDecimal;
@@ -44,6 +42,7 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(description = FieldsDescriptions.TANGIBLE_ITEMS_AMOUNT) BigDecimal tangibleItemsAmount,
                              @Schema(description = FieldsDescriptions.TOTAL_ITEMS_AMOUNT) BigDecimal totalItemsAmount,
                              @Schema(description = FieldsDescriptions.TOTAL_DISCOUNT) BigDecimal totalDiscount,
+                             @Schema(description = FieldsDescriptions.TRANSACTION_LEVEL_DISCOUNT) @PositiveOrZero(message = "Transaction.transactionLevelDiscount " + NumericErrorMessages.MUST_BE_POSITIVE_ERROR) BigDecimal transactionLevelDiscount,
                              @Schema(description = FieldsDescriptions.FINAL_TRANSACTION_AMOUNT) BigDecimal finalTransactionAmount,
                              @Schema(description = FieldsDescriptions.TRANSACTION_FILING_STATUS) TransactionFilingStatusDto transactionFilingStatus,
                              @Schema(description = FieldsDescriptions.CURRENCY) String currency,

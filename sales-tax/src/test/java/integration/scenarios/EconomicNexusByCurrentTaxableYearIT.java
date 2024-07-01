@@ -265,7 +265,7 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(receivedTransaction -> assertEquals(new BigDecimal("775.0000"), receivedTransaction.salesTax().amount()));
+                .value(receivedTransaction -> assertEquals(new BigDecimal("775"), receivedTransaction.salesTax().amount()));
     }
 
     @Order(5)

@@ -224,7 +224,41 @@ public class UnitTestUtilities {
                 customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()),
                 null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
                 TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, curreny, null);
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, curreny, null);
+    }
+
+    public Transaction createTransactionWithCalculatedTotalItem(String id) {
+        String documentName = "INVUS1000";
+        Address billingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
+        Address shippingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
+        List<Item> items = createItemsWithCalculatedTotal(true, false, false);
+        Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
+        ShippingFee shippingFee = createShippingFee(true, false, false);
+        String curreny = "USD";
+
+        return new Transaction(UUID.randomUUID(), id, id, source,
+                documentName, items, false, billingAddress, shippingAddress,
+                customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()),
+                null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
+                TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, curreny, null);
+    }
+
+    public Transaction createTransactionWithThreeItemsAndCalculatedTotal(String id) {
+        String documentName = "INVUS1000";
+        Address billingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
+        Address shippingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
+        List<Item> items = createThreeItemsWithCalculatedTotal(true, false, false);
+        Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
+        ShippingFee shippingFee = createShippingFee(true, false, false);
+        String curreny = "USD";
+
+        return new Transaction(UUID.randomUUID(), id, id, source,
+                documentName, items, false, billingAddress, shippingAddress,
+                customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()),
+                null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
+                TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, curreny, null);
     }
 
     public Transaction createGtTransaction(String id) {
@@ -247,7 +281,7 @@ public class UnitTestUtilities {
                 createCustomerDto(customerIdOtherDomains.toString()), null,
                 TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE,
                 shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD", null);
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD", null);
     }
 
     public List<Item> createItems(boolean withJurisdictionalSalesTaxRules, boolean withJurisdictionalGtTaxRules, boolean withTangibleCategory) {
@@ -256,15 +290,55 @@ public class UnitTestUtilities {
                     "description", "name", "C1S1",
                     withJurisdictionalSalesTaxRules ? createJurisdictionalSalesTaxRules() : null,
                     withJurisdictionalGtTaxRules ? createJurisdictionalTaxRules() : null,
-                    null, null, false, BigDecimal.ZERO, null,
+                    null, null, false, BigDecimal.ZERO, null, null,
                     withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
             add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), null,
                     "description", "name", "C3S1",
                     withJurisdictionalSalesTaxRules ? createJurisdictionalSalesTaxRules() : null,
                     withJurisdictionalGtTaxRules ? createJurisdictionalTaxRules() : null,
-                    null, null, false, BigDecimal.ZERO, null,
+                    null, null, false, BigDecimal.ZERO, null, null,
                     withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
 
+        }};
+    }
+
+    public List<Item> createItemsWithCalculatedTotal(boolean withJurisdictionalSalesTaxRules, boolean withJurisdictionalGtTaxRules, boolean withTangibleCategory) {
+        return new ArrayList<>() {{
+            add(new Item(new BigDecimal(500), new BigDecimal(3), new BigDecimal(1500), new BigDecimal(1500),
+                    "description", "name", "C3S1",
+                    withJurisdictionalSalesTaxRules ? createJurisdictionalSalesTaxRules() : null,
+                    withJurisdictionalGtTaxRules ? createJurisdictionalTaxRules() : null,
+                    null, null, false, BigDecimal.ZERO, null, null,
+                    withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
+            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), new BigDecimal(8000),
+                    "description", "name", "C1S1",
+                    withJurisdictionalSalesTaxRules ? createJurisdictionalSalesTaxRules() : null,
+                    withJurisdictionalGtTaxRules ? createJurisdictionalTaxRules() : null,
+                    null, null, false, BigDecimal.ZERO, null, null,
+                    withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
+        }};
+    }
+
+    public List<Item> createThreeItemsWithCalculatedTotal(boolean withJurisdictionalSalesTaxRules, boolean withJurisdictionalGtTaxRules, boolean withTangibleCategory) {
+        return new ArrayList<>() {{
+            add(new Item(new BigDecimal(500), new BigDecimal(3), new BigDecimal(1500), new BigDecimal(1500),
+                    "description", "name", "C3S1",
+                    withJurisdictionalSalesTaxRules ? createJurisdictionalSalesTaxRules() : null,
+                    withJurisdictionalGtTaxRules ? createJurisdictionalTaxRules() : null,
+                    null, null, false, BigDecimal.ZERO, null, null,
+                    withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
+            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), new BigDecimal(8000),
+                    "description", "name", "C1S1",
+                    withJurisdictionalSalesTaxRules ? createJurisdictionalSalesTaxRules() : null,
+                    withJurisdictionalGtTaxRules ? createJurisdictionalTaxRules() : null,
+                    null, null, false, BigDecimal.ZERO, null, null,
+                    withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
+            add(new Item(new BigDecimal(1000), new BigDecimal(8), new BigDecimal(8000), new BigDecimal(8000),
+                    "description", "name", "C1S1",
+                    withJurisdictionalSalesTaxRules ? createJurisdictionalSalesTaxRules() : null,
+                    withJurisdictionalGtTaxRules ? createJurisdictionalTaxRules() : null,
+                    null, null, false, BigDecimal.ZERO, null, null,
+                    withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
         }};
     }
 
@@ -325,6 +399,18 @@ public class UnitTestUtilities {
                 ).collect(Collectors.toList());
     }
 
+    public List<Item> setCalculatedTotalAndRelativeDiscountOnItemsList(List<Item> items, BigDecimal relativeDiscountPercentageForNewAmountCalculation) {
+        return items.stream()
+                .map(item ->
+                        item.withRelativeTransactionDiscount(removeTrailingZeros(item.getCalculatedTotal().multiply(relativeDiscountPercentageForNewAmountCalculation)))
+                        .withCalculatedTotal(removeTrailingZeros(item.getCalculatedTotal().subtract(item.getCalculatedTotal().multiply(relativeDiscountPercentageForNewAmountCalculation))))
+                ).collect(Collectors.toList());
+    }
+
+    private BigDecimal removeTrailingZeros(BigDecimal integer){
+        return new BigDecimal(integer.stripTrailingZeros().toPlainString());
+    }
+
     public ShippingFee setCalculatedTotalOnShippingFee(ShippingFee shippingFee) {
         return shippingFee.withCalculatedTotal(shippingFee.getTotalPrice());
     }
@@ -332,9 +418,9 @@ public class UnitTestUtilities {
     public List<ItemDto> createItemDtosWithSalesTaxRate(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
             add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), new BigDecimal(8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
-                    createSalesTaxRatesDto(), null, false, BigDecimal.ZERO, null, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
+                    createSalesTaxRatesDto(), null, false, BigDecimal.ZERO, null, null, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
             add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), new BigDecimal(8000), "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
-                    createSalesTaxRatesDto(), null, false, BigDecimal.ZERO, null, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
+                    createSalesTaxRatesDto(), null, false, BigDecimal.ZERO, null, null, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
         }};
     }
 
@@ -352,19 +438,19 @@ public class UnitTestUtilities {
             add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), BigDecimal.ZERO,
                     "description", "name", "C1S1",
                     withJurisdictionalSalesTaxRules || withJurisdictionalGtTaxRules ? createJurisdictionalSalesTaxRulesDto() : null, null, null,
-                    false, BigDecimal.ZERO, null,
+                    false, BigDecimal.ZERO, null, null,
                     withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
             add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), BigDecimal.ZERO,
                     "description", "name", "C3S1",
                     withJurisdictionalSalesTaxRules || withJurisdictionalGtTaxRules ? createJurisdictionalSalesTaxRulesDto() : null,
-                    null, null, false, BigDecimal.ZERO, null,
+                    null, null, false, BigDecimal.ZERO, null, null,
                     withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
         }};
     }
 
     public ItemDto createItemDtoWithNegativeAmount(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ItemDto(new BigDecimal(-2000), new BigDecimal(4), new BigDecimal(-8000), null, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
-                null, null, false, BigDecimal.ZERO, null, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE);
+                null, null, false, BigDecimal.ZERO, null, null, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE);
     }
 
     public SalesTaxRates createSalesTaxRates() {

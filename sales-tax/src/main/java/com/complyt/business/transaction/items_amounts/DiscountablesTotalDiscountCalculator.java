@@ -1,5 +1,6 @@
 package com.complyt.business.transaction.items_amounts;
 
+import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.Discountable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,6 @@ public class DiscountablesTotalDiscountCalculator implements AmountCalculator<Li
 
         log.debug("Total discount of transaction calculated: " + discountAmount);
 
-        return discountAmount;
+        return BigDecimalProcessor.removeTrailingZeros(discountAmount);
     }
 }

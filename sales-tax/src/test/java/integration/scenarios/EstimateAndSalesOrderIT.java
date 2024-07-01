@@ -206,7 +206,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertEquals(new BigDecimal("9300.0000"), transactionDto.salesTax().amount()));
+                .value(transactionDto -> assertEquals(new BigDecimal("9300"), transactionDto.salesTax().amount()));
     }
 
     @Order(4)
@@ -233,6 +233,6 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertEquals(new BigDecimal("9300.0000"), transactionDto.salesTax().amount()));
+                .value(transactionDto -> assertEquals(new BigDecimal("9300"), transactionDto.salesTax().amount()));
     }
 }

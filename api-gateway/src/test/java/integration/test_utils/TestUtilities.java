@@ -160,7 +160,7 @@ public class TestUtilities {
     }
 
     public static String transactionJsonExample(String externalId, String customerId, String country, String state, String zip, String region, boolean isTaxInclusive, String subsidiary, String... items) {
-        return transactionWithCustomItems(externalId, customerId, null, true, country, state, zip, region, isTaxInclusive, subsidiary,
+        return transactionWithCustomItems(externalId, customerId, null, true, country, state, zip, region, isTaxInclusive, subsidiary, "0",
                 items);
     }
 
@@ -410,7 +410,7 @@ public class TestUtilities {
                 discount);
     }
 
-    public static String transactionWithCustomItems(String externalId, String customerId, String complytId, boolean isValidated, String country, String state, String zip, String region, boolean isTaxInclusive, String subsidiary,
+    public static String transactionWithCustomItems(String externalId, String customerId, String complytId, boolean isValidated, String country, String state, String zip, String region, boolean isTaxInclusive, String subsidiary, String transactionDiscount,
                                                     String... items) {
         return String.format("""
                         {
@@ -441,7 +441,8 @@ public class TestUtilities {
                                 "totalPrice": 0,
                                 "taxCode": "C6S1"
                             },
-                            "isTaxInclusive":%s
+                            "isTaxInclusive":%s,
+                            "transactionLevelDiscount":%s
                         }
                         """,
                 complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
@@ -455,7 +456,8 @@ public class TestUtilities {
                 region,
                 customerId,
                 isValidated ? "\"transactionType\": \"INVOICE\"," : "",
-                isTaxInclusive
+                isTaxInclusive,
+                transactionDiscount
         );
     }
 

@@ -20,7 +20,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,9 +35,16 @@ public interface ITUtilities {
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
                 false, null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false),
                 customerId, null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(localDateTime, localDateTime),
-                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD", null);
+                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD", null);
     } // note isTaxInclusive is false, finalTransactionAmount is zero
 
+    static TransactionDto stubTransactionDtoWithThreeItems(String externalId, UUID customerId, ItemDto... items) {
+        return new TransactionDto(null, externalId, "1", "INVUS1000",
+                List.of(items.length < 1 ? new ItemDto[]{stubItemDtoWithDiscount(BigDecimal.valueOf(500), BigDecimal.ZERO), stubItemDtoWithDiscount(BigDecimal.valueOf(1000), BigDecimal.ZERO), stubItemDtoWithDiscount(BigDecimal.valueOf(10000), BigDecimal.ZERO)} : items),
+                false, null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false),
+                customerId, null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
+                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD", null);
+    } // note isTaxInclusive is false, finalTransactionAmount is zero
 
     static TransactionDto stubTransactionDtoNonUsaCountry(String externalId, UUID customerId, ItemDto... items) {
         MandatoryAddressDto shippingAddress = new MandatoryAddressDto(null, "Canada", null, null, "", "Quebec", null, false);
@@ -68,7 +74,14 @@ public interface ITUtilities {
         return new ItemDto(new BigDecimal(10000), new BigDecimal(1), new BigDecimal(10000),
                 null, "some description", "Hardware", "C1S1",
                 null, null, null, false, BigDecimal.ZERO, null,
-                null, null);
+                null, null, null);
+    }
+
+    static ItemDto stubItemDtoWithDiscount(BigDecimal price, BigDecimal discount) {
+        return new ItemDto(price, new BigDecimal(1), price,
+                price, "some description", "Hardware", "C1S1",
+                null, null, null, false, BigDecimal.ZERO, discount,
+                null, null, null);
     }
 
     static ShippingFeeDto stubShippingFeeDto() {
@@ -530,4 +543,5 @@ public interface ITUtilities {
                 .append("tangibleCategory", "INTANGIBLE")
                 .append("jurisdictionalTaxRules", new Document());
     }
+
 }

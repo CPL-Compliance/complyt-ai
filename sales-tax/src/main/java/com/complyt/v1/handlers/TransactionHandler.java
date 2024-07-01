@@ -1,6 +1,5 @@
 package com.complyt.v1.handlers;
 
-import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.permissions.transaction.TransactionCreatePermission;

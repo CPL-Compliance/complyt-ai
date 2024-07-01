@@ -36,7 +36,7 @@ public class TransactionRepository {
     public Mono<Transaction> save(@NonNull Transaction transaction) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
-                    Transaction transactionWithTenantId = transaction.withTenantId(tenantId);
+                    Transaction transactionWithTenantId = transaction.setTenantId(tenantId);
 
                     return ContextLogger.observeCtx("Saving transaction: " + transactionWithTenantId.toString(), log::info)
                             .then(reactiveMongoTemplate.save(transactionWithTenantId));
@@ -45,7 +45,7 @@ public class TransactionRepository {
 
     public Flux<Transaction> saveAll(@NonNull List<Transaction> transactions) {
         return tenantResolver.resolve()
-                .map(tenantId -> transactions.stream().map(transaction -> transaction.withTenantId(tenantId)).collect(Collectors.toList()))
+                .map(tenantId -> transactions.stream().map(transaction -> transaction.setTenantId(tenantId)).collect(Collectors.toList()))
                 .flatMapMany(transactionsWithTenantId -> ContextLogger.observeCtx("Saving transactions: " + transactionsWithTenantId.toString(), log::info)
                         .thenMany(reactiveMongoTemplate.insertAll(transactionsWithTenantId)));
     }

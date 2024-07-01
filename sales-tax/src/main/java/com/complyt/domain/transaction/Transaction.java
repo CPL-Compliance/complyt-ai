@@ -5,6 +5,8 @@ import com.complyt.domain.properties.ComplytIdProperty;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.timestamps.Timestamps;
 import lombok.*;
+import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,11 +14,16 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-@Value
 @Builder
 @With
 @AllArgsConstructor
+@Getter
+@EqualsAndHashCode
+@ToString
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Document(collection = "transaction")
+@Data
+@Accessors(chain = true)
 public class Transaction implements ComplytIdProperty {
 
     UUID complytId;
@@ -44,6 +51,7 @@ public class Transaction implements ComplytIdProperty {
     BigDecimal totalItemsAmount;
     BigDecimal finalTransactionAmount; //todo: this field name might change - depends on sky
     BigDecimal totalDiscount;
+    BigDecimal transactionLevelDiscount;
     TransactionFilingStatus transactionFilingStatus;
     String currency;
     String subsidiary;

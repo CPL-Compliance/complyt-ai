@@ -6,7 +6,6 @@ import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.body_checkers.DtoBodyChecker;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.javatuples.Pair;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -20,13 +19,25 @@ import java.util.function.Function;
 @AllArgsConstructor
 public class TransactionTotalAmountChecker implements DtoBodyChecker<TransactionDto>, TransactionBodyFunctions {
 
-    // a transaction must have a positive sum
-    // this check was added when supporting negative total items was started
+    /**
+     * This method checks the total transaction amount after applying item-level and
+     * transaction-level discounts is positive or zero.
+     * It first calculates the total amount of items after item-level discounts,
+     * then applies the transaction-level discount if it exists.
+     * Finally, it verifies that the resulting transaction amount is not below zero.
+     *
+     * @param transactionDto the transaction data transfer object containing items
+     *                       and discounts information
+     * @return a Flux of Strings indicating the result of the transaction amount check
+     */
     @Override
-    // check if the discount is not larger than all the items total
     public Flux<String> check(@NonNull TransactionDto transactionDto) {
         return Flux.from(Mono.just(transactionDto.items())
                 .map(calculateTotalItemsAmountAfterDiscount())
+                .map(totalItemsAmountAfterItemsDiscount -> transactionDto.transactionLevelDiscount() != null ?
+                        totalItemsAmountAfterItemsDiscount.subtract(transactionDto.transactionLevelDiscount()) :
+                        totalItemsAmountAfterItemsDiscount
+                )
                 .flatMap(this::checkTransactionTotalAmountIsNotBelowZero));
     }
 

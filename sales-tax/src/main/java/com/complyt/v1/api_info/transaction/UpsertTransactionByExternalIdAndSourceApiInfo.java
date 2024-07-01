@@ -146,6 +146,7 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                },
                "transactionStatus": "ACTIVE",
                "transactionType": "INVOICE",
+               "transactionLevelDiscount": 0,
                "createdFrom": "string",
                "transactionFilingStatus": "NOT_FILED"
             }
@@ -163,6 +164,7 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                         "totalPrice": 0,
                         "calculatedTotal":0,
                         "discount":0,
+                        "relativeTransactionDiscount": 0,
                         "description": "string",
                         "name": "string",
                         "taxCode": "string",
@@ -305,6 +307,7 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                 "tangibleItemsAmount": 0,
                 "totalItemsAmount": 0,
                 "totalDiscount" :0,
+                "transactionLevelDiscount": 0,
                 "transactionFilingStatus": "NOT_FILED"
             }
             """;

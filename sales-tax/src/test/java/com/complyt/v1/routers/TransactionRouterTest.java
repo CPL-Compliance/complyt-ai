@@ -4815,7 +4815,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("-200"), new BigDecimal("5000"),
                 null, "desc", "HW Installation Services", "C1S1",
                 null, null, null, false, BigDecimal.ZERO,
-                null, null, null));
+                null, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of("Item.quantity " + NumericErrorMessages.NOT_NEGATIVE_ERROR);
@@ -4842,7 +4842,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", null, "C1S1", null,
-                null, null, false, BigDecimal.ZERO, null, null, null));
+                null, null, false, BigDecimal.ZERO, null, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4870,7 +4870,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", null, "C1S1", null,
-                null, null, false, BigDecimal.ZERO, null, null, null));
+                null, null, false, BigDecimal.ZERO, null, null, null,null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4898,7 +4898,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", "", "C1S1", null,
-                null, null, false, BigDecimal.ZERO, null, null, null));
+                null, null, false, BigDecimal.ZERO, null, null, null,null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4927,7 +4927,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", testUtilities.stringWithLength(257), "C1S1",
                 null, null, null, false, BigDecimal.ZERO,
-                null, null, null));
+                null, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4956,7 +4956,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"), null,
                 "desc", "HW Installation Services", null, null,
                 null, null, false, BigDecimal.ZERO,
-                null, null, null));
+                null, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4985,7 +4985,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"), null,
                 "desc", "HW Installation Services", testUtilities.stringWithLength(257),
                 null, null, null, false, BigDecimal.ZERO,
-                null, null, null));
+                null, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -5014,7 +5014,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", "HW Installation Services", "C1S1", null,
                 null, null, false, new BigDecimal("-0.5"),
-                null, null, null));
+                null, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -5043,7 +5043,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", "HW Installation Services", "C1S1",
                 null, null, null, false, new BigDecimal("0.5"),
-                null, null, null));
+                null, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(

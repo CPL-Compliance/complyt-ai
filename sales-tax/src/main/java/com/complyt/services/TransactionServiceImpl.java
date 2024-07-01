@@ -6,7 +6,7 @@ import com.complyt.business.strategy.StrategySelector;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.business.transaction.CityCountyProvider;
-import com.complyt.business.transaction.ItemsTotalCalculator;
+import com.complyt.business.transaction.DiscountCalculator;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
@@ -22,6 +22,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
@@ -29,7 +30,7 @@ import java.util.function.Function;
 @Service
 @AllArgsConstructor
 @Slf4j
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class TransactionServiceImpl implements TransactionService {
 
     @NonNull
@@ -51,7 +52,13 @@ public class TransactionServiceImpl implements TransactionService {
     private ComplytIdHandler<Transaction> complytIdHandler;
 
     @NonNull
-    ItemsTotalCalculator itemsTotalCalculator;
+    DiscountCalculator itemsDiscountCalculator;
+
+    @NonNull
+    DiscountCalculator transactionDiscountCalculator;
+
+    @NonNull
+    DiscountCalculator shippingFeeCalculator;
 
     @NonNull
     StrategySelector shippingAddressAlignmentStrategy;
@@ -89,25 +96,25 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Mono<Transaction> injectDataToModifiedTransaction(@NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
+    public Mono<Transaction> injectDataToTransaction(@NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
         Transaction newTransactionWithInternalTimestamps = modifiedTransaction
-                .withInternalTimestamps(originalTransaction.getInternalTimestamps());
+                .setInternalTimestamps(originalTransaction.getInternalTimestamps());
 
-        return injectCommonDataToNewAndModifiedTransaction(newTransactionWithInternalTimestamps)
+        return injectCommonDataToTransaction(newTransactionWithInternalTimestamps)
                 .map(ExistingTransactionInternalTimestampsInjector::new)
                 .map(ExistingTransactionInternalTimestampsInjector::inject);
     }
 
     @Override
-    public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
-        return injectCommonDataToNewAndModifiedTransaction(transaction)
+    public Mono<Transaction> injectDataToTransaction(@NonNull Transaction transaction) {
+        return injectCommonDataToTransaction(transaction)
                 .map(complytIdHandler::insertComplytIdToNew)
                 .map(NewTransactionInternalTimestampsInjector::new)
                 .map(NewTransactionInternalTimestampsInjector::inject);
     }
 
-    private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
-        return itemsTotalCalculator.injectRecalculatedTotal(transaction)
+    private Mono<Transaction> injectCommonDataToTransaction(Transaction transaction) {
+        return recalculateTotalItemsPrice(transaction)
                 .map(transactionWithCalculatedItems ->
                         (Transaction) shippingAddressAlignmentStrategy.select(transaction).apply(transactionWithCalculatedItems))
                 .flatMap(transactionWithCalculatedItemsAndShippingAddress ->
@@ -117,6 +124,13 @@ public class TransactionServiceImpl implements TransactionService {
                                 .flatMap(transactionWithAmounts -> CountryIsUsaChecker.isCountryUsa(transactionWithAmounts.getShippingAddress()) ?
                                         cityCountyProvider.provide(transactionWithAmounts) :
                                         Mono.just(transactionWithAmounts)));
+    }
+
+    // Apply the discounts on items
+    private Mono<Transaction> recalculateTotalItemsPrice(Transaction transaction) {
+        return itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(transaction)
+                .flatMap(shippingFeeCalculator::injectRecalculatedTotalAfterDiscount)
+                .flatMap(this::calculateTransactionLevelDiscountIfExist);
     }
 
     @Deprecated
@@ -130,8 +144,8 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository
                 .findByExternalIdAndSource(externalId, source)
                 .map(transaction -> transaction
-                        .withTransactionStatus(TransactionStatus.CANCELLED)
-                        .withCustomer(null))
+                        .setTransactionStatus(TransactionStatus.CANCELLED)
+                        .setCustomer(null))
                 .flatMap(transactionRepository::save);
     }
 
@@ -159,7 +173,7 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.getExternalTimestamps(), transaction.getTransactionType(), transaction.getShippingFee(),
                         transaction.getCreatedFrom(), transaction.getTaxableItemsAmount(),
                         transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount(), transaction.getFinalTransactionAmount(), transaction.getTotalDiscount(),
-                        transaction.getTransactionFilingStatus(), transaction.getCurrency(),
+                        transaction.getTransactionLevelDiscount(), transaction.getTransactionFilingStatus(), transaction.getCurrency(),
                         transaction.getSubsidiary()
                 );
     }
@@ -179,4 +193,9 @@ public class TransactionServiceImpl implements TransactionService {
                 modifiedTransaction.getTransactionStatus() == TransactionStatus.CANCELLED;
     }
 
+    private Mono<Transaction> calculateTransactionLevelDiscountIfExist(Transaction transaction) {
+        return transaction.getTransactionLevelDiscount() != null && !transaction.getTransactionLevelDiscount().equals(BigDecimal.ZERO) ?
+                transactionDiscountCalculator.injectRecalculatedTotalAfterDiscount(transaction) :
+                Mono.just(transaction);
+    }
 }

@@ -161,6 +161,7 @@ class ItemTest {
                 ", manualSalesTax=" + item.isManualSalesTax() +
                 ", manualSalesTaxRate=" + item.getManualSalesTaxRate() +
                 ", discount=" + item.getDiscount() +
+                ", relativeTransactionDiscount=" + item.getRelativeTransactionDiscount() +
                 ", tangibleCategory=" + item.getTangibleCategory() +
                 ", taxableCategory=" + item.getTaxableCategory() + ")";
 

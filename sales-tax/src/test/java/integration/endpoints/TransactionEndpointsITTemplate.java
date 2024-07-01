@@ -72,4 +72,8 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_ConflictingItemHasNegativeDiscount_Returns400ConflictedData();
 
     void upsertByExternalIdAndSource_TransactionWithStatusCancelled_Returns204();
+
+    void upsertByExternalIdAndSource_TransactionWithTransactionLevelDiscount_Returns201();
+
+    void upsertByExternalIdAndSource_TransactionWithBothItemAndTransactionDiscount_Returns201();
 }
