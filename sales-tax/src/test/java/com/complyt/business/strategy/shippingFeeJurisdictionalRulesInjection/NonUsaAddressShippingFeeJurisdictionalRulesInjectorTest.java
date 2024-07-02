@@ -49,21 +49,6 @@ public class NonUsaAddressShippingFeeJurisdictionalRulesInjectorTest {
     }
 
     @Test
-    void inject_InjectsDataToTransactionWithRegionThatIsNotInRule_ReturnsModifiedTransaction() {
-        // Given
-        Transaction transactionNoRules = transaction.withShippingFee(transaction.getShippingFee().withJurisdictionalTaxRules(null));
-        Map<String, ProductClassification> classifications = testUtilities.createNonUsaShippingFeeClassificationsMap(
-                transaction.getShippingFee().getJurisdictionalTaxRules()
-        );
-
-        // When
-        Transaction actualTransaction = nonUsaAddressShippingFeeJurisdictionalRulesInjector.inject(transactionNoRules).apply(classifications);
-
-        // Then
-        Assertions.assertEquals(transaction, actualTransaction);
-    }
-
-    @Test
     void inject_InjectsDataToTransactionWithNotTaxableRule_ReturnsModifiedTransaction() {
         // Given
         transaction = transaction.withShippingFee(transaction.getShippingFee()

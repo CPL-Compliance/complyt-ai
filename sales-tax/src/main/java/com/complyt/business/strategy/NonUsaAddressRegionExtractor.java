@@ -10,7 +10,7 @@ public interface NonUsaAddressRegionExtractor {
         if (rules.getRegions() != null) {
 
             if (rules.getRegions().get(region) != null) {
-                return rules.withRegions(Map.of(rules.getRegions().get(region).getAbbreviation(), rules.getRegions().get(region)));
+                return rules.withRegions(Map.of(rules.getRegions().get(region).getName(), rules.getRegions().get(region)));
             } else {
                 return rules.withRegions(null);
             }

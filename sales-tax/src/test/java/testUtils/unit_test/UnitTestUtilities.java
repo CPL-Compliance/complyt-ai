@@ -534,14 +534,6 @@ public class UnitTestUtilities {
                 false, CalculationType.FIXED, "description", new BigDecimal("0.5"), null, null);
     }
 
-    public JurisdictionalSalesTaxRulesDto createJurisdictionalSalesTaxRulesDtoWithCities() {
-        return createJurisdictionalSalesTaxRulesDto()
-                .withCities(new HashMap<String, SubJurisdictionalTaxRules>() {{
-                    add("CA-city1", new SubJurisdictionalTaxRules("CA-city1", "CA-1",
-                            true, false, CalculationType.FIXED, "CA-1", new BigDecimal("0.6")));
-                }});
-    }
-
     public JurisdictionalSalesTaxRulesDto createJurisdictionalSalesTaxRulesDtoWithGt() {
         JurisdictionalTaxRules jurisdictionalTaxRules = new JurisdictionalTaxRules("Armenia", "ARM", true,
                 false, CalculationType.FIXED, "armenia #1", new BigDecimal("0.6"), null);

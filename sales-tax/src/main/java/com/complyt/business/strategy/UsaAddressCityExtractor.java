@@ -10,7 +10,7 @@ public interface UsaAddressCityExtractor {
         if (rules.getCities() != null) {
 
             if (rules.getCities().get(city) != null) {
-                return rules.withCities(Map.of(rules.getCities().get(city).getAbbreviation(), rules.getCities().get(city)));
+                return rules.withCities(Map.of(rules.getCities().get(city).getName(), rules.getCities().get(city)));
             } else {
                 return rules.withCities(null);
             }

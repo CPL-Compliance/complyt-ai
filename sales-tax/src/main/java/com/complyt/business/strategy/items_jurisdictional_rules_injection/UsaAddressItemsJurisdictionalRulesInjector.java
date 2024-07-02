@@ -17,6 +17,7 @@ import java.util.function.Function;
 @Component
 @Slf4j
 public class UsaAddressItemsJurisdictionalRulesInjector implements ItemsJurisdictionalInjector, UsaAddressCityExtractor {
+
     @Override
     public Function<Map<String, ProductClassification>, List<Item>> inject(Transaction transaction) {
         return mapTaxCodesToClassifications -> {
