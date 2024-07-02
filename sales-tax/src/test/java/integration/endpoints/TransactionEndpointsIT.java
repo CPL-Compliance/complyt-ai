@@ -188,7 +188,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(transactionDto -> {
                     assertEquals(expectedSalesTax, transactionDto.salesTax());
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
-                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
+                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
                     assertTrue(transactionDto.isTaxInclusive());
                     assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("9225.0000")));
                 });
@@ -222,9 +222,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
+
                     assertEquals(expectedSalesTax, transactionDto.salesTax());
-                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
-                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
+                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
                     assertTrue(transactionDto.isTaxInclusive());
                     assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("9225.0000")));
                     assertEquals("USA", transactionDto.shippingAddress().country());
@@ -256,7 +256,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
                     assertEquals(expectedSalesTax, transactionDto.salesTax());
-                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
+                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
                     assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000.0000")));
                     assertEquals("Canada", transactionDto.shippingAddress().country());
@@ -288,7 +288,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
                     assertEquals(expectedSalesTax, transactionDto.salesTax());
-                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
+                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
                     assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000.0000")));
                     assertEquals("Canada", transactionDto.shippingAddress().country());
@@ -324,7 +324,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
                     assertTrue(transactionDto.isTaxInclusive());
-                    assertEquals( 0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("8525.0000")));
+                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("8525.0000")));
                 });
     }
 
@@ -1879,7 +1879,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertEquals(givenDiscount, transactionDto.transactionLevelDiscount());
                     assertEquals(givenDiscount, totalActualGivenTransactionDiscount);
                     assertEquals(totalTransactionAmountAfterDiscount, transactionDto.totalItemsAmount());
-                });;
+                });
+        ;
     }
 
     @Order(3)
@@ -1916,6 +1917,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertEquals(givenDiscount, totalActualGivenTransactionDiscount);
                     assertEquals(totalTransactionAmountAfterDiscount, transactionDto.totalItemsAmount());
                     assertEquals(BigDecimal.valueOf(250), totalGivenDiscount);
-                });;
+                });
+        ;
     }
 }

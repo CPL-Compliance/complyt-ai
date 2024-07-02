@@ -26,6 +26,16 @@ public class NonUsaAddressItemsJurisdictionalRulesInjector implements ItemsJuris
             for (Item item : transaction.getItems()) {
                 ProductClassification classification = mapTaxCodesToClassifications.get(item.getTaxCode());
                 JurisdictionalTaxRules rules = classification.getJurisdictionalTaxRules().get(jurisdiction);
+
+                String region = transaction.getShippingAddress().region();
+                if (rules.getRegions() != null) {
+
+                    if (rules.getRegions().get(region) != null) {
+                        rules = rules.withRegions(Map.of(rules.getRegions().get(region).getAbbreviation(), rules.getRegions().get(region)));
+                    } else {
+                        rules = rules.withRegions(null);
+                    }
+                }
                 Item itemWithRules = item.withJurisdictionalTaxRules(rules);
 
                 log.info("Fetching jurisdictionalRules from product classification");

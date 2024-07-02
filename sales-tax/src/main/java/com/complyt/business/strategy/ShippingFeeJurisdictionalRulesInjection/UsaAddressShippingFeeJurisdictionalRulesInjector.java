@@ -24,6 +24,15 @@ public class UsaAddressShippingFeeJurisdictionalRulesInjector implements Shippin
             ProductClassification classification = mapTaxCodesToClassifications.get(transaction.getShippingFee().getTaxCode());
             JurisdictionalSalesTaxRules rules = classification.getJurisdictionalSalesTaxRules().get(state);
 
+            String city = transaction.getShippingAddress().city();
+            if (rules.getCities() != null) {
+
+                if (rules.getCities().get(city) != null) {
+                    rules = rules.withCities(Map.of(rules.getCities().get(city).getAbbreviation(), rules.getCities().get(city)));
+                } else {
+                    rules = rules.withCities(null);
+                }
+            }
             ShippingFee modifiedShippingFee = transaction.getShippingFee().withJurisdictionalSalesTaxRules(rules);
 
             TaxableCategory category = modifiedShippingFee.getJurisdictionalSalesTaxRules().isTaxable() ?

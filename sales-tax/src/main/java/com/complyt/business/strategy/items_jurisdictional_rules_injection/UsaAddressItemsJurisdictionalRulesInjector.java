@@ -25,6 +25,17 @@ public class UsaAddressItemsJurisdictionalRulesInjector implements ItemsJurisdic
             for (Item item : transaction.getItems()) {
                 ProductClassification classification = mapTaxCodesToClassifications.get(item.getTaxCode());
                 JurisdictionalSalesTaxRules rules = classification.getJurisdictionalSalesTaxRules().get(jurisdiction);
+                String city = transaction.getShippingAddress().city();
+
+                if (rules.getCities() != null) {
+
+                    if (rules.getCities().get(city) != null) {
+                        rules = rules.withCities(Map.of(rules.getCities().get(city).getAbbreviation(), rules.getCities().get(city)));
+                    } else {
+                        rules = rules.withCities(null);
+                    }
+                }
+
                 Item itemWithRules = item.withJurisdictionalSalesTaxRules(rules);
 
                 log.info("Fetching jurisdictionalRules from product classification");

@@ -21,6 +21,15 @@ public class NonUsaAddressShippingFeeJurisdictionalRulesInjector implements Ship
             ProductClassification classification = mapTaxCodesToClassifications.get(transaction.getShippingFee().getTaxCode());
             JurisdictionalTaxRules rules = classification.getJurisdictionalTaxRules().get(country);
 
+            String region = transaction.getShippingAddress().region();
+            if (rules.getRegions() != null) {
+
+                if (rules.getRegions().get(region) != null) {
+                    rules = rules.withRegions(Map.of(rules.getRegions().get(region).getAbbreviation(), rules.getRegions().get(region)));
+                } else {
+                    rules = rules.withRegions(null);
+                }
+            }
             ShippingFee modifiedShippingFee = transaction.getShippingFee().withJurisdictionalTaxRules(rules);
 
             TaxableCategory category = modifiedShippingFee.getJurisdictionalTaxRules().isTaxable() ?
