@@ -542,14 +542,6 @@ public class UnitTestUtilities {
                 }});
     }
 
-    public JurisdictionalSalesTaxRulesDto createJurisdictionalSalesTaxRulesDtoWithGtAndRegion() {
-        return createJurisdictionalSalesTaxRulesDtoWithGt()
-                .withRegions(new HashMap<String, SubJurisdictionalTaxRules>() {{
-                    add("Armenia-region1", new SubJurisdictionalTaxRules("Armenia-region1", "arm1",
-                            true, false, CalculationType.FIXED, "armenia #1", new BigDecimal("0.6")));
-                }});
-    }
-
     public JurisdictionalSalesTaxRulesDto createJurisdictionalSalesTaxRulesDtoWithGt() {
         JurisdictionalTaxRules jurisdictionalTaxRules = new JurisdictionalTaxRules("Armenia", "ARM", true,
                 false, CalculationType.FIXED, "armenia #1", new BigDecimal("0.6"), null);

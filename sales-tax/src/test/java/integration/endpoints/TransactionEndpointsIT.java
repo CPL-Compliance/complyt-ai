@@ -222,7 +222,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
-
                     assertEquals(expectedSalesTax, transactionDto.salesTax());
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
                     assertTrue(transactionDto.isTaxInclusive());

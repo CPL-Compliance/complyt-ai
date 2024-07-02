@@ -1,5 +1,6 @@
 package com.complyt.business.strategy.items_jurisdictional_rules_injection;
 
+import com.complyt.business.strategy.UsaAddressCityExtractor;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
@@ -15,7 +16,7 @@ import java.util.function.Function;
 
 @Component
 @Slf4j
-public class UsaAddressItemsJurisdictionalRulesInjector implements ItemsJurisdictionalInjector {
+public class UsaAddressItemsJurisdictionalRulesInjector implements ItemsJurisdictionalInjector, UsaAddressCityExtractor {
     @Override
     public Function<Map<String, ProductClassification>, List<Item>> inject(Transaction transaction) {
         return mapTaxCodesToClassifications -> {
@@ -25,16 +26,9 @@ public class UsaAddressItemsJurisdictionalRulesInjector implements ItemsJurisdic
             for (Item item : transaction.getItems()) {
                 ProductClassification classification = mapTaxCodesToClassifications.get(item.getTaxCode());
                 JurisdictionalSalesTaxRules rules = classification.getJurisdictionalSalesTaxRules().get(jurisdiction);
+
                 String city = transaction.getShippingAddress().city();
-
-                if (rules.getCities() != null) {
-
-                    if (rules.getCities().get(city) != null) {
-                        rules = rules.withCities(Map.of(rules.getCities().get(city).getAbbreviation(), rules.getCities().get(city)));
-                    } else {
-                        rules = rules.withCities(null);
-                    }
-                }
+                rules = extractCityIfExists(rules, city);
 
                 Item itemWithRules = item.withJurisdictionalSalesTaxRules(rules);
 
