@@ -54,5 +54,17 @@ public class UsaAddressCityExtractorTest {
         Assertions.assertEquals(expectedRules, actualRules);
     }
 
+    @Test
+    void extractCityIfExists_CityDoesntInRulesMap_ReturnsModifiedRules() {
+        // Given
+        JurisdictionalSalesTaxRules expectedRules = jurisdictionalSalesTaxRules.withCities(null);
+
+        // When
+        JurisdictionalSalesTaxRules actualRules = usaAddressItemsJurisdictionalRulesInjector.extractCityIfExists(jurisdictionalSalesTaxRules, "NonExistingCity");
+
+        // Then
+        Assertions.assertEquals(expectedRules, actualRules);
+    }
+
 
 }
