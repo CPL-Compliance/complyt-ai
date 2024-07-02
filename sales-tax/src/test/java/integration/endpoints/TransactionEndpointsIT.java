@@ -7,7 +7,6 @@ import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
-import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.sales_tax.RatesMetaDataDto;
 import com.complyt.v1.models.sales_tax.SalesTaxDto;
@@ -19,7 +18,6 @@ import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.transaction.TransactionStatusDto;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
-import lombok.With;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -168,7 +166,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withTaxInclusive(true);
 
-        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO")); //salestaxtracking is approved and physical
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salestaxtracking is approved and physical
 
         SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
                 BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
@@ -188,7 +186,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(transactionDto -> {
                     assertEquals(expectedSalesTax, transactionDto.salesTax());
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
-                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
+                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
+                    assertEquals(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().size(), 1);
+                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().get("Arvada"));
                     assertTrue(transactionDto.isTaxInclusive());
                     assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("9225.0000")));
                 });
@@ -223,7 +223,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
                     assertEquals(expectedSalesTax, transactionDto.salesTax());
-                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
+                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
+                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
                     assertTrue(transactionDto.isTaxInclusive());
                     assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("9225.0000")));
                     assertEquals("USA", transactionDto.shippingAddress().country());
@@ -321,6 +322,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(transactionDto -> {
                     assertEquals(expectedSalesTax, transactionDto.salesTax());
                     assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
+                    assertEquals(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions().size(), 1);
+                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions().get("Quebec"));
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
                     assertTrue(transactionDto.isTaxInclusive());
                     assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("8525.0000")));
