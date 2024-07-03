@@ -1,5 +1,6 @@
 package com.complyt.business.strategy.ShippingFeeJurisdictionalRulesInjection;
 
+import com.complyt.business.strategy.NonUsaAddressRegionExtractor;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
@@ -13,13 +14,16 @@ import java.util.function.Function;
 
 @Component
 @Slf4j
-public class NonUsaAddressShippingFeeJurisdictionalRulesInjector implements ShippingFeeJurisdictionalInjector {
+public class NonUsaAddressShippingFeeJurisdictionalRulesInjector implements ShippingFeeJurisdictionalInjector, NonUsaAddressRegionExtractor {
     @Override
     public Function<Map<String, ProductClassification>, Transaction> inject(Transaction transaction) {
         return mapTaxCodesToClassifications -> {
             String country = transaction.getShippingAddress().country();
             ProductClassification classification = mapTaxCodesToClassifications.get(transaction.getShippingFee().getTaxCode());
             JurisdictionalTaxRules rules = classification.getJurisdictionalTaxRules().get(country);
+
+            String region = transaction.getShippingAddress().region();
+            rules = extractRegionIfExists(rules, region);
 
             ShippingFee modifiedShippingFee = transaction.getShippingFee().withJurisdictionalTaxRules(rules);
 
