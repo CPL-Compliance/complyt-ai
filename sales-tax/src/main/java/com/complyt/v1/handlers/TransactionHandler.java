@@ -126,9 +126,9 @@ public class TransactionHandler {
                                                         .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse))))
                                         .switchIfEmpty(Mono.defer(() -> transactionFacade.saveTransaction(receivedTransaction)
                                                 .flatMap(savedTransaction -> ContextLogger.observeCtx("<-- Returned Body: " + savedTransaction, log::info).thenReturn(savedTransaction))
-                                                .flatMap(savedTransaction -> ServerResponse.created(URI.create(resourceURI)).contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class))))
+                                                .flatMap(savedTransaction -> ServerResponse.created(URI.create(resourceURI)).contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class)))
                                                 .switchIfEmpty(ServerResponse.noContent().build()
-                                                        .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse)))));
+                                                        .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse))))));
     }
 
     @TransactionDeletePermission

@@ -47,7 +47,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT implements SalesTaxTrackingEndpointsITemplate {
 
     private final String usaCountry = "USA";
-
     private final String nonUsaCountry = "Brazil";
     private final StateDto existingState = new StateDto("AZ", "04", "Arizona");
     private final StateDto newState = new StateDto("AL", "01", "Alabama");

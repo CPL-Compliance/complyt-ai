@@ -9,6 +9,8 @@ import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.ProductClassificationRepository;
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.exceptions.types.TaxCodeNotValidException;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,37 +92,6 @@ public class ProductClassificationServiceTest {
         List<Item> modifiedItems = testUtilities.createItems(true, false, true);
         return transaction.withItems(modifiedItems);
     }
-
-//    @Test
-//    void getTransactionWithRelevantProductClassificationData_InjectsDataToTransaction_ReturnsTransaction() {
-//        // Given
-//        Transaction givenTransaction = transaction.withShippingFee(null);
-//        String taxCode0 = givenTransaction.getItems().get(0).getTaxCode();
-//        String taxCode1 = givenTransaction.getItems().get(1).getTaxCode();
-//
-//        JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", true, false,
-//                CalculationType.FIXED, "rule1", BigDecimal.ZERO, null);
-//        JurisdictionalSalesTaxRules secondRule = new JurisdictionalSalesTaxRules("rule2", "CA", true, false,
-//                CalculationType.FIXED, "rule2", BigDecimal.ZERO, null);
-//
-//        Transaction transactionWithData = createTransactionWithProductClassificationData()
-//                .withShippingFee(null)
-//                .withComplytId(givenTransaction.getComplytId())
-//                .withExternalId(givenTransaction.getExternalId())
-//                .withCustomer(givenTransaction.getCustomer());
-//
-//        Map<String, ProductClassification> mapTaxCodesToClassifications = testUtilities.createUsaClassificationsMap(firstRule, secondRule);
-//
-//        // When
-//        when(productClassificationRepository.findOneByTaxCode(taxCode0)).thenReturn(Mono.just(mapTaxCodesToClassifications.get(taxCode0)));
-//        when(productClassificationRepository.findOneByTaxCode(taxCode1)).thenReturn(Mono.just(mapTaxCodesToClassifications.get(taxCode1)));
-//        when(transactionProductClassificationDataInjector.inject(mapTaxCodesToClassifications, givenTransaction)).thenReturn(Mono.just(transactionWithData));
-//
-//        Mono<Transaction> actualTransaction = productClassificationService.getTransactionWithRelevantProductClassificationData(givenTransaction);
-//
-//        // Then
-//        StepVerifier.create(actualTransaction).expectNext(transactionWithData).verifyComplete();
-//    }
 
     @Test
     void getTransactionWithRelevantProductClassificationData_WithValidTransactionWithShippingFee_ShouldInjectClassificationCorrectly() {
@@ -207,6 +178,20 @@ public class ProductClassificationServiceTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "taxCode is marked non-null but is null");
+    }
+
+    @Test
+    public void findOneByTaxCode_taxCodeNotExist_shouldReturnError() {
+        String invalidTaxCode = "invalidTaxCode";
+
+        when(productClassificationRepository.findOneByTaxCode(invalidTaxCode))
+                .thenReturn(Mono.empty());
+
+        Mono<ProductClassification> result = productClassificationService.findOneByTaxCode(invalidTaxCode);
+
+        StepVerifier.create(result)
+                .expectError(TaxCodeNotValidException.class)
+                .verify();
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.complyt.business.transaction.data_injector.TransactionProductClassifi
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.ProductClassificationRepository;
+import com.complyt.v1.exceptions.types.TaxCodeNotValidException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,8 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
 
     @Override
     public Mono<ProductClassification> findOneByTaxCode(@NonNull String taxCode) {
-        return productClassificationRepository.findOneByTaxCode(taxCode);
+        return productClassificationRepository.findOneByTaxCode(taxCode)
+                .switchIfEmpty(Mono.error(TaxCodeNotValidException::new));
     }
 
     @Override

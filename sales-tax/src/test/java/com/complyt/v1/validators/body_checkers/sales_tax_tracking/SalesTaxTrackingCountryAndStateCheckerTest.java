@@ -1,9 +1,9 @@
-package com.complyt.v1.validators.body_checkers.exemption;
+package com.complyt.v1.validators.body_checkers.sales_tax_tracking;
 
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.customer.exemption.ExemptionDto;
+import com.complyt.v1.validators.body_checkers.DtoBodyChecker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
@@ -12,34 +12,21 @@ import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+public class SalesTaxTrackingCountryAndStateCheckerTest {
 
-public class ExemptionCountryAndStateCheckerTest {
-
-    ExemptionCountryAndStateChecker exemptionCountryAndStateChecker;
-    ExemptionDto exemptionDto;
+    private DtoBodyChecker<SalesTaxTrackingDto> salesTaxTrackingCountryAndStateChecker;
+    private SalesTaxTrackingDto salesTaxTrackingDto;
 
     @BeforeEach
     void setUp() {
-        exemptionCountryAndStateChecker = new ExemptionCountryAndStateChecker();
-        exemptionDto = new UnitTestUtilities(LocalDateTime.now(), null).createExemptionDto();
-    }
-
-    @Test
-    void check_NullExemptionDtoPassed_ThrowsNullPointerException() {
-        // When
-        ExemptionDto nullExemptionDto = null;
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionCountryAndStateChecker.check(nullExemptionDto));
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "exemptionDto is marked non-null but is null");
+        salesTaxTrackingCountryAndStateChecker = new SalesTaxTrackingCountryAndStateChecker();
+        salesTaxTrackingDto = new UnitTestUtilities(LocalDateTime.now(), null).createSalesTaxTrackingDto();
     }
 
     @Test
     void check_SalesTaxTrackingWithValidState_ShouldReturnFluxEmpty() {
 
-        Flux<String> result = exemptionCountryAndStateChecker.check(exemptionDto);
+        Flux<String> result = salesTaxTrackingCountryAndStateChecker.check(salesTaxTrackingDto);
 
         StepVerifier.create(result)
                 .expectComplete()
@@ -49,9 +36,9 @@ public class ExemptionCountryAndStateCheckerTest {
     @Test
     void check_SalesTaxTrackingWithInvalidStateName_ShouldReturnAnError() {
         StateDto stateDto = new StateDto("CA", "02", "KaliforniaWithSpellingMistake");
-        ExemptionDto exemptionDtoUpdated = exemptionDto.withState(stateDto);
+        SalesTaxTrackingDto salesTaxTrackingDtoUpdated = salesTaxTrackingDto.withState(stateDto);
 
-        Flux<String> result = exemptionCountryAndStateChecker.check(exemptionDtoUpdated);
+        Flux<String> result = salesTaxTrackingCountryAndStateChecker.check(salesTaxTrackingDtoUpdated);
 
         StepVerifier.create(result)
                 .expectNext("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)
@@ -62,9 +49,9 @@ public class ExemptionCountryAndStateCheckerTest {
     @Test
     void check_SalesTaxTrackingWithInvalidStateAbbreviation_ShouldReturnAnError() {
         StateDto stateDto = new StateDto("CALI", "02", "California");
-        ExemptionDto exemptionDtoUpdated = exemptionDto.withState(stateDto);
+        SalesTaxTrackingDto salesTaxTrackingDtoUpdated = salesTaxTrackingDto.withState(stateDto);
 
-        Flux<String> result = exemptionCountryAndStateChecker.check(exemptionDtoUpdated);
+        Flux<String> result = salesTaxTrackingCountryAndStateChecker.check(salesTaxTrackingDtoUpdated);
 
         StepVerifier.create(result)
                 .expectNext("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)
@@ -75,9 +62,9 @@ public class ExemptionCountryAndStateCheckerTest {
     @Test
     void check_SalesTaxTrackingWithInvalidStateNameNull_ShouldReturnAnError() {
         StateDto stateDto = new StateDto(null, "02", "California");
-        ExemptionDto exemptionDtoUpdated = exemptionDto.withState(stateDto);
+        SalesTaxTrackingDto salesTaxTrackingDtoUpdated = salesTaxTrackingDto.withState(stateDto);
 
-        Flux<String> result = exemptionCountryAndStateChecker.check(exemptionDtoUpdated);
+        Flux<String> result = salesTaxTrackingCountryAndStateChecker.check(salesTaxTrackingDtoUpdated);
 
         StepVerifier.create(result)
                 .expectNext("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)
@@ -88,9 +75,9 @@ public class ExemptionCountryAndStateCheckerTest {
     @Test
     void check_SalesTaxTrackingWithInvalidStateAbbriviationNull_ShouldReturnAnError() {
         StateDto stateDto = new StateDto("CA", "02", null);
-        ExemptionDto exemptionDtoUpdated = exemptionDto.withState(stateDto);
+        SalesTaxTrackingDto salesTaxTrackingDtoUpdated = salesTaxTrackingDto.withState(stateDto);
 
-        Flux<String> result = exemptionCountryAndStateChecker.check(exemptionDtoUpdated);
+        Flux<String> result = salesTaxTrackingCountryAndStateChecker.check(salesTaxTrackingDtoUpdated);
 
         StepVerifier.create(result)
                 .expectNext("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)

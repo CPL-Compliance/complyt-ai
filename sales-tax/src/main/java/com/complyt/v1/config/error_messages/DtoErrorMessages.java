@@ -47,6 +47,8 @@ public interface DtoErrorMessages {
 
     String STATE_MUST_NOT_BE_NULL_USA = "in usa addresses state must not be null";
 
+    String STATE_NOT_RECOGNIZED_USA = "in usa addresses state is not recognized";
+
     String ONE_OF_THE_ITEMS_IS_UNALIGNED = "At least one of the item's total price does not have the same sign as the amount (one is negative and the other one is positive)";
 
     String CURRENCY_IS_NOT_SUPPORTED = "The currency entedted is not supported";

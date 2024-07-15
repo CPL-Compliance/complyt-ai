@@ -7,6 +7,7 @@ import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
+import com.complyt.v1.exceptions.types.TaxCodeNotValidException;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.sales_tax.RatesMetaDataDto;
 import com.complyt.v1.models.sales_tax.SalesTaxDto;
@@ -192,6 +193,71 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertTrue(transactionDto.isTaxInclusive());
                     assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("9225.0000")));
                 });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaShippingWithSpacesInTheAddress_Returns200() { // Same as the test above just changed the state.abbreviation to check the spaces trimming
+        String externalId = "newNonExistingTransactionID";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withTaxInclusive(true);
+
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState(" CO ").withCity("Arvada")); //salestaxtracking is approved and physical
+
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(expectedSalesTax, transactionDto.salesTax());
+                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
+                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
+                    assertEquals(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().size(), 1);
+                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().get("Arvada"));
+                    assertTrue(transactionDto.isTaxInclusive());
+                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("9225.0000")));
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaTransactionWithNonExistingTaxCode_Returns400BadRequest() { // Same as the test above just changed the state.abbreviation to check the spaces trimming
+        String externalId = "newNonExistingTransactionID";
+        TransactionDto transactionDto = ITUtilities.stubTransactionDto(externalId, customerId);
+        TransactionDto givenTransaction = transactionDto
+                .withItems(transactionDto.items().stream().map(itemDto -> itemDto.withTaxCode("Non-existing TaxCode")).collect(Collectors.toList()));
+
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salestaxtracking is approved and physical
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(TaxCodeNotValidException.class)
+                .value(e ->
+                        assertEquals(e.getReason(), "The tax code entered is not recognized"));
     }
 
     @Order(1)
@@ -706,7 +772,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().is4xxClientError();
     }
 
     @Order(2)
@@ -730,7 +796,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().is4xxClientError();
 
         webTestClient
                 .get()

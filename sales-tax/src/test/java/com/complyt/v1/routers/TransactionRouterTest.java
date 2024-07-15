@@ -1648,7 +1648,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(null);
         Set<String> expectedErrors = Set.of(
-                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX,
+                "Address.state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA);
 
         // When + Then
         webTestClient
@@ -1660,7 +1661,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
                 .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
@@ -1773,7 +1775,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState("");
         Set<String> expectedErrors = Set.of(
-                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX,
+                "Address.state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA);
 
         // When + Then
         webTestClient

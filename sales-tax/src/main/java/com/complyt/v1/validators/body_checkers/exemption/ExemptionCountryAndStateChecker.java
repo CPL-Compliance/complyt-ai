@@ -4,6 +4,7 @@ import com.complyt.business.address.CountryIsSupportedNonUsaChecker;
 import com.complyt.business.address.CountryIsUsaChecker;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
+import com.complyt.v1.validators.body_checkers.StateExistsChecker;
 import com.complyt.v1.validators.body_checkers.DtoBodyChecker;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,9 @@ public class ExemptionCountryAndStateChecker implements DtoBodyChecker<Exemption
         return CountryIsUsaChecker.isCountryUsa(exemptionDto.country()) ?
                 exemptionDto.state() == null ?
                         Flux.just("state " + DtoErrorMessages.NOT_NULL_ERROR) :
-                        Flux.empty() :
+                        StateExistsChecker.check(exemptionDto.state().abbreviation()) == null || StateExistsChecker.check(exemptionDto.state().name()) == null ?
+                                Flux.just("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA) :
+                                Flux.empty() :
                 !CountryIsSupportedNonUsaChecker.isCountrySupportedNonUsaCountry(exemptionDto.country()) ?
                         Flux.just(DtoErrorMessages.NOT_SUPPORTED_COUNTRY_FORMAT_ERROR) :
                         Flux.empty();

@@ -21,5 +21,7 @@ public interface GenericErrorMessages {
     String CONFLICTED_REGISTERED_ERROR = "registered field is false but date was provided";
 
     String INVALID_DISCOUNT_AMOUNT = "transaction level discount should be positive or zero";
+
+    String INVALID_TAX_CODE = "The tax code entered is not recognized";
 }
 

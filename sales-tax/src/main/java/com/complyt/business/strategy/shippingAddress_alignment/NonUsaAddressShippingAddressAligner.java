@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class NonUsaAddressShippingAddressAligner implements ShippingAddressAligner {
     @Override
     public Transaction align(Transaction transaction) {
-        String alignedCountry = CountryToStandardizedCountry.standardize(transaction.getShippingAddress().country());
+        String alignedCountry = CountryToStandardizedCountry.standardize(transaction.getShippingAddress().country().trim());
         Address alignedShippingAddress = transaction.getShippingAddress().withCountry(alignedCountry);
         return transaction.withShippingAddress(alignedShippingAddress);
     }

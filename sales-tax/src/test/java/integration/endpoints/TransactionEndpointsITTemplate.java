@@ -76,4 +76,8 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_TransactionWithTransactionLevelDiscount_Returns201();
 
     void upsertByExternalIdAndSource_TransactionWithBothItemAndTransactionDiscount_Returns201();
+
+    void upsertByExternalIdAndSource_UsaShippingWithSpacesInTheAddress_Returns200();
+
+    void upsertByExternalIdAndSource_UsaTransactionWithNonExistingTaxCode_Returns400BadRequest();
 }
