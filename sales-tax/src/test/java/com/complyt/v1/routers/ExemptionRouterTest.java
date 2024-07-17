@@ -203,6 +203,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         }};
         ExemptionWrapperDto exemptionWrapperDto = new ExemptionWrapperDto(givenExemptionDto, stateDtos);
         HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "State.name " + StringErrorMessages.MINMAX_256_ERROR,
                 "Certificate.url " + DtoErrorMessages.NOT_NULL_ERROR,
                 "status " + DtoErrorMessages.NOT_NULL_ERROR));
 

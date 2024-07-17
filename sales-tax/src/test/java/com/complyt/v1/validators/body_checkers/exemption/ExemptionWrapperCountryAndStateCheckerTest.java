@@ -2,7 +2,6 @@ package com.complyt.v1.validators.body_checkers.exemption;
 
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import com.complyt.v1.models.customer.exemption.ExemptionWrapperDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,17 +62,6 @@ public class ExemptionWrapperCountryAndStateCheckerTest {
     }
 
     @Test
-    void check_UsaExemptionWrapperWithStatesListNull_ReturnFluxWithError() {
-        // Given
-        ExemptionWrapperDto exemptionWrapperDto = new ExemptionWrapperDto(
-                testUtilities.createExemptionWrapperDto().exemption(), null);
-
-        // When + Then
-        Flux<String> errorMessages = exemptionWrapperCountryAndStateChecker.check(exemptionWrapperDto);
-        StepVerifier.create(errorMessages).expectNext("states " + DtoErrorMessages.LIST_NOT_EMPTY_ERROR);
-    }
-
-    @Test
     void check_UsaExemptionWrapperWithStatesListEmpty_ReturnFluxWithError() {
         // Given
         ExemptionWrapperDto exemptionWrapperDto = new ExemptionWrapperDto(
@@ -104,5 +92,72 @@ public class ExemptionWrapperCountryAndStateCheckerTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "exemptionWrapperDto is marked non-null but is null");
+    }
+
+    @Test
+    void check_UsaExemptionWrapperWithInvalidStateInStatesList_ReturnFluxWithError() {
+        // Given
+        ExemptionWrapperDto exemptionWrapperDto = new ExemptionWrapperDto(
+                testUtilities.createExemptionWrapperDto().exemption().withState(null), List.of(
+                        new StateDto("CO", "04", "Colorado"),
+                        new StateDto("CA", "06", "KaliforniaIsWrong")
+        ));
+
+        // When + Then
+        Flux<String> errorMessages = exemptionWrapperCountryAndStateChecker.check(exemptionWrapperDto);
+        StepVerifier.create(errorMessages).expectNext("state " + exemptionWrapperDto.states().get(1).abbreviation() + " or " + exemptionWrapperDto.states().get(1).name() + " " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA + DtoErrorMessages.STATE_NOT_RECOGNIZED_OR_INVALID_COMBINATION);
+    }
+
+    @Test
+    void check_UsaExemptionWrapperWithInvalidStateInStatesList_ReturnFluxWithOnlyTheFirstError() {
+        // Given
+        ExemptionWrapperDto exemptionWrapperDto = new ExemptionWrapperDto(
+                testUtilities.createExemptionWrapperDto().exemption().withState(null), List.of(
+                new StateDto("CO", "04", "KoloradoIsWrong"),
+                new StateDto("CA", "06", "KaliforniaIsWrong")
+        ));
+
+        // When + Then
+        Flux<String> errorMessages = exemptionWrapperCountryAndStateChecker.check(exemptionWrapperDto);
+        StepVerifier.create(errorMessages).expectNext("state " + exemptionWrapperDto.states().get(0).abbreviation() + " or " + exemptionWrapperDto.states().get(0).name() + " " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA + DtoErrorMessages.STATE_NOT_RECOGNIZED_OR_INVALID_COMBINATION);
+    }
+
+    @Test
+    void check_UsaExemptionWrapperWithValidStatesButMismatch_ReturnFluxWithError() {
+        // Given
+        ExemptionWrapperDto exemptionWrapperDto = new ExemptionWrapperDto(
+                testUtilities.createExemptionWrapperDto().exemption().withState(null), List.of(
+                new StateDto("NY", "04", "Colorado")
+        ));
+
+        // When + Then
+        Flux<String> errorMessages = exemptionWrapperCountryAndStateChecker.check(exemptionWrapperDto);
+        StepVerifier.create(errorMessages).expectNext("state " + exemptionWrapperDto.states().get(0).abbreviation() + " or " + exemptionWrapperDto.states().get(0).name() + " " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA + DtoErrorMessages.STATE_NOT_RECOGNIZED_OR_INVALID_COMBINATION);
+    }
+
+    @Test
+    void check_UsaExemptionWrapperWithTotalMadeUpStates_ReturnFluxWithError() {
+        // Given
+        ExemptionWrapperDto exemptionWrapperDto = new ExemptionWrapperDto(
+                testUtilities.createExemptionWrapperDto().exemption().withState(null), List.of(
+                new StateDto("Niv", "01", "Kaplan")
+        ));
+
+        // When + Then
+        Flux<String> errorMessages = exemptionWrapperCountryAndStateChecker.check(exemptionWrapperDto);
+        StepVerifier.create(errorMessages).expectNext("state " + exemptionWrapperDto.states().get(0).abbreviation() + " or " + exemptionWrapperDto.states().get(0).name() + " " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA + DtoErrorMessages.STATE_NOT_RECOGNIZED_OR_INVALID_COMBINATION);
+    }
+
+    @Test
+    void check_UsaExemptionWrapperWithNullStateInStatesList_ReturnFluxWithError() {
+        // Given
+        ExemptionWrapperDto exemptionWrapperDto = new ExemptionWrapperDto(
+                testUtilities.createExemptionWrapperDto().exemption().withState(new StateDto("CA", "01", "California")), List.of(
+                new StateDto(null, "01", null)
+        ));
+
+        // When + Then
+        Flux<String> errorMessages = exemptionWrapperCountryAndStateChecker.check(exemptionWrapperDto);
+        StepVerifier.create(errorMessages).expectNext("state " + exemptionWrapperDto.states().get(0).abbreviation() + " or " + exemptionWrapperDto.states().get(0).name() + " " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA + DtoErrorMessages.STATE_NOT_RECOGNIZED_OR_INVALID_COMBINATION);
     }
 }

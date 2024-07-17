@@ -18,9 +18,7 @@ public class ExemptionCountryAndStateChecker implements DtoBodyChecker<Exemption
         return CountryIsUsaChecker.isCountryUsa(exemptionDto.country()) ?
                 exemptionDto.state() == null ?
                         Flux.just("state " + DtoErrorMessages.NOT_NULL_ERROR) :
-                        StateExistsChecker.check(exemptionDto.state().abbreviation()) == null || StateExistsChecker.check(exemptionDto.state().name()) == null ?
-                                Flux.just("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA) :
-                                Flux.empty() :
+                        Flux.empty() :
                 !CountryIsSupportedNonUsaChecker.isCountrySupportedNonUsaCountry(exemptionDto.country()) ?
                         Flux.just(DtoErrorMessages.NOT_SUPPORTED_COUNTRY_FORMAT_ERROR) :
                         Flux.empty();

@@ -749,7 +749,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> testUtilities.checkErrorMessages(map,
                         Set.of("state " + DtoErrorMessages.CONFLICTED_WITH_QUERY_PARAM_IN_URL_ERROR,
-                                "state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)));
+                                "state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_OR_INVALID_COMBINATION)));
     }
 
     @Test

@@ -41,7 +41,7 @@ public class SalesTaxTrackingCountryAndStateCheckerTest {
         Flux<String> result = salesTaxTrackingCountryAndStateChecker.check(salesTaxTrackingDtoUpdated);
 
         StepVerifier.create(result)
-                .expectNext("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)
+                .expectNext("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_OR_INVALID_COMBINATION)
                 .expectComplete()
                 .verify();
     }
@@ -54,7 +54,7 @@ public class SalesTaxTrackingCountryAndStateCheckerTest {
         Flux<String> result = salesTaxTrackingCountryAndStateChecker.check(salesTaxTrackingDtoUpdated);
 
         StepVerifier.create(result)
-                .expectNext("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)
+                .expectNext("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_OR_INVALID_COMBINATION)
                 .expectComplete()
                 .verify();
     }
@@ -67,7 +67,7 @@ public class SalesTaxTrackingCountryAndStateCheckerTest {
         Flux<String> result = salesTaxTrackingCountryAndStateChecker.check(salesTaxTrackingDtoUpdated);
 
         StepVerifier.create(result)
-                .expectNext("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)
+                .expectNext("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_OR_INVALID_COMBINATION)
                 .expectComplete()
                 .verify();
     }
@@ -80,7 +80,33 @@ public class SalesTaxTrackingCountryAndStateCheckerTest {
         Flux<String> result = salesTaxTrackingCountryAndStateChecker.check(salesTaxTrackingDtoUpdated);
 
         StepVerifier.create(result)
-                .expectNext("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)
+                .expectNext("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_OR_INVALID_COMBINATION)
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void check_SalesTaxTrackingWithValidStatesButMismatch_ShouldReturnAnError() {
+        StateDto stateDto = new StateDto("NY", "02", "California");
+        SalesTaxTrackingDto salesTaxTrackingDtoUpdated = salesTaxTrackingDto.withState(stateDto);
+
+        Flux<String> result = salesTaxTrackingCountryAndStateChecker.check(salesTaxTrackingDtoUpdated);
+
+        StepVerifier.create(result)
+                .expectNext("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_OR_INVALID_COMBINATION)
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void check_SalesTaxTrackingWithStateNull_ShouldReturnAnError() {
+        StateDto stateDto = new StateDto(null, "02", null);
+        SalesTaxTrackingDto salesTaxTrackingDtoUpdated = salesTaxTrackingDto.withState(stateDto);
+
+        Flux<String> result = salesTaxTrackingCountryAndStateChecker.check(salesTaxTrackingDtoUpdated);
+
+        StepVerifier.create(result)
+                .expectNext("state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_OR_INVALID_COMBINATION)
                 .expectComplete()
                 .verify();
     }
