@@ -166,7 +166,7 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>mongodb</artifactId>
         </dependency>
-        <!-- Test containers -->
+        <!-- Testcontainers -->
         <!-- Other -->
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -12,14 +12,29 @@ on:
     types: [synchronize]
 
 jobs:
-  find-linear-issue-on-pull-request:
+  fetch-linear-ticket-info:
     runs-on: ubuntu-latest
     steps:
-      - name: Find the Linear Issue
-        id: findIssue
-        uses: nrpx/action-find-linear-issue@v1.3
-        with:
-          linear-api-key: ${{secrets.LINEAR_API_KEY}}
-      - name: Show ticket
+      - name: Fetch Linear Ticket
+        id: fetch-ticket
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
         run: |
-          echo ${{ fromJson(steps.findIssue.outputs.linear-issue).identifier }}
+          HEAD_REF="${{ github.head_ref }}"
+          ISSUE_ID=$(echo "$HEAD_REF" | grep -oP 'com-\d+')
+          RESPONSE=$(curl -s -X POST \
+            https://api.linear.app/graphql \
+            -H "Authorization: $LINEAR_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"query":"query { issue(id: \"'$ISSUE_ID'\") { id title description state { name } } }"}')
+          echo "::set-output name=response::$RESPONSE"
+
+      - name: Check if ticket exists
+        id: check-response
+        run: |
+          RESPONSE="${{ fromJson(steps.fetch-ticket.outputs.response).data.issue.id }}"
+          echo $RESPONSE
+          if [ -z "$RESPONSE" ]; then
+            echo "Error: Ticket ID is null or empty"
+            exit 1
+          fi
