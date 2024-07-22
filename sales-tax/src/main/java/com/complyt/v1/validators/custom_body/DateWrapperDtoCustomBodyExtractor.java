@@ -9,6 +9,6 @@ import reactor.core.publisher.Mono;
 public class DateWrapperDtoCustomBodyExtractor implements CustomBodyExtractor<DateWrapperDto> {
     @Override
     public Mono<DateWrapperDto> extract(ServerRequest serverRequest) {
-        return Mono.just(new DateWrapperDto(serverRequest.queryParam("date").orElse("")));
+        return Mono.just(new DateWrapperDto(serverRequest.queryParam("date").orElse(null)));
     }
 }

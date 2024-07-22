@@ -12,6 +12,7 @@ import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.RegisteredType;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionType;
 import com.complyt.repositories.ClientTrackingRepository;
 import com.complyt.repositories.NexusStateRuleRepository;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.core.query.Update;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -59,11 +61,17 @@ public class SalesTaxTrackingServiceImplTest {
     @Mock
     ComplytIdHandler<SalesTaxTracking> complytIdHandler;
 
+    @Mock
+    NexusService nexusService;
+
     SalesTaxTracking salesTaxTracking;
 
     ClientTracking clientTracking;
 
     UnitTestUtilities testUtilities;
+
+    Transaction transaction;
+
     private NexusStateRule nexusStateRule;
 
     @BeforeEach
@@ -72,6 +80,7 @@ public class SalesTaxTrackingServiceImplTest {
         salesTaxTracking = testUtilities.createSalesTaxTracking(new ObjectId().toString());
         clientTracking = salesTaxTracking.getClientTracking();
         nexusStateRule = salesTaxTracking.getNexusStateRule();
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {
@@ -791,5 +800,72 @@ public class SalesTaxTrackingServiceImplTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void handleSalesTaxEnforcement_SalesTaxNotEnforced_ReturnSalesTaxTracking() {
+        // Given
+        salesTaxTracking.setEnforcesSalesTax(false);
+
+        // When
+        Mono<SalesTaxTracking> result = salesTaxTrackingService.handleSalesTaxEnforcement(transaction, salesTaxTracking);
+
+        // Then
+        StepVerifier.create(result).expectNext(salesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void handleSalesTaxEnforcement_EconomicNexusEstablished_ReturnSalesTaxTracking() {
+        // Given
+        salesTaxTracking.setEnforcesSalesTax(true);
+        salesTaxTracking.setEconomicNexusTracker(salesTaxTracking.getEconomicNexusTracker().withEstablished(true));
+
+        // When
+        Mono<SalesTaxTracking> result = salesTaxTrackingService.handleSalesTaxEnforcement(transaction, salesTaxTracking);
+
+        // Then
+        StepVerifier.create(result).expectNext(salesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void handleSalesTaxEnforcement_EnforcedAndNotEstablished_UpsertToNexusTracking() {
+        // Given
+        salesTaxTracking.setEnforcesSalesTax(true);
+        salesTaxTracking.setEconomicNexusTracker(salesTaxTracking.getEconomicNexusTracker().withEstablished(false));
+
+        // When
+        when(nexusService.upsertToNexusTracking(transaction, salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingRepository.save(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+
+        Mono<SalesTaxTracking> result = salesTaxTrackingService.handleSalesTaxEnforcement(transaction, salesTaxTracking);
+
+        // Then
+        StepVerifier.create(result).expectNext(salesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void handleSalesTaxEnforcement_NullTransaction_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.handleSalesTaxEnforcement(nullTransaction, salesTaxTracking);
+        });
+
+        assertEquals("transaction is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void handleSalesTaxEnforcement_NullSalesTaxTracking_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.handleSalesTaxEnforcement(transaction, nullSalesTaxTracking);
+        });
+
+        assertEquals("salesTaxTracking is marked non-null but is null", nullPointerException.getMessage());
     }
 }

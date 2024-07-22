@@ -24,8 +24,8 @@ class NexusCalculationSummaryTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "NexusCalculationSummary[count=" + nexusCalculationSummary.count() +
-                ", amount=" + nexusCalculationSummary.amount() + "]";
+        String expectedString = "NexusCalculationSummary(count=" + nexusCalculationSummary.getCount() +
+                ", amount=" + nexusCalculationSummary.amount() + ")";
 
         // When
         String actualString = nexusCalculationSummary.toString();
@@ -49,7 +49,7 @@ class NexusCalculationSummaryTest {
     @Test
     void getAmount_AmountIsNull_ReturnsZero() {
         // Given
-        NexusCalculationSummary nexusCalculationSummaryWithNullManualTaxRate = nexusCalculationSummary.withAmount(null);
+        NexusCalculationSummary nexusCalculationSummaryWithNullManualTaxRate = nexusCalculationSummary.setAmount(null);
 
         // When
         BigDecimal actualTotalPrice = nexusCalculationSummaryWithNullManualTaxRate.amount();
@@ -61,7 +61,7 @@ class NexusCalculationSummaryTest {
     @Test
     void getAmount_AmountIs10_ReturnsBigDecimalOf10() {
         // Given
-        NexusCalculationSummary nexusCalculationSummaryWithManualTaxRateOf10 = nexusCalculationSummary.withAmount(new BigDecimal("10"));
+        NexusCalculationSummary nexusCalculationSummaryWithManualTaxRateOf10 = nexusCalculationSummary.setAmount(new BigDecimal("10"));
 
         // When
         BigDecimal actualTotalPrice = nexusCalculationSummaryWithManualTaxRateOf10.amount();

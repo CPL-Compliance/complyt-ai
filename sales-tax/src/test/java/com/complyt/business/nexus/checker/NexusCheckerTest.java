@@ -66,8 +66,6 @@ public class NexusCheckerTest {
 
     @Test
     void salesTaxTrackingWithNexusIndication_TrackingIndicatesThatClientHasPhysicalNexus_ReturnsTrue() {
-        // Given
-
         // When
         when(salesTaxEnforcementChecker.check(salesTaxTracking)).thenReturn(true);
         when(physicalNexusChecker.check(salesTaxTracking)).thenReturn(true);
@@ -93,8 +91,6 @@ public class NexusCheckerTest {
 
     @Test
     void salesTaxTrackingWithNexusIndication_TrackingIndicatesThatClientHasEconomicNexus_ReturnsTrue() {
-        // Given
-
         // When
         when(salesTaxEnforcementChecker.check(salesTaxTracking)).thenReturn(true);
         when(physicalNexusChecker.check(salesTaxTracking)).thenReturn(false);
@@ -121,8 +117,6 @@ public class NexusCheckerTest {
 
     @Test
     void salesTaxTrackingWithNexusIndication_TrackingIndicatesThatStateDoesntChargeSalesTax_ReturnsFalse() {
-        // Given
-
         // When
         when(salesTaxEnforcementChecker.check(salesTaxTracking)).thenReturn(false);
         boolean hasNexus = nexusChecker.hasNexus(salesTaxTracking);
@@ -233,6 +227,44 @@ public class NexusCheckerTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "dateRange is marked non-null but is null");
+    }
+
+    @Test
+    void salesTaxTrackingWithEconomicNexus_EconomicNexusCheckerReturnsTrue_ReturnsTrue() {
+        // Given
+
+        // When
+        when(economicNexusChecker.check(salesTaxTracking)).thenReturn(true);
+        boolean hasEconomicNexus = nexusChecker.hasEconomicNexus(salesTaxTracking);
+
+        // Then
+        Assertions.assertTrue(hasEconomicNexus);
+    }
+
+    @Test
+    void salesTaxTrackingWithNoEconomicNexus_EconomicNexusCheckerReturnsFalse_ReturnsFalse() {
+        // Given
+
+        // When
+        when(economicNexusChecker.check(salesTaxTracking)).thenReturn(false);
+        boolean hasEconomicNexus = nexusChecker.hasEconomicNexus(salesTaxTracking);
+
+        // Then
+        Assertions.assertFalse(hasEconomicNexus);
+    }
+
+    @Test
+    void hasEconomicNexus_NullSalesTaxTracking_ThrowsException() {
+        // Given
+        SalesTaxTracking salesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            nexusChecker.hasEconomicNexus(salesTaxTracking);
+        });
+
+        // Then
+        assertEquals("salesTaxTracking is marked non-null but is null", nullPointerException.getMessage());
     }
 
 }

@@ -54,7 +54,9 @@ public class TransactionFacade {
                                 .flatMap(setTransaction -> findSalesTaxTrackingByTransaction(setTransaction)
                                         .flatMap(salesTaxTracking -> nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)
                                                 .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
-                                                        handleSalesTaxCalculationAndSave(setTransaction, salesTaxTrackingWithNexusInfo, customer) :
+                                                        handleSalesTaxCalculationAndSave(setTransaction, salesTaxTrackingWithNexusInfo, customer)
+                                                                .flatMap(returnedTransaction -> salesTaxTrackingService.handleSalesTaxEnforcement(returnedTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
+                                                                        .thenReturn(returnedTransaction)) :
                                                         transactionService.isTransactionWithStatusCancelled(setTransaction) ?
                                                                 transactionService.save(setTransaction.setCustomer(null))
                                                                         .map(savedTransaction -> savedTransaction.setCustomer(customer)) :
@@ -72,11 +74,7 @@ public class TransactionFacade {
         Customer transactionCustomer = transaction.getCustomer();
         return transactionService.save(transaction.setCustomer(null))
                 .map(savedTransaction -> savedTransaction.setCustomer(transactionCustomer))
-                .flatMap(savedTransaction -> salesTaxTracking.isEnforcesSalesTax()
-                        ? nexusService.upsertToNexusTracking(savedTransaction, salesTaxTracking)
-                        .flatMap(salesTaxTrackingAfterCalculation -> salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTrackingAfterCalculation)
-                                .thenReturn(savedTransaction))
-                        : Mono.just(savedTransaction));
+                .flatMap(savedTransaction -> salesTaxTrackingService.handleSalesTaxEnforcement(savedTransaction, salesTaxTracking).thenReturn(savedTransaction));
     }
 
     public Mono<Transaction> update(@NonNull String externalId, @NonNull String source, @NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
@@ -86,7 +84,9 @@ public class TransactionFacade {
                                 .flatMap(setTransaction -> findSalesTaxTrackingByTransaction(setTransaction)
                                         .flatMap(salesTaxTracking -> nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)
                                                 .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
-                                                        handleSalesTaxCalculationAndUpdate(externalId, source, setTransaction, salesTaxTrackingWithNexusInfo, customer) :
+                                                        handleSalesTaxCalculationAndUpdate(externalId, source, setTransaction, salesTaxTrackingWithNexusInfo, customer)
+                                                                .flatMap(returnedTransaction -> salesTaxTrackingService.handleSalesTaxEnforcement(returnedTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
+                                                                        .thenReturn(returnedTransaction)) :
                                                         transactionService.isTransactionWithStatusCancelled(setTransaction) ?
                                                                 updateAndRemoveTransactionFromNexusTrackingCalculationIfNeeded(externalId, source, setTransaction, originalTransaction) :
                                                                 updateAndHandleNexusTrackingCalculation(externalId, source, setTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking()))

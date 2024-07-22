@@ -69,7 +69,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    public void upsertByExternalIdAndSource_DoesntExistsAndSaleTaxTrackingDoesntExists_Returns500() {
+    public void upsertByExternalIdAndSource_DoesntExistsAndSaleTaxTrackingDoesntExists_Returns400() {
         // Given
         String externalId = "10003";
         String nonExistingState = "Nilfgaard";
@@ -85,13 +85,13 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 })
                 .bodyValue(TestUtilities.transactionJsonExampleWithState(externalId, customerId, nonExistingState, createdDate))
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().is4xxClientError();
     }
 
     @Order(2)
     @Test
     @Override
-    public void upsertByExternalIdAndSource_ExistsAndSaleTaxTrackingDoesntExists_Returns500() {
+    public void upsertByExternalIdAndSource_ExistsAndSaleTaxTrackingDoesntExists_Returns400() {
         // Given
         String externalId = "10002";
         String nonExistingState = "Nilfgaard";
@@ -108,7 +108,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 })
                 .bodyValue(TestUtilities.transactionJsonExampleWithState(externalId, customerId, nonExistingState, createdDate))
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus()
+                .is4xxClientError();
 
         WEB_TEST_CLIENT
                 .get()

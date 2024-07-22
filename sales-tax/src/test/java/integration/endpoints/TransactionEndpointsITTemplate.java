@@ -37,9 +37,9 @@ public interface TransactionEndpointsITTemplate extends
 
     void upsertByExternalIdAndSource_ExistsAndCustomerDoesntExists_Returns404();
 
-    void upsertByExternalIdAndSource_DoesntExistsAndSaleTaxTrackingDoesntExists_Returns500();
+    void upsertByExternalIdAndSource_DoesntExistsAndSaleTaxTrackingDoesntExists_Returns400();
 
-    void upsertByExternalIdAndSource_ExistsAndSaleTaxTrackingDoesntExists_Returns500();
+    void upsertByExternalIdAndSource_ExistsAndSaleTaxTrackingDoesntExists_Returns400();
 
     void upsertByExternalIdAndSource_OneItemIsNegativeAmount_ReturnsTaxableTransaction();
 
@@ -80,4 +80,9 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_UsaShippingWithSpacesInTheAddress_Returns200();
 
     void upsertByExternalIdAndSource_UsaTransactionWithNonExistingTaxCode_Returns400BadRequest();
+
+    void upsertByExternalIdAndSource_NewTransaction_PhysicalNexusTrackingTrue_salesTaxTrackingGotUpdated();
+
+    void upsertByExternalIdAndSource_ExistingTransaction_PhysicalNexusTrackingTrue_salesTaxTrackingGotUpdated();
+
 }

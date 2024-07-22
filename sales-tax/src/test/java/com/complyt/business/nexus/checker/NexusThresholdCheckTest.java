@@ -101,7 +101,7 @@ public class NexusThresholdCheckTest {
     void check_DefinitionOfAmount_ReturnsFalse() {
         // Given
         BigDecimal lowerAmountThanRule = nexusStateRule.nexusThreshold().getAmount().subtract(BigDecimal.ONE);
-        NexusCalculationSummary summary = nexusCalculationSummary.withAmount(lowerAmountThanRule);
+        NexusCalculationSummary summary = nexusCalculationSummary.setAmount(lowerAmountThanRule);
 
         NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.nexusThreshold().getAmount(),
                 nexusStateRule.nexusThreshold().getCount(), Definition.AMOUNT);
@@ -136,7 +136,7 @@ public class NexusThresholdCheckTest {
     void check_DefinitionOfCount_ReturnsFalse() {
         // Given
         int lowerCountThanRule = nexusStateRule.nexusThreshold().getCount() - 1;
-        NexusCalculationSummary summary = nexusCalculationSummary.withCount(lowerCountThanRule);
+        NexusCalculationSummary summary = nexusCalculationSummary.setCount(lowerCountThanRule);
         NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.nexusThreshold().getAmount(),
                 nexusStateRule.nexusThreshold().getCount(), Definition.COUNT);
         NexusStateRule nexusStateRuleWithCountDefinition = nexusStateRule.withNexusThreshold(nexusThreshold);
@@ -154,8 +154,8 @@ public class NexusThresholdCheckTest {
     void check_DefinitionOfAmountAndCount_ReturnsTrue() {
         // Given
         NexusCalculationSummary summary = nexusCalculationSummary
-                .withCount(nexusStateRule.nexusThreshold().getCount())
-                .withAmount(nexusStateRule.nexusThreshold().getAmount());
+                .setCount(nexusStateRule.nexusThreshold().getCount())
+                .setAmount(nexusStateRule.nexusThreshold().getAmount());
         NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.nexusThreshold().getAmount(),
                 nexusStateRule.nexusThreshold().getCount(), Definition.AMOUNT_AND_COUNT);
 
@@ -174,7 +174,7 @@ public class NexusThresholdCheckTest {
     void check_DefinitionOfAmountAndCount_ReturnsFalseBecauseOfCount() {
         // Given
         NexusCalculationSummary summary = nexusCalculationSummary
-                .withCount(nexusStateRule.nexusThreshold().getCount() - 1);
+                .setCount(nexusStateRule.nexusThreshold().getCount() - 1);
         NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.nexusThreshold().getAmount(),
                 nexusStateRule.nexusThreshold().getCount(), Definition.AMOUNT_AND_COUNT);
 
@@ -193,7 +193,7 @@ public class NexusThresholdCheckTest {
     void check_DefinitionOfAmountAndCount_ReturnsFalseBecauseOfAmount() {
         // Given
         NexusCalculationSummary summary = nexusCalculationSummary
-                .withAmount(nexusStateRule.nexusThreshold().getAmount().subtract(BigDecimal.ONE));
+                .setAmount(nexusStateRule.nexusThreshold().getAmount().subtract(BigDecimal.ONE));
         NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.nexusThreshold().getAmount(),
                 nexusStateRule.nexusThreshold().getCount(), Definition.AMOUNT_AND_COUNT);
 
@@ -212,8 +212,8 @@ public class NexusThresholdCheckTest {
     void check_DefinitionOfAmountOrCount_ReturnsTrueBecauseOfAmount() {
         // Given
         NexusCalculationSummary summary = nexusCalculationSummary
-                .withAmount(nexusStateRule.nexusThreshold().getAmount())
-                .withCount(nexusStateRule.nexusThreshold().getCount() - 1);
+                .setAmount(nexusStateRule.nexusThreshold().getAmount())
+                .setCount(nexusStateRule.nexusThreshold().getCount() - 1);
 
         NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.nexusThreshold().getAmount(),
                 nexusStateRule.nexusThreshold().getCount(), Definition.AMOUNT_OR_COUNT);
@@ -233,8 +233,8 @@ public class NexusThresholdCheckTest {
     void check_DefinitionOfAmountOrCount_ReturnsTrueBecauseOfCount() {
         // Given
         NexusCalculationSummary summary = nexusCalculationSummary
-                .withAmount(nexusStateRule.nexusThreshold().getAmount().subtract(BigDecimal.ONE))
-                .withCount(nexusStateRule.nexusThreshold().getCount());
+                .setAmount(nexusStateRule.nexusThreshold().getAmount().subtract(BigDecimal.ONE))
+                .setCount(nexusStateRule.nexusThreshold().getCount());
 
         NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.nexusThreshold().getAmount(),
                 nexusStateRule.nexusThreshold().getCount(), Definition.AMOUNT_OR_COUNT);
@@ -254,8 +254,8 @@ public class NexusThresholdCheckTest {
     void check_DefinitionOfAmountOrCount_ReturnsTrueBecauseOfCountAndAmount() {
         // Given
         NexusCalculationSummary summary = nexusCalculationSummary
-                .withAmount(nexusStateRule.nexusThreshold().getAmount())
-                .withCount(nexusStateRule.nexusThreshold().getCount());
+                .setAmount(nexusStateRule.nexusThreshold().getAmount())
+                .setCount(nexusStateRule.nexusThreshold().getCount());
 
         NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.nexusThreshold().getAmount(),
                 nexusStateRule.nexusThreshold().getCount(), Definition.AMOUNT_OR_COUNT);
@@ -275,8 +275,8 @@ public class NexusThresholdCheckTest {
     void check_DefinitionOfAmountOrCount_ReturnsFalse() {
         // Given
         NexusCalculationSummary summary = nexusCalculationSummary
-                .withAmount(nexusStateRule.nexusThreshold().getAmount().subtract(BigDecimal.ONE))
-                .withCount(nexusStateRule.nexusThreshold().getCount() - 1);
+                .setAmount(nexusStateRule.nexusThreshold().getAmount().subtract(BigDecimal.ONE))
+                .setCount(nexusStateRule.nexusThreshold().getCount() - 1);
 
         NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.nexusThreshold().getAmount(),
                 nexusStateRule.nexusThreshold().getCount(), Definition.AMOUNT_OR_COUNT);

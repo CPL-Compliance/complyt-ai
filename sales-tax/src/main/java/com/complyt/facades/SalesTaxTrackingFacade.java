@@ -71,19 +71,20 @@ public class SalesTaxTrackingFacade {
                 : Mono.just(salesTaxTracking);
     }
 
-    public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull String country, String state, @NonNull LocalDate refreshDate, String subsidiary) {
+    /**
+     *  <a href="https://coda.io/d/Refresh-Flow_dx9KY9BHPh8/Refresh-Flow_suYGv#_luR43">Coda documentation</a>
+     */
+    public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull String country, String state, LocalDate refreshDate, String subsidiary) {
         return salesTaxTrackingService.findByCountryStateAndSubsidiary(country, state, subsidiary)
                 .flatMap(extractedSalesTaxTracking -> nexusService.salesTaxTrackingWithNexusIndication(extractedSalesTaxTracking)
-                        .flatMap(salesTaxTrackingWithNexusInfo -> !salesTaxTrackingWithNexusInfo.isHasNexus()
-                                ? salesTaxTrackingService.addClientAndStateDetails(salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
+                        .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingService.addClientAndStateDetails(salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
                                 .flatMap(salesTaxTracking -> nexusService.getTransactionsQueryByNexusCalculation(salesTaxTracking.getNexusStateRule(), salesTaxTracking.getClientTracking(), refreshDate, salesTaxTracking.getSubsidiary())
                                         .flatMapMany(transactionService::getTransactionsByQuery)
-                                        .flatMap(transaction -> customerService.findByComplytId(transaction.getCustomerId())
-                                                .map(transaction::withCustomer))
+                                        .flatMapSequential(transaction -> customerService.findByComplytId(transaction.getCustomerId())
+                                                .map(transaction::setCustomer))
                                         .collectList()
                                         .flatMap(transactions -> nexusService.refreshNexusSummary(salesTaxTracking, transactions, refreshDate))
-                                        .flatMap(salesTaxTrackingService::save))
-                                : Mono.just(extractedSalesTaxTracking)));
+                                        .flatMap(salesTaxTrackingService::save))));
     }
 
 }

@@ -6,6 +6,7 @@ import com.complyt.domain.State;
 import com.complyt.domain.properties.ComplytIdProperty;
 import com.complyt.domain.sales_tax.RegisteredType;
 import lombok.*;
+import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -20,8 +21,10 @@ import java.util.UUID;
 @EqualsAndHashCode
 @With
 @ToString
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Document(collection = "sales_tax_tracking")
+@Data
+@Accessors(chain = true)
 public class SalesTaxTracking implements ComplytIdProperty {
     UUID complytId;
     @Id

@@ -27,19 +27,27 @@ import java.lang.annotation.Target;
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "Refresh Sales tax tracking by state and date",
+                        description = "Refresh Sales tax tracking by state ahd optional date. ",
                         operationId = "refreshSalesTaxTrackingByState",
                         parameters = {
-                                @Parameter(in = ParameterIn.QUERY,
-                                        name = "date",
-                                        description = "a date to refresh by",
-                                        examples = @ExampleObject(value = RefreshSalesTaxTrackingByStateApiInfo.dateExample,
-                                                name = RefreshSalesTaxTrackingByStateApiInfo.dateExample)),
-                                @Parameter(in = ParameterIn.PATH,
+                                @Parameter(
+                                        in = ParameterIn.QUERY,
+                                        name = "country ",
+                                        description = "Country (e.g., USA, Canada)",
+                                        required = true),
+                                @Parameter(
+                                        in = ParameterIn.QUERY,
                                         name = "state",
-                                        description = "State",
-                                        examples = @ExampleObject(value = RefreshSalesTaxTrackingByStateApiInfo.stateExample,
-                                                name = RefreshSalesTaxTrackingByStateApiInfo.stateExample))
+                                        description = "State (e.g., California, Texas)"),
+                                @Parameter(
+                                        in = ParameterIn.QUERY,
+                                        name = "date",
+                                        description = "A date to refresh (format yyyy-MM-dd). " +
+                                        "if date isn't provided, the refresh will be for all transactions history"),
+                                @Parameter(
+                                        in = ParameterIn.QUERY,
+                                        name = "subsidiary",
+                                        description = "Subsidiary of the client")
                         },
                         tags = "salesTaxTracking",
                         responses = {
@@ -73,11 +81,6 @@ import java.lang.annotation.Target;
                         }))
 })
 public @interface RefreshSalesTaxTrackingByStateApiInfo {
-
-    String stateExample = "California";
-
-    String dateExample = "2024-01-01";
-
     String returnedSalesTaxTrackingsExample = """
             {
                  "complytId": "679cab51-7d88-41a6-b587-3eceecdd9524",

@@ -94,8 +94,6 @@ public interface SalesTaxTrackingRouterTestTemplate extends
 
     void refreshByStateAndDate_DateNotInFormat_Returns400();
 
-    void refreshByStateAndDate_NoDateInAsQueryParam_Returns400();
-
     void refreshByStateAndDate_UnauthenticatedUser_Returns401();
 
     void refreshByStateAndDate_UserWithoutAuthorities_Returns403();

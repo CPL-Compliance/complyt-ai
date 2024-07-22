@@ -52,6 +52,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     private final StateDto newState = new StateDto("AL", "01", "Alabama");
     private final StateDto stateWithNexus = new StateDto("TX", "48", "Texas");
     private final StateDto stateWithOldRule = new StateDto("HI", "101", "Hawaii");
+    private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
+
 
     @MockBean
     TenantResolver tenantResolver;
@@ -141,7 +143,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(salesTaxTrackingDto -> {
-                    assertNotNull(salesTaxTrackingDto.nexusCalculationSummaries().get(summaryDate));
+                    assertNull(salesTaxTrackingDto.nexusCalculationSummaries().get(summaryDate));
                     assertEquals(
                             LocalDateTime.of(2022, 1, 1, 0, 0, 0, 0),
                             salesTaxTrackingDto.nexusStateRule().appliedDate());
@@ -222,6 +224,155 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectBody(LinkedHashMap.class)
                 .value(map -> assertEquals("[date " + DtoErrorMessages.LOCALDATE_FORMAT_ERROR + "]", map.get("message")));
     }
+
+    /**
+     * SalesTaxTracking economicTracking.established; False
+     * There is transaction with item with calculatedTotal = 100 (NexusThreshold == 100,000) from 2021
+     */
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_DoesNotPassThreshold_returnsEconomicTrackerFalse() {
+        String refreshState = "Virginia";
+        String date = "2021-01-01";
+
+        webTestClient
+                .mutateWith(csrf())
+                .mutate()
+                .build()
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", refreshState)
+                        .queryParam("date", date)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingResult -> {
+                    LocalDate summeryDateKey = LocalDate.of(2021,12,31);
+                    assertTrue(salesTaxTrackingResult.nexusCalculationSummaries().containsKey(summeryDateKey));
+                    NexusCalculationSummaryDto nexusCalculationSummaryDto = salesTaxTrackingResult.nexusCalculationSummaries().get(summeryDateKey);
+                    assertEquals(
+                            nexusCalculationSummaryDto.count(), 1);
+                    assertEquals(nexusCalculationSummaryDto.amount(), BigDecimal.valueOf(100));
+                    // False - Did not pass threshold
+                    assertFalse(salesTaxTrackingResult.economicNexusTracker().established());
+                });
+    }
+
+    /**
+     * SalesTaxTracking economicTracking.established; False
+     * There is transaction with item with calculatedTotal = 100,000 (NexusThreshold == 100,000) from 2022
+     */
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateAndDate_PassedNexus_returnsEconomicTrackerTrue() {
+        String refreshState = "Virginia";
+        String date = "2022-01-01";
+
+        webTestClient
+                .mutateWith(csrf())
+                .mutate()
+                .build()
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", refreshState)
+                        .queryParam("date", date)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingResult -> {
+                    LocalDate summeryDateKey = LocalDate.of(2022,12,31);
+                    assertTrue(salesTaxTrackingResult.nexusCalculationSummaries().containsKey(summeryDateKey));
+                    NexusCalculationSummaryDto nexusCalculationSummaryDto = salesTaxTrackingResult.nexusCalculationSummaries().get(summeryDateKey);
+                    assertEquals(
+                            nexusCalculationSummaryDto.count(), 1);
+                    assertEquals(nexusCalculationSummaryDto.amount(), BigDecimal.valueOf(100000));
+                    //updated From false -> True
+                    assertTrue(salesTaxTrackingResult.economicNexusTracker().established());
+                    assertEquals(LocalDate.of(2022, 10,10), salesTaxTrackingResult.economicNexusTracker().establishedDate().toLocalDate());
+                });
+    }
+
+    /**
+     * Utah SalesTaxTracking economicTracker, physicalNexus established sets to True
+     * But no transactions for this state -> Should be sets to False
+     */
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateNoRefDate_DoesNotPassThreshold_returnsEconomicTrackerFalse() {
+        String refreshState = "Utah";
+
+        webTestClient
+                .mutateWith(csrf())
+                .mutate()
+                .build()
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", refreshState)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingResult -> {
+                    // Updated from True -> False
+                    assertFalse(salesTaxTrackingResult.economicNexusTracker().established());
+                });
+    }
+
+    /**
+     * SalesTaxTracking economicTracking.established; False
+     * There are transactions which passed threshold (NexusThreshold == 100,000) from 2022
+     */
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void refreshByStateNoRefDate_PassedNexus_returnsEconomicTrackerTrue() {
+        String refreshState = "Virginia";
+
+        webTestClient
+                .mutateWith(csrf())
+                .mutate()
+                .build()
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", refreshState)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingResult -> {
+                    LocalDate summeryDateKey = LocalDate.of(2022,12,31);
+                    assertTrue(salesTaxTrackingResult.nexusCalculationSummaries().containsKey(summeryDateKey));
+                    NexusCalculationSummaryDto nexusCalculationSummaryDto = salesTaxTrackingResult.nexusCalculationSummaries().get(summeryDateKey);
+                    assertEquals(
+                            nexusCalculationSummaryDto.count(), 1);
+                    assertEquals(nexusCalculationSummaryDto.amount(), BigDecimal.valueOf(100000));
+                    //updated From false -> True
+                    assertTrue(salesTaxTrackingResult.economicNexusTracker().established());
+                    assertEquals(LocalDate.of(2022, 10,10), salesTaxTrackingResult.economicNexusTracker().establishedDate().toLocalDate());
+                });
+    }
+
 
     @Order(1)
     @Test
@@ -348,7 +499,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(salesTaxTrackingDto -> {
                     assertNull(salesTaxTrackingDto.nexusCalculationSummaries().get(summaryDate));
-                    assertNotNull(salesTaxTrackingDto.nexusCalculationSummaries().get(localDate));
+                    assertNull(salesTaxTrackingDto.nexusCalculationSummaries().get(localDate));
                     assertEquals(
                             LocalDateTime.of(2022, 1, 1, 0, 0, 0, 0),
                             salesTaxTrackingDto.nexusStateRule().appliedDate());

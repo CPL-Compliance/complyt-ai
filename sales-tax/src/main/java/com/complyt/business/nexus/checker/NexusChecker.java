@@ -47,4 +47,8 @@ public class NexusChecker {
 
         return passedThreshold;
     }
+
+    public boolean hasEconomicNexus(@NonNull SalesTaxTracking salesTaxTracking) {
+        return economicNexusChecker.check(salesTaxTracking);
+    }
 }

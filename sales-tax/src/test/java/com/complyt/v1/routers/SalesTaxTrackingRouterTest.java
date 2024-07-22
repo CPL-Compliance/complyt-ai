@@ -1607,35 +1607,6 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
-    public void refreshByStateAndDate_NoDateInAsQueryParam_Returns400() {
-        // Given
-        LocalDate localDate = LocalDate.now();
-        String country = salesTaxTrackingDto.country();
-        String stateName = salesTaxTrackingDto.state().name();
-        String subsidiaryId = salesTaxTrackingDto.subsidiary();
-
-        // When
-        when(salesTaxTrackingFacade.refreshNexusSummary(country, stateName, localDate, subsidiaryId)).thenReturn(Mono.just(salesTaxTracking));
-
-        // Then
-        webTestClient
-                .mutateWith(csrf())
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
-                        .queryParam("state", stateName)
-                        .queryParam("country", country)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody(LinkedHashMap.class)
-                .value(map -> assertEquals("[date must be in the format yyyy-mm-dd]", map.get("message")));
-    }
-
-    @Test
-    @Override
     public void refreshByStateAndDate_UnauthenticatedUser_Returns401() {
         // Given
         LocalDate localDate = LocalDate.now();

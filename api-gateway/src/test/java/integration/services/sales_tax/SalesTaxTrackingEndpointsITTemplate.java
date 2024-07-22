@@ -7,6 +7,7 @@ import integration.test_utils.templates.endpoints.GetByStateITTemplate;
 import integration.test_utils.templates.endpoints.UpsertByStateITTemplate;
 import integration.test_utils.templates.methods.PatchITTemplate;
 import integration.test_utils.templates.methods.PostITTemplate;
+import integration.test_utils.templates.methods.RefreshITTemplate;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
@@ -16,11 +17,8 @@ public interface SalesTaxTrackingEndpointsITTemplate extends
         GetByComplytIdITTemplate,
         GetAllITTemplate,
         PostITTemplate,
-        PatchITTemplate {
-
-    void refresh_UsaEverythingExists_Returns200WithSummary();
-
-    void refresh_NonUsaEverythingExists_Returns200WithSummary();
+        PatchITTemplate,
+        RefreshITTemplate {
 
     @Order(6)
     @Test

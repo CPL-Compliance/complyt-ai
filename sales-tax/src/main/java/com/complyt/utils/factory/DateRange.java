@@ -24,10 +24,13 @@ public class DateRange {
         this.end = end;
     }
 
-    /*
+    /**
     Each factory method returns a date range object instance
     with start and end dates according to
     a nexus state rule timeframe.
+
+    Coda File Link: Appendix Section Factory Examples:
+     <a href="https://coda.io/d/Refresh-Flow_dx9KY9BHPh8/Refresh-Flow_suYGv#_luwy-">Coda documentation</a>
     */
     public static class Factory {
 

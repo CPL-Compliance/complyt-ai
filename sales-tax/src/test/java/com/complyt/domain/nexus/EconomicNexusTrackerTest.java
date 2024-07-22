@@ -48,4 +48,18 @@ class EconomicNexusTrackerTest {
         assertTrue(isEquals);
     }
 
+    @Test
+    void build_createsEconomicNexusTracker_withInitialValues() {
+        // Given
+        LocalDateTime initDate = LocalDateTime.of(2000,1,1,0,0);
+        EconomicNexusTracker expected = economicNexusTracker.withEstablishedDate(initDate).withEstablished(false);
+
+        // When
+        EconomicNexusTracker result = EconomicNexusTracker.build();
+
+        // Then
+        assertEquals(expected, result);
+    }
+
+
 }

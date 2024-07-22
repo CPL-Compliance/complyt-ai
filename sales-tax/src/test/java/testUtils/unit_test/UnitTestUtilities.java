@@ -38,6 +38,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import reactor.core.publisher.Flux;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -403,11 +404,11 @@ public class UnitTestUtilities {
         return items.stream()
                 .map(item ->
                         item.withRelativeTransactionDiscount(removeTrailingZeros(item.getCalculatedTotal().multiply(relativeDiscountPercentageForNewAmountCalculation)))
-                        .withCalculatedTotal(removeTrailingZeros(item.getCalculatedTotal().subtract(item.getCalculatedTotal().multiply(relativeDiscountPercentageForNewAmountCalculation))))
+                                .withCalculatedTotal(removeTrailingZeros(item.getCalculatedTotal().subtract(item.getCalculatedTotal().multiply(relativeDiscountPercentageForNewAmountCalculation))))
                 ).collect(Collectors.toList());
     }
 
-    private BigDecimal removeTrailingZeros(BigDecimal integer){
+    private BigDecimal removeTrailingZeros(BigDecimal integer) {
         return new BigDecimal(integer.stripTrailingZeros().toPlainString());
     }
 
@@ -670,7 +671,7 @@ public class UnitTestUtilities {
         return new SalesTaxTracking(UUID.randomUUID(), id, "USA", state,
                 tenantId, "comment", true,
                 new PhysicalNexusTracker(false, localDateTime),
-                new EconomicNexusTracker(false, localDateTime),
+                EconomicNexusTracker.build(),
                 createNexusStateRule(id + "nsr"),
                 createClientTracking(tenantId),
                 new HashMap<>(),
@@ -710,7 +711,7 @@ public class UnitTestUtilities {
         return new SalesTaxTrackingDto(UUID.randomUUID(), country, state,
                 "comment", true,
                 new PhysicalNexusTrackerDto(false, localDateTime),
-                new EconomicNexusTrackerDto(false, localDateTime),
+                new EconomicNexusTrackerDto(false, LocalDateTime.of(2000, 1, 1, 0, 0, 0)),
                 Map.of(),
                 createNexusStateRuleDto(),
                 createClientTrackingDto(),
@@ -911,5 +912,17 @@ public class UnitTestUtilities {
                 Request.create(Request.HttpMethod.GET, "sales_tax_rates_uri",
                         Map.of("Authorization", List.of("Dummy Bearer")),
                         null, null, null), null, Map.of("Authorization", List.of("Dummy Bearer")));
+    }
+
+    public SalesTaxTracking insertSummeryToNexusCalculationSummaries(LocalDate localDate, NexusCalculationSummary nexusCalculationSummary, SalesTaxTracking salesTaxTracking) {
+        Map<LocalDate, NexusCalculationSummary> map = salesTaxTracking.getNexusCalculationSummaries();
+        map.put(localDate, nexusCalculationSummary);
+        return salesTaxTracking.withNexusCalculationSummaries(map);
+    }
+
+    public SalesTaxTracking insertTransactionToTransactionCalculationSummaries(TransactionNexusSummary transactionNexusSummary, SalesTaxTracking salesTaxTracking) {
+        Map<UUID, TransactionNexusSummary> map = salesTaxTracking.getTransactionNexusSummaries();
+        map.put(UUID.randomUUID(), transactionNexusSummary);
+        return salesTaxTracking.withTransactionNexusSummaries(map);
     }
 }

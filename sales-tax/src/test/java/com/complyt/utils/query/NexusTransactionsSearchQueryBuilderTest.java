@@ -17,7 +17,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.UUID;
 
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
@@ -43,12 +45,15 @@ public class NexusTransactionsSearchQueryBuilderTest {
     private NexusStateRule nexusStateRule;
     private Nexus nexus;
     private LocalDateTime dateReference;
+    private LocalDate localDateReference;
 
     @BeforeEach
     void setUp() {
         nexusStateRule = createNexusStateRule();
         nexus = createNexusInfo();
-        dateReference = LocalDateTime.now();
+        localDateReference = LocalDate.now();
+        dateReference = LocalDateTime.of(localDateReference, LocalTime.of(23, 59, 59));
+
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -68,7 +73,7 @@ public class NexusTransactionsSearchQueryBuilderTest {
     }
 
     private Query createExpectedQuery(LocalDateTime start, LocalDateTime end) {
-        Query query = new Query(Criteria.where("externalTimestamps.createdDate")
+        Query query = (start == null) ? new Query() : new Query(Criteria.where("externalTimestamps.createdDate")
                 .gte(start).lte(end));
 
         Criteria usaAbbreviationsCriteria = Criteria.where("shippingAddress.country").is("USA");
@@ -95,7 +100,7 @@ public class NexusTransactionsSearchQueryBuilderTest {
     }
 
     @Test
-    void buildNexusTransactionsSearch_BuildsQuery_ReturnsQuery() {
+    void buildNexusTransactionsSearch_BuildsQueryWithRefDate_ReturnsQuery() {
         // Given
         LocalDateTime startOfYear = LocalDateTime.now().with(firstDayOfYear()).with(LocalDateTime.now().with(firstDayOfYear()).withHour(0).withMinute(0).withSecond(0).withNano(0));
         LocalDateTime endOfYear = LocalDateTime.now().with(lastDayOfYear()).with(LocalDateTime.now().with(lastDayOfYear()).withHour(23).withMinute(59).withSecond(59).withNano(59));
@@ -105,14 +110,30 @@ public class NexusTransactionsSearchQueryBuilderTest {
                 .thenReturn(createQueryToSend(startOfYear, endOfYear));
 
         // When
-        Query actualQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRule, dateReference, null);
+        Query actualQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRule, localDateReference, null);
 
         // Then
         assertEquals(expectedQuery, actualQuery);
     }
 
     @Test
-    void buildNexusTransactionsSearch_BuildsQueryNonUsaCountry_ReturnsQuery() {
+    void buildNexusTransactionsSearch_BuildsQueryNoRefDate_ReturnsQuery() {
+        // Given
+        LocalDate referenceDate = null;
+        LocalDateTime startOfYear = null;
+        LocalDateTime endOfYear = LocalDateTime.now().with(lastDayOfYear()).with(LocalDateTime.now().with(lastDayOfYear()).withHour(23).withMinute(59).withSecond(59).withNano(59));
+        Query expectedQuery = createExpectedQuery(startOfYear, endOfYear);
+
+        // When
+        Query actualQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRule, referenceDate, null);
+
+        // Then
+        assertEquals(expectedQuery, actualQuery);
+    }
+
+
+    @Test
+    void buildNexusTransactionsSearch_BuildsQueryNonUsaCountryWithRefDate_ReturnsQuery() {
         // Given
         LocalDateTime startOfYear = LocalDateTime.now().with(firstDayOfYear()).with(LocalDateTime.now().with(firstDayOfYear()).withHour(0).withMinute(0).withSecond(0).withNano(0));
         LocalDateTime endOfYear = LocalDateTime.now().with(lastDayOfYear()).with(LocalDateTime.now().with(lastDayOfYear()).withHour(23).withMinute(59).withSecond(59).withNano(59));
@@ -123,11 +144,12 @@ public class NexusTransactionsSearchQueryBuilderTest {
                 .thenReturn(createQueryToSend(startOfYear, endOfYear));
 
         // When
-        Query actualQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRuleToSend, dateReference, null);
+        Query actualQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRuleToSend, localDateReference, null);
 
         // Then
         assertEquals(expectedQuery, actualQuery);
     }
+
 
     @Test
     void buildNexusTransactionsSearch_NexusInfoIsNull_ThrowsException() {
@@ -136,7 +158,7 @@ public class NexusTransactionsSearchQueryBuilderTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nullNexusInfo, nexusStateRule, dateReference, null);
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nullNexusInfo, nexusStateRule, localDateReference, null);
         });
 
         // Then
@@ -150,24 +172,10 @@ public class NexusTransactionsSearchQueryBuilderTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nullNexusStateRule, dateReference, null);
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nullNexusStateRule, localDateReference, null);
         });
 
         // Then
         assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
-    }
-
-    @Test
-    void buildNexusTransactionsSearch_ReferenceDateIsNull_ThrowsException() {
-        // Given
-        LocalDateTime nullLocalDateTime = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRule, nullLocalDateTime, null);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
     }
 }

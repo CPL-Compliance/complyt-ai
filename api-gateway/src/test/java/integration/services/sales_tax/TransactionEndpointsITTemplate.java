@@ -15,9 +15,9 @@ public interface TransactionEndpointsITTemplate extends
 
     void upsertByExternalIdAndSource_ExistsAndCustomerDoesntExists_Returns404();
 
-    void upsertByExternalIdAndSource_DoesntExistsAndSaleTaxTrackingDoesntExists_Returns500();
+    void upsertByExternalIdAndSource_DoesntExistsAndSaleTaxTrackingDoesntExists_Returns400();
 
-    void upsertByExternalIdAndSource_ExistsAndSaleTaxTrackingDoesntExists_Returns500();
+    void upsertByExternalIdAndSource_ExistsAndSaleTaxTrackingDoesntExists_Returns400();
     
     void upsertByExternalIdAndSource_ConflictingTransactionAmountIsNegative_Returns400ConflictedData();
 

@@ -10,6 +10,16 @@ import java.time.LocalDateTime;
 @ToString
 @EqualsAndHashCode
 public class EconomicNexusTracker {
+    private static final boolean DEFAULT_ESTABLISHED = false;
+    private static final int DEFAULT_YEAR_ESTABLISHED_DATE = 2000;
+    private static final int DEFAULT_MONTH_ESTABLISHED_DATE = 1;
+    private static final int DEFAULT_DAY_ESTABLISHED_DATE = 1;
+
     private boolean established;
     private LocalDateTime establishedDate;
+
+    public static EconomicNexusTracker build() {
+        return new EconomicNexusTracker(DEFAULT_ESTABLISHED,
+                LocalDateTime.of(DEFAULT_YEAR_ESTABLISHED_DATE, DEFAULT_MONTH_ESTABLISHED_DATE, DEFAULT_DAY_ESTABLISHED_DATE,0,0,0));
+    }
 }

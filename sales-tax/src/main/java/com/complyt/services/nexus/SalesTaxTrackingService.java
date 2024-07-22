@@ -2,6 +2,7 @@ package com.complyt.services.nexus;
 
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.services.crud.CrudService;
 import lombok.NonNull;
 import reactor.core.publisher.Flux;
@@ -44,4 +45,6 @@ public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, S
     Mono<SalesTaxTracking> updateRegisteredDateIfIsRegisteredModified(@NonNull SalesTaxTracking salesTaxTracking);
 
     Mono<SalesTaxTracking> injectRegisteredDateToSalesTaxTracking(@NonNull SalesTaxTracking salesTaxTracking);
+
+    Mono<SalesTaxTracking> handleSalesTaxEnforcement(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking);
 }

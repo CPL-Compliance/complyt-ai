@@ -13,7 +13,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,8 +27,8 @@ public class NexusTransactionsSearchQueryBuilder {
     @NonNull
     private TimeFrameQueryBuilder timeFrameQueryBuilder;
 
-    public Query buildNexusTransactionsSearch(@NonNull Nexus nexusInfo, @NonNull NexusStateRule nexusStateRule, @NonNull LocalDateTime referenceDate, String subsidiary) {
-        Query timeFrameQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, nexusStateRule, referenceDate);
+    public Query buildNexusTransactionsSearch(@NonNull Nexus nexusInfo, @NonNull NexusStateRule nexusStateRule, LocalDate referenceDate, String subsidiary) {
+        Query timeFrameQuery = referenceDate == null ? new Query() : timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, nexusStateRule, LocalDateTime.of(referenceDate, LocalTime.of(23, 59, 59)));
         timeFrameQuery = CountryIsUsaChecker.isCountryUsa(nexusStateRule.country()) ?
                 timeFrameQuery
                         .addCriteria(new Criteria().andOperator(countrySearchCriteria(nexusStateRule.country()), new Criteria().orOperator(

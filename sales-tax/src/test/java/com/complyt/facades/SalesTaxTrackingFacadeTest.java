@@ -131,25 +131,8 @@ public class SalesTaxTrackingFacadeTest {
         when(salesTaxTrackingService.save(salesTaxTrackingWithSummary)).thenReturn(Mono.just(salesTaxTrackingWithSummary));
 
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.refreshNexusSummary(salesTaxTracking.getCountry(), salesTaxTracking.getState().getName(), referenceDate, salesTaxTracking.getSubsidiary());
-
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithSummary).verifyComplete();
-    }
-
-    @Test
-    void refreshNexusSummary_HasNexus_ReturnsSalesTaxTrackingFromDB() {
-        // Given
-        SalesTaxTracking salesTaxTrackingWithId = salesTaxTracking.withId(UUID.randomUUID().toString());
-        LocalDate referenceDate = LocalDate.now();
-
-        // When
-        when(salesTaxTrackingService.findByCountryStateAndSubsidiary(salesTaxTracking.getCountry(), salesTaxTracking.getState().getName(), salesTaxTracking.getSubsidiary())).thenReturn(Mono.just(salesTaxTrackingWithId));
-        when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTrackingWithId)).thenReturn(Mono.just(new SalesTaxTrackingWithNexusInfo(salesTaxTrackingWithId, true)));
-
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.refreshNexusSummary(salesTaxTracking.getCountry(), salesTaxTracking.getState().getName(), referenceDate, salesTaxTracking.getSubsidiary());
-
-        // Then
-        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithId).verifyComplete();
     }
 
     @Test
@@ -302,18 +285,6 @@ public class SalesTaxTrackingFacadeTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "country is marked non-null but is null");
-    }
-
-    @Test
-    void refresh_NullDatePassed_ThrowsException() {
-        // Given
-        LocalDate date = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.refreshNexusSummary("country", "state", date, "subsidiaryId"));
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "refreshDate is marked non-null but is null");
     }
 
 }

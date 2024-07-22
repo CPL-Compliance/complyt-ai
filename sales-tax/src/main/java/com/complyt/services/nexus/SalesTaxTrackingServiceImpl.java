@@ -9,6 +9,7 @@ import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.RegisteredType;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.ClientTrackingRepository;
 import com.complyt.repositories.NexusStateRuleRepository;
 import com.complyt.repositories.SalesTaxTrackingRepository;
@@ -50,6 +51,9 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @NonNull
     NexusStateRuleRepository nexusStateRuleRepository;
 
+    @NonNull
+    private NexusService nexusService;
+
     @Override
     public Mono<SalesTaxTracking> findById(@NonNull String id) {
         return salesTaxTrackingRepository.findById(id);
@@ -87,9 +91,9 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     public Mono<SalesTaxTracking> addClientAndStateDetails(@NonNull SalesTaxTracking salesTaxTracking) {
         String stateName = salesTaxTracking.getState() != null ? salesTaxTracking.getState().getName() : "";
         return clientTrackingRepository.findClient()
-                .map(salesTaxTracking::withClientTracking)
+                .map(salesTaxTracking::setClientTracking)
                 .flatMap(salesTaxTrackingWithClient -> nexusStateRuleRepository.findMostRecentByCountryAndState(salesTaxTracking.getCountry(), stateName)
-                        .map(salesTaxTrackingWithClient::withNexusStateRule))
+                        .map(salesTaxTrackingWithClient::setNexusStateRule))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 
@@ -192,4 +196,11 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                 injectRegisteredDateToSalesTaxTracking(salesTaxTracking) : Mono.just(salesTaxTracking);
     }
 
+    @Override
+    public Mono<SalesTaxTracking> handleSalesTaxEnforcement(@NonNull Transaction transaction,@NonNull SalesTaxTracking salesTaxTracking) {
+        return salesTaxTracking.isEnforcesSalesTax() && !salesTaxTracking.getEconomicNexusTracker().isEstablished()
+                ? nexusService.upsertToNexusTracking(transaction, salesTaxTracking)
+                .flatMap(this::handleSalesTaxTrackingAfterTransactionCalculated)
+                : Mono.just(salesTaxTracking);
+    }
 }

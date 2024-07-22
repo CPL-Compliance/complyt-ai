@@ -484,45 +484,13 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isForbidden();
     }
 
-    @Order(4)
-    @Test
-    @Override
-    public void refresh_UsaEverythingExists_Returns200WithSummary() {
-        // Given
-        String country = "USA";
-        String existingStateAbbreviation = "CA";
-        LocalDate now = LocalDate.now();
-        LocalDate summaryDate = LocalDate.parse("2023-12-21");
-
-        // Then
-        WEB_TEST_CLIENT
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
-                        .queryParam("country", country)
-                        .queryParam("state", existingStateAbbreviation)
-                        .queryParam("date", now)
-                        .build())
-                .headers(headers -> {
-                    headers.setBearerAuth(TOKEN);
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                })
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.state.abbreviation").isEqualTo(existingStateAbbreviation)
-                .jsonPath("$.nexusCalculationSummaries['%s'].amount".formatted(summaryDate)).isEqualTo(0)
-                .jsonPath("$.nexusCalculationSummaries['%s'].count".formatted(summaryDate)).isEqualTo(0);
-    }
-
     @Order(5)
     @Test
     @Override
-    public void refresh_NonUsaEverythingExists_Returns200WithSummary() {
+    public void refresh_NonUsaEverythingExists_Returns200() {
         // Given
         String country = "Brazil";
         LocalDate now = LocalDate.now();
-        LocalDate summaryDate = LocalDate.parse("2023-12-21");
 
         // Then
         WEB_TEST_CLIENT
@@ -537,7 +505,66 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(salesTaxTracking ->
+                    assertTrue(salesTaxTracking.get(0).get("economicNexusTracker").toString().contains("true")));
+    }
+
+    @Order(5)
+    @Test
+    @Override
+    public void refresh_NoRefDate_PassedNexus_returnsEconomicTrackerTrue() {
+        // Given
+        String state = "Virginia";
+        String usaCountry = "USA";
+
+        // Then
+        WEB_TEST_CLIENT
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/refresh")
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(salesTaxTracking -> {
+                    assertTrue(salesTaxTracking.get(0).get("economicNexusTracker").toString().contains("true"));
+                });
+    }
+
+    @Order(5)
+    @Test
+    @Override
+    public void refresh_NoRefDate_DoesNotPassThreshold_returnsEconomicTrackerFalse() {
+        // Given
+        String state = "Utah";
+        String usaCountry = "USA";
+
+        // Then
+        WEB_TEST_CLIENT
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/refresh")
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(salesTaxTracking -> {
+                    assertTrue(salesTaxTracking.get(0).get("economicNexusTracker").toString().contains("false"));
+                });
     }
 
     @Order(6)
