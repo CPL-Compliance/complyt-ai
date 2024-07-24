@@ -2,6 +2,7 @@ package integration.endpoints;
 
 import com.complyt.SalesTaxApplication;
 import com.complyt.business.transaction.BigDecimalProcessor;
+import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
@@ -10,10 +11,12 @@ import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.exceptions.types.TaxCodeNotValidException;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.models.sales_tax.RatesMetaDataDto;
 import com.complyt.v1.models.sales_tax.SalesTaxDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.sales_tax.gt.GtRatesDto;
+import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
@@ -63,6 +66,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false);
     private final String source = "1";
+    private final String SALES_TAX_TRACKING_BASE_URL = "/v1/nexus";
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -239,6 +243,150 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     @WithMockUser
+    public void upsertByExternalIdAndSource_UsaCountryTaxInclusiveTransactionTypeTaxableRefund_Returns200() {
+        String externalId = "newNonExistingTransactionID_TAXABLE_REFUND1";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withTaxInclusive(true)
+                .withTransactionType(TransactionTypeDto.TAXABLE_REFUND);
+
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salestaxtracking is approved and physical
+
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(expectedSalesTax, transactionDto.salesTax());
+                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
+                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
+                    assertEquals(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().size(), 1);
+                    assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().get("Arvada"));
+                    assertTrue(transactionDto.isTaxInclusive());
+                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("9225.0000")));
+                });
+    }
+
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaCountryTransactionTypeTaxableRefundDidNotPassNexus_Returns200TransactionWithoutSalesTax() {
+        String externalId = "newNonExistingTransactionID_TAXABLE_REFUND2";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withTaxInclusive(true)
+                .withTransactionType(TransactionTypeDto.TAXABLE_REFUND);
+
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("DE").withCity("Dover")); //salestaxtracking is approved and physical
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertNull(transactionDto.salesTax());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaCountryTransactionTypeTaxableRefundDidNotPassNexus_Returns200TransactionAmountShouldBeSubtractedFromNexusSummaryAmount() {
+        String externalId = "newNonExistingTransactionID_TAXABLE_REFUND3";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withTaxInclusive(true)
+                .withTransactionType(TransactionTypeDto.TAXABLE_REFUND);
+
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("DE").withCity("Dover")); // salestaxtracking is approved and physical
+
+        // Get initial Sales Tax Tracking information
+        TransactionDto finalGivenTransaction = givenTransaction;
+        SalesTaxTrackingDto initialSalesTaxTrackingDto = webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("state", finalGivenTransaction.shippingAddress().state())
+                        .queryParam("country", "US")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .returnResult()
+                .getResponseBody();
+
+        assert initialSalesTaxTrackingDto != null;
+        Map<LocalDate, NexusCalculationSummaryDto> nexusCalculationSummaries = initialSalesTaxTrackingDto.nexusCalculationSummaries();
+        NexusCalculationSummaryDto firstDateSummary = nexusCalculationSummaries.values().stream().findFirst().orElse(null);
+        BigDecimal amountBeforeTaxableRefund = firstDateSummary != null ? firstDateSummary.amount() : BigDecimal.ZERO;
+
+
+        // Upsert the transaction
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(finalGivenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertNull(transactionDto.salesTax());
+
+                    // Get Sales Tax Tracking information after taxable refund transaction
+                    SalesTaxTrackingDto salesTaxTrackingDtoAfterTaxableRefund = webTestClient
+                            .mutateWith(csrf())
+                            .get()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(SALES_TAX_TRACKING_BASE_URL)
+                                    .queryParam("state", finalGivenTransaction.shippingAddress().state())
+                                    .queryParam("country", "US")
+                                    .build())
+                            .accept(MediaType.APPLICATION_JSON)
+                            .exchange()
+                            .expectStatus().isOk()
+                            .expectBody(SalesTaxTrackingDto.class)
+                            .returnResult()
+                            .getResponseBody();
+
+                    assert salesTaxTrackingDtoAfterTaxableRefund != null;
+                    Map<LocalDate, NexusCalculationSummaryDto> nexusCalculationSummariesAfterTaxableRefund = salesTaxTrackingDtoAfterTaxableRefund.nexusCalculationSummaries();
+                    NexusCalculationSummaryDto firstDateSummaryAfterTaxableRefund = nexusCalculationSummariesAfterTaxableRefund.values().stream().findFirst().orElse(null);
+                    assert firstDateSummaryAfterTaxableRefund != null;
+                    BigDecimal amountAfterTaxableRefund = firstDateSummaryAfterTaxableRefund.amount();
+
+                    assertEquals(amountBeforeTaxableRefund.subtract(transactionDto.finalTransactionAmount()), amountAfterTaxableRefund);
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
     public void upsertByExternalIdAndSource_UsaTransactionWithNonExistingTaxCode_Returns400BadRequest() { // Same as the test above just changed the state.abbreviation to check the spaces trimming
         String externalId = "newNonExistingTransactionID";
         TransactionDto transactionDto = ITUtilities.stubTransactionDto(externalId, customerId);
@@ -265,9 +413,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     /**
      * Utah salesTaxTracking: New Transaction
-     *         PhysicalNexusTracker: True
-     *         EconomicNexusTracker: False
-     *  Upsert transaction & checks if nexus tracks this transaction
+     * PhysicalNexusTracker: True
+     * EconomicNexusTracker: False
+     * Upsert transaction & checks if nexus tracks this transaction
      */
     @Order(1)
     @Test
@@ -316,9 +464,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     /**
      * Utah salesTaxTracking: Existing Transaction
-     *         PhysicalNexusTracker: True
-     *         EconomicNexusTracker: False
-     *  Upsert transaction & checks if nexus tracks this transaction
+     * PhysicalNexusTracker: True
+     * EconomicNexusTracker: False
+     * Upsert transaction & checks if nexus tracks this transaction
      */
     @Order(3)
     @Test

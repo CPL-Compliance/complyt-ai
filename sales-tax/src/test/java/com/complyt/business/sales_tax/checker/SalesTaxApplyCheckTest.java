@@ -60,6 +60,18 @@ public class SalesTaxApplyCheckTest {
     }
 
     @Test
+    void isApplied_SalesTaxAppliedBecauseTransactionTypeIsTaxableRefund_ReturnsTrue() {
+        // Given
+        Transaction transaction = createTransactionWithAppliedReferenceDate().setTransactionType(TransactionType.TAXABLE_REFUND);
+        salesTaxApplyCheck = new SalesTaxApplyCheck(transaction);
+
+        // When + Then
+        boolean isApplied = salesTaxApplyCheck.check(salesTaxTracking);
+
+        assertTrue(isApplied);
+    }
+
+    @Test
     void isApplied_SalesTaxNotAppliedBecauseOfApplicationDate_ReturnsFalse() {
         // Given
         Transaction transaction = createTransactionWithReferenceDateNotApplied();

@@ -8,5 +8,6 @@ public enum TransactionTypeDto {
     SALES_ORDER,
     INVOICE,
     ESTIMATE,
-    REFUND
+    REFUND,
+    TAXABLE_REFUND
 }

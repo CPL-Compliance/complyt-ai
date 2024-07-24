@@ -30,7 +30,7 @@ public class TransactionsFilterByNexusRules implements ListFilter<Transaction, N
         }
 
         TransactionType transactionType = transaction.getTransactionType();
-        boolean transactionTypeIsNotRequired = !List.of(TransactionType.INVOICE, TransactionType.REFUND).contains(transactionType);
+        boolean transactionTypeIsNotRequired = !List.of(TransactionType.INVOICE, TransactionType.REFUND, TransactionType.TAXABLE_REFUND).contains(transactionType);
         if (transactionTypeIsNotRequired) {
             log.debug("Transaction of type " + transactionType + " is not being included in nexus' calculation");
             return false;

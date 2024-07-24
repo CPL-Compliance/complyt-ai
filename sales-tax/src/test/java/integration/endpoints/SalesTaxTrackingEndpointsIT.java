@@ -181,7 +181,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     @WithMockUser
     public void refreshByStateAndDate_DoesntExists_Returns404NotFound() {
-        String state = "DE";
+        String state = "OR"; // Oregon
 
         // Then
         webTestClient

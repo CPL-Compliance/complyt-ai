@@ -298,8 +298,7 @@ class NexusServiceTest {
 
 
     @Test
-    void isSalesTaxTrackingCalculationRequired_TransactionIsOfTypeInovice_ReturnsTrue() {
-        // Given
+    void isNexusTrackingCalculationRequired_TransactionIsOfTypeInovice_ReturnsTrue() {
 
         // When
         boolean isSalesTaxRequired = nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTracking);
@@ -309,7 +308,18 @@ class NexusServiceTest {
     }
 
     @Test
-    void isSalesTaxTrackingCalculationRequired_CustomerTypeNotInStateRule_ReturnsFalse() {
+    void isNexusTrackingCalculationRequired_TransactionIsOfTypeTaxableRefund_ReturnsTrue() {
+        // Given
+        transaction.setTransactionType(TransactionType.TAXABLE_REFUND);
+        // When
+        boolean isSalesTaxRequired = nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTracking);
+
+        // Then
+        assertTrue(isSalesTaxRequired);
+    }
+
+    @Test
+    void isNexusTrackingCalculationRequired_CustomerTypeNotInStateRule_ReturnsFalse() {
         // Given
         SalesTaxTracking salesTaxTrackingWithNoCustomerTypesInStateRule = salesTaxTracking
                 .withNexusStateRule(salesTaxTracking.getNexusStateRule()
@@ -323,7 +333,7 @@ class NexusServiceTest {
     }
 
     @Test
-    void isSalesTaxTrackingCalculationRequired_TransactionIsOfTypeSalesOrder_ReturnsFalse() {
+    void isNexusTrackingCalculationRequired_TransactionIsOfTypeSalesOrder_ReturnsFalse() {
         // Given
 
         // When
@@ -335,7 +345,7 @@ class NexusServiceTest {
     }
 
     @Test
-    void isSalesTaxTrackingCalculationRequired_NullSalesTaxTrackingPassed_ThrowsException() {
+    void isNexusTrackingCalculationRequired_NullSalesTaxTrackingPassed_ThrowsException() {
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
                 () -> nexusService.isNexusTrackingCalculationRequired(transaction, null));

@@ -50,7 +50,7 @@ public class NexusService {
     }
 
     public boolean isNexusTrackingCalculationRequired(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
-        return List.of(TransactionType.INVOICE, TransactionType.REFUND).contains(transaction.getTransactionType()) &&
+        return List.of(TransactionType.INVOICE, TransactionType.REFUND, TransactionType.TAXABLE_REFUND).contains(transaction.getTransactionType()) &&
                 salesTaxTracking.getNexusStateRule().customerTypes().contains(transaction.getCustomer().getCustomerType());
     }
 
