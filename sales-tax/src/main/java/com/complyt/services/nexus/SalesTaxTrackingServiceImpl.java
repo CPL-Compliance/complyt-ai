@@ -3,6 +3,7 @@ package com.complyt.services.nexus;
 import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
+import com.complyt.business.timestamps_injection.SalesTaxTrackingPhysicalNexusDateApplierInjector;
 import com.complyt.business.timestamps_injection.SalesTaxTrackingRegisteredDateTimestampsInjector;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -194,6 +195,18 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     public Mono<SalesTaxTracking> updateRegisteredDateIfIsRegisteredModified(@NonNull SalesTaxTracking salesTaxTracking) {
         return (salesTaxTracking.getRegistered() == RegisteredType.REGISTERED && salesTaxTracking.getRegistrationDate() == null) ?
                 injectRegisteredDateToSalesTaxTracking(salesTaxTracking) : Mono.just(salesTaxTracking);
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> updateAppliedDateIfIsPhysicalNexusEstablished(@NonNull SalesTaxTracking salesTaxTracking) {
+        return salesTaxTracking.getPhysicalNexusTracker().isEstablished() ?
+                injectAppliedDateIfIsPhysicalEconomicEnabled(salesTaxTracking) : Mono.just(salesTaxTracking);
+    }
+
+    private Mono<SalesTaxTracking> injectAppliedDateIfIsPhysicalEconomicEnabled(SalesTaxTracking salesTaxTracking) {
+        return Mono.just(salesTaxTracking)
+                .map(SalesTaxTrackingPhysicalNexusDateApplierInjector::new)
+                .map(SalesTaxTrackingPhysicalNexusDateApplierInjector::inject);
     }
 
     @Override

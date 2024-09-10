@@ -46,6 +46,7 @@ public class SalesTaxTrackingFacade {
         return salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, originalSalesTaxTracking)
                 .flatMap(salesTaxTrackingService::addClientAndStateDetails)
                 .flatMap(salesTaxTrackingService::updateRegisteredDateIfIsRegisteredModified)
+                .flatMap(salesTaxTrackingService::updateAppliedDateIfIsPhysicalNexusEstablished)
                 .flatMap(salesTaxTrackingWithClientAndStateDetails -> salesTaxTrackingService.insertSummariesFromOriginal(salesTaxTrackingWithClientAndStateDetails, originalSalesTaxTracking))
                 .flatMap(salesTaxTrackingService::update)
                 .flatMap(recalculateCurrentNexusSummaryIfNeeded());
@@ -54,6 +55,7 @@ public class SalesTaxTrackingFacade {
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
         return salesTaxTrackingService.checkSalesTaxTrackingNotHavingComplytId(salesTaxTracking)
                 .flatMap(salesTaxTrackingService::injectDataToNewSalesTaxTracking)
+                .flatMap(salesTaxTrackingService::updateAppliedDateIfIsPhysicalNexusEstablished)
                 .flatMap(salesTaxTrackingService::save)
                 .flatMap(recalculateCurrentNexusSummaryIfNeeded());
     }
