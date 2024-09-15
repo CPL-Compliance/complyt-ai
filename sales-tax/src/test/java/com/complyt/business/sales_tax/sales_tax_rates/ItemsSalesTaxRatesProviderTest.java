@@ -2,8 +2,6 @@ package com.complyt.business.sales_tax.sales_tax_rates;
 
 import com.complyt.business.tax.sales_tax.sales_tax_rates.ItemsSalesTaxRatesProvider;
 import com.complyt.business.tax.sales_tax.sales_tax_rates.SalesTaxRatesProvider;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.transaction.Address;
@@ -17,9 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import testUtils.unit_test.UnitTestUtilities;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;

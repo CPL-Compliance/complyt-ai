@@ -5,7 +5,6 @@ import integration.test_utils.TestUtilities;
 import integration.test_utils.templates.endpoints.RepositoryConstant;
 import org.junit.jupiter.api.*;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;

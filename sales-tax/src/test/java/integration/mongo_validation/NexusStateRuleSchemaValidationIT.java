@@ -3,7 +3,6 @@ package integration.mongo_validation;
 import com.complyt.SalesTaxApplication;
 import integration.TestContainersInitializerIT;
 import org.bson.Document;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,8 +16,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.test.StepVerifier;
 import testUtils.integration_test.ITUtilities;
-
-import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)

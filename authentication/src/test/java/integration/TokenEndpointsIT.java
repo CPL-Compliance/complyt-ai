@@ -5,7 +5,6 @@ import io.complyt.authentication.v1.config.error_messages.GenericErrorMessages;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.TokenDto;
 import io.complyt.authentication.v1.routers.TokenRouter;
-import net.minidev.json.JSONObject;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;

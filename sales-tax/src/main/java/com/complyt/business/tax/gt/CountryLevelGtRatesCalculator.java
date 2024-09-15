@@ -1,8 +1,8 @@
 package com.complyt.business.tax.gt;
 
-import com.complyt.domain.transaction.tax.GtRates;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
+import com.complyt.domain.transaction.tax.GtRates;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

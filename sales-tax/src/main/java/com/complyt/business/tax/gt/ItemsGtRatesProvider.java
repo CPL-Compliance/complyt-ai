@@ -1,8 +1,8 @@
 package com.complyt.business.tax.gt;
 
+import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.tax.GtAddress;
 import com.complyt.domain.transaction.tax.GtRates;
-import com.complyt.domain.transaction.Item;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

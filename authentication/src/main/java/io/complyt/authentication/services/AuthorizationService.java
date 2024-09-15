@@ -1,8 +1,8 @@
 package io.complyt.authentication.services;
 
-import io.complyt.authentication.business.authorization.*;
 import io.complyt.authentication.auth0_client.Auth0Client;
-import io.complyt.authentication.domain.ApiKey;
+import io.complyt.authentication.business.authorization.AccessToken;
+import io.complyt.authentication.business.authorization.AuthorizationServerWrapper;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.Token;

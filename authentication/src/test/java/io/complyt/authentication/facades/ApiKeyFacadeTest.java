@@ -2,9 +2,9 @@ package io.complyt.authentication.facades;
 
 import io.complyt.authentication.auth0_client.Auth0Client;
 import io.complyt.authentication.business.exceptions.ComplytAuth0Exception;
-import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
+import io.complyt.authentication.domain.TenantIdAndNameObject;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.services.ApiKeyService;
 import io.complyt.authentication.services.AuthorizationService;

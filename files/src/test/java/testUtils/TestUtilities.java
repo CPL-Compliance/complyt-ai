@@ -1,9 +1,8 @@
 package testUtils;
 
-import org.bson.Document;
 import io.complyt.files.domain.File;
 import io.complyt.files.v1.models.FileDto;
-import org.bson.types.Binary;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.security.oauth2.jwt.Jwt;
 

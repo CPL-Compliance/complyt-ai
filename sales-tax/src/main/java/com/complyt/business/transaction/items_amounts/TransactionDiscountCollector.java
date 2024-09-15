@@ -2,7 +2,6 @@ package com.complyt.business.transaction.items_amounts;
 
 import com.complyt.business.builder.CollectionBuilder;
 import com.complyt.domain.Discountable;
-import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

@@ -53,6 +53,7 @@
         <spring-cloud-dependencies.version>2022.0.3</spring-cloud-dependencies.version>
         <testcontainers.version>1.17.6</testcontainers.version>
         <taxjar.version>5.0.3</taxjar.version>
+        <mongodb-driver.version>4.11.0</mongodb-driver.version>
 
         <testcontainers-keycloak.version>2.5.0</testcontainers-keycloak.version>
         <!-- Dependencies -->
@@ -221,6 +222,16 @@
                 <groupId>com.taxjar</groupId>
                 <artifactId>taxjar-java</artifactId>
                 <version>${taxjar.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongodb-driver-reactivestreams</artifactId>
+                <version>${mongodb-driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongodb-driver-core</artifactId>
+                <version>${mongodb-driver.version}</version>
             </dependency>
         </dependencies>
         <!-- Other -->

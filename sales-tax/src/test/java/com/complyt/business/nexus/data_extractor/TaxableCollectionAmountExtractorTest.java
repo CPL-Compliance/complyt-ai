@@ -4,7 +4,6 @@ import com.complyt.business.nexus.checker.qualification_check.QualificationCheck
 import com.complyt.domain.Taxable;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.NexusStateRule;
-import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.BeforeEach;

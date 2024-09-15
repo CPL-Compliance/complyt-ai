@@ -1,13 +1,7 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
-import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.ShippingFee;
-import com.complyt.v1.models.JurisdictionalSalesTaxRulesDto;
-import com.complyt.v1.models.transaction.ItemDto;
 import com.complyt.v1.models.transaction.ShippingFeeDto;
-import com.complyt.v1.models.transaction.TransactionDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;

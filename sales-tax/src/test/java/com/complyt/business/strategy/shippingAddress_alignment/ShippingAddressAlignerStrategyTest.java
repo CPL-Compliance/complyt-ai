@@ -1,19 +1,13 @@
 package com.complyt.business.strategy.shippingAddress_alignment;
 
-import com.complyt.domain.customer.exemption.Exemption;
-import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.Transaction;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Flux;
-import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 public class ShippingAddressAlignerStrategyTest {

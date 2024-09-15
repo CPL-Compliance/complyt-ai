@@ -6,7 +6,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Mapper
 public interface DateWrapperToLocalDateMapper {

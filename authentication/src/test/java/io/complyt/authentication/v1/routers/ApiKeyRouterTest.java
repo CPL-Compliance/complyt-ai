@@ -1,11 +1,11 @@
 package io.complyt.authentication.v1.routers;
 
-import io.complyt.authentication.v1.config.ApiExceptionConfig;
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.enums.ApiKeyStatus;
 import io.complyt.authentication.facades.ApiKeyFacade;
 import io.complyt.authentication.repositories.exceptions.OperationFailedException;
+import io.complyt.authentication.v1.config.ApiExceptionConfig;
 import io.complyt.authentication.v1.config.error_messages.GenericErrorMessages;
 import io.complyt.authentication.v1.exceptions.GlobalErrorAttributes;
 import io.complyt.authentication.v1.exceptions.GlobalExceptionHandler;

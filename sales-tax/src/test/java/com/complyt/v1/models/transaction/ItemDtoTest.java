@@ -1,13 +1,9 @@
 package com.complyt.v1.models.transaction;
 
-import com.complyt.v1.models.TangibleCategoryDto;
-import com.complyt.v1.models.TaxableCategoryDto;
-import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

@@ -1,12 +1,12 @@
 package com.complyt.services;
 
+import com.complyt.business.collection_fetcher.UsaStatesMap;
 import com.complyt.business.data_fetcher.CityCountyFetcher;
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
 import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.domain.SalesTaxData;
-import com.complyt.business.collection_fetcher.UsaStatesMap;
 import com.complyt.repositories.ComplytSalesTaxRatesRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;

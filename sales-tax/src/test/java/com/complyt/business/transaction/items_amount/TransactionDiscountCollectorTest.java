@@ -3,9 +3,7 @@ package com.complyt.business.transaction.items_amount;
 import com.complyt.business.builder.CollectionBuilder;
 import com.complyt.business.transaction.items_amounts.AmountCalculator;
 import com.complyt.business.transaction.items_amounts.TransactionDiscountCollector;
-import com.complyt.business.transaction.items_amounts.TransactionItemsAmountsCollector;
 import com.complyt.domain.Discountable;
-import com.complyt.domain.Taxable;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
 import org.bson.types.ObjectId;
@@ -23,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

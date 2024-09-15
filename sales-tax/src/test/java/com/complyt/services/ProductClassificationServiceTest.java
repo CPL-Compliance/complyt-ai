@@ -9,7 +9,6 @@ import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.ProductClassificationRepository;
-import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.exceptions.types.TaxCodeNotValidException;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;

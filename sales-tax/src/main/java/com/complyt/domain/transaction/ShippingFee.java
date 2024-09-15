@@ -2,12 +2,12 @@ package com.complyt.domain.transaction;
 
 import com.complyt.domain.TaxRates;
 import com.complyt.domain.Taxable;
-import com.complyt.domain.transaction.tax.GtRates;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
+import com.complyt.domain.transaction.tax.GtRates;
 import lombok.*;
 
 import java.math.BigDecimal;

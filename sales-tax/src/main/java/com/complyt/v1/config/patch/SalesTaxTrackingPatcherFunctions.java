@@ -1,6 +1,5 @@
 package com.complyt.v1.config.patch;
 
-import com.complyt.domain.sales_tax.RegisteredType;
 import com.complyt.utils.object_mapper.ComplytObjectMapper;
 import com.complyt.v1.models.*;
 

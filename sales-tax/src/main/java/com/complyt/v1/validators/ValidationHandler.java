@@ -2,18 +2,15 @@ package com.complyt.v1.validators;
 
 import com.complyt.v1.exceptions.types.*;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractor;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.ServerRequest;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

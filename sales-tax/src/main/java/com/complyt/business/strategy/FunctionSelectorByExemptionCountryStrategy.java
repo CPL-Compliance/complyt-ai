@@ -2,7 +2,6 @@ package com.complyt.business.strategy;
 
 import com.complyt.business.address.CountryIsUsaChecker;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
-import com.complyt.domain.transaction.Transaction;
 
 import java.util.function.Function;
 
