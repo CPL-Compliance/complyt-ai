@@ -9,6 +9,7 @@ import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.Address;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.customer.CustomerStatusDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.ClassificationDto;
 import com.complyt.v1.models.nexus.*;
@@ -55,7 +56,7 @@ public interface ITUtilities {
     static CustomerDto stubCustomerDto(String externalId) {
         return new CustomerDto(null, externalId, "1",
                 "stub customer", null, "captaindope@gg.com", CustomerTypeDto.RETAIL,
-                null,new TimestampsDto(localDateTime, localDateTime), "comment");
+                null,new TimestampsDto(localDateTime, localDateTime), "comment", CustomerStatusDto.ACTIVE);
     }
 
     static SalesTaxTrackingDto stubSalesTaxTrackingDto(String country, StateDto state) {
@@ -291,7 +292,8 @@ public interface ITUtilities {
                         .append("updatedDate", LocalDateTime.now()))
                 .append("complytId", UUID.randomUUID())
                 .append("source", "1")
-                .append("email", "captain@dope.com");
+                .append("email", "captain@dope.com")
+                .append("customerStatus", "ACTIVE");
     }
 
     static Document exemptionDocument() {

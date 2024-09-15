@@ -115,7 +115,8 @@ public class CustomerServiceImpl implements CustomerService {
                         customer.getSource(), customer.getName(), customer.getAddress(),
                         customerInfo.getTenantId(), customer.getEmail(), customer.getCustomerType(),
                         customer.getInternalTimestamps(), customer.getExternalTimestamps(),
-                        customer.getComment()
+                        customer.getComment(),
+                        customer.getCustomerStatus()
                 );
     }
 }

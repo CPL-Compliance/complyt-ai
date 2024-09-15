@@ -29,6 +29,7 @@ public record CustomerDto(
         @NotNull(message = "customerType " + DtoErrorMessages.NOT_NULL_ERROR) CustomerTypeDto customerType,
         @Schema(ref = "internalTimestamps") @Valid TimestampsDto internalTimestamps,
         @Schema(ref = "externalTimestamps") @Valid @NotNull(message = "externalTimestamps " + DtoErrorMessages.NOT_NULL_ERROR) TimestampsDto externalTimestamps,
-        @Size(max = 200, message = "comment " + StringErrorMessages.MAX_200_ERROR) String comment)
+        @Size(max = 200, message = "comment " + StringErrorMessages.MAX_200_ERROR) String comment,
+        @Schema(description = FieldsDescriptions.CUSTOMER_STATUS) CustomerStatusDto customerStatus)
         implements SourceCheckable, ExternalIdCheckable {
 }

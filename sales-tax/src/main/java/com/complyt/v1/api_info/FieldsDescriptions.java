@@ -47,6 +47,7 @@ public interface FieldsDescriptions {
     String SALES_TAX = "The sales tax breakdown for the transaction, including the amount and rates by jurisdictions. if tax may apply, contains either salestax rates or gt rates";
 
     String TRANSACTION_STATUS = "The status of the transaction";
+    String CUSTOMER_STATUS = "The status of the customer";
 
     String TRANSACTION_TYPE = "The type of the transaction. Only invoices are considered for nexus tracking and for actual tax calculation";
 
