@@ -2,7 +2,6 @@ package com.complyt.v1.exceptions;
 
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.exceptions.types.ComplytApiException;
-import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.boot.web.error.ErrorAttributeOptions;

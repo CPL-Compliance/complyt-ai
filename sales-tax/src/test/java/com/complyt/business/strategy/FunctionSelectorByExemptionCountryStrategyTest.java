@@ -1,7 +1,6 @@
 package com.complyt.business.strategy;
 
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
-import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

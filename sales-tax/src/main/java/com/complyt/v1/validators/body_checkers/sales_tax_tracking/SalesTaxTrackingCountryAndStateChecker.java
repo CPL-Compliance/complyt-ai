@@ -5,8 +5,8 @@ import com.complyt.business.address.CountryIsUsaChecker;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
-import com.complyt.v1.validators.body_checkers.StateExistsChecker;
 import com.complyt.v1.validators.body_checkers.DtoBodyChecker;
+import com.complyt.v1.validators.body_checkers.StateExistsChecker;
 import reactor.core.publisher.Flux;
 
 import java.util.Objects;

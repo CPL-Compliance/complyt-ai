@@ -4,10 +4,8 @@ import com.complyt.domain.gt.GtAddress;
 import lombok.NonNull;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Component

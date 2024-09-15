@@ -4,7 +4,6 @@ import com.complyt.business.address.CountryIsSupportedNonUsaChecker;
 import com.complyt.business.address.CountryIsUsaChecker;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
-import com.complyt.v1.validators.body_checkers.StateExistsChecker;
 import com.complyt.v1.validators.body_checkers.DtoBodyChecker;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;

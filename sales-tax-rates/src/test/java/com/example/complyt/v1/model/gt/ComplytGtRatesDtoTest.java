@@ -1,8 +1,8 @@
 package com.example.complyt.v1.model.gt;
 
 import com.complyt.v1.model.gt.ComplytGtRatesDto;
-import com.complyt.v1.model.gt.GtRatesDto;
 import com.complyt.v1.model.gt.GtAddressDto;
+import com.complyt.v1.model.gt.GtRatesDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

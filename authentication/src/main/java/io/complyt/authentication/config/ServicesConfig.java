@@ -1,6 +1,5 @@
 package io.complyt.authentication.config;
 
-import io.complyt.authentication.business.authorization.Auth0AuthorizationServerWrapper;
 import io.complyt.authentication.business.authorization.AuthorizationServerWrapper;
 import io.complyt.authentication.repositories.CredentialsRepository;
 import io.complyt.authentication.repositories.TokenRepository;
@@ -8,10 +7,7 @@ import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.services.AuthorizationService;
 import io.complyt.authentication.services.CredentialsService;
 import io.complyt.authentication.services.TokenService;
-import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

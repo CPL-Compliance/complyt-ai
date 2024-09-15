@@ -1,8 +1,5 @@
 package com.complyt.v1.validators.body_checkers.exemption;
 
-import com.complyt.v1.config.error_messages.DtoErrorMessages;
-import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

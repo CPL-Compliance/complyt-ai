@@ -1,6 +1,5 @@
 package io.complyt.authentication.business.authorization;
 
-import com.nimbusds.jose.shaded.gson.annotations.SerializedName;
 import io.complyt.authentication.auth0_client.ClientMetadata;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

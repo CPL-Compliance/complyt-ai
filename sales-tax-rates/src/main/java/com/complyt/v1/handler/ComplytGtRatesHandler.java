@@ -6,7 +6,6 @@ import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.ComplytGtRatesMapper;
 import com.complyt.v1.mappers.GtAddressMapper;
-import com.complyt.v1.model.ComplytSalesTaxRatesDto;
 import com.complyt.v1.model.gt.ComplytGtRatesDto;
 import com.complyt.v1.model.gt.GtAddressDto;
 import com.complyt.v1.validators.ValidationHandler;

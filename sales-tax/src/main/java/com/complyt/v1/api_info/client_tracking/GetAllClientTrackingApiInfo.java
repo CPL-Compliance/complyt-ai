@@ -1,7 +1,6 @@
 package com.complyt.v1.api_info.client_tracking;
 
 
-import com.complyt.v1.api_info.customer.GetAllCustomersApiInfo;
 import com.complyt.v1.models.ClientTrackingDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

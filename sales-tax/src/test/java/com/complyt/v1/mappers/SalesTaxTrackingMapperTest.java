@@ -1,20 +1,16 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.domain.ClientTracking;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.TransactionNexusSummary;
-import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.TransactionType;
 import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;

@@ -1,9 +1,9 @@
 package test_utils.unit_tests;
 
+import io.complyt.authentication.auth0_client.Auth0Client;
 import io.complyt.authentication.auth0_client.ClientMetadata;
 import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.business.authorization.Auth0AccessToken;
-import io.complyt.authentication.auth0_client.Auth0Client;
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.TenantIdAndNameObject;
@@ -13,7 +13,6 @@ import io.complyt.authentication.security.EncryptedData;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.models.TokenDto;
-import io.complyt.authentication.auth0_client.Auth0Client;
 import lombok.NonNull;
 import org.bson.Document;
 import org.bson.types.ObjectId;

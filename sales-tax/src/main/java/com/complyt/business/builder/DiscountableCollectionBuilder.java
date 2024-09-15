@@ -2,8 +2,6 @@ package com.complyt.business.builder;
 
 import com.complyt.domain.Discountable;
 import com.complyt.domain.transaction.Transaction;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 

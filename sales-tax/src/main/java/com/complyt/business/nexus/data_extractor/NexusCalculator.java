@@ -8,7 +8,6 @@ import com.complyt.domain.transaction.TransactionType;
 import com.complyt.utils.factory.DateRange;
 import com.complyt.utils.filter.TransactionsFilterByNexusRules;
 import com.complyt.utils.filter.TransactionsNexusSummariesFilterByDateRange;
-import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +17,6 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 

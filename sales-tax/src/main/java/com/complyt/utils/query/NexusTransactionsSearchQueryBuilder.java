@@ -2,8 +2,6 @@ package com.complyt.utils.query;
 
 import com.complyt.business.address.CountryIsUsaChecker;
 import com.complyt.business.address.CountryToStandardizedCountry;
-import com.complyt.business.address.SupportedNonUsCountries;
-import com.complyt.business.address.UsaAbbreviations;
 import com.complyt.domain.Nexus;
 import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
@@ -16,8 +14,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component

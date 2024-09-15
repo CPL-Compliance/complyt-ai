@@ -1,6 +1,6 @@
 package io.complyt.authentication.auth0_client;
 
-import lombok.*;
+import lombok.With;
 
 import java.util.List;
 

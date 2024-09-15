@@ -1,9 +1,6 @@
 package com.complyt.business.date_injection;
 
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.Item;
@@ -13,9 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

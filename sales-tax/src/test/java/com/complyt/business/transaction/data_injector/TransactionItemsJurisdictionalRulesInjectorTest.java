@@ -1,6 +1,5 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.business.strategy.ShippingFeeJurisdictionalRulesInjection.ShippingFeeJurisdictionalInjector;
 import com.complyt.business.strategy.StrategySelector;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
