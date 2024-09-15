@@ -25,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.mongodb.core.query.Update;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -676,6 +675,29 @@ public class SalesTaxTrackingServiceImplTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "originalSalesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void updateAppliedDateIfIsPhysicalEconomicEnabled_NullOriginalSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.updateAppliedDateIfIsPhysicalNexusEstablished(nullSalesTaxTracking);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void updateAppliedDateIfIsPhysicalEconomicEnabled_EstablishedFalse_ReturnsSalesTaxTracking() {
+       // Given
+        salesTaxTracking = salesTaxTracking.withPhysicalNexusTracker(salesTaxTracking.getPhysicalNexusTracker().withEstablished(false));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.updateAppliedDateIfIsPhysicalNexusEstablished(salesTaxTracking);
+
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
     }
 
     @Test

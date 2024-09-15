@@ -3,6 +3,7 @@ package com.complyt.services.nexus;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
+import com.complyt.business.timestamps_injection.provider.NexusAppliedDateProvider;
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.EconomicNexusTracker;
@@ -42,6 +43,8 @@ public class NexusService {
     private NexusChecker nexusChecker;
     @NonNull
     private NexusTransactionsSearchQueryBuilder nexusTransactionsSearchQueryBuilder;
+    @NonNull
+    private NexusAppliedDateProvider nexusAppliedDateProvider;
 
 
     public Mono<SalesTaxTrackingWithNexusInfo> salesTaxTrackingWithNexusIndication(@NonNull SalesTaxTracking salesTaxTracking) {
@@ -56,7 +59,8 @@ public class NexusService {
 
     public Mono<SalesTaxTracking> economicNexusQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull LocalDateTime referenceDate) {
         EconomicNexusTracker newTracker = new EconomicNexusTracker(true, referenceDate);
-        LocalDateTime appliedDate = applicationDateCreator.create(salesTaxTracking.getNexusStateRule().timeFrame(), referenceDate);
+        LocalDateTime updatedAppliedDate = applicationDateCreator.create(salesTaxTracking.getNexusStateRule().timeFrame(), referenceDate);
+        LocalDateTime appliedDate = nexusAppliedDateProvider.getAppliedDate(salesTaxTracking, updatedAppliedDate);
 
         SalesTaxTracking modifiedTracking = salesTaxTracking
                 .setEconomicNexusTracker(newTracker)

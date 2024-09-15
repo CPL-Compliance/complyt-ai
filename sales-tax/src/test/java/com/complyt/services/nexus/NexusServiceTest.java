@@ -4,6 +4,7 @@ import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
 import com.complyt.business.nexus.data_extractor.NexusTransactionSummaryCalculator;
+import com.complyt.business.timestamps_injection.provider.NexusAppliedDateProvider;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.*;
@@ -34,6 +35,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -56,6 +58,8 @@ class NexusServiceTest {
     private NexusChecker nexusChecker;
     private Transaction transaction;
     private SalesTaxTracking salesTaxTracking;
+    @Mock
+    NexusAppliedDateProvider nexusAppliedDateProvider;
 
     @BeforeEach
     void setUp() {
@@ -136,6 +140,7 @@ class NexusServiceTest {
         when(nexusCalculator.addTransactionToNexusSummary(transaction, salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTrackingAfterCalculation));
         when(nexusChecker.passedThreshold(salesTaxTrackingAfterCalculation, summaryDate)).thenReturn(true);
         when(applicationDateCreator.create(salesTaxTracking.getNexusStateRule().timeFrame(), referenceDate)).thenReturn(referenceDate);
+        when(nexusAppliedDateProvider.getAppliedDate(salesTaxTrackingAfterCalculation, referenceDate)).thenReturn(referenceDate);
 
         Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.upsertToNexusTracking(transaction, salesTaxTracking);
 
@@ -166,6 +171,7 @@ class NexusServiceTest {
         when(nexusCalculator.addTransactionToNexusSummary(transaction, givenSalesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTrackingAfterCalculation));
         when(nexusChecker.passedThreshold(salesTaxTrackingAfterCalculation, summaryDate)).thenReturn(true);
         when(applicationDateCreator.create(givenSalesTaxTracking.getNexusStateRule().timeFrame(), referenceDate)).thenReturn(referenceDate);
+        when(nexusAppliedDateProvider.getAppliedDate(salesTaxTrackingAfterCalculation, referenceDate)).thenReturn(referenceDate);
 
         Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.upsertToNexusTracking(transaction, givenSalesTaxTracking);
 
@@ -244,6 +250,7 @@ class NexusServiceTest {
         when(nexusCalculator.subtractTransactionFromNexusSummary(complytId, salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusChecker.passedThreshold(salesTaxTracking, summaryDate)).thenReturn(true);
         when(applicationDateCreator.create(salesTaxTracking.getNexusStateRule().timeFrame(), referenceDate)).thenReturn(referenceDate);
+        when(nexusAppliedDateProvider.getAppliedDate(salesTaxTracking, referenceDate)).thenReturn(referenceDate);
 
         Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.removeFromNexusTracking(transaction, salesTaxTracking);
 
@@ -636,16 +643,22 @@ class NexusServiceTest {
         // Given
         salesTaxTracking = salesTaxTracking.withEconomicNexusTracker(salesTaxTracking.getEconomicNexusTracker().withEstablished(false));
         LocalDate refDate = LocalDate.now();
+        LocalDateTime appliedDate = LocalDateTime.now();
         List<Transaction> transactionList = Collections.singletonList(transaction);
         DateRange summaryDate = nexusService.getNexusSummaryDate(salesTaxTracking, LocalDateTime.of(refDate, LocalTime.of(23, 59, 59))).block();
         DateRange summaryDateTransaction = nexusService.getNexusSummaryDate(salesTaxTracking, transaction.getExternalTimestamps().getCreatedDate()).block();
-        LocalDateTime appliedDate = applicationDateCreator.create(salesTaxTracking.getNexusStateRule().timeFrame(), transaction.getExternalTimestamps().getCreatedDate());
-        SalesTaxTracking expectedSalesTaxTracking = salesTaxTracking.withEconomicNexusTracker(new EconomicNexusTracker(true, transaction.getExternalTimestamps().getCreatedDate())).withAppliedDate(appliedDate);
+        NexusAppliedDateProvider nexusProvider = new NexusAppliedDateProvider();
+        LocalDateTime resDate = nexusProvider.getAppliedDate(salesTaxTracking, appliedDate);
+        SalesTaxTracking expectedSalesTaxTracking = salesTaxTracking.withEconomicNexusTracker(new EconomicNexusTracker(true, transaction.getExternalTimestamps().getCreatedDate())).withAppliedDate(resDate);
+
 
         when(nexusCalculator.initNexusCalculationSummaryByDateRange(salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusCalculator.addTransactionToNexusSummary(transaction, salesTaxTracking, summaryDateTransaction)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusChecker.passedThreshold(salesTaxTracking, Objects.requireNonNull(summaryDateTransaction))).thenReturn(true);
+        when(applicationDateCreator.create(salesTaxTracking.getNexusStateRule().timeFrame(), transaction.getExternalTimestamps().getCreatedDate())).thenReturn(appliedDate);
         when(nexusChecker.hasEconomicNexus(expectedSalesTaxTracking)).thenReturn(true);
+        when(nexusAppliedDateProvider.getAppliedDate(salesTaxTracking, appliedDate)).thenReturn(resDate);
+
 
         // When
         Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.refreshNexusSummary(salesTaxTracking, transactionList, refDate);

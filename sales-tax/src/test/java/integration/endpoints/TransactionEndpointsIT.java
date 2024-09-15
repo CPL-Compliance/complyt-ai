@@ -2,7 +2,6 @@ package integration.endpoints;
 
 import com.complyt.SalesTaxApplication;
 import com.complyt.business.transaction.BigDecimalProcessor;
-import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;

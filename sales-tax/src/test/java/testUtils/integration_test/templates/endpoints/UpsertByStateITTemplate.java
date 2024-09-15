@@ -19,4 +19,11 @@ public interface UpsertByStateITTemplate extends SalesTaxTrackingRegisteredITTem
     void upsertByState_NoBody_Returns400();
 
     void upsertByState_UnsupportedMediaType_Returns415();
+
+    // AppliedDate Tests
+    void upsertByState_WithDefaultAppliedDateAndPhysicalTrue_ShouldUpdateAppliedDate();
+    void upsertByState_WithFutureAppliedDateAndPhysicalTrue_ShouldUpdateAppliedDate();
+    void upsertByState_WithPastAppliedDateAndPhysicalTrue_ShouldNotUpdateAppliedDate();
+    void upsertByState_WithPhysicalTrueAndEconomicNexusInFuture_ShouldNotUpdateAppliedDate();
+    void upsertByState_WithPhysicalTrueAndPassedNexusByEconomic_ShouldUpdateAppliedDate();
 }

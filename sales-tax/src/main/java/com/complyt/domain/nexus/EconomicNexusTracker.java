@@ -3,6 +3,7 @@ package com.complyt.domain.nexus;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 
 @Getter
 @AllArgsConstructor
@@ -14,6 +15,14 @@ public class EconomicNexusTracker {
     private static final int DEFAULT_YEAR_ESTABLISHED_DATE = 2000;
     private static final int DEFAULT_MONTH_ESTABLISHED_DATE = 1;
     private static final int DEFAULT_DAY_ESTABLISHED_DATE = 1;
+
+    public static final LocalDateTime DEFAULT_ESTABLISHED_DATE = LocalDateTime.of(
+            DEFAULT_YEAR_ESTABLISHED_DATE,
+            Month.of(DEFAULT_MONTH_ESTABLISHED_DATE),
+            DEFAULT_DAY_ESTABLISHED_DATE,
+            0, 0
+    );
+
 
     private boolean established;
     private LocalDateTime establishedDate;
