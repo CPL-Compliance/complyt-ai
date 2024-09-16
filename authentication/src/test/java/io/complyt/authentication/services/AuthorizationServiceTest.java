@@ -1,7 +1,7 @@
 package io.complyt.authentication.services;
 
-import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.auth0_client.Auth0Client;
+import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.business.authorization.AuthorizationServerWrapper;
 import io.complyt.authentication.business.exceptions.ComplytAuth0Exception;
 import io.complyt.authentication.domain.ApiKey;
@@ -30,7 +30,6 @@ import java.security.NoSuchAlgorithmException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)

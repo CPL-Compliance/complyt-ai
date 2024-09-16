@@ -1,8 +1,9 @@
 package com.complyt.v1.validators.body_checkers;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import org.junit.Test;
 
 public class StateExistsCheckerTest {
 

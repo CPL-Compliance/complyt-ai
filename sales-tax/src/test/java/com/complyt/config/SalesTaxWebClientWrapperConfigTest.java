@@ -1,8 +1,8 @@
 package com.complyt.config;
 
+import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
 import com.complyt.business.tax.gt.gt_tax_web_client.GtWebClientWrapper;
 import com.complyt.business.tax.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
-import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
 import com.complyt.business.tax.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.transaction.tax.ComplytGtRates;

@@ -1,10 +1,10 @@
 package com.complyt.domain;
 
-import com.complyt.domain.transaction.tax.GtRates;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.domain.transaction.tax.GtRates;
 
 import java.math.BigDecimal;
 

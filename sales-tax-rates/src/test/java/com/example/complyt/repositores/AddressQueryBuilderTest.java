@@ -1,8 +1,8 @@
 package com.example.complyt.repositores;
 
 import com.complyt.domain.Address;
-import com.complyt.repositories.UnitedStatesAddressQueryBuilder;
 import com.complyt.repositories.QueryBuilder;
+import com.complyt.repositories.UnitedStatesAddressQueryBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

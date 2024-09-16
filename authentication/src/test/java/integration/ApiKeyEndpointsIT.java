@@ -1,7 +1,6 @@
 package integration;
 
 import io.complyt.authentication.AuthenticationApplication;
-import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.v1.config.error_messages.GenericErrorMessages;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;

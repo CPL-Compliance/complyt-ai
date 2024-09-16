@@ -1,7 +1,6 @@
 package com.complyt.v1.config;
 
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
-import com.complyt.v1.models.ClientTrackingDto;
 import com.complyt.v1.models.ClientTrackingDtoTenant;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.customer.CustomerDto;

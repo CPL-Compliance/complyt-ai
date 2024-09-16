@@ -1,6 +1,7 @@
 package com.complyt.domain.nexus;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;

@@ -1,10 +1,10 @@
 package com.complyt.business.tax.gt;
 
-import com.complyt.domain.transaction.tax.GtAddress;
-import com.complyt.domain.transaction.tax.GtRates;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.tax.GtAddress;
+import com.complyt.domain.transaction.tax.GtRates;
 import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;

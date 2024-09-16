@@ -1,6 +1,5 @@
 package com.complyt.repositories.gt_rates;
 
-import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.domain.gt.ComplytGtRates;
 import com.complyt.domain.gt.GtAddress;
 import com.complyt.repositories.QueryBuilder;

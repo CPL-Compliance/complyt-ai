@@ -1,7 +1,7 @@
 package com.complyt.v1.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.With;
 
 @With
 @Schema(name = "ComplytSalesTaxRates")

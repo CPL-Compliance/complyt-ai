@@ -1,9 +1,7 @@
 package com.complyt.business.transaction.items_amount;
 
 import com.complyt.business.transaction.items_amounts.DiscountablesTotalDiscountCalculator;
-import com.complyt.business.transaction.items_amounts.TotalItemsAmountCalculator;
 import com.complyt.domain.Discountable;
-import com.complyt.domain.Taxable;
 import com.complyt.domain.transaction.Item;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DiscountablesTotalDiscountCalculatorTest {
     private UnitTestUtilities testUtilities;

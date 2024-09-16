@@ -2,12 +2,9 @@ package com.complyt.utils.query;
 
 import com.complyt.business.address.CountryIsUsaChecker;
 import com.complyt.business.address.CountryToStandardizedCountry;
-import com.complyt.business.address.SupportedNonUsCountries;
-import com.complyt.business.address.UsaAbbreviations;
 import com.complyt.domain.transaction.Address;
 import lombok.NonNull;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 @Component

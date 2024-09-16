@@ -22,8 +22,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.test.StepVerifier;
 import test_utils.unit_tests.TestUtilities;
 
-import java.util.Date;
-
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = AuthenticationApplication.class)

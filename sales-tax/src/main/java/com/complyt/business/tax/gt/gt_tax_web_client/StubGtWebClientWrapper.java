@@ -2,7 +2,6 @@ package com.complyt.business.tax.gt.gt_tax_web_client;
 
 import com.complyt.annotations.Generated;
 import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
-import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.tax.ComplytGtRates;
 import com.fasterxml.jackson.databind.ObjectMapper;

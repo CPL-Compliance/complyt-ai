@@ -4,7 +4,6 @@ import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.customer.exemption.ExemptionType;
-import com.complyt.domain.customer.exemption.ValidationDates;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.query.CountryAndStateCriteriaBuilder;
