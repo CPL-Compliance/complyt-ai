@@ -56,7 +56,7 @@ public interface ITUtilities {
     static CustomerDto stubCustomerDto(String externalId) {
         return new CustomerDto(null, externalId, "1",
                 "stub customer", null, "captaindope@gg.com", CustomerTypeDto.RETAIL,
-                null,new TimestampsDto(localDateTime, localDateTime), "comment", CustomerStatusDto.ACTIVE);
+                null,new TimestampsDto(localDateTime, localDateTime), "comment", null);
     }
 
     static SalesTaxTrackingDto stubSalesTaxTrackingDto(String country, StateDto state) {
