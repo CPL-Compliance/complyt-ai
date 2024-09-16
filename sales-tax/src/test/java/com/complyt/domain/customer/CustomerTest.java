@@ -20,7 +20,7 @@ class CustomerTest {
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         customer = testUtilities.createCustomer(UUID.randomUUID().toString());
-        anotherCustomer = new Customer(customer.getComplytId(), customer.getId(), customer.getExternalId(), customer.getSource(), customer.getName(), customer.getAddress(), customer.getTenantId(), customer.getEmail(), customer.getCustomerType(), customer.getInternalTimestamps(), customer.getExternalTimestamps(), "comment");
+        anotherCustomer = new Customer(customer.getComplytId(), customer.getId(), customer.getExternalId(), customer.getSource(), customer.getName(), customer.getAddress(), customer.getTenantId(), customer.getEmail(), customer.getCustomerType(), customer.getInternalTimestamps(), customer.getExternalTimestamps(), "comment", customer.getCustomerStatus());
     }
 
     @Test
@@ -47,7 +47,8 @@ class CustomerTest {
                 ", customerType=" + customer.getCustomerType() +
                 ", internalTimestamps=" + customer.getInternalTimestamps() +
                 ", externalTimestamps=" + customer.getExternalTimestamps() +
-                ", comment=" + customer.getComment() + ")";
+                ", comment=" + customer.getComment() +
+                ", customerStatus=" + customer.getCustomerStatus() + ")";
 
         // When
         String actualString = customer.toString();

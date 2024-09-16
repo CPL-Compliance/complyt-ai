@@ -152,7 +152,8 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
                     "createdDate": "2022-10-19T07:00:00",
                     "updatedDate": "2022-10-19T09:07:54.585"
                 },
-                "comment": "this is a customer"
+                "comment": "this is a customer",
+                "customerStatus": "ACTIVE"
             }""";
 
 }

@@ -50,7 +50,8 @@ public class CustomerDtoTest {
                 ", customerType=" + customerDto.customerType() +
                 ", internalTimestamps=" + customerDto.internalTimestamps() +
                 ", externalTimestamps=" + customerDto.externalTimestamps() +
-                ", comment=" + customerDto.comment() + "]";
+                ", comment=" + customerDto.comment() +
+                ", customerStatus=" + customerDto.customerStatus() + "]";
 
         // When
         String actualString = customerDto.toString();

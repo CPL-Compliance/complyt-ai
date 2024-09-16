@@ -2,6 +2,7 @@ package testUtils.unit_test;
 
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.CustomerStatus;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.nexus.*;
@@ -23,6 +24,7 @@ import com.complyt.v1.config.BodyCheckConfig;
 import com.complyt.v1.mappers.ItemMapper;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.customer.CustomerStatusDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.*;
 import com.complyt.v1.models.nexus.*;
@@ -175,6 +177,8 @@ public class UnitTestUtilities {
         Timestamps internalTimeStamps = new Timestamps(localDateTime, localDateTime);
         LocalDateTime localDateTimeMinusOneMinute = localDateTime.minusMinutes(1);
         Timestamps externalTimestamps = new Timestamps(localDateTimeMinusOneMinute, localDateTime);
+        CustomerStatus customerStatus = CustomerStatus.ACTIVE;
+
         return new Customer(
                 UUID.randomUUID(),
                 id,
@@ -187,7 +191,8 @@ public class UnitTestUtilities {
                 CustomerType.RETAIL,
                 internalTimeStamps,
                 externalTimestamps,
-                "comment"
+                "comment",
+                customerStatus
         );
     }
 
@@ -195,6 +200,8 @@ public class UnitTestUtilities {
         TimestampsDto internalTimeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         LocalDateTime localDateTimeMinusOneMinute = localDateTime.minusMinutes(1);
         TimestampsDto externalTimestamps = new TimestampsDto(localDateTimeMinusOneMinute.toString(), localDateTime.toString());
+        CustomerStatusDto customerStatus = CustomerStatusDto.ACTIVE;
+
         return new CustomerDto(
                 UUID.randomUUID(),
                 id,
@@ -205,7 +212,8 @@ public class UnitTestUtilities {
                 CustomerTypeDto.RETAIL,
                 internalTimeStamps,
                 externalTimestamps,
-                "comment"
+                "comment",
+                customerStatus
         );
     }
 

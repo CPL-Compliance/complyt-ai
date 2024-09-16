@@ -29,4 +29,5 @@ public class Customer implements ComplytIdProperty {
     private final Timestamps internalTimestamps;
     private final Timestamps externalTimestamps;
     private final String comment;
+    private final CustomerStatus customerStatus;
 }
