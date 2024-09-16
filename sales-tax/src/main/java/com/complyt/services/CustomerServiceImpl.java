@@ -4,6 +4,7 @@ import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.CustomerStatus;
 import com.complyt.repositories.CustomerRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -48,7 +49,8 @@ public class CustomerServiceImpl implements CustomerService {
         return Mono.just(customer)
                 .map(complytIdHandler::insertComplytIdToNew)
                 .map(NewCustomerInternalTimestampsInjector::new)
-                .map(NewCustomerInternalTimestampsInjector::inject);
+                .map(NewCustomerInternalTimestampsInjector::inject)
+                .map(customerWithInjectedData -> customerWithInjectedData.withCustomerStatus(CustomerStatus.ACTIVE));
     }
 
     @Override
@@ -116,7 +118,7 @@ public class CustomerServiceImpl implements CustomerService {
                         customerInfo.getTenantId(), customer.getEmail(), customer.getCustomerType(),
                         customer.getInternalTimestamps(), customer.getExternalTimestamps(),
                         customer.getComment(),
-                        customer.getCustomerStatus()
+                        customerInfo.getCustomerStatus()
                 );
     }
 }
