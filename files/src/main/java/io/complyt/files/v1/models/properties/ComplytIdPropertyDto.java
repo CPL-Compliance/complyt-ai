@@ -4,5 +4,6 @@ import java.util.UUID;
 
 public interface ComplytIdPropertyDto {
     UUID complytId();
+
     ComplytIdPropertyDto withComplytId(UUID complytId);
 }

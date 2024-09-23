@@ -23,7 +23,7 @@ class FileDtoTest {
     }
 
     @Test
-    public void equals_IdenticalLinks_Equal() {
+    public void equals_SameFileMetadata_ReturnsTrue() {
         FileDto referenceFileDto = TestUtilities.createFileDto(fileDto.complytId());
 
         assertEquals(fileDto, referenceFileDto);

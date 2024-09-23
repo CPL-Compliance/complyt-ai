@@ -1,5 +1,9 @@
 package integration;
 
+import com.github.dockerjava.api.model.ContainerNetwork;
+import com.google.cloud.NoCredentials;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import integration.test_utils.TestUtilities;
 import org.springframework.http.MediaType;
@@ -15,6 +19,10 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,6 +38,7 @@ public abstract class TestContainersInitializerIT {
     // Image versions
     protected static final String MONGO_IMAGE = "mongo:5.0.15";
     protected static final String KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:21.0";
+    protected static final String FAKE_GCS_IMAGE = "fsouza/fake-gcs-server:latest";
 
     // Services
     protected static final String DISCOVERY_SERVICE = "discovery-service";
@@ -49,6 +58,9 @@ public abstract class TestContainersInitializerIT {
     protected static final GenericContainer API_GATEWAY_CONTAINER;
     protected static final KeycloakContainer KEYCLOAK_CONTAINER;
 
+    protected static final GenericContainer FAKE_GCS_CONTAINER;
+
+
     // Tokens
     protected static String TOKEN_COMPLYT_ADMIN;
     protected static String TOKEN;
@@ -61,6 +73,9 @@ public abstract class TestContainersInitializerIT {
     protected static final Map<String, String> JAR_FILE_MAP = new HashMap<>();
     protected static final Network NETWORK;
 
+    //    protected static Storage storageClient;
+    protected static String fakeGcsExternalUrl;
+
     static {
 
         NETWORK = Network.newNetwork();
@@ -69,7 +84,9 @@ public abstract class TestContainersInitializerIT {
         KEYCLOAK_CONTAINER = new KeycloakContainer(KEYCLOAK_IMAGE)
                 .withNetwork(NETWORK)
                 .withNetworkAliases(HOSTNAME)
-                .withRealmImportFile("realm-export.json");
+                .withRealmImportFile("realm-export.json")
+                .withCreateContainerCmdModifier(cmd -> cmd.withName("keycloak_container"));
+        ;
         KEYCLOAK_CONTAINER.start();
         ACCESS_TOKEN_CLIENT = WebTestClient.bindToServer().baseUrl("http://localhost:" + KEYCLOAK_CONTAINER.getMappedPort(8080) + "/").build();
 
@@ -87,7 +104,9 @@ public abstract class TestContainersInitializerIT {
         // Mongo Container
         MONGO_CONTAINER = new MongoDBContainer(DockerImageName.parse(MONGO_IMAGE))
                 .withNetwork(NETWORK)
-                .withNetworkAliases(HOSTNAME);
+                .withNetworkAliases(HOSTNAME)
+                .withCreateContainerCmdModifier(cmd -> cmd.withName("mongo_container"));
+        ;
         MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(SALES_TAX), "/" + dumpPath(SALES_TAX), BindMode.READ_ONLY);
         MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(SALES_TAX_RATES), "/" + dumpPath(SALES_TAX_RATES), BindMode.READ_ONLY);
         MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(FILES), "/" + dumpPath(FILES), BindMode.READ_ONLY);
@@ -126,10 +145,28 @@ public abstract class TestContainersInitializerIT {
                 "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
         SALES_TAX_RATES_CONTAINER.start();
 
+
+        FAKE_GCS_CONTAINER = new GenericContainer<>(DockerImageName.parse(FAKE_GCS_IMAGE))
+                .withNetwork(NETWORK)
+                .withNetworkAliases(HOSTNAME)
+                .withExposedPorts(4443)
+                .withCreateContainerCmdModifier(cmd -> cmd.withEntrypoint(
+                        "/bin/fake-gcs-server",
+                        "-scheme", "http"
+                ))
+                .withCreateContainerCmdModifier(cmd -> cmd.withName("fake_gcs"));
+        FAKE_GCS_CONTAINER.start();
+        try {
+            updateExternalUrlWithContainerUrl(FAKE_GCS_CONTAINER);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
         //Files Container
         FILES_CONTAINER = initializeServiceContainer(FILES,
-                "java", "-Dspring.profiles.active=integration-test",
-                mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
+                "java", "-Dspring.profiles.active=integration-test, fakeGoogleStorage",
+                "-Dgoogle.storage.url=" + fakeGcsExternalUrl, mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
                 "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
         FILES_CONTAINER.start();
 
@@ -208,7 +245,8 @@ public abstract class TestContainersInitializerIT {
                                 .entryPoint(entrypoint)
                         ))
                 .withNetwork(NETWORK)
-                .withNetworkAliases(HOSTNAME);
+                .withNetworkAliases(HOSTNAME)
+                .withCreateContainerCmdModifier(cmd -> cmd.withName(service + "-container"));
     }
 
     private static void getToken(String clientId, String username, Consumer<String> tokenConsumer) {
@@ -227,5 +265,34 @@ public abstract class TestContainersInitializerIT {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.access_token").value(tokenConsumer);
+    }
+
+    private static void updateExternalUrlWithContainerUrl(GenericContainer fakeGcsContainer) throws Exception {
+        String ip_addr = ((ContainerNetwork) fakeGcsContainer
+                .getCurrentContainerInfo()
+                .getNetworkSettings()
+                .getNetworks()
+                .values()
+                .toArray()[0])
+                .getIpAddress();
+        int tc_port = fakeGcsContainer.getMappedPort(4443);
+
+        try {
+            HttpRequest req = HttpRequest.newBuilder()
+                    .uri(URI.create("http://localhost:" + tc_port + "/storage/v1/b"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString("{\"name\": \"test\"}"))
+                    .build();
+            HttpResponse<Void> response = HttpClient.newBuilder().build()
+                    .send(req, HttpResponse.BodyHandlers.discarding());
+            if (response.statusCode() != 200) {
+                throw new RuntimeException(
+                        "error updating fake-gcs-server with external url, response status code " + response.statusCode() + " != 200");
+            }
+            fakeGcsExternalUrl = "http://" + ip_addr + ":4443";
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

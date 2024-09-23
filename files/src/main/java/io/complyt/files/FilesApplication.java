@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @Generated
 public class FilesApplication {
-    public static void main(String[] args) {SpringApplication.run(FilesApplication.class, args);}
-    
+    public static void main(String[] args) {
+        SpringApplication.run(FilesApplication.class, args);
+    }
+
 }

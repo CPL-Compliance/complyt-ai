@@ -1,6 +1,7 @@
 package integration;
 
 import io.complyt.files.FilesApplication;
+import io.complyt.files.business.storage.StorageWrapper;
 import io.complyt.files.v1.models.FileDto;
 import io.complyt.files.v1.routers.FileRouter;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
@@ -30,6 +32,9 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
 
     @Autowired
     private WebTestClient webTestClient;
+
+    @MockBean
+    private StorageWrapper storageWrapper;
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {

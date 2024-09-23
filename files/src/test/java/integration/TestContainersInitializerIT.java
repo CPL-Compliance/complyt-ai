@@ -1,7 +1,9 @@
 package integration;
 
+import com.google.cloud.storage.Storage;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
@@ -14,13 +16,20 @@ public abstract class TestContainersInitializerIT {
 
     protected static final String MONGO_IMAGE = "mongo:5.0.15";
 
+
     protected static final MongoDBContainer MONGO_CONTAINER = new MongoDBContainer(DockerImageName.parse(MONGO_IMAGE))
             .withExposedPorts(27017);
+
+
+    protected static Storage storageClient;
+    protected static WebTestClient WEB_TEST_CLIENT;
 
     static {
         MONGO_CONTAINER.addFileSystemBind("../mongodump/files.dump", "/files.dump", BindMode.READ_ONLY);
         MONGO_CONTAINER.start();
         MONGO_CONTAINER.followOutput(new Slf4jLogConsumer(log));
+
+
         try {
             MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=files.dump");
         } catch (Exception e) {

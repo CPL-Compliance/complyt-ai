@@ -15,9 +15,21 @@ logging:
     root: info
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "https://issuer-uri.com/"
   cloud:
     vault:
       enabled: false
   data:
     mongodb:
       database: files
+key:
+url-ttl: 15
+bucket-name: "test"
+project-id: "test"
+google:
+  storage:
+    url: "http://test-host:4443"

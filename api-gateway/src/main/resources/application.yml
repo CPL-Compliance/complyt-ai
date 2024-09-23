@@ -96,13 +96,13 @@ spring:
             - Path=/v1/transactions/source/{source}/externalId/{external_id}
           filters:
             - SetPath=/v1/transactions/source/{source}/externalId/{external_id}
-#        - id: sales-tax-patch-transaction-by-complyt-id
-#          uri: lb://sales-tax
-#          predicates:
-#            - Method=PATCH
-#            - Path=/v1/transactions/complytId/{complyt_id}
-#          filters:
-#            - SetPath=/v1/transactions/complytId/{complyt_id}
+        #        - id: sales-tax-patch-transaction-by-complyt-id
+        #          uri: lb://sales-tax
+        #          predicates:
+        #            - Method=PATCH
+        #            - Path=/v1/transactions/complytId/{complyt_id}
+        #          filters:
+        #            - SetPath=/v1/transactions/complytId/{complyt_id}
         # ---- Transaction ----
         # ---- Customer ----
         - id: sales-tax-get-customers
@@ -280,9 +280,36 @@ spring:
           uri: lb://files
           predicates:
             - Method=GET
+            - Path=/v1/files_old
+          filters:
+        - id: files-get-all-files
+          uri: lb://files
+          predicates:
+            - Method=GET
             - Path=/v1/files
           filters:
             - SetPath=/v1/files
+        - id: files-save-file
+          uri: lb://files
+          predicates:
+            - Method=PUT
+            - Path=/v1/files
+          filters:
+            - SetPath=/v1/files
+        - id: files-get-one-link
+          uri: lb://files
+          predicates:
+            - Method=GET
+            - Path=/v1/files/{complytId}
+          filters:
+            - SetPath=/v1/files/{complytId}
+        - id: files-mark-delete-one-file
+          uri: lb://files
+          predicates:
+            - Method=DELETE
+            - Path=/v1/files/{complytId}
+          filters:
+            - SetPath=/v1/files/{complytId}
         # ---- Files ----
         # ==== Files Service ====
         # ==== Sales Tax Rates Service ====

@@ -3,6 +3,7 @@ server.port: ${PORT:9880}
 
 spring.profiles.active:
   - @activeEnv@
+  - @activeStorageClient@
 
 # Observability
 management.metrics.distribution.percentiles-histogram.http.server.requests: true

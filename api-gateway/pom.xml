@@ -160,6 +160,12 @@
             <artifactId>netty-resolver-dns-native-macos</artifactId>
             <classifier>osx-aarch_64</classifier>
         </dependency>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-storage</artifactId>
+            <scope>test</scope>
+            <version>2.37.0</version>
+        </dependency>
         <!-- Other -->
     </dependencies>
 

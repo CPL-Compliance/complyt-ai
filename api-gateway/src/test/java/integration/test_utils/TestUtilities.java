@@ -1,7 +1,12 @@
 package integration.test_utils;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.client.MultipartBodyBuilder;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.UUID;
 
 public class TestUtilities {
 
@@ -12,7 +17,8 @@ public class TestUtilities {
     public static final String EXEMPTION_BASE_URL = "/v1/exemptions";
     public static final String COMPLYT_SALES_TAX_RATES_BASE_URL = "/v1/sales_tax_rates";
     public static final String COMPLYT_GT_RATES_BASE_URL = "/v1/gt_rates";
-    public static final String FILES_BASE_URL = "/v1/files";
+    public static final String FILES_BASE_URL = "/v1/files_old";
+    public static final String COMPLYT_FILES_BASE_URL = "/v1/files";
     public static final String TOKEN_BASE_URL = "/v1/token";
     public static final String API_KEY_BASE_URL = "/v1/api_key";
     public static final String SECRET_KEY_BASE_URL = "/v1/secret_key";
@@ -579,5 +585,11 @@ public class TestUtilities {
                     "registered": "REGISTERED"
                 }
                                 """;
+    }
+    public static MultipartBodyBuilder complytFileSaveFileExample() {
+        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+        multipartBodyBuilder.part("file", new ClassPathResource("application.yml")) // Add a file part
+                .header("Content-Disposition", "form-data; name=file; filename=test.it");
+        return multipartBodyBuilder;
     }
 }

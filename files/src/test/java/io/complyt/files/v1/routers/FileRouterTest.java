@@ -2,7 +2,10 @@ package io.complyt.files.v1.routers;
 
 import io.complyt.files.config.ApiExceptionConfig;
 import io.complyt.files.config.SecurityConfig;
+import io.complyt.files.domain.ComplytFile;
+import io.complyt.files.domain.ComplytFileMetadata;
 import io.complyt.files.domain.File;
+import io.complyt.files.facade.ComplytFileFacade;
 import io.complyt.files.services.FileService;
 import io.complyt.files.v1.exceptions.GlobalErrorAttributes;
 import io.complyt.files.v1.exceptions.GlobalExceptionHandler;
@@ -10,8 +13,11 @@ import io.complyt.files.v1.handlers.FileHandler;
 import io.complyt.files.v1.mappers.FileMapper;
 import io.complyt.files.v1.models.FileDto;
 import io.complyt.files.v1.validators.ValidatorConfig;
+import io.complyt.files.v1.validators.query_params.QueryParamsExtractorFile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import testUtils.TestUtilities;
 
@@ -31,20 +38,28 @@ import static org.mockito.Mockito.when;
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
         GlobalExceptionHandler.class,
-        SecurityConfig.class})
+        SecurityConfig.class,
+        QueryParamsExtractorFile.class})
+@ExtendWith(MockitoExtension.class)
 @WebFluxTest
 public class FileRouterTest implements FileRouterTestTemplate {
     @MockBean
     FileService fileService;
+
+    @MockBean
+    ComplytFileFacade complytFileFacade;
+
+
     @Autowired
     private ApplicationContext context;
 
+    @Autowired
     private WebTestClient webTestClient;
 
     @BeforeEach
     void setUp() {
         webTestClient = WebTestClient.bindToApplicationContext(context).build();
-        webTestClient = WebTestClient.bindToApplicationContext(context).build();
+//        webTestClient = WebTestClient.bindToApplicationContext(context).build();
     }
 
     @Test
@@ -149,5 +164,95 @@ public class FileRouterTest implements FileRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    @WithMockUser
+    public void getAllFiles_Exists_Returns200() {
+        // Given
+        ComplytFile complytFile = TestUtilities.createComplytFile();
+        ComplytFileMetadata complytFileMetadata = complytFile.getMetadata();
+        // When
+        when(complytFileFacade.findAllFilesInTenant(false, "active"))
+                .thenReturn(Flux.just(complytFileMetadata));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(FileRouter.COMPLYT_FILE_BASE_URL).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .equals(complytFileMetadata);
+    }
+
+    @Test
+    @WithMockUser
+    public void getSignedLink_Exists_Returns200() {
+        // Given
+        ComplytFile complytFile = TestUtilities.createComplytFile();
+        ComplytFileMetadata complytFileMetadata = complytFile.getMetadata();
+
+        // When
+        when(complytFileFacade.getSignedLinkForFile(complytFile.getMetadata().complytId()))
+                .thenReturn(Mono.just(complytFileMetadata.withLink("https://google.storage.com")));
+
+        // Then
+    }
+
+    @Test
+//    @Override
+    public void saveFile_NullHandler_ThrowsNullPointerException() {
+        // Given
+        FileRouter fileRouter = new FileRouter();
+        FileHandler nullFileHandler = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> fileRouter.saveFile(nullFileHandler));
+
+        // Then
+        assertEquals("fileHandler is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+//    @Override
+    public void getListOfFilesInTenant_NullHandler_ThrowsNullPointerException() {
+        // Given
+        FileRouter fileRouter = new FileRouter();
+        FileHandler nullFileHandler = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> fileRouter.getListOfFilesInTenant(nullFileHandler));
+
+        // Then
+        assertEquals("fileHandler is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+//    @Override
+    public void getFileWithSignedLink_NullHandler_ThrowsNullPointerException() {
+        // Given
+        FileRouter fileRouter = new FileRouter();
+        FileHandler nullFileHandler = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> fileRouter.getFileWithSignedLink(nullFileHandler));
+
+        // Then
+        assertEquals("fileHandler is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+//    @Override
+    public void markAsDeletedFile_NullHandler_ThrowsNullPointerException() {
+        // Given
+        FileRouter fileRouter = new FileRouter();
+        FileHandler nullFileHandler = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> fileRouter.markAsDeletedFile(nullFileHandler));
+
+        // Then
+        assertEquals("fileHandler is marked non-null but is null", nullPointerException.getMessage());
     }
 }

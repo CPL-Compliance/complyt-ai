@@ -2,6 +2,7 @@ package integration.mongo_validation;
 
 import integration.TestContainersInitializerIT;
 import io.complyt.files.FilesApplication;
+import io.complyt.files.business.storage.StorageWrapper;
 import org.bson.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -25,6 +27,8 @@ public class FileSchemaValidationIT extends TestContainersInitializerIT {
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
 
+    @MockBean
+    StorageWrapper storageWrapper;
     Document fileDocument;
 
     @DynamicPropertySource

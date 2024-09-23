@@ -64,3 +64,6 @@ logging:
     reactor:
       netty:
         http: INFO
+google:
+  storage:
+    url:
