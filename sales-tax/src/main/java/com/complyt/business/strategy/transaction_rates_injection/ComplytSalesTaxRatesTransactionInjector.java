@@ -46,8 +46,8 @@ public class ComplytSalesTaxRatesTransactionInjector implements RatesTransaction
                                     transaction.getFinalTransactionAmount().subtract(salesTaxAmount) :
                                     transaction.getFinalTransactionAmount();
 
-                            return transactionWithRates.withSalesTax(salesTax)
-                                    .withFinalTransactionAmount(finalAmount);
+                            return transactionWithRates.setSalesTax(salesTax)
+                                    .setFinalTransactionAmount(finalAmount);
                         }));
     }
 }

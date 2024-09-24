@@ -3,14 +3,21 @@ package com.complyt.services;
 import com.complyt.business.address.CountryIsUsaChecker;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.strategy.StrategySelector;
+import com.complyt.business.strategy.currencyExchange.CurrenciesWebClientWrapper;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
+import com.complyt.business.transaction.BigDecimalProcessor;
+import com.complyt.business.transaction.CurrencyProcessor;
 import com.complyt.business.transaction.CityCountyProvider;
 import com.complyt.business.transaction.DiscountCalculator;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
+import com.complyt.domain.currency.CurrencyExchangeRateObject;
+import com.complyt.domain.currency.CurrencySource;
+import com.complyt.domain.transaction.ExchangeRateInfo;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.repositories.TransactionRepository;
+import com.complyt.v1.exceptions.types.CurrencyNotFoundApiException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -23,6 +30,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
@@ -49,7 +58,7 @@ public class TransactionServiceImpl implements TransactionService {
     CityCountyProvider cityCountyProvider;
 
     @NonNull
-    private ComplytIdHandler<Transaction> complytIdHandler;
+    ComplytIdHandler<Transaction> complytIdHandler;
 
     @NonNull
     DiscountCalculator itemsDiscountCalculator;
@@ -62,6 +71,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @NonNull
     StrategySelector shippingAddressAlignmentStrategy;
+
+    @NonNull
+    CurrenciesWebClientWrapper currenciesWebClientWrapper;
 
     @Override
     public Mono<Transaction> save(Transaction transaction) {
@@ -174,7 +186,7 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.getCreatedFrom(), transaction.getTaxableItemsAmount(),
                         transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount(), transaction.getFinalTransactionAmount(), transaction.getTotalDiscount(),
                         transaction.getTransactionLevelDiscount(), transaction.getTransactionFilingStatus(), transaction.getCurrency(),
-                        transaction.getSubsidiary()
+                        transaction.getRefRate(), transaction.getExchangeRateInfo(), transaction.getSubsidiary()
                 );
     }
 
@@ -197,5 +209,44 @@ public class TransactionServiceImpl implements TransactionService {
         return transaction.getTransactionLevelDiscount() != null && !transaction.getTransactionLevelDiscount().equals(BigDecimal.ZERO) ?
                 transactionDiscountCalculator.injectRecalculatedTotalAfterDiscount(transaction) :
                 Mono.just(transaction);
+    }
+
+    @Override
+    public Mono<Transaction> injectExchangeRateIfNeeded(@NonNull final Transaction transaction) {
+        return Mono.justOrEmpty(transaction.getCurrency())
+                .filter(currency -> !CurrencyProcessor.isUsdCurrency(currency))
+                .flatMap(currency -> getCurrencyExchangeRate(transaction)
+                        .onErrorResume(e -> Mono.error(CurrencyNotFoundApiException::new))
+                        .flatMap(exchangeRate -> calculateExchangeRateInfo(transaction, exchangeRate)
+                                .map(exchangeRateInfo -> {
+                                    transaction.setExchangeRateInfo(exchangeRateInfo);
+                                    return transaction;
+                                })
+                        )
+                )
+                .defaultIfEmpty(transaction);
+    }
+
+    private Mono<ExchangeRateInfo> calculateExchangeRateInfo(Transaction transaction, BigDecimal exchangeRate) {
+        Boolean isFutureExternalCreatedDate = CurrencyProcessor.isFutureExternalCreatedDate(transaction);
+        LocalDateTime exchangeRateDate = CurrencyProcessor.getExchangeRateDate(transaction);
+        CurrencySource exchangeSource = CurrencyProcessor.getExchangeSource(transaction);
+
+        BigDecimal transactionSalesTaxInUsd = transaction.getSalesTax() != null ?
+                BigDecimalProcessor.removeTrailingZeros(transaction.getSalesTax().amount().multiply(exchangeRate)) :
+                BigDecimal.ZERO;
+
+        return Mono.just(BigDecimalProcessor.removeTrailingZeros(
+                        transaction.getFinalTransactionAmount().multiply(exchangeRate)))
+                .map(totalItemsAmountInUSD -> new ExchangeRateInfo(totalItemsAmountInUSD, transactionSalesTaxInUsd, transactionSalesTaxInUsd.add(totalItemsAmountInUSD), transaction.getCurrency(), CurrencyProcessor.usdCurrency, exchangeRate, exchangeSource, isFutureExternalCreatedDate, exchangeRateDate));
+    }
+
+    private Mono<BigDecimal> getCurrencyExchangeRate(Transaction transaction) {
+        return transaction.getRefRate() != null ?
+                Mono.just(transaction.getRefRate()) :
+                currenciesWebClientWrapper.getExchangeRateByCurrencyAndDate(transaction.getCurrency(), transaction.getExternalTimestamps().getCreatedDate())
+                        .map(CurrencyExchangeRateObject::rate)
+                        .map(BigDecimalProcessor::removeTrailingZeros);
+
     }
 }

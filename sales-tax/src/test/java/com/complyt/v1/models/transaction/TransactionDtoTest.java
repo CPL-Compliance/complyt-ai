@@ -49,6 +49,8 @@ class TransactionDtoTest {
                 ", finalTransactionAmount=" + transactionDto.finalTransactionAmount() +
                 ", transactionFilingStatus=" + transactionDto.transactionFilingStatus() +
                 ", currency=" + transactionDto.currency() +
+                ", refRate=" + transactionDto.refRate() +
+                ", exchangeRateInfo=" + transactionDto.exchangeRateInfo() +
                 ", subsidiary=" + transactionDto.subsidiary() + "]";
 
         // When

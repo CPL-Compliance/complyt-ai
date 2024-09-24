@@ -2,18 +2,25 @@ package com.complyt.services;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.strategy.StrategySelector;
+import com.complyt.business.strategy.currencyExchange.CurrenciesWebClientWrapper;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
+import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.business.transaction.CityCountyProvider;
 import com.complyt.business.transaction.DiscountCalculator;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
+import com.complyt.domain.currency.CurrencyExchangeRateObject;
+import com.complyt.domain.currency.CurrencySource;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.*;
 import com.complyt.repositories.TransactionRepository;
 import org.bson.types.ObjectId;
+import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,6 +84,8 @@ class TransactionServiceImplTest {
 
     @Mock
     StrategySelector shippingAddressCountryAlignmentStrategy;
+    @Mock
+    CurrenciesWebClientWrapper currenciesWebClientWrapper;
 
     Transaction transaction;
     Customer customer;
@@ -857,6 +866,21 @@ class TransactionServiceImplTest {
     }
 
     @Test
+    void shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary_transactionsWithDifferentCountryInShippingAddress_ReturnsTrue() {
+        // Given
+        Address usaAddress = testUtilities.createUsaAddress();
+        Address nonUsaAddress = testUtilities.createNonUsaAddress();
+        Transaction usaTransaction = transaction.withShippingAddress(usaAddress);
+        Transaction nonUsaTransaction = transaction.withShippingAddress(nonUsaAddress);
+
+        // When
+        Boolean shouldRemoveTransaction = transactionService.shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary(usaTransaction, nonUsaTransaction);
+
+        // Then
+        assertEquals(true, shouldRemoveTransaction);
+    }
+
+    @Test
     void shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary_nullTransactionPassedFirst_ThrowsNullPointerException() {
         // Given
         Transaction nullTransaction = null;
@@ -990,5 +1014,138 @@ class TransactionServiceImplTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "originalTransaction is marked non-null but is null");
+    }
+
+    @Test
+    void injectExchangeRateIfNeeded_TransactionWithEuroCurrency_ReturnsTransactionWithExchangeRateInfo() {
+        // Given
+        transaction = transaction.setCurrency("EUR").setFinalTransactionAmount(BigDecimal.valueOf(1000));
+        CurrencyExchangeRateObject currencyExchangeRateObject = testUtilities.createEuroCurrencyExchangeRateObject();
+        ExchangeRateInfo exchangeRateInfo = testUtilities.createNotTaxableEuroExchangeRateInfo(transaction);
+        Transaction transactionWithExchangeRateInfo = transaction.withExchangeRateInfo(exchangeRateInfo);
+
+        // When
+        when(currenciesWebClientWrapper.getExchangeRateByCurrencyAndDate(transaction.getCurrency(), transaction.getExternalTimestamps().getCreatedDate()))
+                .thenReturn(Mono.just(currencyExchangeRateObject));
+
+        Mono<Transaction> transactionMono = transactionService.injectExchangeRateIfNeeded(transaction);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionWithExchangeRateInfo).verifyComplete();
+    }
+
+    @Test
+    void injectExchangeRateIfNeeded_TransactionWithEuroCurrencyAndSalesTax_ReturnsTransactionWithExchangeRateInfo() {
+        // Given
+        SalesTax salesTax = testUtilities.createSalesTaxWithAmount(BigDecimal.valueOf(100));
+        transaction = transaction
+                .setCurrency("EUR")
+                .setFinalTransactionAmount(BigDecimal.valueOf(1000))
+                .setSalesTax(salesTax);
+        CurrencyExchangeRateObject currencyExchangeRateObject = testUtilities.createEuroCurrencyExchangeRateObject();
+        ExchangeRateInfo exchangeRateInfo = testUtilities.createEuroExchangeRateInfo(transaction);
+        Transaction transactionWithExchangeRateInfo = transaction.withExchangeRateInfo(exchangeRateInfo).withSalesTax(salesTax);
+
+        // When
+        when(currenciesWebClientWrapper.getExchangeRateByCurrencyAndDate(transaction.getCurrency(), transaction.getExternalTimestamps().getCreatedDate()))
+                .thenReturn(Mono.just(currencyExchangeRateObject));
+
+        Mono<Transaction> transactionMono = transactionService.injectExchangeRateIfNeeded(transaction);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionWithExchangeRateInfo).verifyComplete();
+    }
+
+    @Test
+    void injectExchangeRateIfNeeded_TransactionWithUsdCurrency_ReturnsTransactionWithoutExchangeRateInfo() {
+        // Given
+        transaction = transaction.setFinalTransactionAmount(BigDecimal.valueOf(1000)).setCurrency("USD");
+
+        // When
+        Mono<Transaction> transactionMono = transactionService.injectExchangeRateIfNeeded(transaction);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
+    }
+
+    @Test
+    void injectExchangeRateIfNeeded_TransactionWithNOCurrency_ReturnsTransactionWithoutExchangeRateInfo() {
+        // Given
+        transaction = transaction.setFinalTransactionAmount(BigDecimal.valueOf(1000));
+
+        // When
+        Mono<Transaction> transactionMono = transactionService.injectExchangeRateIfNeeded(transaction);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
+    }
+
+    @Test
+    void injectExchangeRateIfNeeded_TransactionWithEuroCurrencyAndRefRate_ReturnsTransactionWithExchangeRateInfo() {
+        // Given
+        transaction = transaction.setCurrency("EUR")
+                .setRefRate(BigDecimal.valueOf(5))
+                .setFinalTransactionAmount(BigDecimal.valueOf(1000));
+        ExchangeRateInfo exchangeRateInfo = testUtilities.createExchangeRateInfo(BigDecimal.valueOf(5000), BigDecimal.ZERO,  BigDecimal.valueOf(5000), "EUR", "USD", BigDecimal.valueOf(5), CurrencySource.CLIENT, false, transaction.getInternalTimestamps().getCreatedDate());
+        Transaction transactionWithExchangeRateInfo = transaction.withExchangeRateInfo(exchangeRateInfo);
+
+        // When
+        Mono<Transaction> transactionMono = transactionService.injectExchangeRateIfNeeded(transaction);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionWithExchangeRateInfo).verifyComplete();
+    }
+
+    @Test
+    void injectExchangeRateIfNeeded_TransactionWithEuroCurrencyAndFutureCreatedDate_ReturnsTransactionWithExchangeRateInfo() {
+        // Given
+        Transaction transactionWithFutureCreatedDate = transaction.withCurrency("EUR")
+                .withFinalTransactionAmount(BigDecimal.valueOf(1000))
+                .withExternalTimestamps(new Timestamps(LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(1)));
+
+        CurrencyExchangeRateObject currencyExchangeRateObject = testUtilities.createEuroCurrencyExchangeRateObject();
+        BigDecimal finalTransactionAmount = BigDecimalProcessor.removeTrailingZeros(transactionWithFutureCreatedDate.getFinalTransactionAmount().multiply(currencyExchangeRateObject.rate()));
+        ExchangeRateInfo exchangeRateInfo = testUtilities.createExchangeRateInfo(finalTransactionAmount, BigDecimal.ZERO, finalTransactionAmount, "EUR", "USD", currencyExchangeRateObject.rate(), CurrencySource.COMPLYT, true, LocalDate.now().atStartOfDay());
+        Transaction transactionWithExchangeRateInfo = transactionWithFutureCreatedDate.withExchangeRateInfo(exchangeRateInfo);
+
+        // When
+        when(currenciesWebClientWrapper.getExchangeRateByCurrencyAndDate(transactionWithFutureCreatedDate.getCurrency(), transactionWithFutureCreatedDate.getExternalTimestamps().getCreatedDate()))
+                .thenReturn(Mono.just(currencyExchangeRateObject));
+
+        Mono<Transaction> transactionMono = transactionService.injectExchangeRateIfNeeded(transactionWithFutureCreatedDate);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionWithExchangeRateInfo).verifyComplete();
+    }
+
+    @Test
+    void injectExchangeRateIfNeeded_TransactionWithEuroCurrencyAndRefRateAndFutureCreatedDate_ReturnsTransactionWithExchangeRateInfo() {
+        // Given
+        Transaction transactionWithFutureCreatedDate = transaction.withCurrency("EUR")
+                .withRefRate(BigDecimal.valueOf(5))
+                .withFinalTransactionAmount(BigDecimal.valueOf(1000))
+                .withExternalTimestamps(new Timestamps(LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(1)));
+
+        ExchangeRateInfo exchangeRateInfo = testUtilities.createExchangeRateInfo(BigDecimal.valueOf(5000), BigDecimal.ZERO,  BigDecimal.valueOf(5000), "EUR", "USD", BigDecimal.valueOf(5), CurrencySource.CLIENT, false, transactionWithFutureCreatedDate.getExternalTimestamps().getCreatedDate());
+        Transaction transactionWithExchangeRateInfo = transactionWithFutureCreatedDate.withExchangeRateInfo(exchangeRateInfo);
+
+        // When
+        Mono<Transaction> transactionMono = transactionService.injectExchangeRateIfNeeded(transactionWithFutureCreatedDate);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionWithExchangeRateInfo).verifyComplete();
+    }
+
+    @Test
+    void injectExchangeRateIfNeeded_nullTransactionPassed_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.injectExchangeRateIfNeeded(nullTransaction);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
     }
 }

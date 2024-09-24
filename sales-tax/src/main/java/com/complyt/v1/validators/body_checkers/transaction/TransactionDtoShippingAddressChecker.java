@@ -21,7 +21,8 @@ public class TransactionDtoShippingAddressChecker implements DtoBodyChecker<Tran
                 CountryIsUsaChecker.isCountryUsa(address.country()) ?
                         transactionDto.shippingAddress().isPartial() ?
                                 Flux.concat(checkVariableNotBlank(address.zip(), addressErrorBuilder("zip")),
-                                        checkVariableNotBlank(address.state(), addressErrorBuilder("state"))) :
+                                        checkVariableNotBlank(address.state(), addressErrorBuilder("state")),
+                                        checkIfStateExists(address.state(), stateErrorBuilder("state"))) :
                                 Flux.concat(checkVariableNotBlank(address.state(), addressErrorBuilder("state")),
                                         checkVariableNotBlank(address.street(), addressErrorBuilder("street")),
                                         checkVariableNotBlank(address.city(), addressErrorBuilder("city")),

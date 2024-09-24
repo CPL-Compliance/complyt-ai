@@ -72,4 +72,18 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_NonUsaCountryWithMisspellRegion_Returns200();
 
     void upsertByExternalIdAndSource_NonUsaCountryNotExistInGTDB_Returns404NotFound();
+
+    void upsertByExternalIdAndSource_NewTransactionWithUsdCurrency_Returns201();
+
+    void upsertByExternalIdAndSource_NewTransactionWithEurCurrency_Returns201();
+
+    void upsertByExternalIdAndSource_NewTransactionWithEurCurrencyAndRefRate_Returns201();
+
+    void upsertByExternalIdAndSource_NewTransactionWithRefRateAndNullCurrency_Returns201();
+
+    void upsertByExternalIdAndSource_ExistingTransactionThatCurrencyUpdateToNull_Returns200WithoutExchangeRateInfo();
+
+    void upsertByExternalIdAndSource_NewTransactionWithUnsupportedCurrency_Returns400();
+
+    void upsertByExternalIdAndSource_NewTransactionWithEurCurrencyAndFutureCreatedDate_Returns201();
 }

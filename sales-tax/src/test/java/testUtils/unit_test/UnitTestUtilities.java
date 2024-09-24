@@ -1,6 +1,9 @@
 package testUtils.unit_test;
 
+import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.*;
+import com.complyt.domain.currency.CurrencyExchangeRateObject;
+import com.complyt.domain.currency.CurrencySource;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerStatus;
 import com.complyt.domain.customer.CustomerType;
@@ -231,7 +234,7 @@ public class UnitTestUtilities {
                 customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()),
                 null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
                 TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, curreny, null);
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, null, null, null, null);
     }
 
     public Transaction createTransactionWithCalculatedTotalItem(String id) {
@@ -248,7 +251,7 @@ public class UnitTestUtilities {
                 customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()),
                 null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
                 TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, curreny, null);
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, curreny, null, null, null);
     }
 
     public Transaction createTransactionWithThreeItemsAndCalculatedTotal(String id) {
@@ -265,7 +268,7 @@ public class UnitTestUtilities {
                 customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()),
                 null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
                 TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, curreny, null);
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, curreny, null, null, null);
     }
 
     public Transaction createGtTransaction(String id) {
@@ -288,7 +291,7 @@ public class UnitTestUtilities {
                 createCustomerDto(customerIdOtherDomains.toString()), null,
                 TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE,
                 shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD", null);
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, null, null, null, null);
     }
 
     public List<Item> createItems(boolean withJurisdictionalSalesTaxRules, boolean withJurisdictionalGtTaxRules, boolean withTangibleCategory) {
@@ -389,6 +392,10 @@ public class UnitTestUtilities {
 
     public SalesTax createSalesTaxWithAllFields() {
         return new SalesTax(BigDecimal.ZERO, BigDecimal.ZERO, createSalesTaxRates(), createGtRates());
+    }
+
+    public SalesTax createSalesTaxWithAmount(BigDecimal amount) {
+        return new SalesTax(amount, BigDecimal.ZERO, createSalesTaxRates(), createGtRates());
     }
 
     public SalesTaxDto createSalesTaxDtoWithAllFields() {
@@ -930,5 +937,38 @@ public class UnitTestUtilities {
         Map<UUID, TransactionNexusSummary> map = salesTaxTracking.getTransactionNexusSummaries();
         map.put(UUID.randomUUID(), transactionNexusSummary);
         return salesTaxTracking.withTransactionNexusSummaries(map);
+    }
+
+    public CurrencyExchangeRateObject createCurrencyExchangeRateObject(String currency, LocalDateTime date, BigDecimal rate){
+        return new CurrencyExchangeRateObject(currency, date, rate);
+    }
+
+    public ExchangeRateInfo createExchangeRateInfo(BigDecimal totalItemsAmountInUSD, BigDecimal transactionSalesTaxInUsd, BigDecimal finalTransactionAmountInUsd, String fromCurrency, String toCurrency, BigDecimal fxRate, CurrencySource source, Boolean isExchangeRateEstimated, LocalDateTime exchangeRateDate){
+        return new ExchangeRateInfo(totalItemsAmountInUSD, transactionSalesTaxInUsd, finalTransactionAmountInUsd, fromCurrency, toCurrency, fxRate, source, isExchangeRateEstimated, exchangeRateDate);
+    }
+
+    public ExchangeRateInfoDto createExchangeRateInfoDto(BigDecimal totalItemsAmountInUSD, BigDecimal transactionSalesTaxInUsd, BigDecimal finalTransactionAmountInUsd, String fromCurrency, String toCurrency, BigDecimal fxRate, CurrencySource source, Boolean isExchangeRateEstimated, LocalDateTime exchangeRateDate){
+        return new ExchangeRateInfoDto(totalItemsAmountInUSD, transactionSalesTaxInUsd, finalTransactionAmountInUsd, fromCurrency, toCurrency, fxRate, source,isExchangeRateEstimated, exchangeRateDate);
+    }
+
+    public ExchangeRateInfo createEuroExchangeRateInfo(Transaction transaction){
+        BigDecimal itemsAmount = BigDecimal.valueOf(1107.31);
+        BigDecimal tax = BigDecimalProcessor.removeTrailingZeros(itemsAmount.multiply(BigDecimal.valueOf(0.1)));
+        BigDecimal finalTransactionAmount = itemsAmount.add(tax);
+
+        return new ExchangeRateInfo(itemsAmount , tax , finalTransactionAmount,"EUR", "USD", BigDecimal.valueOf(1.10731), CurrencySource.COMPLYT, false, transaction.getExternalTimestamps().getCreatedDate());
+    }
+
+    public ExchangeRateInfo createNotTaxableEuroExchangeRateInfo(Transaction transaction){
+        BigDecimal itemsAmount = BigDecimal.valueOf(1107.31);
+        BigDecimal tax = BigDecimal.ZERO;
+        BigDecimal finalTransactionAmount = itemsAmount.add(tax);
+
+        return new ExchangeRateInfo(itemsAmount , tax , finalTransactionAmount,"EUR", "USD", BigDecimal.valueOf(1.10731), CurrencySource.COMPLYT, false, transaction.getExternalTimestamps().getCreatedDate());
+    }
+
+
+    public CurrencyExchangeRateObject createEuroCurrencyExchangeRateObject(){
+        return new CurrencyExchangeRateObject("EUR",  LocalDateTime.now(), BigDecimal.valueOf(1.10731));
     }
 }

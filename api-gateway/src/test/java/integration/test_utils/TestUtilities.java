@@ -5,8 +5,7 @@ import org.springframework.http.client.MultipartBodyBuilder;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.UUID;
+
 
 public class TestUtilities {
 
@@ -157,12 +156,12 @@ public class TestUtilities {
                 isValidated ? "\"customerType\": \"RETAIL\"," : "");
     }
 
-    public static String unvalidatedTransactionJsonExample(String externalId, String customerId, String createdDate) {
-        return transactionJsonExample(externalId, customerId, null, false, null, "US", createdDate);
+    public static String unvalidatedTransactionJsonExample(String externalId, String customerId, String createdDate, String currency) {
+        return transactionJsonExample(externalId, customerId, null, false, null, "US", createdDate, currency, null);
     }
 
-    public static String transactionJsonExample(String externalId, String customerId, String state, String createdDate) {
-        return transactionJsonExample(externalId, customerId, null, true, state, "US", createdDate);
+    public static String transactionJsonExample(String externalId, String customerId, String state, String createdDate, String currency, BigDecimal refRate) {
+        return transactionJsonExample(externalId, customerId, null, true, state, "US", createdDate, currency, refRate);
     }
 
     public static String transactionJsonExample(String externalId, String customerId, String country, String state, String zip, String region, boolean isTaxInclusive, String subsidiary, String... items) {
@@ -170,16 +169,16 @@ public class TestUtilities {
                 items);
     }
 
-    public static String existingTransactionJsonExample(String externalId, String customerId, String complytId, String createdDate) {
-        return transactionJsonExample(externalId, customerId, complytId, true, null, "US",createdDate);
+    public static String existingTransactionJsonExample(String externalId, String customerId, String complytId, String createdDate, String currency) {
+        return transactionJsonExample(externalId, customerId, complytId, true, null, "US", createdDate, currency, null);
     }
 
-    public static String transactionJsonExampleWithState(String externalId, String customerId, String state, String createdDate) {
-        return transactionJsonExample(externalId, customerId, null, true, state, "US", createdDate);
+    public static String transactionJsonExampleWithState(String externalId, String customerId, String state, String createdDate, String currency) {
+        return transactionJsonExample(externalId, customerId, null, true, state, "US", createdDate, currency, null);
     }
 
-    public static String transactionJsonExample(String externalId, String customerId, String complytId, boolean isValidated, String state, String country, String createdDate) {
-        return String.format("""
+    public static String transactionJsonExample(String externalId, String customerId, String complytId, boolean isValidated, String state, String country, String createdDate, String currency, BigDecimal refRate) {
+        String output = String.format("""
                         {
                             %s
                             "externalId": "%s",
@@ -202,7 +201,7 @@ public class TestUtilities {
                                 "state": "%s",
                                 "street": "10 5th Ave",
                                 "zip": "90210",
-                                "isPartial": "false"
+                                "isPartial": false
                             },
                             "customerId": "%s",
                             "transactionStatus": "ACTIVE",
@@ -216,7 +215,9 @@ public class TestUtilities {
                                 "manualSalesTaxRate": 0,
                                 "totalPrice": 0,
                                 "taxCode": "C6S1"
-                            }
+                            },
+                            "currency": %s,
+                            "refRate": %s
                         }
                         """,
                 complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
@@ -227,8 +228,11 @@ public class TestUtilities {
                 customerId,
                 createdDate,
                 createdDate,
-                isValidated ? "\"transactionType\": \"INVOICE\"," : ""
+                isValidated ? "\"transactionType\": \"INVOICE\"," : "",
+                currency == null ? null : "\"" + currency + "\"",
+                refRate
         );
+        return output;
     }
 
     public static String getClientCredentialsJsonExample() {

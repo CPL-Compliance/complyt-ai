@@ -117,4 +117,8 @@ public interface FieldsDescriptions {
     String SHIPPING_FEE_TOTAL_PRICE =  "The total price of the shipping fee";
 
     String SHIPPING_FEE_CALCULATED_TOTAL = "The calculated price of the shipping fee. calculated on run time";
+
+    String EXCHANGE_RATE_INFO = "The information about currency exchange rate in case of a transaction with currency other than USD";
+
+    String REF_RATE = "Manually entered currency exchange rate in case of a transaction with currency other than USD";
 }

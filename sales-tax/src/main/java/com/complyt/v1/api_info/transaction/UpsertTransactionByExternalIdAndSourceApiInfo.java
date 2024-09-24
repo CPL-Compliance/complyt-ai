@@ -149,7 +149,8 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                "transactionLevelDiscount": 0,
                "createdFrom": "string",
                "transactionFilingStatus": "NOT_FILED"
-            }
+            },
+            "currency": "EUR"
             """;
 
     String returnedTransactionExample = """
@@ -308,7 +309,20 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                 "totalItemsAmount": 0,
                 "totalDiscount" :0,
                 "transactionLevelDiscount": 0,
-                "transactionFilingStatus": "NOT_FILED"
+                "transactionFilingStatus": "NOT_FILED",
+                "currency": "EUR",
+                "refRate": null
+                "exchangeRateInfo": {
+                     "totalItemsAmountInUSD": 0,
+                     "transactionSalesTaxInUsd": 0,
+                     "finalTransactionAmountInUsd": 0,
+                     "fromCurrency": "EUR",
+                     "toCurrency": "USD",
+                     "fxRate": 0,
+                     "source": "Complyt",
+                     "isExchangeRateEstimated": false,
+                     "exchangeRateDate": "2023-02-05T12:24:43.193Z"
+                },
             }
             """;
 }

@@ -2157,7 +2157,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .withPartial(true);
 
         Set<String> expectedErrors = Set.of(
-                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX,
+                "Address.state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA);
 
         // When + Then
         webTestClient

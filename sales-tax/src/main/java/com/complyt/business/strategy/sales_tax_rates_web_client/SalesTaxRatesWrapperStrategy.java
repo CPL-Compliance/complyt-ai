@@ -16,8 +16,10 @@ import java.util.function.Function;
 @Component
 @AllArgsConstructor
 public class SalesTaxRatesWrapperStrategy extends FunctionSelectorByTransactionAddressStrategy {
+
     @NonNull
     SalesTaxRatesWebClientWrapper<ComplytSalesTaxRates> salesTaxWebClientWrapper;
+
     @NonNull
     SalesTaxRatesWebClientWrapper<ComplytGtRates> gtWebClientWrapper;
 

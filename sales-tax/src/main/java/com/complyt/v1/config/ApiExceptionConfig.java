@@ -27,6 +27,7 @@ public class ApiExceptionConfig {
     public Map<Class<? extends Exception>, HttpStatus> exceptionToStatusCode() {
         return Map.of(
                 ObjectNotFoundApiException.class, HttpStatus.NOT_FOUND,
+                CurrencyNotFoundApiException.class, HttpStatus.UNPROCESSABLE_ENTITY,
                 ObjectNotValidApiException.class, HttpStatus.BAD_REQUEST,
                 MissingBodyApiException.class, HttpStatus.BAD_REQUEST,
                 ConflictedDataApiException.class, HttpStatus.BAD_REQUEST,

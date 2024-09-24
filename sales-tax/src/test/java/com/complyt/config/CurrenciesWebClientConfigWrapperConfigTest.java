@@ -1,0 +1,41 @@
+package com.complyt.config;
+
+import com.complyt.business.strategy.currencyExchange.ComplytCurrenciesWebClientWrapper;
+import com.complyt.business.strategy.currencyExchange.CurrenciesWebClientWrapper;
+import com.complyt.business.strategy.currencyExchange.StubCurrenciesWebClientWrapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class CurrenciesWebClientConfigWrapperConfigTest {
+
+    CurrenciesWebClientWrapperConfig currenciesWebClientWrapperConfig;
+
+    WebClient webClient;
+
+    @BeforeEach
+    void setUp() {
+        currenciesWebClientWrapperConfig = new CurrenciesWebClientWrapperConfig();
+        webClient = WebClient.builder().build();
+    }
+
+    @Test
+    public void currenciesWebClientWrapper_createComplytCurrenciesWebClientWrapper_getComplytCurrenciesWebClientWrapper() {
+        CurrenciesWebClientWrapper expectedComplytCurrenciesWebClientWrapper = new ComplytCurrenciesWebClientWrapper(webClient);
+
+        CurrenciesWebClientWrapper actualComplytCurrenciesWebClientWrapper = currenciesWebClientWrapperConfig.currenciesWebClientWrapper(webClient);
+
+        assertEquals(expectedComplytCurrenciesWebClientWrapper, actualComplytCurrenciesWebClientWrapper);
+    }
+
+    @Test
+    public void currenciesWebClientWrapper_createStubCurrenciesWebClientWrapper_getStubCurrenciesWebClientWrapper() {
+        CurrenciesWebClientWrapper expectedStubCurrenciesWebClientWrapper = new StubCurrenciesWebClientWrapper();
+
+        CurrenciesWebClientWrapper actualStubCurrenciesWebClientWrapper = currenciesWebClientWrapperConfig.stubCurrenciesWebClientWrapper();
+
+        assertEquals(expectedStubCurrenciesWebClientWrapper, actualStubCurrenciesWebClientWrapper);
+    }
+}

@@ -1,5 +1,6 @@
 package testUtils.integration_test;
 
+import com.complyt.domain.currency.CurrencySource;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
@@ -28,7 +29,7 @@ public interface ITUtilities {
 
     String NON_EXISTING_COMPLYT_ID = "d18068f0-6d98-4b0d-ba19-4536f0b4173a";
 
-    String localDateTime = "2024-01-01T00:00:00.000+00:00";
+    String localDateTime = "2024-01-01T00:00:00.00";
 
     // if no items provided, puts a default stub
     static TransactionDto stubTransactionDto(String externalId, UUID customerId, ItemDto... items) {
@@ -36,7 +37,8 @@ public interface ITUtilities {
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
                 false, null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false),
                 customerId, null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(localDateTime, localDateTime),
-                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD", null);
+                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED,
+                "USD", null, null, null);
     } // note isTaxInclusive is false, finalTransactionAmount is zero
 
     static TransactionDto stubTransactionDtoWithThreeItems(String externalId, UUID customerId, ItemDto... items) {
@@ -44,7 +46,8 @@ public interface ITUtilities {
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDtoWithDiscount(BigDecimal.valueOf(500), BigDecimal.ZERO), stubItemDtoWithDiscount(BigDecimal.valueOf(1000), BigDecimal.ZERO), stubItemDtoWithDiscount(BigDecimal.valueOf(10000), BigDecimal.ZERO)} : items),
                 false, null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false),
                 customerId, null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
-                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, "USD", null);
+                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED,
+                "USD", null, null, null);
     } // note isTaxInclusive is false, finalTransactionAmount is zero
 
     static TransactionDto stubTransactionDtoNonUsaCountry(String externalId, UUID customerId, ItemDto... items) {
@@ -56,7 +59,7 @@ public interface ITUtilities {
     static CustomerDto stubCustomerDto(String externalId) {
         return new CustomerDto(null, externalId, "1",
                 "stub customer", null, "captaindope@gg.com", CustomerTypeDto.RETAIL,
-                null,new TimestampsDto(localDateTime, localDateTime), "comment", null);
+                null, new TimestampsDto(localDateTime, localDateTime), "comment", null);
     }
 
     static SalesTaxTrackingDto stubSalesTaxTrackingDto(String country, StateDto state) {
@@ -243,7 +246,7 @@ public interface ITUtilities {
 
     static NexusStateRuleDto stubMichiganNexusStateRuleDto() {
         return new NexusStateRuleDto(true, "USA",
-                new StateDto("MI", "26" ,"Michigan"),
+                new StateDto("MI", "26", "Michigan"),
                 List.of(TaxableCategoryDto.TAXABLE, TaxableCategoryDto.NOT_TAXABLE),
                 List.of(TangibleCategoryDto.INTANGIBLE, TangibleCategoryDto.TANGIBLE),
                 List.of(CustomerTypeDto.RETAIL, CustomerTypeDto.MARKETPLACE, CustomerTypeDto.RESELLER),
@@ -270,7 +273,7 @@ public interface ITUtilities {
                 .append("name", "Bestclient TM")
                 .append("internalTimestamps", new Document("createdDate", LocalDateTime.now())
                         .append("updatedDate", LocalDateTime.now()))
-                .append("subsidiaries",List.of("1"));
+                .append("subsidiaries", List.of("1"));
     }
 
     static Document customerDocument() {
@@ -544,6 +547,10 @@ public interface ITUtilities {
                         .append("calculationValue", "0")))
                 .append("tangibleCategory", "INTANGIBLE")
                 .append("jurisdictionalTaxRules", new Document());
+    }
+
+    static ExchangeRateInfoDto createExchangeRateInfoDto(BigDecimal totalItemsAmountInUSD, BigDecimal transactionSalesTaxInUsd, BigDecimal finalTransactionAmountInUsd, String fromCurrency, String toCurrency, BigDecimal fxRate, CurrencySource source, Boolean isExchangeRateEstimated, LocalDateTime exchangeRateDate) {
+        return new ExchangeRateInfoDto(totalItemsAmountInUSD, transactionSalesTaxInUsd, finalTransactionAmountInUsd, fromCurrency, toCurrency, fxRate, source, isExchangeRateEstimated, exchangeRateDate);
     }
 
 }

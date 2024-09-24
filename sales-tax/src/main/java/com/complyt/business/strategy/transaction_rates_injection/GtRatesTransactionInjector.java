@@ -43,8 +43,8 @@ public class GtRatesTransactionInjector implements RatesTransactionInjector {
                                     transaction.getFinalTransactionAmount().subtract(salesTaxAmount) :
                                     transaction.getFinalTransactionAmount();
 
-                            return transactionWithRates.withSalesTax(salesTax)
-                                    .withFinalTransactionAmount(finalAmount);
+                            return transactionWithRates.setSalesTax(salesTax)
+                                    .setFinalTransactionAmount(finalAmount);
                         }));
     }
 }

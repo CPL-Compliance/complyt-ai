@@ -2,6 +2,7 @@ package integration.endpoints;
 
 import com.complyt.SalesTaxApplication;
 import com.complyt.business.transaction.BigDecimalProcessor;
+import com.complyt.domain.currency.CurrencySource;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
@@ -28,6 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -44,6 +46,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -126,6 +129,213 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> assertEquals(expectedSalesTax, transactionDto.salesTax()));
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaShippingAddressWithEuroCurrency_ReturnsTransactionWithExchangeRateInfo() {
+        String externalId = "newNonExistingTransactionWithEurCurrency";
+
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false))
+                .withCurrency("EUR");
+
+        ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(11076.1), BigDecimal.valueOf(858.39775), BigDecimal.valueOf(11934.49775), "EUR", "USD", BigDecimal.valueOf(1.10761), CurrencySource.COMPLYT, false, LocalDateTime.parse(givenTransaction.externalTimestamps().createdDate()));
+
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(expectedSalesTax, transactionDto.salesTax());
+                    assertEquals("EUR", transactionDto.currency());
+                    assertEquals(exchangeRateInfoDto, transactionDto.exchangeRateInfo());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaShippingAddressWithEuroCurrencyAndFutureCreatedDate_ReturnsTransactionWithExchangeRateInfo() { // Future createdDate = Future trandate
+        String externalId = "newNonExistingFutureTransactionWithEurCurrency";
+
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false))
+                .withCurrency("EUR")
+                .withExternalTimestamps(new TimestampsDto(LocalDateTime.now().plusDays(1).toString(), LocalDateTime.now().plusDays(1).toString()));
+
+        ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(11076.1), BigDecimal.valueOf(858.39775), BigDecimal.valueOf(11934.49775), "EUR", "USD", BigDecimal.valueOf(1.10761), CurrencySource.COMPLYT, true, LocalDate.now().atStartOfDay());
+
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(expectedSalesTax, transactionDto.salesTax());
+                    assertEquals("EUR", transactionDto.currency());
+                    assertEquals(exchangeRateInfoDto, transactionDto.exchangeRateInfo());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaShippingAddressWithEuroCurrencyAndRefRate_ReturnsTransactionWithExchangeRateInfo() { // refRate is a manually entered rate
+        String externalId = "newNonExistingTransactionWithEurCurrencyAndRefRate";
+
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false))
+                .withCurrency("EUR")
+                .withRefRate(BigDecimal.valueOf(2));
+
+        ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(20000), BigDecimal.valueOf(1550), BigDecimal.valueOf(21550),"EUR", "USD", BigDecimal.valueOf(2), CurrencySource.CLIENT, false, LocalDateTime.parse(givenTransaction.externalTimestamps().createdDate()));
+
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(expectedSalesTax, transactionDto.salesTax());
+                    assertEquals("EUR", transactionDto.currency());
+                    assertEquals(exchangeRateInfoDto, transactionDto.exchangeRateInfo());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaShippingAddressWithUsdCurrency_ReturnsTransactionWithoutExchangeRateInfo() {
+        String externalId = "newNonExistingTransactionWithUsdCurrency";
+
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false))
+                .withCurrency("USD");
+
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(expectedSalesTax, transactionDto.salesTax());
+                    assertEquals("USD", transactionDto.currency());
+                    assertNull(transactionDto.exchangeRateInfo());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaShippingAddressWithNullCurrency_ReturnsTransactionWithoutExchangeRateInfo() {
+        String externalId = "newNonExistingTransactionWithNullCurrency";
+
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false))
+                .withCurrency(null);
+
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(expectedSalesTax, transactionDto.salesTax());
+                    assertNull(transactionDto.currency());
+                    assertNull(transactionDto.exchangeRateInfo());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaShippingAddressWithNullCurrencyAndRefRate_ReturnsTransactionWithoutExchangeRateInfo() {
+        String externalId = "newNonExistingTransactionWithNullCurrencyAndRefRate";
+
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false))
+                .withCurrency(null)
+                .withRefRate(BigDecimal.valueOf(2));
+
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(expectedSalesTax, transactionDto.salesTax());
+                    assertNull(transactionDto.currency());
+                    assertNull(transactionDto.exchangeRateInfo());
+                });
     }
 
     @Order(1)

@@ -4,6 +4,7 @@ server.port: ${PORT:9898}
 spring.profiles.active:
   - @activeEnv@
   - @activeTaxClient@
+  - @activeCurrencyClient@
 
 # Observability
 management.metrics.distribution.percentiles-histogram.http.server.requests: true

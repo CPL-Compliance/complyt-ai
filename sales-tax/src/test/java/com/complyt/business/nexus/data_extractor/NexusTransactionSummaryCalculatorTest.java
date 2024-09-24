@@ -2,6 +2,7 @@ package com.complyt.business.nexus.data_extractor;
 
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.TransactionNexusSummary;
+import com.complyt.domain.transaction.ExchangeRateInfo;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.utils.factory.NexusAmountAggregatorFactory;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,45 @@ class NexusTransactionSummaryCalculatorTest {
         when(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction, nexusStateRule)).thenReturn(taxableCollectionAmountExtractor);
         when(taxableCollectionAmountExtractor.extract()).thenReturn(Mono.just(BigDecimal.valueOf(1200)));
         Mono<TransactionNexusSummary> transactionNexusSummaryMono = nexusTransactionSummaryCalculator.extract(transaction, nexusStateRule);
+
+        // Then
+        StepVerifier.create(transactionNexusSummaryMono).expectNext(transactionNexusSummary).verifyComplete();
+    }
+
+    @Test
+    void extract_TaxableCollectionAmountExtractorWithCurrencyUsdReturnsAmount_ReturnsSummary() {
+        // Given
+        Transaction givenTransaction = transaction.withCurrency("USD");
+        TransactionNexusSummary transactionNexusSummary = new TransactionNexusSummary(
+                BigDecimal.valueOf(1200),
+                givenTransaction.getExternalTimestamps().getCreatedDate(),
+                givenTransaction.getTransactionType());
+
+        // When
+        when(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(givenTransaction, nexusStateRule)).thenReturn(taxableCollectionAmountExtractor);
+        when(taxableCollectionAmountExtractor.extract()).thenReturn(Mono.just(BigDecimal.valueOf(1200)));
+
+        Mono<TransactionNexusSummary> transactionNexusSummaryMono = nexusTransactionSummaryCalculator.extract(givenTransaction, nexusStateRule);
+
+        // Then
+        StepVerifier.create(transactionNexusSummaryMono).expectNext(transactionNexusSummary).verifyComplete();
+    }
+
+    @Test
+    void extract_TaxableCollectionAmountExtractorConvertToUsdAndReturnsAmount_ReturnsSummary() {
+        // Given
+        ExchangeRateInfo euroExchangeRateInfo = unitTestUtilities.createEuroExchangeRateInfo(transaction);
+        Transaction givenTransaction = transaction.withCurrency("EUR").withExchangeRateInfo(euroExchangeRateInfo);
+        TransactionNexusSummary transactionNexusSummary = new TransactionNexusSummary(
+                givenTransaction.getExchangeRateInfo().totalItemsAmountInUSD(),
+                givenTransaction.getExternalTimestamps().getCreatedDate(),
+                givenTransaction.getTransactionType());
+
+        // When
+        when(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(givenTransaction, nexusStateRule)).thenReturn(taxableCollectionAmountExtractor);
+        when(taxableCollectionAmountExtractor.extract()).thenReturn(Mono.just(BigDecimal.valueOf(1000)));
+
+        Mono<TransactionNexusSummary> transactionNexusSummaryMono = nexusTransactionSummaryCalculator.extract(givenTransaction, nexusStateRule);
 
         // Then
         StepVerifier.create(transactionNexusSummaryMono).expectNext(transactionNexusSummary).verifyComplete();

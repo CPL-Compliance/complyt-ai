@@ -217,6 +217,21 @@
                 <activeTaxClient>complytStubTax</activeTaxClient>
             </properties>
         </profile>
+        <profile>
+            <id>complytCurrencyEngine</id>
+            <properties>
+                <activeCurrencyClient>complytCurrencyEngine</activeCurrencyClient>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>complytStubCurrency</id>
+            <properties>
+                <activeCurrencyClient>complytStubCurrency</activeCurrencyClient>
+            </properties>
+        </profile>
         <!-- Tax Client Profiles -->
     </profiles>
 
