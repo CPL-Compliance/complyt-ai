@@ -5,6 +5,14 @@ import java.util.Map;
 
 public interface SupportedNonUsCountries {
     Map<String, String> nonUsaCountriesAbbreviations = new HashMap<>() {{
+        put("TW", "Taiwan");
+        put("TAIWAN", "Taiwan");
+        put("TWN", "Taiwan");
+
+        put("KR", "South Korea");
+        put("SOUTH KOREA", "South Korea");
+        put("KOR", "South Korea");
+
         put("AFGHANISTAN", "Afghanistan");
         put("AF", "Afghanistan");
         put("AFG", "Afghanistan");

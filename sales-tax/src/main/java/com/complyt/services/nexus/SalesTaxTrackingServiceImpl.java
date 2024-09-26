@@ -90,7 +90,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> addClientAndStateDetails(@NonNull SalesTaxTracking salesTaxTracking) {
-        String stateName = salesTaxTracking.getState() != null ? salesTaxTracking.getState().getName() : "";
+        String stateName = salesTaxTracking.getState() != null ? salesTaxTracking.getState().getName() : null;
         return clientTrackingRepository.findClient()
                 .map(salesTaxTracking::setClientTracking)
                 .flatMap(salesTaxTrackingWithClient -> nexusStateRuleRepository.findMostRecentByCountryAndState(salesTaxTracking.getCountry(), stateName)
@@ -129,7 +129,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking) {
-        String state = salesTaxTracking.getState() != null ? salesTaxTracking.getState().getName() : "";
+        String state = salesTaxTracking.getState() != null ? salesTaxTracking.getState().getName() : null;
         return salesTaxTrackingRepository.findByCountryStateAndSubsidiary(salesTaxTracking.getCountry(), state, salesTaxTracking.getSubsidiary()) //todo: check
                 .switchIfEmpty(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(salesTaxTracking.getCountry(), state, null))
                 .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with country " + salesTaxTracking.getCountry())))

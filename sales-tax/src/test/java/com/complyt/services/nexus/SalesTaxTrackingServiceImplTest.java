@@ -293,7 +293,7 @@ public class SalesTaxTrackingServiceImplTest {
                 withEconomicNexusTracker(new EconomicNexusTracker(true, LocalDateTime.now()))
                 .withState(null);
         String country = newSalesTaxTracking.getCountry();
-        String state = "";
+        String state = null;
         String subsidiary = newSalesTaxTracking.getSubsidiary();
 
         // When
@@ -512,7 +512,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
-        when(nexusStateRuleRepository.findMostRecentByCountryAndState(salesTaxTrackingToSend.getCountry(), "")).thenReturn(Mono.just(nexusStateRule));
+        when(nexusStateRuleRepository.findMostRecentByCountryAndState(salesTaxTrackingToSend.getCountry(), null)).thenReturn(Mono.just(nexusStateRule));
 
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.addClientAndStateDetails(salesTaxTrackingToSend);
 
