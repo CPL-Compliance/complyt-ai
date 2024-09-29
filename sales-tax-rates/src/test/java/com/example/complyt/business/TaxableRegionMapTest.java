@@ -8,7 +8,7 @@ public class TaxableRegionMapTest {
 
     @Test
     void taxableRegions_Length() {
-        Assertions.assertEquals(TaxableRegionsMap.taxableRegions.size(), 90);
+        Assertions.assertEquals(118,TaxableRegionsMap.taxableRegions.size());
     }
     
     @Test
