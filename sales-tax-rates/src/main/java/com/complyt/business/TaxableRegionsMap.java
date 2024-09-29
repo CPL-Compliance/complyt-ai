@@ -5,6 +5,8 @@ import java.util.Map;
 
 public interface TaxableRegionsMap {
     Map<String, String> taxableRegions = new HashMap<>() {{
+        // Canada Regions
+        put("ALBERTA", "Alberta");
         put("NORTHWEST TERRITORIES", "Northwest Territories");
         put("NUNAVUT", "Nunavut");
         put("YUKON", "Yukon");
@@ -17,6 +19,35 @@ public interface TaxableRegionsMap {
         put("NEWFOUNDLAND AND LABRADOR", "Newfoundland and Labrador");
         put("NOVA SCOTIA", "Nova Scotia");
         put("PRINCE EDWARD ISLAND", "Prince Edward Island");
+
+        // Brazil Regions
+        put("ACRE", "Acre");
+        put("ALAGOAS", "Alagoas");
+        put("AMAPA", "Amapa");
+        put("AMAZONAS", "Amazonas");
+        put("BAHIA", "Bahia");
+        put("CEARA", "Ceara");
+        put("DISTRITO FEDERAL", "Distrito Federal");
+        put("ESPIRITO SANTO", "Espirito Santo");
+        put("GOIAS", "Goias");
+        put("MARANHAO", "Maranhao");
+        put("MATO GROSSO", "Mato Grosso");
+        put("MATO GROSSO DO SUL", "Mato Grosso do Sul");
+        put("MINAS GERAIS", "Minas Gerais");
+        put("PARA", "Para");
+        put("PARAIBA", "Paraiba");
+        put("PARANA", "Parana");
+        put("PERNAMBUCO", "Pernambuco");
+        put("PIAUI", "Piaui");
+        put("RIO DE JANEIRO", "Rio de Janeiro");
+        put("RIO GRANDE DO NORTE", "Rio Grande do Norte");
+        put("RIO GRANDE DO SUL", "Rio Grande do Sul");
+        put("RONDONIA", "Rondonia");
+        put("RORAIMA", "Roraima");
+        put("SANTA CATARINA", "Santa Catarina");
+        put("SAO PAULO", "Sao Paulo");
+        put("SERGIPE", "Sergipe");
+        put("TOCANTINS", "Tocantins");
 
         // Misspelled keys
         put("NORTHWES TERRITORIES", "Northwest Territories");
