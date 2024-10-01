@@ -9,9 +9,14 @@ public interface SupportedNonUsCountries {
         put("TAIWAN", "Taiwan");
         put("TWN", "Taiwan");
 
+        put("AZORES", "Azores");
+
         put("KR", "South Korea");
         put("SOUTH KOREA", "South Korea");
         put("KOR", "South Korea");
+
+        put("KOSOVO", "Kosovo");
+        put("XK", "Kosovo");
 
         put("AFGHANISTAN", "Afghanistan");
         put("AF", "Afghanistan");
@@ -48,6 +53,7 @@ public interface SupportedNonUsCountries {
         put("ANTIGUA AND BARBUDA", "Antigua and barbuda");
         put("AG", "Antigua and barbuda");
         put("ATG", "Antigua and barbuda");
+        put("ANTIGUA & BARBUDA", "Antigua and barbuda");
 
         put("ARGENTINA", "Argentina");
         put("AR", "Argentina");
@@ -118,6 +124,7 @@ public interface SupportedNonUsCountries {
         put("BOL", "Bolivia");
 
         put("BONAIRE, SINT EUSTATIUS AND SABA", "Bonaire, sint eustatius and saba");
+        put("BONAIRE", "Bonaire, sint eustatius and saba");
         put("BQ", "Bonaire, sint eustatius and saba");
         put("BES", "Bonaire, sint eustatius and saba");
 
@@ -158,6 +165,7 @@ public interface SupportedNonUsCountries {
         put("BDI", "Burundi");
 
         put("CABO VERDE", "Cabo verde");
+        put("CAPE VERDE", "Cabo verde");
         put("CV", "Cabo verde");
         put("CPV", "Cabo verde");
 
@@ -173,9 +181,14 @@ public interface SupportedNonUsCountries {
         put("CA", "Canada");
         put("CAN", "Canada");
 
+        put("CANARY ISLANDS", "Canary Islands");
+
         put("CAYMAN ISLANDS", "Cayman islands");
         put("KY", "Cayman islands");
         put("CYM", "Cayman islands");
+
+        put("NETHERLANDS ANTILLES", "Netherlands Antilles");
+        put("AN", "Netherlands Antilles");
 
         put("CENTRAL AFRICAN REPUBLIC", "Central african republic");
         put("CF", "Central african republic");
@@ -378,6 +391,9 @@ public interface SupportedNonUsCountries {
         put("GT", "Guatemala");
         put("GTM", "Guatemala");
 
+        put("IRAN", "Iran");
+        put("IR", "Iran");
+
         put("GUERNSEY", "Guernsey");
         put("GG", "Guernsey");
         put("GGY", "Guernsey");
@@ -484,6 +500,8 @@ public interface SupportedNonUsCountries {
         put("KOREA", "Korea");
         put("KP", "Korea");
         put("PRK", "Korea");
+        put("DPRK", "Korea");
+        put("NORTH KOREA", "Korea");
 
         put("KUWAIT", "Kuwait");
         put("KW", "Kuwait");
@@ -497,6 +515,7 @@ public interface SupportedNonUsCountries {
         put("LAO PEOPLE'S DEMOCRATIC REPUBLIC", "Lao people's democratic republic");
         put("LA", "Lao people's democratic republic");
         put("LAO", "Lao people's democratic republic");
+        put("LAOS", "Lao people's democratic republic");
 
         put("LATVIA", "Latvia");
         put("LV", "Latvia");
@@ -582,6 +601,9 @@ public interface SupportedNonUsCountries {
         put("MEXICO", "Mexico");
         put("MX", "Mexico");
         put("MEX", "Mexico");
+
+        put("IVORY COAST", "Ivory Coast");
+        put("IC", "Ivory Coast");
 
         put("FEDERATED STATES OF MICRONESIA", "Micronesia");
         put("MICRONESIA", "Micronesia");
@@ -732,6 +754,9 @@ public interface SupportedNonUsCountries {
         put("REPUBLIC OF NORTH MACEDONIA", "Republic of north macedonia");
         put("MK", "Republic of north macedonia");
         put("MKD", "Republic of north macedonia");
+        put("MACEDONIA", "Republic of north macedonia");
+
+        put("MADEIRA", "Madeira");
 
         put("ROMANIA", "Romania");
         put("RO", "Romania");
@@ -759,12 +784,14 @@ public interface SupportedNonUsCountries {
         put("SHN", "Saint helena, ascension and tristan da cunha");
 
         put("SAINT KITTS AND NEVIS", "Saint kitts and nevis");
+        put("ST KITTS AND NEVIS", "Saint kitts and nevis");
         put("KN", "Saint kitts and nevis");
         put("KNA", "Saint kitts and nevis");
 
         put("SAINT LUCIA", "Saint lucia");
         put("LC", "Saint lucia");
         put("LCA", "Saint lucia");
+        put("ST LUCIA", "Saint lucia");
 
         put("SAINT PIERRE AND MIQUELON", "Saint pierre and miquelon");
         put("PM", "Saint pierre and miquelon");
@@ -783,6 +810,7 @@ public interface SupportedNonUsCountries {
         put("SMR", "San marino");
 
         put("SAO TOME AND PRINCIPE", "Sao tome and principe");
+        put("São Tomé and Príncipe", "Sao tome and principe");
         put("ST", "Sao tome and principe");
         put("STP", "Sao tome and principe");
 
@@ -819,6 +847,7 @@ public interface SupportedNonUsCountries {
         put("SVN", "Slovenia");
 
         put("SOLOMON ISLANDS", "Solomon islands");
+        put("SOLOMON ISLAND", "Solomon islands");
         put("SB", "Solomon islands");
         put("SLB", "Solomon islands");
 
@@ -867,6 +896,10 @@ public interface SupportedNonUsCountries {
         put("CH", "Switzerland");
         put("CHE", "Switzerland");
 
+        put("ST MARTIN", "St Martin");
+        put("SAINT MARTIN", "St Martin");
+        put("MF", "St Martin");
+
         put("SYRIAN ARAB REPUBLIC", "Syrian arab republic");
         put("SY", "Syrian arab republic");
         put("SYR", "Syrian arab republic");
@@ -902,6 +935,7 @@ public interface SupportedNonUsCountries {
         put("TRINIDAD AND TOBAGO", "Trinidad and tobago");
         put("TT", "Trinidad and tobago");
         put("TTO", "Trinidad and tobago");
+        put("TRINIDAD & TOBAGO", "Trinidad and tobago");
 
         put("TUNISIA", "Tunisia");
         put("TN", "Tunisia");
@@ -963,6 +997,9 @@ public interface SupportedNonUsCountries {
         put("VU", "Vanuatu");
         put("VUT", "Vanuatu");
 
+        put("PALESTINE", "Palestine");
+        put("PALESTINE REGION", "Palestine");
+
         put("BOLIVARIAN REPUBLIC OF VENEZUELA", "Venezuela");
         put("VENEZUELA", "Venezuela");
         put("VE", "Venezuela");
@@ -994,3 +1031,4 @@ public interface SupportedNonUsCountries {
         put("ZWE", "Zimbabwe");
     }};
 }
+
