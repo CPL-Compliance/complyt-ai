@@ -21,8 +21,7 @@ public class TransactionDtoShippingAddressChecker implements DtoBodyChecker<Tran
                 CountryIsUsaChecker.isCountryUsa(address.country()) ?
                         transactionDto.shippingAddress().isPartial() ?
                                 Flux.concat(checkVariableNotBlank(address.zip(), addressErrorBuilder("zip")),
-                                        checkVariableNotBlank(address.state(), addressErrorBuilder("state")),
-                                        checkIfStateExists(address.state(), stateErrorBuilder("state"))) :
+                                        checkIfStateExistsInPartialAddressOrNull(address.state(), stateErrorBuilder("state"))) :
                                 Flux.concat(checkVariableNotBlank(address.state(), addressErrorBuilder("state")),
                                         checkVariableNotBlank(address.street(), addressErrorBuilder("street")),
                                         checkVariableNotBlank(address.city(), addressErrorBuilder("city")),
@@ -39,6 +38,10 @@ public class TransactionDtoShippingAddressChecker implements DtoBodyChecker<Tran
 
     private Mono<String> checkIfStateExists(String variable, String errorMessage) {
         return StateExistsChecker.check(variable) != null ? Mono.empty() : Mono.just(errorMessage);
+    }
+
+    private Mono<String> checkIfStateExistsInPartialAddressOrNull(String variable, String errorMessage) {
+        return variable == null || variable.equals("") || StateExistsChecker.check(variable) != null ? Mono.empty() : Mono.just(errorMessage);
     }
 
     private String addressErrorBuilder(String field) {

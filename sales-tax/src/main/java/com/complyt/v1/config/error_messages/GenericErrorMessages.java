@@ -7,6 +7,7 @@ public interface GenericErrorMessages {
     String INTERNAL_SERVER_ERROR = "The request failed due to an internal error. Please contact support@complyt.io if this continues";
     String NOT_FOUND_ERROR = "The requested operation failed because a resource associated with the request could not be found.";
     String CURRENCY_NOT_FOUND_ERROR = "Currency conversion is not supported for the given transaction date.";
+    String ZIP_CODE_NOT_FOUND_ERROR = "In USA addresses, 'zip' code must be provided.";
     String INVALID_PATCH_FIELD_EXCEPTION = "The requested operation failed because of an invalid patch field provided.";
 
     String MISSING_BODY_ERROR = "The requested operation failed because no request body has been provided";

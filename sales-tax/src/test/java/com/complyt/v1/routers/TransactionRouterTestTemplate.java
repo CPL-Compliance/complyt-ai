@@ -104,7 +104,11 @@ public interface TransactionRouterTestTemplate extends
 
     void upsert_LengthGreaterThen200StreetInBillingAddress_Returns400ValidationError();
 
-    void upsert_PartialAddressWithNullState_Returns400ValidationError();
+    void upsert_PartialAddressWithNullState_ReturnsTransaction();
+
+    void upsert_PartialAddressWithBlankState_ReturnsTransaction();
+
+    void upsert_PartialAddressWithStateAndZip_ReturnsTransaction();
 
     void upsert_PartialAddressWithNullZip_Returns400ValidationError();
 

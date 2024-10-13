@@ -2147,7 +2147,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_PartialAddressWithNullState_Returns400ValidationError() {
+    public void upsert_PartialAddressWithNullState_ReturnsTransaction() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
@@ -2156,9 +2156,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .withCountry("USA")
                 .withPartial(true);
 
-        Set<String> expectedErrors = Set.of(
-                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX,
-                "Address.state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA);
+        TransactionDto givenTransactionDto = transactionDto.withShippingAddress(givenShippingAddress);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
+
+        // When
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         // When + Then
         webTestClient
@@ -2167,11 +2172,84 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .bodyValue(givenTransactionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_PartialAddressWithBlankState_ReturnsTransaction() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress()
+                .withState("")
+                .withCountry("USA")
+                .withPartial(true);
+
+        TransactionDto givenTransactionDto = transactionDto.withShippingAddress(givenShippingAddress);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
+
+        // When
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_PartialAddressWithStateAndZip_ReturnsTransaction() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress()
+                .withState("CO")
+                .withCountry("USA")
+                .withPartial(true);
+
+        TransactionDto givenTransactionDto = transactionDto.withShippingAddress(givenShippingAddress);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
+
+        // When
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test

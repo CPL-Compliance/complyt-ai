@@ -25,17 +25,19 @@ public class ApiExceptionConfig {
 
     @Bean
     public Map<Class<? extends Exception>, HttpStatus> exceptionToStatusCode() {
-        return Map.of(
-                ObjectNotFoundApiException.class, HttpStatus.NOT_FOUND,
-                CurrencyNotFoundApiException.class, HttpStatus.UNPROCESSABLE_ENTITY,
-                ObjectNotValidApiException.class, HttpStatus.BAD_REQUEST,
-                MissingBodyApiException.class, HttpStatus.BAD_REQUEST,
-                ConflictedDataApiException.class, HttpStatus.BAD_REQUEST,
-                PathVariableErrorException.class, HttpStatus.BAD_REQUEST,
-                QueryParamErrorException.class, HttpStatus.BAD_REQUEST,
-                InvalidPatchFieldException.class, HttpStatus.BAD_REQUEST,
-                InvalidDiscountAmountException.class, HttpStatus.BAD_REQUEST,
-                TaxCodeNotValidException.class, HttpStatus.BAD_REQUEST
+        return Map.ofEntries(
+                Map.entry(ObjectNotFoundApiException.class, HttpStatus.NOT_FOUND),
+                Map.entry(CurrencyNotFoundApiException.class, HttpStatus.UNPROCESSABLE_ENTITY),
+                Map.entry(ObjectNotValidApiException.class, HttpStatus.BAD_REQUEST),
+                Map.entry(MissingBodyApiException.class, HttpStatus.BAD_REQUEST),
+                Map.entry(ConflictedDataApiException.class, HttpStatus.BAD_REQUEST),
+                Map.entry(PathVariableErrorException.class, HttpStatus.BAD_REQUEST),
+                Map.entry(QueryParamErrorException.class, HttpStatus.BAD_REQUEST),
+                Map.entry(InvalidPatchFieldException.class, HttpStatus.BAD_REQUEST),
+                Map.entry(InvalidDiscountAmountException.class, HttpStatus.BAD_REQUEST),
+                Map.entry(TaxCodeNotValidException.class, HttpStatus.BAD_REQUEST),
+                Map.entry(ZipCodeNotFoundApiException.class, HttpStatus.BAD_REQUEST)
         );
+
     }
 }

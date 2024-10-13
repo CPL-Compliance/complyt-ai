@@ -19,8 +19,9 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.*;
 import com.complyt.repositories.TransactionRepository;
+import com.complyt.repositories.GeoRecordRepository;
+import com.complyt.v1.exceptions.types.ZipCodeNotFoundApiException;
 import org.bson.types.ObjectId;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,6 +47,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -54,6 +56,9 @@ class TransactionServiceImplTest {
 
     @InjectMocks
     TransactionServiceImpl transactionService;
+
+    @Mock
+    GeoRecordRepository geoRecordRepository;
 
     @Mock
     TransactionRepository transactionRepository;
@@ -474,7 +479,6 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransaction_ReturnsTransaction() {
         // Given
-
         ShippingFee givenShippingFee = transaction.getShippingFee();
         Transaction transactionWithItemsCalculatedTotal = transaction
                 .withItems(testUtilities.setCalculatedTotalOnItemList(transaction.getItems()));
@@ -620,6 +624,133 @@ class TransactionServiceImplTest {
                     expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
                     expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour();
         }).expectComplete().verify();
+    }
+
+    @Test
+    void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndNullState_ReturnsTransaction() {
+        // Given
+        Address partialShippingAddress = new Address(null, "US", null,null,null,"80001",null,true);
+        Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
+
+        ShippingFee givenShippingFee = transactionWithPartialAddress.getShippingFee();
+        Transaction transactionWithItemsCalculatedTotal = transactionWithPartialAddress
+                .withItems(testUtilities.setCalculatedTotalOnItemList(transactionWithPartialAddress.getItems()));
+
+        Transaction transactionWithItemsCalculatedTotalAndShippingFee = transactionWithItemsCalculatedTotal
+                .withShippingFee(givenShippingFee.withCalculatedTotal(givenShippingFee.getTotalPrice()));
+
+        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee);
+
+        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+
+        Transaction transactionWithAllInjectedData = transactionWithProductClassificationAndCounty.withComplytId(UUID.randomUUID());
+
+        NewTransactionInternalTimestampsInjector injector = new NewTransactionInternalTimestampsInjector(transactionWithAllInjectedData);
+        Transaction transactionWithUpdatedDates = injector.inject();
+        GeoRecord geoRecord = new GeoRecord("1", "80001", "CO");
+
+        // When
+        when(geoRecordRepository.findStateByZip(transactionWithPartialAddress.getShippingAddress().zip())).thenReturn(Mono.just(geoRecord));
+        when(itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(transactionWithPartialAddress)).thenReturn(Mono.just(transactionWithItemsCalculatedTotal));
+        when(shippingFeeCalculator.injectRecalculatedTotalAfterDiscount(transactionWithItemsCalculatedTotal)).thenReturn(Mono.just(transactionWithItemsCalculatedTotalAndShippingFee));
+        when(shippingAddressCountryAlignmentStrategy.select(transactionWithPartialAddress)).thenReturn(transaction -> (Transaction) transactionWithItemsCalculatedTotalAndShippingFee);
+        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
+        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
+        when(cityCountyProvider.provide(any(Transaction.class))).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
+        when(transactionItemsAmountsCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
+        when(transactionDiscountCollector.collect(any(Transaction.class))).thenReturn(transactionWithProductClassificationAndCounty);
+
+        Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(transactionWithPartialAddress);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNextMatches(transaction -> {
+            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
+
+            LocalDateTime actualCreatedDateTime = transaction.getInternalTimestamps().getCreatedDate();
+            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimestamps().getUpdatedDate();
+
+            return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
+                    expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
+                    expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() &&
+                    expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() &&
+                    expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
+                    expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
+                    expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
+                    expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour() &&
+                    transaction.getComplytId() == transactionWithAllInjectedData.getComplytId();
+        }).expectComplete().verify();
+    }
+
+    @Test
+    void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndBlankState_ReturnsTransaction() {
+        // Given
+        Address partialShippingAddress = new Address(null, "US", null,"",null,"80001",null,true);
+        Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
+
+        ShippingFee givenShippingFee = transactionWithPartialAddress.getShippingFee();
+        Transaction transactionWithItemsCalculatedTotal = transactionWithPartialAddress
+                .withItems(testUtilities.setCalculatedTotalOnItemList(transactionWithPartialAddress.getItems()));
+
+        Transaction transactionWithItemsCalculatedTotalAndShippingFee = transactionWithItemsCalculatedTotal
+                .withShippingFee(givenShippingFee.withCalculatedTotal(givenShippingFee.getTotalPrice()));
+
+        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee);
+
+        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+
+        Transaction transactionWithAllInjectedData = transactionWithProductClassificationAndCounty.withComplytId(UUID.randomUUID());
+
+        NewTransactionInternalTimestampsInjector injector = new NewTransactionInternalTimestampsInjector(transactionWithAllInjectedData);
+        Transaction transactionWithUpdatedDates = injector.inject();
+        GeoRecord geoRecord = new GeoRecord("1", "80001", "CO");
+
+        // When
+        when(geoRecordRepository.findStateByZip(transactionWithPartialAddress.getShippingAddress().zip())).thenReturn(Mono.just(geoRecord));
+        when(itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(transactionWithPartialAddress)).thenReturn(Mono.just(transactionWithItemsCalculatedTotal));
+        when(shippingFeeCalculator.injectRecalculatedTotalAfterDiscount(transactionWithItemsCalculatedTotal)).thenReturn(Mono.just(transactionWithItemsCalculatedTotalAndShippingFee));
+        when(shippingAddressCountryAlignmentStrategy.select(transactionWithPartialAddress)).thenReturn(transaction -> (Transaction) transactionWithItemsCalculatedTotalAndShippingFee);
+        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
+        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
+        when(cityCountyProvider.provide(any(Transaction.class))).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
+        when(transactionItemsAmountsCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
+        when(transactionDiscountCollector.collect(any(Transaction.class))).thenReturn(transactionWithProductClassificationAndCounty);
+
+        Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(transactionWithPartialAddress);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNextMatches(transaction -> {
+            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
+
+            LocalDateTime actualCreatedDateTime = transaction.getInternalTimestamps().getCreatedDate();
+            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimestamps().getUpdatedDate();
+
+            return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
+                    expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
+                    expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() &&
+                    expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() &&
+                    expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
+                    expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
+                    expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
+                    expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour() &&
+                    transaction.getComplytId() == transactionWithAllInjectedData.getComplytId();
+        }).expectComplete().verify();
+    }
+
+    @Test
+    void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndInvalidZipCode_ReturnsAnError() {
+        // Given
+        Address partialShippingAddress = new Address(null, "US", null,null,null,"InvalidZipCode",null,true);
+        Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
+
+        // When
+        when(geoRecordRepository.findStateByZip(transactionWithPartialAddress.getShippingAddress().zip())).thenReturn(Mono.empty());
+
+        Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(transactionWithPartialAddress);
+
+        // Then
+        StepVerifier.create(transactionMono).expectError(ZipCodeNotFoundApiException.class);
     }
 
     @Test

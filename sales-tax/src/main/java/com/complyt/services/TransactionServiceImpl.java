@@ -17,7 +17,9 @@ import com.complyt.domain.transaction.ExchangeRateInfo;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.repositories.TransactionRepository;
+import com.complyt.repositories.GeoRecordRepository;
 import com.complyt.v1.exceptions.types.CurrencyNotFoundApiException;
+import com.complyt.v1.exceptions.types.ZipCodeNotFoundApiException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -30,7 +32,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -44,6 +45,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @NonNull
     TransactionRepository transactionRepository;
+
+    @NonNull
+    GeoRecordRepository geoRecordRepository;
 
     @NonNull
     ProductClassificationService productClassificationServiceImpl;
@@ -126,7 +130,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Mono<Transaction> injectCommonDataToTransaction(Transaction transaction) {
-        return recalculateTotalItemsPrice(transaction)
+        return injectStateIfMissingInPartialAddress(transaction)
+                .flatMap(this::recalculateTotalItemsPrice)
                 .map(transactionWithCalculatedItems ->
                         (Transaction) shippingAddressAlignmentStrategy.select(transaction).apply(transactionWithCalculatedItems))
                 .flatMap(transactionWithCalculatedItemsAndShippingAddress ->
@@ -143,6 +148,14 @@ public class TransactionServiceImpl implements TransactionService {
         return itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(transaction)
                 .flatMap(shippingFeeCalculator::injectRecalculatedTotalAfterDiscount)
                 .flatMap(this::calculateTransactionLevelDiscountIfExist);
+    }
+
+    private Mono<Transaction> injectStateIfMissingInPartialAddress(Transaction transaction) {
+        return CountryIsUsaChecker.isCountryUsa(transaction.getShippingAddress()) && (transaction.getShippingAddress().state() == null || transaction.getShippingAddress().state().isEmpty()) ?
+                geoRecordRepository.findStateByZip(transaction.getShippingAddress().zip())
+                        .map(geoRecord -> transaction.setShippingAddress(transaction.getShippingAddress().withState(geoRecord.getState())))
+                        .switchIfEmpty(Mono.error(ZipCodeNotFoundApiException::new)) :
+                Mono.just(transaction);
     }
 
     @Deprecated

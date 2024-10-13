@@ -101,7 +101,12 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_UsaShippingAddressWithEuroCurrencyAndRefRate_ReturnsTransactionWithExchangeRateInfo();
 
     void upsertByExternalIdAndSource_UsaShippingAddressWithNullCurrencyAndRefRate_ReturnsTransactionWithoutExchangeRateInfo();
+
     void upsertByExternalIdAndSource_UsaShippingAddressWithEuroCurrencyAndFutureCreatedDate_ReturnsTransactionWithExchangeRateInfo();
+
+    void upsertByExternalIdAndSource_UsaCountryWithPartialAddressWithoutState_Returns201();
+
+    void upsertByExternalIdAndSource_UsaCountryWithPartialAddressAndBlankState_Returns201();
 
 
 }
