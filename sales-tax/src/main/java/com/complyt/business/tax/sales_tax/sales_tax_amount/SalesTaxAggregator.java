@@ -20,8 +20,9 @@ import java.util.Optional;
 @ToString
 public class SalesTaxAggregator {
 
-    public BigDecimal aggregate(@NonNull List<Taxable> taxables) {
-        Optional<BigDecimal> amount = taxables.stream().map(Taxable::calculateSalesTaxAmount).reduce(BigDecimal::add);
+    public BigDecimal aggregate(@NonNull List<Taxable> taxables, Boolean isTaxInclusive) {
+        Optional<BigDecimal> amount = isTaxInclusive ? taxables.stream().map(Taxable::calculateInclusiveSalesTaxAmount).reduce(BigDecimal::add) :
+                                                        taxables.stream().map(Taxable::calculateSalesTaxAmount).reduce(BigDecimal::add);
 
         log.debug("Sales tax amount calculated : " + amount);
 

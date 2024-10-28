@@ -372,6 +372,16 @@ public class UnitTestUtilities {
         return itemsWithSalesTaxRate;
     }
 
+    public List<Taxable> createTaxablesWithSalesTaxRate(boolean withJurisdictionalSalesTaxRules, boolean withJurisdictionalGtTaxRules, boolean withTangibleCategory) {
+        List<Item> Items = createItems(withJurisdictionalSalesTaxRules, withJurisdictionalGtTaxRules, withTangibleCategory);
+        List<Taxable> itemsWithSalesTaxRate = new ArrayList<>() {{
+            add(Items.get(0).withCalculatedTotal(BigDecimal.valueOf(1000)).withSalesTaxRates(createSalesTaxRates()));
+            add(Items.get(1).withCalculatedTotal(BigDecimal.valueOf(1000)).withSalesTaxRates(createSalesTaxRates()));
+        }};
+
+        return itemsWithSalesTaxRate;
+    }
+
     public List<Item> createItemsWithGstTaxRate(boolean withJurisdictionalSalesTaxRules, boolean withJurisdictionalGtTaxRules, boolean withTangibleCategory) {
 //        return new ArrayList<>() {{
 //            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,

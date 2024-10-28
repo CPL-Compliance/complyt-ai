@@ -61,12 +61,12 @@ public class GtRatesTransactionInjectorTest {
         }};
         Collection<Taxable> taxables = new ArrayList<>(transaction.getItems());
         Transaction transactionWithRates = transaction.withItems(itemsWithRates);
-        Transaction transactionWithRatesAndSalesTax = transactionWithRates.withSalesTax(salesTax);
+        Transaction transactionWithRatesAndSalesTax = transactionWithRates.withSalesTax(salesTax).withFinalTransactionAmount(BigDecimal.valueOf(10));
 
         // When
         when(transactionGtRatesHandler.setRates(transaction,gtRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxables);
-        when(salesTaxAggregator.aggregate((List<Taxable>) taxables)).thenReturn(salesTax.amount());
+        when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
         Mono<Transaction> transactionMono = gtRatesTransactionInjector.inject(transaction).apply(complytGtRates);
 
         // Then
@@ -85,12 +85,13 @@ public class GtRatesTransactionInjectorTest {
         }};
         Collection<Taxable> taxables = new ArrayList<>(transactionToSend.getItems());
         Transaction transactionWithRates = transactionToSend.withItems(itemsWithRates);
-        Transaction transactionWithRatesAndSalesTax = transactionWithRates.withSalesTax(salesTax).withFinalTransactionAmount(BigDecimal.valueOf(-10));
+        Transaction transactionWithRatesAndSalesTax = transactionWithRates.withSalesTax(salesTax);
 
         // When
         when(transactionGtRatesHandler.setRates(transactionToSend, gtRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxables);
-        when(salesTaxAggregator.aggregate((List<Taxable>) taxables)).thenReturn(salesTax.amount());
+        when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
+
         Mono<Transaction> transactionMono = gtRatesTransactionInjector.inject(transactionToSend).apply(complytGtRates);
 
         // Then

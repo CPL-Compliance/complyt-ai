@@ -36,7 +36,7 @@ public class TotalItemsAmountCalculatorTest {
                 .getCalculatedTotal());
 
         // When + Then
-        BigDecimal actualAmount = totalItemsAmountCalculator.calculate(items);
+        BigDecimal actualAmount = totalItemsAmountCalculator.calculate(items, false);
         assertEquals(expectedAmount, actualAmount);
     }
 
@@ -46,11 +46,35 @@ public class TotalItemsAmountCalculatorTest {
         List<Taxable> nullItems = null;
 
         // When
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> totalItemsAmountCalculator.calculate(nullItems));
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> totalItemsAmountCalculator.calculate(nullItems, false));
 
         // Then
         assertEquals("items is marked non-null but is null", exception.getMessage());
     }
 
+    @Test
+    void calculate_TwoItemsAreTaxableWithTaxInclusive_ReturnsAmountOfTwoItems() {
+        // Before
+        items = testUtilities.createTaxablesWithSalesTaxRate(true,true,true);
+        BigDecimal expectedAmount = BigDecimal.valueOf(1428.571428);
+
+        // When
+        BigDecimal actualAmount = totalItemsAmountCalculator.calculate(items, true);
+
+        // Then
+        assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    public void calculate_NullItemsPassedAndTaxInclusive_ThrowsException() {
+        // Given
+        List<Taxable> nullItems = null;
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> totalItemsAmountCalculator.calculate(nullItems, true));
+
+        // Then
+        assertEquals("items is marked non-null but is null", exception.getMessage());
+    }
 
 }

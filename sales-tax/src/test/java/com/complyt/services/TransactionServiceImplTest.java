@@ -76,6 +76,9 @@ class TransactionServiceImplTest {
     TransactionAmountsCollector<Transaction> transactionItemsAmountsCollector;
 
     @Mock
+    TransactionAmountsCollector<Transaction> finalTransactionAmountCollector;
+
+    @Mock
     TransactionAmountsCollector<Transaction> transactionDiscountCollector;
 
     @Mock
@@ -397,8 +400,7 @@ class TransactionServiceImplTest {
         when(shippingAddressCountryAlignmentStrategy.select(transaction)).thenReturn(transaction -> (Transaction) transactionWithRelativeDiscount);
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithRelativeDiscount)).thenReturn(Mono.just(transactionWithProductClassification));
         when(cityCountyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
-        when(transactionItemsAmountsCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
-        when(transactionDiscountCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
+        when(finalTransactionAmountCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
         when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(transaction);
@@ -451,8 +453,7 @@ class TransactionServiceImplTest {
         when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
         when(cityCountyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
-        when(transactionItemsAmountsCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
-        when(transactionDiscountCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
+        when(finalTransactionAmountCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(transaction);
 
@@ -502,8 +503,7 @@ class TransactionServiceImplTest {
         when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
         when(cityCountyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
-        when(transactionItemsAmountsCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
-        when(transactionDiscountCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
+        when(finalTransactionAmountCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(transaction);
 
@@ -551,8 +551,7 @@ class TransactionServiceImplTest {
         when(shippingAddressCountryAlignmentStrategy.select(transactionToSend)).thenReturn(transaction -> (Transaction) transactionWithItemsCalculatedTotalAndShippingFee);
         when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassification)).thenReturn(transactionWithAllInjectedData);
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
-        when(transactionItemsAmountsCollector.collect(transactionWithProductClassification)).thenReturn(transactionWithProductClassification);
-        when(transactionDiscountCollector.collect(transactionWithProductClassification)).thenReturn(transactionWithProductClassification);
+        when(finalTransactionAmountCollector.collect(transactionWithProductClassification)).thenReturn(transactionWithProductClassification);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(transactionToSend);
 
@@ -602,8 +601,7 @@ class TransactionServiceImplTest {
         when(shippingAddressCountryAlignmentStrategy.select(newTransaction)).thenReturn(transaction -> (Transaction) transactionWithItemsCalculatedTotalAndShippingFee);
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
         when(cityCountyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
-        when(transactionItemsAmountsCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
-        when(transactionDiscountCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
+        when(finalTransactionAmountCollector.collect(any(Transaction.class))).thenReturn(transactionWithProductClassificationAndCounty);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(newTransaction, transactionWithCustomer);
 
@@ -629,7 +627,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndNullState_ReturnsTransaction() {
         // Given
-        Address partialShippingAddress = new Address(null, "US", null,null,null,"80001",null,true);
+        Address partialShippingAddress = new Address(null, "US", null, null, null, "80001", null, true);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         ShippingFee givenShippingFee = transactionWithPartialAddress.getShippingFee();
@@ -657,8 +655,7 @@ class TransactionServiceImplTest {
         when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
         when(cityCountyProvider.provide(any(Transaction.class))).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
-        when(transactionItemsAmountsCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
-        when(transactionDiscountCollector.collect(any(Transaction.class))).thenReturn(transactionWithProductClassificationAndCounty);
+        when(finalTransactionAmountCollector.collect(any(Transaction.class))).thenReturn(transactionWithProductClassificationAndCounty);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(transactionWithPartialAddress);
 
@@ -685,7 +682,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndBlankState_ReturnsTransaction() {
         // Given
-        Address partialShippingAddress = new Address(null, "US", null,"",null,"80001",null,true);
+        Address partialShippingAddress = new Address(null, "US", null, "", null, "80001", null, true);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         ShippingFee givenShippingFee = transactionWithPartialAddress.getShippingFee();
@@ -713,8 +710,7 @@ class TransactionServiceImplTest {
         when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
         when(cityCountyProvider.provide(any(Transaction.class))).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
-        when(transactionItemsAmountsCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
-        when(transactionDiscountCollector.collect(any(Transaction.class))).thenReturn(transactionWithProductClassificationAndCounty);
+        when(finalTransactionAmountCollector.collect(any(Transaction.class))).thenReturn(transactionWithProductClassificationAndCounty);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(transactionWithPartialAddress);
 
@@ -741,7 +737,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndInvalidZipCode_ReturnsAnError() {
         // Given
-        Address partialShippingAddress = new Address(null, "US", null,null,null,"InvalidZipCode",null,true);
+        Address partialShippingAddress = new Address(null, "US", null, null, null, "InvalidZipCode", null, true);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         // When
@@ -1150,7 +1146,7 @@ class TransactionServiceImplTest {
     @Test
     void injectExchangeRateIfNeeded_TransactionWithEuroCurrency_ReturnsTransactionWithExchangeRateInfo() {
         // Given
-        transaction = transaction.setCurrency("EUR").setFinalTransactionAmount(BigDecimal.valueOf(1000));
+        transaction = transaction.setCurrency("EUR").setTotalItemsAmount(BigDecimal.valueOf(1000));
         CurrencyExchangeRateObject currencyExchangeRateObject = testUtilities.createEuroCurrencyExchangeRateObject();
         ExchangeRateInfo exchangeRateInfo = testUtilities.createNotTaxableEuroExchangeRateInfo(transaction);
         Transaction transactionWithExchangeRateInfo = transaction.withExchangeRateInfo(exchangeRateInfo);
@@ -1171,7 +1167,7 @@ class TransactionServiceImplTest {
         SalesTax salesTax = testUtilities.createSalesTaxWithAmount(BigDecimal.valueOf(100));
         transaction = transaction
                 .setCurrency("EUR")
-                .setFinalTransactionAmount(BigDecimal.valueOf(1000))
+                .setTotalItemsAmount(BigDecimal.valueOf(1000))
                 .setSalesTax(salesTax);
         CurrencyExchangeRateObject currencyExchangeRateObject = testUtilities.createEuroCurrencyExchangeRateObject();
         ExchangeRateInfo exchangeRateInfo = testUtilities.createEuroExchangeRateInfo(transaction);
@@ -1216,8 +1212,8 @@ class TransactionServiceImplTest {
         // Given
         transaction = transaction.setCurrency("EUR")
                 .setRefRate(BigDecimal.valueOf(5))
-                .setFinalTransactionAmount(BigDecimal.valueOf(1000));
-        ExchangeRateInfo exchangeRateInfo = testUtilities.createExchangeRateInfo(BigDecimal.valueOf(5000), BigDecimal.ZERO,  BigDecimal.valueOf(5000), "EUR", "USD", BigDecimal.valueOf(5), CurrencySource.CLIENT, false, transaction.getInternalTimestamps().getCreatedDate());
+                .setTotalItemsAmount(BigDecimal.valueOf(1000));
+        ExchangeRateInfo exchangeRateInfo = testUtilities.createExchangeRateInfo(BigDecimal.valueOf(5000), BigDecimal.ZERO, BigDecimal.valueOf(5000), "EUR", "USD", BigDecimal.valueOf(5), CurrencySource.CLIENT, false, transaction.getInternalTimestamps().getCreatedDate());
         Transaction transactionWithExchangeRateInfo = transaction.withExchangeRateInfo(exchangeRateInfo);
 
         // When
@@ -1231,12 +1227,12 @@ class TransactionServiceImplTest {
     void injectExchangeRateIfNeeded_TransactionWithEuroCurrencyAndFutureCreatedDate_ReturnsTransactionWithExchangeRateInfo() {
         // Given
         Transaction transactionWithFutureCreatedDate = transaction.withCurrency("EUR")
-                .withFinalTransactionAmount(BigDecimal.valueOf(1000))
+                .withTotalItemsAmount(BigDecimal.valueOf(1000))
                 .withExternalTimestamps(new Timestamps(LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(1)));
 
         CurrencyExchangeRateObject currencyExchangeRateObject = testUtilities.createEuroCurrencyExchangeRateObject();
-        BigDecimal finalTransactionAmount = BigDecimalProcessor.removeTrailingZeros(transactionWithFutureCreatedDate.getFinalTransactionAmount().multiply(currencyExchangeRateObject.rate()));
-        ExchangeRateInfo exchangeRateInfo = testUtilities.createExchangeRateInfo(finalTransactionAmount, BigDecimal.ZERO, finalTransactionAmount, "EUR", "USD", currencyExchangeRateObject.rate(), CurrencySource.COMPLYT, true, LocalDate.now().atStartOfDay());
+        BigDecimal totalItemsAmount = BigDecimalProcessor.removeTrailingZeros(transactionWithFutureCreatedDate.getTotalItemsAmount().multiply(currencyExchangeRateObject.rate()));
+        ExchangeRateInfo exchangeRateInfo = testUtilities.createExchangeRateInfo(totalItemsAmount, BigDecimal.ZERO, totalItemsAmount, "EUR", "USD", currencyExchangeRateObject.rate(), CurrencySource.COMPLYT, true, LocalDate.now().atStartOfDay());
         Transaction transactionWithExchangeRateInfo = transactionWithFutureCreatedDate.withExchangeRateInfo(exchangeRateInfo);
 
         // When
@@ -1254,14 +1250,36 @@ class TransactionServiceImplTest {
         // Given
         Transaction transactionWithFutureCreatedDate = transaction.withCurrency("EUR")
                 .withRefRate(BigDecimal.valueOf(5))
-                .withFinalTransactionAmount(BigDecimal.valueOf(1000))
+                .withTotalItemsAmount(BigDecimal.valueOf(1000))
                 .withExternalTimestamps(new Timestamps(LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(1)));
 
-        ExchangeRateInfo exchangeRateInfo = testUtilities.createExchangeRateInfo(BigDecimal.valueOf(5000), BigDecimal.ZERO,  BigDecimal.valueOf(5000), "EUR", "USD", BigDecimal.valueOf(5), CurrencySource.CLIENT, false, transactionWithFutureCreatedDate.getExternalTimestamps().getCreatedDate());
+        ExchangeRateInfo exchangeRateInfo = testUtilities.createExchangeRateInfo(BigDecimal.valueOf(5000), BigDecimal.ZERO, BigDecimal.valueOf(5000), "EUR", "USD", BigDecimal.valueOf(5), CurrencySource.CLIENT, false, transactionWithFutureCreatedDate.getExternalTimestamps().getCreatedDate());
         Transaction transactionWithExchangeRateInfo = transactionWithFutureCreatedDate.withExchangeRateInfo(exchangeRateInfo);
 
         // When
         Mono<Transaction> transactionMono = transactionService.injectExchangeRateIfNeeded(transactionWithFutureCreatedDate);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionWithExchangeRateInfo).verifyComplete();
+    }
+
+    @Test
+    void injectExchangeRateIfNeeded_TransactionWithEuroCurrencyAndTaxInclusive_ReturnsTransactionWithExchangeRateInfo() {
+        // Given
+        transaction = transaction.withIsTaxInclusive(true)
+                .setCurrency("EUR")
+                .setTotalItemsAmount(BigDecimal.valueOf(1000))
+                .setFinalTransactionAmount(BigDecimal.valueOf(1000));
+
+        CurrencyExchangeRateObject currencyExchangeRateObject = testUtilities.createEuroCurrencyExchangeRateObject();
+        ExchangeRateInfo exchangeRateInfo = testUtilities.createNotTaxableEuroExchangeRateInfo(transaction);
+        Transaction transactionWithExchangeRateInfo = transaction.withExchangeRateInfo(exchangeRateInfo);
+
+        // When
+        when(currenciesWebClientWrapper.getExchangeRateByCurrencyAndDate(transaction.getCurrency(), transaction.getExternalTimestamps().getCreatedDate()))
+                .thenReturn(Mono.just(currencyExchangeRateObject));
+
+        Mono<Transaction> transactionMono = transactionService.injectExchangeRateIfNeeded(transaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionWithExchangeRateInfo).verifyComplete();

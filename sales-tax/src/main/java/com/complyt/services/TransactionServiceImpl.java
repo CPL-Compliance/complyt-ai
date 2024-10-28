@@ -56,6 +56,9 @@ public class TransactionServiceImpl implements TransactionService {
     TransactionAmountsCollector<Transaction> transactionItemsAmountsCollector;
 
     @NonNull
+    TransactionAmountsCollector<Transaction> finalTransactionAmountCollector;
+
+    @NonNull
     TransactionAmountsCollector<Transaction> transactionDiscountCollector;
 
     @NonNull
@@ -136,8 +139,7 @@ public class TransactionServiceImpl implements TransactionService {
                         (Transaction) shippingAddressAlignmentStrategy.select(transaction).apply(transactionWithCalculatedItems))
                 .flatMap(transactionWithCalculatedItemsAndShippingAddress ->
                         productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItemsAndShippingAddress)
-                                .map(transactionDiscountCollector::collect)
-                                .map(transactionItemsAmountsCollector::collect)
+                                .map(finalTransactionAmountCollector::collect)
                                 .flatMap(transactionWithAmounts -> CountryIsUsaChecker.isCountryUsa(transactionWithAmounts.getShippingAddress()) ?
                                         cityCountyProvider.provide(transactionWithAmounts) :
                                         Mono.just(transactionWithAmounts)));
@@ -156,6 +158,12 @@ public class TransactionServiceImpl implements TransactionService {
                         .map(geoRecord -> transaction.setShippingAddress(transaction.getShippingAddress().withState(geoRecord.getState())))
                         .switchIfEmpty(Mono.error(ZipCodeNotFoundApiException::new)) :
                 Mono.just(transaction);
+    }
+
+    public Mono<Transaction> calculateTotalAmounts(Transaction transaction) {
+        return Mono.just(transaction)
+                .map(transactionDiscountCollector::collect)
+                .map(transactionItemsAmountsCollector::collect);
     }
 
     @Deprecated
@@ -249,9 +257,17 @@ public class TransactionServiceImpl implements TransactionService {
                 BigDecimalProcessor.removeTrailingZeros(transaction.getSalesTax().amount().multiply(exchangeRate)) :
                 BigDecimal.ZERO;
 
-        return Mono.just(BigDecimalProcessor.removeTrailingZeros(
-                        transaction.getFinalTransactionAmount().multiply(exchangeRate)))
-                .map(totalItemsAmountInUSD -> new ExchangeRateInfo(totalItemsAmountInUSD, transactionSalesTaxInUsd, transactionSalesTaxInUsd.add(totalItemsAmountInUSD), transaction.getCurrency(), CurrencyProcessor.usdCurrency, exchangeRate, exchangeSource, isFutureExternalCreatedDate, exchangeRateDate));
+        BigDecimal totalItemsAmountInUsd = transaction.getIsTaxInclusive() ?
+                BigDecimalProcessor.removeTrailingZeros(transaction.getTotalItemsAmount().multiply(exchangeRate).subtract(transactionSalesTaxInUsd)) :
+                BigDecimalProcessor.removeTrailingZeros(transaction.getTotalItemsAmount().multiply(exchangeRate));
+
+        BigDecimal finalTransactionAmountInUsd = transaction.getIsTaxInclusive() ?
+                BigDecimalProcessor.removeTrailingZeros(transaction.getFinalTransactionAmount().multiply(exchangeRate)) :
+                totalItemsAmountInUsd.add(transactionSalesTaxInUsd);
+
+        return Mono.just(new ExchangeRateInfo(totalItemsAmountInUsd, transactionSalesTaxInUsd, finalTransactionAmountInUsd, transaction.getCurrency(),
+                CurrencyProcessor.usdCurrency, exchangeRate, exchangeSource, isFutureExternalCreatedDate, exchangeRateDate
+        ));
     }
 
     private Mono<BigDecimal> getCurrencyExchangeRate(Transaction transaction) {

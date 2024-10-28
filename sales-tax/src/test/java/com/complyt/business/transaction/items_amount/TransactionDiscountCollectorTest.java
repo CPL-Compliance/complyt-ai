@@ -2,6 +2,7 @@ package com.complyt.business.transaction.items_amount;
 
 import com.complyt.business.builder.CollectionBuilder;
 import com.complyt.business.transaction.items_amounts.AmountCalculator;
+import com.complyt.business.transaction.items_amounts.DiscountAmountCalculator;
 import com.complyt.business.transaction.items_amounts.TransactionDiscountCollector;
 import com.complyt.domain.Discountable;
 import com.complyt.domain.transaction.Item;
@@ -31,7 +32,7 @@ class TransactionDiscountCollectorTest {
     private CollectionBuilder<Discountable> discountableCollectionBuilder;
 
     @Mock
-    AmountCalculator<List<Discountable>> discountablesTotalDiscountCalculator;
+    DiscountAmountCalculator<List<Discountable>> discountablesTotalDiscountCalculator;
 
     @InjectMocks
     private TransactionDiscountCollector transactionDiscountCollector;

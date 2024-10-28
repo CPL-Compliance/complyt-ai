@@ -108,5 +108,11 @@ public interface TransactionEndpointsITTemplate extends
 
     void upsertByExternalIdAndSource_UsaCountryWithPartialAddressAndBlankState_Returns201();
 
+    void upsertByExternalIdAndSource_UsaCountryTransactionWithTaxInclusive_Returns201();
+    void upsertByExternalIdAndSource_UsaCountryTransactionWithTaxExclusiveAndNewItems_Returns201();
+    void upsertByExternalIdAndSource_UsaCountryTransactionWithTaxInclusiveAndNewItems_Returns201();
+    void upsertByExternalIdAndSource_UsaCountryTransactionWithTaxInclusiveAndNewItemsAndNoNexus_Returns201();
+    void upsertByExternalIdAndSource_NonUsaCountryTransactionWithTaxInclusiveAndNewItems_Returns201();
+
 
 }

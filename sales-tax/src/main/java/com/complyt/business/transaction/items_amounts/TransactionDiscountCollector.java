@@ -18,7 +18,7 @@ public class TransactionDiscountCollector implements TransactionAmountsCollector
     CollectionBuilder discountableCollectionBuilder;
 
     @NonNull
-    AmountCalculator<List<Discountable>> discountablesTotalDiscountCalculator;
+    DiscountAmountCalculator<List<Discountable>> discountablesTotalDiscountCalculator;
 
     @Override
     public Transaction collect(@NonNull Transaction transaction) {
@@ -29,4 +29,5 @@ public class TransactionDiscountCollector implements TransactionAmountsCollector
 
         return transaction.setTotalDiscount(totalDiscount);
     }
+
 }

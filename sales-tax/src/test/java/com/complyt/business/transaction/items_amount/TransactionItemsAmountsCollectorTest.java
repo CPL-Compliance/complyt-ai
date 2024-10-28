@@ -60,9 +60,9 @@ public class TransactionItemsAmountsCollectorTest {
         // Before + When
 
         when(taxableCollectionBuilder.build(transaction)).thenReturn(items);
-        when(taxableItemsAmountCalculator.calculate(items)).thenReturn(new BigDecimal("10.0"));
-        when(tangibleItemsAmountCalculator.calculate(items)).thenReturn(new BigDecimal("17.0"));
-        when(totalItemsAmountCalculator.calculate(items)).thenReturn(new BigDecimal("18.0"));
+        when(taxableItemsAmountCalculator.calculate(items, transaction.getIsTaxInclusive())).thenReturn(new BigDecimal("10.0"));
+        when(tangibleItemsAmountCalculator.calculate(items, transaction.getIsTaxInclusive())).thenReturn(new BigDecimal("17.0"));
+        when(totalItemsAmountCalculator.calculate(items, transaction.getIsTaxInclusive())).thenReturn(new BigDecimal("18.0"));
 
         // Then
         Transaction outputTransaction = transactionItemsAmountsCollector.collect(transaction);
