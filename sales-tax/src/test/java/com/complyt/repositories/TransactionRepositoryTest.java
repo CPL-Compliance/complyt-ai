@@ -199,6 +199,31 @@ class TransactionRepositoryTest {
     }
 
     @Test
+    void findAll_TransactionsByOffsetAndLimitWithNonExistingSortByProperty_ExpectingChunkOfTransactionsByCreatedDate() {
+        // Given
+        int page = 2;
+        int size = 2;
+        int calculatedOffset = (page - 1) * size;
+
+        List<Transaction> transactionList = IntStream.range(0, 4)
+                .mapToObj(i -> transaction.withComplytId(UUID.randomUUID()).withId(UUID.randomUUID().toString()))
+                .collect(Collectors.toList());
+
+        // Creating the expected list (list of 2-4 transaction objects)
+        List<Transaction> expectedList = transactionList.subList(calculatedOffset, Math.min(calculatedOffset + size, transactionList.size()));
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "nonExistingParameter";
+
+        // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
+        when(reactiveMongoTemplate.aggregate(any(), eq(Transaction.class))).thenReturn(Flux.fromIterable(expectedList));
+
+        // Then
+        Flux<Transaction> transactionFlux = transactionRepository.findAll(page, size, filterMap, sortOrder, sortBy);
+        StepVerifier.create(transactionFlux).expectNextSequence(expectedList).verifyComplete();
+    }
+
+    @Test
     void findAll_NoTransactionReturnedOffsetZeroLimitEqSize_EmptyFluxReturned() {
         // Given
         int page = 1;
