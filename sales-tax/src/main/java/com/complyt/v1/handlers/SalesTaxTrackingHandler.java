@@ -118,18 +118,24 @@ public class SalesTaxTrackingHandler {
     @NexusReadPermission
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+
         String page = serverRequest.queryParam("page")
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM));
         String size = serverRequest.queryParam("size")
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE));
+        String sortOrder = serverRequest.queryParam("sortOrder")
+                .orElse(RepositoryConstant.DEFAULT_SORT_ORDER);
+        String sortBy = serverRequest.queryParam("sortBy")
+                .orElse(RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY);
+
+        Map<String, String> filterMap = serverRequest.queryParams().toSingleValueMap();
 
         Flux<SalesTaxTrackingDto> salesTaxTrackingDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(salesTaxTrackingDtoValidationHandler.handle(serverRequest))
-                .switchIfEmpty(Flux.defer(() -> salesTaxTrackingFacade.findAll(Integer.parseInt(page), Integer.parseInt(size))
+                .switchIfEmpty(Flux.defer(() -> salesTaxTrackingFacade.findAll(Integer.parseInt(page), Integer.parseInt(size), filterMap, sortOrder, sortBy)
                         .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)));
 
         return ServerResponse.ok().body(salesTaxTrackingDtoFlux, SalesTaxTrackingDto.class);
-
     }
 
     @NexusUpdatePermission
@@ -143,8 +149,8 @@ public class SalesTaxTrackingHandler {
                 .then(dateWrapperDtoValidationHandler.handle(serverRequest)
                         .map(DateWrapperToLocalDateMapper.INSTANCE::dateWrapperToLocalDateWrapper)
                         .flatMap(dateWrapper -> salesTaxTrackingFacade.refreshNexusSummary(country, state, dateWrapper.date(), subsidiary)
-                                        .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                                        .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new))));
+                                .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
+                                .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new))));
 
         return ServerResponse.ok().body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
     }

@@ -105,14 +105,21 @@ public class ExemptionHandler {
     @ExemptionReadPermission
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+
         String page = serverRequest.queryParam("page")
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM));
         String size = serverRequest.queryParam("size")
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE));
+        String sortOrder = serverRequest.queryParam("sortOrder")
+                .orElse(RepositoryConstant.DEFAULT_SORT_ORDER);
+        String sortBy = serverRequest.queryParam("sortBy")
+                .orElse(RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY);
+
+        Map<String, String> filterMap = serverRequest.queryParams().toSingleValueMap();
 
         Flux<ExemptionDto> exemptionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(exemptionDtoValidationHandler.handle(serverRequest))
-                .switchIfEmpty(Flux.defer(() -> exemptionFacade.findAll(Integer.parseInt(page), Integer.parseInt(size)))
+                .switchIfEmpty(Flux.defer(() -> exemptionFacade.findAll(Integer.parseInt(page), Integer.parseInt(size), filterMap, sortOrder, sortBy))
                         .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
                         .flatMapSequential(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto)));
 

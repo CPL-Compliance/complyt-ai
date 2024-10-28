@@ -40,6 +40,7 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -993,9 +994,10 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
             add(salesTaxTrackingDto);
             add(secondSalesTaxTrackingDto);
         }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(salesTaxTrackingFacade.findAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
+        when(salesTaxTrackingFacade.findAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
 
         // Then
         webTestClient
@@ -1016,18 +1018,15 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         // Given
         SalesTaxTracking secondSalesTaxTracking = salesTaxTracking
                 .withState(new State("NY", "05", "New York"));
-        SalesTaxTrackingDto salesTaxTrackingDto =
-                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
-        SalesTaxTrackingDto secondSalesTaxTrackingDto =
-                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(secondSalesTaxTracking);
 
         List<SalesTaxTracking> salesTaxTrackingList = new ArrayList<>() {{
             add(salesTaxTracking);
             add(secondSalesTaxTracking);
         }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(salesTaxTrackingFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
+        when(salesTaxTrackingFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
 
         // Then
         webTestClient
@@ -1048,9 +1047,10 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         // Given
         List<SalesTaxTrackingDto> salesTaxTrackingDtoList = new ArrayList<>();
+        Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(salesTaxTrackingFacade.findAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
+        when(salesTaxTrackingFacade.findAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -1089,7 +1089,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // When
-        when(salesTaxTrackingFacade.findAll(0, 0)).thenReturn(Flux.error(new OperationFailedException()));
+        when(salesTaxTrackingFacade.findAll(0, 0, null, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient

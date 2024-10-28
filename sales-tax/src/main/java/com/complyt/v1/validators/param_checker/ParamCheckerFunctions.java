@@ -17,4 +17,5 @@ public interface ParamCheckerFunctions  {
     Function<String, Mono<String>> DATE_CHECK = ParameterCheckableDefault.createParamCheckerFunction(ISO8601Regex.expression, "date " + DtoErrorMessages.LOCALDATE_FORMAT_ERROR);
     Function<String, Mono<String>> TENANT_ID_CHECK = ParameterCheckableDefault.createParamCheckerFunction(TenantIdMaxLimitRegex.expression, DtoErrorMessages.TENANT_ID_FORMAT);
     Function<String, Mono<String>> NAME_CHECK = ParameterCheckableDefault.createParamCheckerFunction(NameMaxLimitRegex.expression, "name " + DtoErrorMessages.MAX_256_ERROR);
+    Function<String, Mono<String>> SORT_ORDER_CHECK = ParameterCheckableDefault.createParamCheckerFunction(SortOrderRegex.expression, "sort order " + DtoErrorMessages.INVALID_SORT_ORDER_PARAMETER);
 }

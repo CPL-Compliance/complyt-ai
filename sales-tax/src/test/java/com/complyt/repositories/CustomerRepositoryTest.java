@@ -21,7 +21,9 @@ import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -206,6 +208,8 @@ class CustomerRepositoryTest {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withId(id).withExternalId(externalId);
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         Query query = Query.query(Criteria.where("tenantId").is(tenantId))
                 .skip(calculatedOffset).limit(size)
@@ -216,7 +220,7 @@ class CustomerRepositoryTest {
         when(reactiveMongoTemplate.find(eq(query), eq(Customer.class))).thenReturn(Flux.just(customer, secondCustomer));
 
         //Then
-        Flux<Customer> customerFlux = customerRepository.findAll(page, size);
+        Flux<Customer> customerFlux = customerRepository.findAll(page, size, filterMap, sortOrder, sortBy);
         StepVerifier.create(customerFlux).expectNext(customer, secondCustomer).verifyComplete();
     }
 
@@ -233,6 +237,8 @@ class CustomerRepositoryTest {
                 .collect(Collectors.toList());
 
         List<Customer> expectedLst = customerList.subList(calculatedOffset, Math.min(calculatedOffset + size, customerList.size()));
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         Query query = Query.query(Criteria.where("tenantId").is(tenantId))
                 .skip(calculatedOffset)
@@ -244,7 +250,7 @@ class CustomerRepositoryTest {
         when(reactiveMongoTemplate.find(eq(query), eq(Customer.class))).thenReturn(Flux.fromIterable(expectedLst));
 
         // Then
-        Flux<Customer> customerFlux = customerRepository.findAll(page, size);
+        Flux<Customer> customerFlux = customerRepository.findAll(page, size, filterMap, sortOrder, sortBy);
         StepVerifier.create(customerFlux).expectNextSequence(expectedLst).verifyComplete();
 
     }
@@ -255,6 +261,8 @@ class CustomerRepositoryTest {
         int page = 1;
         int size = 1;
         int CalculatedOffset = 0;
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         Query query = Query.query(Criteria.where("tenantId").is(customer.getTenantId()))
                 .skip(CalculatedOffset)
@@ -267,7 +275,7 @@ class CustomerRepositoryTest {
 
 
         // Then
-        Flux<Customer> exemptionFlux = customerRepository.findAll(page, size);
+        Flux<Customer> exemptionFlux = customerRepository.findAll(page, size, filterMap, sortOrder, sortBy);
         StepVerifier.create(exemptionFlux).verifyComplete();
     }
 

@@ -41,9 +41,7 @@ import testUtils.unit_test.UnitTestUtilities;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -177,10 +175,12 @@ class TransactionServiceImplTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         Transaction secondTransaction = transaction.withExternalId(externalId);
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         //When
-        when(transactionRepository.findAll(0, 1)).thenReturn(Flux.just(transaction, secondTransaction));
-        Flux<Transaction> transactionFlux = transactionService.findAll(0, 1);
+        when(transactionRepository.findAll(0, 1, filterMap, sortOrder, sortBy)).thenReturn(Flux.just(transaction, secondTransaction));
+        Flux<Transaction> transactionFlux = transactionService.findAll(0, 1, filterMap, sortOrder, sortBy);
 
         //Then
         StepVerifier.create(transactionFlux).expectNext(transaction, secondTransaction).verifyComplete();
@@ -301,10 +301,13 @@ class TransactionServiceImplTest {
             add(transaction);
             add(anotherTransactionWithSameClientId);
         }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
+
 
         // When
-        when(transactionRepository.findAll(0, transactions.size())).thenReturn(Flux.fromIterable(transactions));
-        Flux<Transaction> transactionFlux = transactionService.findAll(0, transactions.size());
+        when(transactionRepository.findAll(0, transactions.size(), filterMap, sortOrder, sortBy)).thenReturn(Flux.fromIterable(transactions));
+        Flux<Transaction> transactionFlux = transactionService.findAll(0, transactions.size(), filterMap, sortOrder, sortBy);
 
         // Then
         StepVerifier.create(transactionFlux).expectNext(transaction, anotherTransactionWithSameClientId).verifyComplete();
@@ -629,7 +632,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndNullState_ReturnsTransaction() {
         // Given
-        Address partialShippingAddress = new Address(null, "US", null,null,null,"80001",null,true);
+        Address partialShippingAddress = new Address(null, "US", null, null, null, "80001", null, true);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         ShippingFee givenShippingFee = transactionWithPartialAddress.getShippingFee();
@@ -685,7 +688,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndBlankState_ReturnsTransaction() {
         // Given
-        Address partialShippingAddress = new Address(null, "US", null,"",null,"80001",null,true);
+        Address partialShippingAddress = new Address(null, "US", null, "", null, "80001", null, true);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         ShippingFee givenShippingFee = transactionWithPartialAddress.getShippingFee();
@@ -741,7 +744,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndInvalidZipCode_ReturnsAnError() {
         // Given
-        Address partialShippingAddress = new Address(null, "US", null,null,null,"InvalidZipCode",null,true);
+        Address partialShippingAddress = new Address(null, "US", null, null, null, "InvalidZipCode", null, true);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         // When
@@ -1217,7 +1220,7 @@ class TransactionServiceImplTest {
         transaction = transaction.setCurrency("EUR")
                 .setRefRate(BigDecimal.valueOf(5))
                 .setFinalTransactionAmount(BigDecimal.valueOf(1000));
-        ExchangeRateInfo exchangeRateInfo = testUtilities.createExchangeRateInfo(BigDecimal.valueOf(5000), BigDecimal.ZERO,  BigDecimal.valueOf(5000), "EUR", "USD", BigDecimal.valueOf(5), CurrencySource.CLIENT, false, transaction.getInternalTimestamps().getCreatedDate());
+        ExchangeRateInfo exchangeRateInfo = testUtilities.createExchangeRateInfo(BigDecimal.valueOf(5000), BigDecimal.ZERO, BigDecimal.valueOf(5000), "EUR", "USD", BigDecimal.valueOf(5), CurrencySource.CLIENT, false, transaction.getInternalTimestamps().getCreatedDate());
         Transaction transactionWithExchangeRateInfo = transaction.withExchangeRateInfo(exchangeRateInfo);
 
         // When
@@ -1257,7 +1260,7 @@ class TransactionServiceImplTest {
                 .withFinalTransactionAmount(BigDecimal.valueOf(1000))
                 .withExternalTimestamps(new Timestamps(LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(1)));
 
-        ExchangeRateInfo exchangeRateInfo = testUtilities.createExchangeRateInfo(BigDecimal.valueOf(5000), BigDecimal.ZERO,  BigDecimal.valueOf(5000), "EUR", "USD", BigDecimal.valueOf(5), CurrencySource.CLIENT, false, transactionWithFutureCreatedDate.getExternalTimestamps().getCreatedDate());
+        ExchangeRateInfo exchangeRateInfo = testUtilities.createExchangeRateInfo(BigDecimal.valueOf(5000), BigDecimal.ZERO, BigDecimal.valueOf(5000), "EUR", "USD", BigDecimal.valueOf(5), CurrencySource.CLIENT, false, transactionWithFutureCreatedDate.getExternalTimestamps().getCreatedDate());
         Transaction transactionWithExchangeRateInfo = transactionWithFutureCreatedDate.withExchangeRateInfo(exchangeRateInfo);
 
         // When

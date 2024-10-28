@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -33,7 +35,7 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     }
 
     @Override
-    public Flux<ProductClassification> findAll(int offSet, int limit) {
+    public Flux<ProductClassification> findAll(int offSet, int limit, Map<String, String> filterMap, String sortOrder, String sortBy) {
         return productClassificationRepository.findAll();
     }
 

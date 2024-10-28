@@ -40,6 +40,7 @@ import java.util.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -604,9 +605,10 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
             add(exemptionDto);
             add(secondExemptionDto);
         }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(exemptionFacade.findAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(exemptions));
+        when(exemptionFacade.findAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(exemptions));
 
 
         // Then
@@ -636,15 +638,11 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
             add(exemption);
             add(secondExemption);
         }};
-
-        List<ExemptionDto> exemptionDtos = new ArrayList<>() {{
-            add(exemptionDto);
-            add(secondExemptionDto);
-        }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         // When
-        when(exemptionFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(exemptions));
-
+        when(exemptionFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, sortOrder, sortBy)).thenReturn(Flux.fromIterable(exemptions));
 
         // Then
         webTestClient
@@ -664,9 +662,10 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         // Given
         List<ExemptionDto> exemptionDtos = new ArrayList<>();
+        Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(exemptionFacade.findAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
+        when(exemptionFacade.findAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -707,7 +706,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // Given + When
-        when(exemptionFacade.findAll(0, 0)).thenReturn(Flux.error(new OperationFailedException()));
+        when(exemptionFacade.findAll(0, 0, null, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient

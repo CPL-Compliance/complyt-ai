@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 @Component
 @AllArgsConstructor
 public class ClientTrackingFacade {
@@ -15,13 +17,14 @@ public class ClientTrackingFacade {
     @NonNull
     private ClientTrackingService clientTrackingService;
 
-    public Flux<ClientTracking> getAll(int page, int size) {
-        return clientTrackingService.findAll(page, size);
+    public Flux<ClientTracking> getAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
+        return clientTrackingService.findAll(page, size, filterMap, sortOrder, sortBy);
     }
 
     public Mono<ClientTracking> getByTenantId(@NonNull String tenantId) {
         return clientTrackingService.getByTenantId(tenantId);
     }
+
     public Flux<ClientTracking> getByName(@NonNull String name) {
         return clientTrackingService.getByName(name);
     }

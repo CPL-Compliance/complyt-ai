@@ -23,9 +23,7 @@ import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -128,10 +126,12 @@ class NexusStateRuleServiceImplTest {
             add(nexusStateRule);
             add(secondRule);
         }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         // When
         when(nexusStateRuleRepository.findAll()).thenReturn(Flux.fromIterable(nexusStateRuleList));
-        Flux<NexusStateRule> nexusStateRuleFlux = nexusStateRuleServiceImpl.findAll(0, nexusStateRuleList.size());
+        Flux<NexusStateRule> nexusStateRuleFlux = nexusStateRuleServiceImpl.findAll(0, nexusStateRuleList.size(), filterMap, sortOrder, sortBy);
 
         // Then
         StepVerifier.create(nexusStateRuleFlux).expectNext(nexusStateRule).expectNext(secondRule).verifyComplete();

@@ -9,7 +9,8 @@ public interface TransactionEndpointsITTemplate extends
         GetByComplytIdITTemplate,
         GetAllITTemplate,
         GetAllBySourceTTemplate,
-        DeleteByExternalIdAndSourceITTemplate {
+        DeleteByExternalIdAndSourceITTemplate,
+        GetAllPaginationITTemplate {
 
     void upsertByExternalIdAndSource_NonUsaCountry_ReturnsTaxableTransaction();
 
@@ -108,5 +109,14 @@ public interface TransactionEndpointsITTemplate extends
 
     void upsertByExternalIdAndSource_UsaCountryWithPartialAddressAndBlankState_Returns201();
 
+    void getAll_PaginationFilteredByCityAndTransactionType_ReturnsSortedTransactions();
+
+    void getAll_PaginationSortedByCityAsc_ReturnsSortedTransactions();
+
+    void getAll_PaginationSortedByCityDesc_ReturnsSortedTransactions();
+
+    void getAll_PaginationFilteredByTransactionType_ReturnsInvoices();
+
+    void getAll_PaginationFilteredByTransactionType_ReturnsRefunds();
 
 }

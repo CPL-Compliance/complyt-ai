@@ -263,9 +263,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
             add(transactionNoId);
             add(secondTransactionNoId);
         }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(transactionFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.just(firstTransaction, secondTransaction));
+        when(transactionFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.just(firstTransaction, secondTransaction));
 
         // Then
         webTestClient
@@ -287,13 +288,12 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String firstId = UUID.randomUUID().toString();
         String secondId = UUID.randomUUID().toString();
-        TransactionDto transactionNoId = transactionDto.withExternalId(firstId);
-        TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
         Transaction firstTransaction = transaction.withExternalId(firstId);
         Transaction secondTransaction = transaction.withExternalId(secondId);
+        Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(transactionFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.just(firstTransaction, secondTransaction));
+        when(transactionFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.just(firstTransaction, secondTransaction));
 
         // Then
         webTestClient
@@ -313,9 +313,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         // Given
         List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
+        Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(transactionFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.empty());
+        when(transactionFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -334,7 +335,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     public void getAll_UnauthenticatedUser_Returns401() {
         // When
-        when(transactionFacade.getAll(0, 0)).thenReturn(Flux.empty());
+        when(transactionFacade.getAll(0, 0, null, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -359,7 +360,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // Given + When
-        when(transactionFacade.getAll(0, 0)).thenReturn(Flux.error(new OperationFailedException()));
+        when(transactionFacade.getAll(0, 0, null, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient
@@ -415,10 +416,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
         Transaction firstTransaction = transaction.withExternalId(firstId);
         Transaction secondTransaction = transaction.withExternalId(secondId);
-        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>() {{
-            add(transactionNoId);
-            add(secondTransactionNoId);
-        }};
 
         // When
         when(transactionFacade.getAllBySource(source)).thenReturn(Flux.just(firstTransaction, secondTransaction));
@@ -442,8 +439,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String firstId = UUID.randomUUID().toString();
         String secondId = UUID.randomUUID().toString();
-        TransactionDto transactionNoId = transactionDto.withExternalId(firstId);
-        TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
         Transaction firstTransaction = transaction.withExternalId(firstId);
         Transaction secondTransaction = transaction.withExternalId(secondId);
         String sourceError = "null";
@@ -4952,7 +4947,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", null, "C1S1", null,
-                null, null, false, BigDecimal.ZERO, null, null, null,null));
+                null, null, false, BigDecimal.ZERO, null, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
@@ -4980,7 +4975,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", "", "C1S1", null,
-                null, null, false, BigDecimal.ZERO, null, null, null,null));
+                null, null, false, BigDecimal.ZERO, null, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(

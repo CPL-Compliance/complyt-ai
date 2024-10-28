@@ -25,6 +25,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.UUID;
 
 @Component
@@ -67,10 +68,16 @@ public class TransactionHandler {
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM));
         String size = serverRequest.queryParam("size")
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE));
+        String sortOrder = serverRequest.queryParam("sortOrder")
+                .orElse(RepositoryConstant.DEFAULT_SORT_ORDER);
+        String sortBy = serverRequest.queryParam("sortBy")
+                .orElse(RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY);
+
+        Map<String, String> filterMap = serverRequest.queryParams().toSingleValueMap();
 
         Flux<TransactionDto> transactionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(transactionDtoValidationHandler.handle(serverRequest))
-                .switchIfEmpty(Flux.defer(() -> transactionFacade.getAll(Integer.parseInt(page), Integer.parseInt(size)))
+                .switchIfEmpty(Flux.defer(() -> transactionFacade.getAll(Integer.parseInt(page), Integer.parseInt(size), filterMap, sortOrder.toUpperCase(), sortBy))
                         .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
                         .flatMapSequential(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto)));
 

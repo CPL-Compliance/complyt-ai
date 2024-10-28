@@ -8,5 +8,6 @@ public interface CustomerEndpointsITITTemplate extends
         GetByComplytIdITTemplate,
         GetAllITTemplate,
         GetAllBySourceTTemplate,
-        PatchITTemplate {
+        PatchITTemplate,
+        GetAllPaginationITTemplate {
 }

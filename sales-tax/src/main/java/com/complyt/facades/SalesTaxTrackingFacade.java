@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -60,8 +61,8 @@ public class SalesTaxTrackingFacade {
                 .flatMap(recalculateCurrentNexusSummaryIfNeeded());
     }
 
-    public Flux<SalesTaxTracking> findAll(int page, int size) {
-        return salesTaxTrackingService.findAll(page, size)
+    public Flux<SalesTaxTracking> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
+        return salesTaxTrackingService.findAll(page, size, filterMap, sortOrder, sortBy)
                 .flatMapSequential(recalculateCurrentNexusSummaryIfNeeded());
     }
 
@@ -74,7 +75,7 @@ public class SalesTaxTrackingFacade {
     }
 
     /**
-     *  <a href="https://coda.io/d/Refresh-Flow_dx9KY9BHPh8/Refresh-Flow_suYGv#_luR43">Coda documentation</a>
+     * <a href="https://coda.io/d/Refresh-Flow_dx9KY9BHPh8/Refresh-Flow_suYGv#_luR43">Coda documentation</a>
      */
     public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull String country, String state, LocalDate refreshDate, String subsidiary) {
         return salesTaxTrackingService.findByCountryStateAndSubsidiary(country, state, subsidiary)

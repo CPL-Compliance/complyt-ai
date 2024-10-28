@@ -1,15 +1,9 @@
 package com.complyt.services.crud;
 
-import lombok.NonNull;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
-public interface CrudService<T, ID> {
-    Mono<T> save(T object);
-
-    Mono<T> findById(@NonNull final ID id);
-
+public interface PaginationAble<T> {
     Flux<T> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy);
 }

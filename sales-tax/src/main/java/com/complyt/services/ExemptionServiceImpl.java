@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -69,7 +70,7 @@ public class ExemptionServiceImpl implements ExemptionService {
     }
 
     @Override
-    public Flux<Exemption> findAll(int offSet, int page) {
+    public Flux<Exemption> findAll(int offSet, int page, Map<String, String> filterMap, String sortOrder, String sortBy) {
         return exemptionRepository.findAll(offSet, page);
     }
 

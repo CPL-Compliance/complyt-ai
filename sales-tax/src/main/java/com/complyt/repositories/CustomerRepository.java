@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Repository
@@ -50,7 +51,7 @@ public class CustomerRepository {
                 });
     }
 
-    public Flux<Customer> findAll(int page, int size) {
+    public Flux<Customer> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
         int calculatedOffset = (page - 1) * size;
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {

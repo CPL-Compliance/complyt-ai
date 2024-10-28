@@ -16,10 +16,7 @@ import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -51,10 +48,12 @@ public class ClientTrackingFacadeTest {
         // Given
         ClientTracking secondClientTracking = clientTracking.withTenantId("org_B");
         List<ClientTracking> allClientTrackings = Arrays.asList(clientTracking, secondClientTracking);
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         // When
-        when(clientTrackingService.findAll(0, allClientTrackings.size())).thenReturn(Flux.fromIterable(allClientTrackings));
-        Flux<ClientTracking> returnedClientTracking = clientTrackingFacade.getAll(0, allClientTrackings.size());
+        when(clientTrackingService.findAll(0, allClientTrackings.size(), filterMap, sortOrder, sortBy)).thenReturn(Flux.fromIterable(allClientTrackings));
+        Flux<ClientTracking> returnedClientTracking = clientTrackingFacade.getAll(0, allClientTrackings.size(), filterMap, sortOrder, sortBy);
 
         // Then
         StepVerifier.create(returnedClientTracking).expectNextCount(2).verifyComplete();

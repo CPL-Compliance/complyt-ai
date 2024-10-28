@@ -51,10 +51,16 @@ public class CustomerHandler {
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM));
         String size = serverRequest.queryParam("size")
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE));
+        String sortOrder = serverRequest.queryParam("sortOrder")
+                .orElse(RepositoryConstant.DEFAULT_SORT_ORDER);
+        String sortBy = serverRequest.queryParam("sortBy")
+                .orElse(RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY);
+
+        Map<String, String> filterMap = serverRequest.queryParams().toSingleValueMap();
 
         Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(customerDtoValidationHandler.handle(serverRequest))
-                .switchIfEmpty(Flux.defer(() -> customerFacade.getAll(Integer.parseInt(page), Integer.parseInt(size))
+                .switchIfEmpty(Flux.defer(() -> customerFacade.getAll(Integer.parseInt(page), Integer.parseInt(size), filterMap, sortOrder, sortBy)
                         .map(CustomerMapper.INSTANCE::customerToCustomerDto)
                         .flatMapSequential(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto))));
 

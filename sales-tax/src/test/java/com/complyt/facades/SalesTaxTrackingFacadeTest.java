@@ -128,7 +128,7 @@ public class SalesTaxTrackingFacadeTest {
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(salesTaxTracking.getCountry(), salesTaxTracking.getState().getName(), salesTaxTracking.getSubsidiary())).thenReturn(Mono.just(salesTaxTrackingWithId));
         when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTrackingWithId)).thenReturn(Mono.just(new SalesTaxTrackingWithNexusInfo(salesTaxTrackingWithId, false)));
         when(salesTaxTrackingService.addClientAndStateDetails(salesTaxTrackingWithId)).thenReturn(Mono.just(salesTaxTrackingWithId));
-        when(nexusService.getTransactionsQueryByNexusCalculation(salesTaxTrackingWithId.getNexusStateRule(), salesTaxTrackingWithId.getClientTracking(), referenceDate,salesTaxTracking.getSubsidiary())).thenReturn(Mono.just(query));
+        when(nexusService.getTransactionsQueryByNexusCalculation(salesTaxTrackingWithId.getNexusStateRule(), salesTaxTrackingWithId.getClientTracking(), referenceDate, salesTaxTracking.getSubsidiary())).thenReturn(Mono.just(query));
         when(transactionService.getTransactionsByQuery(query)).thenReturn(Flux.just(transaction));
         when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(nexusService.refreshNexusSummary(salesTaxTrackingWithId, transactionsWithCustomers, referenceDate)).thenReturn(Mono.just(salesTaxTrackingWithSummary));
@@ -178,6 +178,8 @@ public class SalesTaxTrackingFacadeTest {
         LocalDateTime now = LocalDateTime.now();
         SalesTaxTracking secondSalesTaxTracking = salesTaxTracking
                 .withState(new State("NY", "05", "New York"));
+        String sortBy = "externalTimetamps.createdDate", sortOrder = "DESC";
+        Map<String, String> filterMap = null;
 
         List<SalesTaxTracking> salesTaxTrackingList = new ArrayList<>() {{
             add(salesTaxTracking);
@@ -185,12 +187,12 @@ public class SalesTaxTrackingFacadeTest {
         }};
 
         // When
-        when(salesTaxTrackingService.findAll(0, salesTaxTrackingList.size())).thenReturn(Flux.fromIterable(salesTaxTrackingList));
+        when(salesTaxTrackingService.findAll(0, salesTaxTrackingList.size(), filterMap, sortOrder, sortBy)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
         when(nexusService.getNexusSummaryDate(eq(salesTaxTracking), any())).thenReturn(Mono.just(dateRange));
         when(nexusService.getNexusSummaryDate(eq(secondSalesTaxTracking), any())).thenReturn(Mono.just(dateRange));
         when(nexusService.recalculationOfNexusSummaryIfRequired(eq(salesTaxTracking), any())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.recalculationOfNexusSummaryIfRequired(eq(secondSalesTaxTracking), any())).thenReturn(Mono.just(secondSalesTaxTracking));
-        Flux<SalesTaxTracking> salesTaxTrackingFlux = salesTaxTrackingFacade.findAll(0, salesTaxTrackingList.size());
+        Flux<SalesTaxTracking> salesTaxTrackingFlux = salesTaxTrackingFacade.findAll(0, salesTaxTrackingList.size(), filterMap, sortOrder, sortBy);
 
 
         // Then

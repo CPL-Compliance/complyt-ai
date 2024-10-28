@@ -16,9 +16,7 @@ import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -129,10 +127,12 @@ class CustomerFacadeTest {
         List<Customer> allCustomers = new ArrayList<>();
         allCustomers.add(customer);
         allCustomers.add(secondCustomer);
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         // When
-        when(customerService.findAll(0, allCustomers.size())).thenReturn(Flux.fromIterable(allCustomers));
-        Flux<Customer> returnedCustomers = customerFacade.getAll(0, allCustomers.size());
+        when(customerService.findAll(0, allCustomers.size(), filterMap, sortOrder, sortBy)).thenReturn(Flux.fromIterable(allCustomers));
+        Flux<Customer> returnedCustomers = customerFacade.getAll(0, allCustomers.size(), filterMap, sortOrder, sortBy);
 
         // Then
         StepVerifier.create(returnedCustomers).expectNextCount(2).verifyComplete();

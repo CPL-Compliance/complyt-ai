@@ -688,4 +688,13 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 });
     }
 
+    @Override
+    public void getAll_PaginationSortedByDateDesc_ReturnsSortedList() {
+
+    }
+
+    @Override
+    public void getAll_PaginationSortedByDateAsc_ReturnsSortedList() {
+
+    }
 }

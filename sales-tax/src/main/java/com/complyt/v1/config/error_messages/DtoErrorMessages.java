@@ -59,5 +59,7 @@ public interface DtoErrorMessages {
 
     String MAX_256_ERROR = "should be up to 256 characters maximum";
 
+    String INVALID_SORT_ORDER_PARAMETER = "should be one of the following asc/desc";
+
     String ITEMS_MISSING_TOTAL_OR_QUANTITY_AND_UNITPRICE = "All items should have either total price OR quantity and unitPrice";
 }

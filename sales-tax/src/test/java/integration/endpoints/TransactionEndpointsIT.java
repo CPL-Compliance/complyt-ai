@@ -4,6 +4,7 @@ import com.complyt.SalesTaxApplication;
 import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.currency.CurrencySource;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.TransactionType;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
@@ -2498,6 +2499,180 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertEquals(totalTransactionAmountAfterDiscount, transactionDto.totalItemsAmount());
                     assertEquals(BigDecimal.valueOf(250), totalGivenDiscount);
                 });
-        ;
     }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_PaginationSortedByDateDesc_ReturnsSortedList() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> {
+                    LocalDateTime firstDate = LocalDateTime.parse(list.get(0).externalTimestamps().createdDate());
+                    LocalDateTime secondDate = LocalDateTime.parse(list.get(1).externalTimestamps().createdDate());
+                    LocalDateTime thirdDate = LocalDateTime.parse(list.get(1).externalTimestamps().createdDate());
+                    assertTrue(firstDate.isAfter(secondDate));
+                    assertTrue(firstDate.isAfter(thirdDate));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_PaginationSortedByDateAsc_ReturnsSortedList() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("sortOrder", "asc")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> {
+                    LocalDateTime firstDate = LocalDateTime.parse(list.get(0).externalTimestamps().createdDate());
+                    LocalDateTime secondDate = LocalDateTime.parse(list.get(1).externalTimestamps().createdDate());
+                    LocalDateTime thirdDate = LocalDateTime.parse(list.get(2).externalTimestamps().createdDate());
+                    assertTrue(firstDate.isBefore(secondDate));
+                    assertTrue(firstDate.isBefore(thirdDate));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_PaginationFilteredByTransactionType_ReturnsRefunds() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_filtered_by_transaction_type_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("transactionType", "REFUND")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> {
+                    assertEquals(2, list.size());
+                    for (TransactionDto t : list)
+                        assertEquals(t.transactionType(), TransactionTypeDto.REFUND);
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_PaginationFilteredByTransactionType_ReturnsInvoices() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_filtered_by_transaction_type_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("transactionType", "INVOICE")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> {
+                    assertEquals(4, list.size());
+                    for (TransactionDto t : list)
+                        assertEquals(t.transactionType(), TransactionTypeDto.INVOICE);
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_PaginationSortedByCityDesc_ReturnsSortedTransactions() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_sort_by_transaction_city_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("sortBy", "shippingAddress.city")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> {
+                    assertEquals(3, list.size());
+                    String firstCity = list.get(0).shippingAddress().city();
+                    String secondCity = list.get(1).shippingAddress().city();
+                    String thirdCity = list.get(2).shippingAddress().city();
+                    assertTrue(firstCity.compareTo(secondCity) > 0);
+                    assertTrue(secondCity.compareTo(thirdCity) > 0);
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_PaginationSortedByCityAsc_ReturnsSortedTransactions() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_sort_by_transaction_city_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("sortBy", "shippingAddress.city")
+                        .queryParam("sortOrder", "asc")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> {
+                    assertEquals(3, list.size());
+                    String firstCity = list.get(0).shippingAddress().city();
+                    String secondCity = list.get(1).shippingAddress().city();
+                    String thirdCity = list.get(2).shippingAddress().city();
+                    assertTrue(firstCity.compareTo(secondCity) < 0);
+                    assertTrue(secondCity.compareTo(thirdCity) < 0);
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_PaginationFilteredByCityAndTransactionType_ReturnsSortedTransactions() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_filter_by_transaction_city_and_type_tenant"));
+        String city = "A-city";
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("shippingAddress.city", city)
+                        .queryParam("transactionType", "SALES_ORDER")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> {
+                    for (TransactionDto t : list) {
+                        assertEquals(t.transactionType(), TransactionTypeDto.SALES_ORDER);
+                        assertEquals(t.shippingAddress().city(), city);
+                    }
+                });
+    }
+
 }

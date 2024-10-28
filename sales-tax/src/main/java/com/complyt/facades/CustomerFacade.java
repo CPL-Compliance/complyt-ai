@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Component
@@ -43,8 +44,8 @@ public class CustomerFacade {
         return customerService.findByComplytId(complytId);
     }
 
-    public Flux<Customer> getAll(int page, int size) {
-        return customerService.findAll(page, size);
+    public Flux<Customer> getAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
+        return customerService.findAll(page, size, filterMap, sortOrder, sortBy);
     }
 
     public Flux<Customer> getAllBySource(String source) {
