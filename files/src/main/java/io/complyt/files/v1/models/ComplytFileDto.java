@@ -1,6 +1,7 @@
 package io.complyt.files.v1.models;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.With;
 import org.springframework.http.codec.multipart.FilePart;

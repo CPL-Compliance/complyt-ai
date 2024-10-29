@@ -135,7 +135,7 @@ public class GoogleStorageWrapper extends StorageWrapperBase {
                                 tenantId,
                                 updatedBlob.getUpdateTimeOffsetDateTime(),
                                 updatedBlob.getCreateTimeOffsetDateTime(),
-                                FileRouter.BASE_URL + "/" + complytId))))
+                                FileRouter.COMPLYT_FILE_BASE_URL + "/" + complytId))))
                 .doOnError(Mono::error)
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
     }
