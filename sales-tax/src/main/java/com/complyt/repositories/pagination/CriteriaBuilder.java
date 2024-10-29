@@ -16,6 +16,6 @@ public interface CriteriaBuilder {
                 .map(key -> Criteria.where(key).is(filterMap.get(key)))
                 .forEach(criterias::add);
 
-        return !criterias.isEmpty() ? new Criteria().andOperator(criterias.toArray(new Criteria[0])) : null;
+        return criterias.isEmpty() ? null : new Criteria().andOperator(criterias.toArray(new Criteria[0]));
     }
 }
