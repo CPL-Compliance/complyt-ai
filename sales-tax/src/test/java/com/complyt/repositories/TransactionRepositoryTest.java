@@ -224,6 +224,22 @@ class TransactionRepositoryTest {
     }
 
     @Test
+    void findAll_InvalidSortOrderValue_ThrowsException() {
+        // Given
+        int page = 2;
+        int size = 2;
+
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "Invalid", sortBy = "transactionStatus";
+
+        // When
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> transactionRepository.findAll(page, size, filterMap, sortOrder, sortBy));
+
+        // Then
+        assertEquals(illegalArgumentException.getMessage(), "Invalid value 'Invalid' for orders given; Has to be either 'desc' or 'asc' (case insensitive)");
+    }
+
+    @Test
     void findAll_NoTransactionReturnedOffsetZeroLimitEqSize_EmptyFluxReturned() {
         // Given
         int page = 1;
