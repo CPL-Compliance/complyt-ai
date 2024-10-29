@@ -38,6 +38,18 @@ import java.lang.annotation.Target;
                                         description = "The page size for pagination (default 25)",
                                         in = ParameterIn.QUERY,
                                         schema = @Schema(type = "integer", defaultValue = "25")
+                                ),
+                                @Parameter(
+                                        name = "sortOrder",
+                                        description = "The sort order for pagination (DESC/ASC) (default DESC)",
+                                        in = ParameterIn.QUERY,
+                                        schema = @Schema(type = "string", defaultValue = "DESC")
+                                ),
+                                @Parameter(
+                                        name = "sortBy",
+                                        description = "The parameter value to sort the list by (default externalTimestamps.createdDate)",
+                                        in = ParameterIn.QUERY,
+                                        schema = @Schema(type = "string", defaultValue = "externalTimestamps.createdDate")
                                 )
 
                         },
