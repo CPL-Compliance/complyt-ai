@@ -1215,7 +1215,7 @@ class TransactionServiceImplTest {
         // Given
         transaction = transaction.setCurrency("EUR")
                 .setRefRate(BigDecimal.valueOf(5))
-                .setFinalTransactionAmount(BigDecimal.valueOf(1000));
+                .setTotalItemsAmount(BigDecimal.valueOf(1000));
         ExchangeRateInfo exchangeRateInfo = testUtilities.createExchangeRateInfo(BigDecimal.valueOf(5000), BigDecimal.ZERO, BigDecimal.valueOf(5000), "EUR", "USD", BigDecimal.valueOf(5), CurrencySource.CLIENT, false, transaction.getInternalTimestamps().getCreatedDate());
         Transaction transactionWithExchangeRateInfo = transaction.withExchangeRateInfo(exchangeRateInfo);
 
