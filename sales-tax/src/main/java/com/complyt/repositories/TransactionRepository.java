@@ -136,8 +136,7 @@ public class TransactionRepository {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query updatedQuery = query.addCriteria(Criteria.where("tenantId").is(tenantId))
-                            .with(Sort.by(Sort.Direction.ASC, "externalTimestamps.createdDate"));
-                    ;
+                            .with(Sort.by(Sort.Direction.ASC, "externalTimestamps.createdDate"));;
 
                     return ContextLogger.observeCtx("Searching for transactions by query: " + updatedQuery, log::info)
                             .thenMany(reactiveMongoTemplate.find(updatedQuery, Transaction.class));

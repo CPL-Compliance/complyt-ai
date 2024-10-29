@@ -54,7 +54,7 @@ public class CustomerHandler {
         String sortOrder = serverRequest.queryParam("sortOrder")
                 .orElse(RepositoryConstant.DEFAULT_SORT_ORDER);
         String sortBy = serverRequest.queryParam("sortBy")
-                .orElse(RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY);
+                .orElse(RepositoryConstant.DEFAULT_CUSTOMER_SORT_BY);
 
         Map<String, String> filterMap = serverRequest.queryParams().toSingleValueMap();
 

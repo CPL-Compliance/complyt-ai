@@ -109,7 +109,7 @@ public interface TransactionEndpointsITTemplate extends
 
     void upsertByExternalIdAndSource_UsaCountryWithPartialAddressAndBlankState_Returns201();
 
-    void getAll_PaginationFilteredByCityAndTransactionType_ReturnsSortedTransactions();
+    void getAll_PaginationFilteredByCityAndTransactionType_ReturnsTransactions();
 
     void getAll_PaginationSortedByCityAsc_ReturnsSortedTransactions();
 

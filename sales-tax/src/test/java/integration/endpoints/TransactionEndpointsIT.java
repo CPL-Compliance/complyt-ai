@@ -4,7 +4,6 @@ import com.complyt.SalesTaxApplication;
 import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.currency.CurrencySource;
 import com.complyt.domain.transaction.Transaction;
-import com.complyt.domain.transaction.TransactionType;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
@@ -2519,9 +2518,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(list -> {
                     LocalDateTime firstDate = LocalDateTime.parse(list.get(0).externalTimestamps().createdDate());
                     LocalDateTime secondDate = LocalDateTime.parse(list.get(1).externalTimestamps().createdDate());
-                    LocalDateTime thirdDate = LocalDateTime.parse(list.get(1).externalTimestamps().createdDate());
+                    LocalDateTime thirdDate = LocalDateTime.parse(list.get(2).externalTimestamps().createdDate());
                     assertTrue(firstDate.isAfter(secondDate));
-                    assertTrue(firstDate.isAfter(thirdDate));
+                    assertTrue(secondDate.isAfter(thirdDate));
                 });
     }
 
@@ -2546,7 +2545,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     LocalDateTime secondDate = LocalDateTime.parse(list.get(1).externalTimestamps().createdDate());
                     LocalDateTime thirdDate = LocalDateTime.parse(list.get(2).externalTimestamps().createdDate());
                     assertTrue(firstDate.isBefore(secondDate));
-                    assertTrue(firstDate.isBefore(thirdDate));
+                    assertTrue(secondDate.isBefore(thirdDate));
                 });
     }
 
@@ -2652,9 +2651,21 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     @WithMockUser
-    public void getAll_PaginationFilteredByCityAndTransactionType_ReturnsSortedTransactions() {
+    public void getAll_PaginationFilteredByCityAndTransactionType_ReturnsTransactions() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_filter_by_transaction_city_and_type_tenant"));
         String city = "A-city";
+
+        // Making sure that there are 7 transactions when querying without filter
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> assertEquals(7, list.size()));
 
         webTestClient
                 .get()
@@ -2668,6 +2679,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isOk()
                 .expectBodyList(TransactionDto.class)
                 .value(list -> {
+                    assertEquals(2, list.size());
                     for (TransactionDto t : list) {
                         assertEquals(t.transactionType(), TransactionTypeDto.SALES_ORDER);
                         assertEquals(t.shippingAddress().city(), city);
