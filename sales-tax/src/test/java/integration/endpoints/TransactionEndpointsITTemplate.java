@@ -127,4 +127,6 @@ public interface TransactionEndpointsITTemplate extends
 
     void getAll_PaginationFilteredByTransactionType_ReturnsRefunds();
 
+    void getAll_PaginationFilteredByCityAndTransactionType_ReturnsTransactions();
+
 }
