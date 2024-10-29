@@ -12,12 +12,12 @@ import java.util.Objects;
 
 @Component
 @Slf4j
-public class DiscountablesTotalDiscountCalculator implements AmountCalculator<List<Discountable>> {
+public class DiscountablesTotalDiscountCalculator implements DiscountAmountCalculator<List<Discountable>> {
 
     @Override
     public BigDecimal calculate(@NonNull List<Discountable> discountables) {
-         BigDecimal discountAmount = discountables.stream()
-                 .map(Discountable::getDiscount)
+        BigDecimal discountAmount = discountables.stream()
+                .map(Discountable::getDiscount)
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 

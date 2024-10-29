@@ -1,5 +1,6 @@
 package com.complyt.domain.transaction;
 
+import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.TaxRates;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -297,7 +299,7 @@ class ItemTest {
     }
 
     @Test
-    void getTaxRate_GtRatesAreSet_ReturnsItemsGtRates(){
+    void getTaxRate_GtRatesAreSet_ReturnsItemsGtRates() {
         // Given
         GtRates gtRates = testUtilities.createGtRates();
         Item itemWithGtRates = item
@@ -308,6 +310,108 @@ class ItemTest {
         TaxRates actualGtRates = itemWithGtRates.getTaxRates();
 
         // Then
-        Assertions.assertEquals(gtRates,actualGtRates);
+        Assertions.assertEquals(gtRates, actualGtRates);
+    }
+
+    @Test
+    void calculateInclusiveSalesTaxAmount_ManualSalesTax_ReturnsAmount() {
+        // Given
+        item = item.withManualSalesTax(true)
+                .withManualSalesTaxRate(BigDecimal.valueOf(0.2))
+                .withCalculatedTotal(BigDecimal.valueOf(1200));
+
+        BigDecimal expectedAmount = BigDecimalProcessor.removeTrailingZeros(item.getCalculatedTotal()
+                .subtract(item.getCalculatedTotal().divide(BigDecimal.ONE.add(new BigDecimal("0.2")), 6, RoundingMode.HALF_UP)));
+
+        // When
+        BigDecimal actualAmount = item.calculateInclusiveSalesTaxAmount();
+
+        // Then
+        assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    void calculateInclusiveSalesTaxAmount_NotManualSalesTax_ReturnsAmount() {
+        // Given
+        item = item.withManualSalesTax(false)
+                .withSalesTaxRates(testUtilities.createSalesTaxRates())
+                .withCalculatedTotal(BigDecimal.valueOf(1000));
+
+        BigDecimal expectedAmount = BigDecimalProcessor.removeTrailingZeros(item.getCalculatedTotal()
+                .subtract(item.getCalculatedTotal().divide(BigDecimal.ONE.add(new BigDecimal("0.4")), 6, RoundingMode.HALF_UP)));
+
+        // When
+        BigDecimal actualAmount = item.calculateInclusiveSalesTaxAmount();
+
+        // Then
+        assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    void calculateInclusiveSalesTaxAmount_NotManualSalesTaxWithOutSalesTaxRate_ReturnsAmount() {
+        // Given
+        item = item.withManualSalesTax(false)
+                .withSalesTaxRates(null)
+                .withGtRates(null)
+                .withCalculatedTotal(BigDecimal.valueOf(1000));
+
+        BigDecimal expectedAmount = BigDecimal.ZERO;
+
+        // When
+        BigDecimal actualAmount = item.calculateInclusiveSalesTaxAmount();
+
+        // Then
+        assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    void removeInclusiveSalesTax_ManualSalesTax_ReturnsAmount() {
+        // Given
+        item = item.withManualSalesTax(true)
+                .withManualSalesTaxRate(BigDecimal.valueOf(0.25))
+                .withCalculatedTotal(BigDecimal.valueOf(1250));
+
+        BigDecimal expectedAmount = BigDecimalProcessor.removeTrailingZeros(item.getCalculatedTotal()
+                .divide(BigDecimal.ONE.add(new BigDecimal("0.25")), 6, RoundingMode.HALF_UP));
+
+        // When
+        BigDecimal actualAmount = item.removeInclusiveSalesTax();
+
+        // Then
+        assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    void removeInclusiveSalesTax_NotManualSalesTax_ReturnsAmount() {
+        // Given
+        item = item.withManualSalesTax(false)
+                .withSalesTaxRates(testUtilities.createSalesTaxRates())
+                .withCalculatedTotal(BigDecimal.valueOf(1000));
+
+        BigDecimal expectedAmount = BigDecimalProcessor.removeTrailingZeros(item.getCalculatedTotal()
+                .divide(BigDecimal.ONE.add(new BigDecimal("0.4")), 6, RoundingMode.HALF_UP));
+
+        // When
+        BigDecimal actualAmount = item.removeInclusiveSalesTax();
+
+        // Then
+        assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    void removeInclusiveSalesTax_NotManualSalesTaxWithOutSalesTaxRate_ReturnsAmount() {
+        // Given
+        item = item.withManualSalesTax(false)
+                .withSalesTaxRates(null)
+                .withGtRates(null)
+                .withCalculatedTotal(BigDecimal.valueOf(1000));
+
+        BigDecimal expectedAmount = item.getCalculatedTotal();
+
+        // When
+        BigDecimal actualAmount = item.removeInclusiveSalesTax();
+
+        // Then
+        assertEquals(expectedAmount, actualAmount);
     }
 }

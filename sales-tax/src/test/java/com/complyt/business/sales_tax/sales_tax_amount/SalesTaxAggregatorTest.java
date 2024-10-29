@@ -51,7 +51,7 @@ public class SalesTaxAggregatorTest {
         List<Taxable> taxAbles = testUtilities.createTaxables(transaction);
 
         // When
-        BigDecimal actualAmount = salesTaxAggregator.aggregate(taxAbles);
+        BigDecimal actualAmount = salesTaxAggregator.aggregate(taxAbles, transaction.getIsTaxInclusive());
 
         // Then
         assertEquals(expectedAmount, actualAmount);
@@ -64,7 +64,7 @@ public class SalesTaxAggregatorTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxAggregator.aggregate(nullTaxAbles);
+            salesTaxAggregator.aggregate(nullTaxAbles, transaction.getIsTaxInclusive());
         });
 
         // Then

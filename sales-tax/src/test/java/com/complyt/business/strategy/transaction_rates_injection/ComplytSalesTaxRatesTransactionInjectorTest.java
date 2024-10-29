@@ -64,13 +64,13 @@ public class ComplytSalesTaxRatesTransactionInjectorTest {
         }};
         Collection<Taxable> taxables = new ArrayList<>(transaction.getItems());
         Transaction transactionWithRates = transaction.withItems(itemsWithRates);
-        Transaction transactionWithRatesAndSalesTax = transactionWithRates.withSalesTax(salesTax);
+        Transaction transactionWithRatesAndSalesTax = transactionWithRates.withSalesTax(salesTax).withFinalTransactionAmount(BigDecimal.valueOf(10));
 
         // When
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)).thenReturn(Mono.just(transactionWithRates));
         when(complytSalesTaxRatesToSalesTaxRates.map(complytSalesTaxRates)).thenReturn(Mono.just(salesTaxRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxables);
-        when(salesTaxAggregator.aggregate((List<Taxable>) taxables)).thenReturn(salesTax.amount());
+        when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
         Mono<Transaction> transactionMono = complytSalesTaxRatesTransactionInjector.inject(transaction).apply(complytSalesTaxRates);
 
         // Then
@@ -89,13 +89,13 @@ public class ComplytSalesTaxRatesTransactionInjectorTest {
         }};
         Collection<Taxable> taxables = new ArrayList<>(transactionToSend.getItems());
         Transaction transactionWithRates = transactionToSend.withItems(itemsWithRates);
-        Transaction transactionWithRatesAndSalesTax = transactionWithRates.withSalesTax(salesTax).withFinalTransactionAmount(BigDecimal.valueOf(-10));
+        Transaction transactionWithRatesAndSalesTax = transactionWithRates.withSalesTax(salesTax);
 
         // When
         when(transactionSalesTaxRatesHandler.setRates(transactionToSend, salesTaxRates)).thenReturn(Mono.just(transactionWithRates));
         when(complytSalesTaxRatesToSalesTaxRates.map(complytSalesTaxRates)).thenReturn(Mono.just(salesTaxRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxables);
-        when(salesTaxAggregator.aggregate((List<Taxable>) taxables)).thenReturn(salesTax.amount());
+        when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
         Mono<Transaction> transactionMono = complytSalesTaxRatesTransactionInjector.inject(transactionToSend).apply(complytSalesTaxRates);
 
         // Then

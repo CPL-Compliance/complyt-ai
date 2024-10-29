@@ -15,15 +15,15 @@ import java.util.List;
 public class TaxableItemsAmountCalculator implements AmountCalculator<List<Taxable>> {
 
     @Override
-    public BigDecimal calculate(@NonNull List<Taxable> items) {
+    public BigDecimal calculate(@NonNull List<Taxable> items, Boolean isTaxInclusive) {
         BigDecimal amount = BigDecimal.ZERO;
         for (Taxable item : items) {
             amount = item.getTaxableCategory() == TaxableCategory.TAXABLE ?
-                    amount.add(item.getCalculatedTotal()) : amount;
+                    isTaxInclusive ? amount.add(item.removeInclusiveSalesTax()) : amount.add(item.getCalculatedTotal()) :
+                    amount;
         }
         log.debug("Total Taxable items price calculated: " + amount);
 
         return BigDecimalProcessor.removeTrailingZeros(amount);
     }
-
 }

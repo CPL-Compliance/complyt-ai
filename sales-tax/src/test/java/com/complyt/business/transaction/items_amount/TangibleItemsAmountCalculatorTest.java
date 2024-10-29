@@ -45,7 +45,7 @@ public class TangibleItemsAmountCalculatorTest {
         BigDecimal expectedAmount = items.get(0).getCalculatedTotal().add(items.get(1).getCalculatedTotal());
 
         // When + Then
-        BigDecimal actualAmount = tangibleItemsAmountCalculator.calculate(items);
+        BigDecimal actualAmount = tangibleItemsAmountCalculator.calculate(items, false);
         assertEquals(expectedAmount, actualAmount);
     }
 
@@ -56,7 +56,7 @@ public class TangibleItemsAmountCalculatorTest {
         BigDecimal expectedAmount = items.get(1).getCalculatedTotal();
 
         // When + Then
-        BigDecimal actualAmount = tangibleItemsAmountCalculator.calculate(items);
+        BigDecimal actualAmount = tangibleItemsAmountCalculator.calculate(items, false);
         assertEquals(expectedAmount, actualAmount);
     }
 
@@ -68,7 +68,7 @@ public class TangibleItemsAmountCalculatorTest {
         BigDecimal expectedAmount = BigDecimal.ZERO;
 
         // When + Then
-        BigDecimal actualAmount = tangibleItemsAmountCalculator.calculate(items);
+        BigDecimal actualAmount = tangibleItemsAmountCalculator.calculate(items, false);
         assertEquals(expectedAmount, actualAmount);
     }
 
@@ -78,7 +78,32 @@ public class TangibleItemsAmountCalculatorTest {
         List<Taxable> nullItems = null;
 
         // When
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> tangibleItemsAmountCalculator.calculate(nullItems));
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> tangibleItemsAmountCalculator.calculate(nullItems, false));
+
+        // Then
+        assertEquals("items is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void calculate_TwoItemsAreTangibleWithTaxInclusive_ReturnsAmountOfTwoItems() {
+        // Before
+        items = testUtilities.createTaxablesWithSalesTaxRate(true,true,true);
+        BigDecimal expectedAmount = BigDecimal.valueOf(1428.571428);
+
+        // When
+        BigDecimal actualAmount = tangibleItemsAmountCalculator.calculate(items, true);
+
+        // Then
+        assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    public void calculate_NullItemsPassedAndTaxInclusive_ThrowsException() {
+        // Given
+        List<Taxable> nullItems = null;
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> tangibleItemsAmountCalculator.calculate(nullItems, true));
 
         // Then
         assertEquals("items is marked non-null but is null", exception.getMessage());

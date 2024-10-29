@@ -54,7 +54,8 @@ public class TransactionFacade {
                                                         handleSalesTaxCalculationAndSave(setTransaction, salesTaxTrackingWithNexusInfo, customer)
                                                                 .flatMap(returnedTransaction -> salesTaxTrackingService.handleSalesTaxEnforcement(returnedTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
                                                                         .thenReturn(returnedTransaction)) :
-                                                        transactionService.injectExchangeRateIfNeeded(setTransaction)
+                                                        transactionService.calculateTotalAmounts(setTransaction)
+                                                                .flatMap(transactionService::injectExchangeRateIfNeeded)
                                                                 .flatMap(returnedTransaction -> transactionService.isTransactionWithStatusCancelled(setTransaction) ?
                                                                         transactionService.save(returnedTransaction.setCustomer(null))
                                                                                 .map(savedTransaction -> savedTransaction.setCustomer(customer)) :
@@ -65,6 +66,7 @@ public class TransactionFacade {
 
     private Mono<Transaction> handleSalesTaxCalculationAndSave(Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo, Customer customer) {
         return salesTaxService.handleSalesTaxCalculation(transaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking(), customer)
+                .flatMap(transactionService::calculateTotalAmounts)
                 .flatMap(transactionWithSalesTax -> transactionService.injectExchangeRateIfNeeded(transactionWithSalesTax))
                 .flatMap(transactionService::save);
     }
@@ -88,7 +90,8 @@ public class TransactionFacade {
                                                         handleSalesTaxCalculationAndUpdate(externalId, source, setTransaction, salesTaxTrackingWithNexusInfo, customer)
                                                                 .flatMap(returnedTransaction -> salesTaxTrackingService.handleSalesTaxEnforcement(returnedTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
                                                                         .thenReturn(returnedTransaction)) :
-                                                        transactionService.injectExchangeRateIfNeeded(setTransaction)
+                                                        transactionService.calculateTotalAmounts(setTransaction)
+                                                                .flatMap(transactionService::injectExchangeRateIfNeeded)
                                                                 .flatMap(returnedTransaction -> transactionService.isTransactionWithStatusCancelled(setTransaction) ?
                                                                         updateAndRemoveTransactionFromNexusTrackingCalculationIfNeeded(externalId, source, returnedTransaction, originalTransaction) :
                                                                         updateAndHandleNexusTrackingCalculation(externalId, source, returnedTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking()))
@@ -101,6 +104,7 @@ public class TransactionFacade {
 
     private Mono<Transaction> handleSalesTaxCalculationAndUpdate(String externalId, String source, Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo, Customer customer) {
         return salesTaxService.handleSalesTaxCalculation(transaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking(), customer)
+                .flatMap(transactionService::calculateTotalAmounts)
                 .flatMap(transactionWithSalesTax -> transactionService.injectExchangeRateIfNeeded(transactionWithSalesTax))
                 .flatMap(updatedTransaction -> transactionService.update(externalId, source, updatedTransaction));
     }

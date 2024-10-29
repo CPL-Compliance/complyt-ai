@@ -35,13 +35,12 @@ public class GtRatesTransactionInjector implements RatesTransactionInjector {
                 .flatMap(gtRates -> transactionGtRatesHandler.setRates(transaction, gtRates)
                         .map(transactionWithRates -> {
                             List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transactionWithRates);
-                            BigDecimal salesTaxAmount = salesTaxAggregator.aggregate(taxables);
+                            BigDecimal salesTaxAmount = salesTaxAggregator.aggregate(taxables, transaction.getIsTaxInclusive());
                             SalesTax salesTax = new SalesTax(salesTaxAmount, gtRates.taxRate(), null, gtRates);
-
-
+                            
                             BigDecimal finalAmount = transaction.getIsTaxInclusive() ?
-                                    transaction.getFinalTransactionAmount().subtract(salesTaxAmount) :
-                                    transaction.getFinalTransactionAmount();
+                                    transaction.getFinalTransactionAmount() :
+                                    transaction.getFinalTransactionAmount().add(salesTaxAmount);
 
                             return transactionWithRates.setSalesTax(salesTax)
                                     .setFinalTransactionAmount(finalAmount);

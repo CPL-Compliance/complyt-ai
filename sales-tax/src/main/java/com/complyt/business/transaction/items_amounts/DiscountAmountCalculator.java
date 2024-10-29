@@ -4,7 +4,6 @@ import lombok.NonNull;
 
 import java.math.BigDecimal;
 
-public interface AmountCalculator<T> {
-    BigDecimal calculate(@NonNull T t, Boolean isTaxInclusive);
-
+public interface DiscountAmountCalculator<T> {
+    BigDecimal calculate(@NonNull T t);
 }

@@ -37,6 +37,7 @@ import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -380,7 +381,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salestaxtracking is approved and physical
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("719.257541"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
                 BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
 
         // Then
@@ -402,7 +403,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertEquals(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().size(), 1);
                     assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().get("Arvada"));
                     assertTrue(transactionDto.isTaxInclusive());
-                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("9225.0000")));
+                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000")));
                 });
     }
 
@@ -417,7 +418,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState(" CO ").withCity("Arvada")); //salestaxtracking is approved and physical
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("719.257541"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
                 BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
 
         // Then
@@ -439,7 +440,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertEquals(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().size(), 1);
                     assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().get("Arvada"));
                     assertTrue(transactionDto.isTaxInclusive());
-                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("9225.0000")));
+                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000")));
                 });
     }
 
@@ -455,7 +456,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salestaxtracking is approved and physical
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("719.257541"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
                 BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
 
         // Then
@@ -477,7 +478,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertEquals(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().size(), 1);
                     assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().get("Arvada"));
                     assertTrue(transactionDto.isTaxInclusive());
-                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("9225.0000")));
+                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000")));
                 });
     }
 
@@ -631,7 +632,10 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "newTransactionID";
         BigDecimal itemTotalPrice = BigDecimal.valueOf(10000);
         MandatoryAddressDto shippingAddress = new MandatoryAddressDto(null, country, null, state, null, null, "11111", true);
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+        SalesTaxRatesDto salesTaxRatesDto = ITUtilities.createSalesTaxRatesDto(BigDecimal.valueOf(0.1));
+        TransactionDto originalTransaction = ITUtilities.stubTransactionDto(externalId, customerId);
+        ItemDto itemDto = originalTransaction.items().get(0).withSalesTaxRates(salesTaxRatesDto);
+        TransactionDto givenTransaction = originalTransaction.withItems(Collections.singletonList(itemDto))
                 .withTaxInclusive(true).withShippingAddress(shippingAddress);
 
         // upsertTransaction
@@ -682,7 +686,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "newTransactionID"; // already in DB
         BigDecimal passedItemPrice = BigDecimal.valueOf(200);
         MandatoryAddressDto shippingAddress = new MandatoryAddressDto(null, country, null, state, null, null, "11111", true);
-        ItemDto itemDto = ITUtilities.stubItemDto().withUnitPrice(passedItemPrice).withTotalPrice(passedItemPrice);
+        SalesTaxRatesDto salesTaxRatesDto = ITUtilities.createSalesTaxRatesDto(BigDecimal.valueOf(0.1));
+        ItemDto itemDto = ITUtilities.stubItemDto().withUnitPrice(passedItemPrice).withTotalPrice(passedItemPrice).withSalesTaxRates(salesTaxRatesDto);
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId, itemDto)
                 .withTaxInclusive(true).withShippingAddress(shippingAddress);
 
@@ -728,7 +733,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO")
                 .withCountry("US")); //salestaxtracking is approved and physical
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("719.257541"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
                 BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
 
         // Then
@@ -748,7 +753,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
                     assertTrue(transactionDto.isTaxInclusive());
-                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("9225.0000")));
+                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000")));
                     assertEquals("USA", transactionDto.shippingAddress().country());
                 });
     }
@@ -813,6 +818,222 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     @WithMockUser
+    public void upsertByExternalIdAndSource_UsaCountryTransactionWithTaxInclusive_Returns201() {
+        String externalId = "newNonExistingUsaCountryTransactionWithTaxInclusive";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withTaxInclusive(true);
+        MandatoryAddressDto partialShippingAddress = new MandatoryAddressDto(null, "US", null, null, null, null, "80001", true); // zip code belongs to New York
+        givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    BigDecimal amountWithoutTax = transactionDto.finalTransactionAmount().subtract(transactionDto.salesTax().amount());
+
+                    assertEquals(amountWithoutTax, transactionDto.tangibleItemsAmount());
+                    assertEquals(amountWithoutTax, transactionDto.taxableItemsAmount());
+                    assertEquals(amountWithoutTax, transactionDto.totalItemsAmount());
+                    assertEquals(transactionDto.items().get(0).totalPrice(), transactionDto.finalTransactionAmount());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaCountryTransactionWithTaxExclusiveAndNewItems_Returns201() {
+        String externalId = "newNonExistingUsaCountryTransactionWithTaxExclusiveAndNewItems";
+        BigDecimal firstItemAmount = BigDecimal.valueOf(5000);
+        BigDecimal secondItemAmount = BigDecimal.valueOf(10000);
+        BigDecimal thirdItemAmount = BigDecimal.valueOf(1000);
+        BigDecimal expectedTaxableAmount = firstItemAmount.add(thirdItemAmount);
+        BigDecimal expectedTangibleAmount = secondItemAmount.add(thirdItemAmount);
+        BigDecimal expectedTotalAmount = firstItemAmount.add(secondItemAmount).add(thirdItemAmount);
+        List<ItemDto> items = Arrays.asList(
+                ITUtilities.stubItemDto().withTaxCode("C2S1").withTotalPrice(firstItemAmount).withUnitPrice(firstItemAmount), // TAXABLE & INTANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C3S1").withTotalPrice(secondItemAmount).withUnitPrice(secondItemAmount), // NOT_TAXABLE & TANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C4S1").withTotalPrice(thirdItemAmount).withUnitPrice(thirdItemAmount) // TAXABLE & TANGIBLE
+        );
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withItems(items)
+                .withTaxInclusive(false);
+        MandatoryAddressDto partialShippingAddress = new MandatoryAddressDto(null, "US", null, null, null, null, "80001", true); // zip code belongs to New York
+        givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    BigDecimal amountWithSalesTax = expectedTotalAmount.add(transactionDto.salesTax().amount());
+
+                    assertEquals(expectedTaxableAmount, transactionDto.taxableItemsAmount());
+                    assertEquals(expectedTangibleAmount, transactionDto.tangibleItemsAmount());
+                    assertEquals(expectedTotalAmount, transactionDto.totalItemsAmount());
+                    assertEquals(amountWithSalesTax, transactionDto.finalTransactionAmount());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaCountryTransactionWithTaxInclusiveAndNewItems_Returns201() {
+        String externalId = "newNonExistingUsaCountryTransactionWithTaxInclusiveAndNewItems";
+        BigDecimal firstItemAmount = BigDecimal.valueOf(5000);
+        BigDecimal firstItemWithoutTax = BigDecimalProcessor.removeTrailingZeros(firstItemAmount.divide(BigDecimal.ONE.add(BigDecimal.valueOf(0.0775)), 6, RoundingMode.HALF_UP));
+        BigDecimal secondItemAmount = BigDecimal.valueOf(10000);
+        BigDecimal thirdItemAmount = BigDecimal.valueOf(1000);
+        BigDecimal thirdItemWithoutTax = BigDecimalProcessor.removeTrailingZeros(thirdItemAmount.divide(BigDecimal.ONE.add(BigDecimal.valueOf(0.0775)), 6, RoundingMode.HALF_UP));
+        BigDecimal expectedTaxableAmount = firstItemWithoutTax.add(thirdItemWithoutTax);
+        BigDecimal expectedTangibleAmount = secondItemAmount.add(thirdItemWithoutTax);
+        BigDecimal expectedTotalAmount = firstItemWithoutTax.add(secondItemAmount).add(thirdItemWithoutTax);
+        List<ItemDto> items = Arrays.asList(
+                ITUtilities.stubItemDto().withTaxCode("C2S1").withTotalPrice(firstItemAmount).withUnitPrice(firstItemAmount), // TAXABLE & INTANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C3S1").withTotalPrice(secondItemAmount).withUnitPrice(secondItemAmount), // NOT_TAXABLE & TANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C4S1").withTotalPrice(thirdItemAmount).withUnitPrice(thirdItemAmount) // TAXABLE & TANGIBLE
+        );
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withItems(items)
+                .withTaxInclusive(true);
+        MandatoryAddressDto partialShippingAddress = new MandatoryAddressDto(null, "US", null, null, null, null, "80001", true); // zip code belongs to New York
+        givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    BigDecimal amountWithSalesTax = BigDecimalProcessor.removeTrailingZeros(expectedTotalAmount.add(transactionDto.salesTax().amount()));
+
+                    assertEquals(expectedTaxableAmount, transactionDto.taxableItemsAmount());
+                    assertEquals(expectedTangibleAmount, transactionDto.tangibleItemsAmount());
+                    assertEquals(expectedTotalAmount, transactionDto.totalItemsAmount());
+                    assertEquals(amountWithSalesTax, transactionDto.finalTransactionAmount());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaCountryTransactionWithTaxInclusiveAndNewItemsAndNoNexus_Returns201() {
+        String externalId = "newNonExistingUsaCountryTransactionWithTaxInclusiveAndNewItemsAndNoNexus";
+        BigDecimal firstItemAmount = BigDecimal.valueOf(5000);
+        BigDecimal secondItemAmount = BigDecimal.valueOf(10000);
+        BigDecimal thirdItemAmount = BigDecimal.valueOf(1000);
+        BigDecimal expectedTaxableAmount = firstItemAmount.add(thirdItemAmount);
+        BigDecimal expectedTangibleAmount = secondItemAmount.add(thirdItemAmount);
+        BigDecimal expectedTotalAmount = firstItemAmount.add(secondItemAmount).add(thirdItemAmount);
+        List<ItemDto> items = Arrays.asList(
+                ITUtilities.stubItemDto().withTaxCode("C5S1").withTotalPrice(firstItemAmount).withUnitPrice(firstItemAmount), // TAXABLE & INTANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C8S1").withTotalPrice(secondItemAmount).withUnitPrice(secondItemAmount), // NOT_TAXABLE & TANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C3S1").withTotalPrice(thirdItemAmount).withUnitPrice(thirdItemAmount) // TAXABLE & TANGIBLE
+        );
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withItems(items)
+                .withTaxInclusive(true);
+        MandatoryAddressDto partialShippingAddress = new MandatoryAddressDto(null, "US", null, null, null, null, "38603", true); // zip code belongs to New York
+        givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertNull(transactionDto.salesTax());
+                    assertEquals(expectedTaxableAmount, transactionDto.taxableItemsAmount());
+                    assertEquals(expectedTangibleAmount, transactionDto.tangibleItemsAmount());
+                    assertEquals(expectedTotalAmount, transactionDto.totalItemsAmount());
+                    assertEquals(expectedTotalAmount, transactionDto.finalTransactionAmount());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NonUsaCountryTransactionWithTaxInclusiveAndNewItems_Returns201() {
+        String externalId = "newNonExistingNonUsaCountryTransactionWithTaxInclusiveAndNewItems";
+        BigDecimal firstItemAmount = BigDecimal.valueOf(5000);
+        BigDecimal firstItemWithoutTax = BigDecimalProcessor.removeTrailingZeros(firstItemAmount.divide(BigDecimal.ONE.add(BigDecimal.valueOf(0.14975)), 6, RoundingMode.HALF_UP));
+        BigDecimal secondItemAmount = BigDecimal.valueOf(10000);
+        BigDecimal thirdItemAmount = BigDecimal.valueOf(1000);
+        BigDecimal thirdItemWithoutTax = BigDecimalProcessor.removeTrailingZeros(thirdItemAmount.divide(BigDecimal.ONE.add(BigDecimal.valueOf(0.14975)), 6, RoundingMode.HALF_UP));
+        BigDecimal expectedTaxableAmount = firstItemWithoutTax.add(thirdItemWithoutTax);
+        BigDecimal expectedTangibleAmount = secondItemAmount.add(thirdItemWithoutTax);
+        BigDecimal expectedTotalAmount = firstItemWithoutTax.add(secondItemAmount).add(thirdItemWithoutTax);
+        List<ItemDto> items = Arrays.asList(
+                ITUtilities.stubItemDto().withTaxCode("C6S1").withTotalPrice(firstItemAmount).withUnitPrice(firstItemAmount), // TAXABLE & INTANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C4S1").withTotalPrice(secondItemAmount).withUnitPrice(secondItemAmount), // NOT_TAXABLE & TANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C3S1").withTotalPrice(thirdItemAmount).withUnitPrice(thirdItemAmount) // TAXABLE & TANGIBLE
+        );
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withItems(items)
+                .withTaxInclusive(true);
+        MandatoryAddressDto partialShippingAddress = new MandatoryAddressDto(null, "CA", null, null, "", "", null, false); // zip code belongs to New York
+        givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    BigDecimal amountWithOutSalesTax = BigDecimalProcessor.removeTrailingZeros(expectedTotalAmount.add(transactionDto.salesTax().amount()));
+
+                    assertEquals(expectedTaxableAmount, transactionDto.taxableItemsAmount());
+                    assertEquals(expectedTangibleAmount, transactionDto.tangibleItemsAmount());
+                    assertEquals(expectedTotalAmount, transactionDto.totalItemsAmount());
+                    assertEquals(amountWithOutSalesTax, transactionDto.finalTransactionAmount());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
     public void upsertByExternalIdAndSource_NonUsaCountryButSentAsAbbreviationReturnUpperCase_Returns201() {
         String externalId = "newNonExistingTransactionIDNonUsaAbbreviation";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -836,7 +1057,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertEquals(expectedSalesTax, transactionDto.salesTax());
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
-                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000.0000")));
+                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("11497.5")));
                     assertEquals("Canada", transactionDto.shippingAddress().country());
                 });
     }
@@ -868,7 +1089,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertEquals(expectedSalesTax, transactionDto.salesTax());
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
-                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000.0000")));
+                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("11497.5")));
                     assertEquals("Canada", transactionDto.shippingAddress().country());
                 });
     }
@@ -883,7 +1104,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDtoNonUsaCountry(externalId, customerId)
                 .withTaxInclusive(true);
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1475"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1285.40305"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 
         // Then
         webTestClient
@@ -904,7 +1125,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions().get("Quebec"));
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
                     assertTrue(transactionDto.isTaxInclusive());
-                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("8525.0000")));
+                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000")));
                 });
     }
 

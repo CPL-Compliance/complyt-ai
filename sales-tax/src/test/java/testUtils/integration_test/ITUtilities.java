@@ -215,6 +215,10 @@ public interface ITUtilities {
         return new SalesTaxRatesDto(new BigDecimal("0.00375"), new BigDecimal("0.0"), new BigDecimal("0.00725"), new BigDecimal("0.0125"), new BigDecimal("0.06"), null);
     }
 
+    static SalesTaxRatesDto createSalesTaxRatesDto(BigDecimal taxRate) {
+        return new SalesTaxRatesDto(new BigDecimal("0.0"), new BigDecimal("0.0"), new BigDecimal("0.0"), taxRate, new BigDecimal("0.0"), null);
+    }
+
     static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
         Address address = createAddressInCalifornia();
         SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
