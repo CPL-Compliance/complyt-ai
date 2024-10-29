@@ -77,7 +77,7 @@ public class TransactionHandler {
 
         Flux<TransactionDto> transactionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(transactionDtoValidationHandler.handle(serverRequest))
-                .switchIfEmpty(Flux.defer(() -> transactionFacade.getAll(Integer.parseInt(page), Integer.parseInt(size), filterMap, sortOrder.toUpperCase(), sortBy))
+                .switchIfEmpty(Flux.defer(() -> transactionFacade.getAll(Integer.parseInt(page), Integer.parseInt(size), filterMap, sortOrder, sortBy))
                         .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
                         .flatMapSequential(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto)));
 
