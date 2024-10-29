@@ -1,6 +1,7 @@
 package io.complyt.files.v1.validators.query_params;
 
 import io.complyt.files.v1.exceptions.types.ObjectNotFoundApiException;
+import io.complyt.files.v1.exceptions.types.ObjectNotValidApiException;
 import io.complyt.files.v1.models.ComplytFileDto;
 import io.complyt.files.v1.models.ComplytFileMetadataDto;
 import org.junit.jupiter.api.Test;
@@ -80,7 +81,7 @@ class QueryParamsExtractorFileTest {
 
         // Assert
         StepVerifier.create(result)
-                .expectError(ObjectNotFoundApiException.class)
+                .expectError(ObjectNotValidApiException.class)
                 .verify();
     }
 

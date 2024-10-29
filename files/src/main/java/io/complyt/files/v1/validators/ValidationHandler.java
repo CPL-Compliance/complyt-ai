@@ -60,7 +60,7 @@ public class ValidationHandler<T, U extends Validator> {
             return Mono.just(objectToValidate);
         } else {
             return ContextLogger.observeCtx("Failed to validate the format " + errors.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList(), log::info)
-                    .then(onValidationErrors());
+                    .then(onValidationErrors(errors));
         }
     }
 
@@ -80,9 +80,4 @@ public class ValidationHandler<T, U extends Validator> {
     private Mono<T> onValidationErrors(Errors errors) {
         return Mono.error(new ObjectNotValidApiException(errors));
     }
-
-    private @NonNull Mono<T> onValidationErrors() {
-        return Mono.error(new Exception());
-    }
-
 }
