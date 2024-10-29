@@ -17,6 +17,7 @@ import com.complyt.v1.models.sales_tax.SalesTaxDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.sales_tax.gt.GtRatesDto;
 import com.complyt.v1.models.transaction.*;
+import com.complyt.v1.routers.CustomerRouter;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
@@ -2905,6 +2906,26 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                         assertEquals(t.transactionType(), TransactionTypeDto.SALES_ORDER);
                         assertEquals(t.shippingAddress().city(), city);
                     }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_InvalidSortOrderSent_Throws400() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("sortOrder", "ascc")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = map.get("message").toString();
+                    assertTrue(message.contains(GenericErrorMessages.INVALID_SORT_ORDER_PARAMETER));
                 });
     }
 

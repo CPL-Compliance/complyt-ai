@@ -7,10 +7,7 @@ import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.transaction.OptionalAddressDto;
-import com.complyt.v1.models.transaction.TransactionDto;
-import com.complyt.v1.models.transaction.TransactionTypeDto;
 import com.complyt.v1.routers.CustomerRouter;
-import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -915,6 +912,26 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                         assertEquals(CustomerTypeDto.MARKETPLACE, c.customerType());
                         assertEquals("VA", c.address().state());
                     }
+                });
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_InvalidSortOrderSent_Throws400() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("sortOrder", "ascc")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = map.get("message").toString();
+                    assertTrue(message.contains(GenericErrorMessages.INVALID_SORT_ORDER_PARAMETER));
                 });
     }
 
