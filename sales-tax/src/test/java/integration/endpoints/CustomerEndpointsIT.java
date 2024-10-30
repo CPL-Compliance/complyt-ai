@@ -935,4 +935,24 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 });
     }
 
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_InvalidPageValuePassed_Throws400() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("page", "0")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = map.get("message").toString();
+                    assertTrue(message.contains(DtoErrorMessages.PAGE_FORMAT_ERROR));
+                });
+    }
+
 }

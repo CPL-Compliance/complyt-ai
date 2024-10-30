@@ -51,7 +51,6 @@ import java.lang.annotation.Target;
                                         in = ParameterIn.QUERY,
                                         schema = @Schema(type = "string", defaultValue = "externalTimestamps.createdDate")
                                 )
-
                         },
 
                         security = @SecurityRequirement(name = "bearerAuth"),

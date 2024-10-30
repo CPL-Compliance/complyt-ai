@@ -15,9 +15,9 @@ public interface CustomerEndpointsITITTemplate extends
 
     void getAll_PaginationSortedByNameAsc_ReturnsSortedCustomer();
 
-    public void getAll_PaginationFilteredByMarketPlaceCustomerType_ReturnsCustomers();
+    void getAll_PaginationFilteredByMarketPlaceCustomerType_ReturnsCustomers();
 
-    public void getAll_PaginationFilteredByRetailCustomerType_ReturnsCustomers();
+    void getAll_PaginationFilteredByRetailCustomerType_ReturnsCustomers();
 
     void getAll_PaginationFilteredByStateType_ReturnsCustomers();
 
