@@ -5,6 +5,7 @@ import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.transaction.OptionalAddressDto;
 import com.complyt.v1.routers.CustomerRouter;
 import integration.TestContainersInitializerIT;
@@ -685,6 +686,272 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .value(returnedCustomer -> {
                     Assertions.assertEquals(returnedCustomer.address(), addressToPatch);
                     Assertions.assertEquals(returnedCustomer.name(), nameToPatch);
+                });
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_PaginationSortedByDateDesc_ReturnsSortedList() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list -> {
+                    assertEquals(4, list.size());
+                    LocalDateTime firstDate = LocalDateTime.parse(list.get(0).externalTimestamps().createdDate());
+                    LocalDateTime secondDate = LocalDateTime.parse(list.get(1).externalTimestamps().createdDate());
+                    LocalDateTime thirdDate = LocalDateTime.parse(list.get(2).externalTimestamps().createdDate());
+                    LocalDateTime fourthDate = LocalDateTime.parse(list.get(3).externalTimestamps().createdDate());
+                    assertTrue(firstDate.isAfter(secondDate));
+                    assertTrue(secondDate.isAfter(thirdDate));
+                    assertTrue(thirdDate.isAfter(fourthDate));
+                });
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_PaginationSortedByDateAsc_ReturnsSortedList() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("sortOrder", "asc")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list -> {
+                    assertEquals(4, list.size());
+                    LocalDateTime firstDate = LocalDateTime.parse(list.get(0).externalTimestamps().createdDate());
+                    LocalDateTime secondDate = LocalDateTime.parse(list.get(1).externalTimestamps().createdDate());
+                    LocalDateTime thirdDate = LocalDateTime.parse(list.get(2).externalTimestamps().createdDate());
+                    LocalDateTime fourthDate = LocalDateTime.parse(list.get(3).externalTimestamps().createdDate());
+                    assertTrue(firstDate.isBefore(secondDate));
+                    assertTrue(secondDate.isBefore(thirdDate));
+                    assertTrue(thirdDate.isBefore(fourthDate));
+                });
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_PaginationSortedByNameDesc_ReturnsSortedCustomers() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("sortBy", "name")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list -> {
+                    assertEquals(4, list.size());
+                    String firstName = list.get(0).name();
+                    String secondName = list.get(1).name();
+                    String thirdName = list.get(2).name();
+                    String fourthName = list.get(3).name();
+                    assertTrue(firstName.compareTo(secondName) > 0);
+                    assertTrue(secondName.compareTo(thirdName) > 0);
+                    assertTrue(thirdName.compareTo(fourthName) > 0);
+                });
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_PaginationSortedByNameAsc_ReturnsSortedCustomer() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("sortOrder", "asc")
+                        .queryParam("sortBy", "name")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list -> {
+                    assertEquals(4, list.size());
+                    String firstName = list.get(0).name();
+                    String secondName = list.get(1).name();
+                    String thirdName = list.get(2).name();
+                    String fourthName = list.get(3).name();
+                    assertTrue(firstName.compareTo(secondName) < 0);
+                    assertTrue(secondName.compareTo(thirdName) < 0);
+                    assertTrue(thirdName.compareTo(fourthName) < 0);
+                });
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_PaginationFilteredByMarketPlaceCustomerType_ReturnsCustomers() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("customerType", "MARKETPLACE")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list -> {
+                    assertEquals(2, list.size());
+                    for (CustomerDto c : list) {
+                        assertEquals(CustomerTypeDto.MARKETPLACE, c.customerType());
+                    }
+                });
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_PaginationFilteredByRetailCustomerType_ReturnsCustomers() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("customerType", "RETAIL")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list -> {
+                    assertEquals(2, list.size());
+                    for (CustomerDto c : list) {
+                        assertEquals(CustomerTypeDto.RETAIL, c.customerType());
+                    }
+                });
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_PaginationFilteredByStateType_ReturnsCustomers() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("sortBy", "address.state")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list -> {
+                    assertEquals(4, list.size());
+                    String firstState = list.get(0).address().state();
+                    String secondState = list.get(1).address().state();
+                    String thirdState = list.get(2).address().state();
+                    String fourthState = list.get(3).address().state();
+                    assertTrue(firstState.compareTo(secondState) > 0);
+                    assertTrue(secondState.compareTo(thirdState) > 0);
+                    assertTrue(thirdState.compareTo(fourthState) > 0);
+                });
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_PaginationFilteredByCustomerTypeAndState_ReturnsCustomers() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("filtered_by_customer_type_and_state_pagination_tenant"));
+
+        // Making sure that there are 4 customers when querying without filter
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list -> assertEquals(4, list.size()));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("customerType", "MARKETPLACE")
+                        .queryParam("address.state", "VA")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list -> {
+                    assertEquals(2, list.size());
+                    for (CustomerDto c : list) {
+                        assertEquals(CustomerTypeDto.MARKETPLACE, c.customerType());
+                        assertEquals("VA", c.address().state());
+                    }
+                });
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_InvalidSortOrderSent_Throws400() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("sortOrder", "ascc")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = map.get("message").toString();
+                    assertTrue(message.contains(GenericErrorMessages.INVALID_SORT_ORDER_PARAMETER));
+                });
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_InvalidPageValuePassed_Throws400() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("page", "0")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = map.get("message").toString();
+                    assertTrue(message.contains(DtoErrorMessages.PAGE_FORMAT_ERROR));
                 });
     }
 

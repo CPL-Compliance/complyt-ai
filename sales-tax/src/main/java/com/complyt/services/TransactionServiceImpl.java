@@ -33,6 +33,7 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
@@ -187,8 +188,8 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findAllByQuery(query);
     }
 
-    public Flux<Transaction> findAll(int page, int size) {
-        return transactionRepository.findAll(page, size);
+    public Flux<Transaction> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
+        return transactionRepository.findAll(page, size, filterMap, sortOrder, sortBy);
     }
 
     public Flux<Transaction> findAllBySource(@NonNull final String source) {

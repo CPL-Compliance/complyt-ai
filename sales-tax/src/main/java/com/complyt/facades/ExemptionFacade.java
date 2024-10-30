@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -30,8 +31,8 @@ public class ExemptionFacade {
         return exemptionService.findByComplytId(complytId);
     }
 
-    public Flux<Exemption> findAll(int page, int size) {
-        return exemptionService.findAll(page, size);
+    public Flux<Exemption> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
+        return exemptionService.findAll(page, size, filterMap, sortOrder, sortBy);
     }
 
     public Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final UUID complytId) {

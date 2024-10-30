@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
@@ -71,7 +72,7 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
     }
 
     @Override
-    public Flux<ClientTracking> findAll(int page, int size) {
+    public Flux<ClientTracking> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
         return clientTrackingRepository.findAll(page, size);
     }
 

@@ -38,6 +38,7 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -666,7 +667,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", testUtilities.stringWithLength(101), "state", "street", "zip", "",false);
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", testUtilities.stringWithLength(101), "state", "street", "zip", "", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.county " + StringErrorMessages.MAX_100_ERROR));
 
         // When + Then
@@ -690,7 +691,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", "street", testUtilities.stringWithLength(21), "",false);
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", "street", testUtilities.stringWithLength(21), "", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.zip " + StringErrorMessages.MAX_20_ERROR));
 
         // When + Then
@@ -714,7 +715,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         /// Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", testUtilities.stringWithLength(51), "county", "state", "street", "","zip", false);
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", testUtilities.stringWithLength(51), "county", "state", "street", "", "zip", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.country " + StringErrorMessages.MAX_50_ERROR));
 
         // When + Then
@@ -738,7 +739,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto(testUtilities.stringWithLength(101), "country", "county", "state", "street", "","zip", false);
+        OptionalAddressDto givenAddress = new OptionalAddressDto(testUtilities.stringWithLength(101), "country", "county", "state", "street", "", "zip", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.city " + StringErrorMessages.MAX_100_ERROR));
 
         // When + Then
@@ -762,7 +763,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", testUtilities.stringWithLength(101), "street", "","zip", false);
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", testUtilities.stringWithLength(101), "street", "", "zip", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.state " + StringErrorMessages.MAX_100_ERROR));
         // When + Then
         webTestClient
@@ -785,7 +786,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", testUtilities.stringWithLength(201), "","zip", false);
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", testUtilities.stringWithLength(201), "", "zip", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.street" + StringErrorMessages.MAX_200_ERROR));
 
         // When + Then
@@ -1120,9 +1121,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
             add(customer);
             add(secondCustomer);
         }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(customerFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(allCustomers));
+        when(customerFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(allCustomers));
 
         // Then
         webTestClient
@@ -1147,9 +1149,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
             add(customer);
             add(secondCustomer);
         }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(customerFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(allCustomers));
+        when(customerFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(allCustomers));
 
         // Then
         webTestClient
@@ -1169,9 +1172,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         /// Given
         List<Customer> emptyCustomerList = new ArrayList<>();
+        Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(customerFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(emptyCustomerList));
+        when(customerFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(emptyCustomerList));
 
         // Then
         webTestClient
@@ -1192,7 +1196,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         List<Customer> emptyCustomerList = new ArrayList<>();
 
         // When
-        when(customerFacade.getAll(0, 0)).thenReturn(Flux.fromIterable(emptyCustomerList));
+        when(customerFacade.getAll(0, 0, null, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(emptyCustomerList));
 
         // Then
         webTestClient
@@ -1217,7 +1221,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // Given + When
-        when(customerFacade.getAll(0, 0)).thenReturn(Flux.error(new OperationFailedException()));
+        when(customerFacade.getAll(0, 0, null, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient

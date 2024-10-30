@@ -1,6 +1,9 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.customer.Customer;
+import com.complyt.repositories.pagination.CriteriaBuilder;
+import com.complyt.repositories.pagination.customer.CustomerPaginationUtil;
+import com.complyt.repositories.pagination.transaction.TransactionPaginationUtil;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Repository
@@ -50,13 +54,19 @@ public class CustomerRepository {
                 });
     }
 
-    public Flux<Customer> findAll(int page, int size) {
+    public Flux<Customer> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
         int calculatedOffset = (page - 1) * size;
+        Criteria criteriaFromFilterMap = CriteriaBuilder.build(filterMap, CustomerPaginationUtil.customerFilterKeys);
+        String sortByProperty = CustomerPaginationUtil.customerSortByFields.contains(sortBy) ? sortBy : CustomerPaginationUtil.DEFAULT_SORT_BY;
+        Sort.Direction sortDirection = Sort.Direction.fromString(sortOrder);
+
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
-                    Query query = Query.query(Criteria.where("tenantId").is(tenantId))
+                    Criteria criteria = criteriaFromFilterMap != null ? Criteria.where("tenantId").is(tenantId).andOperator(criteriaFromFilterMap) : Criteria.where("tenantId").is(tenantId);
+
+                    Query query = Query.query(criteria)
                             .skip(calculatedOffset).limit(size)
-                            .with(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate"));
+                            .with(Sort.by(sortDirection, sortByProperty));
 
                     return ContextLogger.observeCtx("Searching for customers with tenant ID " + tenantId + " with page " + page + " and size " + size, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Customer.class));

@@ -19,9 +19,7 @@ import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -163,11 +161,13 @@ class TransactionRepositoryTest {
             add(transaction);
             add(secondTransaction);
         }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         //When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.aggregate(any(), eq(Transaction.class))).thenReturn(Flux.fromIterable(allTransactions));
-        Flux<Transaction> transactionFlux = transactionRepository.findAll(page, size);
+        Flux<Transaction> transactionFlux = transactionRepository.findAll(page, size, filterMap, sortOrder, sortBy);
 
         //Then
         StepVerifier.create(transactionFlux).expectNext(transaction, secondTransaction).verifyComplete();
@@ -186,14 +186,57 @@ class TransactionRepositoryTest {
 
         // Creating the expected list (list of 2-4 transaction objects)
         List<Transaction> expectedList = transactionList.subList(calculatedOffset, Math.min(calculatedOffset + size, transactionList.size()));
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.aggregate(any(), eq(Transaction.class))).thenReturn(Flux.fromIterable(expectedList));
 
         // Then
-        Flux<Transaction> transactionFlux = transactionRepository.findAll(page, size);
+        Flux<Transaction> transactionFlux = transactionRepository.findAll(page, size, filterMap, sortOrder, sortBy);
         StepVerifier.create(transactionFlux).expectNextSequence(expectedList).verifyComplete();
+    }
+
+    @Test
+    void findAll_TransactionsByOffsetAndLimitWithNonExistingSortByProperty_ExpectingChunkOfTransactionsByCreatedDate() {
+        // Given
+        int page = 2;
+        int size = 2;
+        int calculatedOffset = (page - 1) * size;
+
+        List<Transaction> transactionList = IntStream.range(0, 4)
+                .mapToObj(i -> transaction.withComplytId(UUID.randomUUID()).withId(UUID.randomUUID().toString()))
+                .collect(Collectors.toList());
+
+        // Creating the expected list (list of 2-4 transaction objects)
+        List<Transaction> expectedList = transactionList.subList(calculatedOffset, Math.min(calculatedOffset + size, transactionList.size()));
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "nonExistingParameter";
+
+        // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
+        when(reactiveMongoTemplate.aggregate(any(), eq(Transaction.class))).thenReturn(Flux.fromIterable(expectedList));
+
+        // Then
+        Flux<Transaction> transactionFlux = transactionRepository.findAll(page, size, filterMap, sortOrder, sortBy);
+        StepVerifier.create(transactionFlux).expectNextSequence(expectedList).verifyComplete();
+    }
+
+    @Test
+    void findAll_InvalidSortOrderValue_ThrowsException() {
+        // Given
+        int page = 2;
+        int size = 2;
+
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "Invalid", sortBy = "transactionStatus";
+
+        // When
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> transactionRepository.findAll(page, size, filterMap, sortOrder, sortBy));
+
+        // Then
+        assertEquals(illegalArgumentException.getMessage(), "Invalid value 'Invalid' for orders given; Has to be either 'desc' or 'asc' (case insensitive)");
     }
 
     @Test
@@ -205,11 +248,13 @@ class TransactionRepositoryTest {
         String externalId = UUID.randomUUID().toString();
         UUID customerId = UUID.randomUUID();
         Transaction secondTransaction = transaction.withExternalId(externalId).withCustomerId(customerId);
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         //When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.aggregate(any(), eq(Transaction.class))).thenReturn(Flux.just(secondTransaction));
-        Flux<Transaction> transactionFlux = transactionRepository.findAll(page, size);
+        Flux<Transaction> transactionFlux = transactionRepository.findAll(page, size, filterMap, sortOrder, sortBy);
 
         //Then
         StepVerifier.create(transactionFlux).expectNext(secondTransaction).verifyComplete();

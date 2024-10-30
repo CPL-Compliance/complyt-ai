@@ -178,7 +178,7 @@ public class SalesTaxTrackingServiceImplTest {
     @Test
     void updateEconomicNexus_UpdatesSalesTaxTracking_ReturnsSalesTaxTracking() {
         // Given
-        UpdateResult updateResult = UpdateResult.acknowledged (0, null, null);
+        UpdateResult updateResult = UpdateResult.acknowledged(0, null, null);
 
         // When
         when(salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
@@ -241,10 +241,12 @@ public class SalesTaxTrackingServiceImplTest {
         List<SalesTaxTracking> salesTaxTrackingList = new ArrayList<>() {{
             add(salesTaxTracking);
         }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         // When
         when(salesTaxTrackingRepository.findAll(0, salesTaxTrackingList.size())).thenReturn(Flux.fromIterable(salesTaxTrackingList));
-        Flux<SalesTaxTracking> actualTrackingFlux = salesTaxTrackingService.findAll(0, salesTaxTrackingList.size());
+        Flux<SalesTaxTracking> actualTrackingFlux = salesTaxTrackingService.findAll(0, salesTaxTrackingList.size(), filterMap, sortOrder, sortBy);
 
         // Then
         StepVerifier.create(actualTrackingFlux).expectNext(salesTaxTracking).verifyComplete();
@@ -581,7 +583,7 @@ public class SalesTaxTrackingServiceImplTest {
     void handleSalesTaxTrackingAfterTransactionCalculated_SalesTaxTrackingWithEconomicNexusEstablished_UpdatesSalesTaxTracking() {
         // Given
         EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(true, LocalDateTime.now());
-        UpdateResult updateResult = UpdateResult.acknowledged (0, null, null);
+        UpdateResult updateResult = UpdateResult.acknowledged(0, null, null);
         SalesTaxTracking salesTaxTrackingWithEconomicNexusEstablished = salesTaxTracking.withEconomicNexusTracker(economicNexusTracker);
 
         // When
@@ -693,7 +695,7 @@ public class SalesTaxTrackingServiceImplTest {
 
     @Test
     void updateAppliedDateIfIsPhysicalEconomicEnabled_EstablishedFalse_ReturnsSalesTaxTracking() {
-       // Given
+        // Given
         salesTaxTracking = salesTaxTracking.withPhysicalNexusTracker(salesTaxTracking.getPhysicalNexusTracker().withEstablished(false));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.updateAppliedDateIfIsPhysicalNexusEstablished(salesTaxTracking);
 

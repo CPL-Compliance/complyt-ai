@@ -1,6 +1,8 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.repositories.pagination.CriteriaBuilder;
+import com.complyt.repositories.pagination.transaction.TransactionPaginationUtil;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
@@ -17,6 +19,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -88,14 +91,19 @@ public class TransactionRepository {
                 });
     }
 
-    public Flux<Transaction> findAll(int page, int size) {
+    public Flux<Transaction> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
         int calculatedOffset = (page - 1) * size;
+        Criteria criteriaFromFilterMap = CriteriaBuilder.build(filterMap, TransactionPaginationUtil.transactionFilterKeys);
+        String sortByProperty = TransactionPaginationUtil.transactionSortByFields.contains(sortBy) ? sortBy : TransactionPaginationUtil.DEFAULT_SORT_BY;
+        Sort.Direction sortDirection = Sort.Direction.fromString(sortOrder);
 
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
+
+                    Criteria criteria = criteriaFromFilterMap != null ? Criteria.where("tenantId").is(tenantId).andOperator(criteriaFromFilterMap) : Criteria.where("tenantId").is(tenantId);
                     TypedAggregation<Transaction> aggregation = Aggregation.newAggregation(Transaction.class,
-                                    Aggregation.match(Criteria.where("tenantId").is(tenantId)),
-                                    Aggregation.sort(Sort.by(Sort.Direction.DESC, "externalTimestamps.createdDate")),
+                                    Aggregation.match(criteria),
+                                    Aggregation.sort(Sort.by(sortDirection, sortByProperty)),
                                     Aggregation.skip(calculatedOffset),
                                     Aggregation.limit(size),
                                     Aggregation.lookup()
@@ -107,7 +115,7 @@ public class TransactionRepository {
                                     Aggregation.unwind("customer", true))
                             .withOptions(newAggregationOptions().cursorBatchSize(size).build());
 
-                    return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId + " with page " + page + " and size " + size, log::info)
+                    return ContextLogger.observeCtx("Searching for transactions by criteria " + criteria.getCriteriaObject() + " with page " + page + " and size " + size, log::info)
                             .thenMany(reactiveMongoTemplate.aggregate(aggregation, Transaction.class));
                 });
     }

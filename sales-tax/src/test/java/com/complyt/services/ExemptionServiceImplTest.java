@@ -26,9 +26,7 @@ import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -112,14 +110,16 @@ public class ExemptionServiceImplTest {
         // Given
         Exemption secondExemption = exemption.withId(UUID.randomUUID().toString())
                 .withState(new State("NY", "05", "New York"));
-        List<Exemption> exemptions = new ArrayList<Exemption>() {{
+        List<Exemption> exemptions = new ArrayList<>() {{
             add(exemption);
             add(secondExemption);
         }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         // When
         when(exemptionRepository.findAll(0, exemptions.size())).thenReturn(Flux.fromIterable(exemptions));
-        Flux<Exemption> exemptionFlux = exemptionService.findAll(0, exemptions.size());
+        Flux<Exemption> exemptionFlux = exemptionService.findAll(0, exemptions.size(), filterMap, sortOrder, sortBy);
 
         // Then
         StepVerifier.create(exemptionFlux).expectNext(exemption, secondExemption).verifyComplete();

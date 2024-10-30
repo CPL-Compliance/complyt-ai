@@ -8,5 +8,19 @@ public interface CustomerEndpointsITITTemplate extends
         GetByComplytIdITTemplate,
         GetAllITTemplate,
         GetAllBySourceTTemplate,
-        PatchITTemplate {
+        PatchITTemplate,
+        GetAllPaginationITTemplate {
+
+    void getAll_PaginationSortedByNameDesc_ReturnsSortedCustomers();
+
+    void getAll_PaginationSortedByNameAsc_ReturnsSortedCustomer();
+
+    void getAll_PaginationFilteredByMarketPlaceCustomerType_ReturnsCustomers();
+
+    void getAll_PaginationFilteredByRetailCustomerType_ReturnsCustomers();
+
+    void getAll_PaginationFilteredByStateType_ReturnsCustomers();
+
+    void getAll_PaginationFilteredByCustomerTypeAndState_ReturnsCustomers();
+
 }

@@ -109,7 +109,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     @Override
-    public Flux<SalesTaxTracking> findAll(int page, int size) {
+    public Flux<SalesTaxTracking> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
         return salesTaxTrackingRepository.findAll(page, size);
     }
 

@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 @AllArgsConstructor
 @Slf4j
 @Service
@@ -28,7 +30,7 @@ public class NexusStateRuleServiceImpl implements NexusStateRuleService {
     }
 
     @Override
-    public Flux<NexusStateRule> findAll(int page, int limit) {
+    public Flux<NexusStateRule> findAll(int page, int limit, Map<String, String> filterMap, String sortOrder, String sortBy) {
         return nexusStateRuleRepository.findAll();
     }
 

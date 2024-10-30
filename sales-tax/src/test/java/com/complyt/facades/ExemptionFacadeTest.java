@@ -19,9 +19,7 @@ import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -93,10 +91,12 @@ public class ExemptionFacadeTest {
             add(exemption);
             add(secondExemption);
         }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         // When
-        when(exemptionService.findAll(0, exemptions.size())).thenReturn(Flux.fromIterable(exemptions));
-        Flux<Exemption> exemptionFlux = exemptionFacade.findAll(0, exemptions.size());
+        when(exemptionService.findAll(0, exemptions.size(), filterMap, sortOrder, sortBy)).thenReturn(Flux.fromIterable(exemptions));
+        Flux<Exemption> exemptionFlux = exemptionFacade.findAll(0, exemptions.size(), filterMap, sortOrder, sortBy);
 
         // Then
         StepVerifier.create(exemptionFlux).expectNext(exemption, secondExemption);

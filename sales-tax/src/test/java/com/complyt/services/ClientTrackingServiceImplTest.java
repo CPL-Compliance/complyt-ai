@@ -18,7 +18,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -195,11 +197,14 @@ class ClientTrackingServiceImplTest {
         // Given
         int page = 0;
         int size = 10;
+
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
         List<ClientTracking> clientTrackings = List.of(clientTracking);
 
         // When + Then
         when(clientTrackingRepository.findAll(page, size)).thenReturn(Flux.fromIterable(clientTrackings));
-        Flux<ClientTracking> foundClientTrackings = clientTrackingServiceImp.findAll(page, size);
+        Flux<ClientTracking> foundClientTrackings = clientTrackingServiceImp.findAll(page, size, filterMap, sortOrder, sortBy);
 
         StepVerifier.create(foundClientTrackings).expectNextCount(1).verifyComplete();
     }

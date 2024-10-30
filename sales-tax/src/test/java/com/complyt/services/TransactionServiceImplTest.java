@@ -41,9 +41,7 @@ import testUtils.unit_test.UnitTestUtilities;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -180,10 +178,12 @@ class TransactionServiceImplTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         Transaction secondTransaction = transaction.withExternalId(externalId);
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         //When
-        when(transactionRepository.findAll(0, 1)).thenReturn(Flux.just(transaction, secondTransaction));
-        Flux<Transaction> transactionFlux = transactionService.findAll(0, 1);
+        when(transactionRepository.findAll(0, 1, filterMap, sortOrder, sortBy)).thenReturn(Flux.just(transaction, secondTransaction));
+        Flux<Transaction> transactionFlux = transactionService.findAll(0, 1, filterMap, sortOrder, sortBy);
 
         //Then
         StepVerifier.create(transactionFlux).expectNext(transaction, secondTransaction).verifyComplete();
@@ -304,10 +304,13 @@ class TransactionServiceImplTest {
             add(transaction);
             add(anotherTransactionWithSameClientId);
         }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
+
 
         // When
-        when(transactionRepository.findAll(0, transactions.size())).thenReturn(Flux.fromIterable(transactions));
-        Flux<Transaction> transactionFlux = transactionService.findAll(0, transactions.size());
+        when(transactionRepository.findAll(0, transactions.size(), filterMap, sortOrder, sortBy)).thenReturn(Flux.fromIterable(transactions));
+        Flux<Transaction> transactionFlux = transactionService.findAll(0, transactions.size(), filterMap, sortOrder, sortBy);
 
         // Then
         StepVerifier.create(transactionFlux).expectNext(transaction, anotherTransactionWithSameClientId).verifyComplete();

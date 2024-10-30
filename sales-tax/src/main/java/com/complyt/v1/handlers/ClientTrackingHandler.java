@@ -24,6 +24,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -40,14 +41,21 @@ public class ClientTrackingHandler {
     @ClientTrackingReadPermission
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+
         String page = serverRequest.queryParam("page")
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM));
         String size = serverRequest.queryParam("size")
                 .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE));
+        String sortOrder = serverRequest.queryParam("sortOrder")
+                .orElse(RepositoryConstant.DEFAULT_SORT_ORDER);
+        String sortBy = serverRequest.queryParam("sortBy")
+                .orElse(RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY);
+
+        Map<String, String> filterMap = serverRequest.queryParams().toSingleValueMap();
 
         Flux<ClientTrackingDtoTenant> ClientTrackingDtoTenantFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(ClientTrackingDtoTenantValidationHandler.handle(serverRequest))
-                .switchIfEmpty(Flux.defer(() -> clientTrackingFacade.getAll(Integer.parseInt(page), Integer.parseInt(size))
+                .switchIfEmpty(Flux.defer(() -> clientTrackingFacade.getAll(Integer.parseInt(page), Integer.parseInt(size), filterMap, sortOrder, sortBy)
                         .map(ClientTrackingMapper.INSTANCE::clientTrackingToClientTrackingDtoTenant)
                         .flatMapSequential(ClientTrackingDtoTenant -> ContextLogger.observeCtx("<-- Returned Body: " + ClientTrackingDtoTenant, log::info).thenReturn(ClientTrackingDtoTenant))));
 

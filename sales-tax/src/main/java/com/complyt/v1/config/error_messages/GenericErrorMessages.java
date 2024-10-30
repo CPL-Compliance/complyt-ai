@@ -26,5 +26,7 @@ public interface GenericErrorMessages {
     String INVALID_DISCOUNT_AMOUNT = "transaction level discount should be positive or zero";
 
     String INVALID_TAX_CODE = "The tax code entered is not recognized";
+
+    String INVALID_SORT_ORDER_PARAMETER = "sort order should be one of the following asc/desc";
 }
 

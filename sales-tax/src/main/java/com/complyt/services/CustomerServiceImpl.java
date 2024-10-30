@@ -15,6 +15,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -91,8 +92,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Flux<Customer> findAll(int page, int size) {
-        return customerRepository.findAll(page, size);
+    public Flux<Customer> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
+        return customerRepository.findAll(page, size, filterMap, sortOrder, sortBy);
     }
 
     @Override

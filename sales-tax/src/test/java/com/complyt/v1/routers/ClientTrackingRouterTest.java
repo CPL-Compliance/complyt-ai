@@ -27,10 +27,7 @@ import reactor.core.publisher.Mono;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -81,7 +78,8 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     @WithMockUser
     public void getAll_Exists_Returns200WithList() {
         // When
-        when(clientTrackingFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(clientTrackingList));
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        when(clientTrackingFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(clientTrackingList));
 
         // Then
         webTestClient
@@ -100,7 +98,8 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     @WithMockUser
     public void getAll_QueryParamInvalid_Returns400() {
         // When
-        when(clientTrackingFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(clientTrackingList));
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        when(clientTrackingFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(clientTrackingList));
 
         // Then
         webTestClient
@@ -129,7 +128,8 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     @WithMockUser
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         // When
-        when(clientTrackingFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(emptyClientTrackingList));
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        when(clientTrackingFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(emptyClientTrackingList));
 
         // Then
         webTestClient
@@ -147,7 +147,8 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     @Test
     public void getAll_UnauthenticatedUser_Returns401() {
         // When
-        when(clientTrackingFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE)).thenReturn(Flux.fromIterable(emptyClientTrackingList));
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        when(clientTrackingFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(emptyClientTrackingList));
 
         // Then
         webTestClient
@@ -165,7 +166,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // When
-        when(clientTrackingFacade.getAll(0, 0)).thenReturn(Flux.error(new OperationFailedException()));
+        when(clientTrackingFacade.getAll(0, 0, null, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient
@@ -435,7 +436,6 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     }
 
 
-
     @Override
     @Test
     @WithMockUser
@@ -448,11 +448,11 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
                         .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
-                {
-                    "name": "SKY",
-                    "tenantId": "org_nD6T71fMDbR0qTSY"
-                }
-                """)
+                        {
+                            "name": "SKY",
+                            "tenantId": "org_nD6T71fMDbR0qTSY"
+                        }
+                        """)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -474,13 +474,13 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
                         .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
-                {
-                    "nexus": {
-                        "taxableDate": "2015-06-01T00:00:00"
-                    },
-                    "tenantId": "org_nD6T71fMDbR0qTSY"
-                }
-                """)
+                        {
+                            "nexus": {
+                                "taxableDate": "2015-06-01T00:00:00"
+                            },
+                            "tenantId": "org_nD6T71fMDbR0qTSY"
+                        }
+                        """)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -501,13 +501,13 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
                         .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
-                {
-                    "nexus": {
-                        "taxableDate": "2015-06-01T00:00:00"
-                    },
-                    "name": "SKY"
-                }
-                """)
+                        {
+                            "nexus": {
+                                "taxableDate": "2015-06-01T00:00:00"
+                            },
+                            "name": "SKY"
+                        }
+                        """)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -558,14 +558,14 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
                         .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
-                {
-                    "nexus": {
-                        "taxableDate": "2015-06-01T00:00:00"
-                    },
-                    "name": "SKY",
-                    "tenantId": "org_12345"
-                }
-                """)
+                        {
+                            "nexus": {
+                                "taxableDate": "2015-06-01T00:00:00"
+                            },
+                            "name": "SKY",
+                            "tenantId": "org_12345"
+                        }
+                        """)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {

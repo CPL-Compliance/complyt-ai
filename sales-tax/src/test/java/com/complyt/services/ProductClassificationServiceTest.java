@@ -201,10 +201,12 @@ public class ProductClassificationServiceTest {
             add(firstItemProductClassification);
             add(otherProductClassification);
         }};
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         // When
         when(productClassificationRepository.findAll()).thenReturn(Flux.fromIterable(productClassifications));
-        Flux<ProductClassification> productClassificationFlux = productClassificationService.findAll(0, productClassifications.size());
+        Flux<ProductClassification> productClassificationFlux = productClassificationService.findAll(0, productClassifications.size(), filterMap, sortOrder, sortBy);
 
         // Then
         StepVerifier.create(productClassificationFlux).expectNext(firstItemProductClassification, otherProductClassification).verifyComplete();

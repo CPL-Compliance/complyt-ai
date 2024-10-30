@@ -23,6 +23,8 @@ import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -246,10 +248,12 @@ class CustomerServiceImplTest {
         // Given
         String id = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withExternalId(id);
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         // When
-        when(customerRepository.findAll(0, 1)).thenReturn(Flux.just(customer, secondCustomer));
-        Flux<Customer> customerFlux = customerServiceImpl.findAll(0, 1);
+        when(customerRepository.findAll(0, 1, filterMap, sortOrder, sortBy)).thenReturn(Flux.just(customer, secondCustomer));
+        Flux<Customer> customerFlux = customerServiceImpl.findAll(0, 1, filterMap, sortOrder, sortBy);
 
         // Then
         StepVerifier.create(customerFlux).expectNext(customer, secondCustomer).verifyComplete();
