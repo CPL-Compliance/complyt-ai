@@ -7,8 +7,8 @@ import com.complyt.business.strategy.currencyExchange.CurrenciesWebClientWrapper
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.business.transaction.BigDecimalProcessor;
-import com.complyt.business.transaction.CurrencyProcessor;
 import com.complyt.business.transaction.CityCountyProvider;
+import com.complyt.business.transaction.CurrencyProcessor;
 import com.complyt.business.transaction.DiscountCalculator;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.domain.currency.CurrencyExchangeRateObject;
@@ -16,8 +16,8 @@ import com.complyt.domain.currency.CurrencySource;
 import com.complyt.domain.transaction.ExchangeRateInfo;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
-import com.complyt.repositories.TransactionRepository;
 import com.complyt.repositories.GeoRecordRepository;
+import com.complyt.repositories.TransactionRepository;
 import com.complyt.v1.exceptions.types.CurrencyNotFoundApiException;
 import com.complyt.v1.exceptions.types.ZipCodeNotFoundApiException;
 import lombok.AccessLevel;
@@ -236,8 +236,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Transaction> injectExchangeRateIfNeeded(@NonNull final Transaction transaction) {
         return Mono.justOrEmpty(transaction.getCurrency())
-                .filter(currency -> !CurrencyProcessor.isUsdCurrency(currency))
-                .flatMap(currency -> getCurrencyExchangeRate(transaction)
+                .flatMap(currency -> CurrencyProcessor.alignCurrency(transaction))
+                .map(Transaction::getCurrency)
+                .filter(alignedCurrency -> !CurrencyProcessor.isUsdCurrency(alignedCurrency))
+                .flatMap(alignedCurrency -> getCurrencyExchangeRate(transaction)
                         .onErrorResume(e -> Mono.error(CurrencyNotFoundApiException::new))
                         .flatMap(exchangeRate -> calculateExchangeRateInfo(transaction, exchangeRate)
                                 .map(exchangeRateInfo -> {

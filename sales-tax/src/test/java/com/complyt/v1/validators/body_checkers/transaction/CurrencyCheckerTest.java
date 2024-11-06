@@ -2,7 +2,6 @@ package com.complyt.v1.validators.body_checkers.transaction;
 
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.transaction.TransactionDto;
-import com.complyt.v1.validators.body_checkers.CurrenciesEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
@@ -12,8 +11,6 @@ import testUtils.unit_test.UnitTestUtilities;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.databind.jsonFormatVisitors.JsonValueFormat.UUID;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class CurrencyCheckerTest {
 
