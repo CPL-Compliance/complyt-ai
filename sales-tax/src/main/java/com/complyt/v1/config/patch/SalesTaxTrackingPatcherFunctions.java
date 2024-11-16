@@ -14,9 +14,7 @@ public interface SalesTaxTrackingPatcherFunctions {
         return salesTaxTrackingDto.withState(convertedStateDto);
     };
 
-    BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchEnforcesSalesTax = (salesTaxTrackingDto, enforcesSalesTax) ->{
-        return salesTaxTrackingDto.withEnforcesSalesTax((Boolean) enforcesSalesTax);
-    } ;
+    BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchEnforcesSalesTax = (salesTaxTrackingDto, enforcesSalesTax) -> salesTaxTrackingDto.withEnforcesSalesTax((Boolean) enforcesSalesTax);
 
     BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchPhysicalNexusTracker = (salesTaxTrackingDto, physicalNexusTracker) -> {
         LinkedHashMap<String, Object> economicNexusTrackerDtoLinkedHashMap = (LinkedHashMap<String, Object>) physicalNexusTracker;
@@ -65,5 +63,7 @@ public interface SalesTaxTrackingPatcherFunctions {
         FilingFrequencyDto convertedFilingFrequency = (FilingFrequencyDto) ComplytObjectMapper.mapObject(filingFrequency, FilingFrequencyDto.class);
         return salesTaxTrackingDto.withFilingFrequency(convertedFilingFrequency);
     };
+
+    BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchComment = (salesTaxTrackingDto, comment) -> salesTaxTrackingDto.withComment((String) comment);
 
 }

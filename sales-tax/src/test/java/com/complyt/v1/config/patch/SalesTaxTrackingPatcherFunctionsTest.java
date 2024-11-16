@@ -170,4 +170,16 @@ public class SalesTaxTrackingPatcherFunctionsTest {
         Assertions.assertEquals(FilingFrequencyDto.MONTHLY, modifiedDto.filingFrequency());
     }
 
+    @Test
+    void patchComment_patchesCommentField_ReturnsModifiedSalesTaxTrackingDto() {
+        // Given
+        String comment = "Patched comment";
+
+        // When
+        SalesTaxTrackingDto modifiedDto = SalesTaxTrackingPatcherFunctions.patchComment.apply(salesTaxTracking, comment);
+
+        // Then
+        Assertions.assertEquals(comment, modifiedDto.comment());
+    }
+
 }
