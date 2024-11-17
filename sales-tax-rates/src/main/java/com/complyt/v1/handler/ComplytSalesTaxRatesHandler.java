@@ -44,7 +44,8 @@ public class ComplytSalesTaxRatesHandler {
                 .map(ComplytSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesToComplytSalesTaxRates)
                 .flatMap(complytSalesTaxRates -> ContextLogger.observeCtx("<-- Returned Body: " + complytSalesTaxRates, log::info)
                         .thenReturn(complytSalesTaxRates))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(ContextLogger.observeCtx("Failed to get SalesTaxRates by address", log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                 .body(complytSalesTaxRatesDto, ComplytSalesTaxRatesDto.class);

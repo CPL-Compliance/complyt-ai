@@ -276,7 +276,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, "", null, false, null, "0", item1, item2))
+                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, "12345", null, false, null, "0", item1, item2))
                 .exchange()
                 .expectStatus().isOk();
     }

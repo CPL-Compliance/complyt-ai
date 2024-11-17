@@ -41,16 +41,9 @@ public class TransactionRepository {
                 .flatMap(tenantId -> {
                     Transaction transactionWithTenantId = transaction.setTenantId(tenantId);
 
-                    return ContextLogger.observeCtx("Saving transaction: " + transactionWithTenantId.toString(), log::info)
+                    return ContextLogger.observeCtx("Saving transaction: " + transactionWithTenantId.toString(), tenantId, log::info)
                             .then(reactiveMongoTemplate.save(transactionWithTenantId));
                 });
-    }
-
-    public Flux<Transaction> saveAll(@NonNull List<Transaction> transactions) {
-        return tenantResolver.resolve()
-                .map(tenantId -> transactions.stream().map(transaction -> transaction.setTenantId(tenantId)).collect(Collectors.toList()))
-                .flatMapMany(transactionsWithTenantId -> ContextLogger.observeCtx("Saving transactions: " + transactionsWithTenantId.toString(), log::info)
-                        .thenMany(reactiveMongoTemplate.insertAll(transactionsWithTenantId)));
     }
 
     @Deprecated
@@ -60,7 +53,7 @@ public class TransactionRepository {
                     Query query = Query.query(Criteria.where("_id").is(transactionId)
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for transaction with ID " + transactionId + " and tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for transaction with ID " + transactionId + " and tenant ID " + tenantId, tenantId, log::info)
                             .then(reactiveMongoTemplate
                                     .findOne(query, Transaction.class));
                 });
@@ -73,7 +66,7 @@ public class TransactionRepository {
                             .and("source").is(source)
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for transaction with external ID " + externalId + ", source" + source + ", and tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for transaction with external ID " + externalId + ", source" + source + ", and tenant ID " + tenantId, tenantId, log::info)
                             .then(reactiveMongoTemplate
                                     .findOne(query, Transaction.class));
                 });
@@ -85,7 +78,7 @@ public class TransactionRepository {
                     Query query = Query.query(Criteria.where("complytId").is(complytId)
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for transaction with complyt ID " + complytId + " and tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for transaction with complyt ID " + complytId + " and tenant ID " + tenantId, tenantId, log::info)
                             .then(reactiveMongoTemplate
                                     .findOne(query, Transaction.class));
                 });
@@ -115,7 +108,7 @@ public class TransactionRepository {
                                     Aggregation.unwind("customer", true))
                             .withOptions(newAggregationOptions().cursorBatchSize(size).build());
 
-                    return ContextLogger.observeCtx("Searching for transactions by criteria " + criteria.getCriteriaObject() + " with page " + page + " and size " + size, log::info)
+                    return ContextLogger.observeCtx("Searching for transactions by criteria " + criteria.getCriteriaObject() + " with page " + page + " and size " + size, tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.aggregate(aggregation, Transaction.class));
                 });
     }
@@ -127,7 +120,7 @@ public class TransactionRepository {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)
                             .and("source").is(source));
 
-                    return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId + " and source " + source, log::info)
+                    return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId + " and source " + source, tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Transaction.class));
                 });
     }
@@ -136,9 +129,10 @@ public class TransactionRepository {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query updatedQuery = query.addCriteria(Criteria.where("tenantId").is(tenantId))
-                            .with(Sort.by(Sort.Direction.ASC, "externalTimestamps.createdDate"));;
+                            .with(Sort.by(Sort.Direction.ASC, "externalTimestamps.createdDate"));
+                    ;
 
-                    return ContextLogger.observeCtx("Searching for transactions by query: " + updatedQuery, log::info)
+                    return ContextLogger.observeCtx("Searching for transactions by query: " + updatedQuery, tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(updatedQuery, Transaction.class));
                 });
     }

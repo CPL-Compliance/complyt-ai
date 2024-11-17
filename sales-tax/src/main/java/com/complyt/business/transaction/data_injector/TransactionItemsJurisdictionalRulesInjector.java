@@ -5,6 +5,7 @@ import com.complyt.domain.sales_tax.product_classification.ProductClassification
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.utils.observability.ContextLogger;
+import com.complyt.v1.exceptions.types.CountryNotFoundInJurisdictionalTaxRulesApiException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;

@@ -1,9 +1,11 @@
 package io.complyt.files.v1.validators.query_params;
 
+import io.complyt.files.utils.observability.ContextLogger;
 import io.complyt.files.v1.exceptions.types.ObjectNotFoundApiException;
 import io.complyt.files.v1.exceptions.types.ObjectNotValidApiException;
 import io.complyt.files.v1.models.ComplytFileDto;
 import io.complyt.files.v1.models.ComplytFileMetadataDto;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -19,20 +21,22 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class QueryParamsExtractorFile implements QueryParamsExtractor<ComplytFileDto> {
 
-    @Override
     public Mono<ComplytFileDto> extract(@NotNull ServerRequest serverRequest) {
         return Mono.justOrEmpty(serverRequest.headers().contentType())
                 .filter(mediaType -> mediaType.isCompatibleWith(MediaType.MULTIPART_FORM_DATA))
-                .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new))
+                .switchIfEmpty(ContextLogger.observeCtx("ObjectNotFoundApiException thrown in QueryParamsExtractorFile.extract", log::error)
+                    .then(Mono.error(new ObjectNotFoundApiException())))
                 .flatMap(mediaType -> serverRequest.multipartData())
                 .flatMap(multipartData -> {
 
                     Map<String, Part> parts = multipartData.toSingleValueMap();
                     if (!parts.containsKey("file")) {
-                        return Mono.error(ObjectNotValidApiException::new);
+                        return ContextLogger.observeCtx("ObjectNotValidApiException thrown in QueryParamsExtractorFile.extract because parts " + parts + " does not contains the word 'file'", log::error)
+                            .then(Mono.error(new ObjectNotValidApiException()));
                     }
                     Part part = parts.get("file");
                     FilePart filePart = null;

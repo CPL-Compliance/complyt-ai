@@ -31,7 +31,7 @@ public class ClientTrackingRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for client tracking with tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for client tracking with tenant ID " + tenantId, tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, ClientTracking.class));
                 });
     }
@@ -41,7 +41,7 @@ public class ClientTrackingRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for client tracking with ID " + id + " and tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for client tracking with ID " + id + " and tenant ID " + tenantId, tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, ClientTracking.class));
                 });
     }
@@ -51,21 +51,25 @@ public class ClientTrackingRepository {
                 .flatMap(tenantId -> {
                     ClientTracking clientTrackingWithTenantId = clientTracking.withTenantId(tenantId);
 
-                    return ContextLogger.observeCtx("Saving client tracking " + clientTrackingWithTenantId.toString(), log::info)
+                    return ContextLogger.observeCtx("Saving client tracking " + clientTrackingWithTenantId.toString(), tenantId, log::info)
                             .then(reactiveMongoTemplate.save(clientTrackingWithTenantId));
                 });
     }
 
     public Mono<ClientTracking> saveWithoutTenant(@NonNull ClientTracking clientTracking) {
-        return ContextLogger.observeCtx("Saving client tracking " + clientTracking, log::info)
-                .then(reactiveMongoTemplate.save(clientTracking));
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> {
+                    return ContextLogger.observeCtx("Saving client tracking " + clientTracking, tenantId, log::info)
+                            .then(reactiveMongoTemplate.save(clientTracking));
+                });
     }
 
     public Flux<ClientTracking> findByName(@NonNull String name) {
         Query query = new Query(Criteria.where("name").regex("^" + Pattern.quote(name) + "$", "i"));
 
         return ContextLogger.observeCtx("Searching for client tracking by name: " + name, log::info)
-                .thenMany(reactiveMongoTemplate.find(query, ClientTracking.class));
+                            .thenMany(reactiveMongoTemplate.find(query, ClientTracking.class));
+
     }
 
     public Flux<ClientTracking> findAll(int page, int size) {
@@ -73,14 +77,15 @@ public class ClientTrackingRepository {
         Query query = new Query()
                 .limit(size)
                 .skip(calculatedOffset);
+
         return ContextLogger.observeCtx("Searching for all client tracking", log::info)
-                .thenMany(reactiveMongoTemplate.find(query, ClientTracking.class));
+                            .thenMany(reactiveMongoTemplate.find(query, ClientTracking.class));
     }
 
     public Mono<ClientTracking> findByTenantId(@NonNull String tenantId) {
         Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
-        return ContextLogger.observeCtx("Searching for client tracking by tenant ID: " + tenantId, log::info)
+        return ContextLogger.observeCtx("Searching for client tracking by tenant ID: " + tenantId, tenantId, log::info)
                 .then(reactiveMongoTemplate.findOne(query, ClientTracking.class));
     }
 

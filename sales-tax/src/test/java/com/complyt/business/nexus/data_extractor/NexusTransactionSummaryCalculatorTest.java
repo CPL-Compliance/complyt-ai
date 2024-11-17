@@ -77,7 +77,7 @@ class NexusTransactionSummaryCalculatorTest {
         ExchangeRateInfo euroExchangeRateInfo = unitTestUtilities.createEuroExchangeRateInfo(transaction);
         Transaction givenTransaction = transaction.withCurrency("EUR").withExchangeRateInfo(euroExchangeRateInfo);
         TransactionNexusSummary transactionNexusSummary = new TransactionNexusSummary(
-                givenTransaction.getExchangeRateInfo().totalItemsAmountInUSD(),
+                givenTransaction.getExchangeRateInfo().totalItemsAmountInUsd(),
                 givenTransaction.getExternalTimestamps().getCreatedDate(),
                 givenTransaction.getTransactionType());
 

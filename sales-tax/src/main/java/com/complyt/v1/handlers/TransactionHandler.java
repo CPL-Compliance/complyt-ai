@@ -55,7 +55,8 @@ public class TransactionHandler {
                 .switchIfEmpty(Mono.defer(() -> transactionFacade.findByExternalIdAndSource(externalId, source))
                         .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
                         .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto))
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to get transaction by externalId " + externalId + " and source " + source, log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException()))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoMono, TransactionDto.class);
     }
@@ -108,7 +109,8 @@ public class TransactionHandler {
                 .switchIfEmpty(Mono.defer(() -> transactionFacade.findByComplytId(UUID.fromString(complytIdAsString))
                         .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
                         .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto))
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()))));
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to get transaction by complytId " + complytIdAsString, log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException())))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoMono, TransactionDto.class);
     }
@@ -148,8 +150,8 @@ public class TransactionHandler {
                 .then(transactionDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Mono.defer(() -> transactionFacade.markAsCancelled(externalId, source))
                         .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
-
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to delete transaction by externalId " + externalId + " and source " + source, log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException()))));
 
         return transactionDtoMono.switchIfEmpty(transactionDtoMono)
                 .flatMap(response -> ServerResponse.noContent().build()

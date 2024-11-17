@@ -313,7 +313,7 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                 "currency": "EUR",
                 "refRate": null
                 "exchangeRateInfo": {
-                     "totalItemsAmountInUSD": 0,
+                     "totalItemsAmountInUsd": 0,
                      "transactionSalesTaxInUsd": 0,
                      "finalTransactionAmountInUsd": 0,
                      "fromCurrency": "EUR",

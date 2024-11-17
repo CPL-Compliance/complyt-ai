@@ -511,7 +511,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
         CustomerDto customerDto = ITUtilities.stubCustomerDto(externalId)
                 .withCustomerType(null).withName(null);
         Set<String> expectedErrors = Set.of(
-                "name " + DtoErrorMessages.NOT_NULL_ERROR,
                 "customerType " + DtoErrorMessages.NOT_NULL_ERROR
         );
 

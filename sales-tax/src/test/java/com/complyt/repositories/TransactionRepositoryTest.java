@@ -101,23 +101,6 @@ class TransactionRepositoryTest {
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
     }
 
-    @Test
-    void insertAll_InsertsTwoTransactions_ReturnsTwoTransactions() {
-        // Given
-        String externalId = UUID.randomUUID().toString();
-        Transaction secondTransaction = transaction.withExternalId(externalId);
-        List<Transaction> allTransactions = new ArrayList<>();
-        allTransactions.add(transaction);
-        allTransactions.add(secondTransaction);
-
-        // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
-        when(reactiveMongoTemplate.insertAll(allTransactions)).thenReturn(Flux.fromIterable(allTransactions));
-        Flux<Transaction> transactionFlux = transactionRepository.saveAll(allTransactions);
-
-        // Then
-        StepVerifier.create(transactionFlux).expectNextCount(2).verifyComplete();
-    }
 
     @Test
     void save_TransactionSaved_TransactionReturned() {
@@ -348,18 +331,6 @@ class TransactionRepositoryTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transactionId is marked non-null but is null");
-    }
-
-    @Test
-    void saveAll_NullListGiven_ThrowsNullPointerException() {
-        // Given
-        List<Transaction> nullTransactions = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionRepository.saveAll(nullTransactions));
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "transactions is marked non-null but is null");
     }
 
 }

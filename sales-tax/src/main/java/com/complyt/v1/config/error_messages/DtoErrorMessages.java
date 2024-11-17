@@ -18,7 +18,8 @@ public interface DtoErrorMessages {
 
     String COMPLYT_ID_IN_A_NEW_RECORD_ERROR = "new record cannot have a complytId field";
 
-    String NON_PARTIAL_ERROR_SUFFIX = "in a non partial address"; // Appended to other errors messages
+    String NON_PARTIAL_ERROR_SUFFIX = "in a non partial address."; // Appended to other errors messages
+    String PARTIAL_ERROR_SUFFIX = "in a partial address."; // Appended to other errors messages
 
     String ISO8601_FORMAT_ERROR = "is in an illegal format - " +
             "For date/time fields please provide a " + FieldsDescriptions.TIMESTAMP_FORMAT;
@@ -47,7 +48,9 @@ public interface DtoErrorMessages {
 
     String STATE_MUST_NOT_BE_NULL_USA = "in usa addresses state must not be null";
 
-    String STATE_NOT_RECOGNIZED_USA = "in usa address is not recognized";
+    String STATE_NOT_RECOGNIZED_USA = "in usa address is not recognized.";
+
+    String ZIP_NOT_IN_FORMAT = "format is incorrect.";
 
     String STATE_NOT_RECOGNIZED_OR_INVALID_COMBINATION = STATE_NOT_RECOGNIZED_USA + " or an invalid combination";
 
@@ -62,4 +65,5 @@ public interface DtoErrorMessages {
     String INVALID_SORT_ORDER_PARAMETER = "should be one of the following asc/desc";
 
     String ITEMS_MISSING_TOTAL_OR_QUANTITY_AND_UNITPRICE = "All items should have either total price OR quantity and unitPrice";
+
 }

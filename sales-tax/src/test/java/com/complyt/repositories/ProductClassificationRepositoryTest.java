@@ -3,6 +3,7 @@ package com.complyt.repositories;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
+import com.complyt.security.TenantResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +35,9 @@ public class ProductClassificationRepositoryTest {
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
 
+    @Mock
+    TenantResolver tenantResolver;
+
     ProductClassification productClassification;
     UnitTestUtilities testUtilities;
 
@@ -56,6 +60,7 @@ public class ProductClassificationRepositoryTest {
         Query query = Query.query(Criteria.where("taxCode").is(taxCode));
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just("Some tenantId"));
         when(reactiveMongoTemplate.findOne(query, ProductClassification.class)).thenReturn(Mono.just(productClassification));
         Mono<ProductClassification> productClassificationMono = productClassificationRepository.findOneByTaxCode(taxCode);
 
@@ -87,6 +92,7 @@ public class ProductClassificationRepositoryTest {
         Query query = Query.query(Criteria.where("_id").is(id));
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just("Some tenantId"));
         when(reactiveMongoTemplate.findOne(query, ProductClassification.class)).thenReturn(Mono.just(productClassification));
         Mono<ProductClassification> actualClassification = productClassificationRepository.findById(id);
 
@@ -112,6 +118,7 @@ public class ProductClassificationRepositoryTest {
         ProductClassification productClassificationNoId = productClassification.withId(null);
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just("Some tenantId"));
         when(reactiveMongoTemplate.save(productClassificationNoId)).thenReturn(Mono.just(productClassification));
         Mono<ProductClassification> actualClassification = productClassificationRepository.save(productClassificationNoId);
 

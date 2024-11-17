@@ -44,7 +44,8 @@ public class ComplytGtRatesHandler {
                 .map(ComplytGtRatesMapper.INSTANCE::complytGstRatesToComplytGstRatesDto)
                 .flatMap(complytGstRatesDto -> ContextLogger.observeCtx("<-- Returned Body: " + complytGstRatesDto, log::info)
                         .thenReturn(complytGstRatesDto))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(ContextLogger.observeCtx("Failed to get GtRates by address", log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                 .body(complytGtRatesDtoMono, ComplytGtRatesDto.class);

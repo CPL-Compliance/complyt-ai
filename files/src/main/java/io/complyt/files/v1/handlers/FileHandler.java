@@ -49,7 +49,8 @@ public class FileHandler {
         Mono<FileDto> value = ContextLogger.observeCtx(logStr, log::info).then(fileService.find())
                 .map(FileMapper.INSTANCE::fileToFileDto)
                 .flatMap(fileDto -> ContextLogger.observeCtx("<-- Returned Body: " + fileDto.toString(), log::info).thenReturn(fileDto))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(ContextLogger.observeCtx("Failed to get file", log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().body(value, FileDto.class);
     }
@@ -76,7 +77,8 @@ public class FileHandler {
                 .flatMap(complytFileFacade::saveFile)
                 .map(ComplytFileMapper.INSTANCE::complytFileMetadataToComplytFileMetadataDto)
                 .flatMap(complytFileMetadataDto -> ContextLogger.observeCtx("<-- Returned Body: " + complytFileMetadataDto.toString(), log::info).thenReturn(complytFileMetadataDto))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(ContextLogger.observeCtx("Failed to saveFile", log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
         return ServerResponse.created(URI.create(FileRouter.COMPLYT_FILE_BASE_URL)).body(value, ComplytFileMetadataDto.class);
     }
 
@@ -86,7 +88,8 @@ public class FileHandler {
                 .then(complytFileFacade.getSignedLinkForFile(UUID.fromString(serverRequest.pathVariable("complytId"))))
                 .map(ComplytFileMapper.INSTANCE::complytFileMetadataToComplytFileMetadataDto)
                 .flatMap(complytFileMetadataDto -> ContextLogger.observeCtx("<-- Returned Body: " + complytFileMetadataDto.toString(), log::info).thenReturn(complytFileMetadataDto))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(ContextLogger.observeCtx("Failed to getFileWithSignedLink", log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
         return ServerResponse.ok().body(value, ComplytFileMetadata.class);
     }
 
@@ -96,7 +99,8 @@ public class FileHandler {
                 .then(complytFileFacade.markAsDeleted(UUID.fromString(serverRequest.pathVariable("complytId"))))
                 .map(ComplytFileMapper.INSTANCE::complytFileMetadataToComplytFileMetadataDto)
                 .flatMap(complytFileMetadataDto -> ContextLogger.observeCtx("<-- Returned Body: " + complytFileMetadataDto.toString(), log::info).thenReturn(complytFileMetadataDto))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(ContextLogger.observeCtx("Failed to markAsDeleted file", log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
         return ServerResponse.ok().body(value, ComplytFileMetadata.class);
     }
 }

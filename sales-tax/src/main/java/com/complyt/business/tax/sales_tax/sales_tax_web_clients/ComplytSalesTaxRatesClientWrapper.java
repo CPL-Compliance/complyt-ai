@@ -5,6 +5,7 @@ import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.transaction.Address;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
+import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
 import feign.FeignException;
@@ -12,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -20,6 +22,7 @@ import java.time.Duration;
 
 @EqualsAndHashCode
 @AllArgsConstructor
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Component
 public class ComplytSalesTaxRatesClientWrapper implements SalesTaxRatesWebClientWrapper<ComplytSalesTaxRates> {
@@ -35,7 +38,10 @@ public class ComplytSalesTaxRatesClientWrapper implements SalesTaxRatesWebClient
                                 ((retryBackoffSpec, retrySignal) ->
                                         new ComplytSalesTaxRatesException(retrySignal.totalRetries() + " Retries Exhausted")
                                 ))).map(ComplytSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesDtoToComplytSalesTaxRates)
-                .onErrorMap(FeignException.NotFound.class, notFound -> new ObjectNotFoundApiException());
+                .onErrorResume(FeignException.NotFound.class, notFound -> {
+                    ContextLogger.observeCtx("Failed to find ComplytSalesTaxRates by country " + country + " and region " + region, log::error);
+                    return Mono.error(new ObjectNotFoundApiException());
+                });
     }
 
     @Override

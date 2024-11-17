@@ -174,6 +174,7 @@ public class ClientTrackingRepositoryTest {
         ClientTracking clientTrackingNoId = clientTracking.withId(null).withTenantId(tenantId);
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just("Some tenantId"));
         when(reactiveMongoTemplate.save(clientTrackingNoId)).thenReturn(Mono.just(clientTracking));
 
         // Then

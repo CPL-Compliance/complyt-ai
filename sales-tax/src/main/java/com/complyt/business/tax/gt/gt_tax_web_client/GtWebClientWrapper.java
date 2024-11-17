@@ -6,6 +6,7 @@ import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.tax.ComplytGtRates;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
+import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.ComplytGtRatesMapper;
 import feign.FeignException;
@@ -13,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
@@ -20,6 +22,7 @@ import java.time.Duration;
 
 @EqualsAndHashCode
 @AllArgsConstructor
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GtWebClientWrapper implements SalesTaxRatesWebClientWrapper<ComplytGtRates> {
 
@@ -32,11 +35,14 @@ public class GtWebClientWrapper implements SalesTaxRatesWebClientWrapper<Complyt
         return salesTaxRatesServiceProxy.findGtByAddress(standardizedCountry, region)
                 .retryWhen(Retry.backoff(5, Duration.ofMillis(10))
                         .filter(throwable -> !(throwable instanceof FeignException.NotFound))
-                        .onRetryExhaustedThrow(
-                                ((retryBackoffSpec, retrySignal) ->
-                                        new ComplytSalesTaxRatesException(retrySignal.totalRetries() + " Retries Exhausted")
-                                ))).map(ComplytGtRatesMapper.INSTANCE::complytGtRatesDtoToComplytGtRates)
-                .onErrorMap(FeignException.NotFound.class, notFound -> new ObjectNotFoundApiException());
+                        .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) ->
+                                new ComplytSalesTaxRatesException(retrySignal.totalRetries() + " Retries Exhausted")
+                        ))
+                .map(ComplytGtRatesMapper.INSTANCE::complytGtRatesDtoToComplytGtRates)
+                .onErrorResume(FeignException.NotFound.class, notFound -> {
+                    ContextLogger.observeCtx("Failed to find ComplytGtRates by country " + country + " and region " + region, log::error);
+                    return Mono.error(new ObjectNotFoundApiException());
+                });
     }
 
     @Override

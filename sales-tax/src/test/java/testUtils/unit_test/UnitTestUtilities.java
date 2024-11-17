@@ -222,8 +222,8 @@ public class UnitTestUtilities {
 
     public Transaction createTransaction(String id) {
         String documentName = "INVUS1000";
-        Address billingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
-        Address shippingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
+        Address billingAddress = new Address("City", "USA", "County", "CA", "Street", "10000", "", false);
+        Address shippingAddress = new Address("City", "USA", "County", "CA", "Street", "10000", "", false);
         List<Item> items = createItems(true, false, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false, false);
@@ -281,8 +281,8 @@ public class UnitTestUtilities {
 
     public TransactionDto createTransactionDto(String id) {
         String documentName = "INVUS1000";
-        OptionalAddressDto billingAddress = new OptionalAddressDto("City", "USA", "County", "CA", "Street", "", "Zip", false);
-        MandatoryAddressDto shippingAddress = new MandatoryAddressDto("City", "USA", "County", "CA", "Street", "", "Zip", false);
+        OptionalAddressDto billingAddress = new OptionalAddressDto("City", "USA", "County", "CA", "Street", "", "10000", false);
+        MandatoryAddressDto shippingAddress = new MandatoryAddressDto("City", "USA", "County", "CA", "Street", "", "10000", false);
         List<ItemDto> items = createItemDtos(true, false, false);
         TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);

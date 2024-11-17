@@ -215,5 +215,4 @@ public interface StateMap {
         put("WYOOMING", "Wyoming");
         put("WIOMING", "Wyoming");
     }};
-
 }

@@ -43,7 +43,8 @@ class TransactionDtoShippingAddressCheckerTest {
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithoutZip);
 
         StepVerifier.create(errorMessages)
-                .expectNext("Address.zip may not be blank in a non partial address")
+                .expectNext("Address.zip may not be blank in a partial address. Invalid value: null")
+                .expectNext("Address.zip format is incorrect. Invalid value: null")
                 .verifyComplete();
     }
 
@@ -56,7 +57,7 @@ class TransactionDtoShippingAddressCheckerTest {
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithoutZip);
 
         StepVerifier.create(errorMessages)
-                .expectNext("Address.state in usa address is not recognized")
+                .expectNext("Address.state in usa address is not recognized. Invalid value: Invalid State")
                 .verifyComplete();
     }
 
@@ -104,8 +105,9 @@ class TransactionDtoShippingAddressCheckerTest {
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithoutZip);
 
         StepVerifier.create(errorMessages)
-                .expectNext("Address.zip may not be blank in a non partial address")
-                .expectNext("Address.state in usa address is not recognized")
+                .expectNext("Address.zip may not be blank in a non partial address. Invalid value: null")
+                .expectNext("Address.zip format is incorrect. Invalid value: null")
+                .expectNext("Address.state in usa address is not recognized. Invalid value: Invalid State")
                 .verifyComplete();
     }
 
@@ -118,10 +120,10 @@ class TransactionDtoShippingAddressCheckerTest {
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithoutZip);
 
         StepVerifier.create(errorMessages)
-                .expectNext("Address.state may not be blank in a non partial address")
-                .expectNext("Address.street may not be blank in a non partial address")
-                .expectNext("Address.city may not be blank in a non partial address")
-                .expectNext("Address.state in usa address is not recognized")
+                .expectNext("Address.state may not be blank in a non partial address. Invalid value: null")
+                .expectNext("Address.street may not be blank in a non partial address. Invalid value: null")
+                .expectNext("Address.city may not be blank in a non partial address. Invalid value: null")
+                .expectNext("Address.state in usa address is not recognized. Invalid value: null")
                 .verifyComplete();
     }
 
@@ -134,7 +136,8 @@ class TransactionDtoShippingAddressCheckerTest {
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithMissingZipAndBlankState);
 
         StepVerifier.create(errorMessages)
-                .expectNext("Address.zip may not be blank in a non partial address")
+                .expectNext("Address.zip may not be blank in a partial address. Invalid value: null")
+                .expectNext("Address.zip format is incorrect. Invalid value: null")
                 .verifyComplete();
     }
 
@@ -160,7 +163,7 @@ class TransactionDtoShippingAddressCheckerTest {
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithBlankCity);
 
         StepVerifier.create(errorMessages)
-                .expectNext("Address.city may not be blank in a non partial address")
+                .expectNext("Address.city may not be blank in a non partial address. Invalid value: ")
                 .verifyComplete();
     }
 
@@ -173,7 +176,8 @@ class TransactionDtoShippingAddressCheckerTest {
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithEmptyFields);
 
         StepVerifier.create(errorMessages)
-                .expectNext("Address.zip may not be blank in a non partial address")
+                .expectNext("Address.zip may not be blank in a partial address. Invalid value: ")
+                .expectNext("Address.zip format is incorrect. Invalid value: ")
                 .verifyComplete(); // No specific error for empty fields in partial addresses
     }
 
@@ -186,11 +190,12 @@ class TransactionDtoShippingAddressCheckerTest {
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithAllFieldsMissing);
 
         StepVerifier.create(errorMessages)
-                .expectNext("Address.state may not be blank in a non partial address")
-                .expectNext("Address.street may not be blank in a non partial address")
-                .expectNext("Address.city may not be blank in a non partial address")
-                .expectNext("Address.zip may not be blank in a non partial address")
-                .expectNext("Address.state in usa address is not recognized")
+                .expectNext("Address.state may not be blank in a non partial address. Invalid value: null")
+                .expectNext("Address.street may not be blank in a non partial address. Invalid value: null")
+                .expectNext("Address.city may not be blank in a non partial address. Invalid value: null")
+                .expectNext("Address.zip may not be blank in a non partial address. Invalid value: null")
+                .expectNext("Address.zip format is incorrect. Invalid value: null")
+                .expectNext("Address.state in usa address is not recognized. Invalid value: null")
                 .verifyComplete();
     }
 
@@ -203,7 +208,34 @@ class TransactionDtoShippingAddressCheckerTest {
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithNullZipAndValidState);
 
         StepVerifier.create(errorMessages)
-                .expectNext("Address.zip may not be blank in a non partial address")
+                .expectNext("Address.zip may not be blank in a partial address. Invalid value: null")
+                .expectNext("Address.zip format is incorrect. Invalid value: null")
+                .expectComplete().verify(); // No error for partial address with null zip if state is valid
+    }
+
+    @Test
+    void check_PartialAddressWithLongZip_ShouldReturnEmpty() {
+        // Given
+        MandatoryAddressDto address = new MandatoryAddressDto(null, "USA", null, "CO", null, null, "1232434324324-3424123", true);
+        TransactionDto transactionDtoWithNullZipAndValidState = transactionDto.withShippingAddress(address);
+
+        Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithNullZipAndValidState);
+
+        StepVerifier.create(errorMessages)
+                .expectNext("Address.zip format is incorrect. Invalid value: 1232434324324-3424123")
+                .expectComplete().verify(); // No error for partial address with null zip if state is valid
+    }
+
+    @Test
+    void check_PartialAddressWithLettersInZip_ShouldReturnEmpty() {
+        // Given
+        MandatoryAddressDto address = new MandatoryAddressDto(null, "USA", null, "CO", null, null, "1a2b3", true);
+        TransactionDto transactionDtoWithNullZipAndValidState = transactionDto.withShippingAddress(address);
+
+        Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithNullZipAndValidState);
+
+        StepVerifier.create(errorMessages)
+                .expectNext("Address.zip format is incorrect. Invalid value: 1a2b3")
                 .expectComplete().verify(); // No error for partial address with null zip if state is valid
     }
 

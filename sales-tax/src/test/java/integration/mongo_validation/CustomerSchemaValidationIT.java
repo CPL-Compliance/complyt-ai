@@ -76,17 +76,6 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
                 .verify();
     }
 
-
-
-    @Test
-    public void saveCustomer_MissingRequiredName_throwsValidationError() {
-        customerDocument.remove("name");
-
-        StepVerifier.create(reactiveMongoTemplate.save(customerDocument, "customer"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
     @Test
     public void saveCustomer_MissingRequiredTenantId_throwsValidationError() {
         customerDocument.remove("tenantId");

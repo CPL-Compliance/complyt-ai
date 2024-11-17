@@ -51,7 +51,8 @@ public class ApiKeyHandler {
                 .flatMap(apiKeyFacade::saveNewCredentials)
                 .map(ApiKeyMapper.INSTANCE::apiKeyToApiKeyDto)
                 .flatMap(apiKeyDto -> ContextLogger.observeCtx("<-- Returned Body: " + apiKeyDto.toString(), log::info).thenReturn(apiKeyDto))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(ContextLogger.observeCtx("Failed to post ApiKey", log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.created(URI.create(ApiKeyRouter.BASE_URL)).body(value, TokenDto.class);
     }
@@ -79,7 +80,8 @@ public class ApiKeyHandler {
                 .flatMap(apiKeyFacade::rotateCredentials)
                 .map(ApiKeyMapper.INSTANCE::apiKeyToApiKeyDto)
                 .flatMap(apiKeyDto -> ContextLogger.observeCtx("<-- Returned Body: " + apiKeyDto.toString(), log::info).thenReturn(apiKeyDto))
-                .switchIfEmpty(Mono.error(new ApiKeyNotValidException()));
+                .switchIfEmpty(ContextLogger.observeCtx("Failed to rotate ApiKey", log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.created(URI.create(ApiKeyRouter.BASE_URL)).body(value, TokenDto.class);
     }

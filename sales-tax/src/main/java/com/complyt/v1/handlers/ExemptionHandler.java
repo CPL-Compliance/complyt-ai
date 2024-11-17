@@ -62,7 +62,8 @@ public class ExemptionHandler {
                 .switchIfEmpty(Mono.defer(() -> exemptionFacade.findByComplytId(UUID.fromString(complytId)))
                         .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
                         .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto))
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to find exemption by complytId " + complytId, log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException()))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(exemptionDtoMono, ExemptionDto.class);
     }
@@ -80,7 +81,8 @@ public class ExemptionHandler {
                 })
                 .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
                 .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(ContextLogger.observeCtx("Failed to update exemption by complytId " + complytId, log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(exemptionDtoMono, ExemptionDto.class);
     }
@@ -97,7 +99,8 @@ public class ExemptionHandler {
                 })
                 .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
                 .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(ContextLogger.observeCtx("Failed to create exemption", log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.created(URI.create(ExemptionRouter.BASE_URL)).contentType(MediaType.APPLICATION_JSON).body(exemptionDtoFlux, ExemptionDto.class);
     }
@@ -135,7 +138,8 @@ public class ExemptionHandler {
                 .then(exemptionDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Mono.defer(() -> exemptionFacade.markAsCancelled(UUID.fromString(complytId)))
                         .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to delete exemption by complytId " + complytId, log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException()))));
 
         return exemptionDtoMono.switchIfEmpty(exemptionDtoMono)
                 .flatMap(response -> ServerResponse.noContent().build()
@@ -156,7 +160,8 @@ public class ExemptionHandler {
                                 .flatMap(exemptionDto -> exemptionFacade.update(ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto), UUID.fromString(complytId)))
                                 .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
                                 .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto)))
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to patch exemption by complytId " + complytId, log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException()))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(exemptionDtoMono, ExemptionDto.class);
     }

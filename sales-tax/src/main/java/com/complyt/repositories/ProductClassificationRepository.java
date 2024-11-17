@@ -1,6 +1,7 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
+import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -20,11 +21,17 @@ public class ProductClassificationRepository {
     @NonNull
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
+    @NonNull
+    TenantResolver tenantResolver;
+
     public Mono<ProductClassification> findOneByTaxCode(String taxCode) {
         Query query = Query.query(Criteria.where("taxCode").is(taxCode));
 
-        return ContextLogger.observeCtx("Searching for product classification with tax code " + taxCode, log::debug)
-                .then(reactiveMongoTemplate.findOne(query, ProductClassification.class));
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> {
+                    return ContextLogger.observeCtx("Searching for product classification with tax code " + taxCode, tenantId, log::debug)
+                            .then(reactiveMongoTemplate.findOne(query, ProductClassification.class));
+                });
     }
 
     public Flux<ProductClassification> findAll() {
@@ -34,12 +41,18 @@ public class ProductClassificationRepository {
     public Mono<ProductClassification> findById(@NonNull String id) {
         Query query = Query.query(Criteria.where("_id").is(id));
 
-        return ContextLogger.observeCtx("Searching for a product classification with ID " + id, log::info)
-                .then(reactiveMongoTemplate.findOne(query, ProductClassification.class));
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> {
+                    return ContextLogger.observeCtx("Searching for a product classification with ID " + id, tenantId, log::info)
+                            .then(reactiveMongoTemplate.findOne(query, ProductClassification.class));
+                });
     }
 
     public Mono<ProductClassification> save(@NonNull ProductClassification productClassification) {
-        return ContextLogger.observeCtx("Saving product classification " + productClassification, log::info)
-                .then(reactiveMongoTemplate.save(productClassification));
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> {
+                    return ContextLogger.observeCtx("Saving product classification " + productClassification, tenantId, log::info)
+                            .then(reactiveMongoTemplate.save(productClassification));
+                });
     }
 }
