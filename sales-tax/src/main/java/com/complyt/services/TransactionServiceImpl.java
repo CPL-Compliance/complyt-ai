@@ -6,10 +6,7 @@ import com.complyt.business.strategy.StrategySelector;
 import com.complyt.business.strategy.currencyExchange.CurrenciesWebClientWrapper;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
-import com.complyt.business.transaction.BigDecimalProcessor;
-import com.complyt.business.transaction.CityCountyProvider;
-import com.complyt.business.transaction.CurrencyProcessor;
-import com.complyt.business.transaction.DiscountCalculator;
+import com.complyt.business.transaction.*;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.domain.currency.CurrencyExchangeRateObject;
 import com.complyt.domain.currency.CurrencySource;
@@ -136,10 +133,8 @@ public class TransactionServiceImpl implements TransactionService {
     private Mono<Transaction> injectCommonDataToTransaction(Transaction transaction) {
         return injectStateIfMissingInPartialAddress(transaction)
                 .flatMap(this::recalculateTotalItemsPrice)
-                .map(transactionWithCalculatedItems ->
-                        (Transaction) shippingAddressAlignmentStrategy.select(transaction).apply(transactionWithCalculatedItems))
-                .flatMap(transactionWithCalculatedItemsAndShippingAddress ->
-                        productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItemsAndShippingAddress)
+                .map(transactionWithCalculatedItems -> (Transaction) shippingAddressAlignmentStrategy.select(transaction).apply(transactionWithCalculatedItems))
+                .flatMap(transactionWithCalculatedItemsAndShippingAddress -> productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItemsAndShippingAddress)
                                 .map(finalTransactionAmountCollector::collect)
                                 .flatMap(transactionWithAmounts -> CountryIsUsaChecker.isCountryUsa(transactionWithAmounts.getShippingAddress()) ?
                                         cityCountyProvider.provide(transactionWithAmounts) :
@@ -155,7 +150,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     private Mono<Transaction> injectStateIfMissingInPartialAddress(Transaction transaction) {
         return CountryIsUsaChecker.isCountryUsa(transaction.getShippingAddress()) && (transaction.getShippingAddress().state() == null || transaction.getShippingAddress().state().isEmpty()) ?
-                geoRecordRepository.findStateByZip(transaction.getShippingAddress().zip())
+                ZipCodeProcessor.get5DigitZipCode(transaction.getShippingAddress().zip())
+                        .flatMap(zip -> geoRecordRepository.findStateByZip(zip))
                         .map(geoRecord -> transaction.setShippingAddress(transaction.getShippingAddress().withState(geoRecord.getState())))
                         .switchIfEmpty(Mono.error(ZipCodeNotFoundApiException::new)) :
                 Mono.just(transaction);

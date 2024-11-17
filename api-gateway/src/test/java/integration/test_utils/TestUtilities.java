@@ -462,7 +462,7 @@ public class TestUtilities {
                 Arrays.toString(items),
                 country,
                 state != null ? state : "CA",
-                zip != null ? state : "90210",
+                zip != null ? zip : "90210",
                 region,
                 customerId,
                 isValidated ? "\"transactionType\": \"INVOICE\"," : "",

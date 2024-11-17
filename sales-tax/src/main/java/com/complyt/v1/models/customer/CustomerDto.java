@@ -23,7 +23,7 @@ public record CustomerDto(
         @Schema(description = FieldsDescriptions.COMPLYT_ID + "customer") UUID complytId,
         @Schema(description = FieldsDescriptions.EXTERNAL_ID) @NotNull(message = "externalId " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "externalId " + StringErrorMessages.MINMAX_256_ERROR) String externalId,
         @Schema(description = FieldsDescriptions.SOURCE) @NotNull(message = "source " + DtoErrorMessages.NOT_NULL_ERROR) @Pattern(regexp = "^(?:[1-9]|1[0-5])$", message = DtoErrorMessages.SOURCE_FORMAT_ERROR) String source,
-        @Schema(description = FieldsDescriptions.NAME_OF_CUSTOMER) @NotNull(message = "name " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "name " + StringErrorMessages.MINMAX_256_ERROR) String name,
+        @Schema(description = FieldsDescriptions.NAME_OF_CUSTOMER) @Size(min = 1, max = 256, message = "name " + StringErrorMessages.MINMAX_256_ERROR) String name,
         @Schema(ref = "addressOfCustomer") @Valid OptionalAddressDto address,
         @Schema(description = FieldsDescriptions.EMAIL) @Email String email,
         @NotNull(message = "customerType " + DtoErrorMessages.NOT_NULL_ERROR) CustomerTypeDto customerType,

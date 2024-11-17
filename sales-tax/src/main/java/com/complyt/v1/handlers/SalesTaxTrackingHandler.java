@@ -64,7 +64,8 @@ public class SalesTaxTrackingHandler {
                 .then(CountryIsUsaChecker.isCountryUsa(country) ? salesTaxTrackingDtoValidationHandler.validateQueryParam("state", state) : Mono.just(""))
                 .then(Mono.defer(() -> salesTaxTrackingFacade.findByCountryAndState(country, state, subsidiary)
                         .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()))));
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to get salesTaxTracking by country " + country + ", state " + state + " and subsidiary " + subsidiary, log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException())))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
 
@@ -79,7 +80,8 @@ public class SalesTaxTrackingHandler {
                 .then(salesTaxTrackingDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Mono.defer(() -> salesTaxTrackingFacade.findByComplytId(UUID.fromString(complytId)))
                         .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to get salesTaxTracking by complytId " + complytId, log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException()))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
     }
@@ -150,7 +152,8 @@ public class SalesTaxTrackingHandler {
                         .map(DateWrapperToLocalDateMapper.INSTANCE::dateWrapperToLocalDateWrapper)
                         .flatMap(dateWrapper -> salesTaxTrackingFacade.refreshNexusSummary(country, state, dateWrapper.date(), subsidiary)
                                 .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                                .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new))));
+                                .switchIfEmpty(ContextLogger.observeCtx("Failed to refresh salesTaxTracking by country " + country + ", state " + state + " and subsidiary " + subsidiary, log::error)
+                                        .then(Mono.error(new ObjectNotFoundApiException())))));
 
         return ServerResponse.ok().body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
     }
@@ -173,7 +176,8 @@ public class SalesTaxTrackingHandler {
                                 .flatMap(salesTaxTrackingDto -> salesTaxTrackingFacade.update(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto), existingSalesTaxTracking))
                                 .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
                                 .flatMap(salesTaxTrackingDto -> ContextLogger.observeCtx("<-- Returned Body: " + salesTaxTrackingDto, log::info).thenReturn(salesTaxTrackingDto)))
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to patch salesTaxTracking by country " + country + ", state " + state + " and subsidiary " + subsidiary, log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException()))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
     }

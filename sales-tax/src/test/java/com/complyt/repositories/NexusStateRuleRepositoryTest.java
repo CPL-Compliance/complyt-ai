@@ -2,6 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.security.TenantResolver;
 import com.complyt.utils.query.CountryAndStateCriteriaBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,9 @@ public class NexusStateRuleRepositoryTest {
     @Mock
     CountryAndStateCriteriaBuilder countryQueryBuilder;
 
+    @Mock
+    private TenantResolver tenantResolver;
+
     NexusStateRule nexusStateRule;
     UnitTestUtilities testUtilities;
 
@@ -59,6 +63,7 @@ public class NexusStateRuleRepositoryTest {
         String id = nexusStateRule.id();
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just("Some tenantId"));
         when(reactiveMongoTemplate.findById(id, NexusStateRule.class)).thenReturn(Mono.just(nexusStateRule));
         Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.findById(id);
 
@@ -90,6 +95,7 @@ public class NexusStateRuleRepositoryTest {
         Query query = Query.query(criteria);
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just("Some tenantId"));
         when(countryQueryBuilder.build(country, state)).thenReturn(criteria);
         when(reactiveMongoTemplate.findOne(query, NexusStateRule.class)).thenReturn(Mono.just(nexusStateRule));
         Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.findByCountryAndState(country, state);
@@ -109,6 +115,7 @@ public class NexusStateRuleRepositoryTest {
         Query query = Query.query(criteria);
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just("Some tenantId"));
         when(countryQueryBuilder.build(country, state)).thenReturn(criteria);
         when(reactiveMongoTemplate.findOne(query, NexusStateRule.class)).thenReturn(Mono.just(nexusStateRule));
         Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.findByCountryAndState(country, state);
@@ -127,6 +134,7 @@ public class NexusStateRuleRepositoryTest {
                 Criteria.where("state.name").is(nexusStateRule.state().getName()));
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just("Some tenantId"));
         when(reactiveMongoTemplate.aggregate(any(), eq(NexusStateRule.class))).thenReturn(Flux.just(mostRecentNexusStateRule, nexusStateRule));
         when(countryQueryBuilder.build(country, state)).thenReturn(criteria);
         Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.findMostRecentByCountryAndState(country, state);
@@ -145,6 +153,7 @@ public class NexusStateRuleRepositoryTest {
                 Criteria.where("state.name").is(nexusStateRule.state().getName()));
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just("Some tenantId"));
         when(reactiveMongoTemplate.aggregate(any(), eq(NexusStateRule.class))).thenReturn(Flux.just(mostRecentNexusStateRule, nexusStateRule));
         when(countryQueryBuilder.build(country, state)).thenReturn(criteria);
         Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.findMostRecentByCountryAndState(country, state);
@@ -185,6 +194,7 @@ public class NexusStateRuleRepositoryTest {
         // Given
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just("Some tenantId"));
         when(reactiveMongoTemplate.save(nexusStateRule)).thenReturn(Mono.just(nexusStateRule));
         Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.save(nexusStateRule);
 
@@ -216,6 +226,7 @@ public class NexusStateRuleRepositoryTest {
         }};
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just("Some tenantId"));
         when(reactiveMongoTemplate.findAll(NexusStateRule.class)).thenReturn(Flux.fromIterable(nexusStateRules));
         Flux<NexusStateRule> nexusStateRuleFlux = nexusStateRuleRepository.findAll();
 

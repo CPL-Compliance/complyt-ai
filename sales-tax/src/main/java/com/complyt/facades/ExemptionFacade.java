@@ -3,9 +3,11 @@ package com.complyt.facades;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.services.ExemptionService;
+import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -15,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @AllArgsConstructor
+@Slf4j
 @Component
 public class ExemptionFacade {
 
@@ -39,7 +42,8 @@ public class ExemptionFacade {
         return exemptionService.findByComplytId(complytId).flatMap(originalExemption ->
                         exemptionService.checkComplytIdOfModifiedEqualsToOriginal(exemption, originalExemption)
                                 .flatMap(checkedExemption -> exemptionService.update(checkedExemption, originalExemption, complytId)))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(ContextLogger.observeCtx("ObjectNotFoundApiException thrown in ExemptionFacade.update for complytId " + complytId, log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
     }
 
     public Mono<Exemption> markAsCancelled(@NonNull final UUID complytId) {

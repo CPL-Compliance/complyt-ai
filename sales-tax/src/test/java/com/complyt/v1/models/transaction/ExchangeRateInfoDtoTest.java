@@ -39,7 +39,7 @@ class ExchangeRateInfoDtoTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "ExchangeRateInfoDto[totalItemsAmountInUSD=" + exchangeRateInfoDto.totalItemsAmountInUSD() +
+        String expectedString = "ExchangeRateInfoDto[totalItemsAmountInUsd=" + exchangeRateInfoDto.totalItemsAmountInUsd() +
                 ", transactionSalesTaxInUsd=" + exchangeRateInfoDto.transactionSalesTaxInUsd() +
                 ", finalTransactionAmountInUsd=" + exchangeRateInfoDto.finalTransactionAmountInUsd() +
                 ", fromCurrency=" + exchangeRateInfoDto.fromCurrency() +

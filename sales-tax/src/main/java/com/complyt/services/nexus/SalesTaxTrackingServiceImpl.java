@@ -95,7 +95,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                 .map(salesTaxTracking::setClientTracking)
                 .flatMap(salesTaxTrackingWithClient -> nexusStateRuleRepository.findMostRecentByCountryAndState(salesTaxTracking.getCountry(), stateName)
                         .map(salesTaxTrackingWithClient::setNexusStateRule))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(ContextLogger.observeCtx("ObjectNotFoundApiException thrown in SalesTaxTrackingServiceImpl.addClientAndStateDetails for stateName " + stateName, log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
     }
 
     @Override
@@ -210,7 +211,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     @Override
-    public Mono<SalesTaxTracking> handleSalesTaxEnforcement(@NonNull Transaction transaction,@NonNull SalesTaxTracking salesTaxTracking) {
+    public Mono<SalesTaxTracking> handleSalesTaxEnforcement(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
         return salesTaxTracking.isEnforcesSalesTax() && !salesTaxTracking.getEconomicNexusTracker().isEstablished()
                 ? nexusService.upsertToNexusTracking(transaction, salesTaxTracking)
                 .flatMap(this::handleSalesTaxTrackingAfterTransactionCalculated)

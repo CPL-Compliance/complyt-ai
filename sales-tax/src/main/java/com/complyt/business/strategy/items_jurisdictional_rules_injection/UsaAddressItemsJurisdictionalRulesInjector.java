@@ -6,6 +6,8 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.utils.observability.ContextLogger;
+import com.complyt.v1.exceptions.types.StateNotFoundInJurisdictionalTaxRulesApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +19,6 @@ import java.util.function.Function;
 @Component
 @Slf4j
 public class UsaAddressItemsJurisdictionalRulesInjector implements ItemsJurisdictionalInjector, UsaAddressCityExtractor {
-
     @Override
     public Function<Map<String, ProductClassification>, List<Item>> inject(Transaction transaction) {
         return mapTaxCodesToClassifications -> {
@@ -28,17 +29,22 @@ public class UsaAddressItemsJurisdictionalRulesInjector implements ItemsJurisdic
                 ProductClassification classification = mapTaxCodesToClassifications.get(item.getTaxCode());
                 JurisdictionalSalesTaxRules rules = classification.getJurisdictionalSalesTaxRules().get(jurisdiction);
 
+                if (rules == null) {
+                    ContextLogger.observeCtx("State provided was not found in the jurisdictional sales tax rule", log::error);
+                    throw new StateNotFoundInJurisdictionalTaxRulesApiException();
+                }
+
                 String city = transaction.getShippingAddress().city();
                 rules = extractCityIfExists(rules, city);
 
                 Item itemWithRules = item.withJurisdictionalSalesTaxRules(rules);
 
-                log.info("Fetching jurisdictionalRules from product classification");
+                ContextLogger.observeCtx("Fetching jurisdictionalRules from product classification", log::info);
                 TaxableCategory category = itemWithRules.getJurisdictionalSalesTaxRules().isTaxable() ?
                         TaxableCategory.TAXABLE : TaxableCategory.NOT_TAXABLE;
                 Item itemWithCategory = itemWithRules.withTaxableCategory(category);
 
-                log.debug("Inserting new item with rules : " + rules + ", with taxable category : " + category);
+                ContextLogger.observeCtx("Inserting new item with rules : " + rules + ", with taxable category : " + category, log::debug);
                 modifiedItems.add(itemWithCategory);
             }
             return modifiedItems;

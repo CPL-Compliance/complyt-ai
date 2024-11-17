@@ -18,9 +18,10 @@ import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.*;
-import com.complyt.repositories.TransactionRepository;
 import com.complyt.repositories.GeoRecordRepository;
+import com.complyt.repositories.TransactionRepository;
 import com.complyt.v1.exceptions.types.ZipCodeNotFoundApiException;
+import com.complyt.v1.exceptions.types.ZipCodeNotValidApiException;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,13 +72,7 @@ class TransactionServiceImplTest {
     ComplytIdHandler<Transaction> transactionComplytIdHandler;
 
     @Mock
-    TransactionAmountsCollector<Transaction> transactionItemsAmountsCollector;
-
-    @Mock
     TransactionAmountsCollector<Transaction> finalTransactionAmountCollector;
-
-    @Mock
-    TransactionAmountsCollector<Transaction> transactionDiscountCollector;
 
     @Mock
     DiscountCalculator itemsDiscountCalculator;
@@ -741,17 +736,54 @@ class TransactionServiceImplTest {
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndInvalidZipCode_ReturnsAnError() {
         // Given
         Address partialShippingAddress = new Address(null, "US", null, null, null, "InvalidZipCode", null, true);
-        Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
+        Transaction transactionWithInvalidZip = transaction.withShippingAddress(partialShippingAddress);
 
         // When
-        when(geoRecordRepository.findStateByZip(transactionWithPartialAddress.getShippingAddress().zip())).thenReturn(Mono.empty());
-
-        Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(transactionWithPartialAddress);
+        Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(transactionWithInvalidZip);
 
         // Then
-        StepVerifier.create(transactionMono).expectError(ZipCodeNotFoundApiException.class);
+        StepVerifier.create(transactionMono).expectError(ZipCodeNotValidApiException.class);
     }
 
+    @Test
+    void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAnd3DigitZip_ReturnsAnError() {
+        // Given
+        Address partialShippingAddress = new Address(null, "US", null, null, null, "111", null, true);
+        Transaction transactionWithInvalidZip = transaction.withShippingAddress(partialShippingAddress);
+
+        // When
+        Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(transactionWithInvalidZip);
+
+        // Then
+        StepVerifier.create(transactionMono).expectError(ZipCodeNotValidApiException.class);
+    }
+
+    @Test
+    void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndInvalidLongZip_ReturnsAnError() {
+        // Given
+        Address partialShippingAddress = new Address(null, "US", null, null, null, "11111111-1111", null, true);
+        Transaction transactionWithInvalidZip = transaction.withShippingAddress(partialShippingAddress);
+
+        // When
+        Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(transactionWithInvalidZip);
+
+        // Then
+        StepVerifier.create(transactionMono).expectError(ZipCodeNotValidApiException.class);
+    }
+
+    @Test
+    void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndInvalidBlankZip_ReturnsAnError() {
+        // Given
+        Address partialShippingAddress = new Address(null, "US", null, null, null, "", null, true);
+        Transaction transactionWithInvalidZip = transaction.withShippingAddress(partialShippingAddress);
+
+        // When
+        Mono<Transaction> transactionMono = transactionService.injectDataToTransaction(transactionWithInvalidZip);
+
+        // Then
+        StepVerifier.create(transactionMono).expectError(ZipCodeNotValidApiException.class);
+    }
+    
     @Test
     void findAllBySource_SourceExists_Returns2Transactions() {
         // Given

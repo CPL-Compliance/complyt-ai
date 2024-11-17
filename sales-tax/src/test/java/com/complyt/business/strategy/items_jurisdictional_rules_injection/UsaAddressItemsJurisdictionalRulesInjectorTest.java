@@ -5,7 +5,7 @@ import com.complyt.domain.sales_tax.product_classification.ProductClassification
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
-import org.junit.jupiter.api.Assertions;
+import com.complyt.v1.exceptions.types.StateNotFoundInJurisdictionalTaxRulesApiException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UsaAddressItemsJurisdictionalRulesInjectorTest {
 
@@ -53,7 +55,7 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest {
         List<Item> actualItems = usaAddressItemsJurisdictionalRulesInjector.inject(transactionNoRules).apply(classifications);
 
         // Then
-        Assertions.assertEquals(transaction.getItems(), actualItems);
+        assertEquals(transaction.getItems(), actualItems);
     }
 
     @Test
@@ -79,6 +81,28 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest {
         List<Item> actualItems = usaAddressItemsJurisdictionalRulesInjector.inject(transactionNoRules).apply(classifications);
 
         // Then
-        Assertions.assertEquals(expectedItems, actualItems);
+        assertEquals(expectedItems, actualItems);
+    }
+
+    @Test
+    void inject_TransactionWithUnsupportedState_ThrowsAnError() {
+        // Given
+        Address shippingAddress = testUtilities.createAddress().withState("Upsupported State");
+        Transaction transactionNoRules = transaction.withShippingAddress(shippingAddress).withItems(
+                new ArrayList<>() {{
+                    add(transaction.getItems().get(0).withJurisdictionalSalesTaxRules(null));
+                    add(transaction.getItems().get(1).withJurisdictionalSalesTaxRules(null));
+                }}
+        );
+
+        Map<String, ProductClassification> classifications = testUtilities.createUsaClassificationsMap(
+                transaction.getItems().get(0).getJurisdictionalSalesTaxRules(),
+                transaction.getItems().get(1).getJurisdictionalSalesTaxRules()
+        );
+
+        // When & Then
+        assertThrows(StateNotFoundInJurisdictionalTaxRulesApiException.class, () ->
+                usaAddressItemsJurisdictionalRulesInjector.inject(transactionNoRules).apply(classifications)
+        );
     }
 }

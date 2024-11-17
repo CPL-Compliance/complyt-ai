@@ -1618,7 +1618,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(null).withCountry("USA");
         Set<String> expectedErrors = Set.of(
-                "Address.city " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.city " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: " + givenShippingAddress.city());
 
         // When + Then
         webTestClient
@@ -1643,8 +1643,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(null);
         Set<String> expectedErrors = Set.of(
-                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX,
-                "Address.state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA);
+                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: " + givenShippingAddress.state(),
+                "Address.state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA + " Invalid value: " + givenShippingAddress.state());
 
         // When + Then
         webTestClient
@@ -1658,7 +1658,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors)
+                );
     }
 
     @Test
@@ -1670,7 +1671,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(null).withCountry("USA");
         Set<String> expectedErrors = Set.of(
-                "Address.street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: " + givenShippingAddress.street());
 
         // When + Then
         webTestClient
@@ -1695,7 +1696,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip(null);
         Set<String> expectedErrors = Set.of(
-                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: null",
+                "Address.zip " + DtoErrorMessages.ZIP_NOT_IN_FORMAT + " Invalid value: null");
 
         // When + Then
         webTestClient
@@ -1745,7 +1747,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity("");
         Set<String> expectedErrors = Set.of(
-                "Address.city " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.city " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: " + givenShippingAddress.city());
 
         // When + Then
         webTestClient
@@ -1770,8 +1772,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState("");
         Set<String> expectedErrors = Set.of(
-                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX,
-                "Address.state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA);
+                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: " + givenShippingAddress.state(),
+                "Address.state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA + " Invalid value: " + givenShippingAddress.state());
 
         // When + Then
         webTestClient
@@ -1797,7 +1799,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         transactionDto = transactionDto.withShippingAddress(changeShippingAddressToUsa(transactionDto.shippingAddress()));
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet("");
         Set<String> expectedErrors = Set.of(
-                "Address.street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: " + givenShippingAddress.street());
 
         // When + Then
         webTestClient
@@ -1822,7 +1824,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("");
         Set<String> expectedErrors = Set.of(
-                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: " + givenShippingAddress.zip(),
+                "Address.zip " + DtoErrorMessages.ZIP_NOT_IN_FORMAT + " Invalid value: " + givenShippingAddress.zip());
 
         // When + Then
         webTestClient
@@ -1837,7 +1840,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
-
 
     @Test
     @Override
@@ -2259,7 +2261,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .withPartial(true);
 
         Set<String> expectedErrors = Set.of(
-                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.PARTIAL_ERROR_SUFFIX + " Invalid value: null",
+                "Address.zip " + DtoErrorMessages.ZIP_NOT_IN_FORMAT + " Invalid value: null");
 
         // When + Then
         webTestClient

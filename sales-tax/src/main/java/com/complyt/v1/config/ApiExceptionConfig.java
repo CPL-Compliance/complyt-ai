@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 
+import java.util.HashMap;
 import java.util.Map;
+
 
 @Configuration
 @Generated
@@ -36,7 +38,11 @@ public class ApiExceptionConfig {
                 Map.entry(InvalidPatchFieldException.class, HttpStatus.BAD_REQUEST),
                 Map.entry(InvalidDiscountAmountException.class, HttpStatus.BAD_REQUEST),
                 Map.entry(TaxCodeNotValidException.class, HttpStatus.BAD_REQUEST),
-                Map.entry(ZipCodeNotFoundApiException.class, HttpStatus.BAD_REQUEST)
+                Map.entry(CountryNotFoundInJurisdictionalTaxRulesApiException.class, HttpStatus.BAD_REQUEST),
+                Map.entry(StateNotFoundInJurisdictionalTaxRulesApiException.class, HttpStatus.BAD_REQUEST),
+                Map.entry(CustomerNotFoundApiException.class, HttpStatus.NOT_FOUND),
+                Map.entry(ZipCodeNotFoundApiException.class, HttpStatus.NOT_FOUND),
+                Map.entry(ZipCodeNotValidApiException.class, HttpStatus.BAD_REQUEST)
         );
 
     }

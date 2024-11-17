@@ -6,6 +6,7 @@ import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.customer.exemption.ExemptionType;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.security.TenantResolver;
+import com.complyt.utils.observability.ContextLogger;
 import com.complyt.utils.query.CountryAndStateCriteriaBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,7 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 

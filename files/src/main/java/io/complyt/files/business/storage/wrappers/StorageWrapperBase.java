@@ -4,8 +4,10 @@ import io.complyt.files.annotations.Generated;
 import io.complyt.files.business.storage.StorageWrapper;
 import io.complyt.files.domain.ComplytFile;
 import io.complyt.files.domain.ComplytFileMetadata;
+import io.complyt.files.utils.observability.ContextLogger;
 import io.complyt.files.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -14,6 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @AllArgsConstructor
+@Slf4j
 public abstract class StorageWrapperBase implements StorageWrapper {
     @Generated
     public static class StubStorageWrapper extends StorageWrapperBase {
@@ -41,7 +44,8 @@ public abstract class StorageWrapperBase implements StorageWrapper {
                             .filter(t -> t.equals(hardcodedTenantId))
                             .flatMap(t -> Mono.just(complytFileMetadata.withMetadata(Map.of("status", "deleted", "display_name", "test.it"))))
                     )
-                    .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                    .switchIfEmpty(ContextLogger.observeCtx("ObjectNotFoundApiException thrown in StorageWrapperBase.markAsDeleted for file with complytId " + complytId + " and tenantId " + tenantId, log::error)
+                            .then(Mono.error(new ObjectNotFoundApiException())));
         }
 
         @Override
@@ -53,7 +57,8 @@ public abstract class StorageWrapperBase implements StorageWrapper {
                             .flatMap(t -> Mono.just(complytFileMetadata.withLink(
                                     "https://storage.test.it")))
                     )
-                    .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                    .switchIfEmpty(ContextLogger.observeCtx("ObjectNotFoundApiException thrown in StorageWrapperBase.getSignedLinkForFile for file with complytId " + complytId + " and tenantId " + tenantId, log::error)
+                            .then(Mono.error(new ObjectNotFoundApiException())));
         }
 
         @Override

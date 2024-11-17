@@ -121,7 +121,8 @@ public class GoogleStorageWrapper extends StorageWrapperBase {
                         blob.getCreateTimeOffsetDateTime(),
                         createSignedLinkForBlob(blob))))
                 .doOnError(Mono::error)
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                .switchIfEmpty(ContextLogger.observeCtx("ObjectNotFoundApiException thrown in GoogleStorageWrapper.getSignedLinkForFile for file with complytId " + complytId + " and tenantId " + tenantId, log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException()))));
     }
 
     @Override
@@ -137,7 +138,8 @@ public class GoogleStorageWrapper extends StorageWrapperBase {
                                 updatedBlob.getCreateTimeOffsetDateTime(),
                                 FileRouter.COMPLYT_FILE_BASE_URL + "/" + complytId))))
                 .doOnError(Mono::error)
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                .switchIfEmpty(ContextLogger.observeCtx("ObjectNotFoundApiException thrown in GoogleStorageWrapper.markAsDeleted for file with complytId " + complytId + " and tenantId " + tenantId, log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException()))));
     }
 
     private Mono<byte[]> fileContentToByteArray(Flux<DataBuffer> content) {

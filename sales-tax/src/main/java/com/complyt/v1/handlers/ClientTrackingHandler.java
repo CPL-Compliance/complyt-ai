@@ -72,7 +72,8 @@ public class ClientTrackingHandler {
                 .switchIfEmpty(Flux.defer(() -> clientTrackingFacade.getByName(name))
                         .map(ClientTrackingMapper.INSTANCE::clientTrackingToClientTrackingDtoTenant)
                         .flatMap(ClientTrackingDtoTenant -> ContextLogger.observeCtx("<-- Returned Body: " + ClientTrackingDtoTenant, log::info).thenReturn(ClientTrackingDtoTenant))
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to get clientTracking by name " + name, log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException()))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(ClientTrackingDtoTenantFlux, ClientTrackingDtoTenant.class);
     }
@@ -87,7 +88,8 @@ public class ClientTrackingHandler {
                 .switchIfEmpty(Flux.defer(() -> (clientTrackingFacade.getByTenantId(tenantId))
                         .map(ClientTrackingMapper.INSTANCE::clientTrackingToClientTrackingDtoTenant)
                         .flatMap(ClientTrackingDtoTenant -> ContextLogger.observeCtx("<-- Returned Body: " + ClientTrackingDtoTenant, log::info).thenReturn(ClientTrackingDtoTenant))
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()))));
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to get clientTracking by tenantId " + tenantId, log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException())))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(ClientTrackingDtoTenantFlux, ClientTrackingDtoTenant.class);
     }

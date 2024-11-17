@@ -1,6 +1,7 @@
 package com.complyt.business.nexus.data_extractor;
 
 import com.complyt.business.transaction.BigDecimalProcessor;
+import com.complyt.business.transaction.CurrencyProcessor;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.TransactionNexusSummary;
 import com.complyt.domain.transaction.Transaction;
@@ -29,6 +30,6 @@ public class NexusTransactionSummaryCalculator {
     }
 
     private Boolean shouldConvertToUsd(Transaction transaction){
-        return transaction.getCurrency() != null && !transaction.getCurrency().equals("USD");
+        return transaction.getCurrency() != null && !transaction.getCurrency().equals(CurrencyProcessor.usdCurrency);
     }
 }

@@ -38,7 +38,7 @@ public class CustomerRepository {
                     Query query = Query.query(Criteria.where("name").regex("^" + name, "i")
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for customers with name " + name + " and tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for customers with name " + name + " and tenant ID " + tenantId, tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Customer.class));
                 });
     }
@@ -49,7 +49,7 @@ public class CustomerRepository {
                     Query query = Query.query(Criteria.where("name").is("^" + name)
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for a customer with name " + name + " and tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for a customer with name " + name + " and tenant ID " + tenantId, tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }
@@ -68,7 +68,7 @@ public class CustomerRepository {
                             .skip(calculatedOffset).limit(size)
                             .with(Sort.by(sortDirection, sortByProperty));
 
-                    return ContextLogger.observeCtx("Searching for customers with tenant ID " + tenantId + " with page " + page + " and size " + size, log::info)
+                    return ContextLogger.observeCtx("Searching for customers with tenant ID " + tenantId + " with page " + page + " and size " + size, tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Customer.class));
                 });
     }
@@ -79,7 +79,7 @@ public class CustomerRepository {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)
                             .and("source").is(source));
 
-                    return ContextLogger.observeCtx("Searching for customers with source " + source + " and tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for customers with source " + source + " and tenant ID " + tenantId, tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Customer.class));
                 });
     }
@@ -88,7 +88,7 @@ public class CustomerRepository {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Customer customerWithTenantId = customer.withTenantId(tenantId);
-                    return ContextLogger.observeCtx("Saving Customer " + customerWithTenantId.toString(), log::info)
+                    return ContextLogger.observeCtx("Saving Customer " + customerWithTenantId.toString(), tenantId, log::info)
                             .then(reactiveMongoTemplate.save(customerWithTenantId));
                 });
     }
@@ -97,7 +97,8 @@ public class CustomerRepository {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
-                    return ContextLogger.observeCtx("Searching for a customer with id of: " + id + " and tenant ID " + tenantId, log::info)
+
+                    return ContextLogger.observeCtx("Searching for a customer with id of: " + id + " and tenant ID " + tenantId, tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }
@@ -110,7 +111,7 @@ public class CustomerRepository {
                             .and("tenantId").is(tenantId));
 
                     return ContextLogger.observeCtx("Searching for a customer with externalId "
-                                    + externalId + ", source " + source + ", and tenant ID: " + tenantId, log::info)
+                                    + externalId + ", source " + source + ", and tenant ID: " + tenantId, tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }
@@ -122,7 +123,7 @@ public class CustomerRepository {
                             .and("tenantId").is(tenantId));
 
                     return ContextLogger.observeCtx("Searching for a customer with complytId "
-                                    + complytId + " and tenant ID " + tenantId, log::info)
+                                    + complytId + " and tenant ID " + tenantId, tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }
@@ -134,7 +135,7 @@ public class CustomerRepository {
                             .and("tenantId").is(tenantId));
 
                     return ContextLogger.observeCtx("Searching for a customer with ID "
-                                    + id.toString() + " and tenant ID " + tenantId, log::info)
+                                    + id.toString() + " and tenant ID " + tenantId, tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }

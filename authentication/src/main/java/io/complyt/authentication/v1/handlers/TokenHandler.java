@@ -41,7 +41,8 @@ public class TokenHandler {
                 .map(TokenMapper.INSTANCE::tokentoTokenDto)
                 .flatMap(tokenDto -> ContextLogger.observeCtx("<-- Returned Body: Token",
                         log::info).thenReturn(tokenDto))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(ContextLogger.observeCtx("Failed to post Token", log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().body(value, TokenDto.class);
     }

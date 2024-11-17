@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Schema(name = "ExchangeRateDto", description = FieldsDescriptions.EXCHANGE_RATE_INFO)
 @With
 public record ExchangeRateInfoDto(
-        @PositiveOrZero(message = "ExchangeRateInfoDto.totalItemsAmountInUSD " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal totalItemsAmountInUSD,
+        @PositiveOrZero(message = "ExchangeRateInfoDto.totalItemsAmountInUsd " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal totalItemsAmountInUsd,
         BigDecimal transactionSalesTaxInUsd,
         @PositiveOrZero(message = "ExchangeRateInfoDto.finalTransactionAmountInUsd " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal finalTransactionAmountInUsd,
         String fromCurrency,

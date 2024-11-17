@@ -553,8 +553,8 @@ public interface ITUtilities {
                 .append("jurisdictionalTaxRules", new Document());
     }
 
-    static ExchangeRateInfoDto createExchangeRateInfoDto(BigDecimal totalItemsAmountInUSD, BigDecimal transactionSalesTaxInUsd, BigDecimal finalTransactionAmountInUsd, String fromCurrency, String toCurrency, BigDecimal fxRate, CurrencySource source, Boolean isExchangeRateEstimated, LocalDateTime exchangeRateDate) {
-        return new ExchangeRateInfoDto(totalItemsAmountInUSD, transactionSalesTaxInUsd, finalTransactionAmountInUsd, fromCurrency, toCurrency, fxRate, source, isExchangeRateEstimated, exchangeRateDate);
+    static ExchangeRateInfoDto createExchangeRateInfoDto(BigDecimal totalItemsAmountInUsd, BigDecimal transactionSalesTaxInUsd, BigDecimal finalTransactionAmountInUsd, String fromCurrency, String toCurrency, BigDecimal fxRate, CurrencySource source, Boolean isExchangeRateEstimated, LocalDateTime exchangeRateDate) {
+        return new ExchangeRateInfoDto(totalItemsAmountInUsd, transactionSalesTaxInUsd, finalTransactionAmountInUsd, fromCurrency, toCurrency, fxRate, source, isExchangeRateEstimated, exchangeRateDate);
     }
 
 }

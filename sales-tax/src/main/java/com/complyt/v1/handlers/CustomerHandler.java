@@ -115,7 +115,8 @@ public class CustomerHandler {
                         .map(CustomerMapper.INSTANCE::customerToCustomerDto)
                         .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info)
                                 .thenReturn(customerDto))
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()))));
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to get customer by complytId " + complytId, log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException())))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
     }
@@ -131,7 +132,8 @@ public class CustomerHandler {
                 .switchIfEmpty(Mono.defer(() -> customerFacade.findByExternalIdAndSource(externalId, source))
                         .map(CustomerMapper.INSTANCE::customerToCustomerDto)
                         .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto))
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to get customer by externalId " + externalId + " and source " + source, log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException()))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
     }
@@ -150,7 +152,8 @@ public class CustomerHandler {
                                 .flatMap(customerDto -> customerFacade.updateIfModified(CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto), existingCustomer))
                                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
                                 .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto)))
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())));
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to patch customer by complytId " + complytId, log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException()))));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
     }

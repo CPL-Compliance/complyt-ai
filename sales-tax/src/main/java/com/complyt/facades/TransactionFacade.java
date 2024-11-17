@@ -9,9 +9,12 @@ import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
 import com.complyt.services.nexus.NexusService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
+import com.complyt.utils.observability.ContextLogger;
+import com.complyt.v1.exceptions.types.CustomerNotFoundApiException;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -21,6 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @AllArgsConstructor
+@Slf4j
 @Component
 public class TransactionFacade {
 
@@ -163,7 +167,7 @@ public class TransactionFacade {
 
     public Mono<Customer> getCustomerByTransaction(Transaction transaction) {
         return customerService.findByComplytId(transaction.getCustomerId())
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(Mono.error(CustomerNotFoundApiException::new));
     }
 
     public Mono<Transaction> removeTransactionFromNexusTracking(Transaction transaction) {
@@ -177,7 +181,8 @@ public class TransactionFacade {
     public Mono<SalesTaxTracking> findSalesTaxTrackingByTransaction(@NonNull Transaction transaction) {
         return salesTaxTrackingService.findByCountryStateAndSubsidiary(transaction.getShippingAddress().country(), transaction.getShippingAddress().state(), transaction.getSubsidiary())
                 .switchIfEmpty(salesTaxTrackingService.findByCountryStateAndSubsidiary(transaction.getShippingAddress().country(), transaction.getShippingAddress().state(), null))
-                .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new));
+                .switchIfEmpty(ContextLogger.observeCtx("ObjectNotFoundApiException thrown in TransactionFacade.findSalesTaxTrackingByTransaction because could not find SalesTaxTracking by state " + transaction.getShippingAddress().state() + " and subsidiary " + transaction.getSubsidiary() + " or null", log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
 
     }
 }
