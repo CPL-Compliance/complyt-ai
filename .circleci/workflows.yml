@@ -1,4 +1,3 @@
-
 orbs:
   codecov: codecov/codecov@4.1.0
   aws-cli: circleci/aws-cli@4.1.3
@@ -73,9 +72,9 @@ jobs:
     executor: arm64-ubuntu-22-lts-corretto-21-vm
     steps:
       - checkout
-  #We must use attach_workspace to gain access to the artifacts that we build on previous steps (of our services)
+      #We must use attach_workspace to gain access to the artifacts that we build on previous steps (of our services)
       - attach_workspace:
-            at: .
+          at: .
       - run:
           name: Execute
           command: |
@@ -194,6 +193,12 @@ jobs:
           cluster: "complyt-demo"
           container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
           family: "<<parameters.service_name>>-complyt-demo"
+          service_name: "<<parameters.service_name>>"
+      ## Deploy to complyt-sb cluster
+      - aws-ecs/update_service:
+          cluster: "complyt-sb"
+          container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
+          family: "<<parameters.service_name>>-complyt-sb"
           service_name: "<<parameters.service_name>>"
 
 workflows:

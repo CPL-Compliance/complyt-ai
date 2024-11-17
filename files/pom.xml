@@ -187,7 +187,6 @@
             <version>2.37.0</version>
         </dependency>
         <!-- Other -->
-        
     </dependencies>
     <build>
         <plugins>
