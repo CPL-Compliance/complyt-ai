@@ -12,7 +12,7 @@ public interface CriteriaBuilder {
         List<Criteria> criterias = new ArrayList<>();
 
         filterMap.entrySet().stream()
-                .filter(entry -> filterKeys.contains(entry.getKey()) && entry.getValue() != null && !entry.getValue().isEmpty())
+                .filter(entry -> filterKeys.contains(entry.getKey()) && !entry.getValue().isEmpty())
                 .map(entry -> Criteria.where(entry.getKey()).regex(entry.getValue(), "i"))
                 .forEach(criterias::add);
 
