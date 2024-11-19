@@ -2996,7 +2996,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 });
     }
 
+    @Test
     @Override
+    @WithMockUser
     public void getAll_InvalidPageValuePassed_Throws400() {
         webTestClient
                 .get()
@@ -3011,6 +3013,50 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(map -> {
                     String message = map.get("message").toString();
                     assertTrue(message.contains(DtoErrorMessages.PAGE_FORMAT_ERROR));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_PartialFilterValuePassed_ReturnsList() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_filtered_by_transaction_type_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("transactionType", "voIc")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> {
+                    assertEquals(4, list.size());
+                    for (TransactionDto t : list)
+                        assertEquals(t.transactionType(), TransactionTypeDto.INVOICE);
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_BlankFilterValuePassed_ReturnsFullList() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_filtered_by_transaction_type_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("transactionType", "")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> {
+                    assertEquals(6, list.size());
                 });
     }
 

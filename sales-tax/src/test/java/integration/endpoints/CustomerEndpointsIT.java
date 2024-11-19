@@ -954,4 +954,49 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 });
     }
 
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_PartialFilterValuePassed_ReturnsList() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("customerType", "ETai")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list -> {
+                    assertEquals(2, list.size());
+                    for (CustomerDto c : list) {
+                        assertEquals(CustomerTypeDto.RETAIL, c.customerType());
+                    }
+                });
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void getAll_BlankFilterValuePassed_ReturnsFullList() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("customerType", "")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list -> {
+                    assertEquals(4, list.size());
+                });
+    }
+
 }

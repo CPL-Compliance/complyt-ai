@@ -11,10 +11,11 @@ public interface CriteriaBuilder {
     static Criteria build(Map<String, String> filterMap, List<String> filterKeys) {
         List<Criteria> criterias = new ArrayList<>();
 
-        filterMap.keySet().stream()
-                .filter(filterKeys::contains)
-                .map(key -> Criteria.where(key).is(filterMap.get(key)))
+        filterMap.entrySet().stream()
+                .filter(entry -> filterKeys.contains(entry.getKey()) && !entry.getValue().isEmpty())
+                .map(entry -> Criteria.where(entry.getKey()).regex(entry.getValue(), "i"))
                 .forEach(criterias::add);
+
 
         return criterias.isEmpty() ? null : new Criteria().andOperator(criterias.toArray(new Criteria[0]));
     }
