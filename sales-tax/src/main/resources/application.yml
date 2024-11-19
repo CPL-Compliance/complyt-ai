@@ -2,9 +2,9 @@ spring.application.name: sales-tax
 server.port: ${PORT:9898}
 
 spring.profiles.active:
-  - @activeEnv@
+  - development
   - @activeTaxClient@
-  - @activeCurrencyClient@
+  - complytStubCurrency
 
 # Observability
 management.metrics.distribution.percentiles-histogram.http.server.requests: true

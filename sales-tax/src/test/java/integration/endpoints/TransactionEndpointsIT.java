@@ -3039,4 +3039,25 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 });
     }
 
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_BlankFilterValuePassed_ReturnsFullList() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_filtered_by_transaction_type_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("transactionType", "")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> {
+                    assertEquals(6, list.size());
+                });
+    }
+
 }
