@@ -6,4 +6,6 @@ public interface GetAllPaginationITTemplate {
     void getAll_InvalidSortOrderSent_Throws400();
 
     void getAll_InvalidPageValuePassed_Throws400();
+
+    void getAll_PartialFilterValuePassed_ReturnsList();
 }
