@@ -94,9 +94,11 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_ExistingTransaction_PhysicalNexusTrackingTrue_salesTaxTrackingGotUpdated();
 
     void upsertByExternalIdAndSource_UsaShippingAddressWithEurCurrency_ReturnsTransactionWithExchangeRateInfo();
+
     void upsertByExternalIdAndSource_UsaShippingAddressWithEuroCurrency_ReturnsTransactionWithExchangeRateInfo();
 
     void upsertByExternalIdAndSource_UsaShippingAddressWithUsdCurrency_ReturnsTransactionWithoutExchangeRateInfo();
+
     void upsertByExternalIdAndSource_UsaShippingAddressWithUsDollarCurrency_ReturnsTransactionWithoutExchangeRateInfo();
 
     void upsertByExternalIdAndSource_UsaShippingAddressWithNullCurrency_ReturnsTransactionWithoutExchangeRateInfo();
@@ -130,5 +132,11 @@ public interface TransactionEndpointsITTemplate extends
     void getAll_PaginationFilteredByTransactionType_ReturnsRefunds();
 
     void getAll_PaginationFilteredByCityAndTransactionType_ReturnsTransactions();
+
+    void upsert_TransactionIsAllocatedRefund_Returns201WithSalesTaxOfInvoice();
+
+    void upsert_TransactionIsAllocatedRefundAndInvoiceNotFound_Returns201WithSameRefund();
+
+    void upsert_TransactionIsAllocatedRefundWithNullCreatedFrom_Returns201WithSameRefund();
 
 }

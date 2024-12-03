@@ -7,6 +7,7 @@ import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.ComplytInternalRates;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +30,15 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     @NonNull
     private StrategySelector transactionRatesInjectionStrategy;
 
+    @NonNull
+    private TransactionServiceImpl transactionService;
+
     @Override
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transactionWithOutSalesTax, @NonNull SalesTaxTracking salesTaxTracking, @NonNull Customer customer) {
+        if (isAllocatedRefundFromAnInvoice(transactionWithOutSalesTax)) {
+            return allocateInvoiceSalesTaxToRefund(transactionWithOutSalesTax);
+        }
+
         SalesTaxApplyCheck salesTaxApplyCheck = new SalesTaxApplyCheck(transactionWithOutSalesTax);
         boolean isApplied = salesTaxApplyCheck.check(salesTaxTracking);
 
@@ -45,4 +53,17 @@ public class SalesTaxServiceImpl implements SalesTaxService {
         return ((Mono<ComplytInternalRates>) salesTaxRatesWrapperStrategy.select(transaction).apply(transaction.getShippingAddress()))
                 .flatMap(complytInternalRates -> (Mono<Transaction>) transactionRatesInjectionStrategy.select(transaction).apply(complytInternalRates));
     }
+
+    private boolean isAllocatedRefundFromAnInvoice(Transaction transactionWithOutSalesTax) {
+        return transactionWithOutSalesTax.getTransactionType() == TransactionType.REFUND &&
+                transactionWithOutSalesTax.getIsAllocatedRefund() &&
+                transactionWithOutSalesTax.getCreatedFrom() != null;
+    }
+
+    private Mono<Transaction> allocateInvoiceSalesTaxToRefund(@NonNull Transaction transaction) {
+        return transactionService.findByExternalIdAndSource(transaction.getCreatedFrom(), transaction.getSource())
+                .map(invoice -> transaction.setSalesTax(invoice.getSalesTax()))
+                .switchIfEmpty(Mono.just(transaction));
+    }
+
 }

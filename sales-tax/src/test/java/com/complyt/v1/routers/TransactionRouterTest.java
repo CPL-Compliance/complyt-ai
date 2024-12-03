@@ -1,8 +1,10 @@
 package com.complyt.v1.routers;
 
+import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
+import com.complyt.domain.transaction.TransactionType;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.repositories.exceptions.OperationFailedException;

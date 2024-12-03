@@ -20,6 +20,7 @@ import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
+import org.apache.commons.math.stat.inference.TestUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -43,6 +44,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -3058,6 +3060,108 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(list -> {
                     assertEquals(6, list.size());
                 });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_TransactionIsAllocatedRefund_Returns201WithSalesTaxOfInvoice() {
+        // Given + When
+        String invoiceExternalId = "4123658121";
+        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + invoiceExternalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(invoice -> {
+                    String refundExternalId = UUID.randomUUID().toString();
+                    SalesTaxDto invoicesSalesTax = invoice.salesTax();
+
+                    TransactionDto refund = invoice
+                            .withComplytId(null)
+                            .withExternalId(refundExternalId)
+                            .withCreatedFrom(invoiceExternalId)
+                            .withTransactionType(TransactionTypeDto.REFUND)
+                            .withIsAllocatedRefund(true)
+                            .withSalesTax(null)
+                            .withCustomer(null);
+
+
+                    webTestClient
+                            .mutateWith(csrf())
+                            .put()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + refundExternalId)
+                                    .build())
+                            .bodyValue(refund)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .exchange()
+                            .expectStatus().isCreated()
+                            .expectBody(TransactionDto.class)
+                            .value(TransactionDto::salesTax, equalTo(invoicesSalesTax));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_TransactionIsAllocatedRefundAndInvoiceNotFound_Returns201WithSameRefund() {
+        // Given + When
+        String notFoundInvoiceExternalId = "4123658121-not found";
+        TransactionDto refund = ITUtilities.stubTransactionDto("externalIdOfRefund", customerId,
+                        ITUtilities.stubItemDto().withQuantity(null).withUnitPrice(null))
+                .withShippingAddress(ITUtilities.createAddressDtoInKensas())
+                .withCreatedFrom(notFoundInvoiceExternalId)
+                .withTransactionType(TransactionTypeDto.REFUND)
+                .withIsAllocatedRefund(true);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + refund.externalId())
+                        .build())
+                .bodyValue(refund)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(TransactionDto::salesTax, equalTo(null));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_TransactionIsAllocatedRefundWithNullCreatedFrom_Returns201WithSameRefund() {
+        // Given + When
+        TransactionDto refund = ITUtilities.stubTransactionDto("externalIdOfRefund2", customerId,
+                        ITUtilities.stubItemDto().withQuantity(null).withUnitPrice(null))
+                .withShippingAddress(ITUtilities.createAddressDtoInKensas())
+                .withCreatedFrom(null)
+                .withTransactionType(TransactionTypeDto.REFUND)
+                .withIsAllocatedRefund(true);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + refund.externalId())
+                        .build())
+                .bodyValue(refund)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(TransactionDto::salesTax, equalTo(null));
     }
 
 }

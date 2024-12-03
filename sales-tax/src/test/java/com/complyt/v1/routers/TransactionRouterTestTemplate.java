@@ -1,7 +1,5 @@
 package com.complyt.v1.routers;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.security.test.context.support.WithMockUser;
 import testUtils.unit_test.templates.endpoints.*;
 import testUtils.unit_test.templates.validations.ExternalTimestampsValidationTestTemplate;
 import testUtils.unit_test.templates.validations.InternalTimestampsValidationTestTemplate;
@@ -27,26 +25,16 @@ public interface TransactionRouterTestTemplate extends
 
     void getByExternalIdAndSource_ExistsWithSalesTax_Returns200();
 
-    @Test
-    @WithMockUser
     void upsertByExternalIdAndSource_WithShippingFeeAndOutsideOfUsaAndDoesntExists_Returns201();
 
     void upsertByExternalIdAndSource_NonUseTransactionWithShippingFeeAndDoesntExists_Returns201();
 
-    @Test
-    @WithMockUser
     void upsertByExternalIdAndSource_NonUseTransactionAndDoesntExists_Returns201();
 
-    @Test
-    @WithMockUser
     void upsertByExternalIdAndSource_NonUseTransactionWithNonSupportedCountry_Returns400();
 
-    @Test
-    @WithMockUser
     void upsertByExternalIdAndSource_TransactionWithUnsupportedCurrency_Returns400();
 
-    @Test
-    @WithMockUser
     void upsertByExternalIdAndSource_DoesntExistsAndNullCurrency_Returns201();
 
     void getAny_InvalidUrl_Returns404();
