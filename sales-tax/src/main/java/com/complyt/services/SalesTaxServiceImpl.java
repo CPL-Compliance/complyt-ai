@@ -60,7 +60,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
                 transactionWithOutSalesTax.getCreatedFrom() != null;
     }
 
-    private Mono<Transaction> setInvoiceSalesTaxToRefund(@NonNull Transaction transaction) {
+    private Mono<Transaction> setInvoiceSalesTaxToRefund(Transaction transaction) {
         return transactionService.findByExternalIdAndSource(transaction.getCreatedFrom(), transaction.getSource())
                 .map(invoice -> transaction.setSalesTax(invoice.getSalesTax()))
                 .switchIfEmpty(Mono.just(transaction));
