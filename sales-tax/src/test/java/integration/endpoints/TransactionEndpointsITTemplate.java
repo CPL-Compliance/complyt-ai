@@ -133,10 +133,10 @@ public interface TransactionEndpointsITTemplate extends
 
     void getAll_PaginationFilteredByCityAndTransactionType_ReturnsTransactions();
 
-    void upsert_TransactionIsAllocatedRefund_Returns201WithSalesTaxOfInvoice();
+    void upsert_TransactionIsLinkedRefund_Returns201WithSalesTaxOfInvoice();
 
-    void upsert_TransactionIsAllocatedRefundAndInvoiceNotFound_Returns201WithSameRefund();
+    void upsert_TransactionIsLinkedRefundAndInvoiceNotFound_Returns201WithSameRefund();
 
-    void upsert_TransactionIsAllocatedRefundWithNullCreatedFrom_Returns201WithSameRefund();
+    void upsert_TransactionIsLinkedRefundWithNullCreatedFrom_Returns201WithSameRefund();
 
 }

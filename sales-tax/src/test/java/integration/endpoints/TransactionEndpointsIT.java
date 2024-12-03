@@ -3065,7 +3065,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     @WithMockUser
-    public void upsert_TransactionIsAllocatedRefund_Returns201WithSalesTaxOfInvoice() {
+    public void upsert_TransactionIsLinkedRefund_Returns201WithSalesTaxOfInvoice() {
         // Given + When
         String invoiceExternalId = "4123658121";
         when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
@@ -3089,7 +3089,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                             .withExternalId(refundExternalId)
                             .withCreatedFrom(invoiceExternalId)
                             .withTransactionType(TransactionTypeDto.REFUND)
-                            .withIsAllocatedRefund(true)
+                            .withIsRefundLinked(true)
                             .withSalesTax(null)
                             .withCustomer(null);
 
@@ -3112,7 +3112,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     @WithMockUser
-    public void upsert_TransactionIsAllocatedRefundAndInvoiceNotFound_Returns201WithSameRefund() {
+    public void upsert_TransactionIsLinkedRefundAndInvoiceNotFound_Returns201WithSameRefund() {
         // Given + When
         String notFoundInvoiceExternalId = "4123658121-not found";
         TransactionDto refund = ITUtilities.stubTransactionDto("externalIdOfRefund", customerId,
@@ -3120,7 +3120,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withShippingAddress(ITUtilities.createAddressDtoInKensas())
                 .withCreatedFrom(notFoundInvoiceExternalId)
                 .withTransactionType(TransactionTypeDto.REFUND)
-                .withIsAllocatedRefund(true);
+                .withIsRefundLinked(true);
 
         // Then
         webTestClient
@@ -3140,14 +3140,14 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     @WithMockUser
-    public void upsert_TransactionIsAllocatedRefundWithNullCreatedFrom_Returns201WithSameRefund() {
+    public void upsert_TransactionIsLinkedRefundWithNullCreatedFrom_Returns201WithSameRefund() {
         // Given + When
         TransactionDto refund = ITUtilities.stubTransactionDto("externalIdOfRefund2", customerId,
                         ITUtilities.stubItemDto().withQuantity(null).withUnitPrice(null))
                 .withShippingAddress(ITUtilities.createAddressDtoInKensas())
                 .withCreatedFrom(null)
                 .withTransactionType(TransactionTypeDto.REFUND)
-                .withIsAllocatedRefund(true);
+                .withIsRefundLinked(true);
 
         // Then
         webTestClient

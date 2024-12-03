@@ -50,6 +50,6 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(description = FieldsDescriptions.EXCHANGE_RATE_INFO) ExchangeRateInfoDto exchangeRateInfo,
 
                              String subsidiary,
-                             Boolean isAllocatedRefund)
+                             Boolean isRefundLinked)
         implements SourceCheckable, ExternalIdCheckable {
 }

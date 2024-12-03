@@ -204,7 +204,7 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.getCreatedFrom(), transaction.getTaxableItemsAmount(),
                         transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount(), transaction.getFinalTransactionAmount(), transaction.getTotalDiscount(),
                         transaction.getTransactionLevelDiscount(), transaction.getTransactionFilingStatus(), transaction.getCurrency(),
-                        transaction.getRefRate(), transaction.getExchangeRateInfo(), transaction.getSubsidiary(), transaction.getIsAllocatedRefund()
+                        transaction.getRefRate(), transaction.getExchangeRateInfo(), transaction.getSubsidiary(), transaction.getIsRefundLinked()
                 );
     }
 

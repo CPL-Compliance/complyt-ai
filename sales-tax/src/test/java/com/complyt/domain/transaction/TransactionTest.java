@@ -66,7 +66,7 @@ public class TransactionTest {
                 ", refRate=" + transaction.getRefRate() +
                 ", exchangeRateInfo=" + transaction.getExchangeRateInfo() +
                 ", subsidiary=" + transaction.getSubsidiary() +
-                ", isAllocatedRefund=" + transaction.getIsAllocatedRefund() +
+                ", isRefundLinked=" + transaction.getIsRefundLinked() +
                 ")";
 
         // When
@@ -126,7 +126,7 @@ public class TransactionTest {
                 .transactionLevelDiscount(transaction.getTransactionLevelDiscount())
                 .currency(transaction.getCurrency())
                 .subsidiary(transaction.getSubsidiary())
-                .isAllocatedRefund(transaction.getIsAllocatedRefund())
+                .isRefundLinked(transaction.getIsRefundLinked())
                 .build();
 
         // Then

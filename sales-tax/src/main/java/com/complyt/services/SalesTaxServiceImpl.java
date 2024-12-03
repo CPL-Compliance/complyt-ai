@@ -35,8 +35,8 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
     @Override
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transactionWithOutSalesTax, @NonNull SalesTaxTracking salesTaxTracking, @NonNull Customer customer) {
-        if (isAllocatedRefundFromAnInvoice(transactionWithOutSalesTax)) {
-            return allocateInvoiceSalesTaxToRefund(transactionWithOutSalesTax);
+        if (isLinkedRefundFromAnInvoice(transactionWithOutSalesTax)) {
+            return setInvoiceSalesTaxToRefund(transactionWithOutSalesTax);
         }
 
         SalesTaxApplyCheck salesTaxApplyCheck = new SalesTaxApplyCheck(transactionWithOutSalesTax);
@@ -54,13 +54,13 @@ public class SalesTaxServiceImpl implements SalesTaxService {
                 .flatMap(complytInternalRates -> (Mono<Transaction>) transactionRatesInjectionStrategy.select(transaction).apply(complytInternalRates));
     }
 
-    private boolean isAllocatedRefundFromAnInvoice(Transaction transactionWithOutSalesTax) {
+    private boolean isLinkedRefundFromAnInvoice(Transaction transactionWithOutSalesTax) {
         return transactionWithOutSalesTax.getTransactionType() == TransactionType.REFUND &&
-                transactionWithOutSalesTax.getIsAllocatedRefund() &&
+                transactionWithOutSalesTax.getIsRefundLinked() &&
                 transactionWithOutSalesTax.getCreatedFrom() != null;
     }
 
-    private Mono<Transaction> allocateInvoiceSalesTaxToRefund(@NonNull Transaction transaction) {
+    private Mono<Transaction> setInvoiceSalesTaxToRefund(@NonNull Transaction transaction) {
         return transactionService.findByExternalIdAndSource(transaction.getCreatedFrom(), transaction.getSource())
                 .map(invoice -> transaction.setSalesTax(invoice.getSalesTax()))
                 .switchIfEmpty(Mono.just(transaction));

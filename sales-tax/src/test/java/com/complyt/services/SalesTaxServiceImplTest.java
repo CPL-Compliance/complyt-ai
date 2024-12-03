@@ -189,12 +189,12 @@ public class SalesTaxServiceImplTest {
     }
 
     @Test
-    void handleSalesTaxCalculation_AllocatedRefund_ReturnsTheSalesTaxOfTheOriginalInvoice() {
+    void handleSalesTaxCalculation_LinkedRefund_ReturnsTheSalesTaxOfTheOriginalInvoice() {
         // Given
         SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         String externalIdOfTheInvoice = "some random id";
         SalesTax salesTax = new SalesTax(BigDecimal.valueOf(500), BigDecimal.valueOf(0.08), testUtilities.createSalesTaxRates(), null);
-        Transaction refund = transaction.withIsAllocatedRefund(true).withCreatedFrom(externalIdOfTheInvoice).withTransactionType(TransactionType.REFUND);
+        Transaction refund = transaction.withIsRefundLinked(true).withCreatedFrom(externalIdOfTheInvoice).withTransactionType(TransactionType.REFUND);
         Transaction invoice = transaction.withTransactionType(TransactionType.INVOICE).withExternalId(externalIdOfTheInvoice)
                 .withSalesTax(salesTax);
 
@@ -209,11 +209,11 @@ public class SalesTaxServiceImplTest {
     }
 
     @Test
-    void handleSalesTaxCalculation_AllocatedRefund_NoInvoiceFound_ReturnsRefundUnchanged() {
+    void handleSalesTaxCalculation_LinkedRefund_NoInvoiceFound_ReturnsRefundUnchanged() {
         // Given
         SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         String externalIdOfTheInvoice = "some random id";
-        Transaction refund = transaction.withIsAllocatedRefund(true).withCreatedFrom(externalIdOfTheInvoice).withTransactionType(TransactionType.REFUND);
+        Transaction refund = transaction.withIsRefundLinked(true).withCreatedFrom(externalIdOfTheInvoice).withTransactionType(TransactionType.REFUND);
 
         // When
         when(transactionService.findByExternalIdAndSource(refund.getCreatedFrom(),refund.getSource())).thenReturn(Mono.empty());
