@@ -56,6 +56,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
     private boolean isLinkedRefundFromAnInvoice(Transaction transactionWithOutSalesTax) {
         return transactionWithOutSalesTax.getTransactionType() == TransactionType.REFUND &&
+                transactionWithOutSalesTax.getIsRefundLinked() != null &&
                 transactionWithOutSalesTax.getIsRefundLinked() &&
                 transactionWithOutSalesTax.getCreatedFrom() != null;
     }
