@@ -49,7 +49,7 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(description = FieldsDescriptions.REF_RATE) @PositiveOrZero BigDecimal refRate,
                              @Schema(description = FieldsDescriptions.EXCHANGE_RATE_INFO) ExchangeRateInfoDto exchangeRateInfo,
 
-                             String subsidiary,
-                             Boolean isRefundLinked)
+                             @Schema(description = FieldsDescriptions.SUBSIDIARY_INFO) String subsidiary,
+                             @Schema(description = FieldsDescriptions.IS_REFUND_LINKED_INFO) Boolean isRefundLinked)
         implements SourceCheckable, ExternalIdCheckable {
 }

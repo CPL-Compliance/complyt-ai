@@ -121,4 +121,8 @@ public interface FieldsDescriptions {
     String EXCHANGE_RATE_INFO = "The information about currency exchange rate in case of a transaction with currency other than USD";
 
     String REF_RATE = "Manually entered currency exchange rate in case of a transaction with currency other than USD";
+
+    String SUBSIDIARY_INFO = "Indicates the subsidiary associated with the company executing the transaction";
+
+    String IS_REFUND_LINKED_INFO = "Flag indicating whether the transaction is a refund linked to an associated invoice";
 }
