@@ -139,4 +139,5 @@ public interface TransactionEndpointsITTemplate extends
 
     void upsert_TransactionIsLinkedRefundWithNullCreatedFrom_Returns201WithSameRefund();
 
+    void upsert_IsLinkedRefundFieldIsNull_Returns201WithSameRefund();
 }

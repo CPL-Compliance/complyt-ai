@@ -3164,4 +3164,31 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(TransactionDto::salesTax, equalTo(null));
     }
 
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_IsLinkedRefundFieldIsNull_Returns201WithSameRefund() {
+        // Given + When
+        TransactionDto refund = ITUtilities.stubTransactionDto("externalIdOfRefund3", customerId,
+                        ITUtilities.stubItemDto().withQuantity(null).withUnitPrice(null))
+                .withShippingAddress(ITUtilities.createAddressDtoInKensas())
+                .withCreatedFrom(null)
+                .withTransactionType(TransactionTypeDto.REFUND)
+                .withIsRefundLinked(null);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + refund.externalId())
+                        .build())
+                .bodyValue(refund)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(TransactionDto::salesTax, equalTo(null));
+    }
+
 }
