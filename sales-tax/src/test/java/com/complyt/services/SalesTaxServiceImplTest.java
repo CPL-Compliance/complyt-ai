@@ -16,6 +16,7 @@ import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.TransactionType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,6 +62,9 @@ public class SalesTaxServiceImplTest {
 
     @Mock
     TransactionGtRatesHandler transactionGstRatesHandler;
+
+    @Mock
+    TransactionServiceImpl transactionService;
 
     @Mock
     TaxableCollectionBuilder taxableCollectionBuilder;
@@ -182,6 +186,41 @@ public class SalesTaxServiceImplTest {
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
+    }
+
+    @Test
+    void handleSalesTaxCalculation_LinkedRefund_ReturnsTheSalesTaxOfTheOriginalInvoice() {
+        // Given
+        SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
+        String externalIdOfTheInvoice = "some random id";
+        SalesTax salesTax = new SalesTax(BigDecimal.valueOf(500), BigDecimal.valueOf(0.08), testUtilities.createSalesTaxRates(), null);
+        Transaction refund = transaction.withIsRefundLinked(true).withCreatedFrom(externalIdOfTheInvoice).withTransactionType(TransactionType.REFUND);
+        Transaction invoice = transaction.withTransactionType(TransactionType.INVOICE).withExternalId(externalIdOfTheInvoice)
+                .withSalesTax(salesTax);
+
+        Transaction expectedRefund = refund.withSalesTax(invoice.getSalesTax());
+
+        // When
+        when(transactionService.findByExternalIdAndSource(refund.getCreatedFrom(),refund.getSource())).thenReturn(Mono.just(invoice));
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(refund, tracking, customer);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(expectedRefund).verifyComplete();
+    }
+
+    @Test
+    void handleSalesTaxCalculation_LinkedRefund_NoInvoiceFound_ReturnsRefundUnchanged() {
+        // Given
+        SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
+        String externalIdOfTheInvoice = "some random id";
+        Transaction refund = transaction.withIsRefundLinked(true).withCreatedFrom(externalIdOfTheInvoice).withTransactionType(TransactionType.REFUND);
+
+        // When
+        when(transactionService.findByExternalIdAndSource(refund.getCreatedFrom(),refund.getSource())).thenReturn(Mono.empty());
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(refund, tracking, customer);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(refund).verifyComplete();
     }
 
     @Test

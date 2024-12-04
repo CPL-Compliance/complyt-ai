@@ -135,10 +135,10 @@ public class TransactionServiceImpl implements TransactionService {
                 .flatMap(this::recalculateTotalItemsPrice)
                 .map(transactionWithCalculatedItems -> (Transaction) shippingAddressAlignmentStrategy.select(transaction).apply(transactionWithCalculatedItems))
                 .flatMap(transactionWithCalculatedItemsAndShippingAddress -> productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItemsAndShippingAddress)
-                                .map(finalTransactionAmountCollector::collect)
-                                .flatMap(transactionWithAmounts -> CountryIsUsaChecker.isCountryUsa(transactionWithAmounts.getShippingAddress()) ?
-                                        cityCountyProvider.provide(transactionWithAmounts) :
-                                        Mono.just(transactionWithAmounts)));
+                        .map(finalTransactionAmountCollector::collect)
+                        .flatMap(transactionWithAmounts -> CountryIsUsaChecker.isCountryUsa(transactionWithAmounts.getShippingAddress()) ?
+                                cityCountyProvider.provide(transactionWithAmounts) :
+                                Mono.just(transactionWithAmounts)));
     }
 
     // Apply the discounts on items
@@ -204,7 +204,7 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.getCreatedFrom(), transaction.getTaxableItemsAmount(),
                         transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount(), transaction.getFinalTransactionAmount(), transaction.getTotalDiscount(),
                         transaction.getTransactionLevelDiscount(), transaction.getTransactionFilingStatus(), transaction.getCurrency(),
-                        transaction.getRefRate(), transaction.getExchangeRateInfo(), transaction.getSubsidiary()
+                        transaction.getRefRate(), transaction.getExchangeRateInfo(), transaction.getSubsidiary(), transaction.getIsRefundLinked()
                 );
     }
 
@@ -238,12 +238,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .flatMap(alignedCurrency -> getCurrencyExchangeRate(transaction)
                         .onErrorResume(e -> Mono.error(CurrencyNotFoundApiException::new))
                         .flatMap(exchangeRate -> calculateExchangeRateInfo(transaction, exchangeRate)
-                                .map(exchangeRateInfo -> {
-                                    transaction.setExchangeRateInfo(exchangeRateInfo);
-                                    return transaction;
-                                })
-                        )
-                )
+                                .map(transaction::setExchangeRateInfo)))
                 .defaultIfEmpty(transaction);
     }
 

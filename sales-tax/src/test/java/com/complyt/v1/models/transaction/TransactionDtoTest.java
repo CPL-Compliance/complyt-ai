@@ -51,7 +51,8 @@ class TransactionDtoTest {
                 ", currency=" + transactionDto.currency() +
                 ", refRate=" + transactionDto.refRate() +
                 ", exchangeRateInfo=" + transactionDto.exchangeRateInfo() +
-                ", subsidiary=" + transactionDto.subsidiary() + "]";
+                ", subsidiary=" + transactionDto.subsidiary() +
+                ", isRefundLinked=" + transactionDto.isRefundLinked() + "]";
 
         // When
         String actualString = transactionDto.toString();
