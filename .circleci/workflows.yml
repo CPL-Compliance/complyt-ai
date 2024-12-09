@@ -182,24 +182,31 @@ jobs:
           aws_access_key_id: AWS_ACCESS_KEY_ID
           region: AWS_DEFAULT_REGION
           aws_secret_access_key: AWS_SECRET_ACCESS_KEY
+      
       ## Deploy to production cluster
       - aws-ecs/update_service:
-          cluster: "complyt-prd"
+          cluster: "production"
           container_image_name_updates: "container=<<parameters.service_name>>, tag=${IMAGE_TAG}"
-          family: "<<parameters.service_name>>-complyt-prd"
+          family: "<<parameters.service_name>>-production"
           service_name: "<<parameters.service_name>>"
-      ## Deploy to demo cluster
-      - aws-ecs/update_service:
-          cluster: "complyt-demo"
-          container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
-          family: "<<parameters.service_name>>-complyt-demo"
-          service_name: "<<parameters.service_name>>"
-      ## Deploy to complyt-sb cluster
-      - aws-ecs/update_service:
-          cluster: "complyt-sb"
-          container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
-          family: "<<parameters.service_name>>-complyt-sb"
-          service_name: "<<parameters.service_name>>"
+      # ## Deploy to complyt-prd cluster
+      # - aws-ecs/update_service:
+      #     cluster: "complyt-prd"
+      #     container_image_name_updates: "container=<<parameters.service_name>>, tag=${IMAGE_TAG}"
+      #     family: "<<parameters.service_name>>-complyt-prd"
+      #     service_name: "<<parameters.service_name>>"
+      # ## Deploy to complyt-demo cluster
+      # - aws-ecs/update_service:
+      #     cluster: "complyt-demo"
+      #     container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
+      #     family: "<<parameters.service_name>>-complyt-demo"
+      #     service_name: "<<parameters.service_name>>"
+      # ## Deploy to complyt-sb cluster
+      # - aws-ecs/update_service:
+      #     cluster: "complyt-sb"
+      #     container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
+      #     family: "<<parameters.service_name>>-complyt-sb"
+      #     service_name: "<<parameters.service_name>>"
 
 workflows:
   sales-tax-workflow:
