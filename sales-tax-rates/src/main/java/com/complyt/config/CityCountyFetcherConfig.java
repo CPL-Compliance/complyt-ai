@@ -19,7 +19,7 @@ public class CityCountyFetcherConfig {
         return new FastTaxGetTaxInfoByCityCountyStateCityCountyFetcher();
     }
 
-    @Profile({"fastTax", "stubFastTax", "default"})
+    @Profile({"internalSalesTax", "fastTax", "stubFastTax", "stubInternalRates","internalRatesSystemTestProfile", "default"})
     @Bean("cityCountyFetcher")
     public FastTaxGetBestMatchCityCountyFetcher fastTaxGetBestMatchCityCountyAddressFetcher() {
         return new FastTaxGetBestMatchCityCountyFetcher();

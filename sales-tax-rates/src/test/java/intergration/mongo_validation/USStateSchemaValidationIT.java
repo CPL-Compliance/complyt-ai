@@ -1,7 +1,7 @@
 package intergration.mongo_validation;
 
 import com.complyt.SalesTaxRatesApplication;
-import com.example.complyt.config.SecurityConfig;
+import com.complyt.config.SecurityConfig;
 import intergration.MongoContainerInitializerIT;
 import org.bson.Document;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -29,6 +30,7 @@ import testUtils.TestUtilities;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ContextConfiguration(classes = {
         SecurityConfig.class})
+@ActiveProfiles({"stubInternalRates"})
 public class USStateSchemaValidationIT extends MongoContainerInitializerIT {
 
     @Autowired
@@ -47,7 +49,52 @@ public class USStateSchemaValidationIT extends MongoContainerInitializerIT {
     }
 
     @Test
-    public void saveSalesTaxRate_validSalesTaxRate_Success() {
+    public void saveSalesTaxRate_MissingRequestAddressCountry_throwsValidationError() {
+        ((Document) salesTaxRateDocument.get("requestAddress")).remove("country");
+
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxRate_MissingAddressCountry_throwsValidationError() {
+        ((Document) salesTaxRateDocument.get("address")).remove("country");
+
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxRate_MissingSalesTaxRatesTaxRate_throwsValidationError() {
+        ((Document) salesTaxRateDocument.get("salesTaxRates")).remove("taxRate");
+
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxRate_MissingSalesTaxRatesRatesMetaDataCityDistrictRate_throwsValidationError() {
+        ((Document) ((Document) salesTaxRateDocument.get("salesTaxRates")).get("ratesMetaData")).remove("cityDistrictRate");
+
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveSalesTaxRate_MissingSalesTaxRatesRatesMetaDataCountyDistrictRate_throwsValidationError() {
+        ((Document) ((Document) salesTaxRateDocument.get("salesTaxRates")).get("ratesMetaData")).remove("countyDistrictRate");
+
+        StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void  saveSalesTaxRate_validSalesTaxRate_Success() {
         StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectNextCount(1)
                 .verifyComplete();
@@ -81,26 +128,8 @@ public class USStateSchemaValidationIT extends MongoContainerInitializerIT {
     }
 
     @Test
-    public void saveSalesTaxRate_MissingRequestAddress_throwsValidationError() {
-        salesTaxRateDocument.remove("requestAddress");
-
-                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
     public void saveSalesTaxRate_MissingSalesTaxRates_throwsValidationError() {
         salesTaxRateDocument.remove("salesTaxRates");
-
-                StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveSalesTaxRate_MissingSalesTaxRatesTaxRate_throwsValidationError() {
-        ((Document) salesTaxRateDocument.get("salesTaxRates")).remove("taxRate");
 
                 StepVerifier.create(reactiveMongoTemplate.save(salesTaxRateDocument, "alabama"))
                 .expectError(DataIntegrityViolationException.class)
@@ -115,9 +144,6 @@ public class USStateSchemaValidationIT extends MongoContainerInitializerIT {
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
-
-
-
 
     @Test
     public void saveSalesTaxRate_InvalidCreatedDateType_throwsValidationError() {
@@ -204,6 +230,4 @@ public class USStateSchemaValidationIT extends MongoContainerInitializerIT {
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
-
-
 }

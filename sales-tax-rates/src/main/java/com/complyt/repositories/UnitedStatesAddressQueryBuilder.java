@@ -14,21 +14,21 @@ public class UnitedStatesAddressQueryBuilder implements QueryBuilder<Address> {
 
     @Override
     public Query build(@NonNull Address address) {
-        Query query = Query.query(Criteria.where("requestAddress.zip").is(address.zip()));
+        Query query = Query.query(Criteria.where("address.zip").is(address.zip()));
 
         Optional.ofNullable(address.city()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
-            query.addCriteria(Criteria.where("requestAddress.city").regex(escapedSearchString, "i"));
+            query.addCriteria(Criteria.where("address.city").regex(escapedSearchString, "i"));
         });
 
         Optional.ofNullable(address.street()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
-            query.addCriteria(Criteria.where("requestAddress.street").regex(escapedSearchString, "i"));
+            query.addCriteria(Criteria.where("address.street").regex(escapedSearchString, "i"));
         });
 
         Optional.ofNullable(address.county()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
-            query.addCriteria(Criteria.where("requestAddress.county").regex(escapedSearchString, "i"));
+            query.addCriteria(Criteria.where("address.county").regex(escapedSearchString, "i"));
         });
 
         return query;

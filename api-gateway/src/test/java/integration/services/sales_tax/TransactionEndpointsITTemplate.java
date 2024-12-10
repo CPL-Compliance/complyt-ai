@@ -18,7 +18,7 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_DoesntExistsAndSaleTaxTrackingDoesntExists_Returns400();
 
     void upsertByExternalIdAndSource_ExistsAndSaleTaxTrackingDoesntExists_Returns400();
-    
+
     void upsertByExternalIdAndSource_ConflictingTransactionAmountIsNegative_Returns400ConflictedData();
 
     void upsertByExternalIdAndSource_ConflictingTransactionItemTotalIsNotAligned_Returns400ConflictedData();
@@ -71,8 +71,13 @@ public interface TransactionEndpointsITTemplate extends
 
     void upsertByExternalIdAndSource_NonUsaCountryWithMisspellRegion_Returns200();
 
+    void upsertByExternalIdAndSource_transactionWithBothItemAndTransactionDiscount_Returns201();
+
     void upsertByExternalIdAndSource_NonUsaCountryNotExistInGTDB_Returns404NotFound();
 
+    // Testing for AddressValidation & SalesTaxRates
+    void upsertByExternalIdAndSource_HasNexus_CachedAddress_InternalRate_Returns200();
+    void upsertByExternalIdAndSource_HasNexus_CachedAddress_FastTax_Returns200();
     void upsertByExternalIdAndSource_NewTransactionWithUsdCurrency_Returns201();
 
     void upsertByExternalIdAndSource_NewTransactionWithEurCurrency_Returns201();

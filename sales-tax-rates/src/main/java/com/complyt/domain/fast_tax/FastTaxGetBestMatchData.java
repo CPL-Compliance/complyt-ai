@@ -1,6 +1,7 @@
 package com.complyt.domain.fast_tax;
 
 import com.complyt.domain.SalesTaxData;
+import com.complyt.v1.exceptions.types.fastTax.FastTaxError;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -17,6 +18,7 @@ public class FastTaxGetBestMatchData implements SalesTaxData {
     String matchLevel;
     List<TaxInfoItem> taxInfoItems;
     String UNINCORPORATED_CODE = "1";
+    FastTaxError error;
 
     @Override
     public boolean isUnincorporated() {

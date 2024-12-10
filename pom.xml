@@ -19,6 +19,7 @@
     <!--    Don't change modules order! It's necessary for system tests-->
     <modules>
         <module>discovery-service</module>
+        <module>address-validation</module>
         <module>sales-tax-rates</module>
         <module>sales-tax</module>
         <module>files</module>

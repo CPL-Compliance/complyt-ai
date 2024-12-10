@@ -1,11 +1,9 @@
 package integration;
 
 import com.github.dockerjava.api.model.ContainerNetwork;
-import com.google.cloud.NoCredentials;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import integration.test_utils.TestUtilities;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -13,6 +11,7 @@ import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
@@ -29,14 +28,16 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
+@Slf4j
 public abstract class TestContainersInitializerIT {
 
     protected static final String HOSTNAME = "test-host";
 
     // Image versions
-    protected static final String MONGO_IMAGE = "mongo:5.0.15";
+    protected static final String MONGO_IMAGE = "mongo:6.0.10";
     protected static final String KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:21.0";
     protected static final String FAKE_GCS_IMAGE = "fsouza/fake-gcs-server:latest";
 
@@ -44,6 +45,7 @@ public abstract class TestContainersInitializerIT {
     protected static final String DISCOVERY_SERVICE = "discovery-service";
     protected static final String SALES_TAX = "sales-tax";
     protected static final String SALES_TAX_RATES = "sales-tax-rates";
+    protected static final String ADDRESS_VALIDATION = "address-validation";
     protected static final String FILES = "files";
     protected static final String AUTHENTICATION = "authentication";
     protected static final String API_GATEWAY = "api-gateway";
@@ -53,6 +55,7 @@ public abstract class TestContainersInitializerIT {
     protected static final GenericContainer DISCOVERY_CONTAINER;
     protected static final GenericContainer SALES_TAX_CONTAINER;
     protected static final GenericContainer SALES_TAX_RATES_CONTAINER;
+    protected static final GenericContainer ADDRESS_VALIDATION_CONTAINER;
     protected static final GenericContainer FILES_CONTAINER;
     protected static final GenericContainer AUTHENTICATION_CONTAINER;
     protected static final GenericContainer API_GATEWAY_CONTAINER;
@@ -73,7 +76,6 @@ public abstract class TestContainersInitializerIT {
     protected static final Map<String, String> JAR_FILE_MAP = new HashMap<>();
     protected static final Network NETWORK;
 
-    //    protected static Storage storageClient;
     protected static String fakeGcsExternalUrl;
 
     static {
@@ -111,8 +113,9 @@ public abstract class TestContainersInitializerIT {
         MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(SALES_TAX_RATES), "/" + dumpPath(SALES_TAX_RATES), BindMode.READ_ONLY);
         MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(FILES), "/" + dumpPath(FILES), BindMode.READ_ONLY);
         MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(AUTHENTICATION), "/" + dumpPath(AUTHENTICATION), BindMode.READ_ONLY);
+        MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(ADDRESS_VALIDATION), "/" + dumpPath(ADDRESS_VALIDATION), BindMode.READ_ONLY);
 
-        MONGO_CONTAINER.start();
+        startContainer(MONGO_CONTAINER);
 
         // Retrieve Tokens
         getToken("complyt-admin", "complyt-admin-test-user",
@@ -140,11 +143,17 @@ public abstract class TestContainersInitializerIT {
 
         //Sales Tax Rates Container
         SALES_TAX_RATES_CONTAINER = initializeServiceContainer(SALES_TAX_RATES,
-                "java", "-Dspring.profiles.active=integration-test, stubFastTax",
+                "java", "-Dspring.profiles.active=integration-test, internalRatesSystemTestProfile",
                 mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
                 "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
         SALES_TAX_RATES_CONTAINER.start();
 
+        //Address Validation Container
+        ADDRESS_VALIDATION_CONTAINER = initializeServiceContainer(ADDRESS_VALIDATION,
+                "java", "-Dspring.profiles.active=integration-test, stubHere",
+                mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
+                "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
+        ADDRESS_VALIDATION_CONTAINER.start();
 
         FAKE_GCS_CONTAINER = new GenericContainer<>(DockerImageName.parse(FAKE_GCS_IMAGE))
                 .withNetwork(NETWORK)
@@ -176,6 +185,7 @@ public abstract class TestContainersInitializerIT {
             MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(FILES));
             MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(SALES_TAX_RATES));
             MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(AUTHENTICATION));
+            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(ADDRESS_VALIDATION));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -191,12 +201,15 @@ public abstract class TestContainersInitializerIT {
                                 .forHttp(TestUtilities.TRANSACTION_BASE_URL)
                                 .withHeader("Authorization", "Bearer " + TOKEN))
                         .withStrategy(Wait
-                                .forHttp(TestUtilities.COMPLYT_SALES_TAX_RATES_BASE_URL + "?state=CA&zip=90210&isPartial=true&country=US")
+                                .forHttp(TestUtilities.COMPLYT_GT_RATES_BASE_URL + "?country=Canada")
                                 .withHeader("Authorization", "Bearer " + TOKEN))
                         .withStrategy(Wait
                                 .forHttp(TestUtilities.FILES_BASE_URL)
                                 .withHeader("Authorization", "Bearer " + TOKEN))
-                        .withStartupTimeout(Duration.ofSeconds(60)));
+                        .withStrategy(Wait
+                                .forHttp(TestUtilities.ADDRESS_VALIDATION_BASE_URL + "?country=USA&state=New%20York&city=New%20York&zip=10013&isPartial=true")
+                                .withHeader("Authorization", "Bearer " + TOKEN))
+                        .withStartupTimeout(Duration.ofSeconds(90)));
         API_GATEWAY_CONTAINER.start();
 
         WEB_TEST_CLIENT = WebTestClient.bindToServer().responseTimeout(Duration.ofSeconds(60)).baseUrl("http://localhost:" + API_GATEWAY_CONTAINER
@@ -265,6 +278,16 @@ public abstract class TestContainersInitializerIT {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.access_token").value(tokenConsumer);
+    }
+
+    private static void startContainer(GenericContainer container) {
+        container.start();
+        container.followOutput(new Slf4jLogConsumer(log));
+    }
+
+    protected static void makeScriptRunnable(GenericContainer container, String... scriptAndArgs) throws IOException, InterruptedException {
+        container.execInContainer("cp", scriptAndArgs[0] + ".origin", scriptAndArgs[0]);
+        container.execInContainer("chmod", "+x", scriptAndArgs[0]);
     }
 
     private static void updateExternalUrlWithContainerUrl(GenericContainer fakeGcsContainer) throws Exception {

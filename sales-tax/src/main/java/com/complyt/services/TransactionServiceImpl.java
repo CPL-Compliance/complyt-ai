@@ -10,6 +10,7 @@ import com.complyt.business.transaction.*;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.domain.currency.CurrencyExchangeRateObject;
 import com.complyt.domain.currency.CurrencySource;
+import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.transaction.ExchangeRateInfo;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
@@ -130,15 +131,20 @@ public class TransactionServiceImpl implements TransactionService {
                 .map(NewTransactionInternalTimestampsInjector::inject);
     }
 
+    @Override
+    public Mono<Transaction> injectDataBySalesTaxTracking(@NonNull Transaction transaction,@NonNull SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {
+        return Mono.just(transaction.setSubsidiary(salesTaxTrackingWithNexusInfo.getSalesTaxTracking().getSubsidiary()))
+                .flatMap(transactionWithAmounts -> cityCountyProvider.provide(transactionWithAmounts, salesTaxTrackingWithNexusInfo));
+    }
+
     private Mono<Transaction> injectCommonDataToTransaction(Transaction transaction) {
         return injectStateIfMissingInPartialAddress(transaction)
                 .flatMap(this::recalculateTotalItemsPrice)
-                .map(transactionWithCalculatedItems -> (Transaction) shippingAddressAlignmentStrategy.select(transaction).apply(transactionWithCalculatedItems))
-                .flatMap(transactionWithCalculatedItemsAndShippingAddress -> productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItemsAndShippingAddress)
-                        .map(finalTransactionAmountCollector::collect)
-                        .flatMap(transactionWithAmounts -> CountryIsUsaChecker.isCountryUsa(transactionWithAmounts.getShippingAddress()) ?
-                                cityCountyProvider.provide(transactionWithAmounts) :
-                                Mono.just(transactionWithAmounts)));
+                .map(transactionWithCalculatedItems ->
+                        (Transaction) shippingAddressAlignmentStrategy.select(transaction).apply(transactionWithCalculatedItems))
+                .flatMap(transactionWithCalculatedItemsAndShippingAddress ->
+                        productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItemsAndShippingAddress)
+                                .map(finalTransactionAmountCollector::collect));
     }
 
     // Apply the discounts on items

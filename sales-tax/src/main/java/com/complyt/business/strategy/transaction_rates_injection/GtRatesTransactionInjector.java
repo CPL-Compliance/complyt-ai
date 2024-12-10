@@ -19,7 +19,7 @@ import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-public class GtRatesTransactionInjector implements RatesTransactionInjector {
+public class GtRatesTransactionInjector implements RatesTransactionInjector<ComplytGtRates> {
     @NonNull
     private TransactionGtRatesHandler transactionGtRatesHandler;
 
@@ -30,14 +30,14 @@ public class GtRatesTransactionInjector implements RatesTransactionInjector {
     private SalesTaxAggregator salesTaxAggregator;
 
     @Override
-    public Function<ComplytInternalRates, Mono<Transaction>> inject(Transaction transaction) {
-        return complytGtRates -> Mono.just(((ComplytGtRates) complytGtRates).gtRates())
+    public Function<ComplytGtRates, Mono<Transaction>> inject(Transaction transaction) {
+        return complytGtRates -> Mono.just(complytGtRates.gtRates())
                 .flatMap(gtRates -> transactionGtRatesHandler.setRates(transaction, gtRates)
                         .map(transactionWithRates -> {
                             List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transactionWithRates);
                             BigDecimal salesTaxAmount = salesTaxAggregator.aggregate(taxables, transaction.getIsTaxInclusive());
-                            SalesTax salesTax = new SalesTax(salesTaxAmount, gtRates.taxRate(), null, gtRates);
-                            
+                            SalesTax salesTax = new SalesTax(null, salesTaxAmount, gtRates.taxRate(), null, gtRates);
+
                             BigDecimal finalAmount = transaction.getIsTaxInclusive() ?
                                     transaction.getFinalTransactionAmount() :
                                     transaction.getFinalTransactionAmount().add(salesTaxAmount);

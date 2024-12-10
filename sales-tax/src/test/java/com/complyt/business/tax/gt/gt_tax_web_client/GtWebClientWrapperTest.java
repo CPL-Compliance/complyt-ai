@@ -7,7 +7,7 @@ import com.complyt.domain.transaction.tax.GtAddress;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.ComplytGtRatesMapper;
-import com.complyt.v1.models.sales_tax.gt.ComplytGtRatesDto;
+import com.complyt.v1.models.tax.global_tax.ComplytGtRatesDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,12 +31,14 @@ public class GtWebClientWrapperTest {
     SalesTaxRatesServiceProxy salesTaxRatesServiceProxy;
     UnitTestUtilities testUtilities;
     GtAddress gtAddress;
+    LocalDateTime transactionDate;
 
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(
                 LocalDateTime.now(), UUID.randomUUID().toString());
         gtAddress = testUtilities.createCanadaGtAddress();
+        transactionDate = LocalDateTime.now();
     }
 
     @Test
@@ -49,7 +51,7 @@ public class GtWebClientWrapperTest {
         // When
         when(salesTaxRatesServiceProxy.findGtByAddress(addressAsGtAddress.country(), addressAsGtAddress.region())).thenReturn(Mono.just(complytGtRatesDto));
         Mono<ComplytGtRates> actualComplytGtRates = gtWebClientWrapper
-                .findByAddress(addressAsGtAddress);
+                .findByAddress(addressAsGtAddress, transactionDate);
 
         // Then
         StepVerifier.create(actualComplytGtRates).expectNext(complytGtRates).verifyComplete();
@@ -61,7 +63,7 @@ public class GtWebClientWrapperTest {
         when(salesTaxRatesServiceProxy.findGtByAddress(gtAddress.country(), gtAddress.region()))
                 .thenReturn(Mono.error(new ComplytSalesTaxRatesException()));
         Mono<ComplytGtRates> actualComplytGtRates = gtWebClientWrapper
-                .findByAddress(null, gtAddress.country(), null, null, null, null, gtAddress.region(), false);
+                .findByAddress(null, gtAddress.country(), null, null, null, null, gtAddress.region(), false, transactionDate);
 
         // Then
         StepVerifier.create(actualComplytGtRates)
@@ -78,7 +80,7 @@ public class GtWebClientWrapperTest {
                 .thenReturn(Mono.error(testUtilities.create404NodFoundFeignException()));
 
         Mono<ComplytGtRates> actualComplytGtRates = gtWebClientWrapper
-                .findByAddress(null, gtAddress.country(), null, null, null, null, gtAddress.region(), false);
+                .findByAddress(null, gtAddress.country(), null, null, null, null, gtAddress.region(), false, transactionDate);
 
         // Then
         StepVerifier.create(actualComplytGtRates).expectError(ObjectNotFoundApiException.class).verify();
@@ -90,7 +92,7 @@ public class GtWebClientWrapperTest {
         when(salesTaxRatesServiceProxy.findGtByAddress(gtAddress.country(), gtAddress.region()))
                 .thenReturn(Mono.error(new ComplytSalesTaxRatesException()));
         Mono<ComplytGtRates> actualComplytGtRates = gtWebClientWrapper
-                .findByAddress(null, gtAddress.country(), null, null, null, null, gtAddress.region(), false);
+                .findByAddress(null, gtAddress.country(), null, null, null, null, gtAddress.region(), false, transactionDate);
 
         // Then
         StepVerifier.create(actualComplytGtRates).expectError(ComplytSalesTaxRatesException.class).verify();

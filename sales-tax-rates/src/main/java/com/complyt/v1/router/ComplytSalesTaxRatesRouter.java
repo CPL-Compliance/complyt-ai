@@ -16,11 +16,10 @@ public class ComplytSalesTaxRatesRouter {
     @Bean
     @GetSalesTaxRatesByAddressApiInfo
     public RouterFunction<ServerResponse> getComplytSalesTaxRatesByAddress(@NonNull final ComplytSalesTaxRatesHandler complytSalesTaxRatesHandler) {
-        RequestPredicate getTransactionRoute = RequestPredicates
+        RequestPredicate getSalesTaxRatesRoute = RequestPredicates
                 .GET(BASE_URL)
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
-        return RouterFunctions.route(getTransactionRoute, complytSalesTaxRatesHandler::getSalesTaxRatesByAddress);
+        return RouterFunctions.route(getSalesTaxRatesRoute, complytSalesTaxRatesHandler::getSalesTaxRatesByAddress);
     }
-
 }

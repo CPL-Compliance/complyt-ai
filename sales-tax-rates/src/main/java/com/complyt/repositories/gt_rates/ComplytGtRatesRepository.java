@@ -3,7 +3,7 @@ package com.complyt.repositories.gt_rates;
 import com.complyt.domain.gt.ComplytGtRates;
 import com.complyt.domain.gt.GtAddress;
 import com.complyt.repositories.QueryBuilder;
-import com.complyt.utils.observability.ContextLogger;
+import com.complyt.utils.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

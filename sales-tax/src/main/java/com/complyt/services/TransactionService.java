@@ -1,5 +1,6 @@
 package com.complyt.services;
 
+import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.services.crud.CrudService;
 import lombok.NonNull;
@@ -37,4 +38,5 @@ public interface TransactionService extends CrudService<Transaction, String> {
     Boolean hasModifiedTransactionStatusChangedToCancelled(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction);
     Mono<Transaction> injectExchangeRateIfNeeded(@NonNull final Transaction transaction);
     Mono<Transaction> calculateTotalAmounts(Transaction transaction);
+    Mono<Transaction> injectDataBySalesTaxTracking(Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo);
 }

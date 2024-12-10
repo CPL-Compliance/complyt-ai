@@ -1,6 +1,6 @@
 package com.complyt.v1.api_info.sales_tax_rates;
 
-import com.complyt.v1.model.SalesTaxRatesDto;
+import com.complyt.v1.model.common_sales_tax_rates.SalesTaxRatesDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;

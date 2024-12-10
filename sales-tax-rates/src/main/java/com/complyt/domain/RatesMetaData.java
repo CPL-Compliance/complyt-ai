@@ -5,5 +5,5 @@ import lombok.With;
 import java.math.BigDecimal;
 
 @With
-public record RatesMetaData(BigDecimal cityDistrictRate, BigDecimal countyDistrictRate) {
+public record RatesMetaData(BigDecimal cityDistrictRate, BigDecimal countyDistrictRate, BigDecimal specialDistrictRate) {
 }

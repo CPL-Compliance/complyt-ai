@@ -15,17 +15,18 @@ import java.math.BigDecimal;
 public interface FastTaxGetBestMatchDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
     FastTaxGetBestMatchDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(FastTaxGetBestMatchDataToSalesTaxRateMapper.class);
 
-    @Mapping(target = "ratesMetaData.cityDistrictRate", source = "cityDistrictRate")
-    @Mapping(target = "ratesMetaData.countyDistrictRate", source = "countyDistrictRate")
-    @Mapping(target = "cityRate", source = "cityRate")
-    @Mapping(target = "taxRate", source = "taxRate")
-    @Mapping(target = "countyRate", source = "countyRate")
-    @Mapping(target = "stateRate", source = "stateRate")
-    @Mapping(expression = "java(toCombinedDistrictRate(taxInfoItem))", target = "combinedDistrictRate")
+    @Mapping(target = "ratesMetaData.cityDistrictRate", expression = "java(stripTrailingZeros(new BigDecimal(taxInfoItem.cityDistrictRate())))")
+    @Mapping(target = "ratesMetaData.countyDistrictRate", expression = "java(stripTrailingZeros(new BigDecimal(taxInfoItem.countyDistrictRate())))")
+    @Mapping(target = "ratesMetaData.specialDistrictRate", expression = "java(stripTrailingZeros(new BigDecimal(taxInfoItem.specialDistrictRate())))")
+    @Mapping(target = "cityRate", expression = "java(stripTrailingZeros(new BigDecimal(taxInfoItem.cityRate())))")
+    @Mapping(target = "taxRate", expression = "java(stripTrailingZeros(new BigDecimal(taxInfoItem.taxRate())))")
+    @Mapping(target = "countyRate", expression = "java(stripTrailingZeros(new BigDecimal(taxInfoItem.countyRate())))")
+    @Mapping(target = "stateRate", expression = "java(stripTrailingZeros(new BigDecimal(taxInfoItem.stateRate())))")
+    @Mapping(target = "combinedDistrictRate", expression = "java(toCombinedDistrictRate(taxInfoItem))")
     SalesTaxRates map(TaxInfoItem taxInfoItem);
 
     default BigDecimal toCombinedDistrictRate(TaxInfoItem taxInfoItem) {
-        return new BigDecimal(taxInfoItem.cityDistrictRate()).add(new BigDecimal(taxInfoItem.countyDistrictRate()));
+        return stripTrailingZeros(new BigDecimal(taxInfoItem.cityDistrictRate()).add(new BigDecimal(taxInfoItem.countyDistrictRate()).add(new BigDecimal(taxInfoItem.specialDistrictRate()))));
     }
 
     @Override
@@ -34,5 +35,12 @@ public interface FastTaxGetBestMatchDataToSalesTaxRateMapper extends SalesTaxDat
         TaxInfoItem taxInfoItem = fastTaxGetBestMatchData.getTaxInfoItems().get(0);
 
         return map(taxInfoItem);
+    }
+
+    /**
+     * Utility method to strip trailing zeros from a BigDecimal.
+     */
+    default BigDecimal stripTrailingZeros(BigDecimal value) {
+        return value != null ? value.stripTrailingZeros() : null;
     }
 }

@@ -8,7 +8,7 @@ import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.checkables.ExternalIdCheckable;
 import com.complyt.v1.models.checkables.SourceCheckable;
 import com.complyt.v1.models.customer.CustomerDto;
-import com.complyt.v1.models.sales_tax.SalesTaxDto;
+import com.complyt.v1.models.tax.sales_tax.SalesTaxDto;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -18,6 +18,8 @@ import lombok.With;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+
+import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
 
 @With
 @Schema(name = "transaction", description = FieldsDescriptions.TRANSACTION)
@@ -40,7 +42,7 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(description = FieldsDescriptions.CREATED_FROM) @Size(max = 256, message = "createdFrom " + StringErrorMessages.MAX_256_ERROR) String createdFrom,
                              @Schema(description = FieldsDescriptions.TAXABLE_ITEMS_AMOUNT) BigDecimal taxableItemsAmount,
                              @Schema(description = FieldsDescriptions.TANGIBLE_ITEMS_AMOUNT) BigDecimal tangibleItemsAmount,
-                             @Schema(description = FieldsDescriptions.TOTAL_ITEMS_AMOUNT) BigDecimal totalItemsAmount,
+                             @Schema(description = FieldsDescriptions.TOTAL_ITEMS_AMOUNT, requiredMode = Schema.RequiredMode.NOT_REQUIRED, accessMode = READ_ONLY) BigDecimal totalItemsAmount,
                              @Schema(description = FieldsDescriptions.TOTAL_DISCOUNT) BigDecimal totalDiscount,
                              @Schema(description = FieldsDescriptions.TRANSACTION_LEVEL_DISCOUNT) @PositiveOrZero(message = "Transaction.transactionLevelDiscount " + NumericErrorMessages.MUST_BE_POSITIVE_ERROR) BigDecimal transactionLevelDiscount,
                              @Schema(description = FieldsDescriptions.FINAL_TRANSACTION_AMOUNT) BigDecimal finalTransactionAmount,

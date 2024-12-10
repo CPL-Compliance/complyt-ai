@@ -48,12 +48,13 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     void calculate_CityRuleIsTaxable_ReturnsTaxableCityRate() {
         // Given
         SubJurisdictionalTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true);
+        SalesTaxRates expectedSalesTaxRates = salesTaxRates.withTaxRate(BigDecimal.valueOf(0.3)); // city + county + state
 
         // When
         SalesTaxRates actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(taxableCityRule, salesTaxRates);
 
         // Then
-        assertEquals(salesTaxRates, actualSalesTaxRate);
+        assertEquals(expectedSalesTaxRates, actualSalesTaxRate);
     }
 
     @Test
@@ -91,8 +92,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
         BigDecimal newCityRate = taxableCityRule.getCalculationValue();
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates()
                 .withCityRate(newCityRate);
-        BigDecimal taxRate = newCityRate.add(salesTaxRates.combinedDistrictRate())
-                .add(salesTaxRates.countyRate()).add(salesTaxRates.stateRate());
+        BigDecimal taxRate = newCityRate.add(salesTaxRates.countyRate()).add(salesTaxRates.stateRate());
 
         SalesTaxRates expectedSalesTaxRate = salesTaxRates.withTaxRate(taxRate).withCityRate(newCityRate);
 
@@ -111,8 +111,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
                 .withCalculationType(CalculationType.PERCENTAGE);
         SalesTaxRates originalSalesTaxRate = UnitTestUtilities.createCaliforniaSalesTaxRates().withCityRate(new BigDecimal("0.05"));
         BigDecimal newCityTaxRate = originalSalesTaxRate.cityRate().multiply(taxableCityRule.getCalculationValue());
-        BigDecimal taxRate = newCityTaxRate.add(originalSalesTaxRate.combinedDistrictRate())
-                .add(originalSalesTaxRate.countyRate()).add(originalSalesTaxRate.stateRate());
+        BigDecimal taxRate = newCityTaxRate.add(originalSalesTaxRate.countyRate()).add(originalSalesTaxRate.stateRate());
 
         SalesTaxRates expectedSalesTaxRate = originalSalesTaxRate.withTaxRate(taxRate).withCityRate(newCityTaxRate);
 

@@ -421,7 +421,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError() {
+    public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400ValidationError() {
         // Given
         String externalId = "1003";
 

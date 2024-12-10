@@ -1,7 +1,8 @@
 package com.complyt.v1.validators.query_params;
 
-import com.complyt.utils.observability.ContextLogger;
+import com.complyt.utils.ContextLogger;
 import com.complyt.v1.model.AddressDto;
+import com.complyt.v1.model.AddressWithDateDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -9,23 +10,24 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
-public class AddressDtoQueryParamsExtractor implements QueryParamsExtractor<AddressDto> {
+public class AddressDtoQueryParamsExtractor implements QueryParamsExtractor<AddressWithDateDto> {
 
-    public Mono<AddressDto> extract(ServerRequest serverRequest) {
+    public Mono<AddressWithDateDto> extract(ServerRequest serverRequest) {
         String state = serverRequest.queryParam("state").orElse(null);
         String country = serverRequest.queryParam("country").orElse(null);
         String city = serverRequest.queryParam("city").orElse(null);
         String street = serverRequest.queryParam("street").orElse(null);
         String zip = serverRequest.queryParam("zip").orElse(null);
         String county = serverRequest.queryParam("county").orElse(null);
+        String requiredDate = serverRequest.queryParam("requiredDate").orElse(null);
         boolean isPartial = serverRequest.queryParam("isPartial")
                 .map(Boolean::valueOf)
                 .orElse(false);
 
-        AddressDto address = new AddressDto(city, country, county, state, street, zip, isPartial);
+        AddressWithDateDto addressAndTransactionDateDto = new AddressWithDateDto(new AddressDto(city, country, county, state, street, zip, isPartial),
+                requiredDate);
 
-        return ContextLogger.observeCtx("Address extracted from request query params: " + address, log::info)
-                .then(Mono.just(address));
+        return ContextLogger.observeCtx("Address extracted from request query params: " + addressAndTransactionDateDto, log::info)
+                .then(Mono.just(addressAndTransactionDateDto));
     }
-
 }

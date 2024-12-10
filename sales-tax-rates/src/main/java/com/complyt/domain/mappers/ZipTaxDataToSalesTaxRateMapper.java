@@ -1,5 +1,6 @@
 package com.complyt.domain.mappers;
 
+import com.complyt.annotations.Generated;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.zip_tax.Result;
@@ -11,6 +12,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.math.BigDecimal;
 
+@Generated // Not In Use
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
 public interface ZipTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
     ZipTaxDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(ZipTaxDataToSalesTaxRateMapper.class);

@@ -1,6 +1,6 @@
 package com.complyt.business.transaction.data_fetcher;
 
-import com.complyt.business.tax.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
+import com.complyt.business.address_validation.AddressValidationWebClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.CityCountyWrapper;
@@ -26,7 +26,8 @@ class TransactionCityCountyFetcherTest {
     @InjectMocks
     private TransactionCityCountyFetcher transactionCityCountyFetcher;
     @Mock
-    StubComplytSalesTaxRatesClientWrapper salesTaxWebClientWrapper;
+    AddressValidationWebClientWrapper<Address> addressAddressValidationWebClientWrapper;
+
     UnitTestUtilities testUtilities;
     private Transaction transaction;
 
@@ -42,13 +43,14 @@ class TransactionCityCountyFetcherTest {
         Address addressWithCounty = UnitTestUtilities.createAddressInCalifornia().withCounty("Fresno");
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates()
                 .withAddress(addressWithCounty);
+        Address address = transaction.getShippingAddress();
 
 
-        CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(complytSalesTaxRates.address().city(), addressWithCounty.county());
+        CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(address.city(), address.county());
 
         // When
-        when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(complytSalesTaxRates));
-        Mono<CityCountyWrapper> cityCountyWrapperMono = transactionCityCountyFetcher.fetch(transaction.getShippingAddress());
+        when(addressAddressValidationWebClientWrapper.validateAddress(address)).thenReturn(Mono.just(address));
+        Mono<CityCountyWrapper> cityCountyWrapperMono = transactionCityCountyFetcher.fetch(address);
 
         // Then
         StepVerifier.create(cityCountyWrapperMono).expectNext(cityCountyWrapper).verifyComplete();

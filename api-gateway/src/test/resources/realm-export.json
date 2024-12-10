@@ -32,7 +32,8 @@
         "create:api_key",
         "create:secret_key",
         "read:client_tracking",
-        "update:client_tracking"
+        "update:client_tracking",
+        "update:sales_tax_rates"
       ]
     },
     {
@@ -75,7 +76,8 @@
         "read:sales_tax_rates",
         "read:global_tax_rates",
         "read:link",
-        "read:state"
+        "read:state",
+        "read:address_validation"
       ]
     },
     {
@@ -202,6 +204,14 @@
     },
     {
       "name": "update:client_tracking",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "read:address_validation",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "update:sales_tax_rates",
       "protocol": "openid-connect"
     }
   ],

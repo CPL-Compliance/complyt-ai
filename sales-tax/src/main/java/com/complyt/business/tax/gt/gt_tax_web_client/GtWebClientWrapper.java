@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 @EqualsAndHashCode
 @AllArgsConstructor
@@ -29,7 +30,8 @@ public class GtWebClientWrapper implements SalesTaxRatesWebClientWrapper<Complyt
     SalesTaxRatesServiceProxy salesTaxRatesServiceProxy;
 
     @Override
-    public Mono<ComplytGtRates> findByAddress(String state, String country, String county, String city, String street, String zip, String region, boolean isPartial) {
+    public Mono<ComplytGtRates> findByAddress(String state, String country, String county, String city,
+                                              String street, String zip, String region, boolean isPartial, LocalDateTime transactionDate) {
         String standardizedCountry = CountryToStandardizedCountry.standardize(country);
 
         return salesTaxRatesServiceProxy.findGtByAddress(standardizedCountry, region)
@@ -46,7 +48,7 @@ public class GtWebClientWrapper implements SalesTaxRatesWebClientWrapper<Complyt
     }
 
     @Override
-    public Mono<ComplytGtRates> findByAddress(Address address) {
-        return findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.region(), address.isPartial());
+    public Mono<ComplytGtRates> findByAddress(Address address, LocalDateTime transactionDate) {
+        return findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.region(), address.isPartial(), transactionDate);
     }
 }

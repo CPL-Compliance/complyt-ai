@@ -1,7 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.transaction.tax.ComplytGtRates;
-import com.complyt.v1.models.sales_tax.gt.ComplytGtRatesDto;
+import com.complyt.v1.models.tax.global_tax.ComplytGtRatesDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

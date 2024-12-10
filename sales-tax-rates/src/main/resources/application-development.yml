@@ -1,5 +1,6 @@
 eureka:
   client:
+    enable: false
     serviceUrl:
       defaultZone: http://localhost:8080/eureka
     should-unregister-on-shutdown: true

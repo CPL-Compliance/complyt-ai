@@ -1,10 +1,10 @@
 package intergration;
 
 import com.complyt.SalesTaxRatesApplication;
+import com.complyt.config.SecurityConfig;
 import com.complyt.v1.model.gt.ComplytGtRatesDto;
 import com.complyt.v1.model.gt.GtAddressDto;
 import com.complyt.v1.router.GtRatesRouter;
-import com.example.complyt.config.SecurityConfig;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -33,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ContextConfiguration(classes = {
         SecurityConfig.class})
+@ActiveProfiles({"stubInternalRates"})
 public class ComplytGtRatesEnodpointsIT extends MongoContainerInitializerIT {
 
     @Autowired

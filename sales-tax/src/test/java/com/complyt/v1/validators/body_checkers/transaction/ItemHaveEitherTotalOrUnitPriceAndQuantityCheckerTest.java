@@ -176,5 +176,4 @@ class ItemHaveEitherTotalOrUnitPriceAndQuantityCheckerTest {
         StepVerifier.create(errorStringFlux)
                 .expectNext(DtoErrorMessages.ITEMS_MISSING_TOTAL_OR_QUANTITY_AND_UNITPRICE).verifyComplete();
     }
-
 }

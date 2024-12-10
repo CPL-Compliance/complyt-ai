@@ -12,15 +12,16 @@ import org.mapstruct.factory.Mappers;
 
 import java.math.BigDecimal;
 
+@Generated // Not in Use
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
 public interface TaxJarDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
     TaxJarDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(TaxJarDataToSalesTaxRateMapper.class);
 
-    @Mapping(expression = "java(toBigDecimal(rate.getCityRate()))", target = "cityRate")
-    @Mapping(expression = "java(toBigDecimal(rate.getCombinedRate()))", target = "taxRate")
-    @Mapping(expression = "java(toBigDecimal(rate.getCountyRate()))", target = "countyRate")
-    @Mapping(expression = "java(toBigDecimal(rate.getCombinedDistrictRate()))", target = "combinedDistrictRate")
-    @Mapping(expression = "java(toBigDecimal(rate.getStateRate()))", target = "stateRate")
+    @Mapping(target = "cityRate", expression = "java(toBigDecimal(rate.getCityRate()))")
+    @Mapping(target = "taxRate", expression = "java(toBigDecimal(rate.getCombinedRate()))")
+    @Mapping(target = "countyRate", expression = "java(toBigDecimal(rate.getCountyRate()))")
+    @Mapping(target = "combinedDistrictRate", expression = "java(toBigDecimal(rate.getCombinedDistrictRate()))")
+    @Mapping(target = "stateRate", expression = "java(toBigDecimal(rate.getStateRate()))")
     SalesTaxRates map(Rate rate);
 
     @Generated

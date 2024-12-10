@@ -1,5 +1,7 @@
 package testUtils.unit_test;
 
+import com.complyt.business.tax.sales_tax.models.ComplytInternalSalesTaxRatesDto;
+import com.complyt.business.tax.sales_tax.models.InternalSalesTaxRatesDto;
 import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.*;
 import com.complyt.domain.currency.CurrencyExchangeRateObject;
@@ -31,10 +33,8 @@ import com.complyt.v1.models.customer.CustomerStatusDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.*;
 import com.complyt.v1.models.nexus.*;
-import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
-import com.complyt.v1.models.sales_tax.SalesTaxDto;
-import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
-import com.complyt.v1.models.sales_tax.gt.GtRatesDto;
+import com.complyt.v1.models.tax.global_tax.GtRatesDto;
+import com.complyt.v1.models.tax.sales_tax.*;
 import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.validators.body_checkers.transaction.*;
 import feign.FeignException;
@@ -42,7 +42,6 @@ import feign.Request;
 import org.springframework.data.mongodb.core.query.Update;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -82,25 +81,68 @@ public class UnitTestUtilities {
         return new MandatoryAddressDto("Fresno", "US", "county", "CA", "7498 N Remington Ave", "", "93711-5508", false);
     }
 
+
     public static SalesTaxRates createCaliforniaSalesTaxRates() {
-        return new SalesTaxRates(new BigDecimal(0), new BigDecimal(0), new BigDecimal("0.005"), new BigDecimal("0.0125"), new BigDecimal("0.06"), null);
+        return new SalesTaxRates(
+                new BigDecimal("0.06"), // stateRate
+                new BigDecimal("0.0125"), // countyRate
+                new BigDecimal("0.005"), // cityRate
+                new BigDecimal("0"), // combinedDistrictRate
+                null, // ratesMetaData
+                null, // mtaRate
+                null, // spdRate
+                null, // otherRate
+                new BigDecimal("0.0775") // taxRate
+        );
     }
 
     public static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
-        return new SalesTaxRatesDto(new BigDecimal(0), new BigDecimal(0), new BigDecimal("0.005"), new BigDecimal("0.0125"), new BigDecimal("0.06"), null);
+        return new SalesTaxRatesDto(
+                new BigDecimal("0.06"), // stateRate
+                new BigDecimal("0.0125"), // countyRate
+                new BigDecimal("0.005"), // cityRate
+                new BigDecimal("0"), // combinedDistrictRate
+                null, // ratesMetaData
+                null, // mtaRate
+                null, // spdRate
+                null, // otherRate
+                new BigDecimal("0.0775") // taxRate
+        );
     }
 
     public static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
         Address address = createAddressInCalifornia();
         SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
-        return new ComplytSalesTaxRates(address, salesTaxRates);
+        return new ComplytSalesTaxRates(null, address, salesTaxRates);
     }
 
     public static ComplytSalesTaxRatesDto createCaliforniaComplytSalesTaxRatesDto() {
-        MandatoryAddressDto address = createAddressDtoInCalifornia();
+        SalesTaxRatesAddressDto address = createSalesTaxRatesAddressDto();
         SalesTaxRatesDto salesTaxRates = createCaliforniaSalesTaxRatesDto();
         return new ComplytSalesTaxRatesDto(address, salesTaxRates);
     }
+
+    public static SalesTaxRatesAddressDto createSalesTaxRatesAddressDto() {
+        return new SalesTaxRatesAddressDto("US", "CA", "county","Fresno", null, null, "12345", null, null, null, true);
+    }
+
+    public static ComplytInternalSalesTaxRatesDto createComplytInternalSalesTaxRatesDto() {
+        return new ComplytInternalSalesTaxRatesDto(null, createSalesTaxRatesAddressDto(), createInternalSalesTaxRatesDto(UUID.randomUUID()), null);
+    }
+
+    public static InternalSalesTaxRatesDto createInternalSalesTaxRatesDto(UUID complytId) {
+        return new InternalSalesTaxRatesDto(
+                new BigDecimal(0),
+                new BigDecimal(0),
+                new BigDecimal("0.005"),
+                BigDecimal.ZERO,
+                null,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                new BigDecimal("0.0125"));
+    }
+
 
     public static boolean stringPassedRegex(String input, Pattern pattern) {
         Matcher matcher = pattern.matcher(input);
@@ -401,15 +443,15 @@ public class UnitTestUtilities {
     }
 
     public SalesTax createSalesTaxWithAllFields() {
-        return new SalesTax(BigDecimal.ZERO, BigDecimal.ZERO, createSalesTaxRates(), createGtRates());
+        return new SalesTax(null, BigDecimal.ZERO, BigDecimal.ZERO, createSalesTaxRates(), createGtRates());
     }
 
     public SalesTax createSalesTaxWithAmount(BigDecimal amount) {
-        return new SalesTax(amount, BigDecimal.ZERO, createSalesTaxRates(), createGtRates());
+        return new SalesTax(null, amount, BigDecimal.ZERO, createSalesTaxRates(), createGtRates());
     }
 
     public SalesTaxDto createSalesTaxDtoWithAllFields() {
-        return new SalesTaxDto(BigDecimal.ZERO, BigDecimal.ZERO, createSalesTaxRatesDto(), createGtRatesDto());
+        return new SalesTaxDto(null, BigDecimal.ZERO, BigDecimal.ZERO, createSalesTaxRatesDto(), createGtRatesDto());
     }
 
 
@@ -478,7 +520,7 @@ public class UnitTestUtilities {
     }
 
     public SalesTaxRates createSalesTaxRates() {
-        return new SalesTaxRates(new BigDecimal("0.1"), new BigDecimal("0.1"), new BigDecimal("0.1"), new BigDecimal("0.4"), new BigDecimal("0.1"), null);
+        return new SalesTaxRates(new BigDecimal("0.1"), new BigDecimal("0.1"), new BigDecimal("0.1"), BigDecimal.ZERO, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, new BigDecimal("0.4"));
     }
 
     public GtRates createGtRates() {
@@ -498,7 +540,7 @@ public class UnitTestUtilities {
     }
 
     public SalesTaxRatesDto createSalesTaxRatesDto() {
-        return new SalesTaxRatesDto(new BigDecimal("0.1"), new BigDecimal("0.1"), new BigDecimal("0.1"), new BigDecimal("0.4"), new BigDecimal("0.1"), null);
+        return new SalesTaxRatesDto(null, new BigDecimal("0.1"), new BigDecimal("0.1"), new BigDecimal("0.1"),null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, new BigDecimal("0.1"));
     }
 
     public GtRatesDto createGtRatesDto() {
@@ -781,8 +823,19 @@ public class UnitTestUtilities {
                 0, 0, "");
     }
 
+    public String capitalizeFirstLetter(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+        return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
+    }
+
     public Address createAddress() {
         return new Address("City", "Country", "County", "CA", "Street", "Zip", "region", false);
+    }
+
+    public MandatoryAddressDto createMandatoryAddressDto() {
+        return new MandatoryAddressDto("City", "Country", "County", "CA", "Street", "region", "Zip", false);
     }
 
     public Address createUsaAddress() {
@@ -937,16 +990,20 @@ public class UnitTestUtilities {
                         null, null, null), null, Map.of("Authorization", List.of("Dummy Bearer")));
     }
 
-    public SalesTaxTracking insertSummeryToNexusCalculationSummaries(LocalDate localDate, NexusCalculationSummary nexusCalculationSummary, SalesTaxTracking salesTaxTracking) {
-        Map<LocalDate, NexusCalculationSummary> map = salesTaxTracking.getNexusCalculationSummaries();
-        map.put(localDate, nexusCalculationSummary);
-        return salesTaxTracking.withNexusCalculationSummaries(map);
+    public static FeignException.BadRequest create400BadRequestFeignException() {
+        return new FeignException.BadRequest("Bad request",
+                Request.create(Request.HttpMethod.GET, "sales_tax_rates_uri",
+                        Map.of("Authorization", List.of("Dummy Bearer")),
+                        null, null, null), null, Map.of("Authorization", List.of("Dummy Bearer")));
     }
 
-    public SalesTaxTracking insertTransactionToTransactionCalculationSummaries(TransactionNexusSummary transactionNexusSummary, SalesTaxTracking salesTaxTracking) {
-        Map<UUID, TransactionNexusSummary> map = salesTaxTracking.getTransactionNexusSummaries();
-        map.put(UUID.randomUUID(), transactionNexusSummary);
-        return salesTaxTracking.withTransactionNexusSummaries(map);
+
+    public RatesMetaDataDto createRatesMetaDataDto() {
+        return new RatesMetaDataDto(BigDecimal.valueOf(0.1), BigDecimal.valueOf(0.2), BigDecimal.ZERO);
+    }
+
+    public ComplytSalesTaxRatesDto createComplytSalesTaxRatesDto() {
+        return new ComplytSalesTaxRatesDto(createSalesTaxRatesAddressDto(), createSalesTaxRatesDto());
     }
 
     public CurrencyExchangeRateObject createCurrencyExchangeRateObject(String currency, LocalDateTime date, BigDecimal rate) {

@@ -1,7 +1,6 @@
 package com.complyt.business.transaction.data_fetcher;
 
-import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
-import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
+import com.complyt.business.address_validation.AddressValidationWebClientWrapper;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.CityCountyWrapper;
 import lombok.AllArgsConstructor;
@@ -16,11 +15,11 @@ import reactor.core.publisher.Mono;
 public class TransactionCityCountyFetcher implements CityCountyFetcher {
 
     @NonNull
-    private SalesTaxRatesWebClientWrapper<ComplytSalesTaxRates> salesTaxWebClientWrapper;
+    AddressValidationWebClientWrapper<Address> complytAddressValidationWebClientWrapper;
 
     @Override
     public Mono<CityCountyWrapper> fetch(Address address) {
-        return salesTaxWebClientWrapper.findByAddress(address)
-                .map(complytSalesTaxRates -> new CityCountyWrapper(complytSalesTaxRates.address().city(), complytSalesTaxRates.address().county()));
+        return complytAddressValidationWebClientWrapper.validateAddress(address)
+                .map(validatedAddress -> new CityCountyWrapper(validatedAddress.city(), validatedAddress.county()));
     }
 }

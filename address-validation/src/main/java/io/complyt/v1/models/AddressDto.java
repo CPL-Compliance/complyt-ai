@@ -1,0 +1,23 @@
+package io.complyt.v1.models;
+
+import io.complyt.utils.ZipRegex;
+import io.complyt.v1.config.error_messages.DtoErrorMessages;
+import io.complyt.v1.config.error_messages.StringErrorMessages;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.With;
+
+@With
+@Schema(name = "Address")
+public record AddressDto(
+        @Size(max = 100, message = "Address.city " + StringErrorMessages.MAX_100_ERROR) String city,
+        @NotBlank(message = "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR) @Size(max = 50, message = "Address.country " + StringErrorMessages.MAX_50_ERROR) String country,
+        @Size(max = 100, message = "Address.county " + StringErrorMessages.MAX_100_ERROR) String county,
+        @NotBlank(message = "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR) @Size(max = 100, message = "Address.state " + StringErrorMessages.MAX_100_ERROR) String state,
+        @Size(max = 200, message = "Address.street " + StringErrorMessages.MAX_200_ERROR) String street,
+        @NotBlank(message = "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR)
+        @Size(max = 20, message = "Address.zip " + StringErrorMessages.MAX_20_ERROR) String zip,
+        @Schema(description = "whether country, city or street are necessary") boolean isPartial) {
+}

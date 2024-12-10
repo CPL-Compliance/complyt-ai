@@ -4,7 +4,7 @@ import com.complyt.domain.RatesMetaData;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.mappers.SalesTaxDataToSalesTaxRateMapper;
-import com.complyt.utils.observability.ContextLogger;
+import com.complyt.utils.ContextLogger;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;

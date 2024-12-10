@@ -293,4 +293,35 @@ public class NexusCalculatorTest {
         // Then
         assertEquals("salesTaxTracking is marked non-null but is null", exception.getMessage());
     }
+
+    @Test
+    void initNexusCalculationSummaryByDateRange_RemovesKeyDoesntAppear() {
+        Mono<SalesTaxTracking> result = nexusCalculator.initNexusCalculationSummaryByDateRange(salesTaxTracking, dateRange);
+
+        StepVerifier.create(result)
+                .expectNextMatches(updatedSalesTaxTracking -> {
+                    Map<LocalDate, NexusCalculationSummary> summaries = updatedSalesTaxTracking.getNexusCalculationSummaries();
+                    return !summaries.containsKey(dateRange.getEnd().toLocalDate());
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void initNexusCalculationSummaryByDateRange_RemovesKeyAppears() {
+        // Adding new nexusSummery
+        Map<LocalDate, NexusCalculationSummary> map = salesTaxTracking.getNexusCalculationSummaries();
+        map.put(dateRange.getEnd().toLocalDate(), new NexusCalculationSummary(0, BigDecimal.ONE));
+
+        SalesTaxTracking salesTaxTrackingWithKey = salesTaxTracking.withNexusCalculationSummaries(map);
+        Mono<SalesTaxTracking> result = nexusCalculator.initNexusCalculationSummaryByDateRange(salesTaxTrackingWithKey, dateRange);
+
+        StepVerifier.create(result)
+                .expectNextMatches(updatedSalesTaxTracking -> {
+                    Map<LocalDate, NexusCalculationSummary> summaries = updatedSalesTaxTracking.getNexusCalculationSummaries();
+                    return !summaries.containsKey(dateRange);
+                })
+                .verifyComplete();
+    }
+
+
 }

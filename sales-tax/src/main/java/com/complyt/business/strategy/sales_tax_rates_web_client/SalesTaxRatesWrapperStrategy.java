@@ -25,11 +25,11 @@ public class SalesTaxRatesWrapperStrategy extends FunctionSelectorByTransactionA
 
     @Override
     protected Function<Address, Mono<ComplytSalesTaxRates>> getFunctionForUsaOption(Transaction transaction) {
-        return address -> salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress());
+        return address -> salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress(), transaction.getExternalTimestamps().getCreatedDate());
     }
 
     @Override
     protected Function<Address, Mono<ComplytGtRates>> getFunctionForNonUsaOption(Transaction transaction) {
-        return address -> gtWebClientWrapper.findByAddress(transaction.getShippingAddress());
+        return address -> gtWebClientWrapper.findByAddress(transaction.getShippingAddress(), transaction.getExternalTimestamps().getCreatedDate());
     }
 }

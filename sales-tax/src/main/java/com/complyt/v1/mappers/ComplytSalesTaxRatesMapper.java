@@ -1,7 +1,7 @@
 package com.complyt.v1.mappers;
 
+import com.complyt.business.tax.sales_tax.models.ComplytInternalSalesTaxRatesDto;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
-import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -9,7 +9,6 @@ import org.mapstruct.factory.Mappers;
 public interface ComplytSalesTaxRatesMapper {
     ComplytSalesTaxRatesMapper INSTANCE = Mappers.getMapper(ComplytSalesTaxRatesMapper.class);
 
-    ComplytSalesTaxRates complytSalesTaxRatesDtoToComplytSalesTaxRates(ComplytSalesTaxRatesDto complytSalesTaxRatesDto);
-    ComplytSalesTaxRatesDto complytSalesTaxRatesToComplytSalesTaxRatesDto(ComplytSalesTaxRates complytSalesTaxRates);
-
+    ComplytSalesTaxRates complytSalesTaxRatesDtoToComplytSalesTaxRates(ComplytInternalSalesTaxRatesDto complytSalesTaxRatesDto);
+    ComplytInternalSalesTaxRatesDto complytSalesTaxRatesToComplytSalesTaxRatesDto(ComplytSalesTaxRates complytSalesTaxRates);
 }

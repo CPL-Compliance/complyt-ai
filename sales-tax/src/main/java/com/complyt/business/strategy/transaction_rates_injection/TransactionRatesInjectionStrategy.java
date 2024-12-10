@@ -3,7 +3,9 @@ package com.complyt.business.strategy.transaction_rates_injection;
 import com.complyt.annotations.Generated;
 import com.complyt.business.strategy.FunctionSelectorByTransactionAddressStrategy;
 import com.complyt.domain.sales_tax.ComplytInternalRates;
+import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.tax.ComplytGtRates;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
@@ -17,19 +19,19 @@ import java.util.function.Function;
 public class TransactionRatesInjectionStrategy extends FunctionSelectorByTransactionAddressStrategy {
 
     @NonNull
-    RatesTransactionInjector complytSalesTaxRatesTransactionInjector;
+    RatesTransactionInjector<ComplytSalesTaxRates> complytSalesTaxRatesTransactionInjector;
 
     @NonNull
-    RatesTransactionInjector gtRatesTransactionInjector;
+    RatesTransactionInjector<ComplytGtRates> gtRatesTransactionInjector;
 
     @Override
-    protected Function<ComplytInternalRates, Mono<Transaction>> getFunctionForUsaOption(Transaction transaction) {
-        return (complytInternalRates) -> complytSalesTaxRatesTransactionInjector.inject(transaction).apply(complytInternalRates);
+    protected Function<ComplytSalesTaxRates, Mono<Transaction>> getFunctionForUsaOption(Transaction transaction) {
+        return ComplytSalesTaxRates -> complytSalesTaxRatesTransactionInjector.inject(transaction).apply(ComplytSalesTaxRates);
     }
 
     @Generated
     @Override
-    protected Function<ComplytInternalRates, Mono<Transaction>> getFunctionForNonUsaOption(Transaction transaction) {
-        return (complytInternalRates) ->  gtRatesTransactionInjector.inject(transaction).apply(complytInternalRates);
+    protected Function<ComplytGtRates, Mono<Transaction>> getFunctionForNonUsaOption(Transaction transaction) {
+        return ComplytGtRates ->  gtRatesTransactionInjector.inject(transaction).apply(ComplytGtRates);
     }
 }

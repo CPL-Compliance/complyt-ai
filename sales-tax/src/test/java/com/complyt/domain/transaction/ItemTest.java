@@ -30,8 +30,8 @@ class ItemTest {
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        SalesTaxRates salesTaxRates = new SalesTaxRates(new BigDecimal("0.01"), new BigDecimal("0.01"),
-                new BigDecimal("0.01"), new BigDecimal("0.01"), new BigDecimal("0.01"), null);
+        SalesTaxRates salesTaxRates = new SalesTaxRates(null, new BigDecimal("0.01"), new BigDecimal("0.01"),
+                new BigDecimal("0.01"),null, null, null, null, new BigDecimal("0.01"));
         JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
                 "California", "CA", true, true, CalculationType.FIXED,
                 "description", new BigDecimal("0.07"), null);
@@ -40,17 +40,7 @@ class ItemTest {
                 .withTangibleCategory(TangibleCategory.INTANGIBLE)
                 .withJurisdictionalTaxRules(testUtilities.createJurisdictionalTaxRules())
                 .withGtRates(testUtilities.createGtRates());
-
-//                new Item(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"), "description", "name", "taxCode", rule, salesTaxRates,
-//                null, false, BigDecimal.ZERO, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
-    } //todo: note gst is null
-
-
-//    item = testUtilities.createItems(true, true)
-//            .get(0)
-//                .withSalesTaxRates(new SalesTaxRates(new BigDecimal("0.01"), new BigDecimal("0.01"),
-//                        new BigDecimal("0.01"), new BigDecimal("0.01"), new BigDecimal("0.01"), null));
-    //todo: note - old version
+    }
 
     @Test
     void calculateSalesTaxAmount_SalesTaxIsSetManually_ReturnsAmount() {
@@ -130,15 +120,8 @@ class ItemTest {
     @Test
     void Equals_sameItem_ReturnsTrue() {
         // Given
-//        SalesTaxRates salesTaxRates = new SalesTaxRates(new BigDecimal("0.01"), new BigDecimal("0.01"), new BigDecimal("0.01"),
-//                new BigDecimal("0.01"), new BigDecimal("0.01"), null);
-//        JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
-//                "California", "CA", true, true, CalculationType.FIXED,
-//                "description", new BigDecimal("0.07"), null); //todo: remove
         Item givenItem = item.withDescription(item.getDescription());
-//        Item givenItem = item = new Item(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"), "description", "name", "taxCode", rule, salesTaxRates,
-//                null, false, BigDecimal.ZERO, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
-        //todo: note gst is null
+
         // When
         boolean isEquals = item.equals(givenItem);
 

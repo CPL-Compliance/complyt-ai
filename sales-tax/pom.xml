@@ -197,7 +197,6 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
         </dependency>
-        <!-- Other -->
     </dependencies>
 
     <profiles>

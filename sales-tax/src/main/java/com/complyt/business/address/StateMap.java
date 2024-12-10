@@ -16,7 +16,6 @@ public interface StateMap {
         put("AZ", "Arizona");
         put("ARIZONA", "Arizona");
         put("ARIZONNA", "Arizona");
-        put("ARIZONA", "Arizona");
         put("AR", "Arkansas");
         put("ARKANSAS", "Arkansas");
         put("ARKANSA", "Arkansas");

@@ -1,20 +1,13 @@
 package testUtils.integration_test;
 
 import com.complyt.domain.currency.CurrencySource;
-import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
-import com.complyt.domain.sales_tax.SalesTaxRates;
-import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
-import com.complyt.domain.sales_tax.fast_tax.InformationComponent;
-import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
-import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.domain.transaction.Address;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
-import com.complyt.v1.models.customer.CustomerStatusDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.ClassificationDto;
 import com.complyt.v1.models.nexus.*;
-import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
+import com.complyt.v1.models.tax.sales_tax.RatesMetaDataDto;
+import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -93,86 +86,6 @@ public interface ITUtilities {
                 null, null, null, "C6S1", null, null);
     }
 
-    static FastTaxData stubFastTaxFlorida() {
-        return new FastTaxData("Address", List.of(new TaxInfoItem(
-                "Miami", "0", "0",
-                "Miami-Dade", "0", "0.010",
-                List.of(new InformationComponent("CountyFIPS", "086")),
-                "", "", "0",
-                "FL", "Florida", "0.06",
-                "0.070", "SERVICES", "33142")));
-    }
-
-    static FastTaxData stubFastTaxNewYork() {
-        return new FastTaxData("Address", List.of(new TaxInfoItem(
-                "New York", "0", "0.045",
-                "New York", "0.00375", "0",
-                List.of(new InformationComponent("CountyFIPS", "061")),
-                "", "", "0",
-                "NY", "New York", "0.04",
-                "0.08875", "SERVICES", "10001")));
-    }
-
-    static FastTaxData stubFastTaxMinnesota() {
-        return new FastTaxData("Address", List.of(new TaxInfoItem(
-                "Minneapolis", "0", "0.0500",
-                "Hennepin", "0", "0.00150",
-                List.of(new InformationComponent("CountyFIPS", "053")),
-                "", "", "0.00500",
-                "MN", "Minnesota", "0.06875",
-                "0.08025", "SERVICES", "55410")));
-    }
-
-    static FastTaxData stubFastTaxConnecticut() {
-        return new FastTaxData("Address", List.of(new TaxInfoItem(
-                "West Haven", "0", "0",
-                "New Haven", "0", "0",
-                List.of(new InformationComponent("CountyFIPS", "009")),
-                "", "", "0",
-                "CT", "Connecticut", "0.06350",
-                "0.06350", "SERVICES", "06516")));
-    }
-
-    static FastTaxData stubFastTaxGeorgia() {
-        return new FastTaxData("Address", List.of(new TaxInfoItem(
-                "Atlanta", "0", "0.01900",
-                "Fulton", "0", "0.03000",
-                List.of(new InformationComponent("CountyFIPS", "121")),
-                "", "", "0",
-                "GA", "Georgia", "0.0400",
-                "0.08900", "LABOR/SERVICES", "30303-3192")));
-    }
-
-    static FastTaxData stubFastTaxIndiana() {
-        return new FastTaxData("Address", List.of(new TaxInfoItem(
-                "Indianapolis", "0", "0",
-                "Marion", "0", "0",
-                List.of(new InformationComponent("CountyFIPS", "097")),
-                "", "", "0",
-                "IN", "Indiana", "0.07000",
-                "0.07000", "LABOR/SERVICES", "46202-5109")));
-    }
-
-    static FastTaxData stubFastTaxMaine() {
-        return new FastTaxData("Address", List.of(new TaxInfoItem(
-                "Cape Elizabeth", "0", "0",
-                "Cumberland", "0", "0",
-                List.of(new InformationComponent("CountyFIPS", "005")),
-                "", "", "0",
-                "IN", "Indiana", "0.05500",
-                "0.05500", "LABOR/FREIGHT/SERVICES", "04107-1929")));
-    }
-
-    static FastTaxData stubFastTaxKentucky() {
-        return new FastTaxData("Address", List.of(new TaxInfoItem(
-                "Louisville", "0", "0",
-                "Jefferson", "0", "0",
-                List.of(new InformationComponent("CountyFIPS", "111")),
-                "", "", "0",
-                "KY", "Kentucky", "0.06000",
-                "0.06000", "LABOR/SERVICES", "40127-2430")));
-    }
-
     static Jwt.Builder stubJwt() {
         return Jwt.withTokenValue("token")
                 .header("typ", "JWT")
@@ -185,45 +98,30 @@ public interface ITUtilities {
                         "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
     }
 
-    static Timestamps createTimestamps() {
-        LocalDateTime localDateTime = LocalDateTime.now();
-        return new Timestamps(localDateTime.minusYears(1), localDateTime);
-    }
-
-    static TimestampsDto createTimestampsDto() {
-        LocalDateTime localDateTime = LocalDateTime.now();
-        return new TimestampsDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
-    }
-
-    static Address createAddressInCalifornia() {
-        return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", "", false);
-    }
-
-    static MandatoryAddressDto createAddressDtoInCalifornia() {
-        return new MandatoryAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "", "93711-5508", false);
-    }
-
     static OptionalAddressDto createOptionalAddressDtoInCalifornia() {
         return new OptionalAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", null, "93711-5508", false);
     }
 
-    static SalesTaxRates createCaliforniaSalesTaxRates() {
-        return new SalesTaxRates(new BigDecimal("0.00375"), new BigDecimal("0.0"), new BigDecimal("0.00725"), new BigDecimal("0.0125"), new BigDecimal("0.06"), null);
-    }
-
-    static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
-        return new SalesTaxRatesDto(new BigDecimal("0.00375"), new BigDecimal("0.0"), new BigDecimal("0.00725"), new BigDecimal("0.0125"), new BigDecimal("0.06"), null);
+    static SalesTaxRatesDto createSalesTaxRatesDto() {
+        return new SalesTaxRatesDto(
+                new BigDecimal("0.06"), // state
+                new BigDecimal("0.0125"), // county
+                new BigDecimal("0"), // city
+                new BigDecimal("0.005"), // combinedDistrictRate
+                new RatesMetaDataDto(
+                        new BigDecimal("0"), // cityDistrictRate
+                        new BigDecimal("0.005"), // countyDistrictRate
+                        BigDecimal.ZERO
+                ),
+                null, // mtaRate
+                null, // spdRate
+                null, // otherRate
+                new BigDecimal("0.0775") // taxRate
+    );
     }
 
     static SalesTaxRatesDto createSalesTaxRatesDto(BigDecimal taxRate) {
-        return new SalesTaxRatesDto(new BigDecimal("0.0"), new BigDecimal("0.0"), new BigDecimal("0.0"), taxRate, new BigDecimal("0.0"), null);
-    }
-
-    static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
-        Address address = createAddressInCalifornia();
-        SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
-        LocalDateTime now = LocalDateTime.now();
-        return new ComplytSalesTaxRates(address, salesTaxRates);
+        return new SalesTaxRatesDto(new BigDecimal("0.0"), new BigDecimal("0.0"), new BigDecimal("0.0"),null, null, null, null, taxRate, new BigDecimal("0.0"));
     }
 
     static ClientTrackingDto stubClientTrackingDto() {
@@ -405,13 +303,19 @@ public interface ITUtilities {
                         .append("zip", "")
                         .append("isPartial", false))
                 .append("salesTax", new Document("amount", "0")
+                        .append("complytId", UUID.randomUUID())
                         .append("salesTaxRates", new Document("taxRate", "0.0825")
                                 .append("cityRate", "0.01")
                                 .append("combinedDistrictRate", "0.015")
                                 .append("countyRate", "0.005")
                                 .append("stateRate", "0.0525")
+                                .append("mtaRate", "0")
+                                .append("spdRate", "0")
+                                .append("otherRate", "0")
                                 .append("ratesMetaData", new Document("cityDistrictRate", "0.005")
-                                        .append("countyDistrictRate", "0.01")))
+                                        .append("countyDistrictRate", "0.01")
+                                        .append("specialDistrictRate", "0.01")
+                                ))
                         .append("gtRates", new Document("taxRate", "0.05")
                                 .append("countryRate", "0.02")
                                 .append("regionRate", "0.03"))

@@ -145,7 +145,7 @@ public class ValidatorConfig {
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,
                 queryParamChecker,
-                shouldCallValidate); //todo: add body check for state if usa
+                shouldCallValidate);
     }
 
     @Bean

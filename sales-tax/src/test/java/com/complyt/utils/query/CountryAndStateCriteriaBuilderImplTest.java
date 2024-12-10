@@ -47,7 +47,7 @@ public class CountryAndStateCriteriaBuilderImplTest {
         Criteria actualCriteria = criteriaBuilder.build(address);
 
         // Then
-        Assertions.assertEquals(actualCriteria.toString(), expectedCriteria.toString());
+        Assertions.assertEquals(expectedCriteria, actualCriteria);
     }
 
     @Test
