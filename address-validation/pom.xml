@@ -19,6 +19,7 @@
   
     <version>0.10.0-SNAPSHOT</version>
     <!-- Maven Coordinates -->
+    
 
     <name>address-validation</name>
     <description>This is the address validation Service of Complyt</description>
