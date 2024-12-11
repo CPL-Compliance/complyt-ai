@@ -109,6 +109,22 @@ class HereAddressValidationClientWrapperTest {
     }
 
     @Test
+    void validateAddress_StringContainsSemiCol_AppendsToQueryParam() {
+        // Given
+        address = address.withZip("12345").withStreet("Main; St").withCity("Los Angeles").withState("CA").withCountry("US");
+
+        // When
+        when(webClient.get()).thenReturn(requestHeadersUriSpecMock);
+        when(requestHeadersUriSpecMock.uri((URI) any())).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToMono(ArgumentMatchers.<Class<HereAddressData>>notNull())).thenReturn(Mono.just(hereAddressData));
+
+        // Then
+        StepVerifier.create(hereAddressValidationClientWrapper.validateAddress(address)).expectNext(hereAddressData).verifyComplete();
+    }
+
+    @Test
     void appendStringIfNotNullAndNotEmpty_StringIsNotNullAndNotEmpty_AppendsToQueryParam() {
         // Given
         address = address.withStreet("Main St");

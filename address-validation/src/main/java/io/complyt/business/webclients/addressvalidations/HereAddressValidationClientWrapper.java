@@ -1,7 +1,6 @@
 package io.complyt.business.webclients.addressvalidations;
 
 import io.complyt.domain.Address;
-import io.complyt.domain.AddressData;
 import io.complyt.domain.here.HereAddressData;
 import io.complyt.utils.observability.ContextLogger;
 import lombok.EqualsAndHashCode;
@@ -11,7 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.springframework.web.util.UriUtils;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -65,13 +63,15 @@ public class HereAddressValidationClientWrapper extends AddressValidationWebClie
 
     private void appendStringIfNotNullAndNotEmpty(StringBuilder stringBuilder, String strToAppend, String paramName) {
         if(strToAppend != null && !strToAppend.equals("")) {
-            String encodedQuery = UriUtils.encodeQueryParam(strToAppend, StandardCharsets.UTF_8);
-            stringBuilder.append(paramName + "=" + encodedQuery + ";");
+            String sanitizedValue = strToAppend.replace(";", ""); // Remove semicolons for correctness
+            stringBuilder.append(paramName + "=" + sanitizedValue + ";");
+
         }
     }
 
     private URI buildUri(StringBuilder qureyParamsStringBuilder) {
         return UriComponentsBuilder.newInstance()
+                .encode(StandardCharsets.UTF_8)
                 .scheme(scheme)
                 .host(host)
                 .path(path)
