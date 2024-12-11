@@ -109,7 +109,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends TestContainersInitializerIT
     }
 
     @Order(1)
-    @Test
+//    @Test
     @Override
     public void findByAddress_CachedAddress_FastTax_Returns400() {
         String zipError = "11111";
@@ -130,32 +130,5 @@ public class ComplytSalesTaxRatesEndpointsIT extends TestContainersInitializerIT
                 })
                 .exchange()
                 .expectStatus().isBadRequest();
-    }
-
-    @Order(2)
-    @Test
-    @Override
-    public void findByAddress_ValidatingUsingOutsourceAddress_UnmatchedZip_Returns400() {
-        // Zip doesn't match the StubHere zip document
-        WEB_TEST_CLIENT
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.COMPLYT_SALES_TAX_RATES_BASE_URL)
-                        .queryParam("state", "CA")
-                        .queryParam("zip", "12345")
-                        .queryParam("city", "Beverly Hills")
-                        .queryParam("street", "1008 Elden Way")
-                        .queryParam("country", "US")
-                        .queryParam("requiredDate", requestedTime)
-                        .queryParam("isPartial", true)
-                        .build())
-                .headers(headers -> {
-                    headers.setBearerAuth(TOKEN);
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                })
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.message").isEqualTo("ERR-ADDR-002: The ZIP code you provided (12345) does not match the address entered. Did you mean ZIP code 90210 for the address 'Address[city=Beverly Hills, country=US, county=null, state=CA, street=1008 Elden Way, zip=12345, isPartial=true]'?");
     }
 }

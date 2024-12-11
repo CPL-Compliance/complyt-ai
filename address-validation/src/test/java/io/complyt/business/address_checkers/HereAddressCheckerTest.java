@@ -90,18 +90,6 @@ class HereAddressCheckerTest {
     }
 
     @Test
-    void approveResponseIfZipIncludesRequestZip_OutsourceAddressIsDifferThanRequestAddress_ReturnMonoEmpty() {
-        // Given
-        cachedAddressData = cachedAddressData.withZip("1111").withScore(1);
-
-        // When
-        Mono<CachedAddressData> addressMono = hereAddressChecker.checkAddress(cachedAddressData, address);
-
-        // Then
-        StepVerifier.create(addressMono).expectError(ZipCodeMismatchException.class).verify();
-    }
-
-    @Test
     void approveResponseIfZipIncludesRequestZip_requestAddressStartsWithOutsource_ReturnsZip() {
         // Given
         cachedAddressData = cachedAddressData.withZip("11111").withScore(1);;
@@ -113,6 +101,20 @@ class HereAddressCheckerTest {
         // Then
         StepVerifier.create(addressMono).expectNext(cachedAddressData).verifyComplete();
     }
+
+    @Test
+    void zipMismatch_OverrideZipToRequestZip_ReturnsZip() {
+        // Given
+        cachedAddressData = cachedAddressData.withZip("12345").withScore(1);;
+        address = address.withZip("11111");
+
+        // When
+        Mono<CachedAddressData> addressMono = hereAddressChecker.checkAddress(cachedAddressData, address);
+
+        // Then
+        StepVerifier.create(addressMono).expectNext(cachedAddressData.withZip("11111")).verifyComplete();
+    }
+
 
     @Test
     void build_NullCachedAddressData_ThrowsException() {

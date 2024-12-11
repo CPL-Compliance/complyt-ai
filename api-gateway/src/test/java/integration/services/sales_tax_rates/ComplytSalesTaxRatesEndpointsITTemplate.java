@@ -8,7 +8,4 @@ public interface ComplytSalesTaxRatesEndpointsITTemplate {
     void findByAddress_CachedAddressBySearchIndex_InternalRate_Returns200();
     void findByAddress_CachedAddress_FastTax_Returns200();
     void findByAddress_CachedAddress_FastTax_Returns400();
-
-    // StubHere Address
-    void findByAddress_ValidatingUsingOutsourceAddress_UnmatchedZip_Returns400();
 }

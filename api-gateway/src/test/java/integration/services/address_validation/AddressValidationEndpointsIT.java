@@ -102,29 +102,4 @@ public class AddressValidationEndpointsIT extends TestContainersInitializerIT im
                     assertEquals("ERR-ADDR-001: The address could not be validated. Please check that the street, city, state, and ZIP are correct and properly formatted.", error.get("message"));
                 });
     }
-
-    @Test
-    @Order(2)
-    public void getAddress_MismatchesZip_Returns400() {
-        WEB_TEST_CLIENT
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.ADDRESS_VALIDATION_BASE_URL)
-                        .queryParam("state", "CA")
-                        .queryParam("zip", "12345")
-                        .queryParam("city", "Beverly Hills")
-                        .queryParam("street", "1008 Elden Way")
-                        .queryParam("country", country)
-                        .build())
-                .headers(headers -> {
-                    headers.setBearerAuth(TOKEN);
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                })
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody(LinkedHashMap.class)
-                .value(error -> {
-                    assertEquals("ERR-ADDR-002: The ZIP code you provided (12345) does not match the address entered. Did you mean ZIP code 90210 for the address 'Address[city=Beverly Hills, country=US, county=null, state=CA, street=1008 Elden Way, zip=12345, isPartial=false]'?", error.get("message"));
-                });
-    }
 }
