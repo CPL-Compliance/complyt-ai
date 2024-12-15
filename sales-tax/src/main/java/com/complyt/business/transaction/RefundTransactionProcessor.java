@@ -7,10 +7,10 @@ import com.complyt.services.TransactionService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-@Service
+@Component
 @AllArgsConstructor
 @Slf4j
 public class RefundTransactionProcessor {

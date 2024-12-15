@@ -148,4 +148,7 @@ public interface TransactionEndpointsITTemplate extends
     void upsert_Transaction_RefundLinkedPercentageHasValueGreaterThan1_Returns400();
 
     void upsert_Transaction_RefundLinkedPercentageHasNegativeValue_Returns400();
+
+    void upsert_TransactionIsLinkedButInvoiceHasSalesTaxNull_Returns201WithNullSalesTax();
+
 }
