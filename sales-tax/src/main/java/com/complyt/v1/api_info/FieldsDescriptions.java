@@ -125,4 +125,5 @@ public interface FieldsDescriptions {
     String SUBSIDIARY_INFO = "Indicates the subsidiary associated with the company executing the transaction";
 
     String IS_REFUND_LINKED_INFO = "Flag indicating whether the transaction is a refund linked to an associated invoice";
+
 }

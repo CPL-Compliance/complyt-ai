@@ -2,6 +2,7 @@ package com.complyt.services;
 
 import com.complyt.business.strategy.StrategySelector;
 import com.complyt.business.tax.sales_tax.checker.SalesTaxApplyCheck;
+import com.complyt.business.transaction.RefundTransactionProcessor;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.SalesTaxTracking;
@@ -31,12 +32,12 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private StrategySelector transactionRatesInjectionStrategy;
 
     @NonNull
-    private TransactionServiceImpl transactionService;
+    private RefundTransactionProcessor refundTransactionProcessor;
 
     @Override
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transactionWithOutSalesTax, @NonNull SalesTaxTracking salesTaxTracking, @NonNull Customer customer) {
-        if (isLinkedRefundFromAnInvoice(transactionWithOutSalesTax)) {
-            return setInvoiceSalesTaxToRefund(transactionWithOutSalesTax);
+        if (refundTransactionProcessor.isLinkedRefundFromAnInvoice(transactionWithOutSalesTax)) {
+            return refundTransactionProcessor.setInvoiceSalesTaxToRefund(transactionWithOutSalesTax);
         }
 
         SalesTaxApplyCheck salesTaxApplyCheck = new SalesTaxApplyCheck(transactionWithOutSalesTax);
@@ -52,19 +53,6 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     public Mono<Transaction> calculate(@NonNull Transaction transaction) {
         return ((Mono<ComplytInternalRates>) salesTaxRatesWrapperStrategy.select(transaction).apply(transaction.getShippingAddress()))
                 .flatMap(complytInternalRates -> (Mono<Transaction>) transactionRatesInjectionStrategy.select(transaction).apply(complytInternalRates));
-    }
-
-    private boolean isLinkedRefundFromAnInvoice(Transaction transactionWithOutSalesTax) {
-        return transactionWithOutSalesTax.getTransactionType() == TransactionType.REFUND &&
-                transactionWithOutSalesTax.getIsRefundLinked() != null &&
-                transactionWithOutSalesTax.getIsRefundLinked() &&
-                transactionWithOutSalesTax.getCreatedFrom() != null;
-    }
-
-    private Mono<Transaction> setInvoiceSalesTaxToRefund(Transaction transaction) {
-        return transactionService.findByExternalIdAndSource(transaction.getCreatedFrom(), transaction.getSource())
-                .map(invoice -> transaction.setSalesTax(invoice.getSalesTax()))
-                .switchIfEmpty(Mono.just(transaction));
     }
 
 }

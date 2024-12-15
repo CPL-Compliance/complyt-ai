@@ -113,4 +113,5 @@ public class StatesMapTest {
         Assertions.assertEquals(StateMap.statesToStandartizedState.get("WY"), "Wyoming");
         Assertions.assertEquals(StateMap.statesToStandartizedState.get("WYOMING"), "Wyoming");
     }
+
 }

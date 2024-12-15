@@ -7,6 +7,7 @@ import com.complyt.business.tax.sales_tax.mapper.ComplytSalesTaxRatesToSalesTaxR
 import com.complyt.business.tax.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.tax.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
 import com.complyt.business.tax.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
+import com.complyt.business.transaction.RefundTransactionProcessor;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.SalesTaxTracking;
@@ -64,7 +65,7 @@ public class SalesTaxServiceImplTest {
     TransactionGtRatesHandler transactionGstRatesHandler;
 
     @Mock
-    TransactionServiceImpl transactionService;
+    RefundTransactionProcessor refundTransactionProcessor;
 
     @Mock
     TaxableCollectionBuilder taxableCollectionBuilder;
@@ -201,7 +202,8 @@ public class SalesTaxServiceImplTest {
         Transaction expectedRefund = refund.withSalesTax(invoice.getSalesTax());
 
         // When
-        when(transactionService.findByExternalIdAndSource(refund.getCreatedFrom(),refund.getSource())).thenReturn(Mono.just(invoice));
+        when(refundTransactionProcessor.isLinkedRefundFromAnInvoice(refund)).thenReturn(true);
+        when(refundTransactionProcessor.setInvoiceSalesTaxToRefund(refund)).thenReturn(Mono.just(refund.withSalesTax(invoice.getSalesTax())));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(refund, tracking, customer);
 
         // Then
@@ -216,7 +218,8 @@ public class SalesTaxServiceImplTest {
         Transaction refund = transaction.withIsRefundLinked(true).withCreatedFrom(externalIdOfTheInvoice).withTransactionType(TransactionType.REFUND);
 
         // When
-        when(transactionService.findByExternalIdAndSource(refund.getCreatedFrom(),refund.getSource())).thenReturn(Mono.empty());
+        when(refundTransactionProcessor.isLinkedRefundFromAnInvoice(refund)).thenReturn(true);
+        when(refundTransactionProcessor.setInvoiceSalesTaxToRefund(refund)).thenReturn(Mono.just(refund));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(refund, tracking, customer);
 
         // Then

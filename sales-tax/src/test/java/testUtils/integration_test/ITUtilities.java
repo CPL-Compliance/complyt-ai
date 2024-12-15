@@ -38,7 +38,7 @@ public interface ITUtilities {
                 false, null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false),
                 customerId, null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(localDateTime, localDateTime),
                 TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED,
-                "USD", null, null, null, false);
+                "USD", null, null, null, false, null);
     } // note isTaxInclusive is false, finalTransactionAmount is zero
 
     static TransactionDto stubTransactionDtoWithThreeItems(String externalId, UUID customerId, ItemDto... items) {
@@ -47,7 +47,7 @@ public interface ITUtilities {
                 false, null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false),
                 customerId, null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
                 TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED,
-                "USD", null, null, null, false);
+                "USD", null, null, null, false, null);
     } // note isTaxInclusive is false, finalTransactionAmount is zero
 
     static TransactionDto stubTransactionDtoNonUsaCountry(String externalId, UUID customerId, ItemDto... items) {
