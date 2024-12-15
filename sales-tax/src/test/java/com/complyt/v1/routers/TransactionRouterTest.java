@@ -21,9 +21,8 @@ import com.complyt.v1.handlers.TransactionHandler;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.customer.CustomerDto;
-import com.complyt.v1.models.sales_tax.RatesMetaDataDto;
-import com.complyt.v1.models.sales_tax.SalesTaxDto;
-import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
+import com.complyt.v1.models.tax.sales_tax.SalesTaxDto;
+import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.validators.Patcher;
 import org.junit.jupiter.api.BeforeEach;
@@ -141,8 +140,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        SalesTaxDto salesTaxDto = new SalesTaxDto(BigDecimal.ZERO, BigDecimal.ZERO, new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
-                BigDecimal.ZERO, new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.ZERO)), null);
+        SalesTaxDto salesTaxDto = new SalesTaxDto(null, BigDecimal.ZERO, BigDecimal.ZERO, new SalesTaxRatesDto(null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO), null);
         TransactionDto transactionDtoWithSalesTax = transactionDto.withSalesTax(salesTaxDto);
         Transaction returnedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDtoWithSalesTax);
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(returnedTransaction));
@@ -2634,7 +2632,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        SalesTaxDto salesTax = new SalesTaxDto(new BigDecimal("-0.1"), testUtilities.createSalesTaxRatesDto().taxRate(), testUtilities.createSalesTaxRatesDto(), null);
+        SalesTaxDto salesTax = new SalesTaxDto(null, new BigDecimal("-0.1"), testUtilities.createSalesTaxRatesDto().taxRate(), testUtilities.createSalesTaxRatesDto(), null);
         Set<String> expectedErrors = Set.of(
                 "SalesTax.amount " + NumericErrorMessages.NOT_NEGATIVE_ERROR);
 

@@ -33,7 +33,7 @@ public class Transaction implements ComplytIdProperty {
     String source;
     String documentName;
     List<Item> items;
-    Boolean isTaxInclusive; //todo:make work with get change name to isTaxInclusive
+    Boolean isTaxInclusive;
     Address billingAddress;
     Address shippingAddress;
     UUID customerId;
@@ -49,7 +49,7 @@ public class Transaction implements ComplytIdProperty {
     BigDecimal taxableItemsAmount;
     BigDecimal tangibleItemsAmount;
     BigDecimal totalItemsAmount;
-    BigDecimal finalTransactionAmount; //todo: this field name might change - depends on sky
+    BigDecimal finalTransactionAmount;
     BigDecimal totalDiscount;
     BigDecimal transactionLevelDiscount;
     TransactionFilingStatus transactionFilingStatus;

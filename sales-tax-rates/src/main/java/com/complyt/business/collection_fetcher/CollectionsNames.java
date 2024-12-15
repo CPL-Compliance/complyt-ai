@@ -52,5 +52,4 @@ public interface CollectionsNames {
     String WYOMING = "wyoming";
     String ILLINOIS = "illinois";
     String COLORADO = "colorado";
-
 }

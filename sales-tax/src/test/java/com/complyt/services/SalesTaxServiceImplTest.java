@@ -3,7 +3,6 @@ package com.complyt.services;
 import com.complyt.business.builder.TaxableCollectionBuilder;
 import com.complyt.business.strategy.StrategySelector;
 import com.complyt.business.tax.gt.TransactionGtRatesHandler;
-import com.complyt.business.tax.sales_tax.mapper.ComplytSalesTaxRatesToSalesTaxRates;
 import com.complyt.business.tax.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.tax.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
 import com.complyt.business.tax.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
@@ -48,9 +47,6 @@ public class SalesTaxServiceImplTest {
 
     @Mock
     StubComplytSalesTaxRatesClientWrapper complytSalesTaxRatesClientWrapper;
-
-    @Mock
-    ComplytSalesTaxRatesToSalesTaxRates complytSalesTaxRatesToSalesTaxRates;
 
     @Mock
     ExemptionService exemptionService;
@@ -135,7 +131,7 @@ public class SalesTaxServiceImplTest {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //todo: note gst is null
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //todo: note gst is null
 
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
@@ -158,7 +154,7 @@ public class SalesTaxServiceImplTest {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //todo: note gst is null
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //todo: note gst is null
 
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
@@ -194,7 +190,7 @@ public class SalesTaxServiceImplTest {
         // Given
         SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         String externalIdOfTheInvoice = "some random id";
-        SalesTax salesTax = new SalesTax(BigDecimal.valueOf(500), BigDecimal.valueOf(0.08), testUtilities.createSalesTaxRates(), null);
+        SalesTax salesTax = new SalesTax(null, BigDecimal.valueOf(500), BigDecimal.valueOf(0.08), testUtilities.createSalesTaxRates(), null);
         Transaction refund = transaction.withIsRefundLinked(true).withCreatedFrom(externalIdOfTheInvoice).withTransactionType(TransactionType.REFUND);
         Transaction invoice = transaction.withTransactionType(TransactionType.INVOICE).withExternalId(externalIdOfTheInvoice)
                 .withSalesTax(salesTax);

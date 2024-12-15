@@ -3,7 +3,6 @@ package com.complyt.repositories;
 import com.complyt.domain.customer.Customer;
 import com.complyt.repositories.pagination.CriteriaBuilder;
 import com.complyt.repositories.pagination.customer.CustomerPaginationUtil;
-import com.complyt.repositories.pagination.transaction.TransactionPaginationUtil;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;

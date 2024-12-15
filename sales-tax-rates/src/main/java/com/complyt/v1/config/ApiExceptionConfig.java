@@ -1,9 +1,8 @@
 package com.complyt.v1.config;
 
 import com.complyt.annotations.Generated;
-import com.complyt.v1.exceptions.types.ConflictedDataApiException;
-import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
-import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
+import com.complyt.v1.exceptions.types.*;
+import com.complyt.v1.exceptions.types.fastTax.FastTaxException;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +29,8 @@ public class ApiExceptionConfig {
         return Map.of(
                 ObjectNotFoundApiException.class, HttpStatus.NOT_FOUND,
                 ObjectNotValidApiException.class, HttpStatus.BAD_REQUEST,
-                ConflictedDataApiException.class, HttpStatus.BAD_REQUEST
+                ConflictedDataApiException.class, HttpStatus.BAD_REQUEST,
+                FastTaxException.class, HttpStatus.BAD_REQUEST
         );
     }
 }

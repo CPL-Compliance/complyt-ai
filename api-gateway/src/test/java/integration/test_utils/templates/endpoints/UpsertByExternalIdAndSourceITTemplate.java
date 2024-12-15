@@ -16,7 +16,7 @@ public interface UpsertByExternalIdAndSourceITTemplate extends PutITTemplate {
 
     void upsertByExternalIdAndSource_ConflictingExternalId_Returns400ConflictedData();
 
-    void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError();
+    void upsertByExternalIdAndSource_DoesntPassValidation_Returns400ValidationError();
 
     void upsertByExternalIdAndSource_NoBody_Returns400();
 }

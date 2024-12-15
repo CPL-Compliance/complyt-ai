@@ -46,7 +46,7 @@ public class SalesTaxRatesWrapperStrategyTest {
         ComplytSalesTaxRates expectedComplytSalesTaxRates = testUtilities.createCaliforniaComplytSalesTaxRates();
 
         // When
-        when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress()))
+        when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress(), transaction.getExternalTimestamps().getCreatedDate()))
                 .thenReturn(Mono.just(testUtilities.createCaliforniaComplytSalesTaxRates()));
         // Then
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = (Mono<ComplytSalesTaxRates>) salesTaxRatesWrapperStrategy.select(transaction).apply(transaction.getShippingAddress());
@@ -60,7 +60,7 @@ public class SalesTaxRatesWrapperStrategyTest {
         Transaction givenTransaction = transaction.withShippingAddress(transaction.getShippingAddress().withCountry("Canada"));
 
         // When
-        when(gtWebClientWrapper.findByAddress(givenTransaction.getShippingAddress()))
+        when(gtWebClientWrapper.findByAddress(givenTransaction.getShippingAddress(), transaction.getExternalTimestamps().getCreatedDate()))
                 .thenReturn(Mono.just(testUtilities.createComplytGtRates()));
         // Then
         Mono<ComplytGtRates> complytSalesTaxRatesMono = (Mono<ComplytGtRates>) salesTaxRatesWrapperStrategy.select(givenTransaction).apply(givenTransaction.getShippingAddress());

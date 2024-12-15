@@ -36,6 +36,9 @@ parameters:
   run-discovery-service-workflow:
     type: boolean
     default: false
+  run-address-validation-workflow:
+    type: boolean
+    default: false
   run-sales-tax-rates-workflow:
     type: boolean
     default: false
@@ -117,6 +120,7 @@ jobs:
       - run:
           name: Release
           command: |
+            env
             cd <<parameters.service_directory>>
             PROJECT_VERSION=$(./mvnw -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEXT_DEVELOPMENT_VERSION=$(echo "$PROJECT_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
@@ -182,24 +186,31 @@ jobs:
           aws_access_key_id: AWS_ACCESS_KEY_ID
           region: AWS_DEFAULT_REGION
           aws_secret_access_key: AWS_SECRET_ACCESS_KEY
+      
       ## Deploy to production cluster
       - aws-ecs/update_service:
-          cluster: "complyt-prd"
+          cluster: "production"
           container_image_name_updates: "container=<<parameters.service_name>>, tag=${IMAGE_TAG}"
-          family: "<<parameters.service_name>>-complyt-prd"
+          family: "<<parameters.service_name>>-production"
           service_name: "<<parameters.service_name>>"
-      ## Deploy to demo cluster
-      - aws-ecs/update_service:
-          cluster: "complyt-demo"
-          container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
-          family: "<<parameters.service_name>>-complyt-demo"
-          service_name: "<<parameters.service_name>>"
-      ## Deploy to complyt-sb cluster
-      - aws-ecs/update_service:
-          cluster: "complyt-sb"
-          container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
-          family: "<<parameters.service_name>>-complyt-sb"
-          service_name: "<<parameters.service_name>>"
+      # ## Deploy to complyt-prd cluster
+      # - aws-ecs/update_service:
+      #     cluster: "complyt-prd"
+      #     container_image_name_updates: "container=<<parameters.service_name>>, tag=${IMAGE_TAG}"
+      #     family: "<<parameters.service_name>>-complyt-prd"
+      #     service_name: "<<parameters.service_name>>"
+      # ## Deploy to complyt-demo cluster
+      # - aws-ecs/update_service:
+      #     cluster: "complyt-demo"
+      #     container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
+      #     family: "<<parameters.service_name>>-complyt-demo"
+      #     service_name: "<<parameters.service_name>>"
+      # ## Deploy to complyt-sb cluster
+      # - aws-ecs/update_service:
+      #     cluster: "complyt-sb"
+      #     container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
+      #     family: "<<parameters.service_name>>-complyt-sb"
+      #     service_name: "<<parameters.service_name>>"
 
 workflows:
   sales-tax-workflow:
@@ -258,6 +269,34 @@ workflows:
             - release
           service_name: "files"
 
+  address-validation-workflow:
+    when: << pipeline.parameters.run-address-validation-workflow >>
+    jobs:
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "address-validation"
+
+      - release:
+          service_directory: "address-validation"
+          filters:
+            branches:
+              only:
+                - main
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - release
+          service_directory: "address-validation"
+
+      - update-ecs-service:
+          requires:
+            - release
+          service_name: "address-validation"
+
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
     jobs:
@@ -267,6 +306,9 @@ workflows:
       - package-dependency:
           name: package-sales-tax-rates
           service_directory: "sales-tax-rates"
+      - package-dependency:
+          name: package-address-validation
+          service_directory: "address-validation"
       - package-dependency:
           name: package-discovery-service
           service_directory: "discovery-service"
@@ -285,6 +327,7 @@ workflows:
           requires:
             - package-sales-tax
             - package-sales-tax-rates
+            - package-address-validation
             - package-discovery-service
             - package-files
             - package-authentication
@@ -294,6 +337,7 @@ workflows:
           requires:
             - package-sales-tax
             - package-sales-tax-rates
+            - package-address-validation
             - package-discovery-service
             - package-files
             - package-authentication

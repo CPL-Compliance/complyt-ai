@@ -9,6 +9,8 @@ import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.nio.channels.UnresolvedAddressException;
+
 @EqualsAndHashCode
 @Component
 public class FastTaxGetBestMatchCityCountyFetcher implements CityCountyFetcher {
@@ -16,6 +18,9 @@ public class FastTaxGetBestMatchCityCountyFetcher implements CityCountyFetcher {
     @Override
     public Mono<CityCountyWrapper> fetch(@NonNull SalesTaxData salesTaxData) {
         FastTaxGetBestMatchData fastTaxGetBestMatchData = (FastTaxGetBestMatchData) salesTaxData;
+        if (fastTaxGetBestMatchData.getTaxInfoItems() == null ) {
+            return Mono.error(new UnresolvedAddressException());
+        }
         TaxInfoItem taxInfoItem = fastTaxGetBestMatchData.getTaxInfoItems().get(0);
         CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(taxInfoItem.city(), taxInfoItem.county());
 

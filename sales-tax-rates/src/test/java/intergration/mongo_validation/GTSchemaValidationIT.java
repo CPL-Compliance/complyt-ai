@@ -1,7 +1,7 @@
 package intergration.mongo_validation;
 
 import com.complyt.SalesTaxRatesApplication;
-import com.example.complyt.config.SecurityConfig;
+import com.complyt.config.SecurityConfig;
 import intergration.MongoContainerInitializerIT;
 import org.bson.Document;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -29,6 +30,7 @@ import testUtils.TestUtilities;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ContextConfiguration(classes = {
         SecurityConfig.class})
+@ActiveProfiles({"stubInternalRates"})
 public class GTSchemaValidationIT extends MongoContainerInitializerIT {
 
     @Autowired
@@ -88,10 +90,6 @@ public class GTSchemaValidationIT extends MongoContainerInitializerIT {
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
-
-
-
-
 
     @Test
     public void saveGTRates_InvalidGtAddressCountryType_throwsValidationError() {

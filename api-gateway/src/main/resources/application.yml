@@ -45,6 +45,12 @@ spring:
             - Path=/authentication/**
           filters:
             - RewritePath=/authentication/(?<path>.*), /$\{path}
+        - id: address-validation-service
+          uri: lb://address-validation-service
+          predicates:
+            - Path=/address-validation/**
+          filters:
+            - RewritePath=/address-validation/(?<path>.*), /$\{path}
         - id: openapi
           uri: http://localhost:${server.port}
           predicates:
@@ -321,6 +327,13 @@ spring:
             - Path=/v1/sales_tax_rates
           filters:
             - SetPath=/v1/sales_tax_rates
+        - id: sales-tax-rates-put-sales-tax-rates
+          uri: lb://sales-tax-rates
+          predicates:
+            - Method=PUT
+            - Path=/v1/sales_tax_rates
+          filters:
+            - SetPath=/v1/sales_tax_rates
         - id: sales-tax-rates-get-gt-rates
           uri: lb://sales-tax-rates
           predicates:
@@ -330,6 +343,17 @@ spring:
             - SetPath=/v1/gt_rates
         # ---- SalesTaxRates ----
         # ==== Sales Tax Rates Service ====
+        # ==== Address Validation Service ====
+        # ---- AddressValidation ----
+        - id: address-validation-get-address
+          uri: lb://address-validation
+          predicates:
+            - Method=GET
+            - Path=/v1/addresses
+          filters:
+            - SetPath=/v1/addresses
+        # ---- AddressValidation ----
+        # ==== Address Validation Service ====
         # ==== Authentication Service ====
         # ---- ApiKey ----
         - id: authentication-get-token

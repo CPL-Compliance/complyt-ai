@@ -3,7 +3,12 @@ package com.complyt.business.sales_tax_web_clients;
 import com.complyt.domain.Address;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
+import com.complyt.utils.ContextLogger;
+import com.complyt.v1.config.error_messages.GenericErrorMessages;
+import com.complyt.v1.exceptions.types.ComplytApiException;
+import com.complyt.v1.exceptions.types.fastTax.FastTaxException;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,7 +19,10 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 
 @EqualsAndHashCode
+@Slf4j
 public class FastTaxGetBestMatchWebClientWrapper extends SalesTaxWebClientWrapperBase {
+    private static final String MATCH_LEVEL_ERROR = "Error";
+    private static final String ERROR_NUMBER_INVALID_INPUT = "2";
 
     public FastTaxGetBestMatchWebClientWrapper(WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {
         super(webClient, scheme, host, path, key);
@@ -30,7 +38,7 @@ public class FastTaxGetBestMatchWebClientWrapper extends SalesTaxWebClientWrappe
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve()
                 .bodyToMono(FastTaxGetBestMatchData.class)
-                .cast(SalesTaxData.class);
+                .flatMap(this::handleResponse);
     }
 
     @Override
@@ -51,5 +59,18 @@ public class FastTaxGetBestMatchWebClientWrapper extends SalesTaxWebClientWrappe
                 .queryParam("taxtype", "sales")
                 .build()
                 .toUri();
+    }
+
+    private Mono<SalesTaxData> handleResponse(FastTaxGetBestMatchData response) {
+        if (MATCH_LEVEL_ERROR.equalsIgnoreCase(response.getMatchLevel())) {
+            ContextLogger.observeCtx("fastTax exception with error: " + response.getError(), log::error);
+            // Invalid Address
+            if (response.getError().getNumber().equals(ERROR_NUMBER_INVALID_INPUT)) {
+                return Mono.error(new FastTaxException(response.getError().getDesc()));
+            }
+            return Mono.error(new ComplytApiException(GenericErrorMessages.INTERNAL_SERVER_ERROR));
+        }
+        // Map and return the valid response
+        return Mono.just(response);
     }
 }

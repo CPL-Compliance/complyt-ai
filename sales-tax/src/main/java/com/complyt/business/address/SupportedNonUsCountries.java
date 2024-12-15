@@ -1,7 +1,6 @@
 package com.complyt.business.address;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public interface SupportedNonUsCountries {
     Map<String, String> nonUsaCountriesAbbreviations = new HashMap<>() {{

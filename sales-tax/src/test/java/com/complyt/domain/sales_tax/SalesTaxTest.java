@@ -16,7 +16,7 @@ public class SalesTaxTest {
     private UnitTestUtilities testUtilities;
 
     private SalesTaxRates createSalesTaxRates() {
-        return new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null);
+        return new SalesTaxRates(null, new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null, null, null, null, new BigDecimal("0.5"));
     }
 
     @BeforeEach
@@ -28,11 +28,21 @@ public class SalesTaxTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "SalesTax[amount=" + salesTax.amount() +
-                ", rate=" + salesTax.rate()  +
-                ", salesTaxRates=" + salesTax.salesTaxRates() +
-                ", gtRates=" + salesTax.gtRates()
-                + "]";
+        String expectedString = "SalesTax[complytId=null" +
+                ", amount=0" +
+                ", rate=0" +
+                ", salesTaxRates=SalesTaxRates[stateRate=0.1" +
+                ", countyRate=0.1" +
+                ", cityRate=0.1" +
+                ", combinedDistrictRate=0" +
+                ", ratesMetaData=null" +
+                ", mtaRate=0" +
+                ", spdRate=0" +
+                ", otherRate=0" +
+                ", taxRate=0.4]" +
+                ", gtRates=GtRates[countryRate=0.1" +
+                ", regionRate=0.1" +
+                ", taxRate=0.2]]";
 
         // When
         String actualString = salesTax.toString();

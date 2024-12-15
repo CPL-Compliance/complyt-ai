@@ -7,8 +7,8 @@ import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.JurisdictionalSalesTaxRulesDto;
 import com.complyt.v1.models.TangibleCategoryDto;
 import com.complyt.v1.models.TaxableCategoryDto;
-import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
-import com.complyt.v1.models.sales_tax.gt.GtRatesDto;
+import com.complyt.v1.models.tax.global_tax.GtRatesDto;
+import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.NotNull;
@@ -34,5 +34,6 @@ public record ItemDto(
         @PositiveOrZero(message = "Item.manualSalesTaxRate " + NumericErrorMessages.NOT_NEGATIVE_ERROR) @DecimalMax(value = "0.2", message = "Item.manualSalesTaxRate" + NumericErrorMessages.DECIMAL_MAX_02_ERROR) BigDecimal manualSalesTaxRate,
         @Schema(description = FieldsDescriptions.DISCOUNT) @PositiveOrZero(message = "Item.discount " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal discount,
         @Schema(description = FieldsDescriptions.RELATIVE_TRANSACTION_DISCOUNT) @PositiveOrZero(message = "Item.relativeTransactionDiscount " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal relativeTransactionDiscount,
-        TangibleCategoryDto tangibleCategory, TaxableCategoryDto taxableCategory) {
+        TangibleCategoryDto tangibleCategory,
+        TaxableCategoryDto taxableCategory) {
 }

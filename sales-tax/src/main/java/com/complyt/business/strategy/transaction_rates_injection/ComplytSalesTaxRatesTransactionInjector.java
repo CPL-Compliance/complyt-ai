@@ -1,13 +1,15 @@
 package com.complyt.business.strategy.transaction_rates_injection;
 
 import com.complyt.business.builder.CollectionBuilder;
-import com.complyt.business.tax.sales_tax.mapper.ComplytSalesTaxRatesToSalesTaxRates;
+//import com.complyt.business.tax.sales_tax.mapper.ComplytSalesTaxRatesToSalesTaxRates;
 import com.complyt.business.tax.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.tax.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
+import com.complyt.business.transaction.data_injector.TransactionCityCountyInjector;
 import com.complyt.domain.Taxable;
-import com.complyt.domain.sales_tax.ComplytInternalRates;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.domain.sales_tax.SalesTaxRates;
+import com.complyt.domain.transaction.CityCountyWrapper;
 import com.complyt.domain.transaction.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -16,13 +18,12 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-public class ComplytSalesTaxRatesTransactionInjector implements RatesTransactionInjector {
-    @NonNull
-    private ComplytSalesTaxRatesToSalesTaxRates complytSalesTaxRatesToSalesTaxRates;
+public class ComplytSalesTaxRatesTransactionInjector implements RatesTransactionInjector<ComplytSalesTaxRates> {
 
     @NonNull
     private TransactionSalesTaxRatesHandler transactionSalesTaxRatesHandler;
@@ -33,21 +34,41 @@ public class ComplytSalesTaxRatesTransactionInjector implements RatesTransaction
     @NonNull
     private SalesTaxAggregator salesTaxAggregator;
 
+    @NonNull
+    private TransactionCityCountyInjector transactionCityCountyInjector;
+
+
     @Override
-    public Function<ComplytInternalRates, Mono<Transaction>> inject(Transaction transaction) {
-        return complytSalesTaxRates -> complytSalesTaxRatesToSalesTaxRates.map((ComplytSalesTaxRates) complytSalesTaxRates) //todo: I think this mapping is unnecesarry, we can just do complytSalesTaxRates.salesTaxRate
-                .flatMap(salesTaxRates -> transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)
-                        .map(transactionWithRates -> {
-                            List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transactionWithRates);
-                            BigDecimal salesTaxAmount = salesTaxAggregator.aggregate(taxables, transaction.getIsTaxInclusive());
-                            SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRates.taxRate(), salesTaxRates, null);
+    public Function<ComplytSalesTaxRates, Mono<Transaction>> inject(Transaction transaction) {
+        return complytSalesTaxRates -> setTransactionSalesTaxRates(transaction, complytSalesTaxRates)
+                .flatMap(transactionWithRates -> injectCityCountyData(transactionWithRates, complytSalesTaxRates))
+                .map(transactionWithRatesAndCounty -> calculateFinalTransactionAmounts(transactionWithRatesAndCounty, complytSalesTaxRates));
+    }
 
-                            BigDecimal finalAmount = transaction.getIsTaxInclusive() ?
-                                    transaction.getFinalTransactionAmount() :
-                                    transaction.getFinalTransactionAmount().add(salesTaxAmount);
+    private Mono<Transaction> setTransactionSalesTaxRates(Transaction transaction, ComplytSalesTaxRates complytSalesTaxRates) {
+        SalesTaxRates salesTaxRates = complytSalesTaxRates.salesTaxRates();
+        return transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates);
+    }
 
-                            return transactionWithRates.setSalesTax(salesTax)
-                                    .setFinalTransactionAmount(finalAmount);
-                        }));
+    private Mono<Transaction> injectCityCountyData(Transaction transaction, ComplytSalesTaxRates complytSalesTaxRates) {
+        CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(
+                complytSalesTaxRates.address().city(),
+                complytSalesTaxRates.address().county()
+        );
+        return transactionCityCountyInjector.inject(cityCountyWrapper, transaction);
+    }
+
+    private Transaction calculateFinalTransactionAmounts(Transaction transaction, ComplytSalesTaxRates complytSalesTaxRates) {
+        List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transaction);
+        BigDecimal salesTaxAmount = salesTaxAggregator.aggregate(taxables, transaction.getIsTaxInclusive());
+        SalesTaxRates salesTaxRates = complytSalesTaxRates.salesTaxRates();
+        UUID complytId = complytSalesTaxRates.complytId();
+
+        SalesTax salesTax = new SalesTax(complytId, salesTaxAmount, salesTaxRates.taxRate(), salesTaxRates, null);
+        BigDecimal finalAmount = transaction.getIsTaxInclusive() ?
+                transaction.getFinalTransactionAmount() :
+                transaction.getFinalTransactionAmount().add(salesTaxAmount);
+
+        return transaction.setSalesTax(salesTax).setFinalTransactionAmount(finalAmount);
     }
 }

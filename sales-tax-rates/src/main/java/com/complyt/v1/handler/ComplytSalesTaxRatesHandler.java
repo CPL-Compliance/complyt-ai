@@ -1,13 +1,14 @@
 package com.complyt.v1.handler;
 
-import com.complyt.facade.ComplytSalesTaxRatesFacade;
+import com.complyt.domain.TaxRates;
+import com.complyt.facade.SalesTaxRatesFacade;
 import com.complyt.security.permissions.sales_tax_rates.SalesTaxRatesReadPermission;
-import com.complyt.utils.observability.ContextLogger;
+import com.complyt.utils.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
-import com.complyt.v1.mappers.AddressMapper;
-import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
-import com.complyt.v1.model.AddressDto;
-import com.complyt.v1.model.ComplytSalesTaxRatesDto;
+import com.complyt.v1.mappers.AddressWithDateMapper;
+import com.complyt.v1.mappers.CommonSalesTaxRatesMapper;
+import com.complyt.v1.model.AddressWithDateDto;
+import com.complyt.v1.model.common_sales_tax_rates.CommonSalesTaxRatesDto;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -26,28 +27,27 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ComplytSalesTaxRatesHandler {
+    @NonNull
+    SalesTaxRatesFacade<? extends TaxRates> complytSalesTaxRatesFacade;
 
     @NonNull
-    ComplytSalesTaxRatesFacade complytSalesTaxRatesFacade;
-
-    @NonNull
-    ValidationHandler<AddressDto, SpringValidatorAdapter> gstAddressDtoValidationHandler;
+    ValidationHandler<AddressWithDateDto, SpringValidatorAdapter> addressDtoValidationHandler;
 
     @SalesTaxRatesReadPermission
     public Mono<ServerResponse> getSalesTaxRatesByAddress(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<ComplytSalesTaxRatesDto> complytSalesTaxRatesDto = ContextLogger.observeCtx(logStr, log::info)
-                .then(gstAddressDtoValidationHandler.validate(serverRequest))
-                .map(AddressMapper.INSTANCE::addressDtoToAddress)
+        Mono<CommonSalesTaxRatesDto> commonSalesTaxRatesDto = ContextLogger.observeCtx(logStr, log::info)
+                .then(addressDtoValidationHandler.validate(serverRequest))
+                .map(AddressWithDateMapper.INSTANCE::addressWithDateDtoToAddressDate)
                 .flatMap(complytSalesTaxRatesFacade::findByAddress)
-                .map(ComplytSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesToComplytSalesTaxRates)
-                .flatMap(complytSalesTaxRates -> ContextLogger.observeCtx("<-- Returned Body: " + complytSalesTaxRates, log::info)
-                        .thenReturn(complytSalesTaxRates))
+                .map(CommonSalesTaxRatesMapper.INSTANCE::commonSalesTaxRatesToCommonSalesTaxRatesDto)
+                .flatMap(commonSalesTaxRates -> ContextLogger.observeCtx("<-- Returned Body: " + commonSalesTaxRates, log::info)
+                        .thenReturn(commonSalesTaxRates))
                 .switchIfEmpty(ContextLogger.observeCtx("Failed to get SalesTaxRates by address", log::error)
                         .then(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(complytSalesTaxRatesDto, ComplytSalesTaxRatesDto.class);
+                .body(commonSalesTaxRatesDto, CommonSalesTaxRatesDto.class);
     }
 }

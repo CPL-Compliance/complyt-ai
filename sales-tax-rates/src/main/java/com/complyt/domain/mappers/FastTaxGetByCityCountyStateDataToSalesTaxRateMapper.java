@@ -1,5 +1,6 @@
 package com.complyt.domain.mappers;
 
+import com.complyt.annotations.Generated;
 import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.fast_tax.FastTaxGetByCityCountyStateData;
 import org.mapstruct.Mapper;
@@ -9,6 +10,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.math.BigDecimal;
 
+@Generated // Not in Use
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
 public interface FastTaxGetByCityCountyStateDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
 

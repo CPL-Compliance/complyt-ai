@@ -24,7 +24,21 @@ public final class StubFastTaxWebClientWrapper extends SalesTaxWebClientWrapperB
     @Override
     public Mono<SalesTaxData> findByAddress(@NonNull Address address) {
         return Mono.fromCallable(() -> {
-            String json = "{\"MatchLevel\": \"Address\",\"TaxInfoItems\": [{\"City\": \"Englewood\",\"CityDistrictRate\": \"0\",\"CityRate\": \"0.0\",\"County\": \"Arapahoe\",\"CountyDistrictRate\": \"0.029\",\"CountyRate\": \"0.0\",\"InformationComponents\": [{\"Name\": \"CountyFIPS\",\"Value\": \"005\"}],\"NotesCodes\": \"0\",\"NotesDesc\": \"None\",\"SpecialDistrictRate\": \"0\",\"StateAbbreviation\": \"CO\",\"StateName\": \"Colorado\",\"StateRate\": \"0.011\",\"TaxRate\": \"0.04\",\"TotalTaxExempt\": \"LABOR/SERVICES\",\"Zip\": \"80112\"}]}";
+            String json = "{\"MatchLevel\": \"Address\",\"TaxInfoItems\": " +
+                    "[{\"City\": \"Englewood\"," +
+                    "\"CityDistrictRate\": \"0\"," +
+                    "\"CityRate\": \"0.0\"," +
+                    "\"County\": \"Arapahoe\"," +
+                    "\"CountyDistrictRate\": \"0.029\"," +
+                    "\"CountyRate\": \"0.0125\"," +
+                    "\"InformationComponents\": [{\"Name\": \"CountyFIPS\",\"Value\": \"005\"}]," +
+                    "\"NotesCodes\": \"0\"," +
+                    "\"NotesDesc\": \"None\"," +
+                    "\"SpecialDistrictRate\": \"0\",\"StateAbbreviation\": \"CO\"," +
+                    "\"StateName\": \"Colorado\"," +
+                    "\"StateRate\": \"0.0425\",\"TaxRate\": \"0.05975\"," +
+                    "\"TotalTaxExempt\": \"LABOR/SERVICES\"," +
+                    "\"Zip\": \"80112\"}]}";
             ObjectMapper objectMapper = new ObjectMapper();
             FastTaxGetBestMatchData fastTaxGetBestMatchData = objectMapper.readValue(json, FastTaxGetBestMatchData.class);
 

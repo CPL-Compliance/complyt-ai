@@ -2,7 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.ComplytSalesTaxRates;
-import com.complyt.utils.observability.ContextLogger;
+import com.complyt.utils.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -19,21 +19,19 @@ public class ComplytSalesTaxRatesRepository {
     @NonNull
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    @NonNull //todo: remove
+    @NonNull
     QueryBuilder<Address> unitedStatesAddressQueryBuilder;
 
     public Mono<ComplytSalesTaxRates> findByAddress(@NonNull Address address, @NonNull String collection) {
 
         Query query = unitedStatesAddressQueryBuilder.build(address);
 
-
-        return ContextLogger.observeCtx("Searching for rates in " + collection + ", by requestAddress: " + query, log::info)
+        return ContextLogger.observeCtx("Searching for rates in " + collection + " by address: " + query, log::info)
                 .then(reactiveMongoTemplate.findOne(query, ComplytSalesTaxRates.class, collection));
     }
 
     public Mono<ComplytSalesTaxRates> save(@NonNull ComplytSalesTaxRates complytSalesTaxRates, @NonNull String collection) {
-        return ContextLogger.observeCtx("Saving ComplytSalesTaxRates: " + complytSalesTaxRates, log::info)
+        return ContextLogger.observeCtx("Saving ComplytSalesTaxRates", log::info)
                 .then(reactiveMongoTemplate.save(complytSalesTaxRates, collection));
     }
-
 }

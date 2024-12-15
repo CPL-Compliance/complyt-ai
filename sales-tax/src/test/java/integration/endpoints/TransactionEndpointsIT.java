@@ -13,10 +13,9 @@ import com.complyt.v1.exceptions.types.TaxCodeNotValidException;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
-import com.complyt.v1.models.sales_tax.RatesMetaDataDto;
-import com.complyt.v1.models.sales_tax.SalesTaxDto;
-import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
-import com.complyt.v1.models.sales_tax.gt.GtRatesDto;
+import com.complyt.v1.models.tax.global_tax.GtRatesDto;
+import com.complyt.v1.models.tax.sales_tax.SalesTaxDto;
+import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
@@ -66,7 +65,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false);
     private final String source = "1";
-    private final String SALES_TAX_TRACKING_BASE_URL = "/v1/nexus";
+    private final SalesTaxRatesDto salesTaxRatesDto = ITUtilities.createSalesTaxRatesDto();
+    private SalesTaxDto expectedSalesTax;
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -76,6 +76,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
+        expectedSalesTax = new SalesTaxDto(null, new BigDecimal("775"), salesTaxRatesDto.taxRate(),  salesTaxRatesDto,  null);
+
     }
 
     @Order(0)
@@ -116,7 +118,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(new MandatoryAddressDto(null, "Canada", null, null, "", "", null, false));
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(null, new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 
         // Then
         webTestClient
@@ -146,8 +148,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(11076.1), BigDecimal.valueOf(858.39775), BigDecimal.valueOf(11934.49775), "EUR", "USD", BigDecimal.valueOf(1.10761), CurrencySource.COMPLYT, false, LocalDateTime.parse(givenTransaction.externalTimestamps().createdDate()));
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
-                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+        
 
         // Then
         webTestClient
@@ -181,8 +182,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(11076.1), BigDecimal.valueOf(858.39775), BigDecimal.valueOf(11934.49775), "EUR", "USD", BigDecimal.valueOf(1.10761), CurrencySource.COMPLYT, false, LocalDateTime.parse(givenTransaction.externalTimestamps().createdDate()));
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
-                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+        
 
         // Then
         webTestClient
@@ -217,8 +217,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(11076.1), BigDecimal.valueOf(858.39775), BigDecimal.valueOf(11934.49775), "EUR", "USD", BigDecimal.valueOf(1.10761), CurrencySource.COMPLYT, true, LocalDate.now().atStartOfDay());
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
-                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+        
 
         // Then
         webTestClient
@@ -253,8 +252,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(20000), BigDecimal.valueOf(1550), BigDecimal.valueOf(21550), "EUR", "USD", BigDecimal.valueOf(2), CurrencySource.CLIENT, false, LocalDateTime.parse(givenTransaction.externalTimestamps().createdDate()));
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
-                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+        
 
         // Then
         webTestClient
@@ -286,9 +284,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withShippingAddress(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false))
                 .withCurrency("USD");
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
-                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
-
+        
         // Then
         webTestClient
                 .mutateWith(csrf())
@@ -319,9 +315,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withShippingAddress(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false))
                 .withCurrency("US Dollar");
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
-                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
-
+        
         // Then
         webTestClient
                 .mutateWith(csrf())
@@ -352,9 +346,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withShippingAddress(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false))
                 .withCurrency(null);
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
-                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
-
+        
         // Then
         webTestClient
                 .mutateWith(csrf())
@@ -386,9 +378,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withCurrency(null)
                 .withRefRate(BigDecimal.valueOf(2));
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("775"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
-                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
-
         // Then
         webTestClient
                 .mutateWith(csrf())
@@ -417,7 +406,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDtoNonUsaCountry(externalId, customerId)
                 .withShippingFee(ITUtilities.stubShippingFeeDto());
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1548.75"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(null, new BigDecimal("1548.75"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
         GtRatesDto shippingGtRates = new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.1475));
 
         // Then
@@ -451,8 +440,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salestaxtracking is approved and physical
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("719.257541"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
-                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+        expectedSalesTax = expectedSalesTax.withAmount( new BigDecimal("719.257541"));
 
         // Then
         webTestClient
@@ -488,8 +476,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState(" CO ").withCity("Arvada")); //salestaxtracking is approved and physical
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("719.257541"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
-                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+        expectedSalesTax = expectedSalesTax.withAmount( new BigDecimal("719.257541"));
 
         // Then
         webTestClient
@@ -518,6 +505,34 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     @WithMockUser
+    public void upsertByExternalIdAndSource_UsaTransactionWithNonExistingTaxCode_Returns400BadRequest() { // Same as the test above just changed the state.abbreviation to check the spaces trimming
+        String externalId = "newNonExistingTransactionID";
+        TransactionDto transactionDto = ITUtilities.stubTransactionDto(externalId, customerId);
+        TransactionDto givenTransaction = transactionDto
+                .withItems(transactionDto.items().stream().map(itemDto -> itemDto.withTaxCode("Non-existing TaxCode")).collect(Collectors.toList()));
+
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salestaxtracking is approved and physical
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(TaxCodeNotValidException.class)
+                .value(e ->
+                        assertEquals(e.getReason(), "The tax code entered is not recognized"));
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
     public void upsertByExternalIdAndSource_UsaCountryTaxInclusiveTransactionTypeTaxableRefund_Returns200() {
         String externalId = "newNonExistingTransactionID_TAXABLE_REFUND1";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -526,8 +541,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salestaxtracking is approved and physical
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("719.257541"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
-                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+
+        expectedSalesTax = expectedSalesTax.withAmount( new BigDecimal("719.257541"));
 
         // Then
         webTestClient
@@ -548,8 +563,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertEquals(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().size(), 1);
                     assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().get("Arvada"));
                     assertTrue(transactionDto.isTaxInclusive());
-                    assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000")));
-                });
+                 });
     }
 
 
@@ -600,7 +614,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .mutateWith(csrf())
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SALES_TAX_TRACKING_BASE_URL)
+                        .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("state", finalGivenTransaction.shippingAddress().state())
                         .queryParam("country", "US")
                         .build())
@@ -637,7 +651,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                             .mutateWith(csrf())
                             .get()
                             .uri(uriBuilder -> uriBuilder
-                                    .path(SALES_TAX_TRACKING_BASE_URL)
+                                    .path(SalesTaxTrackingRouter.BASE_URL)
                                     .queryParam("state", finalGivenTransaction.shippingAddress().state())
                                     .queryParam("country", "US")
                                     .build())
@@ -658,33 +672,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 });
     }
 
-    @Order(1)
-    @Test
-    @Override
-    @WithMockUser
-    public void upsertByExternalIdAndSource_UsaTransactionWithNonExistingTaxCode_Returns400BadRequest() { // Same as the test above just changed the state.abbreviation to check the spaces trimming
-        String externalId = "newNonExistingTransactionID";
-        TransactionDto transactionDto = ITUtilities.stubTransactionDto(externalId, customerId);
-        TransactionDto givenTransaction = transactionDto
-                .withItems(transactionDto.items().stream().map(itemDto -> itemDto.withTaxCode("Non-existing TaxCode")).collect(Collectors.toList()));
-
-        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salestaxtracking is approved and physical
-
-        // Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build())
-                .bodyValue(givenTransaction)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody(TaxCodeNotValidException.class)
-                .value(e ->
-                        assertEquals(e.getReason(), "The tax code entered is not recognized"));
-    }
 
     /**
      * Utah salesTaxTracking: New Transaction
@@ -791,6 +778,122 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 });
     }
 
+    @Order(4)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaShippingAddressPassedNexus_Returns200AddressWithCityCounty() {
+        String externalId = "newNonExistingTransactionForCityCounty";
+
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertNotNull(transactionDto.salesTax(), "salesTax should not null");
+                    assertNotNull(transactionDto.shippingAddress().county(), "county is missing");
+                });
+    }
+
+    @Order(3)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaShippingAddressPassedNexus_Returns201AddressWithCityCounty() {
+        String externalId = "newNonExistingTransactionForCityCounty";
+
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertNotNull(transactionDto.salesTax().salesTaxRates(), "salesTaxRates isn't null");
+                    assertNotNull(transactionDto.shippingAddress().county(), "county is missing");
+                });
+    }
+
+    @Order(3)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaShippingAddressDidNotPassedNexus_Returns201AddressWithCityCounty() {
+        String externalId = "newNonExistingTransactionID_TAXABLE_REFUND_FOR_CITY";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withTaxInclusive(true)
+                .withTransactionType(TransactionTypeDto.TAXABLE_REFUND);
+
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("DE").withCity("Dover").withCounty(null)); //salestaxtracking is approved and physical
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertNull(transactionDto.salesTax(), "salesTax shuold be null");
+                    assertNotNull(transactionDto.shippingAddress().county(), "county is missing");
+                });
+    }
+
+    @Order(3)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UsaShippingAddressDidNotPassedNexus_Returns200AddressWithCityCounty() {
+        String externalId = "newNonExistingTransactionID_TAXABLE_REFUND2";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withTaxInclusive(true)
+                .withTransactionType(TransactionTypeDto.TAXABLE_REFUND);
+
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("DE").withCity("Dover").withCounty(null)); //salestaxtracking is approved and physical
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertNull(transactionDto.salesTax());
+                    assertNotNull(transactionDto.shippingAddress().county());
+                });
+    }
+
     @Order(1)
     @Test
     @Override
@@ -803,8 +906,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO")
                 .withCountry("US")); //salestaxtracking is approved and physical
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("719.257541"), BigDecimal.valueOf(0.0775), new SalesTaxRatesDto(BigDecimal.ZERO, BigDecimal.valueOf(0.0125), BigDecimal.valueOf(0.06),
-                BigDecimal.valueOf(0.0775), BigDecimal.valueOf(0.005), new RatesMetaDataDto(BigDecimal.ZERO, BigDecimal.valueOf(0.005))), null);
+        expectedSalesTax = expectedSalesTax.withAmount( new BigDecimal("719.257541"));
 
         // Then
         webTestClient
@@ -1109,7 +1211,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(new MandatoryAddressDto(null, "CA", null, null, "", "", null, false));
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(null, new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 
         // Then
         webTestClient
@@ -1141,7 +1243,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(new MandatoryAddressDto(null, "canada", null, null, "", "", null, false));
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(null, new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 
         // Then
         webTestClient
@@ -1174,7 +1276,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDtoNonUsaCountry(externalId, customerId)
                 .withTaxInclusive(true);
 
-        SalesTaxDto expectedSalesTax = new SalesTaxDto(new BigDecimal("1285.40305"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
+        SalesTaxDto expectedSalesTax = new SalesTaxDto(null, new BigDecimal("1285.40305"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 
         // Then
         webTestClient

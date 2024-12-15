@@ -85,6 +85,7 @@ public class SecurityConfig {
                         "/files/v3/api-docs",
                         "/sales-tax/v3/api-docs",
                         "/sales-tax-rates/v3/api-docs",
+                        "/address-validation/v3/api-docs",
                         "/authentication/v3/api-docs",
                         "/v3/api-docs/**",
                         "/webjars/**",

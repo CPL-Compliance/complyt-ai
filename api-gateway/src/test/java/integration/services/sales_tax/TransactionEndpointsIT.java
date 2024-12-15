@@ -20,9 +20,10 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     private final String source = "1";
     private final String state = "CA";
-    private final String createdDate = "2023-02-05";
+    private final String createdDate = "2023-02-05T12:24:43.193Z";
     private final String exemptedState = "PA";
     private final String customerId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
+    private final String zipInternalRates = "83407";
 
     @Order(2)
     @Test
@@ -185,7 +186,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, "90210", "", false, null, "0", item))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate, externalId, customerId, null, true, "USA", null, "90210", "", false, null, "0", item))
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -207,7 +208,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "CA", createdDate, null, null))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, state, createdDate, null ,null))
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -229,7 +230,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "CA", createdDate, null, null))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, state, createdDate, null, null))
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -252,7 +253,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate ,externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -276,7 +277,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, "12345", null, false, null, "0", item1, item2))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate, externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item1, item2))
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -300,7 +301,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, null, null, false, null, "0", item1, item2))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate, externalId, customerId, null, true, "USA", null, null, null, false, null, "0", item1, item2))
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -323,7 +324,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate ,externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -346,7 +347,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate ,externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -369,7 +370,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate ,externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -392,7 +393,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, "90210", null, false,
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate, externalId, customerId, null, true, "USA", null, "90210", null, false,
                         null, "0", item))
                 .exchange()
                 .expectStatus().isCreated();
@@ -416,7 +417,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate ,externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
                 .exchange()
                 .expectStatus().isBadRequest();
     }
@@ -439,7 +440,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate ,externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
                 .exchange()
                 .expectStatus().isBadRequest();
     }
@@ -462,7 +463,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate ,externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
                 .exchange()
                 .expectStatus().isBadRequest();
     }
@@ -485,7 +486,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate ,externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
                 .exchange()
                 .expectStatus().isBadRequest();
     }
@@ -503,7 +504,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "Canada", "", "", "", false, null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", "", "", "", false, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -529,7 +530,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "Canada", "", "", "Quebec", false, null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", "", "", "Quebec", false, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -555,7 +556,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "Canada", "", "", "", true, null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", "", "", "", true, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -584,7 +585,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "Ukraine", "", "", "", true, null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Ukraine", "", "", "", true, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -606,7 +607,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "Canada", "", "", "QUEBEK", true, null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", "", "", "QUEBEK", true, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -634,7 +635,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "USA", "PA", null, "", true, null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "USA", "PA", null, "", true, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -667,7 +668,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", "null", null, null, false, null, "0", item))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate, externalId, customerId, null, true, "USA", "null", null, null, false, null, "0", item))
                 .exchange()
                 .expectStatus().isBadRequest();
     }
@@ -690,7 +691,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "NotSupported", null, null, null, false, null, "0", item))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate, externalId, customerId, null, true, "NotSupported", null, null, null, false, null, "0", item))
                 .exchange()
                 .expectStatus().isBadRequest();
     }
@@ -707,7 +708,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "US", "ID", "83406", null, false, "A", item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "US", "ID", "83406", null, false, "A", item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -732,7 +733,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "US", "ID", "83406", null, false, "B", item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "US", "ID", "83406", null, false, "B", item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -757,7 +758,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, "Canada", "", "", "not_existing", true, null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", "", "", "not_existing", true, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -1218,7 +1219,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isOk()
                 .expectBodyList(LinkedHashMap.class)
                 .value(transaction ->
-                    assertNull(transaction.get(0).get("exchangeRateInfo"))
+                        assertNull(transaction.get(0).get("exchangeRateInfo"))
                 );
     }
 
@@ -1382,7 +1383,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError() {
+    public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400ValidationError() {
         // Given
         String externalId = "someId";
         String differentExternalId = "differentId";
@@ -1393,7 +1394,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.unvalidatedTransactionJsonExample(externalId, customerId, createdDate, null))
+                .bodyValue(TestUtilities.unvalidatedTransactionJsonExample(differentExternalId, customerId, createdDate, null))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -1448,7 +1449,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isNoContent();
     }
 
-    @Order(5)
+    @Order(6)
     @Test
     @Override
     public void get_checkDeletion_Returns200() {
@@ -1919,7 +1920,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Order(2)
     @Test
-//    @Override
+    @Override
     public void upsertByExternalIdAndSource_transactionWithBothItemAndTransactionDiscount_Returns201() {
         //Given
         String externalId = "TransactionWithDiscount";
@@ -1938,7 +1939,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(externalId, customerId, null, true, "USA", null, "90210", null, false, null, givenTransactionDiscount, item1, item2, item3))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate, externalId, customerId, null, true, "USA", null, "90210", null, false, null, givenTransactionDiscount, item1, item2, item3))
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(LinkedHashMap.class)
@@ -1955,4 +1956,59 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 });
     }
 
+    @Order(5)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_HasNexus_CachedAddress_InternalRate_Returns200() {
+        String externalId = "TransactionWithSubsidiaryB";
+        String item = TestUtilities.customItem(null, BigDecimal.valueOf(100000), BigDecimal.valueOf(1), null);
+        String createdDate = "2022-07-01T00:00:00.000+00:00"; // Apply to currentRate
+        double expectedRate = 0.4;
+
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "US", "UT", zipInternalRates, null, false, null, item))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(LinkedHashMap.class)
+                .value(transaction -> {
+                    assertEquals(((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("salesTaxRates")).get("taxRate"), expectedRate);
+                    assertNotNull(((LinkedHashMap) transaction.get("shippingAddress")).get("county"), "County Can not be null");
+                });
+    }
+
+    @Order(6)
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_HasNexus_CachedAddress_FastTax_Returns200() {
+        String externalId = "TransactionWithSubsidiaryB";
+        String item = TestUtilities.customItem(null, BigDecimal.valueOf(100000), BigDecimal.valueOf(1), null);
+        String createdDate = "2009-07-01T00:00:00.000+00:00";
+        String zipFastTax = "11111";
+
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "US", "UT", zipFastTax, null, false, null, item))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(LinkedHashMap.class)
+                .value(transaction -> {
+                    assertEquals(0.08, ((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("salesTaxRates")).get("taxRate"));
+                    assertNotNull(((LinkedHashMap) transaction.get("shippingAddress")).get("county"), "County Can not be null");
+                });
+    }
 }

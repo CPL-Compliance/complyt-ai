@@ -2,7 +2,7 @@ package com.complyt.v1.handler;
 
 import com.complyt.facade.ComplytGtRatesFacade;
 import com.complyt.security.permissions.sales_tax_rates.GtRatesReadPermission;
-import com.complyt.utils.observability.ContextLogger;
+import com.complyt.utils.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.ComplytGtRatesMapper;
 import com.complyt.v1.mappers.GtAddressMapper;
@@ -31,14 +31,14 @@ public class ComplytGtRatesHandler {
     ComplytGtRatesFacade complytGtRatesFacade;
 
     @NonNull
-    ValidationHandler<GtAddressDto, SpringValidatorAdapter> addressDtoValidationHandler;
+    ValidationHandler<GtAddressDto, SpringValidatorAdapter> gtAddressDtoValidationHandler;
 
     @GtRatesReadPermission
     public Mono<ServerResponse> getGtRatesByAddress(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<ComplytGtRatesDto> complytGtRatesDtoMono = ContextLogger.observeCtx(logStr, log::info)
-                .then(addressDtoValidationHandler.validate(serverRequest))
+                .then(gtAddressDtoValidationHandler.validate(serverRequest))
                 .map(GtAddressMapper.INSTANCE::gtAddressDtoToGtAddress)
                 .flatMap(complytGtRatesFacade::findByAddress)
                 .map(ComplytGtRatesMapper.INSTANCE::complytGstRatesToComplytGstRatesDto)

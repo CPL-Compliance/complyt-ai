@@ -1,6 +1,6 @@
 package com.complyt.v1.api_info.sales_tax_rates;
 
-import com.complyt.v1.model.SalesTaxRatesDto;
+import com.complyt.v1.model.common_sales_tax_rates.SalesTaxRatesDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -30,16 +30,26 @@ import java.lang.annotation.Target;
                         description = "Get ComplytSalesTaxRates by Address",
                         operationId = "getComplytSalesTaxRatesByAddress",
                         parameters = {
+                                @Parameter(in = ParameterIn.QUERY, required = true,
+                                        name = "requiredDate",
+                                        description = "date for getting the rate",
+                                        examples = @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.requiredDateExample,
+                                                name = GetSalesTaxRatesByAddressApiInfo.requiredDateExample)),
+                                @Parameter(in = ParameterIn.QUERY, required = true,
+                                        name = "state",
+                                        description = "Address state",
+                                        examples = @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.stateExample,
+                                                name = GetSalesTaxRatesByAddressApiInfo.stateExample)),
+                                @Parameter(in = ParameterIn.QUERY, required = true,
+                                        name = "zip",
+                                        description = "Address zip",
+                                        examples = @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.zipExample,
+                                                name = GetSalesTaxRatesByAddressApiInfo.zipExample)),
                                 @Parameter(in = ParameterIn.QUERY,
                                         name = "country",
                                         description = "Address country",
                                         examples = @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.countryExample,
                                                 name = GetSalesTaxRatesByAddressApiInfo.countryExample)),
-                                @Parameter(in = ParameterIn.QUERY,
-                                        name = "state",
-                                        description = "Address state",
-                                        examples = @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.stateExample,
-                                                name = GetSalesTaxRatesByAddressApiInfo.stateExample)),
                                 @Parameter(in = ParameterIn.QUERY,
                                         name = "city",
                                         description = "Address city",
@@ -50,11 +60,7 @@ import java.lang.annotation.Target;
                                         description = "Address street",
                                         examples = @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.streetExample,
                                                 name = GetSalesTaxRatesByAddressApiInfo.streetExample)),
-                                @Parameter(in = ParameterIn.QUERY,
-                                        name = "zip",
-                                        description = "Address zip",
-                                        examples = @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.zipExample,
-                                                name = GetSalesTaxRatesByAddressApiInfo.zipExample))
+
                         },
                         tags = "sales_tax_rates",
                         responses = {
@@ -94,6 +100,7 @@ import java.lang.annotation.Target;
 public @interface GetSalesTaxRatesByAddressApiInfo {
     String countryExample = "US";
     String stateExample = "NY";
+    String requiredDateExample = "200-01-01";
     String cityExample = "New York";
     String streetExample = "541 6th Ave";
     String zipExample = "10011";

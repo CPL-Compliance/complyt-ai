@@ -9,6 +9,6 @@ import lombok.With;
 @With
 @Schema(name = "Address")
 public record GtAddressDto(
-        @NotBlank @Size(max = 50, message = "Address.country " + StringErrorMessages.MAX_50_ERROR) String country,
+        @NotBlank(message = "Address.country" + StringErrorMessages.NOT_BE_BLANK_ERROR) @Size(max = 50, message = "Address.country " + StringErrorMessages.MAX_50_ERROR) String country,
         @Size(max = 50, message = "Address.region " + StringErrorMessages.MAX_50_ERROR) String region) {
 }

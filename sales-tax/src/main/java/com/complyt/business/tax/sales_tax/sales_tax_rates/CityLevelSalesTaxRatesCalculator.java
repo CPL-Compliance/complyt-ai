@@ -68,11 +68,14 @@ public class CityLevelSalesTaxRatesCalculator implements TaxRatesCalculator<SubJ
                 .add(salesTaxRates.stateRate()).add(salesTaxRates.countyRate());
 
         return new SalesTaxRates(
-                salesTaxRates.cityRate(),
-                salesTaxRates.countyRate(),
                 salesTaxRates.stateRate(),
-                taxRate,
+                salesTaxRates.countyRate(),
+                salesTaxRates.cityRate(),
                 salesTaxRates.combinedDistrictRate(),
-                salesTaxRates.ratesMetaData());
+                salesTaxRates.ratesMetaData(),
+                salesTaxRates.mtaRate(),
+                salesTaxRates.spdRate(),
+                salesTaxRates.otherRate(),
+                taxRate);
     }
 }

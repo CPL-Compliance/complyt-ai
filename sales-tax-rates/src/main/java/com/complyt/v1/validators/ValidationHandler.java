@@ -1,8 +1,9 @@
 package com.complyt.v1.validators;
 
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
+import com.complyt.v1.exceptions.types.MissingBodyApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
-import com.complyt.v1.validators.query_params.QueryParamsExtractor;
+import com.complyt.v1.validators.custom_body.CustomBodyExtractor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -14,6 +15,9 @@ import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+
 
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -30,36 +34,56 @@ public class ValidationHandler<T, U extends Validator> {
     DataConflictChecksProvider<T> dataConflictChecksProvider;
 
     @NonNull
-    QueryParamsExtractor<T> queryParamsExtractor;
+    CustomBodyExtractor<T> customBodyExtractor;
 
-    private Mono<T> onValidationErrors(Errors errors) {
-        return Mono.error(new ObjectNotValidApiException(errors));
-    }
+    @NonNull
+    ParameterChecksProvider pathVariableChecksProvider;
 
-    public Mono<T> validateRequest(final ServerRequest serverRequest) {
-        return queryParamsExtractor.extract(serverRequest)
-                .flatMap(object -> {
-                    Errors errors = new BeanPropertyBindingResult(object, validationClass.getName());
-                    validator.validate(object, errors);
+    @NonNull
+    ParameterChecksProvider queryParamChecksProvider;
 
-                    if (errors.getAllErrors().isEmpty()) {
-                        return Mono.just(object);
-                    } else {
-                        return onValidationErrors(errors);
-                    }
-                });
-    }
+    @NonNull
+    ShouldCallValidate shouldCallValidate;
 
-    public final Mono<T> validate(final ServerRequest serverRequest) {
-        return this.validateRequest(serverRequest)
+    public Mono<T> validate(final ServerRequest serverRequest) {
+        return validateRequestBody(serverRequest)
                 .flatMap(body -> Flux.fromIterable(serverRequest.pathVariables().keySet())
                         .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)
                                 .flatMap(check -> check.apply(body, serverRequest)))
-                        .concatWith(dataConflictChecksProvider.getBodyConflictCheck()
-                                .flatMapMany(check -> check.apply(body)))
+                        .concatWith(Flux.fromIterable(serverRequest.queryParams().keySet())
+                                .flatMap(param -> dataConflictChecksProvider.getPathVariableCheck(param)
+                                        .flatMap(check -> check.apply(body, serverRequest))))
+                        .concatWith(checkBodyConflicts(body))
                         .collectList()
-                        .flatMap(errorList -> errorList.isEmpty() ? Mono.just(body) :
-                                Mono.error(new ConflictedDataApiException(errorList))));
+                        .flatMap(errorList -> checkErrorList(body, errorList)));
+    }
+
+    private Mono<T> validateRequestBody(final ServerRequest serverRequest) {
+        return customBodyExtractor.extract(serverRequest)
+                .switchIfEmpty(serverRequest.bodyToMono(validationClass))
+                .flatMap(this::validateBody)
+                .switchIfEmpty(Mono.error(new MissingBodyApiException()));
+    }
+
+    private Mono<T> checkErrorList(T object, List<String> errorList) {
+        return errorList.isEmpty() ? Mono.just(object) :
+                Mono.error(new ConflictedDataApiException(errorList));
+    }
+
+    private Mono<T> validateBody(final T object) {
+        Errors errors = new BeanPropertyBindingResult(object, validationClass.getName());
+        validator.validate(object, errors);
+
+        if (errors.getAllErrors().isEmpty()) {
+            return Mono.just(object);
+        } else {
+            return Mono.error(new ObjectNotValidApiException(errors));
+        }
+    }
+
+    private Flux<String> checkBodyConflicts(T body) {
+        return dataConflictChecksProvider.getBodyConflictCheck()
+                .flatMapMany(check -> check.apply(body));
     }
 
 }

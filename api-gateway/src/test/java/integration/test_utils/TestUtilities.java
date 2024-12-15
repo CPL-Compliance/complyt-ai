@@ -1,5 +1,6 @@
 package integration.test_utils;
 
+import net.minidev.json.JSONObject;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.client.MultipartBodyBuilder;
 
@@ -21,6 +22,7 @@ public class TestUtilities {
     public static final String TOKEN_BASE_URL = "/v1/token";
     public static final String API_KEY_BASE_URL = "/v1/api_key";
     public static final String SECRET_KEY_BASE_URL = "/v1/secret_key";
+    public static final String ADDRESS_VALIDATION_BASE_URL = "/v1/addresses";
     public static final String NON_EXISTING_COMPLYT_ID = "d18068f0-6d98-4b0d-ba19-4536f0b4173a";
 
     /*
@@ -106,7 +108,7 @@ public class TestUtilities {
                              "registered": %s,
                              "registrationDate": %s
                          }
-                         """,
+                        """,
                 complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
                 country,
                 stateObject,
@@ -164,8 +166,8 @@ public class TestUtilities {
         return transactionJsonExample(externalId, customerId, null, true, state, "US", createdDate, currency, refRate);
     }
 
-    public static String transactionJsonExample(String externalId, String customerId, String country, String state, String zip, String region, boolean isTaxInclusive, String subsidiary, String... items) {
-        return transactionWithCustomItems(externalId, customerId, null, true, country, state, zip, region, isTaxInclusive, subsidiary, "0",
+    public static String transactionJsonExample(String createdDate, String externalId, String customerId, String country, String state, String zip, String region, boolean isTaxInclusive, String subsidiary, String... items) {
+        return transactionWithCustomItems(createdDate, externalId, customerId, null, true, country, state, zip, region, isTaxInclusive, subsidiary, "0",
                 items);
     }
 
@@ -196,7 +198,7 @@ public class TestUtilities {
                                 }
                             ],
                             "shippingAddress": {
-                                "city": "Los Angeles",
+                                "city": "city",
                                 "country": "%s",
                                 "state": "%s",
                                 "street": "10 5th Ave",
@@ -206,8 +208,8 @@ public class TestUtilities {
                             "customerId": "%s",
                             "transactionStatus": "ACTIVE",
                             "externalTimestamps": {
-                                "createdDate": "%sT12:24:43.193Z",
-                                "updatedDate": "%sT12:24:43.193Z"
+                                "createdDate": "%s",
+                                "updatedDate": "%s"
                             },
                             %s
                             "shippingFee": {
@@ -420,7 +422,7 @@ public class TestUtilities {
                 discount);
     }
 
-    public static String transactionWithCustomItems(String externalId, String customerId, String complytId, boolean isValidated, String country, String state, String zip, String region, boolean isTaxInclusive, String subsidiary, String transactionDiscount,
+    public static String transactionWithCustomItems(String createdDate, String externalId, String customerId, String complytId, boolean isValidated, String country, String state, String zip, String region, boolean isTaxInclusive, String subsidiary, String transactionDiscount,
                                                     String... items) {
         return String.format("""
                         {
@@ -430,7 +432,7 @@ public class TestUtilities {
                             %s
                             "items": %s,
                             "shippingAddress": {
-                                "city": "Los Angeles",
+                                "city": "city",
                                 "country": "%s",
                                 "state": "%s",
                                 "street": "10 5th Ave",
@@ -441,7 +443,7 @@ public class TestUtilities {
                             "customerId": "%s",
                             "transactionStatus": "ACTIVE",
                             "externalTimestamps": {
-                                "createdDate": "2023-02-05T12:24:43.193Z",
+                                "createdDate": "%s",
                                 "updatedDate": "2023-02-05T12:24:43.193Z"
                             },
                             %s
@@ -465,6 +467,7 @@ public class TestUtilities {
                 zip != null ? zip : "90210",
                 region,
                 customerId,
+                createdDate,
                 isValidated ? "\"transactionType\": \"INVOICE\"," : "",
                 isTaxInclusive,
                 transactionDiscount
@@ -575,7 +578,7 @@ public class TestUtilities {
                           },
                           "states": %s
                           }
-                          """,
+                        """,
                 country,
                 stateObject,
                 statesList
@@ -588,8 +591,50 @@ public class TestUtilities {
                 {
                     "registered": "REGISTERED"
                 }
-                                """;
+                """;
     }
+
+    public static JSONObject createAddressJsonExample(String city, String country, String county, String state, String street, String zip, boolean isPartial) {
+        JSONObject addressJson = new JSONObject();
+        addressJson.put("city", city);
+        addressJson.put("country", country);
+        addressJson.put("county", county);
+        addressJson.put("state", state);
+        addressJson.put("street", street);
+        addressJson.put("zip", zip);
+        addressJson.put("isPartial", isPartial);
+        return addressJson;
+    }
+
+    public static JSONObject createAddressAndRate(String state) {
+        // Creating the address part of the object
+        JSONObject addressJson = new JSONObject();
+        addressJson.put("state", state);
+        addressJson.put("county", state);
+        addressJson.put("city", "city");
+        addressJson.put("zip", "10038");
+        addressJson.put("isUnincorporated", false);
+        addressJson.put("hasPlusFourZipCode", false);
+        addressJson.put("lowerPlusFourDigits", 0);
+        addressJson.put("upperPlusFourDigits", 0);
+
+        // Creating the current rates part of the object
+        JSONObject currentRatesJson = new JSONObject();
+        currentRatesJson.put("stateRate", new BigDecimal("0.0"));
+        currentRatesJson.put("countyRate", new BigDecimal("0.0"));
+        currentRatesJson.put("cityRate", new BigDecimal("0.0"));
+        currentRatesJson.put("taxRate", new BigDecimal("0.123"));
+        currentRatesJson.put("effectiveDate", "2021-07-01T00:00:00.000+00:00");
+        currentRatesJson.put("source", "FAST_SALES_TAX");
+        currentRatesJson.put("internalSalesTaxRatesMetaData", new JSONObject());
+
+        // Creating the final object
+        JSONObject json = new JSONObject();
+        json.put("address", addressJson);
+        json.put("rates", currentRatesJson);
+        return json;
+    }
+
     public static MultipartBodyBuilder complytFileSaveFileExample() {
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part("file", new ClassPathResource("application.yml")) // Add a file part

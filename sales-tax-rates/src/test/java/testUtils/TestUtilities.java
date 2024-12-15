@@ -1,21 +1,29 @@
 package testUtils;
 
-import com.complyt.domain.Address;
-import com.complyt.domain.CityCountyWrapper;
-import com.complyt.domain.ComplytSalesTaxRates;
-import com.complyt.domain.SalesTaxRates;
+import com.complyt.domain.*;
+import com.complyt.domain.common_rates.CommonAddress;
+import com.complyt.domain.common_rates.CommonRates;
+import com.complyt.domain.common_rates.CommonSalesTaxRates;
+import com.complyt.domain.enums.SalesTaxSources;
 import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
 import com.complyt.domain.gt.ComplytGtRates;
 import com.complyt.domain.gt.GtAddress;
 import com.complyt.domain.gt.GtRates;
+import com.complyt.domain.internal_rates.*;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.v1.model.AddressDto;
-import com.complyt.v1.model.RatesMetaDataDto;
-import com.complyt.v1.model.SalesTaxRatesDto;
+import com.complyt.v1.model.AddressWithDateDto;
+import com.complyt.v1.model.common_sales_tax_rates.CommonAddressDto;
+import com.complyt.v1.model.common_sales_tax_rates.SalesTaxRatesDto;
 import com.complyt.v1.model.gt.ComplytGtRatesDto;
 import com.complyt.v1.model.gt.GtAddressDto;
 import com.complyt.v1.model.gt.GtRatesDto;
+import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalAddressDto;
+import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalRateDto;
+import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalSalesTaxRatesDto;
+import feign.FeignException;
+import feign.Request;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -23,10 +31,7 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,27 +40,163 @@ public interface TestUtilities {
 
     String LOMBOK_NON_NULL_ANNOTATION_MESSAGE = "is marked non-null but is null";
 
-    static Address createAddressInCalifornia() {
-        return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
+    static AddressWithDate createAddressInCaliforniaWithCreationDate(LocalDateTime localDateTime) {
+        return new AddressWithDate(new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false),
+                localDateTime);
     }
 
-    static CityCountyWrapper createCityCountyInCalifornia() {
-        return new CityCountyWrapper("Fresno", "Fresno");
+    static AddressWithDate createAddressInCaliforniaWithCreationDate() {
+        return new AddressWithDate(new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false),
+                LocalDateTime.now());
+    }
+
+    static Address createAddressInCalifornia() {
+        return new Address("Fresno", "US", null, "California", "7498 N Remington Ave", "93711-5508", false);
     }
 
     static AddressDto createAddressDtoInCalifornia() {
         return new AddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
+    static AddressWithDateDto createAddressWithDateDtoInCalifornia(String date) {
+        return new AddressWithDateDto(createAddressDtoInCalifornia(), date);
+    }
+
+    static AddressWithDate createAddressWithDateInCalifornia(LocalDateTime dateTime) {
+        return new AddressWithDate(createAddressInCalifornia(), dateTime);
+    }
+
     static SalesTaxRates createCaliforniaSalesTaxRates() {
-        return new SalesTaxRates(new BigDecimal("0.00375"), BigDecimal.ZERO, new BigDecimal("0.00725"), new BigDecimal("0.071"), new BigDecimal("0.06"), null);
+        return new SalesTaxRates(
+                new BigDecimal("0"), // city
+                new BigDecimal("0.00375"), // county
+                new BigDecimal("0.00725"), // state
+                new BigDecimal("0.082"), // tax
+                new BigDecimal("0"), // combined
+                null);
     }
 
     static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
         Address address = createAddressInCalifornia();
         SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
         LocalDateTime now = LocalDateTime.now();
-        return new ComplytSalesTaxRates(UUID.randomUUID().toString(), address, address, salesTaxRates, now, now.plusMinutes(1));
+
+        return new ComplytSalesTaxRates(UUID.randomUUID(), UUID.randomUUID().toString(), address, salesTaxRates, now, now.plusMinutes(1));
+    }
+
+    /***
+     *  getting the complytId because commonSalesTaxRates are sometimes received from conversion
+     *  of ComplytSalesTaxRates, by ComplytSalesTaxRatesToCommonRatesMapper.INSTANCE::map
+     */
+    static CommonSalesTaxRates createExternalCommonSalesTaxRates(UUID complytId) {
+        CommonSalesTaxRates commonSalesTaxRates = createExternalCommonSalesTaxRates();
+        CommonRates commonRates = commonSalesTaxRates.salesTaxRates();
+        return commonSalesTaxRates.withSalesTaxRates(commonRates);
+    }
+
+    static CommonAddress createCommonAddressFromAddress(InternalAddress address) {
+        return new CommonAddress(null, address.state(), address.county(), address.city(), address.isUnincorporated(), address.zip(), address.lowerPlusFourDigits(), address.upperPlusFourDigits(), null, null);
+    }
+
+    static CommonRates createCommonRates() {
+        return new CommonRates(
+                new BigDecimal("0.00725"), // state
+                new BigDecimal("0.00375"), // county
+                new BigDecimal("0"), // city
+                null, // combined
+                null,  // rates
+                new BigDecimal("0.071"), // mtd
+                new BigDecimal("0"), // spd
+                new BigDecimal("0"), // other
+                new BigDecimal("0.082"));
+    }
+
+    static CommonSalesTaxRates createExternalCommonSalesTaxRates() {
+        CommonAddress commonAddress = new CommonAddress("California", null, "Fresno", null, false, "12345", 0, 0, "", true);
+        CommonRates commonRates = createCommonRates();
+        return new CommonSalesTaxRates(UUID.randomUUID(), commonAddress, commonRates, SalesTaxSources.FAST_SALES_TAX);
+    }
+
+    static InternalSalesTaxRates createInternalSalesTaxRates(LocalDateTime dateTime, UUID uuid) {
+        return createInternalSalesTaxRates(dateTime).withComplytId(uuid)
+                .withSalesTaxRates(createInternalRates(dateTime));
+    }
+
+
+    static InternalSalesTaxRates createInternalSalesTaxRates(LocalDateTime dateTime) {
+
+        return new InternalSalesTaxRates(UUID.randomUUID(), null, createInternalAddress(),
+                createInternalRates(dateTime), createInternalEffectiveDates(), null, LocalDateTime.now());
+    }
+
+    static InternalEffectiveDates createInternalEffectiveDates() {
+        LocalDateTime initialDate = LocalDateTime.of(2000, 1, 1, 0, 0, 0);
+        return new InternalEffectiveDates(initialDate, initialDate, null, null, null, null, null, null, null, initialDate);
+    }
+
+
+    static InternalAddress createInternalAddress() {
+        InternalAddress internalAddress = new InternalAddress("California", "Fresno", "Fresno", false, "", 0, 0);
+
+        return internalAddress;
+    }
+
+    static InternalRates createInternalRates(LocalDateTime dateTime, UUID uuid) {
+        return createInternalRates(dateTime);
+    }
+
+    static InternalRates createInternalRates(LocalDateTime dateTime) {
+        InternalRates internalRates = new InternalRates(
+                new BigDecimal("0.00725"),
+                new BigDecimal("0.00375"),
+                new BigDecimal("0"),
+                new BigDecimal("0.071"),
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                new BigDecimal("0.082"));
+        return internalRates;
+    }
+
+    static InternalSalesTaxRatesDto createInternalSalesTaxRatesDto() {
+        return new InternalSalesTaxRatesDto(createInternalAddressDto(), createInternalRatesDto());
+    }
+
+    static InternalAddressDto createInternalAddressDto() {
+        return new InternalAddressDto("California", "Fresno", "Fresno", false, "", 0, 0);
+    }
+
+    static InternalAddressDto createInternalAddressDto(String state, String county, String city) {
+        return new InternalAddressDto(state, county, city, false, "", 0, 0);
+    }
+
+    static InternalAddressDto createInternalAddressDto(String state, String county, String city, String zip, boolean isUnincorporated,
+                                                       boolean hasPlusFourZip, int lowerPlusFour, int upperPlusFour) {
+        return new InternalAddressDto(state, county, city, isUnincorporated, zip, lowerPlusFour, upperPlusFour);
+    }
+
+    static InternalRateDto createInternalRatesDto(UUID complytId) {
+        return createInternalRatesDto(complytId,
+                LocalDateTime.of(2021, 01, 07, 0, 0).toString());
+    }
+
+    static InternalRateDto createInternalRatesDto(UUID complytId, String effectiveDate) {
+        return new InternalRateDto(
+                complytId,
+                new BigDecimal("0.06"),
+                new BigDecimal("0.01975"),
+                new BigDecimal("0.00375"),
+                new BigDecimal("0.0835"),
+                effectiveDate,
+                SalesTaxSources.FAST_SALES_TAX,
+                null
+        );
+    }
+
+    static InternalRateDto createInternalRatesDto() {
+        return createInternalRatesDto(null);
     }
 
     static Query createAddressSearchQuery(Address address) {
@@ -69,11 +210,63 @@ public interface TestUtilities {
         String matchLevel = "Address";
         TaxInfoItem taxInfoItem = new TaxInfoItem("Fresno", "0.00375", "0", "Fresno", "0.00725", "0.0125", null, "", "", "0", "CA", "California", "0.06", "0.0835", "LABOR/FREIGHT/SERVICES", "93711-5508");
         List<TaxInfoItem> taxInfoItems = List.of(taxInfoItem);
-        return new FastTaxGetBestMatchData(matchLevel, taxInfoItems, "1");
+        return new FastTaxGetBestMatchData(matchLevel, taxInfoItems, "1", null);
     }
 
     static AddressDto createStubFastTaxAddressDto() {
-        return new AddressDto("Englewood", "US", null, "CO", "street", "80112", false);
+        return new AddressDto("Englewood", "US", null, "Colorado", null, "80112", true);
+    }
+
+    static CommonAddressDto createCommonAddressDto(AddressDto addressDto) {
+        return  new CommonAddressDto(addressDto.country(), addressDto.state(), addressDto.county(), addressDto.city(), null, addressDto.zip(), null, null, addressDto.street(), addressDto.isPartial());
+    }
+
+    static CommonAddressDto createCommonAddressDto() {
+        return new CommonAddressDto(null, "AK", "ANCHORAGE", "ANCHORAGE", false, "99501", 0, 0, null, null);
+    }
+
+    static AddressDto createStubInternalTaxAddressDto() {
+        return new AddressDto("Anchorage", "USA", "Anchorage",
+                "Alaska", "751-2696 205 E Benson Blvd",
+                "99501", false);
+    }
+
+    static AddressDto createStubInternalTaxAddressUnincorporatedDto() {
+        return new AddressDto("PRINCETON", "USA", "MERCER",
+                "West Virginia", "751-2696 205 E Benson Blvd",
+                "24740", false);
+    }
+
+    static SalesTaxRatesDto createStubInternalTax_SalesTaxRatesDto(BigDecimal bigDecimal) {
+        return new SalesTaxRatesDto(
+                bigDecimal,
+                bigDecimal,
+                BigDecimal.ZERO,
+                null,
+                null,
+                bigDecimal,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                bigDecimal.add(bigDecimal).add(bigDecimal));
+    }
+
+    static SalesTaxRatesDto createStubInternalTaxUnincorporated_SalesTaxRatesDto() {
+        return new SalesTaxRatesDto(
+                new BigDecimal("0.00375"),
+                new BigDecimal("0.01975"),
+                new BigDecimal("0.06"),
+                null,
+                null,
+                null,
+                null,
+                null,
+                new BigDecimal("0.0835"));
+    }
+
+    static InternalSalesTaxRatesDto createInternalSalesTaxRatesDtoToInsert(String effectiveDate) {
+        return new InternalSalesTaxRatesDto(createInternalAddressDto("Alaska", "Anchorage", "Anchorage",
+                "99501", false, true, 0, 123)
+                , createInternalRatesDto(null, effectiveDate));
     }
 
     static Result createResult() {
@@ -94,10 +287,16 @@ public interface TestUtilities {
     }
 
     static SalesTaxRatesDto createStubFastTaxSalesTaxRatesDto() {
-        BigDecimal cityDistrictRate = BigDecimal.ZERO;
-        BigDecimal countyDistrictRate = new BigDecimal("0.029");
-        RatesMetaDataDto ratesMetaDataDto = new RatesMetaDataDto(cityDistrictRate, countyDistrictRate);
-        return new SalesTaxRatesDto(new BigDecimal("0.0"), new BigDecimal("0.0"), new BigDecimal("0.011"), new BigDecimal("0.04"), cityDistrictRate.add(countyDistrictRate), ratesMetaDataDto);
+        return  new SalesTaxRatesDto(
+                new BigDecimal("0.0425"), // stateRate
+                new BigDecimal("0.0125"), // countyRate
+                new BigDecimal("0"),    // cityRate
+                new BigDecimal("0.029"), // combinedDistrictRate (CountyDistrictRate in JSON)
+                new RatesMetaData(BigDecimal.ZERO, new BigDecimal("0.029"), BigDecimal.ZERO),  // ratesMetaData
+                null,    // mtaRate
+                null,    // spdRate
+                null,    // otherRate
+                new BigDecimal("0.05975")); // taxRate
     }
 
     static String stringWithLength(int length) {
@@ -175,15 +374,19 @@ public interface TestUtilities {
                         .append("country", "US")
                         .append("county", "BLOUNT")
                         .append("state", "AL")
+                        .append("street", "10 5th Ave")
                         .append("zip", "35097")
-                        .append("isPartial", true))
+                        .append("isPartial", true)
+                        .append("score", 1.0))
                 .append("salesTaxRates", new Document("cityRate", "0.02")
                         .append("countyRate", "0.03")
                         .append("stateRate", "0.04")
                         .append("taxRate", "0.09")
                         .append("combinedDistrictRate", "0")
                         .append("ratesMetaData", new Document("cityDistrictRate", "0")
-                                .append("countyDistrictRate", "0")))
+                                .append("countyDistrictRate", "0")
+                                .append("specialDistrictRate", "0")
+                        ))
                 .append("createdDate", LocalDateTime.now())
                 .append("expireAt", LocalDateTime.now().plusYears(1))
                 .append("_class", "com.complyt.domain.ComplytSalesTaxRates")
@@ -200,5 +403,48 @@ public interface TestUtilities {
                 .append("gtAddress", new Document("country", "Armenia"))
                 .append("gtRates", new Document("taxRate", "0.18")
                         .append("countryRate", "0.18"));
+    }
+
+    static Document internalSalesTaxRates() {
+        return new Document("_id", new ObjectId())
+                .append("complytId", UUID.randomUUID())
+                .append("address", new Document("state", "AK")
+                        .append("county", "ANCHORAGE")
+                        .append("city", "ANCHORAGE")
+                        .append("isUnincorporated", false)
+                        .append("zip", "99501")
+                        .append("lowerPlusFourDigits", 0)
+                        .append("upperPlusFourDigits", 0))
+                .append("salesTaxRates", new Document("stateRate", "0.1")
+                        .append("countyRate", "0.1")
+                        .append("cityRate", "0")
+                        .append("mtaRate", "0.1")
+                        .append("spdRate", "0")
+                        .append("other1Rate", "0")
+                        .append("other2Rate", "0")
+                        .append("other3Rate", "0")
+                        .append("other4Rate", "0")
+                        .append("taxRate", "0.3"))
+                .append("effectiveDates", new Document("state", new Date())
+                        .append("maxEffectiveDate", new Date())
+                        .append("county", new Date())
+                        .append("mta", new Date()))
+                .append("internalSalesTaxRatesMetaData", new Document("FIPS_STATE", "02")
+                        .append("FIPS_COUNTY", "020")
+                        .append("FIPS_CITY", "03000")
+                        .append("FIPS_GEOCODE", "0202003000")
+                        .append("COUNTY_TAXABLE_MAX", "N")
+                        .append("CITY_TAXABLE_MAX", "N")
+                        .append("TAX_SHIPPING_ALONE", "Y")
+                        .append("TAX_SHIPPING_AND_HANDLING_TOGETHER", "Y"))
+                .append("_class", "com.complyt.domain.internal_rates.InternalTaxRatesData")
+                .append("createdDate", LocalDateTime.now());
+    }
+
+    static FeignException.BadRequest create400BadRequestFeignException() {
+        return new FeignException.BadRequest("bad request",
+                Request.create(Request.HttpMethod.GET, "address_validation_uri",
+                        Map.of("Authorization", List.of("Dummy Bearer")),
+                        null, null, null), null, Map.of("Authorization", List.of("Dummy Bearer")));
     }
 }

@@ -6,6 +6,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
 
-public interface RatesTransactionInjector {
-    Function<ComplytInternalRates, Mono<Transaction>> inject(Transaction transaction);
+public interface RatesTransactionInjector<T> {
+    Function<T, Mono<Transaction>> inject(Transaction transaction);
 }

@@ -1,0 +1,23 @@
+auth0.audience: null
+
+eureka:
+  client:
+    should-unregister-on-shutdown: true
+    register-with-eureka: true
+    registry-fetch-interval-seconds: 15
+    initial-instance-info-replication-interval-seconds: 1
+  instance:
+    prefer-ip-address: false
+    lease-renewal-interval-in-seconds: 30
+
+logging:
+  level:
+    root: info
+
+spring:
+  cloud:
+    vault:
+      enabled: false
+  data:
+    mongodb:
+      database: address_validation

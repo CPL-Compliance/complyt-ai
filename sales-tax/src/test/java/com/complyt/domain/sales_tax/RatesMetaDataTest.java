@@ -13,14 +13,14 @@ public class RatesMetaDataTest {
 
     @BeforeEach
     void setUp() {
-        ratesMetaData = new RatesMetaData(new BigDecimal("0.01"), new BigDecimal("0.01"));
+        ratesMetaData = new RatesMetaData(new BigDecimal("0.01"), new BigDecimal("0.01"), BigDecimal.ZERO);
     }
 
     @Test
     void toString_ReturnString() {
         // Given
         String expectedString = "RatesMetaData[cityDistrictRate=" + ratesMetaData.cityDistrictRate() +
-                ", countyDistrictRate=" + ratesMetaData.countyDistrictRate() + "]";
+                ", countyDistrictRate=" + ratesMetaData.countyDistrictRate() + ", specialDistrictRate=0]";
 
         // When
         String actualString = ratesMetaData.toString();

@@ -10,4 +10,8 @@ public class ObjectNotValidApiException extends ComplytApiException {
     public ObjectNotValidApiException(@NonNull Errors errors) {
         super(errors.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList().toString());
     }
+
+    public ObjectNotValidApiException(@NonNull String errorMessage) {
+        super(errorMessage);
+    }
 }
