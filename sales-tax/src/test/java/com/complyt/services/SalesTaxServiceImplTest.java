@@ -203,7 +203,7 @@ public class SalesTaxServiceImplTest {
 
         // When
         when(refundTransactionProcessor.isLinkedRefundFromAnInvoice(refund)).thenReturn(true);
-        when(refundTransactionProcessor.setInvoiceSalesTaxToRefund(refund)).thenReturn(Mono.just(refund.withSalesTax(invoice.getSalesTax())));
+        when(refundTransactionProcessor.setInvoiceSalesTaxToLinkedRefund(refund)).thenReturn(Mono.just(refund.withSalesTax(invoice.getSalesTax())));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(refund, tracking, customer);
 
         // Then
@@ -219,7 +219,7 @@ public class SalesTaxServiceImplTest {
 
         // When
         when(refundTransactionProcessor.isLinkedRefundFromAnInvoice(refund)).thenReturn(true);
-        when(refundTransactionProcessor.setInvoiceSalesTaxToRefund(refund)).thenReturn(Mono.just(refund));
+        when(refundTransactionProcessor.setInvoiceSalesTaxToLinkedRefund(refund)).thenReturn(Mono.just(refund));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(refund, tracking, customer);
 
         // Then

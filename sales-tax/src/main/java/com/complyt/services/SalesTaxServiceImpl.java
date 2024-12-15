@@ -8,7 +8,6 @@ import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.ComplytInternalRates;
 import com.complyt.domain.transaction.Transaction;
-import com.complyt.domain.transaction.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     @Override
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transactionWithOutSalesTax, @NonNull SalesTaxTracking salesTaxTracking, @NonNull Customer customer) {
         if (refundTransactionProcessor.isLinkedRefundFromAnInvoice(transactionWithOutSalesTax)) {
-            return refundTransactionProcessor.setInvoiceSalesTaxToRefund(transactionWithOutSalesTax);
+            return refundTransactionProcessor.setInvoiceSalesTaxToLinkedRefund(transactionWithOutSalesTax);
         }
 
         SalesTaxApplyCheck salesTaxApplyCheck = new SalesTaxApplyCheck(transactionWithOutSalesTax);

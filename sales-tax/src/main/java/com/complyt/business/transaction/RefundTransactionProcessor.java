@@ -7,10 +7,10 @@ import com.complyt.services.TransactionService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-@Component
+@Service
 @AllArgsConstructor
 @Slf4j
 public class RefundTransactionProcessor {
@@ -25,7 +25,7 @@ public class RefundTransactionProcessor {
                 transaction.getCreatedFrom() != null;
     }
 
-    public Mono<Transaction> setInvoiceSalesTaxToRefund(Transaction transaction) {
+    public Mono<Transaction> setInvoiceSalesTaxToLinkedRefund(Transaction transaction) {
         return transactionService.findByExternalIdAndSource(transaction.getCreatedFrom(), transaction.getSource())
                 .map(invoice -> processSalesTax(transaction, invoice))
                 .switchIfEmpty(Mono.just(transaction));
@@ -34,7 +34,7 @@ public class RefundTransactionProcessor {
     private static Transaction processSalesTax(Transaction refund, Transaction invoice) {
         SalesTax st = invoice.getSalesTax();
         if (st == null) {
-            return refund.withSalesTax(null);
+            return refund.setSalesTax(null);
         }
 
         SalesTax salesTax = refund.getRefundLinkedPercentage() == null ? st :
