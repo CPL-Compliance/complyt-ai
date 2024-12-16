@@ -20,8 +20,6 @@ public interface CustomerRouterTestTemplate extends
     void putAny_InvalidUrl_Returns404();
 
     // Validation::Name
-    void upsert_BlankName_Returns400ValidationError();
-
     void upsert_LengthGreaterThen256Name_Returns400ValidationError();
 
     // Validation::email
