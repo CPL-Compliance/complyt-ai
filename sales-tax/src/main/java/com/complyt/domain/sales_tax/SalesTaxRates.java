@@ -19,8 +19,8 @@ public record SalesTaxRates(BigDecimal stateRate, BigDecimal countyRate, BigDeci
 
     public static SalesTaxRates zeroSalesTaxRate() {
         return new SalesTaxRates(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
-                new RatesMetaData(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO),null,
-                null, null, BigDecimal.ZERO);
+                new RatesMetaData(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO),BigDecimal.ZERO,
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
     }
 
     @Override

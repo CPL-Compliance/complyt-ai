@@ -30,8 +30,8 @@ public class HereAddressChecker {
     private Mono<CachedAddressData> approveResponseIfZipIncludesRequestZip(CachedAddressData outSourceResponseAddress, Address requestAddress) {
         String requestZip = requestAddress.zip();
         return (outSourceResponseAddress.zip() == null || outSourceResponseAddress.zip().isEmpty()) ?
-                ContextLogger.observeCtx("here address does not include zip, address was not found: " + outSourceResponseAddress, log::info)
-                        .then(Mono.empty())
+                ContextLogger.observeCtx("here address does not include zip: " + outSourceResponseAddress, log::warn)
+                        .then(Mono.just(outSourceResponseAddress.withZip(requestZip)))
                 : Mono.just(outSourceResponseAddress.zip())
                 .flatMap(outSourceZip -> (outSourceZip.startsWith(requestZip) || (requestZip.startsWith(outSourceZip)))  ?
                         ContextLogger.observeCtx("here address includes the correct zip, returning address: " + outSourceResponseAddress, log::info)

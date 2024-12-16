@@ -94,7 +94,7 @@ public class StateLevelSalesTaxRatesCalculatorTest {
     @Test
     void getRateByRules_NotTaxable_ReturnsZeroRate() {
         // Given
-        SalesTaxRates zeroSalesTaxRate = new SalesTaxRates(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, new RatesMetaData(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO), null, null, null, BigDecimal.ZERO);
+        SalesTaxRates zeroSalesTaxRate = new SalesTaxRates(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, new RatesMetaData(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
         JurisdictionalSalesTaxRules notTaxableRule = jurisdictionalSalesTaxRules.withTaxable(false);
 
         // When + Then
