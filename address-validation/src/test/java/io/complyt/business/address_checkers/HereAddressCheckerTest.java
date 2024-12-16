@@ -2,7 +2,6 @@ package io.complyt.business.address_checkers;
 
 import io.complyt.domain.Address;
 import io.complyt.domain.CachedAddressData;
-import io.complyt.utils.exceptions.types.ZipCodeMismatchException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,16 +11,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import test_utils.TestUtilities;
 
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import test_utils.TestUtilities;
-
-import java.util.Optional;
-import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -75,18 +64,18 @@ class HereAddressCheckerTest {
         Mono<CachedAddressData> addressMono = hereAddressChecker.checkAddress(cachedAddressData, address);
 
         // Then
-        StepVerifier.create(addressMono).verifyComplete();
+        StepVerifier.create(addressMono).expectNext(cachedAddressData.withZip(address.zip())).verifyComplete();
     }
 
     @Test
-    void approveResponseIfZipIncludesRequestZip_zipIsEmpty_ReturnMonoEmpty() {
-        cachedAddressData = cachedAddressData.withZip("").withScore(1);;
+    void approveResponseIfZipIncludesRequestZip_zipIsEmpty_ReturnsZip() {
+        cachedAddressData = cachedAddressData.withZip("").withScore(1);
 
         // When
         Mono<CachedAddressData> addressMono = hereAddressChecker.checkAddress(cachedAddressData, address);
 
         // Then
-        StepVerifier.create(addressMono).verifyComplete();
+        StepVerifier.create(addressMono).expectNext(cachedAddressData.withZip(address.zip())).verifyComplete();
     }
 
     @Test

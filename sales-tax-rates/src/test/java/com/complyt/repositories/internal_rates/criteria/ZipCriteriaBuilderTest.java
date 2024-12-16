@@ -69,4 +69,23 @@ class ZipCriteriaBuilderTest {
         assertTrue(result.isEmpty()); // Expect empty criteria list
     }
 
+    @Test
+    void testBuild_WithZipCodeAndPlusFourInvalid() {
+        // Arrange
+        String zip = "12345-53ND";
+
+        // Act
+        List<Criteria> result = zipCriteriaBuilder.build(zip);
+
+        // Assert
+        assertEquals(2, result.size()); // Expect 2 criteria (zip and plus-four checks)
+        assertEquals("12345", result.get(0).getCriteriaObject().get("address.zip"));
+
+        // Validate plus-four range criteria
+        Criteria plusFourCriteria = result.get(1);
+        List<?> andCriteria = (List<?>) plusFourCriteria.getCriteriaObject().get("$and");
+        assertTrue(andCriteria.stream().anyMatch(c -> c.toString().contains("address.lowerPlusFourDigits")));
+        assertTrue(andCriteria.stream().anyMatch(c -> c.toString().contains("address.upperPlusFourDigits")));
+    }
+
 }

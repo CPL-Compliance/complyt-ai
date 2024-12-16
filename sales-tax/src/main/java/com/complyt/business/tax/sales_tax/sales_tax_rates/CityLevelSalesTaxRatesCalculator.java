@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -64,8 +66,17 @@ public class CityLevelSalesTaxRatesCalculator implements TaxRatesCalculator<SubJ
     }
 
     private SalesTaxRates modifyRates(SalesTaxRates salesTaxRates) {
-        BigDecimal taxRate = salesTaxRates.cityRate().add(salesTaxRates.combinedDistrictRate())
-                .add(salesTaxRates.stateRate()).add(salesTaxRates.countyRate());
+        BigDecimal taxRate = Stream.of(
+                        salesTaxRates.cityRate(),
+                        salesTaxRates.combinedDistrictRate(),
+                        salesTaxRates.stateRate(),
+                        salesTaxRates.countyRate(),
+                        salesTaxRates.mtaRate(),
+                        salesTaxRates.spdRate(),
+                        salesTaxRates.otherRate()
+                ).filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
 
         return new SalesTaxRates(
                 salesTaxRates.stateRate(),

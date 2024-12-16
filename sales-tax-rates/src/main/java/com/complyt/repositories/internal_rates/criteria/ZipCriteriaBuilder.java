@@ -14,40 +14,43 @@ import java.util.regex.Pattern;
 @Component
 public class ZipCriteriaBuilder {
 
-    private static final Pattern ZIP_PATTERN = Pattern.compile("^(\\d{5})(?:-(\\d{4}))?$");
+    private static final Pattern ZIP_PATTERN = Pattern.compile("^(\\d{5})(?:-(.*))?$");
+    private static final String SUB_ZIP_PATTERN = "\\d{4}";
+
 
     public List<Criteria> build(String zip) {
-        // Define a regex pattern to match ZIP codes with optional plus-four part
-        // zip may look like the followings:
-        // XXXXX example 12345
-        // XXXXX-XXXX example 12345-6789
+        // Validate and parse ZIP codes with optional plus-four parts.
+        // XXXXX -> e.g., 12345
+        // XXXXX-XXXX -> e.g., 12345-6789
         Matcher matcher = ZIP_PATTERN.matcher(zip);
 
-        // Initialize List of Criteria object
         List<Criteria> criteriaList = new ArrayList<>();
 
-        // Check if the zip matches the pattern
         if (matcher.matches()) {
-            // Match the base ZIP code
+            // Base ZIP code (e.g., "12345")
             String baseZip = matcher.group(1);
             criteriaList.add(Criteria.where("address.zip").is(baseZip));
 
-            // Handle plus-four if available, otherwise default to 0
-            int plusFour = matcher.group(2) != null ? Integer.parseInt(matcher.group(2)) : 0;
+            // Plus-four code (e.g., "6789"), default to 0 if not present or invalid
+            String plusFourPart = matcher.group(2);
+            int plusFour = 0;
 
-            // Optimized criteria to focus on plus-four ranges, assuming most have `hasPlusFourZipCode` as true
+            if (plusFourPart != null) {
+                if (plusFourPart.matches(SUB_ZIP_PATTERN)) {
+                    plusFour = Integer.parseInt(plusFourPart);
+                } else {
+                    log.warn("Non-numeric plus-four detected: '{}', defaulting to 0", plusFourPart);
+                }
+            }
+
+            // Add criteria for plus-four ranges
             criteriaList.add(new Criteria().andOperator(
                     Criteria.where("address.lowerPlusFourDigits").lte(plusFour),
                     Criteria.where("address.upperPlusFourDigits").gte(plusFour)
             ));
-
-            // arriving here means the zip received does not match the 12345(-6789) format
-            // we split the zip by - and getting the first part
         } else {
-            //todo check with NIV if it's needed
-            log.info("Warning: ZIP code format is unexpected, using first part only.");
+            log.warn("Warning: Unexpected ZIP code format: '{}'", zip);
         }
-
         return criteriaList;
     }
 }

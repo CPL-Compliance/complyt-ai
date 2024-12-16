@@ -104,6 +104,24 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     }
 
     @Test
+    void calculate_InternalRate_SpecialTreatmentByFixed_ReturnsFixedCityRate() {
+        // Given
+        SubJurisdictionalTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true).withSpecialTreatment(true);
+        BigDecimal newCityRate = taxableCityRule.getCalculationValue();
+        SalesTaxRates salesTaxRates = UnitTestUtilities.createInternalCaliforniaSalesTaxRates()
+                .withCityRate(newCityRate);
+        BigDecimal taxRate = newCityRate.add(salesTaxRates.countyRate()).add(salesTaxRates.stateRate());
+
+        SalesTaxRates expectedSalesTaxRate = salesTaxRates.withTaxRate(taxRate).withCityRate(newCityRate);
+
+        // When
+        SalesTaxRates actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(taxableCityRule, salesTaxRates);
+
+        // Then
+        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+    }
+
+    @Test
     void calculate_SpecialTreatmentByPercentage_ReturnsPercentageCityRate() {
         // Given
         SubJurisdictionalTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true)

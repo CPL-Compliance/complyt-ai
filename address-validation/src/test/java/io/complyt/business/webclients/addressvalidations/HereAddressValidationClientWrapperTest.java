@@ -197,4 +197,44 @@ class HereAddressValidationClientWrapperTest {
         method.invoke(wrapper, sb);
         assertEquals("postalCode=12345", sb.toString());
     }
+
+    @Test
+    void limitWords_InputExceedsWordLimit_ReturnsTruncatedString() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        // Access the private method using reflection
+        Method method = HereAddressValidationClientWrapper.class.getDeclaredMethod("limitWords", String.class, int.class);
+        method.setAccessible(true);
+
+        // Create an instance of the class to invoke the method
+        HereAddressValidationClientWrapper wrapper = new HereAddressValidationClientWrapper(webClient, "https", "example.com", "/validate", new Pair<>("key", "value"));
+
+        // Test input
+        String input = "This is a test string with more than four words";
+        int wordLimit = 4;
+
+        // Invoke the method
+        String result = (String) method.invoke(wrapper, input, wordLimit);
+
+        // Assert the expected output
+        assertEquals("This is a test", result);
+    }
+
+    @Test
+    void limitWords_InputWithinWordLimit_ReturnsUnalteredString() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        // Access the private method using reflection
+        Method method = HereAddressValidationClientWrapper.class.getDeclaredMethod("limitWords", String.class, int.class);
+        method.setAccessible(true);
+
+        // Create an instance of the class to invoke the method
+        HereAddressValidationClientWrapper wrapper = new HereAddressValidationClientWrapper(webClient, "https", "example.com", "/validate", new Pair<>("key", "value"));
+
+        // Test input
+        String input = "Short input string";
+        int wordLimit = 10;
+
+        // Invoke the method
+        String result = (String) method.invoke(wrapper, input, wordLimit);
+
+        // Assert the expected output
+        assertEquals("Short input string", result);
+    }
 }

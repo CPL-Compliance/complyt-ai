@@ -96,6 +96,20 @@ public class UnitTestUtilities {
         );
     }
 
+    public static SalesTaxRates createInternalCaliforniaSalesTaxRates() {
+        return new SalesTaxRates(
+                new BigDecimal("0.06"), // stateRate
+                new BigDecimal("0.0125"), // countyRate
+                new BigDecimal("0.005"), // cityRate
+                null, // combinedDistrictRate
+                null, // ratesMetaData
+                new BigDecimal(0), // mtaRate
+                new BigDecimal(0), // spdRate
+                new BigDecimal(0), // otherRate
+                new BigDecimal("0.0775") // taxRate
+        );
+    }
+
     public static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
         return new SalesTaxRatesDto(
                 new BigDecimal("0.06"), // stateRate

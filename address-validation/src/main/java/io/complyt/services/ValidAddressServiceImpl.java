@@ -1,5 +1,6 @@
 package io.complyt.services;
 
+import io.complyt.business.address.CountryToStandardizedCountry;
 import io.complyt.business.address_checkers.HereAddressChecker;
 import io.complyt.business.webclients.addressvalidations.AddressValidationWebClientWrapper;
 import io.complyt.domain.Address;
@@ -56,9 +57,10 @@ public class ValidAddressServiceImpl implements ValidAddressService {
     }
 
     private Mono<CachedAddressData> findByAddressClientWrapper(Address address) {
-        return addressValidationWebClientWrapper.validateAddress(address)
+        Address alignedAddress = address.withCountry(CountryToStandardizedCountry.standardize(address.country()));
+        return addressValidationWebClientWrapper.validateAddress(alignedAddress)
                 .map(HereAddressToAddressMapper.INSTANCE::map)
-                .flatMap(addressData -> hereAddressChecker.checkAddress(addressData, address));
+                .flatMap(addressData -> hereAddressChecker.checkAddress(addressData, alignedAddress));
     }
 
     private Mono<ValidatedAddress> setBeforeSave(CachedAddressData addressData, Address address) {

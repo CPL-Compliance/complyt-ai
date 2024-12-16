@@ -1,5 +1,6 @@
 package io.complyt.services;
 
+import io.complyt.business.address.UsaAbbreviations;
 import io.complyt.business.address_checkers.HereAddressChecker;
 import io.complyt.business.webclients.addressvalidations.AddressValidationWebClientWrapper;
 import io.complyt.domain.Address;
@@ -61,9 +62,10 @@ class ValidAddressServiceImplTest {
 
     @Test
     void validateAddress_AddressNotFoundInRepository_FindsAndSavesNewAddress() {
+        Address alignedAddress = address.withCountry(UsaAbbreviations.DEFAULT_COUNTRY);
         when(validationAddressRepositoryImpl.findAddress(address)).thenReturn(Mono.empty());
-        when(addressValidationWebClientWrapper.validateAddress(address)).thenReturn(Mono.just(hereAddressData));
-        when(hereAddressChecker.checkAddress(cachedAddressData, address)).thenReturn(Mono.just(cachedAddressData));
+        when(addressValidationWebClientWrapper.validateAddress(alignedAddress)).thenReturn(Mono.just(hereAddressData));
+        when(hereAddressChecker.checkAddress(cachedAddressData, alignedAddress)).thenReturn(Mono.just(cachedAddressData));
         when(validationAddressRepositoryImpl.saveAddress(any())).thenReturn(Mono.just(validatedAddress));
 
         StepVerifier.create(validAddressService.validateAddress(address))

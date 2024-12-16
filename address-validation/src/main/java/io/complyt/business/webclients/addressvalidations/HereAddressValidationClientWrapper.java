@@ -11,8 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 @EqualsAndHashCode
 @Slf4j
@@ -24,13 +26,13 @@ public class HereAddressValidationClientWrapper extends AddressValidationWebClie
     private Mono<HereAddressData> validateAddress(String zip, String street, String city, String state, String country) {
         StringBuilder hereQureyParamsStringBuilder = queryParamBuilder(zip, street, city, state, country);
         URI uri = buildUri(hereQureyParamsStringBuilder);
-        return ContextLogger.observeCtx("<-- Sending request to 'here' with the following query params: " +hereQureyParamsStringBuilder, log::info)
+        return ContextLogger.observeCtx("<-- Sending request to 'here' with the following query params: " + hereQureyParamsStringBuilder, log::info)
                 .then(webClient
-                .get()
-                .uri(uri)
-                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .retrieve()
-                .bodyToMono(HereAddressData.class));
+                        .get()
+                        .uri(uri)
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                        .retrieve()
+                        .bodyToMono(HereAddressData.class));
     }
 
     @Override
@@ -40,10 +42,11 @@ public class HereAddressValidationClientWrapper extends AddressValidationWebClie
 
     private StringBuilder queryParamBuilder(String zip, String street, String city, String state, String country) {
         StringBuilder qureyParamsStringBuilder = new StringBuilder();
+        int maxWordsStreet = 4;
 
         // append all params
         appendStringIfNotNullAndNotEmpty(qureyParamsStringBuilder, zip, "postalCode");
-        appendStringIfNotNullAndNotEmpty(qureyParamsStringBuilder, street, "street");
+        appendStringIfNotNullAndNotEmpty(qureyParamsStringBuilder, limitWords(street, maxWordsStreet), "street");
         appendStringIfNotNullAndNotEmpty(qureyParamsStringBuilder, city, "city");
         appendStringIfNotNullAndNotEmpty(qureyParamsStringBuilder, state, "state");
         appendStringIfNotNullAndNotEmpty(qureyParamsStringBuilder, country, "country");
@@ -61,7 +64,7 @@ public class HereAddressValidationClientWrapper extends AddressValidationWebClie
     }
 
     private void appendStringIfNotNullAndNotEmpty(StringBuilder stringBuilder, String strToAppend, String paramName) {
-        if(strToAppend != null && !strToAppend.equals("")) {
+        if (strToAppend != null && !strToAppend.isEmpty()) {
             String sanitizedValue = strToAppend.replace(";", ""); // Remove semicolons for correctness
             stringBuilder.append(paramName + "=" + sanitizedValue + ";");
 
@@ -77,5 +80,15 @@ public class HereAddressValidationClientWrapper extends AddressValidationWebClie
                 .queryParam("qq", qureyParamsStringBuilder.toString())
                 .queryParam(licenseKey.getValue0(), licenseKey.getValue1())
                 .build().toUri();
+    }
+
+    // When street is too long, it makes the score field low
+    private String limitWords(String input, int wordLimit) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        String[] words = input.split("\\s+");
+        return String.join(" ", Arrays.copyOf(words, Math.min(words.length, wordLimit)));
     }
 }
