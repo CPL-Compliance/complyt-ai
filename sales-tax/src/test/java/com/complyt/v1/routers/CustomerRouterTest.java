@@ -105,13 +105,11 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     public void upsertByExternalIdAndSource_CoupleValidationsFailure_Returns400WithErrorList() {
         // Given
         CustomerDto givenCustomerDto = customerDto
-                .withName("")
                 .withSource("d")
                 .withCustomerType(null);
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "name " + StringErrorMessages.MINMAX_256_ERROR,
                 DtoErrorMessages.SOURCE_FORMAT_ERROR,
                 "customerType " + DtoErrorMessages.NOT_NULL_ERROR));
 
@@ -536,37 +534,12 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Override
     @Test
     @WithMockUser
-    public void upsert_BlankName_Returns400ValidationError() {
-        // Given
-        String externalId = customerDto.externalId();
-        String source = customerDto.source();
-        String invalidName = "";
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "name " + StringErrorMessages.MINMAX_256_ERROR));
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(customerDto.withName(invalidName))
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
-    }
-
-    @Override
-    @Test
-    @WithMockUser
     public void upsert_LengthGreaterThen256Name_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         String nameWithLengthOf257 = testUtilities.stringWithLength(257);
-        Set<String> expectedErrors = new HashSet<>(List.of("name " + StringErrorMessages.MINMAX_256_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("name " + StringErrorMessages.MAX_256_ERROR));
 
         // When + Then
         webTestClient
