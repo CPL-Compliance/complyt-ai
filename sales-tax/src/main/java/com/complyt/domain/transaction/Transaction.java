@@ -58,4 +58,6 @@ public class Transaction implements ComplytIdProperty {
     ExchangeRateInfo exchangeRateInfo;
     String subsidiary;
     Boolean isRefundLinked;
+    BigDecimal refundLinkedPercentage;
+
 }

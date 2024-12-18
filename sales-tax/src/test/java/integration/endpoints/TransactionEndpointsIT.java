@@ -8,6 +8,7 @@ import com.complyt.repositories.Constants.RepositoryConstant;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
+import com.complyt.v1.config.error_messages.NumericErrorMessages;
 import com.complyt.v1.exceptions.types.TaxCodeNotValidException;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TimestampsDto;
@@ -19,7 +20,6 @@ import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
-import org.apache.commons.math.stat.inference.TestUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -3167,7 +3167,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     @WithMockUser
-    public void upsert_TransactionIsLinkedRefund_Returns201WithSalesTaxOfInvoice() {
+    public void upsert_TransactionIsLinkedRefund_Returns201WithFullSalesTaxOfInvoice() {
         // Given + When
         String invoiceExternalId = "4123658121";
         when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
@@ -3291,6 +3291,230 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
                 .value(TransactionDto::salesTax, equalTo(null));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_TransactionIsLinkedRefundWithPercentage_Returns201WithHalfSalesTaxOfInvoice() {
+        // Given + When
+        String invoiceExternalId = "4123658121";
+        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + invoiceExternalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(invoice -> {
+                    String refundExternalId = UUID.randomUUID().toString();
+                    BigDecimal refundLinkedPercentage = BigDecimal.valueOf(0.5);
+                    SalesTaxDto refundExpectedSalesTax = invoice.salesTax().withAmount(invoice.salesTax().amount().multiply(refundLinkedPercentage));
+
+                    TransactionDto refund = invoice
+                            .withComplytId(null)
+                            .withExternalId(refundExternalId)
+                            .withCreatedFrom(invoiceExternalId)
+                            .withTransactionType(TransactionTypeDto.REFUND)
+                            .withIsRefundLinked(true)
+                            .withRefundLinkedPercentage(refundLinkedPercentage)
+                            .withSalesTax(null)
+                            .withCustomer(null);
+
+
+                    webTestClient
+                            .mutateWith(csrf())
+                            .put()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + refundExternalId)
+                                    .build())
+                            .bodyValue(refund)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .exchange()
+                            .expectStatus().isCreated()
+                            .expectBody(TransactionDto.class)
+                            .value(TransactionDto::salesTax, equalTo(refundExpectedSalesTax));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_TransactionIsLinkedButInvoiceHasSalesTaxNull_Returns201WithNullSalesTax() {
+        // Given + When
+        String invoiceExternalId = "4123658121222";
+        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + invoiceExternalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(invoice -> {
+                    String refundExternalId = UUID.randomUUID().toString();
+                    BigDecimal refundLinkedPercentage = BigDecimal.valueOf(0.5);
+
+                    TransactionDto refund = invoice
+                            .withComplytId(null)
+                            .withExternalId(refundExternalId)
+                            .withCreatedFrom(invoiceExternalId)
+                            .withTransactionType(TransactionTypeDto.REFUND)
+                            .withIsRefundLinked(true)
+                            .withRefundLinkedPercentage(refundLinkedPercentage)
+                            .withSalesTax(null)
+                            .withCustomer(null);
+
+
+                    webTestClient
+                            .mutateWith(csrf())
+                            .put()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + refundExternalId)
+                                    .build())
+                            .bodyValue(refund)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .exchange()
+                            .expectStatus().isCreated()
+                            .expectBody(TransactionDto.class)
+                            .value(TransactionDto::salesTax, equalTo(null));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_TransactionIsLinkedRefundWithPercentage_Returns201WithQuarterSalesTaxOfInvoice() {
+        // Given + When
+        String invoiceExternalId = "4123658121";
+        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + invoiceExternalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(invoice -> {
+                    String refundExternalId = UUID.randomUUID().toString();
+                    BigDecimal refundLinkedPercentage = BigDecimal.valueOf(0.25);
+                    SalesTaxDto refundExpectedSalesTax = invoice.salesTax().withAmount(invoice.salesTax().amount().multiply(refundLinkedPercentage));
+
+                    TransactionDto refund = invoice
+                            .withComplytId(null)
+                            .withExternalId(refundExternalId)
+                            .withCreatedFrom(invoiceExternalId)
+                            .withTransactionType(TransactionTypeDto.REFUND)
+                            .withIsRefundLinked(true)
+                            .withRefundLinkedPercentage(refundLinkedPercentage)
+                            .withSalesTax(null)
+                            .withCustomer(null);
+
+
+                    webTestClient
+                            .mutateWith(csrf())
+                            .put()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + refundExternalId)
+                                    .build())
+                            .bodyValue(refund)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .exchange()
+                            .expectStatus().isCreated()
+                            .expectBody(TransactionDto.class)
+                            .value(TransactionDto::salesTax, equalTo(refundExpectedSalesTax));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_Transaction_RefundLinkedPercentageHasNegativeValue_Returns400() {
+        // Given + When
+        String externalId = "externalIdOfRefund3";
+        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
+        TransactionDto refund = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withQuantity(null).withUnitPrice(null))
+                .withShippingAddress(ITUtilities.createAddressDtoInKensas())
+                .withCreatedFrom(null)
+                .withTransactionType(TransactionTypeDto.REFUND)
+                .withIsRefundLinked(true)
+                .withRefundLinkedPercentage(BigDecimal.valueOf(-1));
+
+        Set<String> expectedErrors = new HashSet<>(List.of(
+                "refundLinkedPercentage " + NumericErrorMessages.NOT_NEGATIVE_ERROR));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(refund)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_Transaction_RefundLinkedPercentageHasValueGreaterThan1_Returns400() {
+        // Given + When
+        String externalId = "externalIdOfRefund4";
+        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
+        TransactionDto refund = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withQuantity(null).withUnitPrice(null))
+                .withShippingAddress(ITUtilities.createAddressDtoInKensas())
+                .withCreatedFrom(null)
+                .withTransactionType(TransactionTypeDto.REFUND)
+                .withIsRefundLinked(true)
+                .withRefundLinkedPercentage(BigDecimal.valueOf(1.1));
+
+        Set<String> expectedErrors = new HashSet<>(List.of(
+                "refundLinkedPercentage" + NumericErrorMessages.DECIMAL_MAX_1_ERROR));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(refund)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    System.out.println("expectedErrors: " + expectedErrors);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
 }

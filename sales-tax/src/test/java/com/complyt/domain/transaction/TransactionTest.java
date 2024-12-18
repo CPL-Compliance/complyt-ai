@@ -22,7 +22,7 @@ public class TransactionTest {
     void testingAmountOfPropertiesInTransaction() {
         /* In case there is a new property added, If its of type Taxable - handle rates and amount calculation for it */
         Field[] fields = Transaction.class.getDeclaredFields();
-        Assertions.assertEquals(31, fields.length);
+        Assertions.assertEquals(32, fields.length);
     }
 
     @BeforeEach
@@ -67,6 +67,7 @@ public class TransactionTest {
                 ", exchangeRateInfo=" + transaction.getExchangeRateInfo() +
                 ", subsidiary=" + transaction.getSubsidiary() +
                 ", isRefundLinked=" + transaction.getIsRefundLinked() +
+                ", refundLinkedPercentage=" + transaction.getRefundLinkedPercentage() +
                 ")";
 
         // When

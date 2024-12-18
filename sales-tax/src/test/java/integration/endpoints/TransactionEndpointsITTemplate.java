@@ -140,11 +140,22 @@ public interface TransactionEndpointsITTemplate extends
 
     void getAll_PaginationFilteredByCityAndTransactionType_ReturnsTransactions();
 
-    void upsert_TransactionIsLinkedRefund_Returns201WithSalesTaxOfInvoice();
+    void upsert_TransactionIsLinkedRefund_Returns201WithFullSalesTaxOfInvoice();
 
     void upsert_TransactionIsLinkedRefundAndInvoiceNotFound_Returns201WithSameRefund();
 
     void upsert_TransactionIsLinkedRefundWithNullCreatedFrom_Returns201WithSameRefund();
 
     void upsert_IsLinkedRefundFieldIsNull_Returns201WithSameRefund();
+
+    void upsert_TransactionIsLinkedRefundWithPercentage_Returns201WithHalfSalesTaxOfInvoice();
+
+    void upsert_TransactionIsLinkedRefundWithPercentage_Returns201WithQuarterSalesTaxOfInvoice();
+
+    void upsert_Transaction_RefundLinkedPercentageHasValueGreaterThan1_Returns400();
+
+    void upsert_Transaction_RefundLinkedPercentageHasNegativeValue_Returns400();
+
+    void upsert_TransactionIsLinkedButInvoiceHasSalesTaxNull_Returns201WithNullSalesTax();
+
 }
