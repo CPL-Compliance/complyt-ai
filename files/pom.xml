@@ -12,7 +12,6 @@
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
         <tag>files-0.30.0</tag>
     </scm>
-
     <!-- Maven Coordinates -->
     
     <artifactId>files</artifactId>

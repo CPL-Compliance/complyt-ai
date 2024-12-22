@@ -193,24 +193,18 @@ jobs:
           container_image_name_updates: "container=<<parameters.service_name>>, tag=${IMAGE_TAG}"
           family: "<<parameters.service_name>>-production"
           service_name: "<<parameters.service_name>>"
-      # ## Deploy to complyt-prd cluster
-      # - aws-ecs/update_service:
-      #     cluster: "complyt-prd"
-      #     container_image_name_updates: "container=<<parameters.service_name>>, tag=${IMAGE_TAG}"
-      #     family: "<<parameters.service_name>>-complyt-prd"
-      #     service_name: "<<parameters.service_name>>"
-      # ## Deploy to complyt-demo cluster
-      # - aws-ecs/update_service:
-      #     cluster: "complyt-demo"
-      #     container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
-      #     family: "<<parameters.service_name>>-complyt-demo"
-      #     service_name: "<<parameters.service_name>>"
-      # ## Deploy to complyt-sb cluster
-      # - aws-ecs/update_service:
-      #     cluster: "complyt-sb"
-      #     container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
-      #     family: "<<parameters.service_name>>-complyt-sb"
-      #     service_name: "<<parameters.service_name>>"
+      ## Deploy to demo cluster
+      - aws-ecs/update_service:
+          cluster: "demo"
+          container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
+          family: "<<parameters.service_name>>-demo"
+          service_name: "<<parameters.service_name>>"
+      ## Deploy to sandbox cluster
+      - aws-ecs/update_service:
+          cluster: "sandbox"
+          container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
+          family: "<<parameters.service_name>>-sandbox"
+          service_name: "<<parameters.service_name>>"
 
 workflows:
   sales-tax-workflow:
