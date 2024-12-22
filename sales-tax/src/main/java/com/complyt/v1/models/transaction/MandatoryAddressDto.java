@@ -1,6 +1,7 @@
 package com.complyt.v1.models.transaction;
 
 import com.complyt.v1.config.error_messages.StringErrorMessages;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -8,6 +9,7 @@ import lombok.With;
 
 @With
 @Schema(name = "Address")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record MandatoryAddressDto(
         @Size(max = 100, message = "Address.city " + StringErrorMessages.MAX_100_ERROR) String city,
         @NotBlank(message = "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR) @Size(max = 50, message = "Address.country " + StringErrorMessages.MAX_50_ERROR) String country,
@@ -17,5 +19,4 @@ public record MandatoryAddressDto(
         @Size(max = 50, message = "Address.region " + StringErrorMessages.MAX_20_ERROR) String region,
         @Size(max = 20, message = "Address.zip " + StringErrorMessages.MAX_20_ERROR) String zip,
         @Schema(description = "whether country, city or street are necessary") boolean isPartial) {
-
 }

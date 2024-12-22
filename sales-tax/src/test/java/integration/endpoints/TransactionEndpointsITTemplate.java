@@ -42,6 +42,10 @@ public interface TransactionEndpointsITTemplate extends
 
     void upsertByExternalIdAndSource_ExistsAndSaleTaxTrackingDoesntExists_Returns400();
 
+    void getByExternalIdAndSource_Exists_Returns200CheckingDefaultNullFields();
+
+    void getByExternalIdAndSource_ExistsDetailedTrue_Returns200CheckingProjectedFields();
+
     void upsertByExternalIdAndSource_OneItemIsNegativeAmount_ReturnsTaxableTransaction();
 
     void upsertByExternalIdAndSource_TransactionWithShippingFee_ReturnsTaxableTransactionWithShippingFeeAndItemsCalculatedTotal();
@@ -139,6 +143,8 @@ public interface TransactionEndpointsITTemplate extends
     void getAll_PaginationFilteredByTransactionType_ReturnsRefunds();
 
     void getAll_PaginationFilteredByCityAndTransactionType_ReturnsTransactions();
+
+    void getAll_DetailedTrue_Returns200CheckingProjectedFields();
 
     void upsert_TransactionIsLinkedRefund_Returns201WithFullSalesTaxOfInvoice();
 

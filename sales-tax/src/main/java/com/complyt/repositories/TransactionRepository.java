@@ -1,6 +1,8 @@
 package com.complyt.repositories;
 
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.repositories.typedAggregations.TypedAggregationBuilder;
 import com.complyt.repositories.pagination.CriteriaBuilder;
 import com.complyt.repositories.pagination.transaction.TransactionPaginationUtil;
 import com.complyt.security.TenantResolver;
@@ -18,12 +20,9 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregationOptions;
 
 @Repository
 @Slf4j
@@ -34,6 +33,9 @@ public class TransactionRepository {
 
     @NonNull
     private TenantResolver tenantResolver;
+
+    @NonNull
+    private TypedAggregationBuilder<Transaction> transactionTypedAggregationBuilder;
 
 
     public Mono<Transaction> save(@NonNull Transaction transaction) {
@@ -62,13 +64,34 @@ public class TransactionRepository {
     public Mono<Transaction> findByExternalIdAndSource(String externalId, String source) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
-                    Query query = Query.query(Criteria.where("externalId").is(externalId)
-                            .and("source").is(source)
-                            .and("tenantId").is(tenantId));
+                    Query query = Query.query(TransactionRepositoryCommonStagesBuilder
+                            .externalIdSourceAndTenantIsExactCriteria(externalId, source, tenantId));
 
                     return ContextLogger.observeCtx("Searching for transaction with external ID " + externalId + ", source" + source + ", and tenant ID " + tenantId, tenantId, log::info)
                             .then(reactiveMongoTemplate
                                     .findOne(query, Transaction.class));
+                });
+    }
+
+    public Mono<Transaction> findByExternalIdAndSourceProjection(String externalId, String source) {
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> {
+                    TypedAggregation<Transaction> aggregation = Aggregation.newAggregation(Transaction.class,
+                            Aggregation.match(TransactionRepositoryCommonStagesBuilder
+                                    .externalIdSourceAndTenantIsExactCriteria(externalId, source, tenantId)),
+                            Aggregation.lookup()
+                                    .from("customer")
+                                    .localField("customerId")
+                                    .foreignField("complytId")
+                                    .pipeline(Aggregation.match(Criteria.where("tenantId").is(tenantId)))
+                                    .as("customer"),
+                            Aggregation.unwind("customer", true),
+                            Aggregation.addFields().addFieldWithValue("items", TransactionProjectionStage.itemsMapAddFeildStageDocument()).build(),
+                            Aggregation.stage(TransactionProjectionStage.projectionStageDocument()));
+                    ;
+
+                    return ContextLogger.observeCtx("Searching for transaction with external ID " + externalId + ", source" + source + ", and tenant ID " + tenantId, log::info)
+                            .then(reactiveMongoTemplate.aggregate(aggregation, Transaction.class).next());
                 });
     }
 
@@ -87,32 +110,38 @@ public class TransactionRepository {
     public Flux<Transaction> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
         int calculatedOffset = (page - 1) * size;
         Criteria criteriaFromFilterMap = CriteriaBuilder.build(filterMap, TransactionPaginationUtil.transactionFilterKeys);
-        String sortByProperty = TransactionPaginationUtil.transactionSortByFields.contains(sortBy) ? sortBy : TransactionPaginationUtil.DEFAULT_SORT_BY;
+        String sortByProperty = TransactionPaginationUtil.transactionSortByFields.contains(sortBy) ? sortBy : PaginationConstants.DEFAULT_TRANSACTION_SORT_BY;
         Sort.Direction sortDirection = Sort.Direction.fromString(sortOrder);
 
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
-
-                    Criteria criteria = criteriaFromFilterMap != null ? Criteria.where("tenantId").is(tenantId).andOperator(criteriaFromFilterMap) : Criteria.where("tenantId").is(tenantId);
-                    TypedAggregation<Transaction> aggregation = Aggregation.newAggregation(Transaction.class,
-                                    Aggregation.match(criteria),
-                                    Aggregation.sort(Sort.by(sortDirection, sortByProperty)),
-                                    Aggregation.skip(calculatedOffset),
-                                    Aggregation.limit(size),
-                                    Aggregation.lookup()
-                                            .from("customer")
-                                            .localField("customerId")
-                                            .foreignField("complytId")
-                                            .pipeline(Aggregation.match(Criteria.where("tenantId").is(tenantId)))
-                                            .as("customer"),
-                                    Aggregation.unwind("customer", true))
-                            .withOptions(newAggregationOptions().cursorBatchSize(size).build());
+                    Criteria criteria = criteriaFromFilterMap != null ?
+                            Criteria.where("tenantId").is(tenantId).andOperator(criteriaFromFilterMap) :
+                            Criteria.where("tenantId").is(tenantId);
+                    TypedAggregation<Transaction> aggregation = transactionTypedAggregationBuilder.getAllAggregation(tenantId, criteria, sortDirection, sortByProperty, calculatedOffset, size, false);
 
                     return ContextLogger.observeCtx("Searching for transactions by criteria " + criteria.getCriteriaObject() + " with page " + page + " and size " + size, tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.aggregate(aggregation, Transaction.class));
                 });
     }
 
+    public Flux<Transaction> findAllProjection(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
+        int calculatedOffset = (page - 1) * size;
+        Criteria criteriaFromFilterMap = CriteriaBuilder.build(filterMap, TransactionPaginationUtil.transactionFilterKeys);
+        String sortByProperty = TransactionPaginationUtil.transactionSortByFields.contains(sortBy) ? sortBy : PaginationConstants.DEFAULT_TRANSACTION_SORT_BY;
+        Sort.Direction sortDirection = Sort.Direction.fromString(sortOrder);
+
+        return tenantResolver.resolve()
+                .flatMapMany(tenantId -> {
+                    Criteria criteria = criteriaFromFilterMap != null ?
+                            Criteria.where("tenantId").is(tenantId).andOperator(criteriaFromFilterMap) :
+                            Criteria.where("tenantId").is(tenantId);
+                    TypedAggregation<Transaction> aggregation = transactionTypedAggregationBuilder.getAllAggregation(tenantId, criteria, sortDirection, sortByProperty, calculatedOffset, size, true);
+
+                    return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId + " with page " + page + " and size " + size, log::info)
+                            .thenMany(reactiveMongoTemplate.aggregate(aggregation, Transaction.class));
+                });
+    }
 
     public Flux<Transaction> findAllBySource(String source) {
         return tenantResolver.resolve()

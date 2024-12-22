@@ -2,7 +2,7 @@ package com.complyt.v1.routers;
 
 import com.complyt.domain.ClientTracking;
 import com.complyt.facades.ClientTrackingFacade;
-import com.complyt.repositories.Constants.RepositoryConstant;
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
@@ -79,7 +79,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     public void getAll_Exists_Returns200WithList() {
         // When
         Map<String, String> filterMap = new LinkedHashMap<>();
-        when(clientTrackingFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(clientTrackingList));
+        when(clientTrackingFacade.getAll(PaginationConstants.DEFAULT_PAGE_NUM, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(clientTrackingList));
 
         // Then
         webTestClient
@@ -99,7 +99,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     public void getAll_QueryParamInvalid_Returns400() {
         // When
         Map<String, String> filterMap = new LinkedHashMap<>();
-        when(clientTrackingFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(clientTrackingList));
+        when(clientTrackingFacade.getAll(PaginationConstants.DEFAULT_PAGE_NUM, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(clientTrackingList));
 
         // Then
         webTestClient
@@ -129,7 +129,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         // When
         Map<String, String> filterMap = new LinkedHashMap<>();
-        when(clientTrackingFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(emptyClientTrackingList));
+        when(clientTrackingFacade.getAll(PaginationConstants.DEFAULT_PAGE_NUM, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(emptyClientTrackingList));
 
         // Then
         webTestClient
@@ -148,7 +148,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     public void getAll_UnauthenticatedUser_Returns401() {
         // When
         Map<String, String> filterMap = new LinkedHashMap<>();
-        when(clientTrackingFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(emptyClientTrackingList));
+        when(clientTrackingFacade.getAll(0, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(emptyClientTrackingList));
 
         // Then
         webTestClient
@@ -166,7 +166,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // When
-        when(clientTrackingFacade.getAll(0, 0, null, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
+        when(clientTrackingFacade.getAll(0, 0, null, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient

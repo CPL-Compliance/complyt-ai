@@ -107,6 +107,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public Mono<Customer> findByComplytIdProjection(UUID complytId) {
+        return customerRepository.findByComplytIdProjection(complytId);
+    }
+
+    @Override
     public Mono<Customer> findById(@NonNull ObjectId id) {
         return customerRepository.findById(id);
     }

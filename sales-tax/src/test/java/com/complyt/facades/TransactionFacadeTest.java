@@ -315,7 +315,7 @@ public class TransactionFacadeTest {
     }
 
     @Test
-    void getTransactionByExternalId_TransactionFound_TransactionReturned() {
+    void findTransactionByExternalId_TransactionFound_TransactionReturned() {
         // Given
         String externalId = UUID.randomUUID().toString();
         String source = "1";
@@ -324,7 +324,41 @@ public class TransactionFacadeTest {
         // When
         when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transactionToSearchFor));
-        Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source);
+        Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source, true);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionToSearchFor.withCustomer(customer)).verifyComplete();
+    }
+
+    @Test
+    void findTransactionByExternalId_DetailedFalse_TransactionReturned() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        String source = "1";
+        Transaction transactionToSearchFor = testUtilities.createTransactionProjectionAfterProjection(UUID.randomUUID().toString());
+        Customer customerProjection = testUtilities.createCustomerProjection(UUID.randomUUID().toString());
+        boolean detailed = false;
+
+        // When
+        when(customerService.findByComplytIdProjection(transaction.getCustomerId())).thenReturn(Mono.just(customerProjection));
+        when(transactionService.findByExternalIdAndSourceProjection(externalId, source)).thenReturn(Mono.just(transactionToSearchFor));
+        Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source, detailed);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionToSearchFor.withCustomer(customerProjection)).verifyComplete();
+    }
+
+    @Test
+    void findTransactionByExternalId_ProjectionTrue_TransactionFound_TransactionReturned() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        String source = "1";
+        Transaction transactionToSearchFor = transaction.withExternalId(externalId);
+
+        // When
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        when(transactionService.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transactionToSearchFor));
+        Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source, true);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionToSearchFor.withCustomer(customer)).verifyComplete();
@@ -338,15 +372,17 @@ public class TransactionFacadeTest {
         List<Transaction> allTransactions = new ArrayList<>();
         allTransactions.add(transaction);
         allTransactions.add(secondTransaction);
-        Map<String, String> filterMap = new LinkedHashMap<>();
+        Map<String, String> filterMap = new LinkedHashMap<>() {{
+            put("detailed", "true");
+        }};
         String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         // When
         when(transactionService.findAll(0, allTransactions.size(), filterMap, sortOrder, sortBy)).thenReturn(Flux.fromIterable(allTransactions));
-        Flux<Transaction> returnedCustomers = transactionFacade.getAll(0, allTransactions.size(), filterMap, sortOrder, sortBy);
+        Flux<Transaction> returnedTransactions = transactionFacade.getAll(0, allTransactions.size(), filterMap, sortOrder, sortBy);
 
         // Then
-        StepVerifier.create(returnedCustomers).expectNextCount(2).verifyComplete();
+        StepVerifier.create(returnedTransactions).expectNextCount(2).verifyComplete();
     }
 
     @Test
@@ -789,7 +825,10 @@ public class TransactionFacadeTest {
             add(transaction);
             add(anotherTransactionWithSameClientId);
         }};
-        Map<String, String> filterMap = new LinkedHashMap<>();
+        Map<String, String> filterMap = new LinkedHashMap<>() {{
+            put("detailed", "true");
+        }};
+
         String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         // When
@@ -798,6 +837,34 @@ public class TransactionFacadeTest {
 
         // Then
         StepVerifier.create(transactionFlux).expectNext(transaction, anotherTransactionWithSameClientId).verifyComplete();
+    }
+
+    @Test
+    void getAll_findsAllTransactionsWithDetailedFalse_ReturnsAllTransactionsProjected() {
+        // we are not really checking that the transactions are projected, but that the path to the projected transaction is being selected in the facade
+
+        // Given
+        String anotherTransactionId = UUID.randomUUID().toString();
+        Transaction projectedTransaction = testUtilities.createTransactionProjectionAfterProjection(UUID.randomUUID().toString());
+        Transaction anotherTransactionWithSameClientId = transaction.withId(anotherTransactionId);
+        List<Transaction> transactions = new ArrayList<>() {{
+            add(projectedTransaction);
+        }};
+        boolean detailed = false;
+        Map<String, String> filterMap = new LinkedHashMap<>() {{
+            put("detailed", "false");
+        }};
+
+
+
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
+
+        // When
+        when(transactionService.findAllProjection(0, transactions.size(), filterMap, sortOrder, sortBy)).thenReturn(Flux.fromIterable(transactions));
+        Flux<Transaction> transactionFlux = transactionFacade.getAll(0, transactions.size(), filterMap, sortOrder, sortBy, detailed);
+
+        // Then
+        StepVerifier.create(transactionFlux).expectNext(projectedTransaction).verifyComplete();
     }
 
     @Test

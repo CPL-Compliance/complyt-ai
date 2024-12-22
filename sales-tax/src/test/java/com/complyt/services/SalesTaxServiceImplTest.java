@@ -223,6 +223,21 @@ public class SalesTaxServiceImplTest {
     }
 
     @Test
+    void handleSalesTaxCalculation_LinkedRefundFalse_NoInvoiceFound_ReturnsRefundUnchanged() {
+        // Given
+        SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
+        String externalIdOfTheInvoice = "some random id";
+        Transaction refund = transaction.withIsRefundLinked(false).withCreatedFrom(externalIdOfTheInvoice).withTransactionType(TransactionType.REFUND);
+
+        // When
+        when(refundTransactionProcessor.isLinkedRefundFromAnInvoice(refund)).thenReturn(false);
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(refund, tracking, customer);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(refund).verifyComplete();
+    }
+
+    @Test
     void handleSalesTaxCalculation_NullTransactionPassed_ThrowsException() {
         // Given
         SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);

@@ -4,7 +4,7 @@ import com.complyt.SalesTaxApplication;
 import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.currency.CurrencySource;
 import com.complyt.domain.transaction.Transaction;
-import com.complyt.repositories.Constants.RepositoryConstant;
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
@@ -1818,7 +1818,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(TransactionDto.class)
-                .value(list -> assertEquals(RepositoryConstant.DEFAULT_PAGE_SIZE, list.size()));
+                .value(list -> assertEquals(PaginationConstants.DEFAULT_PAGE_SIZE, list.size()));
     }
 
     @Order(2)
@@ -1854,7 +1854,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(TransactionDto.class)
-                .value(list -> assertEquals(list.size(), 0));
+                .value(list -> assertEquals(0, list.size() ));
     }
 
     @Order(2)
@@ -1893,7 +1893,187 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(TransactionDto.class)
-                .value(transaction -> assertEquals(transaction.complytId(), complytId));
+                .value(transaction -> {
+                    assertEquals(transaction.complytId(), complytId);
+                });
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void getByExternalIdAndSource_Exists_Returns200CheckingDefaultNullFields() {
+        //Given
+        String externalId = "transactionToCheckProjectionWithSalesTax";
+        UUID complytId = UUID.fromString("607f3926-61d3-40a4-9b3a-a6bf7c3a1d95"); // complytId of existing transaction
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(transaction -> {
+                    assertEquals(transaction.complytId(), complytId);
+                    assertNotNull(transaction.items().get(0).salesTaxRates());
+                    assertNull(transaction.items().get(0).salesTaxRates().cityRate());
+                    assertNull(transaction.items().get(0).salesTaxRates().countyRate());
+                    assertNull(transaction.items().get(0).salesTaxRates().stateRate());
+                    assertNotNull(transaction.items().get(0).salesTaxRates().taxRate());
+
+                    assertNull(transaction.items().get(0).jurisdictionalSalesTaxRules());
+
+                    assertNull(transaction.salesTax().salesTaxRates().cityRate());
+                    assertNull(transaction.salesTax().salesTaxRates().countyRate());
+                    assertNull(transaction.salesTax().salesTaxRates().stateRate());
+                    assertNotNull(transaction.salesTax().salesTaxRates().taxRate());
+                    assertNotNull(transaction.salesTax().rate());
+
+                    assertNotNull(transaction.complytId());
+                    assertNotNull(transaction.externalId());
+                    assertNotNull(transaction.source());
+                    assertNotNull(transaction.customerId());
+                    assertNotNull(transaction.documentName());
+                    assertNotNull(transaction.subsidiary());
+                    assertNotNull(transaction.currency());
+                    assertNotNull(transaction.tangibleItemsAmount());
+                    assertNotNull(transaction.taxableItemsAmount());
+                    assertNotNull(transaction.totalDiscount());
+                    assertNotNull(transaction.totalItemsAmount());
+                    assertNotNull(transaction.finalTransactionAmount());
+                    assertNotNull(transaction.transactionStatus());
+                    assertNotNull(transaction.billingAddress());
+                    assertNotNull(transaction.shippingAddress());
+                    assertNotNull(transaction.internalTimestamps());
+                    assertNotNull(transaction.externalTimestamps());
+                    assertNotNull(transaction.transactionType());
+                    assertNotNull(transaction.shippingFee().manualSalesTax());
+                    assertNotNull(transaction.shippingFee().manualSalesTaxRate());
+                    assertNotNull(transaction.shippingFee().totalPrice());
+
+                    assertNotNull(transaction.shippingFee().salesTaxRates().taxRate());
+                    assertNull(transaction.shippingFee().salesTaxRates().cityRate());
+                    assertNull(transaction.shippingFee().salesTaxRates().countyRate());
+                    assertNull(transaction.shippingFee().salesTaxRates().stateRate());
+                    assertNull(transaction.shippingFee().salesTaxRates().ratesMetaData());
+                    assertNull(transaction.shippingFee().salesTaxRates().combinedDistrictRate());
+
+                    assertNotNull(transaction.shippingFee().gtRates().taxRate());
+                    assertNull(transaction.shippingFee().gtRates().countryRate());
+                    assertNull(transaction.shippingFee().gtRates().regionRate());
+
+                    assertNotNull(transaction.shippingFee().taxCode());
+                    assertNotNull(transaction.shippingFee().taxableCategory());
+                    assertNotNull(transaction.shippingFee().tangibleCategory());
+                    assertNotNull(transaction.shippingFee().calculatedTotal());
+                    assertNotNull(transaction.salesTax().amount());
+                    assertNotNull(transaction.salesTax().rate());
+                    assertNotNull(transaction.salesTax().salesTaxRates().taxRate());
+                    assertNotNull(transaction.salesTax().gtRates().taxRate());
+                    assertNotNull(transaction.customer().complytId());
+                    assertNotNull(transaction.customer().externalId());
+                    assertNotNull(transaction.customer().name());
+                    assertNotNull(transaction.customer().customerType());
+                    assertNotNull(transaction.exchangeRateInfo());
+                    assertNotNull(transaction.exchangeRateInfo().finalTransactionAmountInUsd());
+                    assertNotNull(transaction.exchangeRateInfo().fxRate());
+                    assertNotNull(transaction.exchangeRateInfo().fromCurrency());
+                    assertNotNull(transaction.exchangeRateInfo().toCurrency());
+                });
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void getByExternalIdAndSource_ExistsDetailedTrue_Returns200CheckingProjectedFields() {
+        //Given
+        String externalId = "transactionToCheckProjectionWithSalesTax";
+        UUID complytId = UUID.fromString("607f3926-61d3-40a4-9b3a-a6bf7c3a1d95"); // complytId of existing transaction
+
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .queryParam("detailed", true)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(transaction -> {
+                    assertEquals(transaction.complytId(), complytId);
+                    assertNotNull(transaction.items().get(0).salesTaxRates());
+                    assertNotNull(transaction.items().get(0).salesTaxRates().cityRate());
+                    assertNotNull(transaction.items().get(0).salesTaxRates().countyRate());
+                    assertNotNull(transaction.items().get(0).salesTaxRates().stateRate());
+                    assertNotNull(transaction.items().get(0).salesTaxRates().taxRate());
+
+                    assertNotNull(transaction.items().get(0).jurisdictionalSalesTaxRules());
+
+                    assertNotNull(transaction.salesTax().salesTaxRates().cityRate());
+                    assertNotNull(transaction.salesTax().salesTaxRates().countyRate());
+                    assertNotNull(transaction.salesTax().salesTaxRates().stateRate());
+                    assertNotNull(transaction.salesTax().salesTaxRates().taxRate());
+                    assertNotNull(transaction.salesTax().rate());
+
+                    assertNotNull(transaction.complytId());
+                    assertNotNull(transaction.externalId());
+                    assertNotNull(transaction.source());
+                    assertNotNull(transaction.customerId());
+                    assertNotNull(transaction.documentName());
+                    assertNotNull(transaction.subsidiary());
+                    assertNotNull(transaction.currency());
+                    assertNotNull(transaction.tangibleItemsAmount());
+                    assertNotNull(transaction.taxableItemsAmount());
+                    assertNotNull(transaction.totalDiscount());
+                    assertNotNull(transaction.totalItemsAmount());
+                    assertNotNull(transaction.finalTransactionAmount());
+                    assertNotNull(transaction.transactionStatus());
+                    assertNotNull(transaction.billingAddress());
+                    assertNotNull(transaction.shippingAddress());
+                    assertNotNull(transaction.internalTimestamps());
+                    assertNotNull(transaction.externalTimestamps());
+                    assertNotNull(transaction.transactionType());
+                    assertNotNull(transaction.shippingFee().manualSalesTax());
+                    assertNotNull(transaction.shippingFee().manualSalesTaxRate());
+                    assertNotNull(transaction.shippingFee().totalPrice());
+
+                    assertNotNull(transaction.shippingFee().salesTaxRates().taxRate());
+                    assertNotNull(transaction.shippingFee().salesTaxRates().cityRate());
+                    assertNotNull(transaction.shippingFee().salesTaxRates().countyRate());
+                    assertNotNull(transaction.shippingFee().salesTaxRates().stateRate());
+                    assertNotNull(transaction.shippingFee().salesTaxRates().ratesMetaData());
+                    assertNotNull(transaction.shippingFee().salesTaxRates().combinedDistrictRate());
+
+                    assertNotNull(transaction.shippingFee().gtRates().taxRate());
+                    assertNotNull(transaction.shippingFee().gtRates().countryRate());
+                    assertNotNull(transaction.shippingFee().gtRates().regionRate());
+
+                    assertNotNull(transaction.shippingFee().taxCode());
+                    assertNotNull(transaction.shippingFee().taxableCategory());
+                    assertNotNull(transaction.shippingFee().tangibleCategory());
+                    assertNotNull(transaction.shippingFee().calculatedTotal());
+                    assertNotNull(transaction.salesTax().amount());
+                    assertNotNull(transaction.salesTax().rate());
+                    assertNotNull(transaction.salesTax().salesTaxRates().taxRate());
+                    assertNotNull(transaction.salesTax().gtRates().taxRate());
+                    assertNotNull(transaction.customer().complytId());
+                    assertNotNull(transaction.customer().externalId());
+                    assertNotNull(transaction.customer().name());
+                    assertNotNull(transaction.customer().customerType());
+                    assertNotNull(transaction.exchangeRateInfo());
+                    assertNotNull(transaction.exchangeRateInfo().finalTransactionAmountInUsd());
+                    assertNotNull(transaction.exchangeRateInfo().fxRate());
+                    assertNotNull(transaction.exchangeRateInfo().fromCurrency());
+                    assertNotNull(transaction.exchangeRateInfo().toCurrency());
+                });
     }
 
     @Order(2)
@@ -2333,7 +2513,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isOk()
                 .expectBodyList(Transaction.class)
                 .value(transactions -> Assertions.assertEquals(transactions.get(0).getComplytId().toString(), expectedComplyId))
-                .value(transactions -> Assertions.assertTrue(transactions.size() <= RepositoryConstant.DEFAULT_PAGE_SIZE));
+                .value(transactions -> Assertions.assertTrue(transactions.size() <= PaginationConstants.DEFAULT_PAGE_SIZE));
     }
 
     @Order(0)
@@ -3080,6 +3260,95 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 });
     }
 
+    @Override
+    public void getAll_DetailedTrue_Returns200CheckingProjectedFields() {
+        //Given
+        String externalId = "transactionToCheckProjectionWithSalesTax";
+        UUID complytId = UUID.fromString("607f3926-61d3-40a4-9b3a-a6bf7c3a1d95"); // complytId of existing transaction
+        boolean detailed = true;
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("detailed", detailed)
+                        .queryParam("externalId", externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(transactions -> {
+                    TransactionDto transaction = transactions.get(0);
+                    assertEquals(transaction.complytId(), complytId);
+                    assertNotNull(transaction.items().get(0).salesTaxRates());
+                    assertNotNull(transaction.items().get(0).salesTaxRates().cityRate());
+                    assertNotNull(transaction.items().get(0).salesTaxRates().countyRate());
+                    assertNotNull(transaction.items().get(0).salesTaxRates().stateRate());
+                    assertNotNull(transaction.items().get(0).salesTaxRates().taxRate());
+
+                    assertNotNull(transaction.items().get(0).jurisdictionalSalesTaxRules());
+
+                    assertNotNull(transaction.salesTax().salesTaxRates().cityRate());
+                    assertNotNull(transaction.salesTax().salesTaxRates().countyRate());
+                    assertNotNull(transaction.salesTax().salesTaxRates().stateRate());
+                    assertNotNull(transaction.salesTax().salesTaxRates().taxRate());
+                    assertNotNull(transaction.salesTax().rate());
+
+                    assertNotNull(transaction.complytId());
+                    assertNotNull(transaction.externalId());
+                    assertNotNull(transaction.source());
+                    assertNotNull(transaction.customerId());
+                    assertNotNull(transaction.documentName());
+                    assertNotNull(transaction.subsidiary());
+                    assertNotNull(transaction.currency());
+                    assertNotNull(transaction.tangibleItemsAmount());
+                    assertNotNull(transaction.taxableItemsAmount());
+                    assertNotNull(transaction.totalDiscount());
+                    assertNotNull(transaction.totalItemsAmount());
+                    assertNotNull(transaction.finalTransactionAmount());
+                    assertNotNull(transaction.transactionStatus());
+                    assertNotNull(transaction.billingAddress());
+                    assertNotNull(transaction.shippingAddress());
+                    assertNotNull(transaction.internalTimestamps());
+                    assertNotNull(transaction.externalTimestamps());
+                    assertNotNull(transaction.transactionType());
+                    assertNotNull(transaction.shippingFee().manualSalesTax());
+                    assertNotNull(transaction.shippingFee().manualSalesTaxRate());
+                    assertNotNull(transaction.shippingFee().totalPrice());
+
+                    assertNotNull(transaction.shippingFee().salesTaxRates().taxRate());
+                    assertNotNull(transaction.shippingFee().salesTaxRates().cityRate());
+                    assertNotNull(transaction.shippingFee().salesTaxRates().countyRate());
+                    assertNotNull(transaction.shippingFee().salesTaxRates().stateRate());
+                    assertNotNull(transaction.shippingFee().salesTaxRates().ratesMetaData());
+                    assertNotNull(transaction.shippingFee().salesTaxRates().combinedDistrictRate());
+
+                    assertNotNull(transaction.shippingFee().gtRates().taxRate());
+                    assertNotNull(transaction.shippingFee().gtRates().countryRate());
+                    assertNotNull(transaction.shippingFee().gtRates().regionRate());
+
+                    assertNotNull(transaction.shippingFee().taxCode());
+                    assertNotNull(transaction.shippingFee().taxableCategory());
+                    assertNotNull(transaction.shippingFee().tangibleCategory());
+                    assertNotNull(transaction.shippingFee().calculatedTotal());
+                    assertNotNull(transaction.salesTax().amount());
+                    assertNotNull(transaction.salesTax().rate());
+                    assertNotNull(transaction.salesTax().salesTaxRates().taxRate());
+                    assertNotNull(transaction.salesTax().gtRates().taxRate());
+                    assertNotNull(transaction.customer().complytId());
+                    assertNotNull(transaction.customer().externalId());
+                    assertNotNull(transaction.customer().name());
+                    assertNotNull(transaction.customer().customerType());
+                    assertNotNull(transaction.exchangeRateInfo());
+                    assertNotNull(transaction.exchangeRateInfo().finalTransactionAmountInUsd());
+                    assertNotNull(transaction.exchangeRateInfo().fxRate());
+                    assertNotNull(transaction.exchangeRateInfo().fromCurrency());
+                    assertNotNull(transaction.exchangeRateInfo().toCurrency());
+                });
+    }
+
     @Test
     @Override
     @WithMockUser
@@ -3177,6 +3446,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + invoiceExternalId)
+                        .queryParam("detailed", true)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -3306,6 +3576,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + invoiceExternalId)
+                        .queryParam("detailed", true)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -3403,6 +3674,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + invoiceExternalId)
+                        .queryParam("detailed", true)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

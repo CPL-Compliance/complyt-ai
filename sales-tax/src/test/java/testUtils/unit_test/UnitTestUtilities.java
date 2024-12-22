@@ -26,7 +26,7 @@ import com.complyt.domain.transaction.tax.ComplytGtRates;
 import com.complyt.domain.transaction.tax.GtAddress;
 import com.complyt.domain.transaction.tax.GtRates;
 import com.complyt.v1.config.BodyCheckConfig;
-import com.complyt.v1.mappers.ItemMapper;
+import com.complyt.v1.mappers.transaction.ItemMapper;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerStatusDto;
@@ -255,6 +255,22 @@ public class UnitTestUtilities {
         );
     }
 
+    public Customer createCustomerProjection(String id) {
+        /**
+         * keeping in customer:
+         * complytId
+         * name
+         * externalId
+         * source
+         * customerType
+         * externalTimeStamps
+         *
+         */
+        return createCustomer(id)
+                .withAddress(null)
+                .withInternalTimestamps(null);
+    }
+
     public CustomerDto createCustomerDto(String id) {
         TimestampsDto internalTimeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         LocalDateTime localDateTimeMinusOneMinute = localDateTime.minusMinutes(1);
@@ -291,6 +307,24 @@ public class UnitTestUtilities {
                 null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
                 TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
                 BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, null, null, null, null, false, null);
+    }
+
+    public Transaction createTransactionProjectionAfterProjection(String id) {
+        String documentName = "INVUS1000";
+        Address billingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
+        Address shippingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
+        List<Item> items = createItems(false, false, true);
+        Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
+        ShippingFee shippingFee = createShippingFee(false, false, false);
+        String curreny = "USD";
+
+        return new Transaction(UUID.randomUUID(), id, id, source,
+                documentName, items, false, billingAddress, shippingAddress,
+                customerIdOtherDomains, createCustomerProjection(customerIdOtherDomains.toString()),
+                null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
+                TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED,
+                null, null, null, null, false, BigDecimal.ZERO);
     }
 
     public Transaction createTransactionWithCalculatedTotalItem(String id) {

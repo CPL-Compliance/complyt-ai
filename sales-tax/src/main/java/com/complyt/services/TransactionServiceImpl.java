@@ -97,6 +97,11 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    public Mono<Transaction> findByExternalIdAndSourceProjection(@NonNull String externalId, @NonNull String source) {
+        return transactionRepository.findByExternalIdAndSourceProjection(externalId, source);
+    }
+
+    @Override
     public Mono<Transaction> findByComplytId(@NonNull UUID complytId) {
         return transactionRepository.findByComplytId(complytId);
     }
@@ -192,6 +197,11 @@ public class TransactionServiceImpl implements TransactionService {
 
     public Flux<Transaction> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
         return transactionRepository.findAll(page, size, filterMap, sortOrder, sortBy);
+    }
+
+    @Override
+    public Flux<Transaction> findAllProjection(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
+        return transactionRepository.findAllProjection(page, size, filterMap, sortOrder, sortBy);
     }
 
     public Flux<Transaction> findAllBySource(@NonNull final String source) {

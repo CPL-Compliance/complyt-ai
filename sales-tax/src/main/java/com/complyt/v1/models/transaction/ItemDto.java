@@ -7,6 +7,7 @@ import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.JurisdictionalSalesTaxRulesDto;
 import com.complyt.v1.models.TangibleCategoryDto;
 import com.complyt.v1.models.TaxableCategoryDto;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.complyt.v1.models.tax.global_tax.GtRatesDto;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 
 @With
 @Schema(name = "Item")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record ItemDto(
         @Schema(description = FieldsDescriptions.UNIT_PRICE) BigDecimal unitPrice,
         @PositiveOrZero(message = "Item.quantity " + NumericErrorMessages.NOT_NEGATIVE_ERROR) @Schema(description = FieldsDescriptions.QUANTITY) BigDecimal quantity,

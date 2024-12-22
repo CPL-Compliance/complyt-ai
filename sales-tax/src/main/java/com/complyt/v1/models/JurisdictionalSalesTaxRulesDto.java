@@ -3,6 +3,7 @@ package com.complyt.v1.models;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.SubJurisdictionalTaxRules;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
 import lombok.With;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 @Schema(name = "JurisdictionalSalesTaxRules")
 @With
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record JurisdictionalSalesTaxRulesDto(
         @Size(max = 256, message = "JurisdictionalSalesTaxRules.name " + StringErrorMessages.MAX_256_ERROR) String name,
         @Size(max = 256, message = "JurisdictionalSalesTaxRules.abbreviation " + StringErrorMessages.MAX_256_ERROR) String abbreviation,

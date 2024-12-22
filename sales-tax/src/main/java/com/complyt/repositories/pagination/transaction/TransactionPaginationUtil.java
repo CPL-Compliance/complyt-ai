@@ -10,5 +10,4 @@ public interface TransactionPaginationUtil {
             "externalId", "documentName", "transactionStatus", "externalTimestamps.createdDate",
             "transactionType", "shippingAddress.country", "shippingAddress.state", "shippingAddress.city"
     );
-    String DEFAULT_SORT_BY = "externalTimestamps.createdDate";
 }

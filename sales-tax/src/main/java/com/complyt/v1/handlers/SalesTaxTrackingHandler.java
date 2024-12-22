@@ -3,7 +3,7 @@ package com.complyt.v1.handlers;
 import com.complyt.business.address.CountryIsUsaChecker;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
-import com.complyt.repositories.Constants.RepositoryConstant;
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.security.permissions.sales_tax_tracking.NexusReadPermission;
 import com.complyt.security.permissions.sales_tax_tracking.NexusUpdatePermission;
 import com.complyt.utils.observability.ContextLogger;
@@ -122,13 +122,13 @@ public class SalesTaxTrackingHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         String page = serverRequest.queryParam("page")
-                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM));
+                .orElse(String.valueOf(PaginationConstants.DEFAULT_PAGE_NUM));
         String size = serverRequest.queryParam("size")
-                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE));
+                .orElse(String.valueOf(PaginationConstants.DEFAULT_PAGE_SIZE));
         String sortOrder = serverRequest.queryParam("sortOrder")
-                .orElse(RepositoryConstant.DEFAULT_SORT_ORDER);
+                .orElse(PaginationConstants.DEFAULT_SORT_ORDER);
         String sortBy = serverRequest.queryParam("sortBy")
-                .orElse(RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY);
+                .orElse(PaginationConstants.DEFAULT_TRANSACTION_SORT_BY);
 
         Map<String, String> filterMap = serverRequest.queryParams().toSingleValueMap();
 

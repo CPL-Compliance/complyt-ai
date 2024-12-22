@@ -2,7 +2,7 @@ package com.complyt.v1.routers;
 
 import com.complyt.domain.customer.Customer;
 import com.complyt.facades.CustomerFacade;
-import com.complyt.repositories.Constants.RepositoryConstant;
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.PatcherConfig;
@@ -1097,7 +1097,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(customerFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(allCustomers));
+        when(customerFacade.getAll(PaginationConstants.DEFAULT_PAGE_NUM, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(allCustomers));
 
         // Then
         webTestClient
@@ -1125,7 +1125,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(customerFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(allCustomers));
+        when(customerFacade.getAll(0, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(allCustomers));
 
         // Then
         webTestClient
@@ -1148,7 +1148,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(customerFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(emptyCustomerList));
+        when(customerFacade.getAll(PaginationConstants.DEFAULT_PAGE_NUM, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(emptyCustomerList));
 
         // Then
         webTestClient
@@ -1169,7 +1169,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         List<Customer> emptyCustomerList = new ArrayList<>();
 
         // When
-        when(customerFacade.getAll(0, 0, null, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(emptyCustomerList));
+        when(customerFacade.getAll(0, 0, null, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(emptyCustomerList));
 
         // Then
         webTestClient
@@ -1194,7 +1194,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // Given + When
-        when(customerFacade.getAll(0, 0, null, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
+        when(customerFacade.getAll(0, 0, null, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient

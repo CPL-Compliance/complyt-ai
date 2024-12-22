@@ -6,7 +6,7 @@ import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.domain.transaction.TransactionType;
 import com.complyt.facades.TransactionFacade;
-import com.complyt.repositories.Constants.RepositoryConstant;
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
@@ -18,9 +18,10 @@ import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.handlers.TransactionHandler;
-import com.complyt.v1.mappers.TransactionMapper;
+import com.complyt.v1.mappers.transaction.TransactionMapper;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.tax.sales_tax.RatesMetaDataDto;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxDto;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
@@ -98,13 +99,17 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        boolean detailed = true;
+
+        when(transactionFacade.findByExternalIdAndSource(externalId, source, true)).thenReturn(Mono.just(transaction));
 
         // When + Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .queryParam("detailed", detailed)
+
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -119,8 +124,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void getByExternalIdAndSource_PathVariableInvalid_Returns400() {
         // Given
         String externalId = "null";
+        boolean detailed = true;
         String source = transactionDto.source();
-        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.findByExternalIdAndSource(externalId, source, detailed)).thenReturn(Mono.just(transaction));
 
         // When + Then
         webTestClient
@@ -138,18 +144,21 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void getByExternalIdAndSource_ExistsWithSalesTax_Returns200() {
         // Given
-        String externalId = transactionDto.externalId();
+         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
+        boolean detailed = true;
+
         SalesTaxDto salesTaxDto = new SalesTaxDto(null, BigDecimal.ZERO, BigDecimal.ZERO, new SalesTaxRatesDto(null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO), null);
         TransactionDto transactionDtoWithSalesTax = transactionDto.withSalesTax(salesTaxDto);
         Transaction returnedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDtoWithSalesTax);
-        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(returnedTransaction));
+        when(transactionFacade.findByExternalIdAndSource(externalId, source, detailed)).thenReturn(Mono.just(returnedTransaction));
 
         // When + Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .queryParam("detailed", detailed)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -165,13 +174,17 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
+        boolean detailed = true;
+
+        when(transactionFacade.findByExternalIdAndSource(externalId, source, detailed)).thenReturn(Mono.empty());
 
         // When + Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .queryParam("detailed", detailed)
+                        .queryParam("detailed", detailed)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -185,7 +198,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
+        boolean detailed = true;
+
+        when(transactionFacade.findByExternalIdAndSource(externalId, source, detailed)).thenReturn(Mono.empty());
 
         // When + Then
         webTestClient
@@ -208,7 +223,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        boolean detailed = true;
+
+        when(transactionFacade.findByExternalIdAndSource(externalId, source, detailed)).thenReturn(Mono.just(transaction));
 
         // When + Then
         webTestClient
@@ -235,7 +252,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.error(new OperationFailedException()));
+        boolean detailed = true;
+
+        when(transactionFacade.findByExternalIdAndSource(externalId, source, detailed)).thenReturn(Mono.error(new OperationFailedException()));
 
         // When + Then
         webTestClient
@@ -253,6 +272,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void getAll_Exists_Returns200WithList() {
         // Given
+        boolean detailed = true;
         String firstId = UUID.randomUUID().toString();
         String secondId = UUID.randomUUID().toString();
         TransactionDto transactionNoId = transactionDto.withExternalId(firstId);
@@ -263,16 +283,58 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
             add(transactionNoId);
             add(secondTransactionNoId);
         }};
-        Map<String, String> filterMap = new LinkedHashMap<>();
+        Map<String, String> filterMap = new LinkedHashMap<>() {{
+            put("detailed", "true");
+        }};
 
         // When
-        when(transactionFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.just(firstTransaction, secondTransaction));
+        when(transactionFacade.getAll(PaginationConstants.DEFAULT_PAGE_NUM, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY, detailed))
+                .thenReturn(Flux.just(firstTransaction, secondTransaction));
 
         // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL)
+                        .queryParam("detailed", detailed)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(transactionDtos -> transactionDtos, equalTo(allTransactionsWithNoId));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getAll_ExistsAndDetailedFalse_Returns200WithList() {
+        // Given
+        boolean detailed = false;
+        String firstId = UUID.randomUUID().toString();
+        String secondId = UUID.randomUUID().toString();
+        TransactionDto transactionNoId = transactionDto.withExternalId(firstId);
+        TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
+        Transaction firstTransaction = transaction.withExternalId(firstId);
+        Transaction secondTransaction = transaction.withExternalId(secondId);
+        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>() {{
+            add(transactionNoId);
+            add(secondTransactionNoId);
+        }};
+        Map<String, String> filterMap = new LinkedHashMap<>() {{
+            put("detailed", "false");
+        }};
+
+        // When
+        when(transactionFacade.getAll(PaginationConstants.DEFAULT_PAGE_NUM, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY, detailed))
+                .thenReturn(Flux.just(firstTransaction, secondTransaction));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("detailed", detailed)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -288,12 +350,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String firstId = UUID.randomUUID().toString();
         String secondId = UUID.randomUUID().toString();
+        boolean detailed = true;
         Transaction firstTransaction = transaction.withExternalId(firstId);
         Transaction secondTransaction = transaction.withExternalId(secondId);
         Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(transactionFacade.getAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.just(firstTransaction, secondTransaction));
+        when(transactionFacade.getAll(0, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY))
+                .thenReturn(Flux.just(firstTransaction, secondTransaction));
 
         // Then
         webTestClient
@@ -313,16 +377,23 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         // Given
         List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
-        Map<String, String> filterMap = new LinkedHashMap<>();
+        Map<String, String> filterMap = new LinkedHashMap<>(){{
+            put("detailed", "true");
+        }};
+
+        boolean detailed = true;
+
 
         // When
-        when(transactionFacade.getAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.empty());
+        when(transactionFacade.getAll(PaginationConstants.DEFAULT_PAGE_NUM, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY, detailed))
+        .thenReturn(Flux.empty());
 
         // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL)
+                        .queryParam("detailed", detailed)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -335,7 +406,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     public void getAll_UnauthenticatedUser_Returns401() {
         // When
-        when(transactionFacade.getAll(0, 0, null, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.empty());
+        when(transactionFacade.getAll(0, 0, null, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -360,7 +431,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // Given + When
-        when(transactionFacade.getAll(0, 0, null, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
+        when(transactionFacade.getAll(0, 0, null, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient
@@ -922,8 +993,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // When
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction.withComplytId(differentComplytId)));
         when(transactionFacade.update(externalId, source, transaction, transaction.withComplytId(differentComplytId))).thenReturn(Mono.error(new ConflictedDataApiException()));
-        when(transactionFacade.saveTransaction(any())).thenReturn(Mono.empty())
-        ;
+        when(transactionFacade.saveTransaction(any())).thenReturn(Mono.empty());
         // Then
         webTestClient
                 .mutateWith(csrf())

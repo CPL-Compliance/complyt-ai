@@ -1,13 +1,13 @@
 package com.complyt.v1.handlers;
 
 import com.complyt.facades.TransactionFacade;
-import com.complyt.repositories.Constants.RepositoryConstant;
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.security.permissions.transaction.TransactionCreatePermission;
 import com.complyt.security.permissions.transaction.TransactionDeletePermission;
 import com.complyt.security.permissions.transaction.TransactionReadPermission;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
-import com.complyt.v1.mappers.TransactionMapper;
+import com.complyt.v1.mappers.transaction.TransactionMapper;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.routers.TransactionRouter;
 import com.complyt.v1.validators.ValidationHandler;
@@ -48,11 +48,13 @@ public class TransactionHandler {
         String externalId = serverRequest.pathVariable("externalId");
         String source = serverRequest.pathVariable("source");
 
+        boolean detailed = Boolean.parseBoolean(serverRequest.queryParam("detailed").orElse("false"));
+
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<TransactionDto> transactionDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(transactionDtoValidationHandler.handle(serverRequest))
-                .switchIfEmpty(Mono.defer(() -> transactionFacade.findByExternalIdAndSource(externalId, source))
+                .switchIfEmpty(Mono.defer(() -> transactionFacade.findByExternalIdAndSource(externalId, source, detailed))
                         .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
                         .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto))
                         .switchIfEmpty(ContextLogger.observeCtx("Failed to get transaction by externalId " + externalId + " and source " + source, log::error)
@@ -66,19 +68,22 @@ public class TransactionHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         String page = serverRequest.queryParam("page")
-                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_NUM));
+                .orElse(String.valueOf(PaginationConstants.DEFAULT_PAGE_NUM));
         String size = serverRequest.queryParam("size")
-                .orElse(String.valueOf(RepositoryConstant.DEFAULT_PAGE_SIZE));
+                .orElse(String.valueOf(PaginationConstants.DEFAULT_PAGE_SIZE));
         String sortOrder = serverRequest.queryParam("sortOrder")
-                .orElse(RepositoryConstant.DEFAULT_SORT_ORDER);
+                .orElse(PaginationConstants.DEFAULT_SORT_ORDER);
         String sortBy = serverRequest.queryParam("sortBy")
-                .orElse(RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY);
+                .orElse(PaginationConstants.DEFAULT_TRANSACTION_SORT_BY);
+
+        boolean detailed = Boolean.parseBoolean(serverRequest.queryParam("detailed").orElse("false"));
+
 
         Map<String, String> filterMap = serverRequest.queryParams().toSingleValueMap();
 
         Flux<TransactionDto> transactionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(transactionDtoValidationHandler.handle(serverRequest))
-                .switchIfEmpty(Flux.defer(() -> transactionFacade.getAll(Integer.parseInt(page), Integer.parseInt(size), filterMap, sortOrder, sortBy))
+                .switchIfEmpty(Flux.defer(() -> transactionFacade.getAll(Integer.parseInt(page), Integer.parseInt(size), filterMap, sortOrder, sortBy, detailed))
                         .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
                         .flatMapSequential(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto)));
 
@@ -88,7 +93,7 @@ public class TransactionHandler {
     @TransactionReadPermission
     public Mono<ServerResponse> getAllBySource(ServerRequest serverRequest) {
         String source = serverRequest.pathVariable("source");
-        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        String logStr = String.format("-quest Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Flux<TransactionDto> transactionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(transactionDtoValidationHandler.handle(serverRequest))
@@ -124,13 +129,16 @@ public class TransactionHandler {
 
         return ContextLogger.observeCtx(logStr, log::info)
                 .then(transactionDtoValidationHandler.handle(serverRequest)
-                        .flatMap(transactionDto -> ContextLogger.observeCtx("--> Body: " + transactionDto, log::info).thenReturn(transactionDto))
+                        .flatMap(transactionDto -> ContextLogger.observeCtx("--> Body: " + transactionDto, log::info)
+                                .thenReturn(transactionDto))
                         .map(TransactionMapper.INSTANCE::transactionDtoToTransaction)
                         .flatMap(receivedTransaction ->
                                 transactionFacade.findByExternalIdAndSource(externalId, source)
                                         .flatMap(originalTransaction -> transactionFacade.update(externalId, source, receivedTransaction, originalTransaction)
-                                                .flatMap(savedTransaction -> ContextLogger.observeCtx("<-- Returned Body: " + savedTransaction, log::info).thenReturn(savedTransaction))
-                                                .flatMap(savedTransaction -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class))
+                                                .flatMap(savedTransaction -> ContextLogger.observeCtx("<-- Returned Body: " + savedTransaction, log::info)
+                                                        .thenReturn(savedTransaction))
+                                                .flatMap(savedTransaction -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                                                        .body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class))
                                                 .switchIfEmpty(ServerResponse.noContent().build()
                                                         .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse))))
                                         .switchIfEmpty(Mono.defer(() -> transactionFacade.saveTransaction(receivedTransaction)

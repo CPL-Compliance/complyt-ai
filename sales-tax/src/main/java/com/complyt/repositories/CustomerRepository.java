@@ -1,5 +1,6 @@
 package com.complyt.repositories;
 
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.domain.customer.Customer;
 import com.complyt.repositories.pagination.CriteriaBuilder;
 import com.complyt.repositories.pagination.customer.CustomerPaginationUtil;
@@ -56,7 +57,7 @@ public class CustomerRepository {
     public Flux<Customer> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
         int calculatedOffset = (page - 1) * size;
         Criteria criteriaFromFilterMap = CriteriaBuilder.build(filterMap, CustomerPaginationUtil.customerFilterKeys);
-        String sortByProperty = CustomerPaginationUtil.customerSortByFields.contains(sortBy) ? sortBy : CustomerPaginationUtil.DEFAULT_SORT_BY;
+        String sortByProperty = CustomerPaginationUtil.customerSortByFields.contains(sortBy) ? sortBy : PaginationConstants.DEFAULT_CUSTOMER_SORT_BY;
         Sort.Direction sortDirection = Sort.Direction.fromString(sortOrder);
 
         return tenantResolver.resolve()
@@ -126,6 +127,26 @@ public class CustomerRepository {
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }
+
+    public Mono<Customer> findByComplytIdProjection(UUID complytId) {
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> {
+                    Query query = Query.query(Criteria.where("complytId").is(complytId)
+                            .and("tenantId").is(tenantId));
+                    query.fields()
+                            .include("name")
+                            .include("externalId")
+                            .include("complytId")
+                            .include("source")
+                            .include("customerType")
+                            .include("externalTimestamps");
+
+                    return ContextLogger.observeCtx("Searching for a customer with complytId "
+                                    + complytId + " and tenant ID " + tenantId, log::info)
+                            .then(reactiveMongoTemplate.findOne(query, Customer.class));
+                });
+    }
+
 
     public Mono<Customer> findById(ObjectId id) {
         return tenantResolver.resolve()

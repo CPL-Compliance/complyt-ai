@@ -1,6 +1,6 @@
-package com.complyt.repositories.Constants;
+package com.complyt.business.pagination;
 
-public interface RepositoryConstant {
+public interface PaginationConstants {
     int DEFAULT_PAGE_SIZE = 25;
     int DEFAULT_PAGE_NUM = 1;
     String DEFAULT_SORT_ORDER = "DESC";

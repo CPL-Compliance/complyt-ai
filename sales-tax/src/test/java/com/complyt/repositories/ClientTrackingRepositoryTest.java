@@ -2,7 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.Nexus;
-import com.complyt.repositories.Constants.RepositoryConstant;
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.security.TenantResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -121,8 +121,8 @@ public class ClientTrackingRepositoryTest {
         List<ClientTracking> clientTrackingList = new ArrayList<>() {{
             add(clientTracking);
         }};
-        int page = RepositoryConstant.DEFAULT_PAGE_NUM;
-        int size = RepositoryConstant.DEFAULT_PAGE_SIZE;
+        int page = PaginationConstants.DEFAULT_PAGE_NUM;
+        int size = PaginationConstants.DEFAULT_PAGE_SIZE;
         int calculatedOffset = (page - 1) * size;
 
         Query query = new Query()

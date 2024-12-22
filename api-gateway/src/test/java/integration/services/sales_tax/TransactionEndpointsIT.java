@@ -9,7 +9,9 @@ import org.springframework.http.MediaType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -117,6 +119,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .queryParam("detailed", true)
                         .build())
                 .headers(headers -> headers
                         .setBearerAuth(TOKEN))
@@ -1278,7 +1281,401 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
                     assertNotNull(exchangeRateInfo);
                     assertTrue((Boolean) exchangeRateInfo.get("isExchangeRateEstimated"));
-                    assertEquals(LocalDate.now().atStartOfDay().toString() + ":00" ,exchangeRateInfo.get("exchangeRateDate"));
+                    assertEquals(LocalDate.now().atStartOfDay().toString() + ":00", exchangeRateInfo.get("exchangeRateDate"));
+                });
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void getByExteranlIdAndSource_DetailedFalse_ProjectedThinTransactionReturned() {
+        // Given
+        String externalId = "transactionToCheckProjectionWithSalesTax";
+        boolean detailed = false;
+
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .queryParam("detailed", detailed)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                }).exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(transactionList -> {
+                    LinkedHashMap<String, Object> transaction = (LinkedHashMap<String, Object>) transactionList.get(0);
+                    LinkedHashMap<String, Object> items = (LinkedHashMap<String, Object>) ((List<?>) transaction.get("items")).get(0);
+                    LinkedHashMap<String, Object> salesTaxRates = (LinkedHashMap<String, Object>) items.get("salesTaxRates");
+
+                    // Validate `items.salesTaxRates`
+                    assertNotNull(salesTaxRates);
+                    assertNull(salesTaxRates.get("cityRate"));
+                    assertNull(salesTaxRates.get("countyRate"));
+                    assertNull(salesTaxRates.get("stateRate"));
+                    assertNotNull(salesTaxRates.get("taxRate"));
+
+                    // Validate `items.jurisdictionalSalesTaxRules`
+                    assertNull(items.get("jurisdictionalSalesTaxRules"));
+
+                    // Validate `transaction.salesTax` and nested fields
+                    LinkedHashMap<String, Object> salesTax = (LinkedHashMap<String, Object>) transaction.get("salesTax");
+                    LinkedHashMap<String, Object> salesTaxSalesTaxRates = (LinkedHashMap<String, Object>) salesTax.get("salesTaxRates");
+                    assertNull(salesTaxSalesTaxRates.get("cityRate"));
+                    assertNull(salesTaxSalesTaxRates.get("countyRate"));
+                    assertNull(salesTaxSalesTaxRates.get("stateRate"));
+                    assertNotNull(salesTaxSalesTaxRates.get("taxRate"));
+                    assertNotNull(salesTax.get("rate"));
+
+                    // Validate general fields in the transaction
+                    assertNotNull(transaction.get("complytId"));
+                    assertNotNull(transaction.get("externalId"));
+                    assertNotNull(transaction.get("source"));
+                    assertNotNull(transaction.get("customerId"));
+                    assertNotNull(transaction.get("documentName"));
+                    assertNotNull(transaction.get("subsidiary"));
+                    assertNotNull(transaction.get("currency"));
+                    assertNotNull(transaction.get("tangibleItemsAmount"));
+                    assertNotNull(transaction.get("taxableItemsAmount"));
+                    assertNotNull(transaction.get("totalDiscount"));
+                    assertNotNull(transaction.get("totalItemsAmount"));
+                    assertNotNull(transaction.get("finalTransactionAmount"));
+                    assertNotNull(transaction.get("transactionStatus"));
+                    assertNotNull(transaction.get("billingAddress"));
+                    assertNotNull(transaction.get("shippingAddress"));
+                    assertNotNull(transaction.get("internalTimestamps"));
+                    assertNotNull(transaction.get("externalTimestamps"));
+                    assertNotNull(transaction.get("transactionType"));
+
+                    // Validate `shippingFee` and its nested fields
+                    LinkedHashMap<String, Object> shippingFee = (LinkedHashMap<String, Object>) transaction.get("shippingFee");
+                    assertNotNull(shippingFee.get("manualSalesTax"));
+                    assertNotNull(shippingFee.get("manualSalesTaxRate"));
+                    assertNotNull(shippingFee.get("totalPrice"));
+
+                    LinkedHashMap<String, Object> shippingFeeSalesTaxRates = (LinkedHashMap<String, Object>) shippingFee.get("salesTaxRates");
+                    assertNotNull(shippingFeeSalesTaxRates.get("taxRate"));
+                    assertNull(shippingFeeSalesTaxRates.get("cityRate"));
+                    assertNull(shippingFeeSalesTaxRates.get("countyRate"));
+                    assertNull(shippingFeeSalesTaxRates.get("stateRate"));
+                    assertNull(shippingFeeSalesTaxRates.get("ratesMetaData"));
+                    assertNull(shippingFeeSalesTaxRates.get("combinedDistrictRate"));
+
+                    LinkedHashMap<String, Object> gtRates = (LinkedHashMap<String, Object>) shippingFee.get("gtRates");
+                    assertNotNull(gtRates.get("taxRate"));
+                    assertNull(gtRates.get("countryRate"));
+                    assertNull(gtRates.get("regionRate"));
+
+                    assertNotNull(shippingFee.get("taxCode"));
+                    assertNotNull(shippingFee.get("taxableCategory"));
+                    assertNotNull(shippingFee.get("tangibleCategory"));
+                    assertNotNull(shippingFee.get("calculatedTotal"));
+
+                    // Validate `exchangeRateInfo`
+                    LinkedHashMap<String, Object> exchangeRateInfo = (LinkedHashMap<String, Object>) transaction.get("exchangeRateInfo");
+                    assertNotNull(exchangeRateInfo);
+                    assertNotNull(exchangeRateInfo.get("finalTransactionAmountInUsd"));
+                    assertNotNull(exchangeRateInfo.get("fxRate"));
+                    assertNotNull(exchangeRateInfo.get("fromCurrency"));
+                    assertNotNull(exchangeRateInfo.get("toCurrency"));
+                });
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void getByExteranlIdAndSource_DetailedTrue_NotProjectedFullTransactionReturned() {
+        // Given
+        String externalId = "transactionToCheckProjectionWithSalesTax";
+        boolean detailed = true;
+
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .queryParam("detailed", detailed)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(transactionList -> {
+                    LinkedHashMap<String, Object> transaction = (LinkedHashMap<String, Object>) transactionList.get(0);
+                    LinkedHashMap<String, Object> items = (LinkedHashMap<String, Object>) ((List<?>) transaction.get("items")).get(0);
+                    LinkedHashMap<String, Object> salesTaxRates = (LinkedHashMap<String, Object>) items.get("salesTaxRates");
+
+                    // Validate `salesTaxRates`
+                    assertNotNull(salesTaxRates);
+                    assertNotNull(salesTaxRates.get("cityRate"));
+                    assertNotNull(salesTaxRates.get("countyRate"));
+                    assertNotNull(salesTaxRates.get("stateRate"));
+                    assertNotNull(salesTaxRates.get("taxRate"));
+
+                    // Validate `jurisdictionalSalesTaxRules`
+                    assertNotNull(items.get("jurisdictionalSalesTaxRules"));
+
+                    // Validate `transaction.salesTax` and nested fields
+                    LinkedHashMap<String, Object> salesTax = (LinkedHashMap<String, Object>) transaction.get("salesTax");
+                    LinkedHashMap<String, Object> salesTaxSalesTaxRates = (LinkedHashMap<String, Object>) salesTax.get("salesTaxRates");
+                    assertNotNull(salesTaxSalesTaxRates.get("cityRate"));
+                    assertNotNull(salesTaxSalesTaxRates.get("countyRate"));
+                    assertNotNull(salesTaxSalesTaxRates.get("stateRate"));
+                    assertNotNull(salesTaxSalesTaxRates.get("taxRate"));
+                    assertNotNull(salesTax.get("rate"));
+
+                    // Validate general fields in the transaction
+                    assertNotNull(transaction.get("complytId"));
+                    assertNotNull(transaction.get("externalId"));
+                    assertNotNull(transaction.get("source"));
+                    assertNotNull(transaction.get("customerId"));
+                    assertNotNull(transaction.get("documentName"));
+                    assertNotNull(transaction.get("subsidiary"));
+                    assertNotNull(transaction.get("currency"));
+                    assertNotNull(transaction.get("tangibleItemsAmount"));
+                    assertNotNull(transaction.get("taxableItemsAmount"));
+                    assertNotNull(transaction.get("totalDiscount"));
+                    assertNotNull(transaction.get("totalItemsAmount"));
+                    assertNotNull(transaction.get("finalTransactionAmount"));
+                    assertNotNull(transaction.get("transactionStatus"));
+                    assertNotNull(transaction.get("billingAddress"));
+                    assertNotNull(transaction.get("shippingAddress"));
+                    assertNotNull(transaction.get("internalTimestamps"));
+                    assertNotNull(transaction.get("externalTimestamps"));
+                    assertNotNull(transaction.get("transactionType"));
+
+                    // Validate `shippingFee` and its nested fields
+                    LinkedHashMap<String, Object> shippingFee = (LinkedHashMap<String, Object>) transaction.get("shippingFee");
+                    assertNotNull(shippingFee.get("manualSalesTax"));
+                    assertNotNull(shippingFee.get("manualSalesTaxRate"));
+                    assertNotNull(shippingFee.get("totalPrice"));
+
+                    LinkedHashMap<String, Object> shippingFeeSalesTaxRates = (LinkedHashMap<String, Object>) shippingFee.get("salesTaxRates");
+                    assertNotNull(shippingFeeSalesTaxRates.get("taxRate"));
+                    assertNotNull(shippingFeeSalesTaxRates.get("cityRate"));
+                    assertNotNull(shippingFeeSalesTaxRates.get("countyRate"));
+                    assertNotNull(shippingFeeSalesTaxRates.get("stateRate"));
+                    assertNotNull(shippingFeeSalesTaxRates.get("ratesMetaData"));
+                    assertNotNull(shippingFeeSalesTaxRates.get("combinedDistrictRate"));
+
+                    LinkedHashMap<String, Object> gtRates = (LinkedHashMap<String, Object>) shippingFee.get("gtRates");
+                    assertNotNull(gtRates.get("taxRate"));
+                    assertNotNull(gtRates.get("countryRate"));
+                    assertNotNull(gtRates.get("regionRate"));
+
+                    assertNotNull(shippingFee.get("taxCode"));
+                    assertNotNull(shippingFee.get("taxableCategory"));
+                    assertNotNull(shippingFee.get("tangibleCategory"));
+                    assertNotNull(shippingFee.get("calculatedTotal"));
+
+                    // Validate `exchangeRateInfo`
+                    LinkedHashMap<String, Object> exchangeRateInfo = (LinkedHashMap<String, Object>) transaction.get("exchangeRateInfo");
+                    assertNotNull(exchangeRateInfo);
+                    assertNotNull(exchangeRateInfo.get("finalTransactionAmountInUsd"));
+                    assertNotNull(exchangeRateInfo.get("fxRate"));
+                    assertNotNull(exchangeRateInfo.get("fromCurrency"));
+                    assertNotNull(exchangeRateInfo.get("toCurrency"));
+                });
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void getAll_DetailedFalse_ProjectedThinTransactionReturned() {
+        // Given
+        String externalId = "transactionToCheckProjectionWithSalesTax";
+        boolean detailed = false;
+
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL)
+                        .queryParam("detailed", detailed)
+                        .queryParam("externalId", externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                }).exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(transactionList -> {
+                    // Extract the first transaction
+                    LinkedHashMap<String, Object> transaction = (LinkedHashMap<String, Object>) transactionList.get(0);
+
+                    LinkedHashMap<String, Object> items = (LinkedHashMap<String, Object>) ((List<?>) transaction.get("items")).get(0);
+                    LinkedHashMap<String, Object> salesTaxRates = (LinkedHashMap<String, Object>) items.get("salesTaxRates");
+
+                    // Validate `items.salesTaxRates`
+                    assertNotNull(salesTaxRates);
+                    assertNull(salesTaxRates.get("cityRate"));
+                    assertNull(salesTaxRates.get("countyRate"));
+                    assertNull(salesTaxRates.get("stateRate"));
+                    assertNotNull(salesTaxRates.get("taxRate"));
+
+                    // Validate `items.jurisdictionalSalesTaxRules`
+                    assertNull(items.get("jurisdictionalSalesTaxRules"));
+
+                    // Validate `transaction.salesTax` and nested fields
+                    LinkedHashMap<String, Object> salesTax = (LinkedHashMap<String, Object>) transaction.get("salesTax");
+                    LinkedHashMap<String, Object> salesTaxSalesTaxRates = (LinkedHashMap<String, Object>) salesTax.get("salesTaxRates");
+                    assertNull(salesTaxSalesTaxRates.get("cityRate"));
+                    assertNull(salesTaxSalesTaxRates.get("countyRate"));
+                    assertNull(salesTaxSalesTaxRates.get("stateRate"));
+                    assertNotNull(salesTaxSalesTaxRates.get("taxRate"));
+                    assertNotNull(salesTax.get("rate"));
+
+                    // Validate general fields in the transaction
+                    assertNotNull(transaction.get("complytId"));
+                    assertNotNull(transaction.get("externalId"));
+                    assertNotNull(transaction.get("source"));
+                    assertNotNull(transaction.get("customerId"));
+                    assertNotNull(transaction.get("documentName"));
+                    assertNotNull(transaction.get("subsidiary"));
+                    assertNotNull(transaction.get("currency"));
+                    assertNotNull(transaction.get("tangibleItemsAmount"));
+                    assertNotNull(transaction.get("taxableItemsAmount"));
+                    assertNotNull(transaction.get("totalDiscount"));
+                    assertNotNull(transaction.get("totalItemsAmount"));
+                    assertNotNull(transaction.get("finalTransactionAmount"));
+                    assertNotNull(transaction.get("transactionStatus"));
+                    assertNotNull(transaction.get("billingAddress"));
+                    assertNotNull(transaction.get("shippingAddress"));
+                    assertNotNull(transaction.get("internalTimestamps"));
+                    assertNotNull(transaction.get("externalTimestamps"));
+                    assertNotNull(transaction.get("transactionType"));
+
+                    // Validate `shippingFee` and its nested fields
+                    LinkedHashMap<String, Object> shippingFee = (LinkedHashMap<String, Object>) transaction.get("shippingFee");
+                    assertNotNull(shippingFee.get("manualSalesTax"));
+                    assertNotNull(shippingFee.get("manualSalesTaxRate"));
+                    assertNotNull(shippingFee.get("totalPrice"));
+
+                    LinkedHashMap<String, Object> shippingFeeSalesTaxRates = (LinkedHashMap<String, Object>) shippingFee.get("salesTaxRates");
+                    assertNotNull(shippingFeeSalesTaxRates.get("taxRate"));
+                    assertNull(shippingFeeSalesTaxRates.get("cityRate"));
+                    assertNull(shippingFeeSalesTaxRates.get("countyRate"));
+                    assertNull(shippingFeeSalesTaxRates.get("stateRate"));
+                    assertNull(shippingFeeSalesTaxRates.get("ratesMetaData"));
+                    assertNull(shippingFeeSalesTaxRates.get("combinedDistrictRate"));
+
+                    LinkedHashMap<String, Object> gtRates = (LinkedHashMap<String, Object>) shippingFee.get("gtRates");
+                    assertNotNull(gtRates.get("taxRate"));
+                    assertNull(gtRates.get("countryRate"));
+                    assertNull(gtRates.get("regionRate"));
+
+                    assertNotNull(shippingFee.get("taxCode"));
+                    assertNotNull(shippingFee.get("taxableCategory"));
+                    assertNotNull(shippingFee.get("tangibleCategory"));
+                    assertNotNull(shippingFee.get("calculatedTotal"));
+
+                    // Validate `exchangeRateInfo`
+                    LinkedHashMap<String, Object> exchangeRateInfo = (LinkedHashMap<String, Object>) transaction.get("exchangeRateInfo");
+                    assertNotNull(exchangeRateInfo);
+                    assertNotNull(exchangeRateInfo.get("finalTransactionAmountInUsd"));
+                    assertNotNull(exchangeRateInfo.get("fxRate"));
+                    assertNotNull(exchangeRateInfo.get("fromCurrency"));
+                    assertNotNull(exchangeRateInfo.get("toCurrency"));
+                });
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void getAll_DetailedTrue_NotProjectedFullTransactionReturned() {
+        // Given
+        String externalId = "transactionToCheckProjectionWithSalesTax";
+        boolean detailed = true;
+
+        // Then
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL)
+                        .queryParam("detailed", detailed)
+                        .queryParam("externalId", externalId)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LinkedHashMap.class)
+                .value(transactionList -> {
+                    // Extract the first transaction
+                    LinkedHashMap<String, Object> transaction = (LinkedHashMap<String, Object>) transactionList.get(0);
+
+                    // Extract and validate items and salesTaxRates
+                    LinkedHashMap<String, Object> items = (LinkedHashMap<String, Object>) ((List<?>) transaction.get("items")).get(0);
+                    LinkedHashMap<String, Object> salesTaxRates = (LinkedHashMap<String, Object>) items.get("salesTaxRates");
+                    assertNotNull(salesTaxRates);
+                    assertNotNull(salesTaxRates.get("cityRate"));
+                    assertNotNull(salesTaxRates.get("countyRate"));
+                    assertNotNull(salesTaxRates.get("stateRate"));
+                    assertNotNull(salesTaxRates.get("taxRate"));
+
+                    assertNotNull(items.get("jurisdictionalSalesTaxRules"));
+
+                    // Validate transaction.salesTax and nested fields
+                    LinkedHashMap<String, Object> salesTax = (LinkedHashMap<String, Object>) transaction.get("salesTax");
+                    LinkedHashMap<String, Object> salesTaxSalesTaxRates = (LinkedHashMap<String, Object>) salesTax.get("salesTaxRates");
+                    assertNotNull(salesTaxSalesTaxRates.get("cityRate"));
+                    assertNotNull(salesTaxSalesTaxRates.get("countyRate"));
+                    assertNotNull(salesTaxSalesTaxRates.get("stateRate"));
+                    assertNotNull(salesTaxSalesTaxRates.get("taxRate"));
+                    assertNotNull(salesTax.get("rate"));
+
+                    // Validate general fields in the transaction
+                    String[] transactionFields = {
+                            "complytId", "externalId", "source", "customerId", "documentName",
+                            "subsidiary", "currency", "tangibleItemsAmount", "taxableItemsAmount",
+                            "totalDiscount", "totalItemsAmount", "finalTransactionAmount",
+                            "transactionStatus", "billingAddress", "shippingAddress",
+                            "internalTimestamps", "externalTimestamps", "transactionType"
+                    };
+                    for (String field : transactionFields) {
+                        assertNotNull(transaction.get(field));
+                    }
+
+                    // Validate shippingFee and its nested fields
+                    LinkedHashMap<String, Object> shippingFee = (LinkedHashMap<String, Object>) transaction.get("shippingFee");
+                    assertNotNull(shippingFee.get("manualSalesTax"));
+                    assertNotNull(shippingFee.get("manualSalesTaxRate"));
+                    assertNotNull(shippingFee.get("totalPrice"));
+
+                    LinkedHashMap<String, Object> shippingFeeSalesTaxRates = (LinkedHashMap<String, Object>) shippingFee.get("salesTaxRates");
+                    assertNotNull(shippingFeeSalesTaxRates.get("taxRate"));
+                    assertNotNull(shippingFeeSalesTaxRates.get("cityRate"));
+                    assertNotNull(shippingFeeSalesTaxRates.get("countyRate"));
+                    assertNotNull(shippingFeeSalesTaxRates.get("stateRate"));
+                    assertNotNull(shippingFeeSalesTaxRates.get("ratesMetaData"));
+                    assertNotNull(shippingFeeSalesTaxRates.get("combinedDistrictRate"));
+
+                    LinkedHashMap<String, Object> gtRates = (LinkedHashMap<String, Object>) shippingFee.get("gtRates");
+                    assertNotNull(gtRates.get("taxRate"));
+                    assertNotNull(gtRates.get("countryRate"));
+                    assertNotNull(gtRates.get("regionRate"));
+
+                    assertNotNull(shippingFee.get("taxCode"));
+                    assertNotNull(shippingFee.get("taxableCategory"));
+                    assertNotNull(shippingFee.get("tangibleCategory"));
+                    assertNotNull(shippingFee.get("calculatedTotal"));
+
+                    // Validate exchangeRateInfo
+                    LinkedHashMap<String, Object> exchangeRateInfo = (LinkedHashMap<String, Object>) transaction.get("exchangeRateInfo");
+                    assertNotNull(exchangeRateInfo);
+                    assertNotNull(exchangeRateInfo.get("finalTransactionAmountInUsd"));
+                    assertNotNull(exchangeRateInfo.get("fxRate"));
+                    assertNotNull(exchangeRateInfo.get("fromCurrency"));
+                    assertNotNull(exchangeRateInfo.get("toCurrency"));
                 });
     }
 

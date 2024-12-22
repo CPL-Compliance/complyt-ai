@@ -50,7 +50,7 @@ public interface DtoErrorMessages {
 
     String STATE_NOT_RECOGNIZED_USA = "in usa address is not recognized.";
 
-    String ZIP_NOT_IN_FORMAT = "format is incorrect.";
+    String ZIP_NOT_IN_FORMAT = "format is incorrect. the correct format is mandatory 5 digits and optional dash and and additional 4 digits. example: 12345 or 12345-6789.";
 
     String STATE_NOT_RECOGNIZED_OR_INVALID_COMBINATION = STATE_NOT_RECOGNIZED_USA + " or an invalid combination";
 
@@ -63,6 +63,8 @@ public interface DtoErrorMessages {
     String MAX_256_ERROR = "should be up to 256 characters maximum";
 
     String INVALID_SORT_ORDER_PARAMETER = "should be one of the following asc/desc";
+
+    String INVALID_DETAILED_TRANSACTION_PARAMETER = "should be one of the following true/false";
 
     String ITEMS_MISSING_TOTAL_OR_QUANTITY_AND_UNITPRICE = "All items should have either total price OR quantity and unitPrice";
 }

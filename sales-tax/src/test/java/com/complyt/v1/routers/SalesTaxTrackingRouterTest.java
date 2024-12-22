@@ -3,7 +3,7 @@ package com.complyt.v1.routers;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
-import com.complyt.repositories.Constants.RepositoryConstant;
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.PatcherConfig;
@@ -997,7 +997,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(salesTaxTrackingFacade.findAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
+        when(salesTaxTrackingFacade.findAll(PaginationConstants.DEFAULT_PAGE_NUM, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
 
         // Then
         webTestClient
@@ -1026,7 +1026,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(salesTaxTrackingFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
+        when(salesTaxTrackingFacade.findAll(0, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
 
         // Then
         webTestClient
@@ -1050,7 +1050,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(salesTaxTrackingFacade.findAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.empty());
+        when(salesTaxTrackingFacade.findAll(PaginationConstants.DEFAULT_PAGE_NUM, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -1089,7 +1089,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // When
-        when(salesTaxTrackingFacade.findAll(0, 0, null, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
+        when(salesTaxTrackingFacade.findAll(0, 0, null, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient

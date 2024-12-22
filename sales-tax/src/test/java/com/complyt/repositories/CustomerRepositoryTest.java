@@ -130,6 +130,32 @@ class CustomerRepositoryTest {
     }
 
     @Test
+    void findByComplytIdProjection_IdExist_ReturnsCustomerAfterProjection() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+        Customer customerProjected = testUtilities.createCustomerProjection(complytId.toString());
+
+        // When
+        Query query = Query.query(Criteria.where("complytId").is(complytId)
+                .and("tenantId").is(tenantId));
+        query.fields()
+                .include("name")
+                .include("externalId")
+                .include("complytId")
+                .include("source")
+                .include("customerType")
+                .include("externalTimestamps");
+
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.just(customerProjected));
+
+        // Then
+        Mono<Customer> monoCustomer = customerRepository.findByComplytIdProjection(complytId);
+        StepVerifier.create(monoCustomer).expectNext(customerProjected).verifyComplete();
+    }
+
+
+    @Test
     void findByName_NameDoesntExist_ReturnsEmpty() {
         // Given
         String name = "Existing Customer";

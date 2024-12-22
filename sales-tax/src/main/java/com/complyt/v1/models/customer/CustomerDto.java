@@ -7,6 +7,7 @@ import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.checkables.ExternalIdCheckable;
 import com.complyt.v1.models.checkables.SourceCheckable;
 import com.complyt.v1.models.transaction.OptionalAddressDto;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 @With
 @Schema(name = "Customer", description = FieldsDescriptions.CUSTOMER)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record CustomerDto(
         @Schema(description = FieldsDescriptions.COMPLYT_ID + "customer") UUID complytId,
         @Schema(description = FieldsDescriptions.EXTERNAL_ID) @NotNull(message = "externalId " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "externalId " + StringErrorMessages.MINMAX_256_ERROR) String externalId,

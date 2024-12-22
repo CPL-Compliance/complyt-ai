@@ -8,6 +8,7 @@ import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.checkables.ExternalIdCheckable;
 import com.complyt.v1.models.checkables.SourceCheckable;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxDto;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,6 +24,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
 
 @With
 @Schema(name = "transaction", description = FieldsDescriptions.TRANSACTION)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID + "transaction") UUID complytId,
                              @Schema(description = FieldsDescriptions.EXTERNAL_ID) @NotNull(message = "externalId " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "externalId " + StringErrorMessages.MINMAX_256_ERROR) String externalId,
                              @Schema(description = FieldsDescriptions.SOURCE) @NotNull(message = "source " + DtoErrorMessages.NOT_NULL_ERROR) @Pattern(regexp = "^(?:[1-9]|1[0-5])$", message = DtoErrorMessages.SOURCE_FORMAT_ERROR) String source,
@@ -50,9 +52,8 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(description = FieldsDescriptions.CURRENCY) String currency,
                              @Schema(description = FieldsDescriptions.REF_RATE) @PositiveOrZero BigDecimal refRate,
                              @Schema(description = FieldsDescriptions.EXCHANGE_RATE_INFO) ExchangeRateInfoDto exchangeRateInfo,
-
                              @Schema(description = FieldsDescriptions.SUBSIDIARY_INFO) String subsidiary,
                              @Schema(description = FieldsDescriptions.IS_REFUND_LINKED_INFO) Boolean isRefundLinked,
-                             @PositiveOrZero(message = "refundLinkedPercentage " + NumericErrorMessages.NOT_NEGATIVE_ERROR) @DecimalMax(value = "1.0", message = "refundLinkedPercentage" + NumericErrorMessages.DECIMAL_MAX_1_ERROR) BigDecimal refundLinkedPercentage)
-        implements SourceCheckable, ExternalIdCheckable {
+                             @PositiveOrZero(message = "refundLinkedPercentage " + NumericErrorMessages.NOT_NEGATIVE_ERROR)
+                             @DecimalMax(value = "1.0", message = "refundLinkedPercentage" + NumericErrorMessages.DECIMAL_MAX_1_ERROR) BigDecimal refundLinkedPercentage) implements SourceCheckable, ExternalIdCheckable {
 }

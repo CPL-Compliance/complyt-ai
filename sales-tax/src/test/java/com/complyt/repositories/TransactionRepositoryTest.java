@@ -1,6 +1,7 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.repositories.typedAggregations.TransactionTypedAggregationBuilder;
 import com.complyt.security.TenantResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,9 @@ class TransactionRepositoryTest {
 
     @Mock
     TenantResolver tenantResolver;
+
+    @Mock
+    private TransactionTypedAggregationBuilder transactionTypedAggregationBuilder;
 
     Transaction transaction;
 
@@ -144,7 +148,9 @@ class TransactionRepositoryTest {
             add(transaction);
             add(secondTransaction);
         }};
-        Map<String, String> filterMap = new LinkedHashMap<>();
+        Map<String, String> filterMap = new LinkedHashMap<>(){{
+            put("documentName", "dummyName");
+        }};
         String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         //When
@@ -267,6 +273,84 @@ class TransactionRepositoryTest {
 
         //Then
         StepVerifier.create(transactionFlux).expectNext(transaction, secondTransaction).verifyComplete();
+    }
+
+    @Test
+    void findAllProjection_twoTransactionsMatch_returnsTwoTransactions() {
+        // Given
+        int page = 1;
+        int size = 2;
+
+        String externalId = UUID.randomUUID().toString();
+        UUID customerId = UUID.randomUUID();
+        Transaction secondTransaction = transaction.withExternalId(externalId).withCustomerId(customerId);
+        List<Transaction> allTransactions = new ArrayList<>() {{
+            add(transaction);
+            add(secondTransaction);
+        }};
+
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimestamps.createdDate";
+
+        //When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
+        when(reactiveMongoTemplate.aggregate(any(), eq(Transaction.class))).thenReturn(Flux.fromIterable(allTransactions));
+        Flux<Transaction> transactionFlux = transactionRepository.findAllProjection(page, size, filterMap, sortOrder, sortBy);
+
+        //Then
+        StepVerifier.create(transactionFlux).expectNext(transaction, secondTransaction).verifyComplete();
+    }
+
+    @Test
+    void findAllProjection_twoTransactionsMatchSortIsDefault_returnsTwoTransactions() {
+        // Given
+        int page = 1;
+        int size = 2;
+
+        String externalId = UUID.randomUUID().toString();
+        UUID customerId = UUID.randomUUID();
+        Transaction secondTransaction = transaction.withExternalId(externalId).withCustomerId(customerId);
+        List<Transaction> allTransactions = new ArrayList<>() {{
+            add(transaction);
+            add(secondTransaction);
+        }};
+
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "does_not_exist";
+
+        //When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
+        when(reactiveMongoTemplate.aggregate(any(), eq(Transaction.class))).thenReturn(Flux.fromIterable(allTransactions));
+        Flux<Transaction> transactionFlux = transactionRepository.findAllProjection(page, size, filterMap, sortOrder, sortBy);
+
+        //Then
+        StepVerifier.create(transactionFlux).expectNext(transaction, secondTransaction).verifyComplete();
+    }
+
+    @Test
+    void findAllProjection_transactionsMatchFilterMapNotEmpty_returnsTwoTransactions() {
+        // Given
+        int page = 1;
+        int size = 2;
+
+        String externalId = UUID.randomUUID().toString();
+        UUID customerId = UUID.randomUUID();
+        List<Transaction> allTransactions = new ArrayList<>() {{
+            add(transaction);
+        }};
+
+        Map<String, String> filterMap = new LinkedHashMap<>(){{
+            put("documentName", transaction.getDocumentName());
+        }};
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
+
+        //When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
+        when(reactiveMongoTemplate.aggregate(any(), eq(Transaction.class))).thenReturn(Flux.fromIterable(allTransactions));
+        Flux<Transaction> transactionFlux = transactionRepository.findAllProjection(page, size, filterMap, sortOrder, sortBy);
+
+        //Then
+        StepVerifier.create(transactionFlux).expectNext(transaction).verifyComplete();
     }
 
 

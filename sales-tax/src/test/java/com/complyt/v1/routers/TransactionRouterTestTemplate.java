@@ -148,4 +148,7 @@ public interface TransactionRouterTestTemplate extends
     void upsert_moreThan50ChartsDocumentName_Returns400();
 
     void upsert_50ChartsDocumentName_Returns200Ok();
+
+    // Validation::Projection
+    void getAll_ExistsAndDetailedFalse_Returns200WithList();
 }

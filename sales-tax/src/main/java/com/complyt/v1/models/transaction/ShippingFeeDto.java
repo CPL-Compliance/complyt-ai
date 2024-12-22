@@ -7,6 +7,7 @@ import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.JurisdictionalSalesTaxRulesDto;
 import com.complyt.v1.models.TangibleCategoryDto;
 import com.complyt.v1.models.TaxableCategoryDto;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.complyt.v1.models.tax.global_tax.GtRatesDto;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 
 @Schema(name = "ShippingFee", description = FieldsDescriptions.SHIPPING_FEE)
 @With
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record ShippingFeeDto(
         boolean manualSalesTax,
         @PositiveOrZero(message = "ShippingFee.manualSalesTaxRate " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal manualSalesTaxRate,

@@ -25,6 +25,8 @@ public interface CustomerService extends CrudService<Customer, String>, FindByNa
 
     Mono<Customer> findByComplytId(UUID complytId);
 
+    Mono<Customer> findByComplytIdProjection(UUID complytId);
+
     Mono<Customer> findById(@NonNull ObjectId id);
 
     Mono<Customer> injectDataToExistingCustomer(Customer newCustomer, Customer originalCustomer);

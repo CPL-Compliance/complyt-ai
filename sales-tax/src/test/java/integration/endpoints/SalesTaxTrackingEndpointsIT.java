@@ -3,7 +3,7 @@ package integration.endpoints;
 import com.complyt.SalesTaxApplication;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.sales_tax.RegisteredType;
-import com.complyt.repositories.Constants.RepositoryConstant;
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
@@ -1095,7 +1095,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isOk()
                 .expectBodyList(SalesTaxTrackingDto.class)
                 .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.get(0).complytId().toString(), expectedComplyId))
-                .value(salesTaxTrackingDto -> assertTrue(salesTaxTrackingDto.size() <= RepositoryConstant.DEFAULT_PAGE_SIZE));
+                .value(salesTaxTrackingDto -> assertTrue(salesTaxTrackingDto.size() <= PaginationConstants.DEFAULT_PAGE_SIZE));
     }
 
     @Order(1)

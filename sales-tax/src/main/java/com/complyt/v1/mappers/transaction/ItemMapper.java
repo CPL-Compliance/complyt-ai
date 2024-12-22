@@ -1,6 +1,8 @@
-package com.complyt.v1.mappers;
+package com.complyt.v1.mappers.transaction;
 
 import com.complyt.domain.transaction.Item;
+import com.complyt.v1.mappers.JurisdictionalSalesTaxRuleMapper;
+import com.complyt.v1.mappers.TimestampsMapper;
 import com.complyt.v1.models.transaction.ItemDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

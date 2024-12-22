@@ -91,4 +91,13 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_NewTransactionWithUnsupportedCurrency_Returns400();
 
     void upsertByExternalIdAndSource_NewTransactionWithEurCurrencyAndFutureCreatedDate_Returns201();
+
+    void getByExteranlIdAndSource_DetailedFalse_ProjectedThinTransactionReturned();
+
+    void getByExteranlIdAndSource_DetailedTrue_NotProjectedFullTransactionReturned();
+
+    void getAll_DetailedFalse_ProjectedThinTransactionReturned();
+
+    void getAll_DetailedTrue_NotProjectedFullTransactionReturned();
+
 }

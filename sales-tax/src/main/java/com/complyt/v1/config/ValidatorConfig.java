@@ -49,7 +49,8 @@ public class ValidatorConfig {
             "date", ParamCheckerFunctions.DATE_CHECK,
             "state", ParamCheckerFunctions.STATE_CHECK,
             "country", ParamCheckerFunctions.COUNTRY_CHECK,
-            "sortOrder", ParamCheckerFunctions.SORT_ORDER_CHECK));
+            "sortOrder", ParamCheckerFunctions.SORT_ORDER_CHECK,
+            "detailed", ParamCheckerFunctions.DETAILED_TRANSACTION_OBJECT_CHECK));
 
     ShouldCallValidate shouldCallValidate = new ShouldCallValidate(Map.of(
             HttpMethod.PUT, "^/v1/transactions/source/[^/]+/externalId/[^/]+$|"

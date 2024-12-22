@@ -21,6 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -135,9 +136,16 @@ public class TransactionFacade {
     }
 
     public Mono<Transaction> findByExternalIdAndSource(String externalId, String source) {
-        return transactionService.findByExternalIdAndSource(externalId, source)
+        return findByExternalIdAndSource(externalId, source, true);
+    }
+
+    public Mono<Transaction> findByExternalIdAndSource(String externalId, String source, boolean detailed) {
+        return detailed ? transactionService.findByExternalIdAndSource(externalId, source)
                 .flatMap(transaction -> getCustomerByTransaction(transaction)
-                        .map(transaction::setCustomer));
+                        .map(transaction::setCustomer)) :
+                transactionService.findByExternalIdAndSourceProjection(externalId, source)
+                        .flatMap(transaction -> getCustomerProjectionByTransaction(transaction)
+                                .map(transaction::setCustomer));
     }
 
     public Mono<Transaction> findByComplytId(@NonNull UUID complytId) {
@@ -147,7 +155,12 @@ public class TransactionFacade {
     }
 
     public Flux<Transaction> getAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
-        return transactionService.findAll(page, size, filterMap, sortOrder, sortBy);
+        return getAll(page, size, filterMap, sortOrder, sortBy, true);
+    }
+
+    public Flux<Transaction> getAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy, boolean detailed) {
+        return detailed ? transactionService.findAll(page, size, filterMap, sortOrder, sortBy) :
+                transactionService.findAllProjection(page, size, filterMap, sortOrder, sortBy);
     }
 
     public Flux<Transaction> getAllBySource(String source) {
@@ -170,6 +183,11 @@ public class TransactionFacade {
     public Mono<Customer> getCustomerByTransaction(Transaction transaction) {
         return customerService.findByComplytId(transaction.getCustomerId())
                 .switchIfEmpty(Mono.error(CustomerNotFoundApiException::new));
+    }
+
+    public Mono<Customer> getCustomerProjectionByTransaction(Transaction transaction) {
+        return customerService.findByComplytIdProjection(transaction.getCustomerId())
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 
     public Mono<Transaction> removeTransactionFromNexusTracking(Transaction transaction) {

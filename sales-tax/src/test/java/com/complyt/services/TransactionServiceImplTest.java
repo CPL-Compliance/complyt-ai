@@ -23,6 +23,7 @@ import com.complyt.repositories.TransactionRepository;
 import com.complyt.repositories.GeoRecordRepository;
 import com.complyt.v1.exceptions.types.ZipCodeNotFoundApiException;
 import org.apache.commons.math.stat.inference.TestUtils;
+import com.complyt.v1.exceptions.types.ZipCodeNotValidApiException;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -164,6 +165,47 @@ class TransactionServiceImplTest {
     }
 
     @Test
+    void findByExternalIdAndSourceProjection_TransactionFound_ReturnsTransaction() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        Transaction transactionToSearchFor = testUtilities.createTransactionProjectionAfterProjection(id);
+
+        // When
+        when(transactionRepository.findByExternalIdAndSourceProjection(id, source)).thenReturn(Mono.just(transactionToSearchFor));
+        Mono<Transaction> transactionMono = transactionService.findByExternalIdAndSourceProjection(id, source);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionToSearchFor).verifyComplete();
+    }
+
+    @Test
+    void findByExternalIdAndSourceProjection_NullSourcedGiven_ThrowsException() {
+        // Given
+        String nullSource = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.findByExternalIdAndSourceProjection(UUID.randomUUID().toString(), nullSource);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "source is marked non-null but is null");
+    }
+    @Test
+    void findByExternalIdAndSourceProjection_NullExternalIdGiven_ThrowsException() {
+        // Given
+        String nullExternalId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.findByExternalIdAndSourceProjection(nullExternalId, source);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+    }
+
+    @Test
     void findById_TransactionFound_ReturnsTransaction() {
         // Given
         String id = UUID.randomUUID().toString();
@@ -191,6 +233,24 @@ class TransactionServiceImplTest {
 
         //Then
         StepVerifier.create(transactionFlux).expectNext(transaction, secondTransaction).verifyComplete();
+    }
+
+    @Test
+    void getAllTransactionsProjection_AllTransactionsRetrieved_ReturnsAllTransactionsFound() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
+
+        Transaction transaction1 = testUtilities.createTransactionProjectionAfterProjection(UUID.randomUUID().toString());
+        Transaction transaction2 = testUtilities.createTransactionProjectionAfterProjection(UUID.randomUUID().toString());
+
+        //When
+        when(transactionRepository.findAllProjection(0, 1, filterMap, sortOrder, sortBy)).thenReturn(Flux.just(transaction1, transaction2));
+        Flux<Transaction> transactionFlux = transactionService.findAllProjection(0, 1, filterMap, sortOrder, sortBy);
+
+        //Then
+        StepVerifier.create(transactionFlux).expectNext(transaction1, transaction2).verifyComplete();
     }
 
     @Test

@@ -4,7 +4,7 @@ import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.facades.ExemptionFacade;
-import com.complyt.repositories.Constants.RepositoryConstant;
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.PatcherConfig;
@@ -608,7 +608,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(exemptionFacade.findAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(exemptions));
+        when(exemptionFacade.findAll(PaginationConstants.DEFAULT_PAGE_NUM, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.fromIterable(exemptions));
 
 
         // Then
@@ -642,7 +642,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         // When
-        when(exemptionFacade.findAll(0, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, sortOrder, sortBy)).thenReturn(Flux.fromIterable(exemptions));
+        when(exemptionFacade.findAll(0, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, sortOrder, sortBy)).thenReturn(Flux.fromIterable(exemptions));
 
         // Then
         webTestClient
@@ -665,7 +665,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         Map<String, String> filterMap = new LinkedHashMap<>();
 
         // When
-        when(exemptionFacade.findAll(RepositoryConstant.DEFAULT_PAGE_NUM, RepositoryConstant.DEFAULT_PAGE_SIZE, filterMap, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.empty());
+        when(exemptionFacade.findAll(PaginationConstants.DEFAULT_PAGE_NUM, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -706,7 +706,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
         // Given + When
-        when(exemptionFacade.findAll(0, 0, null, RepositoryConstant.DEFAULT_SORT_ORDER, RepositoryConstant.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
+        when(exemptionFacade.findAll(0, 0, null, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
         webTestClient

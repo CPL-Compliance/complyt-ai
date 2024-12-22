@@ -1,6 +1,8 @@
-package com.complyt.v1.mappers;
+package com.complyt.v1.mappers.transaction;
 
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.v1.mappers.ShippingFeeMapper;
+import com.complyt.v1.mappers.TimestampsMapper;
 import com.complyt.v1.models.transaction.TransactionDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
