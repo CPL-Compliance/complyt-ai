@@ -1,6 +1,7 @@
 package io.complyt.business.webclients.addressvalidations;
 
 import io.complyt.domain.Address;
+import io.complyt.domain.AddressData;
 import io.complyt.domain.here.HereAddressData;
 import io.complyt.utils.observability.ContextLogger;
 import lombok.EqualsAndHashCode;
@@ -23,7 +24,7 @@ public class HereAddressValidationClientWrapper extends AddressValidationWebClie
         super(webClient, scheme, host, path, licenseKey);
     }
 
-    private Mono<HereAddressData> validateAddress(String zip, String street, String city, String state, String country) {
+    private Mono<AddressData> validateAddress(String zip, String street, String city, String state, String country) {
         StringBuilder hereQureyParamsStringBuilder = queryParamBuilder(zip, street, city, state, country);
         URI uri = buildUri(hereQureyParamsStringBuilder);
         return ContextLogger.observeCtx("<-- Sending request to 'here' with the following query params: " + hereQureyParamsStringBuilder, log::info)
@@ -32,11 +33,12 @@ public class HereAddressValidationClientWrapper extends AddressValidationWebClie
                         .uri(uri)
                         .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                         .retrieve()
-                        .bodyToMono(HereAddressData.class));
+                        .bodyToMono(HereAddressData.class)
+                        .cast(AddressData.class));
     }
 
     @Override
-    public Mono<HereAddressData> validateAddress(Address address) {
+    public Mono<AddressData> validateAddress(Address address) {
         return validateAddress(address.zip(), address.street(), address.city(), address.state(), address.country());
     }
 

@@ -2,6 +2,7 @@ package io.complyt.business.address_checkers;
 
 import io.complyt.domain.Address;
 import io.complyt.domain.CachedAddressData;
+import io.complyt.utils.exceptions.types.ObjectNotValidException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +45,7 @@ class HereAddressCheckerTest {
     }
 
     @Test
-    void checkAddress_ScoreUnacceptable_ReturnsEmpty() {
+    void checkAddress_ScoreUnacceptable_ReturnsError() {
         // Given
         score = 0.1f;
         cachedAddressData = cachedAddressData.withScore(score);

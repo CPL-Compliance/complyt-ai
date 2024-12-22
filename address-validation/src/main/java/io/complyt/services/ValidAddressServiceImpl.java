@@ -2,6 +2,7 @@ package io.complyt.services;
 
 import io.complyt.business.address.CountryToStandardizedCountry;
 import io.complyt.business.address_checkers.HereAddressChecker;
+import io.complyt.business.external_fetcher.FastTaxGetBestMatchCityCountyFetcher;
 import io.complyt.business.webclients.addressvalidations.AddressValidationWebClientWrapper;
 import io.complyt.domain.Address;
 import io.complyt.domain.CachedAddressData;
@@ -30,7 +31,13 @@ public class ValidAddressServiceImpl implements ValidAddressService {
     private ValidationAddressRepositoryImpl validationAddressRepositoryImpl;
 
     @NonNull
-    private AddressValidationWebClientWrapper addressValidationWebClientWrapper;
+    private AddressValidationWebClientWrapper hereAddressValidationClientWrapper;
+
+    @NonNull
+    private AddressValidationWebClientWrapper fastTaxWebClientWrapper;
+
+    @NonNull
+    private FastTaxGetBestMatchCityCountyFetcher fastTaxGetBestMatchCityCountyFetcher;
 
     @NonNull
     private HereAddressChecker hereAddressChecker;
@@ -39,7 +46,7 @@ public class ValidAddressServiceImpl implements ValidAddressService {
     public Mono<Address> validateAddress(Address address) {
         return findByAddress(address)
                 .map(ValidatedAddressToAddressMapper.INSTANCE::map)
-                .switchIfEmpty(Mono.defer(() -> findByAddressClientWrapper(address)
+                .switchIfEmpty(Mono.defer(() -> fetchAndValidateAddress(address)
                         .flatMap(addressData -> setBeforeSave(addressData, address))
                         .flatMap(this::saveAddress)
                         .map(ValidatedAddressToAddressMapper.INSTANCE::map)));
@@ -49,23 +56,41 @@ public class ValidAddressServiceImpl implements ValidAddressService {
         return validationAddressRepositoryImpl.findAddress(address)
                 .doOnNext(foundAddress -> log.info("<-- Address found in db: {}", foundAddress))
                 .switchIfEmpty(Mono.defer(() -> ContextLogger.observeCtx("<-- did not found address in db, returning empty", log::info)
-                                .then(Mono.empty())));
+                        .then(Mono.empty())));
     }
 
     public Mono<ValidatedAddress> saveAddress(@NonNull ValidatedAddress address) {
         return validationAddressRepositoryImpl.saveAddress(address);
     }
 
+    private Mono<CachedAddressData> fetchAndValidateAddress(Address address) {
+        return findByAddressClientWrapper(address)
+                .flatMap(addressData -> hereAddressChecker.checkAddress(addressData, address)
+                        .switchIfEmpty(Mono.defer(() -> resolveStreetIfMissing(addressData, address))
+                                .flatMap(addressDataNoStreet -> hereAddressChecker.checkAddress(addressDataNoStreet, address))))
+                .flatMap(addressData -> resolveCountyIfMissing(addressData, address));
+    }
+
     private Mono<CachedAddressData> findByAddressClientWrapper(Address address) {
         Address alignedAddress = address.withCountry(CountryToStandardizedCountry.standardize(address.country()));
-        return addressValidationWebClientWrapper.validateAddress(alignedAddress)
-                .map(HereAddressToAddressMapper.INSTANCE::map)
-                .flatMap(addressData -> hereAddressChecker.checkAddress(addressData, alignedAddress));
+        return hereAddressValidationClientWrapper.validateAddress(alignedAddress)
+                .map(HereAddressToAddressMapper.INSTANCE::map);
     }
 
     private Mono<ValidatedAddress> setBeforeSave(CachedAddressData addressData, Address address) {
         addressData = addressData.withPartial(address.isPartial());
 
         return Mono.just(new ValidatedAddress(null, addressData, address, LocalDateTime.now()));
+    }
+
+    private Mono<CachedAddressData> resolveStreetIfMissing(CachedAddressData cachedData, Address address) {
+        return cachedData.street() == null ? findByAddressClientWrapper(address.withStreet(null))
+                : Mono.just(cachedData);
+    }
+
+    private Mono<CachedAddressData> resolveCountyIfMissing(CachedAddressData cachedData, Address address) {
+        return cachedData.county() == null ? fastTaxWebClientWrapper.validateAddress(address)
+                .flatMap(validatedAddress -> fastTaxGetBestMatchCityCountyFetcher.fetch(validatedAddress, cachedData))
+                : Mono.just(cachedData);
     }
 }

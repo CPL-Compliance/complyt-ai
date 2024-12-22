@@ -2,6 +2,7 @@ package io.complyt.business.webclients.addressvalidations;
 
 import io.complyt.annotations.Generated;
 import io.complyt.domain.Address;
+import io.complyt.domain.AddressData;
 import io.complyt.domain.here.*;
 import lombok.EqualsAndHashCode;
 import org.javatuples.Pair;
@@ -18,7 +19,7 @@ public class HereStubAddressValidationWebClientWrapper extends AddressValidation
     }
 
     @Override
-    public Mono<HereAddressData> validateAddress(Address address) {
+    public Mono<AddressData> validateAddress(Address address) {
         float hereScoring = address.zip().equals("00000") ? 0.1f : 0.9f; // For getting both errors
 
         return Mono.fromCallable(() ->  new HereAddressData(List.of(new HereAddressItem("", "", "", "",

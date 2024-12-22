@@ -27,4 +27,17 @@ class WebClientWrapperPropertiesConfigTest {
 
         assertEquals(expectedHereWebClientWrapperProperties, actualFastTaxWebClientWrapper);
     }
+
+    @Test
+    void fastTaxGetBestMatchWebClientWrapperProperties_createFastTaxWebClientWrapperProperties_getFastTaxWebClientWrapperProperties() {
+        String licenseKey = "License Key";
+        WebClientWrapperProperties expectedFastTaxWebClientWrapper = new WebClientWrapperProperties("https",
+                "ws.serviceobjects.com",
+                "FT/web.svc/json/GetBestMatch",
+                new Pair<>("licensekey", licenseKey));
+
+        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.fastTaxGetBestMatchWebClientWrapperProperties(licenseKey);
+
+        assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
+    }
 }

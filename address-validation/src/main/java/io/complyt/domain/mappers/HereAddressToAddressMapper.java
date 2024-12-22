@@ -1,5 +1,6 @@
 package io.complyt.domain.mappers;
 
+import io.complyt.domain.AddressData;
 import io.complyt.domain.CachedAddressData;
 import io.complyt.domain.here.HereAddress;
 import io.complyt.domain.here.HereAddressData;
@@ -17,8 +18,9 @@ import java.util.List;
 public interface HereAddressToAddressMapper {
     HereAddressToAddressMapper INSTANCE = Mappers.getMapper(HereAddressToAddressMapper.class);
 
-    default CachedAddressData map(HereAddressData addressData) {
-        List<HereAddressItem> itemsList = addressData.getItems();
+    default CachedAddressData map(AddressData addressData) {
+        HereAddressData hereAddressData = (HereAddressData) addressData;
+        List<HereAddressItem> itemsList = hereAddressData.getItems();
 
         if (itemsList == null || itemsList.isEmpty() || itemsList.get(0) == null) {
             return CachedAddressData.DEFAULT;

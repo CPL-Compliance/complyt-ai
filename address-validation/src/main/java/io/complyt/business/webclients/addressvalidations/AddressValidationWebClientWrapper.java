@@ -6,5 +6,5 @@ import io.complyt.domain.here.HereAddressData;
 import reactor.core.publisher.Mono;
 
 public interface AddressValidationWebClientWrapper {
-    Mono<HereAddressData> validateAddress(Address address);
+    Mono<AddressData> validateAddress(Address address);
 }
