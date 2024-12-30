@@ -138,7 +138,7 @@ public class TransactionRepository {
                             Criteria.where("tenantId").is(tenantId);
                     TypedAggregation<Transaction> aggregation = transactionTypedAggregationBuilder.getAllAggregation(tenantId, criteria, sortDirection, sortByProperty, calculatedOffset, size, true);
 
-                    return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId + " with page " + page + " and size " + size, log::info)
+                    return ContextLogger.observeCtx("Searching for transactions by criteria " + criteria.getCriteriaObject() + " with page " + page + " and size " + size, tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.aggregate(aggregation, Transaction.class));
                 });
     }
