@@ -65,7 +65,7 @@ public class TransactionRepository {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(TransactionRepositoryCommonStagesBuilder
-                            .externalIdSourceAndTenantIsExactCriteria(externalId, source, tenantId));
+                            .tenantIdExternalIdAndSourceExactCriteria(tenantId, externalId, source));
 
                     return ContextLogger.observeCtx("Searching for transaction with external ID " + externalId + ", source" + source + ", and tenant ID " + tenantId, tenantId, log::info)
                             .then(reactiveMongoTemplate
@@ -78,7 +78,7 @@ public class TransactionRepository {
                 .flatMap(tenantId -> {
                     TypedAggregation<Transaction> aggregation = Aggregation.newAggregation(Transaction.class,
                             Aggregation.match(TransactionRepositoryCommonStagesBuilder
-                                    .externalIdSourceAndTenantIsExactCriteria(externalId, source, tenantId)),
+                                    .tenantIdExternalIdAndSourceExactCriteria(tenantId, externalId, source)),
                             Aggregation.lookup()
                                     .from("customer")
                                     .localField("customerId")

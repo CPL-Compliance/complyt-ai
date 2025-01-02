@@ -5,16 +5,14 @@ import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 public interface TransactionRepositoryCommonStagesBuilder {
-    static Criteria externalIdSourceAndTenantIsExactCriteria(String externalId, String source, String tenantId) {
-        return Criteria.where("externalId").is(externalId)
-                .and("source").is(source)
-                .and("tenantId").is(tenantId);
+    static Criteria tenantIdExternalIdAndSourceExactCriteria(String tenantId, String externalId, String source) {
+        return Criteria.where("tenantId").is(tenantId)
+                .and("externalId").is(externalId)
+                .and("source").is(source);
     }
 
-//    static Criteria
-
     static LookupOperation customerLookupByTransactionCustomerIdAndTenant(String tenantId) {
-        return  Aggregation.lookup()
+        return Aggregation.lookup()
                 .from("customer")
                 .localField("customerId")
                 .foreignField("complytId")
