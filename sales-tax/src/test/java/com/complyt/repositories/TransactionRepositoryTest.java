@@ -60,9 +60,9 @@ class TransactionRepositoryTest {
     @Test
     void findByExternalIdAndSource_FindsTransaction_ReturnsTransaction() {
         // Given
-        Query query = Query.query(Criteria.where("externalId").is(transaction.getExternalId())
-                .and("source").is(source)
-                .and("tenantId").is(transaction.getTenantId()));
+        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId())
+                .and("externalId").is(transaction.getExternalId())
+                .and("source").is(source));
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
@@ -91,9 +91,9 @@ class TransactionRepositoryTest {
     @Test
     void findByExternalIdAndSource_ExternalIdExists_ReturnsOneTransaction() {
         // Given
-        Query transactionQuery = Query.query(Criteria.where("externalId").is(transaction.getExternalId())
-                .and("source").is(source)
-                .and("tenantId").is(transaction.getTenantId()));
+        Query transactionQuery = Query.query(Criteria.where("tenantId").is(transaction.getTenantId())
+                .and("externalId").is(transaction.getExternalId())
+                .and("source").is(source));
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.findOne(transactionQuery, Transaction.class)).thenReturn(Mono.just(transaction));
@@ -104,7 +104,6 @@ class TransactionRepositoryTest {
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
     }
-
 
     @Test
     void save_TransactionSaved_TransactionReturned() {

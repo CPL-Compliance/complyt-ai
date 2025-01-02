@@ -76,7 +76,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-        expectedSalesTax = new SalesTaxDto(null, new BigDecimal("775"), salesTaxRatesDto.taxRate(),  salesTaxRatesDto,  null);
+        expectedSalesTax = new SalesTaxDto(null, new BigDecimal("775"), salesTaxRatesDto.taxRate(), salesTaxRatesDto, null);
 
     }
 
@@ -148,7 +148,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(11076.1), BigDecimal.valueOf(858.39775), BigDecimal.valueOf(11934.49775), "EUR", "USD", BigDecimal.valueOf(1.10761), CurrencySource.COMPLYT, false, LocalDateTime.parse(givenTransaction.externalTimestamps().createdDate()));
 
-        
 
         // Then
         webTestClient
@@ -182,7 +181,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(11076.1), BigDecimal.valueOf(858.39775), BigDecimal.valueOf(11934.49775), "EUR", "USD", BigDecimal.valueOf(1.10761), CurrencySource.COMPLYT, false, LocalDateTime.parse(givenTransaction.externalTimestamps().createdDate()));
 
-        
 
         // Then
         webTestClient
@@ -217,7 +215,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(11076.1), BigDecimal.valueOf(858.39775), BigDecimal.valueOf(11934.49775), "EUR", "USD", BigDecimal.valueOf(1.10761), CurrencySource.COMPLYT, true, LocalDate.now().atStartOfDay());
 
-        
 
         // Then
         webTestClient
@@ -252,7 +249,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(20000), BigDecimal.valueOf(1550), BigDecimal.valueOf(21550), "EUR", "USD", BigDecimal.valueOf(2), CurrencySource.CLIENT, false, LocalDateTime.parse(givenTransaction.externalTimestamps().createdDate()));
 
-        
 
         // Then
         webTestClient
@@ -284,7 +280,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withShippingAddress(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false))
                 .withCurrency("USD");
 
-        
+
         // Then
         webTestClient
                 .mutateWith(csrf())
@@ -315,7 +311,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withShippingAddress(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false))
                 .withCurrency("US Dollar");
 
-        
+
         // Then
         webTestClient
                 .mutateWith(csrf())
@@ -346,7 +342,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withShippingAddress(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false))
                 .withCurrency(null);
 
-        
+
         // Then
         webTestClient
                 .mutateWith(csrf())
@@ -440,7 +436,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salestaxtracking is approved and physical
 
-        expectedSalesTax = expectedSalesTax.withAmount( new BigDecimal("719.257541"));
+        expectedSalesTax = expectedSalesTax.withAmount(new BigDecimal("719.257541"));
 
         // Then
         webTestClient
@@ -476,7 +472,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState(" CO ").withCity("Arvada")); //salestaxtracking is approved and physical
 
-        expectedSalesTax = expectedSalesTax.withAmount( new BigDecimal("719.257541"));
+        expectedSalesTax = expectedSalesTax.withAmount(new BigDecimal("719.257541"));
 
         // Then
         webTestClient
@@ -542,7 +538,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salestaxtracking is approved and physical
 
 
-        expectedSalesTax = expectedSalesTax.withAmount( new BigDecimal("719.257541"));
+        expectedSalesTax = expectedSalesTax.withAmount(new BigDecimal("719.257541"));
 
         // Then
         webTestClient
@@ -563,7 +559,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertEquals(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().size(), 1);
                     assertNotNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities().get("Arvada"));
                     assertTrue(transactionDto.isTaxInclusive());
-                 });
+                });
     }
 
 
@@ -721,7 +717,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(salesTaxTrackingDto -> {
-                    LocalDate sumDate = LocalDate.of(LocalDate.now().getYear(), 12, 31);
+                    int year = LocalDateTime.parse(givenTransaction.externalTimestamps().createdDate()).getYear();
+                    LocalDate sumDate = LocalDate.of(year, 12, 31);
                     assertEquals(salesTaxTrackingDto.nexusCalculationSummaries().get(sumDate).amount(), itemTotalPrice);
                 });
     }
@@ -773,7 +770,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(salesTaxTrackingDto -> {
-                    LocalDate sumDate = LocalDate.of(LocalDate.now().getYear(), 12, 31);
+                    int year = LocalDateTime.parse(givenTransaction.externalTimestamps().createdDate()).getYear();
+                    LocalDate sumDate = LocalDate.of(year, 12, 31);
                     assertEquals(salesTaxTrackingDto.nexusCalculationSummaries().get(sumDate).amount(), passedItemPrice);
                 });
     }
@@ -906,7 +904,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO")
                 .withCountry("US")); //salestaxtracking is approved and physical
 
-        expectedSalesTax = expectedSalesTax.withAmount( new BigDecimal("719.257541"));
+        expectedSalesTax = expectedSalesTax.withAmount(new BigDecimal("719.257541"));
 
         // Then
         webTestClient
@@ -1854,7 +1852,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(TransactionDto.class)
-                .value(list -> assertEquals(0, list.size() ));
+                .value(list -> assertEquals(0, list.size()));
     }
 
     @Order(2)
