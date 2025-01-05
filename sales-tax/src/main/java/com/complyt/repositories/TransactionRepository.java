@@ -109,7 +109,7 @@ public class TransactionRepository {
 
     public Flux<Transaction> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
         int calculatedOffset = (page - 1) * size;
-        Criteria criteriaFromFilterMap = CriteriaBuilder.build(filterMap, TransactionPaginationUtil.transactionFilterKeys);
+        Criteria criteriaFromFilterMap = CriteriaBuilder.build(filterMap, TransactionPaginationUtil.transactionFilterMap);
         String sortByProperty = TransactionPaginationUtil.transactionSortByFields.contains(sortBy) ? sortBy : PaginationConstants.DEFAULT_TRANSACTION_SORT_BY;
         Sort.Direction sortDirection = Sort.Direction.fromString(sortOrder);
 
@@ -127,7 +127,7 @@ public class TransactionRepository {
 
     public Flux<Transaction> findAllProjection(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
         int calculatedOffset = (page - 1) * size;
-        Criteria criteriaFromFilterMap = CriteriaBuilder.build(filterMap, TransactionPaginationUtil.transactionFilterKeys);
+        Criteria criteriaFromFilterMap = CriteriaBuilder.build(filterMap, TransactionPaginationUtil.transactionFilterMap);
         String sortByProperty = TransactionPaginationUtil.transactionSortByFields.contains(sortBy) ? sortBy : PaginationConstants.DEFAULT_TRANSACTION_SORT_BY;
         Sort.Direction sortDirection = Sort.Direction.fromString(sortOrder);
 

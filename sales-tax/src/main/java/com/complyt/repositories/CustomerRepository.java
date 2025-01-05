@@ -56,7 +56,7 @@ public class CustomerRepository {
 
     public Flux<Customer> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
         int calculatedOffset = (page - 1) * size;
-        Criteria criteriaFromFilterMap = CriteriaBuilder.build(filterMap, CustomerPaginationUtil.customerFilterKeys);
+        Criteria criteriaFromFilterMap = CriteriaBuilder.build(filterMap, CustomerPaginationUtil.customerFilterMap);
         String sortByProperty = CustomerPaginationUtil.customerSortByFields.contains(sortBy) ? sortBy : PaginationConstants.DEFAULT_CUSTOMER_SORT_BY;
         Sort.Direction sortDirection = Sort.Direction.fromString(sortOrder);
 
