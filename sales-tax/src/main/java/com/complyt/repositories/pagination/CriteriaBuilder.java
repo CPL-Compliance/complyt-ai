@@ -8,12 +8,26 @@ import java.util.Map;
 
 public interface CriteriaBuilder {
 
-    static Criteria build(Map<String, String> filterMap, List<String> filterKeys) {
+    /*
+       The filterMap contains key-value pairs sent from the client.
+       The filterKeys indicates whether each field should be queried as a fuzzy (regex) search or a regular (exact match) search.
+    */
+    static Criteria build(Map<String, String> filterMap, Map<String, Boolean> filterKeys) {
         List<Criteria> criterias = new ArrayList<>();
 
         filterMap.entrySet().stream()
-                .filter(entry -> filterKeys.contains(entry.getKey()) && !entry.getValue().isEmpty())
-                .map(entry -> Criteria.where(entry.getKey()).regex(entry.getValue(), "i"))
+                .filter(entry ->
+                        filterKeys.containsKey(entry.getKey()) &&
+                                !entry.getValue().isEmpty()
+                )
+                .map(entry -> {
+                    boolean isRegex = Boolean.TRUE.equals(filterKeys.get(entry.getKey()));
+                    if (isRegex) {
+                        return Criteria.where(entry.getKey()).regex(entry.getValue(), "i");
+                    } else {
+                        return Criteria.where(entry.getKey()).is(entry.getValue());
+                    }
+                })
                 .forEach(criterias::add);
 
 
