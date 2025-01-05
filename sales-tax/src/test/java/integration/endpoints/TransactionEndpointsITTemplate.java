@@ -164,4 +164,7 @@ public interface TransactionEndpointsITTemplate extends
 
     void upsert_TransactionIsLinkedButInvoiceHasSalesTaxNull_Returns201WithNullSalesTax();
 
+    public void getAll_PaginationFilteredByExternalId_fullIdSent_ReturnsTransaction();
+    public void getAll_PaginationFilteredByExternalId_PartialIdSent_ReturnsEmptyList();
+
 }

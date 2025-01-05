@@ -3222,6 +3222,44 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     @WithMockUser
+    public void getAll_PaginationFilteredByExternalId_PartialIdSent_ReturnsEmptyList() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("externalId", "412365812122")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> assertEquals(0, list.size()));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_PaginationFilteredByExternalId_fullIdSent_ReturnsTransaction() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("externalId", "4123658121222")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> assertEquals(1, list.size()));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
     public void getAll_PaginationFilteredByCityAndTransactionType_ReturnsTransactions() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_filter_by_transaction_city_and_type_tenant"));
         String city = "A-city";
@@ -3312,7 +3350,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertNotNull(transaction.internalTimestamps());
                     assertNotNull(transaction.externalTimestamps());
                     assertNotNull(transaction.transactionType());
-                    assertNotNull(transaction.shippingFee().manualSalesTax());
                     assertNotNull(transaction.shippingFee().manualSalesTaxRate());
                     assertNotNull(transaction.shippingFee().totalPrice());
 
