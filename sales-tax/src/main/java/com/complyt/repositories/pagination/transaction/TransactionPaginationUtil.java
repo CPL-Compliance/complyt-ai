@@ -25,6 +25,7 @@ public interface TransactionPaginationUtil {
             "transactionType",
             "shippingAddress.country",
             "shippingAddress.state",
-            "shippingAddress.city"
+            "shippingAddress.city",
+            "shippingAddress.zip"
     );
 }
