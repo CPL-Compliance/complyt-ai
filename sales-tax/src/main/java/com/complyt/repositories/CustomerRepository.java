@@ -67,7 +67,7 @@ public class CustomerRepository {
                     Query query = Query.query(criteria)
                             .skip(calculatedOffset).limit(size)
                             .with(Sort.by(sortDirection, sortByProperty));
-                    return ContextLogger.observeCtx("Searching for customers by criteria " + criteria.getCriteriaObject() + " with tenantId " + tenantId + " with page " + page + " and size " + size, tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for Customers by criteria " + criteria.getCriteriaObject() + ", sorting by " + sortDirection + ", ordered by " + sortOrder + ", with page " + page + " and size " + size, tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Customer.class));
                 });
     }

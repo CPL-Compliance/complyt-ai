@@ -120,7 +120,7 @@ public class TransactionRepository {
                             Criteria.where("tenantId").is(tenantId);
                     TypedAggregation<Transaction> aggregation = transactionTypedAggregationBuilder.getAllAggregation(tenantId, criteria, sortDirection, sortByProperty, calculatedOffset, size, false);
 
-                    return ContextLogger.observeCtx("Searching for transactions by criteria " + criteria.getCriteriaObject() + " with page " + page + " and size " + size, tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for Transactions by criteria " + criteria.getCriteriaObject() + ", sorting by " + sortDirection + ", ordered by " + sortOrder + ", with page " + page + " and size " + size, tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.aggregate(aggregation, Transaction.class));
                 });
     }
@@ -138,7 +138,7 @@ public class TransactionRepository {
                             Criteria.where("tenantId").is(tenantId);
                     TypedAggregation<Transaction> aggregation = transactionTypedAggregationBuilder.getAllAggregation(tenantId, criteria, sortDirection, sortByProperty, calculatedOffset, size, true);
 
-                    return ContextLogger.observeCtx("Searching for transactions by criteria " + criteria.getCriteriaObject() + " with page " + page + " and size " + size, tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for Transactions by criteria " + criteria.getCriteriaObject() + ", sorting by " + sortDirection + ", ordered by " + sortOrder + ", with page " + page + " and size " + size, tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.aggregate(aggregation, Transaction.class));
                 });
     }
