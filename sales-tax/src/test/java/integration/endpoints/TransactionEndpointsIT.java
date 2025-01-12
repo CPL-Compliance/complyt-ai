@@ -116,7 +116,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_NonUsaCountry_ReturnsTaxableTransaction() {
         String externalId = "newNonExistingTransactionID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new MandatoryAddressDto(null, "Canada", null, null, "", "", null, false));
+                .withShippingAddress(new MandatoryAddressDto(null, "Canada", null, null, "", "", "12345", false));
 
         SalesTaxDto expectedSalesTax = new SalesTaxDto(null, new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 
@@ -1175,7 +1175,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withItems(items)
                 .withTaxInclusive(true);
-        MandatoryAddressDto partialShippingAddress = new MandatoryAddressDto(null, "CA", null, null, "", "", null, false); // zip code belongs to New York
+        MandatoryAddressDto partialShippingAddress = new MandatoryAddressDto(null, "CA", null, null, "", "", "12345", false); // zip code belongs to New York
         givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
 
         // Then
@@ -1207,7 +1207,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_NonUsaCountryButSentAsAbbreviationReturnUpperCase_Returns201() {
         String externalId = "newNonExistingTransactionIDNonUsaAbbreviation";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new MandatoryAddressDto(null, "CA", null, null, "", "", null, false));
+                .withShippingAddress(new MandatoryAddressDto(null, "CA", null, null, "", "", "12345", false));
 
         SalesTaxDto expectedSalesTax = new SalesTaxDto(null, new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 
@@ -1239,7 +1239,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_NonUsaCountryButSentLowerCaseReturnsUpperCase_Returns201() {
         String externalId = "newNonExistingTransactionIDNonUsaLowercase";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new MandatoryAddressDto(null, "canada", null, null, "", "", null, false));
+                .withShippingAddress(new MandatoryAddressDto(null, "canada", null, null, "", "", "12345", false));
 
         SalesTaxDto expectedSalesTax = new SalesTaxDto(null, new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 
