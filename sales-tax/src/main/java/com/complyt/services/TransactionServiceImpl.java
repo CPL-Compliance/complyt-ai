@@ -160,14 +160,21 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Mono<Transaction> injectStateIfMissingInPartialAddress(Transaction transaction) {
-        return ZipCodeProcessor.getPaddedZipCode(transaction.getShippingAddress().zip())
-                .map(paddedZip -> transaction.setShippingAddress(transaction.getShippingAddress().withZip(paddedZip)))
-                .flatMap(newTransaction -> CountryIsUsaChecker.isCountryUsa(transaction.getShippingAddress()) && (transaction.getShippingAddress().state() == null || transaction.getShippingAddress().state().isEmpty()) ?
-                        ZipCodeProcessor.getBaseZipCode(transaction.getShippingAddress().zip())
-                                .flatMap(zip -> geoRecordRepository.findStateByZip(zip))
-                                .map(geoRecord -> transaction.setShippingAddress(transaction.getShippingAddress().withState(geoRecord.getState())))
-                                .switchIfEmpty(Mono.error(ZipCodeNotFoundApiException::new)) :
-                        Mono.just(transaction));
+        return CountryIsUsaChecker.isCountryUsa(transaction.getShippingAddress()) ?
+                ZipCodeProcessor.getPaddedZipCode(transaction.getShippingAddress().zip())
+                        .flatMap(paddedZip -> {
+                            transaction.setShippingAddress(transaction.getShippingAddress().withZip(paddedZip));
+                            return (transaction.getShippingAddress().state() == null || transaction.getShippingAddress().state().isEmpty()) ?
+                                    ZipCodeProcessor.getBaseZipCode(paddedZip)
+                                            .flatMap(baseZip -> geoRecordRepository.findStateByZip(baseZip)
+                                                    .map(geoRecord -> {
+                                                        transaction.setShippingAddress(transaction.getShippingAddress().withState(geoRecord.getState()));
+                                                        return transaction;
+                                                    })
+                                                    .switchIfEmpty(Mono.error(ZipCodeNotFoundApiException::new)))
+                                    : Mono.just(transaction);
+                        })
+                : Mono.just(transaction);
     }
 
     public Mono<Transaction> calculateTotalAmounts(Transaction transaction) {

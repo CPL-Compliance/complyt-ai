@@ -6,6 +6,11 @@ spring.profiles.active:
   - @activeTaxClient@
   - @activeCurrencyClient@
 
+eureka:
+  client:
+    healthcheck:
+      enabled: true
+
 # Observability
 management.metrics.distribution.percentiles-histogram.http.server.requests: true
 management.tracing.sampling.probability: 1.0
