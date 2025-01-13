@@ -399,6 +399,7 @@ spring:
               - java.io.IOException
               - org.springframework.cloud.gateway.support.TimeoutException
               - java.lang.RuntimeException
+              - io.netty.channel.ConnectTimeoutException
             backoff:
               firstBackoff: 20ms
               factor: 2
