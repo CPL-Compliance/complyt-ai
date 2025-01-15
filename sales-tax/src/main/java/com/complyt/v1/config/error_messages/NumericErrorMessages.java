@@ -6,7 +6,7 @@ public interface NumericErrorMessages {
 
     String MUST_BE_POSITIVE_ERROR = "must be a positive number";
 
-    String DECIMAL_MAX_05_ERROR = "'s maximum value is 0.5";
+    String DECIMAL_MAX_03_ERROR = "'s maximum value is 0.3";
 
     String DECIMAL_MAX_1_ERROR = "'s maximum value is 1";
 }
