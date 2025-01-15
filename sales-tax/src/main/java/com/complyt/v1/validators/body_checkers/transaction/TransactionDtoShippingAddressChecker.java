@@ -47,7 +47,7 @@ public class TransactionDtoShippingAddressChecker implements DtoBodyChecker<Tran
     }
 
     private Mono<String> checkIfZipIsValid(String variable, String errorMessage) {
-        return variable != null && variable.length() <= 10 && variable.matches("\\d{5}(-\\d{4})?") ? Mono.empty() : Mono.just(errorMessage);
+        return variable != null && variable.trim().length() <= 10 && variable.trim().matches("\\d{4,5}(-\\d{4})?") ? Mono.empty() : Mono.just(errorMessage);
     }
 
     private String nonPartialAddressErrorBuilder(String fieldName, String fieldValue) {

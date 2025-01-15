@@ -116,7 +116,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_NonUsaCountry_ReturnsTaxableTransaction() {
         String externalId = "newNonExistingTransactionID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new MandatoryAddressDto(null, "Canada", null, null, "", "", null, false));
+                .withShippingAddress(new MandatoryAddressDto(null, "Canada", null, null, "", "", "12345", false));
 
         SalesTaxDto expectedSalesTax = new SalesTaxDto(null, new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 
@@ -1175,6 +1175,54 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withItems(items)
                 .withTaxInclusive(true);
+        MandatoryAddressDto partialShippingAddress = new MandatoryAddressDto(null, "CA", null, null, "", "", "12345", false); // zip code belongs to New York
+        givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    BigDecimal amountWithOutSalesTax = BigDecimalProcessor.removeTrailingZeros(expectedTotalAmount.add(transactionDto.salesTax().amount()));
+
+                    assertEquals(expectedTaxableAmount, transactionDto.taxableItemsAmount());
+                    assertEquals(expectedTangibleAmount, transactionDto.tangibleItemsAmount());
+                    assertEquals(expectedTotalAmount, transactionDto.totalItemsAmount());
+                    assertEquals(amountWithOutSalesTax, transactionDto.finalTransactionAmount());
+                });
+    }
+
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NonUsaCountryTransactionWithNullZipAndTaxInclusiveAndNewItems_Returns201() {
+        String externalId = "newNonExistingNonUsaCountryTransactionWithNullZipAndTaxInclusiveAndNewItems";
+        BigDecimal firstItemAmount = BigDecimal.valueOf(5000);
+        BigDecimal firstItemWithoutTax = BigDecimalProcessor.removeTrailingZeros(firstItemAmount.divide(BigDecimal.ONE.add(BigDecimal.valueOf(0.14975)), 6, RoundingMode.HALF_UP));
+        BigDecimal secondItemAmount = BigDecimal.valueOf(10000);
+        BigDecimal thirdItemAmount = BigDecimal.valueOf(1000);
+        BigDecimal thirdItemWithoutTax = BigDecimalProcessor.removeTrailingZeros(thirdItemAmount.divide(BigDecimal.ONE.add(BigDecimal.valueOf(0.14975)), 6, RoundingMode.HALF_UP));
+        BigDecimal expectedTaxableAmount = firstItemWithoutTax.add(thirdItemWithoutTax);
+        BigDecimal expectedTangibleAmount = secondItemAmount.add(thirdItemWithoutTax);
+        BigDecimal expectedTotalAmount = firstItemWithoutTax.add(secondItemAmount).add(thirdItemWithoutTax);
+        List<ItemDto> items = Arrays.asList(
+                ITUtilities.stubItemDto().withTaxCode("C6S1").withTotalPrice(firstItemAmount).withUnitPrice(firstItemAmount), // TAXABLE & INTANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C4S1").withTotalPrice(secondItemAmount).withUnitPrice(secondItemAmount), // NOT_TAXABLE & TANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C3S1").withTotalPrice(thirdItemAmount).withUnitPrice(thirdItemAmount) // TAXABLE & TANGIBLE
+        );
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withItems(items)
+                .withTaxInclusive(true);
         MandatoryAddressDto partialShippingAddress = new MandatoryAddressDto(null, "CA", null, null, "", "", null, false); // zip code belongs to New York
         givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
 
@@ -1207,7 +1255,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_NonUsaCountryButSentAsAbbreviationReturnUpperCase_Returns201() {
         String externalId = "newNonExistingTransactionIDNonUsaAbbreviation";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new MandatoryAddressDto(null, "CA", null, null, "", "", null, false));
+                .withShippingAddress(new MandatoryAddressDto(null, "CA", null, null, "", "", "12345", false));
 
         SalesTaxDto expectedSalesTax = new SalesTaxDto(null, new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 
@@ -1239,7 +1287,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_NonUsaCountryButSentLowerCaseReturnsUpperCase_Returns201() {
         String externalId = "newNonExistingTransactionIDNonUsaLowercase";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new MandatoryAddressDto(null, "canada", null, null, "", "", null, false));
+                .withShippingAddress(new MandatoryAddressDto(null, "canada", null, null, "", "", "12345", false));
 
         SalesTaxDto expectedSalesTax = new SalesTaxDto(null, new BigDecimal("1497.5"), BigDecimal.valueOf(0.14975), null, new GtRatesDto(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.0975), BigDecimal.valueOf(0.14975)));
 

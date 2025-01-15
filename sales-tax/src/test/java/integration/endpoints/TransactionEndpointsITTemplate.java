@@ -99,8 +99,11 @@ public interface TransactionEndpointsITTemplate extends
 
     // City County
     void upsertByExternalIdAndSource_UsaShippingAddressPassedNexus_Returns200AddressWithCityCounty();
+
     void upsertByExternalIdAndSource_UsaShippingAddressDidNotPassedNexus_Returns200AddressWithCityCounty();
+
     void upsertByExternalIdAndSource_UsaShippingAddressPassedNexus_Returns201AddressWithCityCounty();
+
     void upsertByExternalIdAndSource_UsaShippingAddressDidNotPassedNexus_Returns201AddressWithCityCounty();
 
 
@@ -164,7 +167,10 @@ public interface TransactionEndpointsITTemplate extends
 
     void upsert_TransactionIsLinkedButInvoiceHasSalesTaxNull_Returns201WithNullSalesTax();
 
-    public void getAll_PaginationFilteredByExternalId_fullIdSent_ReturnsTransaction();
-    public void getAll_PaginationFilteredByExternalId_PartialIdSent_ReturnsEmptyList();
+    void getAll_PaginationFilteredByExternalId_fullIdSent_ReturnsTransaction();
+
+    void getAll_PaginationFilteredByExternalId_PartialIdSent_ReturnsEmptyList();
+
+    void upsertByExternalIdAndSource_NonUsaCountryTransactionWithNullZipAndTaxInclusiveAndNewItems_Returns201();
 
 }

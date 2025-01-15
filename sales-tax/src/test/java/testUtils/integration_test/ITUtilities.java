@@ -44,7 +44,7 @@ public interface ITUtilities {
     } // note isTaxInclusive is false, finalTransactionAmount is zero
 
     static TransactionDto stubTransactionDtoNonUsaCountry(String externalId, UUID customerId, ItemDto... items) {
-        MandatoryAddressDto shippingAddress = new MandatoryAddressDto(null, "Canada", null, null, "", "Quebec", null, false);
+        MandatoryAddressDto shippingAddress = new MandatoryAddressDto(null, "Canada", null, null, "", "Quebec", "12345", false);
         return stubTransactionDto(externalId, customerId, items)
                 .withShippingAddress(shippingAddress);
     }

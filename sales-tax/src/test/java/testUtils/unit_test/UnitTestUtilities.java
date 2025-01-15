@@ -995,7 +995,7 @@ public class UnitTestUtilities {
     }
 
     public Address createNonUsaAddress() {
-        return new Address(null, "ARM", null, null, null, null, null, false);
+        return new Address(null, "ARM", null, null, null, "12345", null, false);
     }
 
     public Map<String, ProductClassification> createMapTaxCodesToClassifications() {
