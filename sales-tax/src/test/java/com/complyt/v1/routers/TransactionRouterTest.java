@@ -5189,12 +5189,12 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", "HW Installation Services", "C1S1",
-                null, null, null, false, new BigDecimal("0.501"),
+                null, null, null, false, new BigDecimal("0.301"),
                 null, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Item.manualSalesTaxRate" + NumericErrorMessages.DECIMAL_MAX_05_ERROR);
+                "Item.manualSalesTaxRate" + NumericErrorMessages.DECIMAL_MAX_03_ERROR);
 
         // When + Then
         webTestClient
