@@ -33,7 +33,7 @@ public record ItemDto(
         JurisdictionalSalesTaxRulesDto jurisdictionalSalesTaxRules,
         SalesTaxRatesDto salesTaxRates, GtRatesDto gtRates,
         boolean manualSalesTax,
-        @PositiveOrZero(message = "Item.manualSalesTaxRate " + NumericErrorMessages.NOT_NEGATIVE_ERROR) @DecimalMax(value = "0.2", message = "Item.manualSalesTaxRate" + NumericErrorMessages.DECIMAL_MAX_02_ERROR) BigDecimal manualSalesTaxRate,
+        @PositiveOrZero(message = "Item.manualSalesTaxRate " + NumericErrorMessages.NOT_NEGATIVE_ERROR) @DecimalMax(value = "0.5", message = "Item.manualSalesTaxRate" + NumericErrorMessages.DECIMAL_MAX_05_ERROR) BigDecimal manualSalesTaxRate,
         @Schema(description = FieldsDescriptions.DISCOUNT) @PositiveOrZero(message = "Item.discount " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal discount,
         @Schema(description = FieldsDescriptions.RELATIVE_TRANSACTION_DISCOUNT) @PositiveOrZero(message = "Item.relativeTransactionDiscount " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal relativeTransactionDiscount,
         TangibleCategoryDto tangibleCategory,
