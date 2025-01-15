@@ -94,4 +94,16 @@ public class ExemptionRepository {
                 });
     }
 
+    public Mono<Exemption> findByCountryStateAndCustomer(String country, String state, UUID customerId) {
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> {
+                    Query query = Query.query(Criteria.where("tenantId").is(tenantId)
+                                    .and("customerId").is(customerId))
+                            .addCriteria(countryQueryBuilder.build(country, state));
+
+
+                    return ContextLogger.observeCtx("Searching for exemption by query: " + query, tenantId, log::info)
+                            .then(reactiveMongoTemplate.findOne(query, Exemption.class));
+                });
+    }
 }

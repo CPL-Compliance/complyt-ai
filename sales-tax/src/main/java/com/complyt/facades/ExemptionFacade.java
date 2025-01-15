@@ -50,8 +50,15 @@ public class ExemptionFacade {
         return exemptionService.markAsCancelled(complytId);
     }
 
-    public Flux<Exemption> save(@NonNull ExemptionWrapper exemptionWrapper) {
+    public Flux<Exemption> saveMany(@NonNull ExemptionWrapper exemptionWrapper) {
         return exemptionService.saveMany(exemptionWrapper);
     }
 
+    public Mono<Exemption> save(@NonNull Exemption exemption) {
+        return exemptionService.save(exemption);
+    }
+
+    public Mono<Exemption> findByCountryStateAndCustomer(String country, String state, UUID customerId) {
+        return exemptionService.findByCountryStateAndCustomer(country, state, customerId);
+    }
 }

@@ -2,6 +2,7 @@ package com.complyt.domain.customer.exemption;
 
 import com.complyt.domain.State;
 import com.complyt.domain.properties.ComplytIdProperty;
+import com.complyt.domain.properties.InternalTimestampsProperty;
 import com.complyt.domain.timestamps.Timestamps;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @ToString
 @Builder
 @Document(collection = "exemption")
-public class Exemption implements ComplytIdProperty {
+public class Exemption implements ComplytIdProperty, InternalTimestampsProperty {
 
     private final UUID complytId;
     @Id
@@ -32,4 +33,5 @@ public class Exemption implements ComplytIdProperty {
     private final Certificate certificate;
     private final ExemptionType exemptionType;
     private final ExemptionStatus exemptionStatus;
+
 }

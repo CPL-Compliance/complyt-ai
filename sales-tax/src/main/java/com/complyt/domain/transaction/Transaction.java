@@ -2,6 +2,7 @@ package com.complyt.domain.transaction;
 
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.properties.ComplytIdProperty;
+import com.complyt.domain.properties.InternalTimestampsProperty;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.timestamps.Timestamps;
 import lombok.*;
@@ -24,7 +25,7 @@ import java.util.UUID;
 @Document(collection = "transaction")
 @Data
 @Accessors(chain = true)
-public class Transaction implements ComplytIdProperty {
+public class Transaction implements ComplytIdProperty, InternalTimestampsProperty {
 
     UUID complytId;
     @Id
