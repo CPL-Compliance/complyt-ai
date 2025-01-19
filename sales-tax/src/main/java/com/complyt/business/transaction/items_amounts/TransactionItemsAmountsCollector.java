@@ -16,10 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TransactionItemsAmountsCollector implements TransactionAmountsCollector<Transaction> {
-
-    @NonNull
-    AmountCalculator<List<Taxable>> taxableItemsAmountCalculator;
-
+    
     @NonNull
     AmountCalculator<List<Taxable>> tangibleItemsAmountCalculator;
 
@@ -32,7 +29,11 @@ public class TransactionItemsAmountsCollector implements TransactionAmountsColle
     public Transaction collect(@NonNull Transaction transaction) {
 
         List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transaction);
-        BigDecimal taxableItemsAmount = taxableItemsAmountCalculator.calculate(taxables, transaction.getIsTaxInclusive());
+        BigDecimal taxableItemsAmount = new TaxableItemsAmountCalculator(
+                transaction.getShippingAddress().city(),
+                transaction.getShippingAddress().region())
+                .calculate(taxables, transaction.getIsTaxInclusive());
+
         BigDecimal tangibleItemsAmount = tangibleItemsAmountCalculator.calculate(taxables, transaction.getIsTaxInclusive());
         BigDecimal totalItemsAmount = totalItemsAmountCalculator.calculate(taxables, transaction.getIsTaxInclusive());
 
