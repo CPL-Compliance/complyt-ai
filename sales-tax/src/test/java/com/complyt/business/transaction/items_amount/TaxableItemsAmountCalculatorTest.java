@@ -2,7 +2,6 @@ package com.complyt.business.transaction.items_amount;
 
 import com.complyt.business.transaction.items_amounts.TaxableItemsAmountCalculator;
 import com.complyt.domain.Taxable;
-import com.complyt.domain.nexus.enums.TaxableCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
@@ -29,24 +28,28 @@ public class TaxableItemsAmountCalculatorTest {
 //        items = createItems();
         unitTestUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
 
-        items = new ArrayList<>(unitTestUtilities.setCalculatedTotalOnItemList(unitTestUtilities.createItems(true,false,  true)));
-        taxableItemsAmountCalculator = new TaxableItemsAmountCalculator();
+        items = new ArrayList<>(unitTestUtilities.setCalculatedTotalOnItemList(unitTestUtilities.createItems(true, false, true)));
+        taxableItemsAmountCalculator = new TaxableItemsAmountCalculator("city", "region");
     }
 
     @Test
     void calculate_TwoItemsAreTaxable_ReturnsAmountOfTwoItems() {
         // Before
         BigDecimal expectedAmount = items.get(0).getCalculatedTotal().add(items.get(1).getCalculatedTotal());
+        List<Taxable> nonTaxableItems = List.of(
+                items.get(0).withJurisdictionalSalesTaxRules(items.get(0).getJurisdictionalSalesTaxRules().withTaxable(true)),
+                items.get(0).withJurisdictionalSalesTaxRules(items.get(1).getJurisdictionalSalesTaxRules().withTaxable(true))
+        );
 
         // When + Then
-        BigDecimal actualAmount = taxableItemsAmountCalculator.calculate(items, false);
+        BigDecimal actualAmount = taxableItemsAmountCalculator.calculate(nonTaxableItems, false);
         assertEquals(expectedAmount, actualAmount);
     }
 
     @Test
     void calculate_OneItemIsTaxable_ReturnsAmountOfOneItem() {
         // Before
-        items.set(0, items.get(0).withTaxableCategory(TaxableCategory.NOT_TAXABLE));
+        items.set(0, items.get(0).withJurisdictionalSalesTaxRules(items.get(0).getJurisdictionalSalesTaxRules().withTaxable(false)));
         BigDecimal expectedAmount = items.get(1).getCalculatedTotal();
 
         // When + Then
@@ -57,12 +60,14 @@ public class TaxableItemsAmountCalculatorTest {
     @Test
     void calculate_NoTaxableItems_Returns0() {
         // Before
-        items.set(0, items.get(0).withTaxableCategory(TaxableCategory.NOT_TAXABLE));
-        items.set(1, items.get(1).withTaxableCategory(TaxableCategory.NOT_TAXABLE));
+        List<Taxable> nonTaxableItems = List.of(
+                items.get(0).withJurisdictionalSalesTaxRules(items.get(0).getJurisdictionalSalesTaxRules().withTaxable(false)),
+                items.get(0).withJurisdictionalSalesTaxRules(items.get(1).getJurisdictionalSalesTaxRules().withTaxable(false))
+        );
         BigDecimal expectedAmount = BigDecimal.ZERO;
 
         // When + Then
-        BigDecimal actualAmount = taxableItemsAmountCalculator.calculate(items, false);
+        BigDecimal actualAmount = taxableItemsAmountCalculator.calculate(nonTaxableItems, false);
         assertEquals(expectedAmount, actualAmount);
     }
 
@@ -70,7 +75,7 @@ public class TaxableItemsAmountCalculatorTest {
     void calculate_ItemsWithDiscountPassedBothTaxable_ReturnsAmount() {
         // Before
         List<Taxable> discountedItems = new ArrayList<>(unitTestUtilities.setCalculatedTotalOnItemList(
-                unitTestUtilities.createItems(true,false, true)
+                unitTestUtilities.createItems(true, false, true)
                         .stream().map(item -> item
                                 .withDiscount(BigDecimal.valueOf(500)))
                         .collect(Collectors.toList())));
@@ -97,7 +102,7 @@ public class TaxableItemsAmountCalculatorTest {
     @Test
     void calculate_TwoItemsAreTaxableWithTaxInclusive_ReturnsAmountOfTwoItems() {
         // Before
-        items = unitTestUtilities.createTaxablesWithSalesTaxRate(true,true,true);
+        items = unitTestUtilities.createTaxablesWithSalesTaxRate(true, true, true);
         BigDecimal expectedAmount = BigDecimal.valueOf(1428.571428);
 
         // When

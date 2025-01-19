@@ -15,10 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 public class TaxableItemsAmountCalculator implements AmountCalculator<List<Taxable>> {
 
-    @NonNull
     String shippingAddressCity;
 
-    @NonNull
     String shippingAddressRegion;
 
     @Override

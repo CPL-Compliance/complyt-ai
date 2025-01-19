@@ -20,7 +20,11 @@ public interface Taxable {
 
     JurisdictionalSalesTaxRules getJurisdictionalSalesTaxRules();
 
+    Taxable withJurisdictionalSalesTaxRules(JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules);
+
     JurisdictionalTaxRules getJurisdictionalTaxRules();
+
+    Taxable withJurisdictionalTaxRules(JurisdictionalTaxRules jurisdictionalTaxRules);
 
     Taxable withSalesTaxRates(SalesTaxRates salesTaxRates);
 
