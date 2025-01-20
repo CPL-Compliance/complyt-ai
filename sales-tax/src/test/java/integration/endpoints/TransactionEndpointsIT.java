@@ -3911,7 +3911,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(
                         externalId, customerId,
                         ITUtilities.stubItemDto().withTaxCode("PCforTestingTaxability"))
-                .withShippingAddress(new MandatoryAddressDto("Acampo", "US", null, "Florida", "2285 Trout St", null, "99801", false))
+                .withShippingAddress(new MandatoryAddressDto("Acampo", "US", null, "Arkansas", "2285 Trout St", null, "99801", false))
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
@@ -3926,9 +3926,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus()
                 .isOk()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> {
-                    assertEquals(ITUtilities.stubItemDto().totalPrice(), transactionDto.taxableItemsAmount());
-                });
+                .value(transactionDto -> assertEquals(ITUtilities.stubItemDto().totalPrice().add(ITUtilities.stubShippingFeeDto().totalPrice()), transactionDto.taxableItemsAmount()));
     }
 
     @Test
@@ -3999,7 +3997,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(
                         externalId, customerId,
                         ITUtilities.stubItemDto().withTaxCode("PCforTestingTaxability"))
-                .withShippingAddress(new MandatoryAddressDto(null, "Brazil", null, null, null, null, null, false))
+                .withShippingAddress(new MandatoryAddressDto(null, "Sweden", null, null, null, null, null, false))
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
