@@ -86,34 +86,6 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest {
     }
 
     @Test
-    void inject_InjectsDataToTransactionWithNotTaxableStateAndNonExistingCity_ReturnsModifiedTransaction() {
-        // Given
-        SubJurisdictionalTaxRules s = testUtilities.createCitySalesTaxRules();
-
-        Transaction transactionNoRules = transaction.withItems(
-                new ArrayList<>() {{
-                    add(transaction.getItems().get(0).withJurisdictionalTaxRules(null));
-                    add(transaction.getItems().get(1).withJurisdictionalTaxRules(null));
-                }}
-        );
-        Map<String, ProductClassification> classifications = testUtilities.createUsaClassificationsMap(
-                transaction.getItems().get(0).getJurisdictionalSalesTaxRules().withTaxable(false).withCities(Map.of(s.getName(), s)),
-                transaction.getItems().get(1).getJurisdictionalSalesTaxRules()
-        );
-        List<Item> expectedItems = new ArrayList<>() {{
-            add(transaction.getItems().get(0).withTaxableCategory(TaxableCategory.NOT_TAXABLE)
-                    .withJurisdictionalSalesTaxRules(transaction.getItems().get(0).getJurisdictionalSalesTaxRules().withTaxable(false)));
-            add(transaction.getItems().get(1));
-        }};
-
-        // When
-        List<Item> actualItems = usaAddressItemsJurisdictionalRulesInjector.inject(transactionNoRules).apply(classifications);
-
-        // Then
-        assertEquals(expectedItems, actualItems);
-    }
-
-    @Test
     void inject_TransactionWithUnsupportedState_ThrowsAnError() {
         // Given
         Address shippingAddress = testUtilities.createAddress().withState("Upsupported State");

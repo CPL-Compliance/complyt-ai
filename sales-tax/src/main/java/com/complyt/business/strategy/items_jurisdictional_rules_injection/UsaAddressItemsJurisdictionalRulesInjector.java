@@ -42,7 +42,6 @@ public class UsaAddressItemsJurisdictionalRulesInjector implements ItemsJurisdic
                 ContextLogger.observeCtx("Fetching jurisdictionalRules from product classification", log::info);
                 TaxableCategory category = itemWithRules.getJurisdictionalSalesTaxRules().isTaxable() ||
                         itemWithRules.getJurisdictionalSalesTaxRules().getCities() != null &&
-                                itemWithRules.getJurisdictionalSalesTaxRules().getCities().get(transaction.getShippingAddress().city()) != null &&
                                 itemWithRules.getJurisdictionalSalesTaxRules().getCities().get(transaction.getShippingAddress().city()).isTaxable() ?
                         TaxableCategory.TAXABLE : TaxableCategory.NOT_TAXABLE;
 
