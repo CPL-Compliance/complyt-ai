@@ -40,8 +40,12 @@ public class UsaAddressItemsJurisdictionalRulesInjector implements ItemsJurisdic
                 Item itemWithRules = item.withJurisdictionalSalesTaxRules(rules);
 
                 ContextLogger.observeCtx("Fetching jurisdictionalRules from product classification", log::info);
-                TaxableCategory category = itemWithRules.getJurisdictionalSalesTaxRules().isTaxable() ?
+                TaxableCategory category = itemWithRules.getJurisdictionalSalesTaxRules().isTaxable() ||
+                        itemWithRules.getJurisdictionalSalesTaxRules().getCities() != null &&
+                                // if cities exist there is no case of null pointer exception here because of the call to extractCityIfExists
+                                itemWithRules.getJurisdictionalSalesTaxRules().getCities().get(transaction.getShippingAddress().city()).isTaxable() ?
                         TaxableCategory.TAXABLE : TaxableCategory.NOT_TAXABLE;
+
                 Item itemWithCategory = itemWithRules.withTaxableCategory(category);
 
                 ContextLogger.observeCtx("Inserting new item with rules : " + rules + ", with taxable category : " + category, log::debug);

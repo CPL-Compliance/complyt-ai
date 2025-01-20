@@ -60,13 +60,13 @@ public class TransactionItemsAmountsCollectorTest {
         // Before + When
 
         when(taxableCollectionBuilder.build(transaction)).thenReturn(items);
-        when(taxableItemsAmountCalculator.calculate(items, transaction.getIsTaxInclusive())).thenReturn(new BigDecimal("10.0"));
+        when(taxableItemsAmountCalculator.calculate(items, transaction.getIsTaxInclusive())).thenReturn(new BigDecimal("0"));
         when(tangibleItemsAmountCalculator.calculate(items, transaction.getIsTaxInclusive())).thenReturn(new BigDecimal("17.0"));
         when(totalItemsAmountCalculator.calculate(items, transaction.getIsTaxInclusive())).thenReturn(new BigDecimal("18.0"));
 
         // Then
         Transaction outputTransaction = transactionItemsAmountsCollector.collect(transaction);
-        assertEquals(new BigDecimal("10.0"), outputTransaction.getTaxableItemsAmount());
+        assertEquals(new BigDecimal("0"), outputTransaction.getTaxableItemsAmount());
         assertEquals(new BigDecimal("17.0"), outputTransaction.getTangibleItemsAmount());
         assertEquals(new BigDecimal("18.0"), outputTransaction.getTotalItemsAmount());
     }

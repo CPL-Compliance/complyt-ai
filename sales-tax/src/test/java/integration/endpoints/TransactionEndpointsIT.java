@@ -3872,4 +3872,149 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 });
     }
 
+    // Testing taxableItemsAmount property
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_TransactionWithTaxableState_ReturnsTaxableItemsAmountOfItemsPrice() {
+        //Given
+        String externalId = "externalIdOfTaxabilityTestTransaction";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(
+                        externalId, customerId,
+                        ITUtilities.stubItemDto().withTaxCode("PCforTestingTaxability"))
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", null, "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient.mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(ITUtilities.stubItemDto().totalPrice(), transactionDto.taxableItemsAmount());
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_TransactionWithTaxableCityAndNotTaxableState_ReturnsTaxableItemsAmountOfItemsPrice() {
+        //Given
+        String externalId = "externalIdOfTaxabilityTestTransaction";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(
+                        externalId, customerId,
+                        ITUtilities.stubItemDto().withTaxCode("PCforTestingTaxability"))
+                .withShippingAddress(new MandatoryAddressDto("Acampo", "US", null, "Arkansas", "2285 Trout St", null, "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient.mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertEquals(ITUtilities.stubItemDto().totalPrice().add(ITUtilities.stubShippingFeeDto().totalPrice()), transactionDto.taxableItemsAmount()));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_TransactionWithOutTaxableCityAndState_ReturnsTaxableItemsAmountOfZero() {
+        //Given
+        String externalId = "externalIdOfTaxabilityTestTransaction1";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(
+                        externalId, customerId,
+                        ITUtilities.stubItemDto().withTaxCode("PCforTestingTaxability"))
+                .withShippingAddress(new MandatoryAddressDto("Acampo", "US", null, "California", "2285 Trout St", null, "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient.mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(BigDecimal.ZERO, transactionDto.taxableItemsAmount());
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_TransactionWithOutTaxableCityAndStateWithZeroThatDoesNotExist_ReturnsTaxableItemsAmountOfZero() {
+        //Given
+        String externalId = "externalIdOfTaxabilityTestTransaction2";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(
+                        externalId, customerId,
+                        ITUtilities.stubItemDto().withTaxCode("PCforTestingTaxability"))
+                .withShippingAddress(new MandatoryAddressDto("Acampo", "US", null, "Texas", "2285 Trout St", null, "99801", false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient.mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(BigDecimal.ZERO, transactionDto.taxableItemsAmount());
+                });
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_GTTransactionWithTaxableCountry_ReturnsTaxableItemsAmountOfItemsPrice() {
+        //Given
+        String externalId = "externalIdOfTaxabilityTestTransaction4";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(
+                        externalId, customerId,
+                        ITUtilities.stubItemDto().withTaxCode("PCforTestingTaxability"))
+                .withShippingAddress(new MandatoryAddressDto(null, "Sweden", null, null, null, null, null, false))
+                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient.mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(BigDecimal.valueOf(10500), transactionDto.taxableItemsAmount());
+                });
+    }
+
 }

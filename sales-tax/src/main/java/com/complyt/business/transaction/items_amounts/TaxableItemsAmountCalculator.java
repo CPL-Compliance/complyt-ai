@@ -10,15 +10,15 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Component
 @Slf4j
+@Component
 public class TaxableItemsAmountCalculator implements AmountCalculator<List<Taxable>> {
 
     @Override
     public BigDecimal calculate(@NonNull List<Taxable> items, Boolean isTaxInclusive) {
         BigDecimal amount = BigDecimal.ZERO;
         for (Taxable item : items) {
-            amount = item.getTaxableCategory() == TaxableCategory.TAXABLE ?
+            amount = item.getTaxableCategory().equals(TaxableCategory.TAXABLE) ?
                     isTaxInclusive ? amount.add(item.removeInclusiveSalesTax()) : amount.add(item.getCalculatedTotal()) :
                     amount;
         }
@@ -26,4 +26,5 @@ public class TaxableItemsAmountCalculator implements AmountCalculator<List<Taxab
 
         return BigDecimalProcessor.removeTrailingZeros(amount);
     }
+
 }
