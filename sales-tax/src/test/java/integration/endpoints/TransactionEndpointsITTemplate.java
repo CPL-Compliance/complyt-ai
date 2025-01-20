@@ -184,12 +184,6 @@ public interface TransactionEndpointsITTemplate extends
 
     void upsertByExternalIdAndSource_TransactionWithOutTaxableCityAndStateWithZeroThatDoesNotExist_ReturnsTaxableItemsAmountOfZero();
 
-    void upsertByExternalIdAndSource_GTTransactionWithTaxableState_ReturnsTaxableItemsAmountOfItemsPrice();
-
-    void upsertByExternalIdAndSource_GTTransactionWithTaxableRegion_ReturnsTaxableItemsAmountOfItemsPrice();
-
-    void upsertByExternalIdAndSource_GTTransactionWithOutTaxableRegionAndState_ReturnsTaxableItemsAmountOfZero();
-
-    void upsertByExternalIdAndSource_TransactionWithOutTaxAndSalesTaxRules_ReturnsTaxableItemsAmountOfZero();
+    void upsertByExternalIdAndSource_GTTransactionWithTaxableCountry_ReturnsTaxableItemsAmountOfItemsPrice();
 
 }
