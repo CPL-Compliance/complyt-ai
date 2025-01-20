@@ -3,7 +3,6 @@ package com.complyt.business.transaction.items_amounts;
 import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
