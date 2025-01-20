@@ -3,22 +3,17 @@ package com.complyt.business.transaction.items_amounts;
 import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
-@AllArgsConstructor
+@Component
 public class TaxableItemsAmountCalculator implements AmountCalculator<List<Taxable>> {
-
-    String shippingAddressCity;
-
-    String shippingAddressRegion;
 
     @Override
     public BigDecimal calculate(@NonNull List<Taxable> items, Boolean isTaxInclusive) {

@@ -26,11 +26,10 @@ public class TaxableItemsAmountCalculatorTest {
 
     @BeforeEach
     void setUp() {
-//        items = createItems();
         unitTestUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
 
         items = new ArrayList<>(unitTestUtilities.setCalculatedTotalOnItemList(unitTestUtilities.createItems(true, false, true)));
-        taxableItemsAmountCalculator = new TaxableItemsAmountCalculator("city", "region");
+        taxableItemsAmountCalculator = new TaxableItemsAmountCalculator();
     }
 
     @Test
