@@ -36,13 +36,9 @@ public class TaxableItemsAmountCalculatorTest {
     void calculate_TwoItemsAreTaxable_ReturnsAmountOfTwoItems() {
         // Before
         BigDecimal expectedAmount = items.get(0).getCalculatedTotal().add(items.get(1).getCalculatedTotal());
-        List<Taxable> nonTaxableItems = List.of(
-                items.get(0).withJurisdictionalSalesTaxRules(items.get(0).getJurisdictionalSalesTaxRules().withTaxable(true)),
-                items.get(0).withJurisdictionalSalesTaxRules(items.get(1).getJurisdictionalSalesTaxRules().withTaxable(true))
-        );
 
         // When + Then
-        BigDecimal actualAmount = taxableItemsAmountCalculator.calculate(nonTaxableItems, false);
+        BigDecimal actualAmount = taxableItemsAmountCalculator.calculate(items, false);
         assertEquals(expectedAmount, actualAmount);
     }
 
