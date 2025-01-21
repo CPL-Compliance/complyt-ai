@@ -97,19 +97,24 @@ public class ExemptionFacadeTest {
         // Given
         Exemption secondExemption = exemption.withId(UUID.randomUUID().toString())
                 .withState(new State("NY", "05", "New York"));
-        List<Exemption> exemptions = new ArrayList<Exemption>() {{
+        List<Exemption> exemptions = new ArrayList<>() {{
             add(exemption);
             add(secondExemption);
         }};
+
         Map<String, String> filterMap = new LinkedHashMap<>();
         String sortOrder = "DESC", sortBy = "externalTimetamps.createdDate";
 
         // When
         when(exemptionService.findAll(0, exemptions.size(), filterMap, sortOrder, sortBy)).thenReturn(Flux.fromIterable(exemptions));
+        when(customerService.findByComplytIdProjection(exemption.getCustomerId())).thenReturn(Mono.just(customer));
         Flux<Exemption> exemptionFlux = exemptionFacade.findAll(0, exemptions.size(), filterMap, sortOrder, sortBy);
 
         // Then
-        StepVerifier.create(exemptionFlux).expectNext(exemption, secondExemption);
+        StepVerifier.create(exemptionFlux)
+                .expectNext(exemption.withCustomer(customer))
+                .expectNext(secondExemption.withCustomer(customer))
+                .verifyComplete();
     }
 
     @Test
