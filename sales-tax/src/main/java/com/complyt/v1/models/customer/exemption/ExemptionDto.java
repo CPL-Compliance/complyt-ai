@@ -5,6 +5,7 @@ import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.checkables.ComplytIdCheckable;
+import com.complyt.v1.models.customer.CustomerDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -26,5 +27,6 @@ public record ExemptionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID +
                            @Valid @NotNull(message = "status " + DtoErrorMessages.NOT_NULL_ERROR) StatusDto status,
                            @Valid @NotNull(message = "certificate " + DtoErrorMessages.NOT_NULL_ERROR) CertificateDto certificate,
                            @NotNull(message = "exemptionType " + DtoErrorMessages.NOT_NULL_ERROR) ExemptionTypeDto exemptionType,
-                           @NotNull(message = "exemptionStatus " + DtoErrorMessages.NOT_NULL_ERROR) ExemptionStatusDto exemptionStatus) implements ComplytIdCheckable {
+                           @NotNull(message = "exemptionStatus " + DtoErrorMessages.NOT_NULL_ERROR) ExemptionStatusDto exemptionStatus,
+                           CustomerDto customer) implements ComplytIdCheckable {
 }

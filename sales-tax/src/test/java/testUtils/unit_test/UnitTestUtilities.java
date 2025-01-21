@@ -137,7 +137,7 @@ public class UnitTestUtilities {
     }
 
     public static SalesTaxRatesAddressDto createSalesTaxRatesAddressDto() {
-        return new SalesTaxRatesAddressDto("US", "CA", "county","Fresno", null, null, "12345", null, null, null, true);
+        return new SalesTaxRatesAddressDto("US", "CA", "county", "Fresno", null, null, "12345", null, null, null, true);
     }
 
     public static ComplytInternalSalesTaxRatesDto createComplytInternalSalesTaxRatesDto() {
@@ -588,7 +588,7 @@ public class UnitTestUtilities {
     }
 
     public SalesTaxRatesDto createSalesTaxRatesDto() {
-        return new SalesTaxRatesDto(null, new BigDecimal("0.1"), new BigDecimal("0.1"), new BigDecimal("0.1"),null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, new BigDecimal("0.1"));
+        return new SalesTaxRatesDto(null, new BigDecimal("0.1"), new BigDecimal("0.1"), new BigDecimal("0.1"), null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, new BigDecimal("0.1"));
     }
 
     public GtRatesDto createGtRatesDto() {
@@ -708,7 +708,7 @@ public class UnitTestUtilities {
         Certificate certificate = new Certificate(certificateId, "url", "name");
         return new Exemption(UUID.randomUUID(), id, tenantId, customerIdOtherDomains,
                 country, state, classification, validationDates, internalTimestamps,
-                status, certificate, ExemptionType.FULLY, ExemptionStatus.ACTIVE);
+                status, certificate, ExemptionType.FULLY, ExemptionStatus.ACTIVE, null);
     }
 
 
@@ -724,7 +724,7 @@ public class UnitTestUtilities {
         CertificateDto certificate = new CertificateDto(certificateId, "url", "name");
 
         return new ExemptionDto(UUID.randomUUID(), customerIdOtherDomains,
-                country, state, classification, validationDates, internalTimestamps, status, certificate, ExemptionTypeDto.FULLY, ExemptionStatusDto.ACTIVE);
+                country, state, classification, validationDates, internalTimestamps, status, certificate, ExemptionTypeDto.FULLY, ExemptionStatusDto.ACTIVE, null);
     }
 
     public StateDto createNonUsStateDto() {

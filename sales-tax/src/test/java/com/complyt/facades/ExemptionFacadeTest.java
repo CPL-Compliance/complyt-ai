@@ -1,10 +1,12 @@
 package com.complyt.facades;
 
 import com.complyt.domain.State;
+import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.domain.customer.exemption.Status;
+import com.complyt.services.CustomerServiceImpl;
 import com.complyt.services.ExemptionServiceImpl;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +36,11 @@ public class ExemptionFacadeTest {
     @Mock
     ExemptionServiceImpl exemptionService;
 
+    @Mock
+    CustomerServiceImpl customerService;
+
+    Customer customer;
+
     Exemption exemption;
 
     UnitTestUtilities testUtilities;
@@ -41,20 +48,23 @@ public class ExemptionFacadeTest {
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        exemption = testUtilities.createExemption(UUID.randomUUID().toString());
+        customer = testUtilities.createCustomer(UUID.randomUUID().toString());
+        exemption = testUtilities.createExemption(UUID.randomUUID().toString()).withCustomerId(customer.getComplytId());
     }
 
     @Test
     void findById_FindsExemption_ReturnsExemption() {
         // Given
         String id = exemption.getId();
+        Exemption expectedExemption = exemption.withCustomer(customer);
 
         // When
         when(exemptionService.findById(id)).thenReturn(Mono.just(exemption));
+        when(customerService.findByComplytIdProjection(exemption.getCustomerId())).thenReturn(Mono.just(customer));
         Mono<Exemption> exemptionMono = exemptionFacade.findById(id);
 
         // Then
-        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
+        StepVerifier.create(exemptionMono).expectNext(expectedExemption).verifyComplete();
     }
 
     @Test
@@ -107,15 +117,17 @@ public class ExemptionFacadeTest {
         // Given
         Exemption newExemption = exemption.withStatus(new Status("new code", "new name"));
         UUID id = exemption.getComplytId();
+        Exemption expectedExemption = newExemption.withCustomer(customer);
 
         // When
         when(exemptionService.update(newExemption, exemption, id)).thenReturn(Mono.just(newExemption));
+        when(customerService.findByComplytIdProjection(newExemption.getCustomerId())).thenReturn(Mono.just(customer));
         when(exemptionService.findByComplytId(id)).thenReturn(Mono.just(exemption));
         when(exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption)).thenReturn(Mono.just(newExemption));
         Mono<Exemption> exemptionMono = exemptionFacade.update(newExemption, id);
 
         // Then
-        StepVerifier.create(exemptionMono).expectNext(newExemption).verifyComplete();
+        StepVerifier.create(exemptionMono).expectNext(expectedExemption).verifyComplete();
     }
 
     @Test
@@ -136,13 +148,15 @@ public class ExemptionFacadeTest {
     void getByComplytId_ExemptionExists_ReturnsExemption() {
         // Given
         UUID complytId = exemption.getComplytId();
+        Exemption expectedExemption = exemption.withCustomer(customer);
 
         // When
         when(exemptionService.findByComplytId(complytId)).thenReturn(Mono.just(exemption));
+        when(customerService.findByComplytIdProjection(exemption.getCustomerId())).thenReturn(Mono.just(customer));
         Mono<Exemption> exemptionMono = exemptionFacade.findByComplytId(complytId);
 
         // Then
-        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
+        StepVerifier.create(exemptionMono).expectNext(expectedExemption).verifyComplete();
     }
 
     @Test
@@ -178,16 +192,18 @@ public class ExemptionFacadeTest {
         List<State> states = UnitTestUtilities.createStateList();
         ExemptionWrapper exemptionWrapper = new ExemptionWrapper(exemption, states);
         List<Exemption> expectedExemptions = UnitTestUtilities.createExemptionsListFromWrapper(exemptionWrapper);
+        List<Exemption> expectedExemptionsWithCustomers = expectedExemptions.stream().map(e -> e.withCustomer(customer)).toList();
 
         // When
         when(exemptionService.saveMany(exemptionWrapper)).thenReturn(Flux.fromIterable(expectedExemptions));
+        when(customerService.findByComplytIdProjection(expectedExemptionsWithCustomers.get(0).getCustomerId())).thenReturn(Mono.just(customer));
         Flux<Exemption> exemptionFlux = exemptionFacade.save(exemptionWrapper);
 
         // Then
         StepVerifier.create(exemptionFlux)
-                .expectNext(expectedExemptions.get(0))
-                .expectNext(expectedExemptions.get(1))
-                .expectNext(expectedExemptions.get(2))
+                .expectNext(expectedExemptionsWithCustomers.get(0))
+                .expectNext(expectedExemptionsWithCustomers.get(1))
+                .expectNext(expectedExemptionsWithCustomers.get(2))
                 .verifyComplete();
     }
 

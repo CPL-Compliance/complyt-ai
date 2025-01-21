@@ -88,7 +88,6 @@ public class TransactionRepository {
                             Aggregation.unwind("customer", true),
                             Aggregation.addFields().addFieldWithValue("items", TransactionProjectionStage.itemsMapAddFeildStageDocument()).build(),
                             Aggregation.stage(TransactionProjectionStage.projectionStageDocument()));
-                    ;
 
                     return ContextLogger.observeCtx("Searching for transaction with external ID " + externalId + ", source" + source + ", and tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate.aggregate(aggregation, Transaction.class).next());
