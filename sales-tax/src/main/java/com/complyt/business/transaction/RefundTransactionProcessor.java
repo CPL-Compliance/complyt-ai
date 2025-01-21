@@ -4,6 +4,7 @@ import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionType;
 import com.complyt.services.TransactionService;
+import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +27,12 @@ public class RefundTransactionProcessor {
     }
 
     public Mono<Transaction> setInvoiceSalesTaxToLinkedRefund(Transaction transaction) {
-        return transactionService.findByExternalIdAndSource(transaction.getCreatedFrom(), transaction.getSource())
-                .map(invoice -> processSalesTax(transaction, invoice))
-                .switchIfEmpty(Mono.just(transaction));
+        return ContextLogger.observeCtx("Searching for linked invoice by createdFrom: " + transaction.getCreatedFrom(), log::info)
+                .then(transactionService.findByExternalIdAndSource(transaction.getCreatedFrom(), transaction.getSource()))
+                .flatMap(invoice -> ContextLogger.observeCtx("Linked invoice found. Injecting the invoice's sales tax into the refund", log::info)
+                        .thenReturn(processSalesTax(transaction, invoice)))
+                .switchIfEmpty(Mono.defer(() -> ContextLogger.observeCtx("Linked invoice was NOT found. returning refund's original sales tax", log::info)
+                        .then(Mono.just(transaction))));
     }
 
     private static Transaction processSalesTax(Transaction refund, Transaction invoice) {
