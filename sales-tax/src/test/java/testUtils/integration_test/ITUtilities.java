@@ -4,7 +4,7 @@ import com.complyt.domain.currency.CurrencySource;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
-import com.complyt.v1.models.customer.exemption.ClassificationDto;
+import com.complyt.v1.models.customer.exemption.*;
 import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.tax.sales_tax.RatesMetaDataDto;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
@@ -463,5 +463,20 @@ public interface ITUtilities {
 
     static MandatoryAddressDto createAddressDtoInKensas() {
         return new MandatoryAddressDto("Kensas City", "USA", null, "KS", "101st Main st", null, "66106", false);
+    }
+
+    static ExemptionDto createExemptionDto() {
+        String country = "USA";
+        StateDto state = new StateDto("CA", "02", "California");
+        ClassificationDto classification = new ClassificationDto("code", "description");
+        ValidationDatesDto validationDates = new ValidationDatesDto(
+                LocalDateTime.parse(localDateTime).minusYears(1).toString(),
+                LocalDateTime.parse(localDateTime).plusYears(1).toString());
+        TimestampsDto internalTimestamps = new TimestampsDto(localDateTime, localDateTime);
+        StatusDto status = new StatusDto("code", "name");
+        CertificateDto certificate = new CertificateDto(UUID.randomUUID().toString(), "url", "name");
+
+        return new ExemptionDto(UUID.randomUUID(), UUID.fromString("e10cd4a2-6a4e-4621-bdad-4860bfa91ecb"),
+                country, state, classification, validationDates, internalTimestamps, status, certificate, ExemptionTypeDto.FULLY, ExemptionStatusDto.ACTIVE, null);
     }
 }

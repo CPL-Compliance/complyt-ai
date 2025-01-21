@@ -52,7 +52,8 @@ class ExemptionDtoTest {
                 ", status=" + exemptionDto.status() +
                 ", certificate=" + exemptionDto.certificate() +
                 ", exemptionType=" + exemptionDto.exemptionType() +
-                ", exemptionStatus=" + exemptionDto.exemptionStatus() + "]";
+                ", exemptionStatus=" + exemptionDto.exemptionStatus() +
+                ", customer=" + exemptionDto.customer() + "]";
 
         // When
         String actualString = exemptionDto.toString();
