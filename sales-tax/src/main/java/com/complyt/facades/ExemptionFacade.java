@@ -6,6 +6,7 @@ import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.services.CustomerService;
 import com.complyt.services.ExemptionService;
 import com.complyt.utils.observability.ContextLogger;
+import com.complyt.v1.exceptions.types.CustomerNotFoundApiException;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -72,7 +73,7 @@ public class ExemptionFacade {
 
     public Mono<Customer> getCustomerByExemption(Exemption exemption) {
         return customerService.findByComplytIdProjection(exemption.getCustomerId())
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+                .switchIfEmpty(Mono.error(new CustomerNotFoundApiException()));
     }
 
 }
