@@ -4,9 +4,6 @@ import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.strategy.StrategySelector;
 import com.complyt.business.timestamps_injection.InternalTimestampsHandler;
-import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
-import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerStatus;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
@@ -124,11 +121,6 @@ public class ExemptionServiceImpl implements ExemptionService {
     public Flux<Exemption> saveMany(@NonNull ExemptionWrapper exemptionWrapper) {
         return ((Flux<Exemption>) exemptionListGeneratorStrategy.select(exemptionWrapper).apply(exemptionWrapper))
                 .flatMap(this::save);
-    }
-
-    @Override
-    public Mono<Exemption> findByCountryStateAndCustomer(String country, String state, UUID customerId) {
-        return exemptionRepository.findByCountryStateAndCustomer(country, state, customerId);
     }
 
     private Function<Exemption, Exemption> createFunctionUpdateExemption(Exemption exemptionInfo) {

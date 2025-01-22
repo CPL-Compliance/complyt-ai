@@ -75,5 +75,5 @@ public class ExemptionFacade {
         return customerService.findByComplytIdProjection(exemption.getCustomerId())
                 .switchIfEmpty(Mono.error(new CustomerNotFoundApiException()));
     }
-    
+
 }

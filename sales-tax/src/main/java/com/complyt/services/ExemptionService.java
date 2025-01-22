@@ -29,5 +29,4 @@ public interface ExemptionService extends CrudService<Exemption, String> {
 
     Flux<Exemption> saveMany(@NonNull ExemptionWrapper exemptionWrapper);
 
-    Mono<Exemption> findByCountryStateAndCustomer(String country, String state, UUID customerId);
 }
