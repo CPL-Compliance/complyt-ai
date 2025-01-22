@@ -2,12 +2,14 @@ package com.complyt.services;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.strategy.StrategySelector;
+import com.complyt.business.timestamps_injection.InternalTimestampsHandler;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.domain.customer.exemption.Status;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.ExemptionRepository;
 import com.mongodb.client.result.DeleteResult;
@@ -46,6 +48,9 @@ public class ExemptionServiceImplTest {
     ComplytIdHandler<Exemption> exemptionComplytIdHandler;
 
     @Mock
+    InternalTimestampsHandler<Exemption> internalTimestampsHandler;
+
+    @Mock
     StrategySelector exemptionListGeneratorStrategy;
 
     Transaction transaction;
@@ -53,6 +58,8 @@ public class ExemptionServiceImplTest {
     Customer customer;
     ObjectId customerId = new ObjectId();
     UnitTestUtilities testUtilities;
+    LocalDateTime now = LocalDateTime.now();
+    Timestamps internalTimestamps = new Timestamps(now, now);
 
     @BeforeEach
     void setUp() {
@@ -67,16 +74,17 @@ public class ExemptionServiceImplTest {
         // Given
         Exemption exemptionNoId = exemption.withId(null);
         Exemption exemptionWithNewComplytId = exemptionNoId.withComplytId(exemption.getComplytId());
-        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptionNoId)).thenReturn(Mono.just(exemption));
-        when(exemptionComplytIdHandler.insertComplytIdToNew(exemption)).thenReturn(exemptionWithNewComplytId);
-        Exemption exemptionWithIdAndComplytId = exemptionWithNewComplytId.withId(exemption.getId());
+        Exemption exemptionWithIdAndComplytIdAndTimestamps = exemptionWithNewComplytId.withInternalTimestamps(internalTimestamps);
 
         // When
-        when(exemptionRepository.save(exemptionWithNewComplytId)).thenReturn(Mono.just(exemptionWithIdAndComplytId));
+        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptionNoId)).thenReturn(Mono.just(exemption));
+        when(exemptionComplytIdHandler.insertComplytIdToNew(exemption)).thenReturn(exemptionWithNewComplytId);
+        when(internalTimestampsHandler.insertTimestampsToNew(exemptionWithNewComplytId)).thenReturn(exemptionWithIdAndComplytIdAndTimestamps);
+        when(exemptionRepository.save(exemptionWithIdAndComplytIdAndTimestamps)).thenReturn(Mono.just(exemptionWithIdAndComplytIdAndTimestamps));
         Mono<Exemption> exemptionMono = exemptionService.save(exemptionNoId);
 
         // Then
-        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
+        StepVerifier.create(exemptionMono).expectNext(exemptionWithIdAndComplytIdAndTimestamps).verifyComplete();
     }
 
     @Test
@@ -130,13 +138,15 @@ public class ExemptionServiceImplTest {
         // Given
         Exemption newExemption = exemption.withStatus(new Status("new code", "new name"));
         UUID id = exemption.getComplytId();
+        Exemption updatedExemption = newExemption.withInternalTimestamps(newExemption.getInternalTimestamps().withUpdatedDate(now));
 
         // When
-        when(exemptionRepository.save(newExemption)).thenReturn(Mono.just(newExemption));
+        when(internalTimestampsHandler.insertTimestampsToExisting(newExemption, exemption)).thenReturn(updatedExemption);
+        when(exemptionRepository.save(updatedExemption)).thenReturn(Mono.just(updatedExemption));
         Mono<Exemption> exemptionMono = exemptionService.update(newExemption, exemption, id);
 
         // Then
-        StepVerifier.create(exemptionMono).expectNext(newExemption).verifyComplete();
+        StepVerifier.create(exemptionMono).expectNext(updatedExemption).verifyComplete();
     }
 
     @Test
@@ -272,13 +282,16 @@ public class ExemptionServiceImplTest {
     void injectDataToNewExemption_notNullExemption_ReturnsExemptionWithData() {
         // Given
         UUID complytId = UUID.randomUUID();
+        Exemption exemptionWithComplytId = exemption.withComplytId(complytId);
+        Exemption exemptionWithComplytIdAndTimestamps = exemptionWithComplytId.withInternalTimestamps(internalTimestamps);
 
         // When
-        when(exemptionComplytIdHandler.insertComplytIdToNew(exemption)).thenReturn(exemption.withComplytId(complytId));
+        when(exemptionComplytIdHandler.insertComplytIdToNew(exemption)).thenReturn(exemptionWithComplytId);
+        when(internalTimestampsHandler.insertTimestampsToNew(exemptionWithComplytId)).thenReturn(exemptionWithComplytIdAndTimestamps);
         Mono<Exemption> exemptionMono = exemptionService.injectDataToNewExemption(exemption);
 
         // Then
-        StepVerifier.create(exemptionMono).expectNext(exemption.withComplytId(complytId)).verifyComplete();
+        StepVerifier.create(exemptionMono).expectNext(exemptionWithComplytIdAndTimestamps).verifyComplete();
     }
 
     @Test
@@ -293,9 +306,12 @@ public class ExemptionServiceImplTest {
         Exemption secondExemptionWithComplytId = exemptions.get(1).withComplytId(UUID.randomUUID());
         Exemption thirdExemptionWithComplytId = exemptions.get(2).withComplytId(UUID.randomUUID());
 
-        Exemption firstExemptionWithIds = firstExemptionWithComplytId.withId(UUID.randomUUID().toString());
-        Exemption secondExemptionWithIds = secondExemptionWithComplytId.withId(UUID.randomUUID().toString());
-        Exemption thirdExemptionWithIds = thirdExemptionWithComplytId.withId(UUID.randomUUID().toString());
+        Exemption firstExemptionWithIdsAndTimeStamps = firstExemptionWithComplytId.withId(UUID.randomUUID().toString())
+                .withInternalTimestamps(internalTimestamps);
+        Exemption secondExemptionWithIdsAndTimeStamps = secondExemptionWithComplytId.withId(UUID.randomUUID().toString())
+                .withInternalTimestamps(internalTimestamps);
+        Exemption thirdExemptionWithIdsAndTimeStamps = thirdExemptionWithComplytId.withId(UUID.randomUUID().toString())
+                .withInternalTimestamps(internalTimestamps);
 
         // When
         when(exemptionListGeneratorStrategy.select(exemptionWrapper)).thenReturn(wrapper -> Flux.fromIterable(exemptions));
@@ -308,17 +324,21 @@ public class ExemptionServiceImplTest {
         when(exemptionComplytIdHandler.insertComplytIdToNew(exemptions.get(1))).thenReturn(secondExemptionWithComplytId);
         when(exemptionComplytIdHandler.insertComplytIdToNew(exemptions.get(2))).thenReturn(thirdExemptionWithComplytId);
 
-        when(exemptionRepository.save(firstExemptionWithComplytId)).thenReturn(Mono.just(firstExemptionWithIds));
-        when(exemptionRepository.save(secondExemptionWithComplytId)).thenReturn(Mono.just(secondExemptionWithIds));
-        when(exemptionRepository.save(thirdExemptionWithComplytId)).thenReturn(Mono.just(thirdExemptionWithIds));
+        when(internalTimestampsHandler.insertTimestampsToNew(firstExemptionWithComplytId)).thenReturn(firstExemptionWithIdsAndTimeStamps);
+        when(internalTimestampsHandler.insertTimestampsToNew(secondExemptionWithComplytId)).thenReturn(secondExemptionWithIdsAndTimeStamps);
+        when(internalTimestampsHandler.insertTimestampsToNew(thirdExemptionWithComplytId)).thenReturn(thirdExemptionWithIdsAndTimeStamps);
+
+        when(exemptionRepository.save(firstExemptionWithIdsAndTimeStamps)).thenReturn(Mono.just(firstExemptionWithIdsAndTimeStamps));
+        when(exemptionRepository.save(secondExemptionWithIdsAndTimeStamps)).thenReturn(Mono.just(secondExemptionWithIdsAndTimeStamps));
+        when(exemptionRepository.save(thirdExemptionWithIdsAndTimeStamps)).thenReturn(Mono.just(thirdExemptionWithIdsAndTimeStamps));
 
         Flux<Exemption> exemptionFlux = exemptionService.saveMany(exemptionWrapper);
 
         // Then
         StepVerifier.create(exemptionFlux)
-                .expectNext(firstExemptionWithIds)
-                .expectNext(secondExemptionWithIds)
-                .expectNext(thirdExemptionWithIds)
+                .expectNext(firstExemptionWithIdsAndTimeStamps)
+                .expectNext(secondExemptionWithIdsAndTimeStamps)
+                .expectNext(thirdExemptionWithIdsAndTimeStamps)
                 .verifyComplete();
 
     }
@@ -334,6 +354,7 @@ public class ExemptionServiceImplTest {
         Exemption firstExemptionWithComplytId = exemptions.get(0).withComplytId(UUID.randomUUID());
 
         Exemption firstExemptionWithIds = firstExemptionWithComplytId.withId(UUID.randomUUID().toString());
+        Exemption firstExemptionWithIdsAndTimestamps = firstExemptionWithIds.withInternalTimestamps(internalTimestamps);
 
         // When
         when(exemptionListGeneratorStrategy.select(exemptionWrapper)).thenReturn(wrapper -> Flux.fromIterable(exemptions));
@@ -342,13 +363,15 @@ public class ExemptionServiceImplTest {
 
         when(exemptionComplytIdHandler.insertComplytIdToNew(exemptions.get(0))).thenReturn(firstExemptionWithComplytId);
 
-        when(exemptionRepository.save(firstExemptionWithComplytId)).thenReturn(Mono.just(firstExemptionWithIds));
+        when(internalTimestampsHandler.insertTimestampsToNew(firstExemptionWithComplytId)).thenReturn(firstExemptionWithIdsAndTimestamps);
+
+        when(exemptionRepository.save(firstExemptionWithIdsAndTimestamps)).thenReturn(Mono.just(firstExemptionWithIdsAndTimestamps));
 
         Flux<Exemption> exemptionFlux = exemptionService.saveMany(exemptionWrapper);
 
         // Then
         StepVerifier.create(exemptionFlux)
-                .expectNext(firstExemptionWithIds)
+                .expectNext(firstExemptionWithIdsAndTimestamps)
                 .verifyComplete();
     }
 
@@ -410,7 +433,7 @@ public class ExemptionServiceImplTest {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(nullExemption, exemption, id));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "newExemption is marked non-null but is null");
     }
 
     @Test
@@ -423,7 +446,7 @@ public class ExemptionServiceImplTest {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(exemption, nullExemption, id));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "originalExemption is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "existingExemption is marked non-null but is null");
     }
 
     @Test

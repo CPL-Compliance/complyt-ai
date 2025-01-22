@@ -82,10 +82,10 @@ public class ExemptionServiceImpl implements ExemptionService {
     }
 
     @Override
-    public Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final Exemption existing, @NonNull final UUID complytId) {
-        return Mono.just(existing)
-                .map(newExemption -> internalTimestampsHandler.insertTimestampsToExisting(newExemption, existing))
-                .map(createFunctionUpdateExemption(exemption))
+    public Mono<Exemption> update(@NonNull final Exemption newExemption, @NonNull final Exemption existingExemption, @NonNull final UUID complytId) {
+        return Mono.just(newExemption)
+                .map(exemptionToUpdate -> internalTimestampsHandler.insertTimestampsToExisting(exemptionToUpdate, existingExemption))
+                .map(createFunctionUpdateExemption(existingExemption))
                 .flatMap(exemptionRepository::save);
     }
 
@@ -131,17 +131,17 @@ public class ExemptionServiceImpl implements ExemptionService {
         return exemptionRepository.findByCountryStateAndCustomer(country, state, customerId);
     }
 
-    private Function<Exemption, Exemption> createFunctionUpdateExemption(Exemption exemption) {
-        return exemptionInfo -> exemptionInfo
-                .withCustomerId(exemption.getCustomerId())
-                .withState(exemption.getState())
-                .withClassification(exemption.getClassification())
-                .withValidationDates(exemption.getValidationDates())
-                .withInternalTimestamps(exemption.getInternalTimestamps())
-                .withStatus(exemption.getStatus())
-                .withCertificate(exemption.getCertificate())
-                .withExemptionType(exemption.getExemptionType())
-                .withExemptionStatus(exemption.getExemptionStatus())
-                .withCountry(CountryToStandardizedCountry.standardize(exemption.getCountry()));
+    private Function<Exemption, Exemption> createFunctionUpdateExemption(Exemption exemptionInfo) {
+        return newExemption ->
+                new Exemption(
+                        exemptionInfo.getComplytId(), exemptionInfo.getId(),
+                        exemptionInfo.getTenantId(), newExemption.getCustomerId(),
+                        newExemption.getCountry(), newExemption.getState(),
+                        newExemption.getClassification(), newExemption.getValidationDates(),
+                        newExemption.getInternalTimestamps(), newExemption.getStatus(),
+                        newExemption.getCertificate(), newExemption.getExemptionType(),
+                        newExemption.getExemptionStatus(), null
+                );
     }
+
 }
