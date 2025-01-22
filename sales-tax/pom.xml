@@ -11,7 +11,7 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>sales-tax-0.116.0</tag>
   </scm>
 
     <!-- Maven Coordinates -->
