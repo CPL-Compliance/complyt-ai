@@ -6,10 +6,9 @@ import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Component
-public class InternalTimestampsHandler<T extends InternalTimestampsProperty> {
+public class InternalTimestampsInjector<T extends InternalTimestampsProperty> {
 
     public T insertTimestampsToNew(@NonNull T newEntity) {
         LocalDateTime timestamps = LocalDateTime.now();

@@ -15,11 +15,11 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class InternalTimestampsHandlerTest {
+public class InternalTimestampsInjectorTest {
 
     private UnitTestUtilities testUtilities;
 
-    private InternalTimestampsHandler<Transaction> internalTimestampsHandler;
+    private InternalTimestampsInjector<Transaction> internalTimestampsHandler;
 
     private Transaction transaction;
 
@@ -27,7 +27,7 @@ public class InternalTimestampsHandlerTest {
     void setup() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = createTransaction();
-        internalTimestampsHandler = new InternalTimestampsHandler<>();
+        internalTimestampsHandler = new InternalTimestampsInjector<>();
     }
 
     private Transaction createTransaction() {

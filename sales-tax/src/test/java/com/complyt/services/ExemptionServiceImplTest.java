@@ -2,7 +2,7 @@ package com.complyt.services;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.strategy.StrategySelector;
-import com.complyt.business.timestamps_injection.InternalTimestampsHandler;
+import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.exemption.Exemption;
@@ -48,7 +48,7 @@ public class ExemptionServiceImplTest {
     ComplytIdHandler<Exemption> exemptionComplytIdHandler;
 
     @Mock
-    InternalTimestampsHandler<Exemption> internalTimestampsHandler;
+    InternalTimestampsInjector<Exemption> internalTimestampsHandler;
 
     @Mock
     StrategySelector exemptionListGeneratorStrategy;

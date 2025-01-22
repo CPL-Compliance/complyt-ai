@@ -3,7 +3,7 @@ package com.complyt.services;
 import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.strategy.StrategySelector;
-import com.complyt.business.timestamps_injection.InternalTimestampsHandler;
+import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
@@ -33,7 +33,7 @@ public class ExemptionServiceImpl implements ExemptionService {
     private ComplytIdHandler<Exemption> complytIdHandler;
 
     @NonNull
-    private InternalTimestampsHandler<Exemption> internalTimestampsHandler;
+    private InternalTimestampsInjector<Exemption> internalTimestampsHandler;
 
     @NonNull
     private StrategySelector exemptionListGeneratorStrategy;
