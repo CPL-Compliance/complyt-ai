@@ -75,8 +75,5 @@ public class ExemptionFacade {
         return customerService.findByComplytIdProjection(exemption.getCustomerId())
                 .switchIfEmpty(Mono.error(new CustomerNotFoundApiException()));
     }
-
-    public Mono<Exemption> findByCountryStateAndCustomer(String country, String state, UUID customerId) {
-        return exemptionService.findByCountryStateAndCustomer(country, state, customerId);
-    }
+    
 }
