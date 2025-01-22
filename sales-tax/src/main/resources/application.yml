@@ -29,3 +29,12 @@ spring:
   data:
     mongodb:
       uuid-representation: standard
+
+# Set a TCP connection timeout of 200ms between microservices - so feign will do a retry if microservice is down
+reactive:
+  feign:
+    client:
+      config:
+        default:
+          options:
+            connectTimeoutMillis: 200

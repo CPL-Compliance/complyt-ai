@@ -1,5 +1,7 @@
 package integration.endpoints;
 
+import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 import testUtils.integration_test.templates.endpoints.*;
 
 public interface TransactionEndpointsITTemplate extends
@@ -172,5 +174,16 @@ public interface TransactionEndpointsITTemplate extends
     void getAll_PaginationFilteredByExternalId_PartialIdSent_ReturnsEmptyList();
 
     void upsertByExternalIdAndSource_NonUsaCountryTransactionWithNullZipAndTaxInclusiveAndNewItems_Returns201();
+
+    // Testing taxableItemsAmount property
+    void upsertByExternalIdAndSource_TransactionWithTaxableState_ReturnsTaxableItemsAmountOfItemsPrice();
+
+    void upsertByExternalIdAndSource_TransactionWithTaxableCityAndNotTaxableState_ReturnsTaxableItemsAmountOfItemsPrice();
+
+    void upsertByExternalIdAndSource_TransactionWithOutTaxableCityAndState_ReturnsTaxableItemsAmountOfZero();
+
+    void upsertByExternalIdAndSource_TransactionWithOutTaxableCityAndStateWithZeroThatDoesNotExist_ReturnsTaxableItemsAmountOfZero();
+
+    void upsertByExternalIdAndSource_GTTransactionWithTaxableCountry_ReturnsTaxableItemsAmountOfItemsPrice();
 
 }

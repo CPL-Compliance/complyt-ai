@@ -18,7 +18,7 @@ public interface Taxable {
     String getTaxCode();
 
     JurisdictionalSalesTaxRules getJurisdictionalSalesTaxRules();
-
+    
     Taxable withSalesTaxRates(SalesTaxRates salesTaxRates);
 
     Taxable withGtRates(GtRates gstRates);

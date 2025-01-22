@@ -1,6 +1,7 @@
 package com.complyt.domain.customer.exemption;
 
 import com.complyt.domain.State;
+import com.complyt.domain.customer.Customer;
 import com.complyt.domain.properties.ComplytIdProperty;
 import com.complyt.domain.properties.InternalTimestampsProperty;
 import com.complyt.domain.timestamps.Timestamps;
@@ -33,5 +34,5 @@ public class Exemption implements ComplytIdProperty, InternalTimestampsProperty 
     private final Certificate certificate;
     private final ExemptionType exemptionType;
     private final ExemptionStatus exemptionStatus;
-
+    private final Customer customer;
 }

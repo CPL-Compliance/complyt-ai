@@ -2,6 +2,7 @@ package com.complyt.business.strategy.items_jurisdictional_rules_injection;
 
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
+import com.complyt.domain.sales_tax.product_classification.SubJurisdictionalTaxRules;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;

@@ -14,6 +14,9 @@ spring:
 
   cloud:
     gateway:
+      httpclient:
+        connect-timeout: 200  # Set a TCP connection timeout of 200ms between microservices - so gateway will do a retry if microservice is down
+
       discovery:
         locator:
           enabled: true
@@ -399,7 +402,6 @@ spring:
               - java.io.IOException
               - org.springframework.cloud.gateway.support.TimeoutException
               - java.lang.RuntimeException
-              - io.netty.channel.ConnectTimeoutException
             backoff:
               firstBackoff: 20ms
               factor: 2

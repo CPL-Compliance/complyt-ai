@@ -48,7 +48,8 @@ class ExemptionTest {
                 ", status=" + exemption.getStatus() +
                 ", certificate=" + exemption.getCertificate() +
                 ", exemptionType=" + exemption.getExemptionType() +
-                ", exemptionStatus=" + exemption.getExemptionStatus() + ")";
+                ", exemptionStatus=" + exemption.getExemptionStatus() +
+                ", customer=" + exemption.getCustomer() +")";
 
         // When
         String actualString = exemption.toString();

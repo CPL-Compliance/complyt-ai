@@ -26,10 +26,9 @@ public class TaxableItemsAmountCalculatorTest {
 
     @BeforeEach
     void setUp() {
-//        items = createItems();
         unitTestUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
 
-        items = new ArrayList<>(unitTestUtilities.setCalculatedTotalOnItemList(unitTestUtilities.createItems(true,false,  true)));
+        items = new ArrayList<>(unitTestUtilities.setCalculatedTotalOnItemList(unitTestUtilities.createItems(true, false, true)));
         taxableItemsAmountCalculator = new TaxableItemsAmountCalculator();
     }
 
@@ -70,7 +69,7 @@ public class TaxableItemsAmountCalculatorTest {
     void calculate_ItemsWithDiscountPassedBothTaxable_ReturnsAmount() {
         // Before
         List<Taxable> discountedItems = new ArrayList<>(unitTestUtilities.setCalculatedTotalOnItemList(
-                unitTestUtilities.createItems(true,false, true)
+                unitTestUtilities.createItems(true, false, true)
                         .stream().map(item -> item
                                 .withDiscount(BigDecimal.valueOf(500)))
                         .collect(Collectors.toList())));
@@ -97,7 +96,7 @@ public class TaxableItemsAmountCalculatorTest {
     @Test
     void calculate_TwoItemsAreTaxableWithTaxInclusive_ReturnsAmountOfTwoItems() {
         // Before
-        items = unitTestUtilities.createTaxablesWithSalesTaxRate(true,true,true);
+        items = unitTestUtilities.createTaxablesWithSalesTaxRate(true, true, true);
         BigDecimal expectedAmount = BigDecimal.valueOf(1428.571428);
 
         // When

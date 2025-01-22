@@ -1,10 +1,8 @@
 package com.complyt.v1.routers;
 
-import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
-import com.complyt.domain.transaction.TransactionType;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.repositories.exceptions.OperationFailedException;
@@ -21,7 +19,6 @@ import com.complyt.v1.handlers.TransactionHandler;
 import com.complyt.v1.mappers.transaction.TransactionMapper;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.customer.CustomerDto;
-import com.complyt.v1.models.tax.sales_tax.RatesMetaDataDto;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxDto;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
@@ -5192,12 +5189,12 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         List<ItemDto> itemList = new ArrayList<>();
         itemList.add(new ItemDto(new BigDecimal("25"), new BigDecimal("200"), new BigDecimal("5000"),
                 null, "desc", "HW Installation Services", "C1S1",
-                null, null, null, false, new BigDecimal("0.5"),
+                null, null, null, false, new BigDecimal("0.301"),
                 null, null, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
-                "Item.manualSalesTaxRate" + NumericErrorMessages.DECIMAL_MAX_02_ERROR);
+                "Item.manualSalesTaxRate" + NumericErrorMessages.DECIMAL_MAX_03_ERROR);
 
         // When + Then
         webTestClient

@@ -9,7 +9,7 @@ public interface GenericErrorMessages {
     String CURRENCY_NOT_FOUND_ERROR = "Currency conversion is not supported for the given transaction date.";
     String STATE_NOT_FOUND_IN_JURISDICTIONAL_TAX_RULE = "State was not found in the jurisdictional sales tax rule.";
     String COUNTRY_NOT_FOUND_IN_JURISDICTIONAL_TAX_RULE = "Country was not found in the jurisdictional tax rule.";
-    String CUSTOMER_NOT_FOUND = "Customer specified in the transaction was not found.";
+    String CUSTOMER_NOT_FOUND = "Customer specified in the object was not found.";
     String ZIP_CODE_NOT_FOUND_ERROR = "A ZIP code is required for U.S. addresses. Please enter a valid 5-digit ZIP code or ZIP+4 format (e.g., 85006 or 85006-5705).";
     String ZIP_CODE_NOT_VALID_ERROR = "Zip code format is incorrect. For U.S. addresses, please provide a valid 5-digit ZIP code or ZIP+4 format (e.g., 85006 or 85006-5705).";
     String INVALID_PATCH_FIELD_EXCEPTION = "The requested operation failed because of an invalid patch field provided.";
