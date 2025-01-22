@@ -10,6 +10,7 @@ import java.util.UUID;
 
 @Component
 public class InternalTimestampsHandler<T extends InternalTimestampsProperty> {
+    
     public T insertTimestampsToNew(@NonNull T newEntity) {
         LocalDateTime timestamps = LocalDateTime.now();
         Timestamps timeStamps = new Timestamps(timestamps, timestamps);
