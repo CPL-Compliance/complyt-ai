@@ -1,6 +1,6 @@
-package com.complyt.business.date_injection;
+package com.complyt.business.timestamps_injection;
 
-import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,9 +11,9 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class NewCustomerInternalDateInjectorTest {
+public class ExistingCustomerInternalDateInjectorTest {
 
-    NewCustomerInternalTimestampsInjector newCustomerInternalDateInjector;
+    ExistingCustomerInternalTimestampsInjector existingCustomerInternalTimestampsInjector;
 
     Customer customer;
 
@@ -23,22 +23,21 @@ public class NewCustomerInternalDateInjectorTest {
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         customer = testUtilities.createCustomer(UUID.randomUUID().toString());
-        newCustomerInternalDateInjector = new NewCustomerInternalTimestampsInjector(customer);
+        existingCustomerInternalTimestampsInjector = new ExistingCustomerInternalTimestampsInjector(customer);
     }
 
     @Test
-    void inject_CurrentDate_ReturnModifiedCustomer() {
+    void inject_CurrentDate_ReturnModifiedTransaction() {
         // Given
         LocalDateTime beforeActionTime = LocalDateTime.now();
 
         // When
-        Customer actualCustomer = newCustomerInternalDateInjector.inject();
+        Customer actualCustomer = existingCustomerInternalTimestampsInjector.inject();
         LocalDateTime afterActionTime = LocalDateTime.now();
 
         // Then
-        assertTrue(actualCustomer.getInternalTimestamps().getCreatedDate().isAfter(beforeActionTime));
         assertTrue(actualCustomer.getInternalTimestamps().getUpdatedDate().isAfter(beforeActionTime));
-        assertTrue(actualCustomer.getInternalTimestamps().getCreatedDate().isBefore(afterActionTime));
         assertTrue(actualCustomer.getInternalTimestamps().getUpdatedDate().isBefore(afterActionTime));
+        assertTrue(actualCustomer.getInternalTimestamps().getCreatedDate().isBefore(beforeActionTime));
     }
 }
