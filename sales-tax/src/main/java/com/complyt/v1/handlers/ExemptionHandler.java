@@ -2,7 +2,6 @@ package com.complyt.v1.handlers;
 
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
-import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.ExemptionFacade;
 import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.security.permissions.exemption.ExemptionCreatePermission;
@@ -13,11 +12,9 @@ import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.mappers.ExemptionWrapperMapper;
-import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import com.complyt.v1.models.customer.exemption.ExemptionWrapperDto;
 import com.complyt.v1.routers.ExemptionRouter;
-import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.validators.Patcher;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
@@ -25,7 +22,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
@@ -73,34 +69,6 @@ public class ExemptionHandler {
     }
 
     @ExemptionUpdatePermission
-    public Mono<ServerResponse> upsert(ServerRequest serverRequest) {
-        String country = serverRequest.queryParam("country").orElse("");
-        String state = serverRequest.queryParam("state").orElse(null);
-        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
-
-        StringBuilder resourceURI = new StringBuilder(SalesTaxTrackingRouter.BASE_URL + "?country=" + country);
-
-        if (state != null) {
-            resourceURI.append("&state=").append(state);
-        }
-
-        return ContextLogger.observeCtx(logStr, log::info)
-                .then(exemptionDtoValidationHandler.handle(serverRequest))
-                .flatMap(exemptionDto -> {
-                    Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
-                    return exemptionFacade.findByCountryStateAndCustomer(country, state, receivedExemption.getCustomerId())
-                            .flatMap(exemption -> exemptionFacade.update(exemption, exemption.getComplytId()))
-                            .flatMap(updatedExemption ->
-                                    ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).then(ServerResponse.status(HttpStatus.OK).bodyValue(ExemptionMapper.INSTANCE.exemptionToExemptionDto(updatedExemption))))
-                            .switchIfEmpty(exemptionFacade.save(receivedExemption)
-                                    .flatMap(exemption ->
-                                            ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).then(ServerResponse.created(URI.create(resourceURI.toString())).bodyValue(ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption)))))
-                            .switchIfEmpty(ContextLogger.observeCtx("Failed to update exemption by country " + country + " and state " + state, log::error)
-                                    .then(Mono.error(new ObjectNotFoundApiException())));
-                });
-    }
-
-    @ExemptionUpdatePermission
     public Mono<ServerResponse> update(ServerRequest serverRequest) {
         String complytId = serverRequest.pathVariable("complytId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
@@ -127,7 +95,7 @@ public class ExemptionHandler {
                 .then(exemptionWrapperDtoValidationHandler.handle(serverRequest))
                 .flatMapMany(exemptionWrapperDto -> {
                     ExemptionWrapper receivedExemptionWrapper = ExemptionWrapperMapper.INSTANCE.exemptionWrapperDtoToExemptionWrapper(exemptionWrapperDto);
-                    return exemptionFacade.saveMany(receivedExemptionWrapper);
+                    return exemptionFacade.save(receivedExemptionWrapper);
                 })
                 .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
                 .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto))

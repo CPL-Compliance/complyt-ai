@@ -46,10 +46,10 @@ public class ExemptionRouter {
     @PutExemptionApiInfo
     public RouterFunction<ServerResponse> updateExemptionByComplytIdRouterFunction(@NonNull final ExemptionHandler exemptionHandler) {
         RequestPredicate putExemptionRoute = RequestPredicates
-                .PUT(BASE_URL)
+                .PUT(BASE_URL + "/complytId/{complytId}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
-        return RouterFunctions.route(putExemptionRoute, exemptionHandler::upsert);
+        return RouterFunctions.route(putExemptionRoute, exemptionHandler::update);
     }
 
     @Bean
