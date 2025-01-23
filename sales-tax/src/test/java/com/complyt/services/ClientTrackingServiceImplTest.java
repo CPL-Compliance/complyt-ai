@@ -1,12 +1,10 @@
 package com.complyt.services;
 
-import com.complyt.business.timestamps_injection.ExistingClientTrackingInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.Nexus;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.ClientTrackingRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -127,8 +125,9 @@ class ClientTrackingServiceImplTest {
     void injectDataToExistingClientTracking_InjectsData_ReturnsInjectedClientTracking() {
         // Given
         ClientTracking anotherClientTracking = clientTracking.withName("changedName");
-        ExistingClientTrackingInternalTimestampsInjector injector = new ExistingClientTrackingInternalTimestampsInjector(clientTracking);
-        ClientTracking clientTrackingWithUpdatedDates = injector.inject();
+        LocalDateTime now = LocalDateTime.now();
+        Timestamps internalTimestamps = new Timestamps(clientTracking.getInternalTimestamps().getCreatedDate(),now);
+        ClientTracking clientTrackingWithUpdatedDates = clientTracking.withInternalTimestamps(internalTimestamps);
 
         // Then
         when(internalTimestampsInjector.insertTimestampsToExisting(clientTracking, anotherClientTracking)).thenReturn(clientTrackingWithUpdatedDates);
@@ -148,8 +147,10 @@ class ClientTrackingServiceImplTest {
     @Test
     void injectDataToNewClientTracking_InjectsData_ReturnsInjectedClientTracking() {
         // Given
-        ExistingClientTrackingInternalTimestampsInjector injector = new ExistingClientTrackingInternalTimestampsInjector(clientTracking);
-        ClientTracking clientTrackingWithUpdatedDates = injector.inject();
+        LocalDateTime now = LocalDateTime.now();
+        Timestamps internalTimestamps = new Timestamps(clientTracking.getInternalTimestamps().getCreatedDate(),now);
+        ClientTracking clientTrackingWithUpdatedDates = clientTracking.withInternalTimestamps(internalTimestamps);
+
 
         // When + Then
         when(internalTimestampsInjector.insertTimestampsToNew(clientTracking)).thenReturn(clientTrackingWithUpdatedDates);

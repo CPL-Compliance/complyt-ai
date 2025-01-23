@@ -3,7 +3,6 @@ package com.complyt.services;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.strategy.StrategySelector;
 import com.complyt.business.strategy.currencyExchange.CurrenciesWebClientWrapper;
-import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.business.transaction.CityCountyProvider;
@@ -660,8 +659,7 @@ class TransactionServiceImplTest {
         Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification
                 .withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
 
-        ExistingTransactionInternalTimestampsInjector injector = new ExistingTransactionInternalTimestampsInjector(transactionWithProductClassification);
-        Transaction transactionWithUpdatedDates = injector.inject();
+        Transaction transactionWithUpdatedDates = transactionWithProductClassification.withInternalTimestamps(internalTimestamps);
 
         // When
         when(itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(newTransaction)).thenReturn(Mono.just(transactionWithItemsCalculatedTotal));
