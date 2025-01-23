@@ -4,8 +4,7 @@ import com.complyt.business.address.CountryIsUsaChecker;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.strategy.StrategySelector;
 import com.complyt.business.strategy.currencyExchange.CurrenciesWebClientWrapper;
-import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
-import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.business.transaction.*;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.domain.currency.CurrencyExchangeRateObject;
@@ -81,6 +80,9 @@ public class TransactionServiceImpl implements TransactionService {
     @NonNull
     CurrenciesWebClientWrapper currenciesWebClientWrapper;
 
+    @NonNull
+    private InternalTimestampsInjector<Transaction> internalTimestampsInjector;
+
     @Override
     public Mono<Transaction> save(Transaction transaction) {
         return transactionRepository.save(transaction);
@@ -119,21 +121,16 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Mono<Transaction> injectDataToTransaction(@NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
-        Transaction newTransactionWithInternalTimestamps = modifiedTransaction
-                .setInternalTimestamps(originalTransaction.getInternalTimestamps());
-
-        return injectCommonDataToTransaction(newTransactionWithInternalTimestamps)
-                .map(ExistingTransactionInternalTimestampsInjector::new)
-                .map(ExistingTransactionInternalTimestampsInjector::inject);
+    public Mono<Transaction> injectDataToExistingTransaction(@NonNull Transaction newTransaction, @NonNull Transaction existingTransaction) {
+        return injectCommonDataToTransaction(newTransaction)
+                .map(updatedTransaction -> internalTimestampsInjector.insertTimestampsToExisting(updatedTransaction, existingTransaction));
     }
 
     @Override
-    public Mono<Transaction> injectDataToTransaction(@NonNull Transaction transaction) {
+    public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
         return injectCommonDataToTransaction(transaction)
                 .map(complytIdHandler::insertComplytIdToNew)
-                .map(NewTransactionInternalTimestampsInjector::new)
-                .map(NewTransactionInternalTimestampsInjector::inject);
+                .map(internalTimestampsInjector::insertTimestampsToNew);
     }
 
     @Override

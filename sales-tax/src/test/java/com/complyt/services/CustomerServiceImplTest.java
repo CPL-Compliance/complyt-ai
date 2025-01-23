@@ -1,8 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
-import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
-import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.CustomerRepository;
@@ -25,6 +24,7 @@ import testUtils.unit_test.UnitTestUtilities;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,6 +46,9 @@ class CustomerServiceImplTest {
     @Mock
     ComplytIdHandler<Customer> customerComplytIdHandler;
 
+    @Mock
+    InternalTimestampsInjector<Customer> internalTimestampsInjector;
+
     Customer customer;
 
     String source;
@@ -64,34 +67,41 @@ class CustomerServiceImplTest {
     void injectDataToExistingCustomer_InjectsDataToExistingCustomer_ReturnsCustomer() {
         // Given
         Customer newCustomer = customer.withName("NewName");
-        ExistingCustomerInternalTimestampsInjector injector = new ExistingCustomerInternalTimestampsInjector(customer);
-        Customer customerWithUpdatedDates = injector.inject();
+        LocalDateTime now = LocalDateTime.now();
+        Timestamps internalTimestamps = new Timestamps(customer.getInternalTimestamps().getCreatedDate(), now);
+        Customer customerWithUpdatedDates = newCustomer.withInternalTimestamps(internalTimestamps);
 
-        Customer actualCustomer = customerServiceImpl.injectDataToExistingCustomer(newCustomer, customer).block();
+        // When
+        when(internalTimestampsInjector.insertTimestampsToExisting(newCustomer, customer)).thenReturn(customerWithUpdatedDates);
+
+        Mono<Customer> customerMono = customerServiceImpl.injectDataToExistingCustomer(newCustomer, customer);
 
         // Then
         LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getCreatedDate();
         LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
 
-        LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate();
-        LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate();
+        StepVerifier.create(customerMono).expectNextMatches(actualCustomer -> {
+            LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate();
+            LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate();
 
-        Assertions.assertEquals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear());
-        Assertions.assertEquals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue());
-        Assertions.assertEquals(expectedUpdatedDateTime.getDayOfYear(), actualUpdatedDateTime.getDayOfYear());
-        Assertions.assertEquals(expectedUpdatedDateTime.getHour(), actualUpdatedDateTime.getHour());
-        Assertions.assertEquals(expectedCreatedDateTime.getYear(), actualCreatedDateTime.getYear());
-        Assertions.assertEquals(expectedCreatedDateTime.getMonthValue(), actualCreatedDateTime.getMonthValue());
-        Assertions.assertEquals(expectedCreatedDateTime.getDayOfYear(), actualCreatedDateTime.getDayOfYear());
-        Assertions.assertEquals(expectedCreatedDateTime.getHour(), actualCreatedDateTime.getHour());
+            return Objects.equals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear()) &&
+                    Objects.equals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue()) &&
+                    Objects.equals(expectedUpdatedDateTime.getDayOfYear(), actualUpdatedDateTime.getDayOfYear()) &&
+                    Objects.equals(expectedUpdatedDateTime.getHour(), actualUpdatedDateTime.getHour()) &&
+                    Objects.equals(expectedCreatedDateTime.getYear(), actualCreatedDateTime.getYear()) &&
+                    Objects.equals(expectedCreatedDateTime.getMonthValue(), actualCreatedDateTime.getMonthValue()) &&
+                    Objects.equals(expectedCreatedDateTime.getDayOfYear(), actualCreatedDateTime.getDayOfYear()) &&
+                    Objects.equals(expectedCreatedDateTime.getHour(), actualCreatedDateTime.getHour());
+        }).expectComplete().verify();
     }
 
     @Test
     void injectDataToNewCustomer_InjectsDataToNewCustomer_ReturnsCustomer() {
         // Given
         UUID complytId = UUID.randomUUID();
-        NewCustomerInternalTimestampsInjector injector = new NewCustomerInternalTimestampsInjector(customer.withComplytId(null));
-        Customer customerWithUpdatedDates = injector.inject().withComplytId(complytId);
+        LocalDateTime now = LocalDateTime.now();
+        Timestamps internalTimestamps = new Timestamps(now, now);
+        Customer customerWithUpdatedDates = customer.withComplytId(complytId).withInternalTimestamps(internalTimestamps);
 
         // when
         Mono<Customer> actualCustomerMono = customerServiceImpl.injectDataToNewCustomer(customer);
@@ -114,20 +124,6 @@ class CustomerServiceImplTest {
             Assertions.assertEquals(expectedCreatedDateTime.getHour(), actualCreatedDateTime.getHour());
             assertEquals(customerWithUpdatedDates.getComplytId(), actualCustomer.getComplytId());
         });
-        /*LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getCreatedDate().getTimestamp();
-        LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getUpdatedDate().getTimestamp();
-
-        LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate().getTimestamp();
-        LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate().getTimestamp();
-
-        Assertions.assertEquals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear());
-        Assertions.assertEquals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue());
-        Assertions.assertEquals(expectedUpdatedDateTime.getDayOfYear(), actualUpdatedDateTime.getDayOfYear());
-        Assertions.assertEquals(expectedUpdatedDateTime.getHour(), actualUpdatedDateTime.getHour());
-        Assertions.assertEquals(expectedCreatedDateTime.getYear(), actualCreatedDateTime.getYear());
-        Assertions.assertEquals(expectedCreatedDateTime.getMonthValue(), actualCreatedDateTime.getMonthValue());
-        Assertions.assertEquals(expectedCreatedDateTime.getDayOfYear(), actualCreatedDateTime.getDayOfYear());
-        Assertions.assertEquals(expectedCreatedDateTime.getHour(), actualCreatedDateTime.getHour());*/
     }
 
     @Test
@@ -152,14 +148,18 @@ class CustomerServiceImplTest {
     @Test
     void update_CustomerInserted_CustomerReturned() {
         // Given
+        LocalDateTime now = LocalDateTime.now();
+        Timestamps internalTimestamps = new Timestamps(customer.getInternalTimestamps().getCreatedDate(), now);
+        Customer customerWithUpdatedTimestamps = customer.withInternalTimestamps(internalTimestamps);
 
         // When
         when(customerRepository.findByExternalIdAndSource(customer.getExternalId(), source)).thenReturn(Mono.just(customer));
-        when(customerRepository.save(any())).thenReturn(Mono.just(customer));
+        when(internalTimestampsInjector.insertTimestampsToExisting(customer, customer)).thenReturn(customerWithUpdatedTimestamps);
+        when(customerRepository.save(customerWithUpdatedTimestamps)).thenReturn(Mono.just(customerWithUpdatedTimestamps));
         Mono<Customer> customerMono = customerServiceImpl.update(customer);
 
         // Then
-        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
+        StepVerifier.create(customerMono).expectNext(customerWithUpdatedTimestamps).verifyComplete();
     }
 
     @Test

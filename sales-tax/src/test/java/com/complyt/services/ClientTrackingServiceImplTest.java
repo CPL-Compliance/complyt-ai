@@ -1,6 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.business.timestamps_injection.ExistingClientTrackingInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.Nexus;
 import com.complyt.domain.timestamps.Timestamps;
@@ -18,10 +19,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -36,6 +34,9 @@ class ClientTrackingServiceImplTest {
 
     @Mock
     ClientTrackingRepository clientTrackingRepository;
+
+    @Mock
+    InternalTimestampsInjector<ClientTracking> internalTimestampsInjector;
 
     private ClientTracking clientTracking;
 
@@ -130,6 +131,7 @@ class ClientTrackingServiceImplTest {
         ClientTracking clientTrackingWithUpdatedDates = injector.inject();
 
         // Then
+        when(internalTimestampsInjector.insertTimestampsToExisting(clientTracking, anotherClientTracking)).thenReturn(clientTrackingWithUpdatedDates);
         Mono<ClientTracking> clientTrackingMono = clientTrackingServiceImp.injectDataToExistingClientTracking(clientTracking, anotherClientTracking);
 
         StepVerifier.create(clientTrackingMono).expectNextMatches(clientTracking -> {
@@ -150,6 +152,7 @@ class ClientTrackingServiceImplTest {
         ClientTracking clientTrackingWithUpdatedDates = injector.inject();
 
         // When + Then
+        when(internalTimestampsInjector.insertTimestampsToNew(clientTracking)).thenReturn(clientTrackingWithUpdatedDates);
         Mono<ClientTracking> clientTrackingMono = clientTrackingServiceImp.injectDataToNewClientTracking(clientTracking);
 
         StepVerifier.create(clientTrackingMono).expectNextMatches(clientTracking -> {
@@ -176,19 +179,21 @@ class ClientTrackingServiceImplTest {
         // Given
         ClientTracking newClientTracking = clientTracking.withName("changedName");
         LocalDateTime expectedTime = clientTracking.getInternalTimestamps().getUpdatedDate();
-        // When + Then
-        Mono<ClientTracking> updatedClientTracking = clientTrackingServiceImp.update(newClientTracking, clientTracking);
-        LocalDateTime actualTime = updatedClientTracking.block().getInternalTimestamps().getUpdatedDate();
+        Timestamps internalTimestamps = new Timestamps(clientTracking.getInternalTimestamps().getCreatedDate(), expectedTime);
 
-        Assertions.assertEquals(updatedClientTracking.block().getName(), newClientTracking.getName());
-        Assertions.assertEquals(actualTime.getYear(), expectedTime.getYear());
-        Assertions.assertEquals(actualTime.getMonthValue(), expectedTime.getMonthValue());
-        Assertions.assertEquals(actualTime.getDayOfYear(), expectedTime.getDayOfYear());
-        Assertions.assertEquals(actualTime.getHour(), expectedTime.getHour());
-        Assertions.assertEquals(actualTime.getYear(), expectedTime.getYear());
-        Assertions.assertEquals(actualTime.getMonthValue(), expectedTime.getMonthValue());
-        Assertions.assertEquals(actualTime.getDayOfYear(), expectedTime.getDayOfYear());
-        Assertions.assertEquals(actualTime.getHour(), expectedTime.getHour());
+        // When + Then
+        when(internalTimestampsInjector.insertTimestampsToExisting(newClientTracking, clientTracking)).thenReturn(newClientTracking.withInternalTimestamps(internalTimestamps));
+        Mono<ClientTracking> updatedClientTracking = clientTrackingServiceImp.update(newClientTracking, clientTracking);
+
+        StepVerifier.create(updatedClientTracking).expectNextMatches(actualClientTracking -> {
+            LocalDateTime actualTime = actualClientTracking.getInternalTimestamps().getUpdatedDate();
+            return Objects.equals(actualClientTracking.getName(), newClientTracking.getName()) &&
+                    Objects.equals(actualTime.getYear(), expectedTime.getYear()) &&
+                    Objects.equals(actualTime.getMonthValue(), expectedTime.getMonthValue()) &&
+                    Objects.equals(actualTime.getDayOfYear(), expectedTime.getDayOfYear()) &&
+                    Objects.equals(actualTime.getHour(), expectedTime.getHour());
+        }).expectComplete().verify();
+
 
     }
 
@@ -241,7 +246,7 @@ class ClientTrackingServiceImplTest {
 
         // When & Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            clientTrackingServiceImp.getByName(nullName).blockLast();
+            clientTrackingServiceImp.getByName(nullName);
         });
 
         assertEquals(nullPointerException.getMessage(), "name is marked non-null but is null");
@@ -254,7 +259,7 @@ class ClientTrackingServiceImplTest {
 
         // When & Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            clientTrackingServiceImp.getByTenantId(nullTenantId).block();
+            clientTrackingServiceImp.getByTenantId(nullTenantId);
         });
 
         assertEquals(nullPointerException.getMessage(), "tenantId is marked non-null but is null");
@@ -268,7 +273,7 @@ class ClientTrackingServiceImplTest {
 
         // When & Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            clientTrackingServiceImp.saveByTenantId(nullClientTracking, tenantId).block();
+            clientTrackingServiceImp.saveByTenantId(nullClientTracking, tenantId);
         });
 
         assertEquals(nullPointerException.getMessage(), "clientTracking is marked non-null but is null");
@@ -281,7 +286,7 @@ class ClientTrackingServiceImplTest {
 
         // When & Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            clientTrackingServiceImp.saveByTenantId(clientTracking, null).block();
+            clientTrackingServiceImp.saveByTenantId(clientTracking, null);
         });
 
         assertEquals(nullPointerException.getMessage(), "tenantId is marked non-null but is null");
@@ -295,7 +300,7 @@ class ClientTrackingServiceImplTest {
 
         // When & Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            clientTrackingServiceImp.injectDataToExistingClientTracking(nullNewClientTracking, originalClientTracking).block();
+            clientTrackingServiceImp.injectDataToExistingClientTracking(nullNewClientTracking, originalClientTracking);
         });
 
         assertEquals(nullPointerException.getMessage(), "newClientTracking is marked non-null but is null");
@@ -309,7 +314,7 @@ class ClientTrackingServiceImplTest {
 
         // When & Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            clientTrackingServiceImp.injectDataToExistingClientTracking(newClientTracking, nullOriginalClientTracking).block();
+            clientTrackingServiceImp.injectDataToExistingClientTracking(newClientTracking, nullOriginalClientTracking);
         });
 
         assertEquals(nullPointerException.getMessage(), "originalClientTracking is marked non-null but is null");
@@ -322,7 +327,7 @@ class ClientTrackingServiceImplTest {
 
         // When & Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            clientTrackingServiceImp.injectDataToNewClientTracking(nullClientTracking).block();
+            clientTrackingServiceImp.injectDataToNewClientTracking(nullClientTracking);
         });
 
         assertEquals(nullPointerException.getMessage(), "clientTracking is marked non-null but is null");
@@ -336,7 +341,7 @@ class ClientTrackingServiceImplTest {
 
         // When & Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            clientTrackingServiceImp.update(nullNewClientTracking, originalClientTracking).block();
+            clientTrackingServiceImp.update(nullNewClientTracking, originalClientTracking);
         });
 
         assertEquals(nullPointerException.getMessage(), "newClientTracking is marked non-null but is null");
@@ -350,7 +355,7 @@ class ClientTrackingServiceImplTest {
 
         // When & Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            clientTrackingServiceImp.update(newClientTracking, nullOriginalClientTracking).block();
+            clientTrackingServiceImp.update(newClientTracking, nullOriginalClientTracking);
         });
 
         assertEquals(nullPointerException.getMessage(), "originalClientTracking is marked non-null but is null");

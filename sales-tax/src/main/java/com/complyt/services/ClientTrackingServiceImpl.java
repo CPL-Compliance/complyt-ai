@@ -1,6 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.business.timestamps_injection.ExistingClientTrackingInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewClientTrackingInternalTimestampsInjector;
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.Nexus;
@@ -23,6 +24,8 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
     @NonNull
     private ClientTrackingRepository clientTrackingRepository;
 
+    @NonNull
+    private InternalTimestampsInjector<ClientTracking> internalTimestampsHandler;
 
     @Override
     public Mono<ClientTracking> save(@NonNull ClientTracking clientTracking) {
@@ -51,17 +54,13 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
 
     @Override
     public Mono<ClientTracking> injectDataToExistingClientTracking(@NonNull ClientTracking newClientTracking, @NonNull ClientTracking originalClientTracking) {
-        return Mono.just(newClientTracking).map(clientTracking -> clientTracking
-                        .withInternalTimestamps(originalClientTracking.getInternalTimestamps()))
-                .map(ExistingClientTrackingInternalTimestampsInjector::new)
-                .map(ExistingClientTrackingInternalTimestampsInjector::inject);
+        return Mono.just(newClientTracking)
+                .map(clientTracking -> internalTimestampsHandler.insertTimestampsToExisting(newClientTracking, originalClientTracking));
     }
 
     @Override
     public Mono<ClientTracking> injectDataToNewClientTracking(@NonNull ClientTracking clientTracking) {
-        return Mono.just(clientTracking)
-                .map(NewClientTrackingInternalTimestampsInjector::new)
-                .map(NewClientTrackingInternalTimestampsInjector::inject);
+        return Mono.just(clientTracking).map(internalTimestampsHandler::insertTimestampsToNew);
     }
 
     @Override

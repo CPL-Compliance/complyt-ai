@@ -50,7 +50,7 @@ public class TransactionFacade {
     public Mono<Transaction> saveTransaction(Transaction transaction) {
         return transactionService.checkTransactionNotHavingComplytId(transaction)
                 .flatMap(transactionNoComplytId -> getCustomerByTransaction(transaction)
-                        .flatMap(customer -> transactionService.injectDataToTransaction(transactionNoComplytId)
+                        .flatMap(customer -> transactionService.injectDataToNewTransaction(transactionNoComplytId)
                                 .flatMap(transactionWithData -> findSalesTaxTrackingByTransaction(transactionWithData)
                                 .flatMap(salesTaxTracking -> nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)
                                         .flatMap(salesTaxTrackingWithNexusInfo -> transactionService.injectDataBySalesTaxTracking(transactionWithData, salesTaxTrackingWithNexusInfo)
@@ -88,7 +88,7 @@ public class TransactionFacade {
     public Mono<Transaction> update(@NonNull String externalId, @NonNull String source, @NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
         return transactionService.checkComplytIdOfModifiedEqualsToOriginal(modifiedTransaction, originalTransaction)
                 .flatMap(checkedModifiedTransaction -> getCustomerByTransaction(modifiedTransaction)
-                        .flatMap(customer -> transactionService.injectDataToTransaction(checkedModifiedTransaction, originalTransaction)
+                        .flatMap(customer -> transactionService.injectDataToExistingTransaction(checkedModifiedTransaction, originalTransaction)
                                 .flatMap(transactionWithData -> findSalesTaxTrackingByTransaction(transactionWithData)
                                         .flatMap(salesTaxTracking -> nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)
                                                 .flatMap(salesTaxTrackingWithNexusInfo -> transactionService.injectDataBySalesTaxTracking(transactionWithData, salesTaxTrackingWithNexusInfo)
