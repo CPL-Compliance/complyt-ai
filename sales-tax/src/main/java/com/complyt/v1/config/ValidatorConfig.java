@@ -56,6 +56,7 @@ public class ValidatorConfig {
             HttpMethod.PUT, "^/v1/transactions/source/[^/]+/externalId/[^/]+$|"
                     + "^/v1/customers/source/[^/]+/externalId/[^/]+$|"
                     + "^/v1/exemptions/complytId/[^/]+$|"
+                    + "^/v1/exemptions|"
                     + "^/v1/nexus($|\\?.*)|"
                     + "^/v1/clientTracking/tenantId/[^/]+$",
             HttpMethod.POST, "^/v1/nexus/refresh[^/]*$|"

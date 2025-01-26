@@ -512,7 +512,7 @@ public class TestUtilities {
     public static String exemptionPatchTwoFieldsJsonExample() {
         return """
                 {
-                    "customerId": "2155317e-877d-4c08-8c5c-8cd2b485d80b",
+                    "customerId": "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5",
                     "classification": {
                             "code": "code",
                             "description": "patchedDescription"
@@ -549,7 +549,7 @@ public class TestUtilities {
         String exemptionWrapper = String.format("""
                         {
                           "exemption": {
-                                  "customerId": "81e5475d-3297-40bc-875c-95b44075ab3b",
+                                  "customerId": "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5",
                                   "country":"%s",
                                   "state": %s,
                                   "classification": {

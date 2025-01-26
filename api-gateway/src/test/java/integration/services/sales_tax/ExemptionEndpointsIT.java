@@ -22,7 +22,7 @@ public class ExemptionEndpointsIT extends TestContainersInitializerIT implements
         String complytId = "2aa5809f-301d-44f3-9081-b4f32613463c";
         String map = """
                 {
-                    "customerId": "2155317e-877d-4c08-8c5c-8cd2b485d80a"
+                    "customerId": "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"
                 }
                 """;
 
@@ -39,7 +39,7 @@ public class ExemptionEndpointsIT extends TestContainersInitializerIT implements
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(LinkedHashMap.class)
-                .value(exemption -> assertEquals(exemption.get(0).get("customerId"),"2155317e-877d-4c08-8c5c-8cd2b485d80a"));
+                .value(exemption -> assertEquals(exemption.get(0).get("customerId"),"4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"));
     }
 
     @Order(1)
@@ -62,7 +62,7 @@ public class ExemptionEndpointsIT extends TestContainersInitializerIT implements
                 .expectStatus().isOk()
                 .expectBodyList(LinkedHashMap.class)
                 .value(exemption -> {
-                    assertEquals(exemption.get(0).get("customerId"),"2155317e-877d-4c08-8c5c-8cd2b485d80b");
+                    assertEquals(exemption.get(0).get("customerId"),"4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5");
                     assertTrue(exemption.get(0).get("classification").toString().contains("patchedDescription"));
                 });
     }

@@ -1,5 +1,6 @@
 package com.complyt.domain;
 
+import com.complyt.domain.properties.InternalTimestampsProperty;
 import com.complyt.domain.timestamps.Timestamps;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -13,7 +14,7 @@ import java.util.List;
 @With
 @ToString
 @Document(collection = "client_tracking")
-public class ClientTracking {
+public class ClientTracking implements InternalTimestampsProperty {
     @Id
     private final String id;
     private final String tenantId;

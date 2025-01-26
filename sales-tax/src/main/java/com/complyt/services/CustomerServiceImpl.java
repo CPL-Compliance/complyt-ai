@@ -1,8 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
-import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
-import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerStatus;
 import com.complyt.repositories.CustomerRepository;
@@ -30,6 +29,9 @@ public class CustomerServiceImpl implements CustomerService {
     @NonNull
     private ComplytIdHandler<Customer> complytIdHandler;
 
+    @NonNull
+    private InternalTimestampsInjector<Customer> internalTimestampsHandler;
+
     @Override
     public Mono<Customer> save(@NonNull Customer customer) {
         return customerRepository.save(customer);
@@ -49,8 +51,7 @@ public class CustomerServiceImpl implements CustomerService {
     public Mono<Customer> injectDataToNewCustomer(Customer customer) {
         return Mono.just(customer)
                 .map(complytIdHandler::insertComplytIdToNew)
-                .map(NewCustomerInternalTimestampsInjector::new)
-                .map(NewCustomerInternalTimestampsInjector::inject)
+                .map(internalTimestampsHandler::insertTimestampsToNew)
                 .map(customerWithInjectedData -> customerWithInjectedData.withCustomerStatus(CustomerStatus.ACTIVE));
     }
 
@@ -65,10 +66,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Mono<Customer> injectDataToExistingCustomer(Customer newCustomer, Customer originalCustomer) {
-        return Mono.just(newCustomer).map(customer -> customer
-                        .withInternalTimestamps(originalCustomer.getInternalTimestamps()))
-                .map(ExistingCustomerInternalTimestampsInjector::new)
-                .map(ExistingCustomerInternalTimestampsInjector::inject);
+        return Mono.just(newCustomer).map(customer -> internalTimestampsHandler.insertTimestampsToExisting(customer, originalCustomer));
     }
 
     @Override

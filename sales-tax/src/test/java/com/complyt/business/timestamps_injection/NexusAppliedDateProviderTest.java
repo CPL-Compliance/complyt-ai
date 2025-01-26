@@ -1,5 +1,6 @@
-package com.complyt.business.timestamps_injection.provider;
+package com.complyt.business.timestamps_injection;
 
+import com.complyt.business.timestamps_injection.provider.NexusAppliedDateProvider;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import org.junit.jupiter.api.BeforeEach;

@@ -3,6 +3,7 @@ package com.complyt.services;
 import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.strategy.StrategySelector;
+import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
@@ -30,6 +31,9 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @NonNull
     private ComplytIdHandler<Exemption> complytIdHandler;
+
+    @NonNull
+    private InternalTimestampsInjector<Exemption> internalTimestampsHandler;
 
     @NonNull
     private StrategySelector exemptionListGeneratorStrategy;
@@ -75,9 +79,10 @@ public class ExemptionServiceImpl implements ExemptionService {
     }
 
     @Override
-    public Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final Exemption originalExemption, @NonNull final UUID complytId) {
-        return Mono.just(originalExemption)
-                .map(createFunctionUpdateExemption(exemption))
+    public Mono<Exemption> update(@NonNull final Exemption newExemption, @NonNull final Exemption existingExemption, @NonNull final UUID complytId) {
+        return Mono.just(newExemption)
+                .map(exemptionToUpdate -> internalTimestampsHandler.insertTimestampsToExisting(exemptionToUpdate, existingExemption))
+                .map(createFunctionUpdateExemption(existingExemption))
                 .flatMap(exemptionRepository::save);
     }
 
@@ -96,9 +101,10 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @Override
     public Mono<Exemption> injectDataToNewExemption(@NonNull Exemption exemption) {
-        return Mono.just(exemption).map(complytIdHandler::insertComplytIdToNew)
-                .map(exemptionWithComplytId -> exemptionWithComplytId
-                        .withCountry(CountryToStandardizedCountry.standardize(exemptionWithComplytId.getCountry())));
+        return Mono.just(exemption)
+                .map(complytIdHandler::insertComplytIdToNew)
+                .map(exemptionWithComplytId -> exemptionWithComplytId.withCountry(CountryToStandardizedCountry.standardize(exemptionWithComplytId.getCountry())))
+                .map(internalTimestampsHandler::insertTimestampsToNew);
     }
 
     @Override
@@ -117,17 +123,17 @@ public class ExemptionServiceImpl implements ExemptionService {
                 .flatMap(this::save);
     }
 
-    private Function<Exemption, Exemption> createFunctionUpdateExemption(Exemption exemption) {
-        return exemptionInfo -> exemptionInfo
-                .withCustomerId(exemption.getCustomerId())
-                .withState(exemption.getState())
-                .withClassification(exemption.getClassification())
-                .withValidationDates(exemption.getValidationDates())
-                .withInternalTimestamps(exemption.getInternalTimestamps())
-                .withStatus(exemption.getStatus())
-                .withCertificate(exemption.getCertificate())
-                .withExemptionType(exemption.getExemptionType())
-                .withExemptionStatus(exemption.getExemptionStatus())
-                .withCountry(CountryToStandardizedCountry.standardize(exemption.getCountry()));
+    private Function<Exemption, Exemption> createFunctionUpdateExemption(Exemption exemptionInfo) {
+        return newExemption ->
+                new Exemption(
+                        exemptionInfo.getComplytId(), exemptionInfo.getId(),
+                        exemptionInfo.getTenantId(), newExemption.getCustomerId(),
+                        newExemption.getCountry(), newExemption.getState(),
+                        newExemption.getClassification(), newExemption.getValidationDates(),
+                        newExemption.getInternalTimestamps(), newExemption.getStatus(),
+                        newExemption.getCertificate(), newExemption.getExemptionType(),
+                        newExemption.getExemptionStatus(), null
+                );
     }
+
 }

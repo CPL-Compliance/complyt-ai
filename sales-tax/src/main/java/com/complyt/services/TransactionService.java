@@ -28,9 +28,9 @@ public interface TransactionService extends CrudService<Transaction, String> {
 
     Flux<Transaction> getTransactionsByQuery(@NonNull Query query);
 
-    Mono<Transaction> injectDataToTransaction(@NonNull Transaction newTransaction, @NonNull Transaction oldTransaction);
+    Mono<Transaction> injectDataToExistingTransaction(@NonNull Transaction newTransaction, @NonNull Transaction oldTransaction);
 
-    Mono<Transaction> injectDataToTransaction(@NonNull Transaction transaction);
+    Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction);
 
     Mono<Transaction> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction);
 
@@ -43,6 +43,8 @@ public interface TransactionService extends CrudService<Transaction, String> {
     Boolean hasModifiedTransactionStatusChangedToCancelled(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction);
 
     Mono<Transaction> injectExchangeRateIfNeeded(@NonNull final Transaction transaction);
+
     Mono<Transaction> calculateTotalAmounts(Transaction transaction);
+
     Mono<Transaction> injectDataBySalesTaxTracking(Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo);
 }
