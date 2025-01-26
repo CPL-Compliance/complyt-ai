@@ -402,6 +402,8 @@ spring:
               - java.io.IOException
               - org.springframework.cloud.gateway.support.TimeoutException
               - java.lang.RuntimeException
+            statuses:
+              - UNPROCESSABLE_ENTITY
             backoff:
               firstBackoff: 20ms
               factor: 2
