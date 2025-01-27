@@ -9,6 +9,7 @@ import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.tax.ComplytGtRates;
 import com.complyt.domain.transaction.tax.GtRates;
+import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,7 +68,7 @@ public class GtRatesTransactionInjectorTest {
         when(transactionGtRatesHandler.setRates(transaction,gtRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxables);
         when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
-        Mono<Transaction> transactionMono = gtRatesTransactionInjector.inject(transaction).apply(complytGtRates);
+        Mono<Transaction> transactionMono = gtRatesTransactionInjector.inject(transaction).apply(Pair.with(complytGtRates, false));
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionWithRatesAndSalesTax).verifyComplete();
@@ -92,11 +93,92 @@ public class GtRatesTransactionInjectorTest {
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxables);
         when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
 
-        Mono<Transaction> transactionMono = gtRatesTransactionInjector.inject(transactionToSend).apply(complytGtRates);
+        Mono<Transaction> transactionMono = gtRatesTransactionInjector.inject(transactionToSend).apply(Pair.with(complytGtRates, false));
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionWithRatesAndSalesTax).verifyComplete();
     }
 
+    @Test
+    void inject_InjectsRatesToTransactionWithExemptCustomerAndNoManualRateItems_ReturnsTransaction() {
+        // Given
+        GtRates gtRates = testUtilities.createGtRates();
+        ComplytGtRates complytGtRates = testUtilities.createComplytGtRates();
 
+        List<Item> itemsWithRates = new ArrayList<>() {{
+            add(transaction.getItems().get(0).withGtRates(gtRates));
+        }};
+        Collection<Taxable> taxables = new ArrayList<>(transaction.getItems());
+        Transaction transactionWithRates = transaction.withItems(itemsWithRates);
+        Transaction transactionWithRatesAndNullSalesTax = transactionWithRates.withSalesTax(null).withFinalTransactionAmount(BigDecimal.valueOf(0)); // finalTransactionAmount equals to the salesTaxAmount because the finalTransactionAmount in 0
+
+        // When
+        when(transactionGtRatesHandler.setRates(transaction,gtRates)).thenReturn(Mono.just(transactionWithRates));
+        when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxables);
+        Mono<Transaction> transactionMono = gtRatesTransactionInjector.inject(transaction).apply(Pair.with(complytGtRates, true));
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionWithRatesAndNullSalesTax).verifyComplete();
+    }
+
+    @Test
+    void inject_InjectsRatesToTransactionWithExemptCustomerAndSomeManualRateItems_ReturnsTransaction() {
+        // Given
+        GtRates gtRates = testUtilities.createGtRates();
+        ComplytGtRates complytGtRates = testUtilities.createComplytGtRates();
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(800), gtRates.taxRate(), null, gtRates); //note gst is null
+
+        List<Item> manualTaxableItems = new ArrayList<>() {{
+            add(transaction.getItems().get(1).withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1)));
+        }};
+
+        List<Item> itemsWithRates = new ArrayList<>() {{
+            add(transaction.getItems().get(0).withGtRates(gtRates));
+            add(transaction.getItems().get(1).withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1)).withGtRates(gtRates));
+        }};
+
+        Collection<Taxable> taxables = new ArrayList<>(manualTaxableItems);
+        Transaction transactionWithRates = transaction.withItems(itemsWithRates);
+        Transaction transactionWithRatesAndNullSalesTax = transactionWithRates.withSalesTax(salesTax).withFinalTransactionAmount(BigDecimal.valueOf(800)); // finalTransactionAmount equals to the salesTaxAmount because the finalTransactionAmount in 0
+
+        // When
+        when(transactionGtRatesHandler.setRates(transaction,gtRates)).thenReturn(Mono.just(transactionWithRates));
+        when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxables);
+        when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
+        Mono<Transaction> transactionMono = gtRatesTransactionInjector.inject(transaction).apply(Pair.with(complytGtRates, true));
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionWithRatesAndNullSalesTax).verifyComplete();
+    }
+
+    @Test
+    void inject_InjectsRatesToTransactionWithExemptCustomerAndAllManualRateItems_ReturnsTransaction() {
+        // Given
+        GtRates gtRates = testUtilities.createGtRates();
+        ComplytGtRates complytGtRates = testUtilities.createComplytGtRates();
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(1600), gtRates.taxRate(), null, gtRates); //note gst is null
+
+        List<Item> manualTaxableItems = new ArrayList<>() {{
+            add(transaction.getItems().get(0).withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1)));
+            add(transaction.getItems().get(1).withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1)));
+        }};
+
+        List<Item> itemsWithRates = new ArrayList<>() {{
+            add(transaction.getItems().get(0).withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1)).withGtRates(gtRates));
+            add(transaction.getItems().get(1).withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1)).withGtRates(gtRates));
+        }};
+
+        Collection<Taxable> taxables = new ArrayList<>(manualTaxableItems);
+        Transaction transactionWithRates = transaction.withItems(itemsWithRates);
+        Transaction transactionWithRatesAndNullSalesTax = transactionWithRates.withSalesTax(salesTax).withFinalTransactionAmount(BigDecimal.valueOf(1600)); // finalTransactionAmount equals to the salesTaxAmount because the finalTransactionAmount in 0
+
+        // When
+        when(transactionGtRatesHandler.setRates(transaction,gtRates)).thenReturn(Mono.just(transactionWithRates));
+        when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxables);
+        when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
+        Mono<Transaction> transactionMono = gtRatesTransactionInjector.inject(transaction).apply(Pair.with(complytGtRates, true));
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionWithRatesAndNullSalesTax).verifyComplete();
+    }
 }

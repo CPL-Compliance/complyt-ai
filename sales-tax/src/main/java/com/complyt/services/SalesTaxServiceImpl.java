@@ -11,6 +11,7 @@ import com.complyt.domain.transaction.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -43,15 +44,14 @@ public class SalesTaxServiceImpl implements SalesTaxService {
         boolean isApplied = salesTaxApplyCheck.check(salesTaxTracking);
 
         return isApplied ? exemptionService.isFullyExempted(transactionWithOutSalesTax)
-                .flatMap(isFullyExempted -> isFullyExempted || customer.getCustomerType() == CustomerType.MARKETPLACE ? Mono.just(transactionWithOutSalesTax) :
-                        calculate(transactionWithOutSalesTax)) :
+                .flatMap(isFullyExempted -> calculate(transactionWithOutSalesTax, isFullyExempted || customer.getCustomerType() == CustomerType.MARKETPLACE)) :
                 Mono.just(transactionWithOutSalesTax);
     }
 
     @Override
-    public Mono<Transaction> calculate(@NonNull Transaction transaction) {
+    public Mono<Transaction> calculate(@NonNull Transaction transaction, @NonNull Boolean isExempt) {
         return ((Mono<ComplytInternalRates>) salesTaxRatesWrapperStrategy.select(transaction).apply(transaction.getShippingAddress()))
-                .flatMap(complytInternalRates -> (Mono<Transaction>) transactionRatesInjectionStrategy.select(transaction).apply(complytInternalRates));
+                .flatMap(complytInternalRates -> (Mono<Transaction>) transactionRatesInjectionStrategy.select(transaction).apply(Pair.with(complytInternalRates, isExempt)));
     }
 
 }

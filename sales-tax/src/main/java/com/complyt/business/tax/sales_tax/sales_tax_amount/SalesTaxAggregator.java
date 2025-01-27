@@ -26,6 +26,7 @@ public class SalesTaxAggregator {
 
         log.debug("Sales tax amount calculated : " + amount);
 
-        return BigDecimalProcessor.removeTrailingZeros(amount.get());
+        BigDecimal aggregatedAmount = amount.orElse(BigDecimal.ZERO);
+        return BigDecimalProcessor.removeTrailingZeros(aggregatedAmount);
     }
 }

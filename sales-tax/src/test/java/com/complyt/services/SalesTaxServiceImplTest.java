@@ -104,13 +104,23 @@ public class SalesTaxServiceImplTest {
         // Given
         SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         Customer marketPlaceCustomer = customer.withCustomerType(CustomerType.MARKETPLACE);
+        SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
+        ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //todo: note gst is null
+
+        List<Item> itemsWithRates = new ArrayList<>() {{
+            add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
+        }};
+        Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
+        when(salesTaxRatesWrapperStrategy.select(transaction)).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
+        when(transactionRatesInjectionStrategy.select(transaction)).thenReturn(transaction -> Mono.just(transactionWithSalesTax));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, marketPlaceCustomer);
 
         // Then
-        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transactionWithSalesTax).verifyComplete();
     }
 
     @Test
@@ -176,13 +186,23 @@ public class SalesTaxServiceImplTest {
     void handleSalesTaxCalculation_CustomerIsFullyExemptedInState_ReturnsTransactionWithOutSalesTax() {
         // Given
         SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
+        SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
+        ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //todo: note gst is null
+
+        List<Item> itemsWithRates = new ArrayList<>() {{
+            add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
+        }};
+        Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(true));
+        when(salesTaxRatesWrapperStrategy.select(transaction)).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
+        when(transactionRatesInjectionStrategy.select(transaction)).thenReturn(transaction -> Mono.just(transactionWithSalesTax));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, customer);
 
         // Then
-        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transactionWithSalesTax).verifyComplete();
     }
 
     @Test
@@ -254,8 +274,18 @@ public class SalesTaxServiceImplTest {
         Transaction nullTransaction = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxService.calculate(nullTransaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxService.calculate(nullTransaction, false));
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
+    }
+
+    @Test
+    void calculate_NullBooleanPassed_ThrowsException() {
+        // Given
+        Boolean nullIsExempt = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxService.calculate(transaction, nullIsExempt));
+        assertEquals(nullPointerException.getMessage(), "isExempt is marked non-null but is null");
     }
 
     @Test

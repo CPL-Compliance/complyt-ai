@@ -4017,4 +4017,207 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 });
     }
 
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndUsaTransactionWithoutManualSalesTax_ReturnsTransactionWithoutSalesTax() {
+        String externalId = "CustomerIsFullyExemptAndUsaTransactionWithoutManualSalesTax_ID";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("city", "US", null, "PA", "st", "", "16028", false))
+                .withExternalTimestamps(new TimestampsDto("2025-01-26", "2025-01-26"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNull(transactionDto.salesTax()));
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndUsaTransactionWithSomeItemsWithManualSalesTax_ReturnsTransactionWithSalesTax() {
+        String externalId = "CustomerIsFullyExemptAndUsaTransactionWithSomeItemsWithManualSalesTax_ID";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId);
+        ItemDto firstItemWithManualRate = givenTransaction.items().get(0).withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1));
+        ItemDto secondItem = givenTransaction.items().get(1);
+        ItemDto thirdItem = givenTransaction.items().get(2);
+        List<ItemDto> itemsDto = new ArrayList<>() {{
+            add(firstItemWithManualRate);
+            add(secondItem);
+            add(thirdItem);
+        }};
+
+        givenTransaction = givenTransaction.withItems(itemsDto)
+                .withShippingAddress(new MandatoryAddressDto("city", "US", null, "PA", "st", "", "16028", false))
+                .withExternalTimestamps(new TimestampsDto("2025-01-26", "2025-01-26"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                            assertNotNull(transactionDto.salesTax());
+                            assertEquals(BigDecimal.valueOf(50), transactionDto.salesTax().amount()); // Manual tax rate is 10% for each item
+                            assertNull(transactionDto.items().get(0).salesTaxRates());
+                            assertNull(transactionDto.items().get(1).salesTaxRates());
+                            assertNull(transactionDto.items().get(2).salesTaxRates());
+                        }
+                );
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndUsaTransactionWithAllItemsWithManualSalesTax_ReturnsTransactionWithSalesTax() {
+        String externalId = "CustomerIsFullyExemptAndUsaTransactionWithAllItemsWithManualSalesTax_ID";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId);
+        List<ItemDto> itemsDto = givenTransaction.items().stream().map(itemDto -> itemDto.withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1))).toList();
+
+        givenTransaction = givenTransaction.withItems(itemsDto)
+                .withShippingAddress(new MandatoryAddressDto("city", "US", null, "PA", "st", "", "16028", false))
+                .withExternalTimestamps(new TimestampsDto("2025-01-26", "2025-01-26"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                            assertNotNull(transactionDto.salesTax());
+                            assertEquals(BigDecimal.valueOf(1150), transactionDto.salesTax().amount()); // Manual tax rate is 10% for each item
+                            assertNull(transactionDto.items().get(0).salesTaxRates());
+                            assertNull(transactionDto.items().get(1).salesTaxRates());
+                            assertNull(transactionDto.items().get(2).salesTaxRates());
+                        }
+                );
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndNonUsaTransactionWithoutManualSalesTax_ReturnsTransactionWithoutSalesTax() {
+        String externalId = "CustomerIsFullyExemptAndNonUsaTransactionWithoutManualSalesTax_ID";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("Ramat Gan", "Sweden", null, "Complyt", "Menachem Begin road 7", "", "5268102", false))
+                .withExternalTimestamps(new TimestampsDto("2022-12-02", "2022-12-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNull(transactionDto.salesTax()));
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndNonUsaTransactionWithSomeItemsWithManualSalesTax_ReturnsTransactionWithSalesTax() {
+        String externalId = "CustomerIsFullyExemptAndNonUsaTransactionWithSomeItemsWithManualSalesTax_ID";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId);
+        ItemDto firstItemWithManualRate = givenTransaction.items().get(0).withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1));
+        ItemDto secondItem = givenTransaction.items().get(1);
+        ItemDto thirdItem = givenTransaction.items().get(2);
+        List<ItemDto> itemsDto = new ArrayList<>() {{
+            add(firstItemWithManualRate);
+            add(secondItem);
+            add(thirdItem);
+        }};
+
+        givenTransaction = givenTransaction.withItems(itemsDto)
+                .withShippingAddress(new MandatoryAddressDto("Ramat Gan", "Sweden", null, "Complyt", "Menachem Begin road 7", "", "5268102", false))
+                .withExternalTimestamps(new TimestampsDto("2022-12-02", "2022-12-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                            assertNotNull(transactionDto.salesTax());
+                            assertEquals(BigDecimal.valueOf(50), transactionDto.salesTax().amount()); // Manual tax rate is 10% for each item
+                            assertNull(transactionDto.items().get(0).salesTaxRates());
+                            assertNull(transactionDto.items().get(1).salesTaxRates());
+                            assertNull(transactionDto.items().get(2).salesTaxRates());
+                        }
+                );
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndNonUsaTransactionWithAllItemsWithManualSalesTax_ReturnsTransactionWithSalesTax() {
+        String externalId = "CustomerIsFullyExemptAndNonUsaTransactionWithAllItemsWithManualSalesTax_ID";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId);
+        List<ItemDto> itemsDto = givenTransaction.items().stream().map(itemDto -> itemDto.withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1))).toList();
+
+        givenTransaction = givenTransaction.withItems(itemsDto)
+                .withShippingAddress(new MandatoryAddressDto("Ramat Gan", "Sweden", null, "Complyt", "Menachem Begin road 7", "", "5268102", false))
+                .withExternalTimestamps(new TimestampsDto("2022-12-02", "2022-12-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                            assertNotNull(transactionDto.salesTax());
+                            assertEquals(BigDecimal.valueOf(1150), transactionDto.salesTax().amount()); // Manual tax rate is 10% for each item
+                            assertNull(transactionDto.items().get(0).salesTaxRates());
+                            assertNull(transactionDto.items().get(1).salesTaxRates());
+                            assertNull(transactionDto.items().get(2).salesTaxRates());
+                        }
+                );
+    }
 }

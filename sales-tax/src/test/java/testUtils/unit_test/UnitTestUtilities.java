@@ -299,7 +299,6 @@ public class UnitTestUtilities {
         List<Item> items = createItems(true, false, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false, false);
-        String curreny = "USD";
 
         return new Transaction(UUID.randomUUID(), id, id, source,
                 documentName, items, false, billingAddress, shippingAddress,
@@ -316,7 +315,7 @@ public class UnitTestUtilities {
         List<Item> items = createItems(false, false, true);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(false, false, false);
-        String curreny = "USD";
+        String currency = "USD";
 
         return new Transaction(UUID.randomUUID(), id, id, source,
                 documentName, items, false, billingAddress, shippingAddress,
@@ -334,14 +333,14 @@ public class UnitTestUtilities {
         List<Item> items = createItemsWithCalculatedTotal(true, false, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false, false);
-        String curreny = "USD";
+        String currency = "USD";
 
         return new Transaction(UUID.randomUUID(), id, id, source,
                 documentName, items, false, billingAddress, shippingAddress,
                 customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()),
                 null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
                 TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, curreny, null, null, null, false, null);
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, currency, null, null, null, false, null);
     }
 
     public Transaction createTransactionWithThreeItemsAndCalculatedTotal(String id) {
@@ -351,14 +350,14 @@ public class UnitTestUtilities {
         List<Item> items = createThreeItemsWithCalculatedTotal(true, false, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false, false);
-        String curreny = "USD";
+        String currency = "USD";
 
         return new Transaction(UUID.randomUUID(), id, id, source,
                 documentName, items, false, billingAddress, shippingAddress,
                 customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()),
                 null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
                 TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, curreny, null, null, null, false, null);
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, currency, null, null, null, false, null);
     }
 
     public Transaction createGtTransaction(String id) {
