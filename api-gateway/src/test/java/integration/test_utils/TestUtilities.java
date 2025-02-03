@@ -193,7 +193,7 @@ public class TestUtilities {
                                     "description": "string",
                                     "name": "string",
                                     "taxCode": "C1S1",
-                                    "manualSalesTax": true,
+                                    "manualSalesTax": false,
                                     "manualSalesTaxRate": 0
                                 }
                             ],
@@ -213,7 +213,7 @@ public class TestUtilities {
                             },
                             %s
                             "shippingFee": {
-                                "manualSalesTax": true,
+                                "manualSalesTax": false,
                                 "manualSalesTaxRate": 0,
                                 "totalPrice": 0,
                                 "taxCode": "C6S1"

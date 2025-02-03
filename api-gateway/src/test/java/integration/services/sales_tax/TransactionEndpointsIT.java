@@ -2034,7 +2034,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Override
     /*
      This transaction's customer has an exemption in state PA with validation dates of:
-     fromDate: 2025-01-01, toDate: 26-01-01, therefore transaction is sales-tax exempt
+     fromDate: 2025-01-01, toDate: 2026-01-01, therefore transaction is sales-tax exempt
     */
     public void upsertByExternalIdAndSource_CustomerIsExemptByStateAndDate_ReturnsNonTaxableTransaction() {
         String externalId = "nonExistingTransactionID";
@@ -2064,7 +2064,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Override
     /*
      This transaction's customer has an exemption in state PA with validation dates of:
-     fromDate: 2025-01-01, toDate: 26-01-01, therefore transaction is NOT sales-tax exempt
+     fromDate: 2025-01-01, toDate: 2026-01-01, therefore transaction is NOT sales-tax exempt
     */
     public void upsertByExternalIdAndSource_CustomerIsNotExemptByStateAndDate_ReturnsTaxableTransaction() {
         String externalId = "anotherNonExistingTransactionID";

@@ -16,4 +16,5 @@ workflows:
             sales-tax-rates/.* run-sales-tax-rates-workflow true
             address-validation/.* run-address-validation-workflow true
             authentication/.* run-authentication-workflow true
+            .* run-api-gateway-verify-workflow true
           config-path: .circleci/workflows.yml

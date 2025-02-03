@@ -23,6 +23,10 @@ executors:
     machine: true
     resource_class: complyt/arm64-ubuntu-22-lts-corretto-21
 
+  arm64-ubuntu-22-lts-corretto-21-vm-gcp:
+    machine: true
+    resource_class: complyt/arm64-ubuntu-22-lts-corretto-21-gcp
+
 parameters:
   run-sales-tax-workflow:
     type: boolean
@@ -43,6 +47,9 @@ parameters:
     type: boolean
     default: false
   run-authentication-workflow:
+    type: boolean
+    default: false
+  run-api-gateway-verify-workflow:
     type: boolean
     default: false
 
@@ -66,6 +73,25 @@ jobs:
           paths:
             - <<parameters.service_directory>>/target/*.jar
 
+  package-dependency-for-gateway:
+    parameters:
+      service_directory:
+        type: string
+        default: ""
+
+    executor: arm64-ubuntu-22-lts-corretto-21-vm-gcp
+    steps:
+      - checkout
+      - run:
+          name: Execute
+          command: |
+            cd <<parameters.service_directory>>
+            ./mvnw clean package -Dmaven.test.skip
+      - persist_to_workspace:
+          root: .
+          paths:
+            - <<parameters.service_directory>>/target/*.jar
+
   verify:
     parameters:
       service_directory:
@@ -73,6 +99,32 @@ jobs:
         default: ""
 
     executor: arm64-ubuntu-22-lts-corretto-21-vm
+    steps:
+      - checkout
+      #We must use attach_workspace to gain access to the artifacts that we build on previous steps (of our services)
+      - attach_workspace:
+          at: .
+      - run:
+          name: Execute
+          command: |
+            cd <<parameters.service_directory>>
+            ./mvnw clean verify
+
+      - persist_to_workspace:
+          root: <<parameters.service_directory>>/target
+          paths:
+            - coverage-reports
+            - failsafe-reports
+            - surefire-reports
+            - site
+
+  verify-gateway:
+    parameters:
+      service_directory:
+        type: string
+        default: ""
+
+    executor: arm64-ubuntu-22-lts-corretto-21-vm-gcp
     steps:
       - checkout
       #We must use attach_workspace to gain access to the artifacts that we build on previous steps (of our services)
@@ -351,6 +403,42 @@ workflows:
           requires:
             - release
           service_name: "api-gateway"
+
+  api-gateway-verify-workflow:
+    when: << pipeline.parameters.run-api-gateway-verify-workflow >>
+    jobs:
+      - package-dependency-for-gateway:
+          name: package-sales-tax
+          service_directory: "sales-tax"
+      - package-dependency-for-gateway:
+          name: package-sales-tax-rates
+          service_directory: "sales-tax-rates"
+      - package-dependency-for-gateway:
+          name: package-address-validation
+          service_directory: "address-validation"
+      - package-dependency-for-gateway:
+          name: package-discovery-service
+          service_directory: "discovery-service"
+      - package-dependency-for-gateway:
+          name: package-files
+          service_directory: "files"
+      - package-dependency-for-gateway:
+          name: package-authentication
+          service_directory: "authentication"
+
+      - verify-gateway:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          requires:
+            - package-sales-tax
+            - package-sales-tax-rates
+            - package-address-validation
+            - package-discovery-service
+            - package-files
+            - package-authentication
+          service_directory: "api-gateway"
 
   discovery-service-workflow:
     when: << pipeline.parameters.run-discovery-service-workflow >>
