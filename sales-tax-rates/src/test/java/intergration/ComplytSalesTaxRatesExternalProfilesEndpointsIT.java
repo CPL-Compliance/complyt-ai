@@ -145,4 +145,59 @@ public class ComplytSalesTaxRatesExternalProfilesEndpointsIT extends MongoContai
         StepVerifier.create(complytSalesTaxRatesFlux).expectNextCount(1).verifyComplete();
     }
 
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void findAddress_CountryIsNull_Returns400() {
+        // Given
+        AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withState("Hawaii").withZip("99501");
+        AddressDto validatedAddress = stubFastTaxAddress.withCounty("Anchorage").withStreet("751-2696 205 E Benson Blvd").withCity("Anchorage"); // Validated by Here
+        CommonAddressDto returnedAddress = TestUtilities.createCommonAddressDto(validatedAddress);
+        SalesTaxRatesDto stubFastTaxSalesTaxRates = new SalesTaxRatesDto(new BigDecimal("0.0625"), BigDecimal.ZERO, new BigDecimal("0.01"), new BigDecimal("0.01"), new RatesMetaData(BigDecimal.ZERO, BigDecimal.ZERO, new BigDecimal("0.01")), null, null, null, new BigDecimal("0.0825"));
+
+        requestedTime = LocalDateTime.now();
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
+                        .queryParam("state", stubFastTaxAddress.state())
+                        .queryParam("city", stubFastTaxAddress.city())
+                        .queryParam("zip", stubFastTaxAddress.zip())
+                        .queryParam("isPartial", stubFastTaxAddress.isPartial())
+                        .queryParam("requiredDate", requestedTime)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void findAddress_ZipIsNotValid_Returns400() {
+        // Given
+        AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withState("Hawaii").withZip("99501");
+        AddressDto validatedAddress = stubFastTaxAddress.withCounty("Anchorage").withStreet("751-2696 205 E Benson Blvd").withCity("Anchorage"); // Validated by Here
+
+        requestedTime = LocalDateTime.now();
+        String zip = "abcde";
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
+                        .queryParam("state", stubFastTaxAddress.state())
+                        .queryParam("city", stubFastTaxAddress.city())
+                        .queryParam("zip", zip)
+                        .queryParam("isPartial", stubFastTaxAddress.isPartial())
+                        .queryParam("requiredDate", requestedTime)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
 }

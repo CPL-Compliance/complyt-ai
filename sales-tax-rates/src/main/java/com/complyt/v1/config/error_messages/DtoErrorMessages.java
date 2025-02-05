@@ -4,7 +4,13 @@ import com.complyt.v1.api_info.sales_tax_rates.FieldsDescriptions;
 
 // Appended to other errors messages
 public interface DtoErrorMessages {
-    String NON_PARTIAL_ERROR_SUFFIX = "in a non partial address";
+    String NON_PARTIAL_ERROR_SUFFIX = "in a non-partial address";
+
+    String PARTIAL_ERROR_SUFFIX = "in a partial address"; // Appended to other errors messages
+
+    String STATE_NOT_RECOGNIZED_USA = "The state in the provided USA address is not recognized. Please verify and provide a valid state";
+
+    String ZIP_NOT_IN_FORMAT = "Zip format is incorrect. The correct format is mandatory 5 digits and optional dash and and additional 4 digits. example: 12345 or 12345-6789";
 
     String NOT_NULL_ERROR = "may not be null";
 
@@ -21,23 +27,8 @@ public interface DtoErrorMessages {
 
     String COMPLYT_ID_IN_A_NEW_RECORD_ERROR = "new record cannot have a complytId field";
 
-    String UNSUPPORTED_STATE = "the state entered is unsupported";
-
-    String ZIP_DIGITS_ARE_MISORDERED = "lowerPlusFourDigits should be either equal or be lower than upperPlusFourDigits";
-
-    String HAS_PLUS_FOUR_ZIP_DIGITS_TRUE_ZIP_DIGITS_MUST_BE_DIFFERENT_THAN_ZERO = "hasPlusFourZipCode is set to true but lower PlusFourDigits and upperPlusFourDigits are equals to 0";
-
-    String HAS_PLUS_FOUR_ZIP_FALSE_PLUS_FOUR_DIGITS_MUST_BE_ZERO = "hasPlusFourZipCode is set to false but lower PlusFourDigits and upperPlusFourDigits are NOT equals to 0";
-
-    String INCORPORATED_ADDRESS_MUST_NOT_HAVE_UNINCORPORATED_CITY = "incorporated address must NOT have unincorporated city";
-    String UNINCORPORATED_ADDRESS_MUST_NOT_HAVE_INCORPORATED_CITY = "unincorporated address must NOT have incorporated city";
-
-    String ADDRESS_NOT_VALID = "address could not be validated";
-
-    String STATE_FORMAT_ERROR = "invalid state provided. Please provide a valid state name or abbreviation.\";";
-
-    String LOCALDATE_FORMAT_ERROR = "must be in the format yyyy-mm-dd";
-
     String ISO8601_FORMAT_ERROR = "is in an illegal format - " +
             "For date/time fields please provide a " + FieldsDescriptions.TIMESTAMP_FORMAT;
+
+    String INVALID_COUNTRY_ERROR =  "Invalid country provided. Only US addresses are supported. Please provide a valid US address";
 }

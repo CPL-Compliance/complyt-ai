@@ -1,18 +1,12 @@
 package com.complyt.v1.validators;
 
-import com.complyt.v1.config.BodyCheckConfig;
 import com.complyt.v1.config.ValidatorConfig;
-import com.complyt.v1.exceptions.types.ConflictedDataApiException;
-import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.AddressWithDateDto;
-import com.complyt.v1.validators.body_checkers.AddressChecker;
 import com.complyt.v1.validators.query_params.QueryParamsExtractor;
-import kotlin.Function;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;

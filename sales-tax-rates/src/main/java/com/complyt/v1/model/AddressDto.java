@@ -10,6 +10,7 @@ import lombok.With;
 @Schema(name = "Address")
 public record AddressDto(
         @Size(max = 100, message = "Address.city " + StringErrorMessages.MAX_100_ERROR) String city,
+        @NotBlank(message = "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR)
         @Size(max = 50, message = "Address.country " + StringErrorMessages.MAX_50_ERROR) String country,
         @Size(max = 100, message = "Address.county " + StringErrorMessages.MAX_100_ERROR) String county,
         @NotBlank(message = "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR) @Size(max = 100, message = "Address.state " + StringErrorMessages.MAX_100_ERROR) String state,

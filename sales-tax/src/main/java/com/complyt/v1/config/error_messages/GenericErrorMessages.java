@@ -10,7 +10,7 @@ public interface GenericErrorMessages {
     String STATE_NOT_FOUND_IN_JURISDICTIONAL_TAX_RULE = "State was not found in the jurisdictional sales tax rule.";
     String COUNTRY_NOT_FOUND_IN_JURISDICTIONAL_TAX_RULE = "Country was not found in the jurisdictional tax rule.";
     String CUSTOMER_NOT_FOUND = "Customer specified in the object was not found.";
-    String ZIP_CODE_NOT_FOUND_ERROR = "A ZIP code is required for U.S. addresses. Please enter a valid 5-digit ZIP code or ZIP+4 format (e.g., 85006 or 85006-5705).";
+    String ZIP_CODE_NOT_FOUND_ERROR = "The provided ZIP code is not recognized as a valid U.S. ZIP code. Please enter a correct ZIP code.";
     String ZIP_CODE_NOT_VALID_ERROR = "Zip code format is incorrect. For U.S. addresses, please provide a valid 5-digit ZIP code or ZIP+4 format (e.g., 85006 or 85006-5705).";
     String INVALID_PATCH_FIELD_EXCEPTION = "The requested operation failed because of an invalid patch field provided.";
 

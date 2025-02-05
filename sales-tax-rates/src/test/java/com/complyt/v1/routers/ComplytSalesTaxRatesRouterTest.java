@@ -191,7 +191,7 @@ public class ComplytSalesTaxRatesRouterTest {
 
 
         Set<String> expectedErrors = Set.of(
-                "Address.city " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
+                "City " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
         );
 
         // Then
@@ -219,7 +219,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressWithDateDto addressWithDateDto = TestUtilities.createAddressWithDateDtoInCalifornia("2011-11-01T00:00:00");
 
         Set<String> expectedErrors = Set.of(
-                "Address.city " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
+                "City " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
         );
 
         // Then
@@ -309,7 +309,7 @@ public class ComplytSalesTaxRatesRouterTest {
                 .withAddress(addressDto);
 
         Set<String> expectedErrors = Set.of(
-                "Address.street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
+                "Street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
         );
 
         // Then
@@ -340,7 +340,7 @@ public class ComplytSalesTaxRatesRouterTest {
                 .withAddress(addressDto);
 
         Set<String> expectedErrors = Set.of(
-                "Address.street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
+                "Street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
         );
 
         // Then
@@ -428,7 +428,7 @@ public class ComplytSalesTaxRatesRouterTest {
                 .withAddress(addressDto);
 
         Set<String> expectedErrors = Set.of(
-                "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
+                "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR
         );
 
         // Then
@@ -456,7 +456,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressWithDateDto addressWithDateDto = TestUtilities.createAddressWithDateDtoInCalifornia("2011-11-01T00:00:00");
 
         Set<String> expectedErrors = Set.of(
-                "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
+                "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR
         );
 
         // Then

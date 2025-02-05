@@ -7,7 +7,7 @@ import com.complyt.v1.validators.DataConflictChecksProvider;
 import com.complyt.v1.validators.ParameterChecksProvider;
 import com.complyt.v1.validators.ShouldCallValidate;
 import com.complyt.v1.validators.ValidationHandler;
-import com.complyt.v1.validators.body_checkers.AddressChecker;
+import com.complyt.v1.validators.body_checkers.AddressDtoChecker;
 import com.complyt.v1.validators.query_params.QueryParamsExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +37,7 @@ public class ValidatorConfig {
                 AddressWithDateDto.class,
                 springValidatorAdapter,
                 new DataConflictChecksProvider(new BodyCheckConfig<AddressWithDateDto>(List.of(
-                        new AddressChecker()
+                        new AddressDtoChecker()
                 )).entityDtoFluxFunction(), Map.of()),
                 addressDtoQueryParamsExtractor,
                 pathVariableChecker,
