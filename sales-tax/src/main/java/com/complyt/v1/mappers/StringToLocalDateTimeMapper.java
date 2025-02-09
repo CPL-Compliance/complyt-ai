@@ -1,6 +1,6 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 public interface StringToLocalDateTimeMapper {
     StringToLocalDateTimeMapper INSTANCE = Mappers.getMapper(StringToLocalDateTimeMapper.class);
 
-    Logger log = LoggerFactory.getLogger(TimestampsMapper.class);
+    Logger log = LoggerFactory.getLogger(StringToLocalDateTimeMapper.class);
 
 
     @Named("parseLocalDateTimeToString")
@@ -58,6 +58,6 @@ public interface StringToLocalDateTimeMapper {
         } catch (Exception e) {
             log.debug("Date has been received in invalid format : " + dateAsString);
         }
-        throw new ParseException("Failed on parsing string to LocalDateTime  " + DtoErrorMessages.ISO8601_FORMAT_ERROR, 0);
+        throw new ParseException(GenericErrorMessages.INVALID_DATE_TIME_FORMAT_EXCEPTION, 0);
     }
 }

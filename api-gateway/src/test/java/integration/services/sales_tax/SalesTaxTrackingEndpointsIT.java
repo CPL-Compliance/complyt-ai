@@ -11,7 +11,9 @@ import org.springframework.http.MediaType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -626,6 +628,78 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isCreated()
                 .expectBody()
                 .jsonPath("$.country").isEqualTo(country);
+    }
+
+    @Order(4)
+    @Test
+    @Override
+    public void path_AppliedDateIsWrongFormat_Returns400() {
+        String invalidFormatAppliedDate = "T00:00:00";
+        String country = "usa";
+        String state = "CA";
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("appliedDate", invalidFormatAppliedDate);
+        }};
+
+        WEB_TEST_CLIENT
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Order(4)
+    @Test
+    @Override
+    public void path_ApprovalDateIsWrongFormat_Returns400() {
+        String invalidFormatAppliedDate = "T00:00:00";
+        String country = "usa";
+        String state = "CA";
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("approvalDate", invalidFormatAppliedDate);
+        }};
+
+        WEB_TEST_CLIENT
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Order(4)
+    @Test
+    @Override
+    public void path_RegistrationDateIsWrongFormat_Returns400() {
+        String invalidFormatAppliedDate = "T00:00:00";
+        String country = "usa";
+        String state = "CA";
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("registrationDate", invalidFormatAppliedDate);
+        }};
+
+        WEB_TEST_CLIENT
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .queryParam("country", country)
+                        .queryParam("state", state)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().is4xxClientError();
     }
 
     @Order(1)

@@ -29,4 +29,10 @@ public interface SalesTaxTrackingEndpointsITTemplate extends
     void upsertByCountryAndState_NonUsaCountryNonSupportedCountry_Returns400();
 
     void upsertByCountry_NonUsaCountry_Returns200();
+
+    void path_AppliedDateIsWrongFormat_Returns400();
+
+    void path_ApprovalDateIsWrongFormat_Returns400();
+
+    void path_RegistrationDateIsWrongFormat_Returns400();
 }

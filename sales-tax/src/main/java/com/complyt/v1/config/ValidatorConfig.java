@@ -2,6 +2,7 @@ package com.complyt.v1.config;
 
 import com.complyt.v1.models.ClientTrackingDtoTenant;
 import com.complyt.v1.models.SalesTaxTrackingDto;
+import com.complyt.v1.models.vat_validation.VatDetailsToValidateDto;
 import com.complyt.v1.models.checkables.ComplytIdCheckable;
 import com.complyt.v1.models.checkables.CountryCheckable;
 import com.complyt.v1.models.checkables.StateCheckable;
@@ -19,9 +20,12 @@ import com.complyt.v1.validators.body_checkers.exemption.ExemptionWrapperCountry
 import com.complyt.v1.validators.body_checkers.sales_tax_tracking.RegisteredChecker;
 import com.complyt.v1.validators.body_checkers.sales_tax_tracking.SalesTaxTrackingCountryAndStateChecker;
 import com.complyt.v1.validators.body_checkers.transaction.*;
+import com.complyt.v1.validators.custom_body.CustomBodyExtractor;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractorEmpty;
 import com.complyt.v1.validators.custom_body.DateWrapperDtoCustomBodyExtractor;
 import com.complyt.v1.validators.param_checker.ParamCheckerFunctions;
+import com.complyt.v1.validators.query_extractors.VatDetailsToValidateQueryExtractor;
+import com.complyt.v1.validators.vat_validation.VatDetailsCountryCodeIsSupportedChecker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,7 +54,12 @@ public class ValidatorConfig {
             "state", ParamCheckerFunctions.STATE_CHECK,
             "country", ParamCheckerFunctions.COUNTRY_CHECK,
             "sortOrder", ParamCheckerFunctions.SORT_ORDER_CHECK,
-            "detailed", ParamCheckerFunctions.DETAILED_TRANSACTION_OBJECT_CHECK));
+            "detailed", ParamCheckerFunctions.DETAILED_TRANSACTION_OBJECT_CHECK,
+
+            // vat validation
+            "countryCode", ParamCheckerFunctions.VAT_VALIDATION_COUNTRY_CODE_CHECK,
+            "vatNumber", ParamCheckerFunctions.VAT_VALIDATION_VAT_NUMBER_CHECK
+    ));
 
     ShouldCallValidate shouldCallValidate = new ShouldCallValidate(Map.of(
             HttpMethod.PUT, "^/v1/transactions/source/[^/]+/externalId/[^/]+$|"
@@ -58,9 +67,10 @@ public class ValidatorConfig {
                     + "^/v1/exemptions/complytId/[^/]+$|"
                     + "^/v1/exemptions|"
                     + "^/v1/nexus($|\\?.*)|"
-                    + "^/v1/clientTracking/tenantId/[^/]+$",
+                    + "^/v1/clientTracking/tenantId/[^/]+$|",
             HttpMethod.POST, "^/v1/nexus/refresh[^/]*$|"
-                    + "^/v1/exemptions$"));
+                    + "^/v1/exemptions$",
+            HttpMethod.GET, "^/v1/vat/validate($|\\?.*)$"));
 
     @Bean
     ValidationHandler<CustomerDto, SpringValidatorAdapter> customerDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
@@ -161,5 +171,18 @@ public class ValidatorConfig {
                 queryParamChecker,
                 shouldCallValidate);
 
+    }
+
+    @Bean
+    ValidationHandler<VatDetailsToValidateDto, SpringValidatorAdapter> VatValidateValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
+        return new ValidationHandler<>(VatDetailsToValidateDto.class, springValidatorAdapter,
+                new DataConflictChecksProvider(Map.of(),
+                        new BodyCheckConfig<VatDetailsToValidateDto>(List.of(
+                                new VatDetailsCountryCodeIsSupportedChecker()
+                        )).entityDtoFluxFunction()),
+                new VatDetailsToValidateQueryExtractor(),
+                pathVariableChecker,
+                queryParamChecker,
+                shouldCallValidate);
     }
 }

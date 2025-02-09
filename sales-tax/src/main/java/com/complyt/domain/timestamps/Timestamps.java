@@ -10,10 +10,8 @@ import java.time.LocalDateTime;
 @ToString
 @With
 public class Timestamps {
-
     @NonNull
     private final LocalDateTime createdDate;
     @NonNull
     private final LocalDateTime updatedDate;
-
 }

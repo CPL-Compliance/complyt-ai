@@ -36,6 +36,8 @@ import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.tax.global_tax.GtRatesDto;
 import com.complyt.v1.models.tax.sales_tax.*;
 import com.complyt.v1.models.transaction.*;
+import com.complyt.v1.models.vat_validation.ValidatedVatDto;
+import com.complyt.v1.models.vat_validation.VatDetailsToValidateDto;
 import com.complyt.v1.validators.body_checkers.transaction.*;
 import feign.FeignException;
 import feign.Request;
@@ -1084,5 +1086,40 @@ public class UnitTestUtilities {
 
     public CurrencyExchangeRateObject createEuroCurrencyExchangeRateObject() {
         return new CurrencyExchangeRateObject("EUR", LocalDateTime.now(), BigDecimal.valueOf(1.10731));
+    }
+
+
+    public ValidatedVat createValidatedVat() {
+        ValidatedVat validatedVat = new ValidatedVat("BE", "Belgium", "0835221567",
+                true, "BV BE³-PROJECTS", "Kasteeldreef 9\\n2940 Stabroek", new Timestamps(LocalDateTime.now(), LocalDateTime.now())); //todo: put a const time
+
+        return validatedVat;
+    }
+
+    public ValidatedVat createValidatedVat(LocalDateTime created, LocalDateTime updated) {
+        return createValidatedVat().withInternalTimestamps(new Timestamps(created, updated));
+    }
+
+    public VatDetailsToValidate createVatDetailsToValidate() {
+        VatDetailsToValidate vatDetailsToValidate = new VatDetailsToValidate("BE", "0835221567");
+
+        return vatDetailsToValidate;
+    }
+
+    public ValidatedVatDto createValidatedVatDto() {
+        ValidatedVatDto validatedVatDto = new ValidatedVatDto("BE", "Belgium", "0835221567",
+                true, "BV BE³-PROJECTS", "Kasteeldreef 9\\n2940 Stabroek", new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString())); //todo: put a const time
+
+        return validatedVatDto;
+    }
+
+    public ValidatedVatDto createValidatedVatDto(LocalDateTime created, LocalDateTime updated) {
+        return createValidatedVatDto().withInternalTimestamps(new TimestampsDto(created.toString(), updated.toString()));
+    }
+
+    public VatDetailsToValidateDto createVatDetailsToValidateDto() {
+        VatDetailsToValidateDto vatDetailsToValidateDto = new VatDetailsToValidateDto("BE", "0835221567");
+
+        return vatDetailsToValidateDto;
     }
 }

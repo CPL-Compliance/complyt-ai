@@ -136,7 +136,7 @@ public abstract class TestContainersInitializerIT {
 
         //Sales Tax Container
         SALES_TAX_CONTAINER = initializeServiceContainer(SALES_TAX,
-                "java", "-Dspring.profiles.active=integration-test, complytTaxEngine, complytStubCurrency",
+                "java", "-Dspring.profiles.active=integration-test, complytTaxEngine, complytStubCurrency, stubVatValidation",
                 mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
                 "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
         SALES_TAX_CONTAINER.start();

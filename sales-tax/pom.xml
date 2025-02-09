@@ -230,8 +230,29 @@
             <properties>
                 <activeCurrencyClient>complytStubCurrency</activeCurrencyClient>
             </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
         <!-- Tax Client Profiles -->
+
+        <!-- VatValidation Client Profiles -->
+        <profile>
+            <id>vowVatValidation</id>
+            <properties>
+                <activeVatValidationClient>vowVatValidation</activeVatValidationClient>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>stubVatValidation</id>
+            <properties>
+                <activeVatValidationClient>stubVatValidation</activeVatValidationClient>
+            </properties>
+        </profile>
+        <!-- VatValidation Client Profiles -->
     </profiles>
 
     <build>

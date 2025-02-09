@@ -77,7 +77,8 @@
         "read:global_tax_rates",
         "read:link",
         "read:state",
-        "read:address_validation"
+        "read:address_validation",
+        "read:vat_validation"
       ]
     },
     {
@@ -212,6 +213,10 @@
     },
     {
       "name": "update:sales_tax_rates",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "read:vat_validation",
       "protocol": "openid-connect"
     }
   ],

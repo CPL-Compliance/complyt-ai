@@ -9,16 +9,32 @@ import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.tax.sales_tax.RatesMetaDataDto;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
+import com.complyt.v1.models.vat_validation.ValidatedVatDto;
+import com.complyt.v1.models.vat_validation.VatDetailsToValidateDto;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public interface ITUtilities {
+
+    static void checkErrorMessages(LinkedHashMap map, Set<String> expectedErrors) {
+        String message = (String) map.get("message");
+        String[] errors = message.split(", ");
+        assertEquals(expectedErrors.size(), errors.length);
+        for (String err : errors) {
+            assertTrue(expectedErrors.contains(err));
+        }
+    }
 
     String NON_EXISTING_COMPLYT_ID = "d18068f0-6d98-4b0d-ba19-4536f0b4173a";
 
@@ -478,5 +494,22 @@ public interface ITUtilities {
 
         return new ExemptionDto(UUID.randomUUID(), UUID.fromString("e10cd4a2-6a4e-4621-bdad-4860bfa91ecb"),
                 country, state, classification, validationDates, internalTimestamps, status, certificate, ExemptionTypeDto.FULLY, ExemptionStatusDto.ACTIVE, null);
+    }
+
+    static ValidatedVatDto createValidatedVatDto() {
+        ValidatedVatDto validatedVatDto = new ValidatedVatDto("BE", "Belgium", "0835221567",
+                true, "BV BE³-PROJECTS", "Kasteeldreef 9\\n2940 Stabroek", new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString())); //todo: put a const time
+
+        return validatedVatDto;
+    }
+
+    static ValidatedVatDto createValidatedVatDto(LocalDateTime created, LocalDateTime updated) {
+        return createValidatedVatDto().withInternalTimestamps(new TimestampsDto(created.toString(), updated.toString()));
+    }
+
+    static VatDetailsToValidateDto createVatDetailsToValidateDto() {
+        VatDetailsToValidateDto vatDetailsToValidateDto = new VatDetailsToValidateDto("BE", "0835221567");
+
+        return vatDetailsToValidateDto;
     }
 }

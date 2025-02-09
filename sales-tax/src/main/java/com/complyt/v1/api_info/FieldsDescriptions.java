@@ -18,6 +18,8 @@ public interface FieldsDescriptions {
 
     String SALES_TAX_TRACKING = "Tracks the organization's sales tax status in each US state";
 
+    String VAT_VALIDATION = "VAT details that indicate whether an organization is VAT registered.";
+
     // General
     String COMPLYT_ID = "The unique identifier in Complyt of the "; // add Dto
 
@@ -27,9 +29,9 @@ public interface FieldsDescriptions {
 
     String CUSTOMER_ID = "The Complyt ID of the customer associated with the "; // add Dto
 
-    String INTERNAL_TIMESTAMPS = "read-only. The APIs internal timestamps for this resource";
+    String INTERNAL_TIMESTAMPS = "read-only. The APIs internal internalTimeStamps for this resource";
 
-    String EXTERNAL_TIMESTAMPS = "External timestamps, which should reference the dates in your originating system since these are the timestamps used for sales tax calculation";
+    String EXTERNAL_TIMESTAMPS = "External internalTimeStamps, which should reference the dates in your originating system since these are the internalTimeStamps used for sales tax calculation";
 
     String TIMESTAMP_FORMAT = "valid ISO8601 format. " +
             "Supported formats are 'YYYY-MM-DD'/ 'YYYY-MM-DDTHH:mm:ssZ'/ and 'YYYY-MM-DDTHH:mm:ss±hh:mm' " +
@@ -126,4 +128,17 @@ public interface FieldsDescriptions {
 
     String IS_REFUND_LINKED_INFO = "Flag indicating whether the transaction is a refund linked to an associated invoice";
 
+    // In vat validation
+
+    String COUNTRY_CODE = "the country code of the vat";
+
+    String VAT_NUMBER = "the registration number/code of the vat";
+
+    String COUNTRY_NAME = "Read Only. The name of the country for the VAT.";
+
+    String VALID = "Read Only. Indicates whether the VAT number is valid.";
+
+    String NAME = "Read Only. The name of the organization associated with the VAT number.";
+
+    String VAT_ADDRESS = "Read Only. The address of the organization associated with the VAT number.";
 }

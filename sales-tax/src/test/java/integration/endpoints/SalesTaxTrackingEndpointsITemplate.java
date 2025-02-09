@@ -8,8 +8,7 @@ public interface SalesTaxTrackingEndpointsITemplate extends
         GetByComplytIdITTemplate,
         GetAllITTemplate,
         PatchITTemplate,
-        RefreshITTemplate
-        {
+        RefreshITTemplate {
 
     void upsertByCountryAndState_NonUsaCountryDoesntExists_Returns201();
 
@@ -29,7 +28,13 @@ public interface SalesTaxTrackingEndpointsITemplate extends
 
     void upsertByCountryAndState_CountryInQueryAndBodyAreDifferent_Returns400ConflictedData();
 
-    public void getByCountryStateAndSubsidiary_DoesntExists_Returns404();
+    void getByCountryStateAndSubsidiary_DoesntExists_Returns404();
 
-    public void getByCountryStateAndSubsidiary_Exists_Returns200();
+    void getByCountryStateAndSubsidiary_Exists_Returns200();
+
+    void path_AppliedDateIsWrongFormat_Returns400();
+
+    void path_ApprovalDateIsWrongFormat_Returns400();
+
+    void path_RegistrationDateIsWrongFormat_Returns400();
 }

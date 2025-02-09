@@ -10,9 +10,10 @@ import org.mapstruct.factory.Mappers;
 import java.util.HashMap;
 
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL, nullValueMapMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT, imports = HashMap.class,
-        uses = {TimestampsMapper.class})
+        uses = {TimestampsMapper.class, StringToLocalDateTimeMapper.class})
 public interface SalesTaxTrackingMapper {
     SalesTaxTrackingMapper INSTANCE = Mappers.getMapper(SalesTaxTrackingMapper.class);
+
     @Mapping(target = "transactionNexusSummaries", expression = "java(new HashMap<>())")
     @Mapping(target = "nexusCalculationSummaries", source = "nexusCalculationSummaries", defaultExpression = "java(new HashMap<>())")
     SalesTaxTracking salesTaxTrackingDtoToSalesTaxTracking(SalesTaxTrackingDto salesTaxTrackingDto);

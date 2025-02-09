@@ -13,6 +13,7 @@ public interface GenericErrorMessages {
     String ZIP_CODE_NOT_FOUND_ERROR = "The provided ZIP code is not recognized as a valid U.S. ZIP code. Please enter a correct ZIP code.";
     String ZIP_CODE_NOT_VALID_ERROR = "Zip code format is incorrect. For U.S. addresses, please provide a valid 5-digit ZIP code or ZIP+4 format (e.g., 85006 or 85006-5705).";
     String INVALID_PATCH_FIELD_EXCEPTION = "The requested operation failed because of an invalid patch field provided.";
+    String INVALID_DATE_TIME_FORMAT_EXCEPTION = "Failed on parsing string to LocalDateTime. LocalDateTime " + DtoErrorMessages.ISO8601_FORMAT_ERROR;
 
     String MISSING_BODY_ERROR = "The requested operation failed because no request body has been provided";
 
@@ -20,6 +21,8 @@ public interface GenericErrorMessages {
     String TENANT_ID_FORMAT = "invalid tenantId provided. please provide a valid parameter";
 
     String MAX_256_ERROR = "should be up to 256 characters maximum";
+    String MIN_1_MAX_50_ERROR = "should be at least 1 character and up to 50 characters maximum";
+    String MIN_1_MAX_20_ERROR = "should be at least 1 character and up to 20 characters maximum";
 
     String NOT_NULL = "may not be null";
 

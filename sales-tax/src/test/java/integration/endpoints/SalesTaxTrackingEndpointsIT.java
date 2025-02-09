@@ -842,6 +842,99 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     @WithMockUser
+    public void path_AppliedDateIsWrongFormat_Returns400() {
+        String invalidFormatAppliedDate = "T00:00:00";
+        String state = "CA";
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("appliedDate", invalidFormatAppliedDate);
+        }};
+
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Error parsing field: " + "appliedDate" + ". " + GenericErrorMessages.INVALID_DATE_TIME_FORMAT_EXCEPTION
+        ));
+
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody(LinkedHashMap.class)
+                .value(errorMap -> ITUtilities.checkErrorMessages(errorMap, expectedErrors));
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void path_ApprovalDateIsWrongFormat_Returns400() {
+        String invalidFormatApprovalDate = "T00:00:00";
+        String state = "CA";
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("approvalDate", invalidFormatApprovalDate);
+        }};
+
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Error parsing field: " + "approvalDate" + ". " + GenericErrorMessages.INVALID_DATE_TIME_FORMAT_EXCEPTION
+        ));
+
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody(LinkedHashMap.class)
+                .value(errorMap -> ITUtilities.checkErrorMessages(errorMap, expectedErrors));
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void path_RegistrationDateIsWrongFormat_Returns400() {
+        String invalidFormatRegistrationDate = "T00:00:00";
+        String state = "CA";
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>() {{
+            put("registrationDate", invalidFormatRegistrationDate);
+        }};
+
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Error parsing field: " + "registrationDate" + ". " + GenericErrorMessages.INVALID_DATE_TIME_FORMAT_EXCEPTION
+        ));
+
+        webTestClient
+                .mutateWith(csrf())
+                .patch()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(map)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody(LinkedHashMap.class)
+                .value(errorMap -> ITUtilities.checkErrorMessages(errorMap, expectedErrors));
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
     public void getByStateName_DoesntExists_Returns404() {
         webTestClient
                 .get()

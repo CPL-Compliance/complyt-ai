@@ -1,8 +1,11 @@
 package com.complyt.v1.config.patch;
 
 import com.complyt.utils.object_mapper.ComplytObjectMapper;
+import com.complyt.v1.exceptions.types.InvalidLocalDateTimeFormatException;
+import com.complyt.v1.mappers.StringToLocalDateTimeMapper;
 import com.complyt.v1.models.*;
 
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.function.BiFunction;
@@ -35,7 +38,13 @@ public interface SalesTaxTrackingPatcherFunctions {
     };
 
     BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchAppliedDate = (salesTaxTrackingDto, appliedDate) -> {
-        LocalDateTime convertedAppliedDate = LocalDateTime.parse(appliedDate.toString());
+        LocalDateTime convertedAppliedDate = null;
+        try {
+            convertedAppliedDate = StringToLocalDateTimeMapper.INSTANCE.parseStringToLocalDateTime(appliedDate.toString());
+        } catch (ParseException e) {
+            throw new InvalidLocalDateTimeFormatException("appliedDate");
+        }
+
         return salesTaxTrackingDto.withAppliedDate(convertedAppliedDate);
     };
 
@@ -45,7 +54,13 @@ public interface SalesTaxTrackingPatcherFunctions {
     };
 
     BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchApprovalDate = (salesTaxTrackingDto, approvalDate) -> {
-        LocalDateTime convertedApprovalDate = LocalDateTime.parse(approvalDate.toString());
+        LocalDateTime convertedApprovalDate = null;
+        try {
+            convertedApprovalDate = StringToLocalDateTimeMapper.INSTANCE.parseStringToLocalDateTime(approvalDate.toString());
+        } catch (ParseException e) {
+            throw new InvalidLocalDateTimeFormatException("approvalDate");
+        }
+
         return salesTaxTrackingDto.withApprovalDate(convertedApprovalDate);
     };
 
@@ -55,7 +70,13 @@ public interface SalesTaxTrackingPatcherFunctions {
     };
 
     BiFunction<SalesTaxTrackingDto, Object, SalesTaxTrackingDto> patchRegistrationDate = (salesTaxTrackingDto, registrationDate) -> {
-        LocalDateTime convertedRegistrationDate = LocalDateTime.parse(registrationDate.toString());
+        LocalDateTime convertedRegistrationDate = null;
+        try {
+            convertedRegistrationDate = StringToLocalDateTimeMapper.INSTANCE.parseStringToLocalDateTime(registrationDate.toString());
+        } catch (ParseException e) {
+            throw new InvalidLocalDateTimeFormatException("registrationDate");
+        }
+
         return salesTaxTrackingDto.withRegistrationDate(convertedRegistrationDate);
     };
 

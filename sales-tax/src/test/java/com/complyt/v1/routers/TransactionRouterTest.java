@@ -23,6 +23,7 @@ import com.complyt.v1.models.tax.sales_tax.SalesTaxDto;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.validators.Patcher;
+import com.complyt.v1.validators.query_extractors.VatDetailsToValidateQueryExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -106,7 +107,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .queryParam("detailed", detailed)
-
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

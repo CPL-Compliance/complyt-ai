@@ -13,11 +13,11 @@ import reactor.netty.transport.logging.AdvancedByteBufFormat;
 
 @Configuration
 @Generated
-public class CurrenciesWebClientConfig {
+public class WebClientsConfig {
 
     @Profile("complytCurrencyEngine")
-    @Bean
-    public WebClient webClient(WebClient.Builder webClientBuilder, @Value("${currency-conversion-service-url}") String currencyConversionServiceUrl) {
+    @Bean(name = "complytCurrencyEngineWebClient")
+    public WebClient complytCurrencyEngineWebClient(WebClient.Builder webClientBuilder, @Value("${currency-conversion-service-url}") String currencyConversionServiceUrl) {
         return webClientBuilder.clientConnector(
                         new ReactorClientHttpConnector(
                                  HttpClient.create()
@@ -25,6 +25,18 @@ public class CurrenciesWebClientConfig {
                                                 LogLevel.DEBUG,
                                                 AdvancedByteBufFormat.TEXTUAL)))
                 .baseUrl(currencyConversionServiceUrl)
+                .build();
+    }
+
+    @Profile({"vowVatValidation", "default"})
+    @Bean(name = "vowVatValidationWebClient")
+    public WebClient vowVatValidationWebClient(WebClient.Builder webClientBuilder) {
+        return webClientBuilder.clientConnector(
+                        new ReactorClientHttpConnector(
+                                HttpClient.create()
+                                        .wiretap("reactor.netty.client.HttpClient",
+                                                LogLevel.DEBUG,
+                                                AdvancedByteBufFormat.TEXTUAL)))
                 .build();
     }
 }

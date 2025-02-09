@@ -267,7 +267,6 @@ spring:
             - Path=/v1/clientTracking/name/{name}
           filters:
             - SetPath=/v1/clientTracking/name/{name}
-
         - id: sales-tax-get-client-tracking-by-tenantId
           uri: lb://sales-tax
           predicates:
@@ -282,6 +281,13 @@ spring:
             - Path=/v1/clientTracking/tenantId/{tenantId}
           filters:
             - SetPath=/v1/clientTracking/tenantId/{tenantId}
+        - id: sales-tax-put-vat-validation
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/vat/validate
+          filters:
+            - SetPath=/v1/vat/validate
         # ==== Sales Tax Service ====
         # ==== Files Service ====
         # ---- Files ----

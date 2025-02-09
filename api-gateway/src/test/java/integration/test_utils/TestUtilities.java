@@ -1,6 +1,8 @@
 package integration.test_utils;
 
 import net.minidev.json.JSONObject;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.client.MultipartBodyBuilder;
 
@@ -23,6 +25,9 @@ public class TestUtilities {
     public static final String API_KEY_BASE_URL = "/v1/api_key";
     public static final String SECRET_KEY_BASE_URL = "/v1/secret_key";
     public static final String ADDRESS_VALIDATION_BASE_URL = "/v1/addresses";
+    public static final String VAT_VALIDATION_BASE_URL = "/v1/vat";
+
+
     public static final String NON_EXISTING_COMPLYT_ID = "d18068f0-6d98-4b0d-ba19-4536f0b4173a";
 
     /*
@@ -48,7 +53,6 @@ public class TestUtilities {
     public static final String API_KEY_CLIENT_SECRET5 = "310e4c1d-0fa5-4b72-b860-31a73f068aa9";
 
     public static final String NULL_STRING = "null";
-
 
     public static String unvalidatedSalesTaxTrackingJsonExample(String stateName, String stateAbbreviation) {
         return salesTaxTrackingJsonExample("USA", true, stateName, stateAbbreviation, null, false, "2000-12-31T22:00:00", null, null);
@@ -641,4 +645,21 @@ public class TestUtilities {
                 .header("Content-Disposition", "form-data; name=file; filename=test.it");
         return multipartBodyBuilder;
     }
+
+    // Vat Validation Objects Start
+
+    public static Pair<String, String> vatDetailsToValidateCorrectCase() {
+        return new MutablePair<>("BE", "0835221567");
+    }
+
+    public static Pair<String, String> vatDetailsToValidateBackendErrorJson() {
+        return new MutablePair<>("Error", "number");
+    }
+
+    public static Pair<String, String> vatDetailsToValidateExistInTheDB() {
+        return new MutablePair<>("AT", "U28609707");
+    }
+
+    // Vat Validation Objects End
+
 }

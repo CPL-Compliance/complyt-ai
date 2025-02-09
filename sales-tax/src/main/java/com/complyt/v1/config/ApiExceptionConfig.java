@@ -42,8 +42,8 @@ public class ApiExceptionConfig {
                 Map.entry(StateNotFoundInJurisdictionalTaxRulesApiException.class, HttpStatus.BAD_REQUEST),
                 Map.entry(CustomerNotFoundApiException.class, HttpStatus.NOT_FOUND),
                 Map.entry(ZipCodeNotFoundApiException.class, HttpStatus.BAD_REQUEST),
-                Map.entry(ZipCodeNotValidApiException.class, HttpStatus.BAD_REQUEST)
+                Map.entry(ZipCodeNotValidApiException.class, HttpStatus.BAD_REQUEST),
+                Map.entry(InvalidLocalDateTimeFormatException.class, HttpStatus.BAD_REQUEST)
         );
-
     }
 }
