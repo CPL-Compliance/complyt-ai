@@ -5,7 +5,10 @@ import java.util.Map;
 
 public interface TransactionPaginationUtil {
 
-    // The filterMap indicates whether each field should be queried as a fuzzy (regex) search or a regular (exact match) search.
+    /*
+        The filterMap indicates whether each field should be queried as a fuzzy (regex) search or a regular (exact match) search.
+        fuzzy (true) / exact (false)
+    */
     Map<String, Boolean> transactionFilterMap = Map.of(
             "externalId", Boolean.FALSE,
             "documentName", Boolean.FALSE,
