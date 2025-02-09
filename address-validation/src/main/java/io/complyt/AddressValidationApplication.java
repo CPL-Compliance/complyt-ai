@@ -19,4 +19,5 @@ public class AddressValidationApplication implements CommandLineRunner {
     @Override
     public void run(String... args) {
     }
+
 }
