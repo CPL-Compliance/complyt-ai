@@ -499,4 +499,71 @@ public class TransactionSchemaValidationIT extends TestContainersInitializerIT {
                 .expectErrorMatches(throwable -> throwable.getMessage().contains("transactionFilingStatus"))
                 .verify();
     }
+    
+    @Test
+    public void saveTransaction_missingAddressInMatchedAddressData_Failure() {
+        ((Document) ((Document) transactionDocument.get("shippingAddress")).get("matchedAddressData")).remove("address");
+
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("address"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_missingScoringInMatchedAddressData_Failure() {
+        ((Document) ((Document) transactionDocument.get("shippingAddress")).get("matchedAddressData")).remove("scoring");
+
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("scoring"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_missingStreetMatchInFieldScore_Failure() {
+        ((Document) ((Document) ((Document) ((Document) transactionDocument.get("shippingAddress"))
+                .get("matchedAddressData")).get("scoring")).get("fieldScore")).remove("streetMatch");
+
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("streetMatch"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_invalidMatchLevel_Failure() {
+        ((Document) ((Document) ((Document) transactionDocument.get("shippingAddress")).get("matchedAddressData"))
+                .get("scoring")).put("matchLevel", "INVALID_LEVEL");
+
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("matchLevel"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_invalidScoreType_Failure() {
+        ((Document) ((Document) ((Document) transactionDocument.get("shippingAddress")).get("matchedAddressData"))
+                .get("scoring")).put("score", "invalid_value"); // Should be double
+
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("score"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_invalidFieldScoreType_Failure() {
+        ((Document) ((Document) ((Document) transactionDocument.get("shippingAddress")).get("matchedAddressData"))
+                .get("scoring")).put("fieldScore", "invalid_value"); // Should be an object
+
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("fieldScore"))
+                .verify();
+    }
+
+    @Test
+    public void saveTransaction_invalidIsPartialType_Failure() {
+        ((Document) transactionDocument.get("shippingAddress")).put("isPartial", "false"); // Should be boolean
+
+        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
+                .expectErrorMatches(throwable -> throwable.getMessage().contains("isPartial"))
+                .verify();
+    }
 }

@@ -5,7 +5,9 @@ import com.complyt.business.tax.gt.TransactionGtRatesHandler;
 import com.complyt.business.tax.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.tax.ComplytGtRates;
 import com.complyt.domain.transaction.tax.GtRates;
@@ -46,8 +48,9 @@ public class GtRatesTransactionInjectorTest {
     void setUp() {
         testUtilities = new UnitTestUtilities(
                 LocalDateTime.now(), UUID.randomUUID().toString());
+        ShippingAddress shippingAddress = new ShippingAddress(null, "ARM", null, null, null, "12345", null, false, null);
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString())
-                .withShippingAddress(testUtilities.createNonUsaAddress());
+                .withShippingAddress(shippingAddress);
     }
 
     @Test
@@ -65,7 +68,7 @@ public class GtRatesTransactionInjectorTest {
         Transaction transactionWithRatesAndSalesTax = transactionWithRates.withSalesTax(salesTax).withFinalTransactionAmount(BigDecimal.valueOf(10));
 
         // When
-        when(transactionGtRatesHandler.setRates(transaction,gtRates)).thenReturn(Mono.just(transactionWithRates));
+        when(transactionGtRatesHandler.setRates(transaction, gtRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxables);
         when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
         Mono<Transaction> transactionMono = gtRatesTransactionInjector.inject(transaction).apply(Pair.with(complytGtRates, false));

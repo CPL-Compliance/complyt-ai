@@ -3,19 +3,21 @@ package test_utils;
 import io.complyt.config.web_clients.WebClientWrapperProperties;
 import io.complyt.domain.Address;
 import io.complyt.domain.CachedAddressData;
+import io.complyt.domain.Scoring;
 import io.complyt.domain.ValidatedAddress;
-import io.complyt.domain.fast_tax.FastTaxGetBestMatchData;
-import io.complyt.domain.fast_tax.TaxInfoItem;
+import io.complyt.domain.enums.FieldMatchType;
+import io.complyt.domain.enums.FieldsMatchScore;
+import io.complyt.domain.enums.MatchLevelType;
 import io.complyt.domain.here.*;
 import io.complyt.v1.models.AddressDto;
+import io.complyt.v1.models.CachedAddressDataDto;
+import io.complyt.v1.models.ScoringDto;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.javatuples.Pair;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,11 +29,27 @@ public interface TestUtilities {
     }
 
     static ValidatedAddress getValidatedAddress() {
-        return new ValidatedAddress(null, getCachedAddressData(), getAddress(), LocalDateTime.now());
+        return new ValidatedAddress(null, null, List.of(getCachedAddressData()), getAddress(), LocalDateTime.now());
     }
 
     static CachedAddressData getCachedAddressData() {
-        return new CachedAddressData("Beverly Hills", "US", "County", "CA", "1008 Elden Way", "90210", false, 0.5f);
+        Address address = new Address("Beverly Hills", "US", "County", "CA", "1008 Elden Way", "90210", null);
+        Scoring scoring = new Scoring(MatchLevelType.GOOD, 0.8, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL));
+        return new CachedAddressData(address, scoring);
+    }
+
+    static CachedAddressDataDto getCachedAddressDataDto() {
+        AddressDto address = new AddressDto("Beverly Hills", "US", "County", "CA", "1008 Elden Way", "90210", true);
+        ScoringDto scoring = new ScoringDto(MatchLevelType.GOOD, 0.8, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL));
+        return new CachedAddressDataDto(address, scoring);
+    }
+
+    static Scoring getScoring() {
+        return new Scoring(MatchLevelType.POOR, 0.5f, new FieldsMatchScore(FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL));
+    }
+
+    static ScoringDto getScoringDto() {
+        return new ScoringDto(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL));
     }
 
     static HereAddressData getHereAddressData() {
@@ -40,13 +58,13 @@ public interface TestUtilities {
 
     static HereAddressItem getHereAddressItem() {
         return new HereAddressItem("","","","",
-                new HereAddress("",null,"US",null,"CA","County","Beverly Hills","1008 Elden Way","90210"),
+                new HereAddress("","USA","US",null,"CA","County","Beverly Hills", "1008 Elden Way","90210"),
                 new HerePosition(12345,12345),new HereMapView(0.5,0.5,0.5,0.5),
-                new HereScoring(0.5f,new HereFieldScore(0.5,0.5,  List.of(0.5)),1,90210));
+                new HereScoring(0.5f,new HereFieldScore(0.5,0.5, 0.5,  List.of(0.5), 0.5)));
     }
 
     static HereScoring getHereScoring() {
-        return new HereScoring(0.9f,new HereFieldScore(0.5,0.5,  List.of(0.5)),1,90210);
+        return new HereScoring(0.9f,new HereFieldScore(0.5, 0.5, 0.5, List.of(0.5), 0.5));
     }
 
     static AddressDto getAddressDto() {
@@ -90,6 +108,25 @@ public interface TestUtilities {
                         .append("zip", "90210")
                         .append("isPartial", false)
                         .append("score", 1.0))
+                .append("matchedAddresses", Collections.singletonList(
+                        new Document("address", new Document("city", "Los Angeles")
+                                .append("country", "United States")
+                                .append("countryCode", "USA")
+                                .append("county", "Los Angeles County")
+                                .append("state", "California")
+                                .append("street", "123 Hollywood Blvd")
+                                .append("zip", "90028")
+                                .append("isPartial", false))
+                                .append("scoring", new Document("matchLevel", "EXCELLENT")
+                                        .append("score", 1.0)
+                                        .append("fieldScore", new Document("countryMatch", "EXACT")
+                                                .append("stateMatch", "EXACT")
+                                                .append("cityMatch", "PARTIAL")
+                                                .append("zipMatch", "EXACT")
+                                                .append("streetMatch", "NO_MATCH")
+                                        )
+                                )
+                ))
                 .append("requestAddress", new Document("city", "street")
                         .append("country", "US")
                         .append("state", "California")
@@ -99,12 +136,4 @@ public interface TestUtilities {
                 .append("createdDate", LocalDateTime.now())
                 .append("_class", "io.complyt.domain.ValidatedAddress");
     }
-
-    static FastTaxGetBestMatchData createFastTaxGetBestMatchData() {
-        String matchLevel = "Address";
-        TaxInfoItem taxInfoItem = new TaxInfoItem("Fresno", "0.00375", "0", "County", "0.00725", "0.0125", null, "", "", "0", "CA", "California", "0.06", "0.0835", "LABOR/FREIGHT/SERVICES", "93711-5508");
-        List<TaxInfoItem> taxInfoItems = List.of(taxInfoItem);
-        return new FastTaxGetBestMatchData(matchLevel, taxInfoItems,null);
-    }
-
 }

@@ -361,6 +361,20 @@ spring:
             - Path=/v1/addresses
           filters:
             - SetPath=/v1/addresses
+        - id: address-validation-get-validate
+          uri: lb://address-validation
+          predicates:
+            - Method=GET
+            - Path=/v1/addresses/validate
+          filters:
+            - SetPath=/v1/addresses/validate
+        - id: address-validation-get-resolve
+          uri: lb://address-validation
+          predicates:
+            - Method=GET
+            - Path=/v1/addresses/resolve
+          filters:
+            - SetPath=/v1/addresses/resolve
         # ---- AddressValidation ----
         # ==== Address Validation Service ====
         # ==== Authentication Service ====

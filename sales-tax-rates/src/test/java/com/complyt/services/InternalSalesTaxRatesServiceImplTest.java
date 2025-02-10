@@ -48,7 +48,7 @@ class InternalSalesTaxRatesServiceImplTest {
 
         // When
         when(internalSalesTaxRatesRepository.find(addressWithDate)).thenReturn(Mono.just(internalSalesTaxRates));
-        when(taxRateApplicabilityProcessor.processRates(internalSalesTaxRates, addressWithDate.getRequiredDate())).thenReturn(internalSalesTaxRates.getSalesTaxRates());
+        when(taxRateApplicabilityProcessor.processRates(internalSalesTaxRates, addressWithDate.getEffectiveDate())).thenReturn(internalSalesTaxRates.getSalesTaxRates());
 
 
         Mono<CommonSalesTaxRates> result = internalSalesTaxRatesServiceImp.findByAddress(addressWithDate);

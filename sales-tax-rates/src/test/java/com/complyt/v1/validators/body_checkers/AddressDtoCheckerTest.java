@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-class AddressDtoCheckerTest {
+public class AddressDtoCheckerTest {
     private AddressDtoChecker addressDtoChecker;
     private AddressWithDateDto addressDto;
 
@@ -63,6 +63,7 @@ class AddressDtoCheckerTest {
         Flux<String> errorMessages = addressDtoChecker.check(addressDto.withAddress(addressWithoutZip));
 
         StepVerifier.create(errorMessages)
+                .expectNext(DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)
                 .verifyComplete();
     }
 
@@ -74,6 +75,7 @@ class AddressDtoCheckerTest {
         Flux<String> errorMessages = addressDtoChecker.check(addressDto.withAddress(addressWithoutZip));
 
         StepVerifier.create(errorMessages)
+                .expectNext(DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)
                 .verifyComplete();
     }
 
@@ -125,6 +127,7 @@ class AddressDtoCheckerTest {
         StepVerifier.create(errorMessages)
                 .expectNext("Zip may not be blank in a partial address")
                 .expectNext(DtoErrorMessages.ZIP_NOT_IN_FORMAT)
+                .expectNext(DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)
                 .verifyComplete();
     }
 
@@ -162,6 +165,7 @@ class AddressDtoCheckerTest {
         StepVerifier.create(errorMessages)
                 .expectNext("Zip may not be blank in a partial address")
                 .expectNext(DtoErrorMessages.ZIP_NOT_IN_FORMAT)
+                .expectNext(DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)
                 .verifyComplete();
     }
 

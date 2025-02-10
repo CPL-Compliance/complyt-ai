@@ -4,6 +4,7 @@ import com.complyt.business.strategy.ShippingFeeJurisdictionalRulesInjection.Usa
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.Assertions;
@@ -27,7 +28,7 @@ public class UsaAddressShippingFeeJurisdictionalRulesInjectorTest {
     void setUp() {
         usaAddressShippingFeeJurisdictionalRulesInjector = new UsaAddressShippingFeeJurisdictionalRulesInjector();
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        Address usaAddress = testUtilities.createAddress();
+        ShippingAddress usaAddress = testUtilities.createShippingAddress();
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString())
                 .withShippingAddress(usaAddress)
                 .withShippingFee(testUtilities.createShippingFee(true, false, true));

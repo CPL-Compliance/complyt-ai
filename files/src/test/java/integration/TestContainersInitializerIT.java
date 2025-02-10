@@ -25,15 +25,25 @@ public abstract class TestContainersInitializerIT {
     protected static WebTestClient WEB_TEST_CLIENT;
 
     static {
-        MONGO_CONTAINER.addFileSystemBind("../mongodump/files.dump", "/files.dump", BindMode.READ_ONLY);
+        // Bind BSON dump folder inside the container
+        MONGO_CONTAINER.addFileSystemBind("../dump/files",
+                "/dump/files",
+                BindMode.READ_ONLY);
+
         MONGO_CONTAINER.start();
         MONGO_CONTAINER.followOutput(new Slf4jLogConsumer(log));
 
-
         try {
-            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=files.dump");
+            // Restore MongoDB from BSON files
+            MONGO_CONTAINER.execInContainer(
+                    "mongorestore",
+                    "--db", "files",
+                    "--dir", "/dump/files"
+            );
+
+            log.info("✅ MongoDB restored from BSON files successfully.");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("❌ Failed to restore MongoDB from BSON files", e);
         }
     }
 }

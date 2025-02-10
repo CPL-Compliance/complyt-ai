@@ -6,6 +6,7 @@ import com.complyt.business.address_validation.ComplytAddressValidationWebClient
 import com.complyt.business.address_validation.StubAddressValidationWebClientWrapper;
 import com.complyt.domain.transaction.Address;
 import com.complyt.proxies.AddressValidationServiceProxy;
+import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -15,7 +16,7 @@ public class AddressValidationClientWrapperConfig {
 
     @Profile({"complytTaxEngine"})
     @Bean("addressValidationWebClientWrapper")
-    public AddressValidationWebClientWrapper<Address> complytAddressValidationWebClientWrapper(AddressValidationServiceProxy addressValidationServiceProxy){
+    public AddressValidationWebClientWrapper<MatchedAddressDataDto> complytAddressValidationWebClientWrapper(AddressValidationServiceProxy addressValidationServiceProxy){
         return new ComplytAddressValidationWebClientWrapper(addressValidationServiceProxy);
     }
 

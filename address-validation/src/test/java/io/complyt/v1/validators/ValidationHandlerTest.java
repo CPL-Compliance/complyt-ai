@@ -5,7 +5,6 @@ import io.complyt.v1.config.BodyCheckConfig;
 import io.complyt.v1.config.ValidatorConfig;
 import io.complyt.v1.models.AddressDto;
 import io.complyt.v1.validators.address_body_checks.AddressExistingAbbreviationBodyCheck;
-import io.complyt.v1.validators.address_body_checks.PartialAddressBodyChecker;
 import io.complyt.v1.validators.query_params.QueryParamsExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,6 @@ import reactor.test.StepVerifier;
 import test_utils.TestUtilities;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiFunction;
 
 import static org.mockito.Mockito.when;
@@ -54,7 +52,6 @@ class ValidationHandlerTest {
     @BeforeEach
     void setup() {
         bodyCheckConfig =  new BodyCheckConfig<AddressDto>(List.of(
-                new PartialAddressBodyChecker(),
                 new AddressExistingAbbreviationBodyCheck()));
 
         queryParamsMap.add("key", "value");
@@ -116,7 +113,7 @@ class ValidationHandlerTest {
     @Test
     void validate_PartialAddressValidAndUnconflictedDto_ReturnsDto() {
         // Given
-        AddressDto addressDto = TestUtilities.getAddressDto().withPartial(true);
+        AddressDto addressDto = TestUtilities.getAddressDto().withIsPartial(true);
 
         // When
         when(serverRequest.queryParams()).thenReturn(queryParamsMap);

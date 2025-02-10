@@ -4,6 +4,10 @@ import com.complyt.domain.*;
 import com.complyt.domain.common_rates.CommonAddress;
 import com.complyt.domain.common_rates.CommonRates;
 import com.complyt.domain.common_rates.CommonSalesTaxRates;
+import com.complyt.domain.common_rates.Scoring;
+import com.complyt.domain.enums.FieldMatchType;
+import com.complyt.domain.enums.FieldsMatchScore;
+import com.complyt.domain.enums.MatchLevelType;
 import com.complyt.domain.enums.SalesTaxSources;
 import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
@@ -11,6 +15,7 @@ import com.complyt.domain.gt.ComplytGtRates;
 import com.complyt.domain.gt.GtAddress;
 import com.complyt.domain.gt.GtRates;
 import com.complyt.domain.internal_rates.*;
+import com.complyt.domain.matched_address.MatchedAddressData;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.AddressWithDateDto;
@@ -45,8 +50,12 @@ public interface TestUtilities {
                 localDateTime);
     }
 
+    static SalesTaxRatesData createSalesTaxRatesData() {
+        return new SalesTaxRatesData(null, TestUtilities.createAddressInCaliforniaWithCreationDate(), createMatchedAddressInCalifornia(), createCommonRates(), SalesTaxSources.FAST_SALES_TAX);
+    }
+
     static AddressWithDate createAddressInCaliforniaWithCreationDate() {
-        return new AddressWithDate(new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false),
+        return new AddressWithDate(new Address("Fresno", "US", null, "California", "7498 N Remington Ave", "93711-5508", false),
                 LocalDateTime.now());
     }
 
@@ -58,12 +67,20 @@ public interface TestUtilities {
         return new AddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
+    static Scoring createScoring() {
+        return new Scoring(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT));
+    }
+
     static AddressWithDateDto createAddressWithDateDtoInCalifornia(String date) {
         return new AddressWithDateDto(createAddressDtoInCalifornia(), date);
     }
 
     static AddressWithDate createAddressWithDateInCalifornia(LocalDateTime dateTime) {
         return new AddressWithDate(createAddressInCalifornia(), dateTime);
+    }
+
+    static MatchedAddressData createMatchedAddressInCalifornia() {
+        return new MatchedAddressData(createAddressInCalifornia(), TestUtilities.createScoring());
     }
 
     static SalesTaxRates createCaliforniaSalesTaxRates() {
@@ -100,6 +117,19 @@ public interface TestUtilities {
 
     static CommonRates createCommonRates() {
         return new CommonRates(
+                new BigDecimal("0.00725"), // state
+                new BigDecimal("0.00375"), // county
+                new BigDecimal("0"), // city
+                null, // combined
+                null,  // rates
+                new BigDecimal("0.071"), // mtd
+                new BigDecimal("0"), // spd
+                new BigDecimal("0"), // other
+                new BigDecimal("0.082"));
+    }
+
+    static SalesTaxRatesDto createSalesTaxRatesDto() {
+        return new SalesTaxRatesDto(
                 new BigDecimal("0.00725"), // state
                 new BigDecimal("0.00375"), // county
                 new BigDecimal("0"), // city

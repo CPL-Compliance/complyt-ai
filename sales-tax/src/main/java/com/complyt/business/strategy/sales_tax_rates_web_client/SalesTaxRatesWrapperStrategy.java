@@ -4,6 +4,7 @@ import com.complyt.business.strategy.FunctionSelectorByTransactionAddressStrateg
 import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.tax.ComplytGtRates;
 import lombok.AllArgsConstructor;
@@ -24,12 +25,12 @@ public class SalesTaxRatesWrapperStrategy extends FunctionSelectorByTransactionA
     SalesTaxRatesWebClientWrapper<ComplytGtRates> gtWebClientWrapper;
 
     @Override
-    protected Function<Address, Mono<ComplytSalesTaxRates>> getFunctionForUsaOption(Transaction transaction) {
+    protected Function<ShippingAddress, Mono<ComplytSalesTaxRates>> getFunctionForUsaOption(Transaction transaction) {
         return address -> salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress(), transaction.getExternalTimestamps().getCreatedDate());
     }
 
     @Override
-    protected Function<Address, Mono<ComplytGtRates>> getFunctionForNonUsaOption(Transaction transaction) {
+    protected Function<ShippingAddress, Mono<ComplytGtRates>> getFunctionForNonUsaOption(Transaction transaction) {
         return address -> gtWebClientWrapper.findByAddress(transaction.getShippingAddress(), transaction.getExternalTimestamps().getCreatedDate());
     }
 }

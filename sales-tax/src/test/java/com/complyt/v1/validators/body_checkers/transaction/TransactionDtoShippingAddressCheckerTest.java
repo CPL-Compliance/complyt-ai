@@ -1,14 +1,12 @@
 package com.complyt.v1.validators.body_checkers.transaction;
 
-import com.complyt.business.address.CountryIsSupportedNonUsaChecker;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
-import com.complyt.v1.models.transaction.MandatoryAddressDto;
+import com.complyt.v1.models.transaction.ShippingAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -16,8 +14,6 @@ import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -38,7 +34,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_PartialAddressWithMissingZipCode_ShouldReturnErrors() {
         // Given
-        MandatoryAddressDto addressWithoutZip = new MandatoryAddressDto(null, "USA",null,"CO",null,null,null,true);
+        ShippingAddressDto addressWithoutZip = new ShippingAddressDto(null, "USA",null,"CO",null,null,null,true, null);
         TransactionDto transactionDtoWithoutZip = transactionDto.withShippingAddress(addressWithoutZip);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithoutZip);
@@ -52,7 +48,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_PartialAddressWithInvalidState_ShouldReturnErrors() {
         // Given
-        MandatoryAddressDto addressWithoutZip = new MandatoryAddressDto(null, "USA",null,"Invalid State",null,null,"80001",true);
+        ShippingAddressDto addressWithoutZip = new ShippingAddressDto(null, "USA",null,"Invalid State",null,null,"80001",true, null);
         TransactionDto transactionDtoWithoutZip = transactionDto.withShippingAddress(addressWithoutZip);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithoutZip);
@@ -65,7 +61,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_PartialAddressWithStateNull_ShouldReturnErrors() {
         // Given
-        MandatoryAddressDto addressWithoutZip = new MandatoryAddressDto(null, "USA",null,null,null,null,"80001",true);
+        ShippingAddressDto addressWithoutZip = new ShippingAddressDto(null, "USA",null,null,null,null,"80001",true, null);
         TransactionDto transactionDtoWithoutZip = transactionDto.withShippingAddress(addressWithoutZip);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithoutZip);
@@ -77,7 +73,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_PartialAddressWithStateBlank_ShouldReturnErrors() {
         // Given
-        MandatoryAddressDto addressWithoutZip = new MandatoryAddressDto(null, "USA",null,"",null,null,"80001",true);
+        ShippingAddressDto addressWithoutZip = new ShippingAddressDto(null, "USA",null,"",null,null,"80001",true, null);
         TransactionDto transactionDtoWithoutZip = transactionDto.withShippingAddress(addressWithoutZip);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithoutZip);
@@ -89,7 +85,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_FullValidAddress_ShouldReturnEmpty() {
         // Given
-        MandatoryAddressDto addressWithoutZip = new MandatoryAddressDto("City", "USA","County","CO","Street","Region","80001",false);
+        ShippingAddressDto addressWithoutZip = new ShippingAddressDto("City", "USA","County","CO","Street","Region","80001",false, null);
         TransactionDto transactionDtoWithoutZip = transactionDto.withShippingAddress(addressWithoutZip);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithoutZip);
@@ -100,7 +96,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_FullAddressWithInvalidStateAndNullZip_ShouldReturnErrors() {
         // Given
-        MandatoryAddressDto addressWithoutZip = new MandatoryAddressDto("City", "USA","County","Invalid State","Street","Region",null,false);
+        ShippingAddressDto addressWithoutZip = new ShippingAddressDto("City", "USA","County","Invalid State","Street","Region",null,false, null);
         TransactionDto transactionDtoWithoutZip = transactionDto.withShippingAddress(addressWithoutZip);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithoutZip);
@@ -115,7 +111,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_FullAddressWithMissingFields_ShouldReturnErrors() {
         // Given
-        MandatoryAddressDto addressWithoutZip = new MandatoryAddressDto(null, "USA",null,null,null,null,"80001",false);
+        ShippingAddressDto addressWithoutZip = new ShippingAddressDto(null, "USA",null,null,null,null,"80001",false, null);
         TransactionDto transactionDtoWithoutZip = transactionDto.withShippingAddress(addressWithoutZip);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithoutZip);
@@ -131,7 +127,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_PartialAddressWithMissingZipAndBlankState_ShouldReturnErrors() {
         // Given
-        MandatoryAddressDto address = new MandatoryAddressDto(null, "USA", null, "", null, null, null, true);
+        ShippingAddressDto address = new ShippingAddressDto(null, "USA", null, "", null, null, null, true, null);
         TransactionDto transactionDtoWithMissingZipAndBlankState = transactionDto.withShippingAddress(address);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithMissingZipAndBlankState);
@@ -145,7 +141,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_PartialAddressWithUnsupportedCountry_ShouldReturnError() {
         // Given
-        MandatoryAddressDto address = new MandatoryAddressDto(null, "UnsupportedCountry", null, null, null, null, "80001", true);
+        ShippingAddressDto address = new ShippingAddressDto(null, "UnsupportedCountry", null, null, null, null, "80001", true, null);
         TransactionDto transactionDtoWithUnsupportedCountry = transactionDto.withShippingAddress(address);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithUnsupportedCountry);
@@ -158,7 +154,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_FullAddressWithBlankCity_ShouldReturnError() {
         // Given
-        MandatoryAddressDto address = new MandatoryAddressDto("", "USA", null, "CO", "Street", null, "80001", false);
+        ShippingAddressDto address = new ShippingAddressDto("", "USA", null, "CO", "Street", null, "80001", false, null);
         TransactionDto transactionDtoWithBlankCity = transactionDto.withShippingAddress(address);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithBlankCity);
@@ -171,7 +167,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_PartialAddressWithEmptyFields_ShouldReturnError() {
         // Given
-        MandatoryAddressDto address = new MandatoryAddressDto("", "USA", "", "", "", "", "", true);
+        ShippingAddressDto address = new ShippingAddressDto("", "USA", "", "", "", "", "", true, null);
         TransactionDto transactionDtoWithEmptyFields = transactionDto.withShippingAddress(address);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithEmptyFields);
@@ -185,7 +181,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_FullAddressWithAllFieldsMissing_ShouldReturnErrors() {
         // Given
-        MandatoryAddressDto address = new MandatoryAddressDto(null, "USA", null, null, null, null, null, false);
+        ShippingAddressDto address = new ShippingAddressDto(null, "USA", null, null, null, null, null, false, null);
         TransactionDto transactionDtoWithAllFieldsMissing = transactionDto.withShippingAddress(address);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithAllFieldsMissing);
@@ -203,7 +199,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_PartialAddressWithNullZipAndValidState_ShouldReturnEmpty() {
         // Given
-        MandatoryAddressDto address = new MandatoryAddressDto(null, "USA", null, "CO", null, null, null, true);
+        ShippingAddressDto address = new ShippingAddressDto(null, "USA", null, "CO", null, null, null, true, null);
         TransactionDto transactionDtoWithNullZipAndValidState = transactionDto.withShippingAddress(address);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithNullZipAndValidState);
@@ -217,7 +213,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_PartialAddressWithLongZip_ShouldReturnEmpty() {
         // Given
-        MandatoryAddressDto address = new MandatoryAddressDto(null, "USA", null, "CO", null, null, "1232434324324-3424123", true);
+        ShippingAddressDto address = new ShippingAddressDto(null, "USA", null, "CO", null, null, "1232434324324-3424123", true, null);
         TransactionDto transactionDtoWithNullZipAndValidState = transactionDto.withShippingAddress(address);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithNullZipAndValidState);
@@ -230,7 +226,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_PartialAddressWithLettersInZip_ShouldReturnEmpty() {
         // Given
-        MandatoryAddressDto address = new MandatoryAddressDto(null, "USA", null, "CO", null, null, "1a2b3", true);
+        ShippingAddressDto address = new ShippingAddressDto(null, "USA", null, "CO", null, null, "1a2b3", true, null);
         TransactionDto transactionDtoWithNullZipAndValidState = transactionDto.withShippingAddress(address);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithNullZipAndValidState);
@@ -243,7 +239,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_FullAddressWithValidZipAndUnsupportedCountry_ShouldReturnError() {
         // Given
-        MandatoryAddressDto address = new MandatoryAddressDto("City", "UnsupportedCountry", null, "CO", "Street", null, "80001", false);
+        ShippingAddressDto address = new ShippingAddressDto("City", "UnsupportedCountry", null, "CO", "Street", null, "80001", false, null);
         TransactionDto transactionDtoWithUnsupportedCountry = transactionDto.withShippingAddress(address);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithUnsupportedCountry);
@@ -256,7 +252,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_AddressWithNonUsaCountry_ShouldReturnEmpty() {
         // Given
-        MandatoryAddressDto address = new MandatoryAddressDto("City", "Canada", null, null, "Street", null, "M4B 1B4", false);
+        ShippingAddressDto address = new ShippingAddressDto("City", "Canada", null, null, "Street", null, "M4B 1B4", false, null);
         TransactionDto transactionDtoWithNonUsaCountry = transactionDto.withShippingAddress(address);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithNonUsaCountry);
@@ -268,7 +264,7 @@ class TransactionDtoShippingAddressCheckerTest {
     @Test
     void check_PartialAddressWithBlankStateInUsa_ShouldReturnNoError() {
         // Given
-        MandatoryAddressDto address = new MandatoryAddressDto(null, "USA", null, "", null, null, "80001", true);
+        ShippingAddressDto address = new ShippingAddressDto(null, "USA", null, "", null, null, "80001", true, null);
         TransactionDto transactionDtoWithBlankState = transactionDto.withShippingAddress(address);
 
         Flux<String> errorMessages = transactionDtoShippingAddressChecker.check(transactionDtoWithBlankState);

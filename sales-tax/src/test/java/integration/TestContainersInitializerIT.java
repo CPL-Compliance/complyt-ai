@@ -18,13 +18,25 @@ public abstract class TestContainersInitializerIT {
             .withExposedPorts(27017);
 
     static {
-        MONGO_CONTAINER.addFileSystemBind("../mongodump/sales-tax.dump", "/sales-tax.dump", BindMode.READ_ONLY);
+        // Bind BSON dump folder inside the container
+        MONGO_CONTAINER.addFileSystemBind("../dump/sales_tax",
+                "/dump/sales_tax",
+                BindMode.READ_ONLY);
+
         MONGO_CONTAINER.start();
         MONGO_CONTAINER.followOutput(new Slf4jLogConsumer(log));
+
         try {
-            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=sales-tax.dump");
+            // Restore MongoDB from BSON files
+            MONGO_CONTAINER.execInContainer(
+                    "mongorestore",
+                    "--db", "sales_tax",
+                    "--dir", "/dump/sales_tax"
+            );
+
+            log.info("✅ MongoDB restored from BSON files successfully.");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("❌ Failed to restore MongoDB from BSON files", e);
         }
     }
 }

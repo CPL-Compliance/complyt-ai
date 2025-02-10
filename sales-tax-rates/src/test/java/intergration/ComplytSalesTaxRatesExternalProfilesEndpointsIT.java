@@ -1,16 +1,15 @@
 package intergration;
 
 import com.complyt.SalesTaxRatesApplication;
-import com.complyt.business.sales_tax_web_clients.StubFastTaxWebClientWrapper;
 import com.complyt.config.SecurityConfig;
+import com.complyt.domain.Address;
 import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.domain.RatesMetaData;
-import com.complyt.v1.config.error_messages.GenericErrorMessages;
+import com.complyt.domain.matched_address.MatchedAddressData;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.common_sales_tax_rates.CommonAddressDto;
-import com.complyt.v1.model.common_sales_tax_rates.CommonSalesTaxRatesDto;
+import com.complyt.v1.model.common_sales_tax_rates.SalesTaxRatesDataDto;
 import com.complyt.v1.model.common_sales_tax_rates.SalesTaxRatesDto;
-import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalSalesTaxRatesDto;
 import com.complyt.v1.router.ComplytSalesTaxRatesRouter;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -34,10 +32,8 @@ import testUtils.TestUtilities;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -74,8 +70,10 @@ public class ComplytSalesTaxRatesExternalProfilesEndpointsIT extends MongoContai
         // Given
         AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto();
         AddressDto addressWithCounty = stubFastTaxAddress.withCounty("Arapahoe").withStreet("street");
+        Address address = new Address(addressWithCounty.city(), addressWithCounty.country(), addressWithCounty.county(), addressWithCounty.state(), addressWithCounty.street(), addressWithCounty.zip(), addressWithCounty.isPartial());
         SalesTaxRatesDto stubFastTaxSalesTaxRates = TestUtilities.createStubFastTaxSalesTaxRatesDto();
         CommonAddressDto returnedAddress = TestUtilities.createCommonAddressDto(addressWithCounty);
+        MatchedAddressData matchedAddressData = TestUtilities.createMatchedAddressInCalifornia().withAddress(address);
 
         // When + Then
         webTestClient
@@ -88,14 +86,14 @@ public class ComplytSalesTaxRatesExternalProfilesEndpointsIT extends MongoContai
                         .queryParam("street", stubFastTaxAddress.street())
                         .queryParam("zip", stubFastTaxAddress.zip())
                         .queryParam("isPartial", stubFastTaxAddress.isPartial())
-                        .queryParam("requiredDate", requestedTime)
+                        .queryParam("effectiveDate", requestedTime)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(CommonSalesTaxRatesDto.class)
+                .expectBody(SalesTaxRatesDataDto.class)
                 .value(commonSalesTaxRatesDto -> {
-                    assertEquals(returnedAddress, commonSalesTaxRatesDto.address());
+                    assertEquals(matchedAddressData, commonSalesTaxRatesDto.matchedAddressData());
                     assertEquals(stubFastTaxSalesTaxRates, commonSalesTaxRatesDto.salesTaxRates());
                 });
     }
@@ -109,6 +107,7 @@ public class ComplytSalesTaxRatesExternalProfilesEndpointsIT extends MongoContai
         AddressDto validatedAddress = stubFastTaxAddress.withCounty("Anchorage").withStreet("751-2696 205 E Benson Blvd").withCity("Anchorage"); // Validated by Here
         CommonAddressDto returnedAddress = TestUtilities.createCommonAddressDto(validatedAddress);
         SalesTaxRatesDto stubFastTaxSalesTaxRates = new SalesTaxRatesDto(new BigDecimal("0.0625"), BigDecimal.ZERO, new BigDecimal("0.01"), new BigDecimal("0.01"), new RatesMetaData(BigDecimal.ZERO, BigDecimal.ZERO, new BigDecimal("0.01")), null, null, null, new BigDecimal("0.0825"));
+        MatchedAddressData matchedAddressData = TestUtilities.createMatchedAddressInCalifornia();
 
         requestedTime = LocalDateTime.now();
 
@@ -122,16 +121,16 @@ public class ComplytSalesTaxRatesExternalProfilesEndpointsIT extends MongoContai
                         .queryParam("city", stubFastTaxAddress.city())
                         .queryParam("zip", stubFastTaxAddress.zip())
                         .queryParam("isPartial", stubFastTaxAddress.isPartial())
-                        .queryParam("requiredDate", requestedTime)
+                        .queryParam("effectiveDate", requestedTime)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(CommonSalesTaxRatesDto.class)
-                .value(commonSalesTaxRatesDto -> {
-                    assertEquals(returnedAddress, commonSalesTaxRatesDto.address());
-                    assertEquals(stubFastTaxSalesTaxRates,
-                            commonSalesTaxRatesDto.salesTaxRates());
+                .expectBody(SalesTaxRatesDataDto.class)
+                .value(salesTaxRatesDataDto -> {
+                    assertEquals(salesTaxRatesDataDto.matchedAddressData(), salesTaxRatesDataDto.matchedAddressData());
+                    assertEquals(salesTaxRatesDataDto.salesTaxRates(),
+                            salesTaxRatesDataDto.salesTaxRates());
                 });
     }
 

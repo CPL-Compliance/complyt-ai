@@ -32,6 +32,11 @@ import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerStatusDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.*;
+import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
+import com.complyt.v1.models.matched_address.ScoringDto;
+import com.complyt.v1.models.matched_address.enums.FieldMatchType;
+import com.complyt.v1.models.matched_address.enums.FieldsMatchScore;
+import com.complyt.v1.models.matched_address.enums.MatchLevelType;
 import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.tax.global_tax.GtRatesDto;
 import com.complyt.v1.models.tax.sales_tax.*;
@@ -75,16 +80,28 @@ public class UnitTestUtilities {
         return new Address("Fresno", "US", "county", "CA", "7498 N Remington Ave", "93711-5508", "", false);
     }
 
-    public static Address createAddressInNewYork() {
-        return new Address("New York City", "US", "county", "NY", "160 Broadway", "10038", "", false);
+    public static ShippingAddress createAddressInNewYork() {
+        return new ShippingAddress("New York City", "US", "county", "NY", "160 Broadway","", "10038", false, null);
     }
 
-    public static MandatoryAddressDto createAddressDtoInCalifornia() {
-        return new MandatoryAddressDto("Fresno", "US", "county", "CA", "7498 N Remington Ave", "", "93711-5508", false);
+    public static ShippingAddressDto createAddressDtoInCalifornia() {
+        return new ShippingAddressDto("Fresno", "US", "county", "CA", "7498 N Remington Ave", "", "93711-5508", false, null);
     }
 
+    public static ShippingAddress createShippingAddressInCalifornia() {
+        return new ShippingAddress("Fresno", "US", "county", "CA", "7498 N Remington Ave", "", "93711-5508", false, null);
+    }
 
-    public static SalesTaxRates createCaliforniaSalesTaxRates() {
+    public static MatchedAddressData createMatchedAddressData() {
+        MandatoryAddress mandatoryAddress = new MandatoryAddress("Fresno", "US", "county", "CA", "7498 N Remington Ave", "", "93711-5508", false);
+        return new MatchedAddressData(mandatoryAddress, createScoring());
+    }
+
+    public static Scoring createScoring() {
+        return new Scoring(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT));
+    }
+
+        public static SalesTaxRates createCaliforniaSalesTaxRates() {
         return new SalesTaxRates(
                 new BigDecimal("0.06"), // stateRate
                 new BigDecimal("0.0125"), // countyRate
@@ -127,7 +144,7 @@ public class UnitTestUtilities {
     }
 
     public static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
-        Address address = createAddressInCalifornia();
+        MatchedAddressData address = createMatchedAddressData();
         SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
         return new ComplytSalesTaxRates(null, address, salesTaxRates);
     }
@@ -143,7 +160,7 @@ public class UnitTestUtilities {
     }
 
     public static ComplytInternalSalesTaxRatesDto createComplytInternalSalesTaxRatesDto() {
-        return new ComplytInternalSalesTaxRatesDto(null, createSalesTaxRatesAddressDto(), createInternalSalesTaxRatesDto(UUID.randomUUID()), null);
+        return new ComplytInternalSalesTaxRatesDto(null, createMatchedAddressData(), createInternalSalesTaxRatesDto(UUID.randomUUID()), null);
     }
 
     public static InternalSalesTaxRatesDto createInternalSalesTaxRatesDto(UUID complytId) {
@@ -297,7 +314,7 @@ public class UnitTestUtilities {
     public Transaction createTransaction(String id) {
         String documentName = "INVUS1000";
         Address billingAddress = new Address("City", "USA", "County", "CA", "Street", "10000", "", false);
-        Address shippingAddress = new Address("City", "USA", "County", "CA", "Street", "10000", "", false);
+        ShippingAddress shippingAddress = new ShippingAddress("City", "USA", "County", "CA", "Street","", "10000", false, null);
         List<Item> items = createItems(true, false, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false, false);
@@ -313,7 +330,7 @@ public class UnitTestUtilities {
     public Transaction createTransactionProjectionAfterProjection(String id) {
         String documentName = "INVUS1000";
         Address billingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
-        Address shippingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
+        ShippingAddress shippingAddress = new ShippingAddress("City", "USA", "County", "CA", "Street", "", "Zip", false, null);
         List<Item> items = createItems(false, false, true);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(false, false, false);
@@ -331,7 +348,7 @@ public class UnitTestUtilities {
     public Transaction createTransactionWithCalculatedTotalItem(String id) {
         String documentName = "INVUS1000";
         Address billingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
-        Address shippingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
+        ShippingAddress shippingAddress = new ShippingAddress("City", "USA", "County", "CA", "Street", "","Zip", false, null);
         List<Item> items = createItemsWithCalculatedTotal(true, false, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false, false);
@@ -348,7 +365,7 @@ public class UnitTestUtilities {
     public Transaction createTransactionWithThreeItemsAndCalculatedTotal(String id) {
         String documentName = "INVUS1000";
         Address billingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
-        Address shippingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
+        ShippingAddress shippingAddress = new ShippingAddress("City", "USA", "County", "CA", "Street", "","Zip", false, null);
         List<Item> items = createThreeItemsWithCalculatedTotal(true, false, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false, false);
@@ -373,7 +390,7 @@ public class UnitTestUtilities {
     public TransactionDto createTransactionDto(String id) {
         String documentName = "INVUS1000";
         OptionalAddressDto billingAddress = new OptionalAddressDto("City", "USA", "County", "CA", "Street", "", "10000", false);
-        MandatoryAddressDto shippingAddress = new MandatoryAddressDto("City", "USA", "County", "CA", "Street", "", "10000", false);
+        ShippingAddressDto shippingAddress = new ShippingAddressDto("City", "USA", "County", "CA", "Street", "", "10000", false, null);
         List<ItemDto> items = createItemDtos(true, false, false);
         TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);
@@ -883,13 +900,26 @@ public class UnitTestUtilities {
         return new Address("City", "Country", "County", "CA", "Street", "Zip", "region", false);
     }
 
+    public ShippingAddress createShippingAddress() {
+        return new ShippingAddress("City", "Country", "County", "CA", "Street","region", "Zip", false, null);
+    }
+
     public MandatoryAddressDto createMandatoryAddressDto() {
         return new MandatoryAddressDto("City", "Country", "County", "CA", "Street", "region", "Zip", false);
+    }
+
+    public MatchedAddressDataDto createMatchedAddressDto() {
+        return new MatchedAddressDataDto(createMandatoryAddressDto(), new ScoringDto(MatchLevelType.EXCELLENT, 0.9,new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT)));
     }
 
     public Address createUsaAddress() {
         return new Address("Fresno", "USA", "County", "CA", "7498 Ave", "55591", "region", false);
     }
+
+    public ShippingAddress createUsaShippingAddress() {
+        return new ShippingAddress("Fresno", "USA", "County", "CA", "7498 Ave","region", "55591", false, null);
+    }
+
 
     public Timestamps createTimestamps() {
         return new Timestamps(localDateTime.minusYears(1), localDateTime);
@@ -997,6 +1027,10 @@ public class UnitTestUtilities {
 
     public Address createNonUsaAddress() {
         return new Address(null, "ARM", null, null, null, "12345", null, false);
+    }
+
+    public ShippingAddress createNonUsaShippingAddress() {
+        return new ShippingAddress(null, "ARM", null, null, null, null,"12345", false, null);
     }
 
     public Map<String, ProductClassification> createMapTaxCodesToClassifications() {

@@ -11,71 +11,74 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HereAddressToAddressMapperTest {
 
-    CachedAddressData address = TestUtilities.getCachedAddressData();
-    CachedAddressData addressDefault = CachedAddressData.DEFAULT;
+    private final CachedAddressData cachedAddressData = TestUtilities.getCachedAddressData().withScoring(TestUtilities.getScoring());
 
     @Test
-    void MapHereAddressDataToAddress_HereAddressData_ReturnsAddress() {
+    void mapHereAddressDataToAddress_HereAddressData_ReturnsMappedAddresses() {
         // Given
         HereAddressData hereAddressData = TestUtilities.getHereAddressData();
 
         // When
-        CachedAddressData actualAddress = HereAddressToAddressMapper.INSTANCE.map(hereAddressData);
+        List<CachedAddressData> actualAddresses = HereAddressToAddressMapper.INSTANCE.map(hereAddressData);
 
         // Then
-        assertEquals(address, actualAddress);
+        assertEquals(1, actualAddresses.size());
+        assertEquals(cachedAddressData.address(), actualAddresses.get(0).address());
+        assertEquals(cachedAddressData.scoring(), actualAddresses.get(0).scoring());
+
     }
 
     @Test
-    void MapHereAddressDataToAddress_Null_ReturnsDefault() {
+    void mapHereAddressDataToAddress_Null_ReturnsDefault() {
         // Given
         HereAddressData hereAddressData = new HereAddressData(null);
 
         // When
-        CachedAddressData actualAddress = HereAddressToAddressMapper.INSTANCE.map(hereAddressData);
+        List<CachedAddressData> actualAddresses = HereAddressToAddressMapper.INSTANCE.map(hereAddressData);
 
         // Then
-        assertEquals(addressDefault, actualAddress);
+        assertTrue(actualAddresses.isEmpty());
     }
 
     @Test
-    void MapHereAddressDataToAddress_Empty_ReturnsDefault() {
+    void mapHereAddressDataToAddress_Empty_ReturnsDefault() {
         // Given
         HereAddressData hereAddressData = TestUtilities.getHereAddressData().withItems(List.of());
 
         // When
-        CachedAddressData actualAddress = HereAddressToAddressMapper.INSTANCE.map(hereAddressData);
+        List<CachedAddressData> actualAddresses = HereAddressToAddressMapper.INSTANCE.map(hereAddressData);
 
         // Then
-        assertEquals(addressDefault, actualAddress);
+        assertTrue(actualAddresses.isEmpty());
     }
 
     @Test
-    void MapHereAddressDataToAddress_NullList_ReturnsDefault() {
+    void mapHereAddressDataToAddress_NullList_ReturnsDefault() {
         // Given
         HereAddressData hereAddressData = TestUtilities.getHereAddressData().withItems(null);
 
         // When
-        CachedAddressData actualAddress = HereAddressToAddressMapper.INSTANCE.map(hereAddressData);
+        List<CachedAddressData> actualAddresses = HereAddressToAddressMapper.INSTANCE.map(hereAddressData);
 
         // Then
-        assertEquals(addressDefault, actualAddress);
+        assertTrue(actualAddresses.isEmpty());
     }
 
     @Test
-    void MapHereAddressDataToAddress_NullItem_ReturnsDefault() {
+    void mapHereAddressDataToAddress_NullItem_ReturnsDefault() {
         // Given
         ArrayList<HereAddressItem> list = new ArrayList<>();
         list.add(null);
         HereAddressData hereAddressData = TestUtilities.getHereAddressData().withItems(list);
 
         // When
-        CachedAddressData actualAddress = HereAddressToAddressMapper.INSTANCE.map(hereAddressData);
+        List<CachedAddressData> actualAddresses = HereAddressToAddressMapper.INSTANCE.map(hereAddressData);
 
         // Then
-        assertEquals(addressDefault, actualAddress);
+        assertTrue(actualAddresses.isEmpty());
     }
 }

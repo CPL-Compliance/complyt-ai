@@ -2,7 +2,8 @@ package com.complyt.facade;
 
 import com.complyt.domain.AddressWithDate;
 import com.complyt.domain.ComplytSalesTaxRates;
-import com.complyt.domain.common_rates.CommonSalesTaxRates;
+import com.complyt.domain.SalesTaxRatesData;
+import com.complyt.domain.mappers.CommonSalesTaxRatesToSalesTaxRatesMapper;
 import com.complyt.services.AddressValidationService;
 import com.complyt.services.SalesTaxRatesService;
 import lombok.NonNull;
@@ -18,9 +19,9 @@ public class ExternalSalesTaxRatesFacade implements SalesTaxRatesFacade<ComplytS
     SalesTaxRatesService<ComplytSalesTaxRates> externalSalesTaxRatesService;
 
     @Override
-    public Mono<CommonSalesTaxRates> findByAddress(@NonNull AddressWithDate addressWithDate) {
-        return addressValidationService.validate(addressWithDate.getAddress())
-                .map(addressWithDate::setAddress)
-                .flatMap(externalSalesTaxRatesService::findByAddress);
+    public Mono<SalesTaxRatesData> validateAddress(@NonNull AddressWithDate requestAddressWithDate) {
+        return addressValidationService.validate(requestAddressWithDate.getAddress())
+                .flatMap(matchedAddress -> externalSalesTaxRatesService.findByAddress(requestAddressWithDate.withAddress(matchedAddress.address()))
+                .map(salesTaxRates -> CommonSalesTaxRatesToSalesTaxRatesMapper.INSTANCE.map(requestAddressWithDate, matchedAddress, salesTaxRates)));
     }
 }

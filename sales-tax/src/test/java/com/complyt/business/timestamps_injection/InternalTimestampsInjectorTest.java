@@ -1,10 +1,7 @@
 package com.complyt.business.timestamps_injection;
 
 import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.domain.transaction.Address;
-import com.complyt.domain.transaction.Item;
-import com.complyt.domain.transaction.Transaction;
-import com.complyt.domain.transaction.TransactionStatus;
+import com.complyt.domain.transaction.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
@@ -37,7 +34,7 @@ public class InternalTimestampsInjectorTest {
         LocalDateTime localDateTime_now = LocalDateTime.now();
         Timestamps internalTimeStamps = new Timestamps(localDateTime_now, localDateTime_now);
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip", "", false);
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", "", false);
+        ShippingAddress shippingAddress = new ShippingAddress("City", "Country", "County", "CA", "Street", "Zip", "", false, null);
 
         List<Item> items = testUtilities.createItems(true, false, true);
 

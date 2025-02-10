@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
+@With
 public class AddressWithDate implements TaxableLocation {
     Address address;
-    LocalDateTime requiredDate;
+    LocalDateTime effectiveDate;
 }

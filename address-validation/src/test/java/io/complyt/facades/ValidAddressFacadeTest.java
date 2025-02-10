@@ -1,6 +1,8 @@
 package io.complyt.facades;
 
 import io.complyt.domain.Address;
+import io.complyt.domain.CachedAddressData;
+import io.complyt.domain.ValidatedAddress;
 import io.complyt.services.ValidAddressService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,8 @@ class ValidAddressFacadeTest {
 
 
     Address address = TestUtilities.getAddress();
+    ValidatedAddress validatedAddress = TestUtilities.getValidatedAddress();
+    CachedAddressData cachedAddressData = TestUtilities.getCachedAddressData();
 
 
     @BeforeEach
@@ -36,11 +40,11 @@ class ValidAddressFacadeTest {
     @Test
     public void validateAddress_AddressValid_ReturnsValidatedAddress() {
         // Arrange
-        when(validAddressService.validateAddress(address)).thenReturn(Mono.just(address));
+        when(validAddressService.validateAddress(address)).thenReturn(Mono.just(validatedAddress));
 
         // Act & Assert
         StepVerifier.create(validAddressFacade.validateAddress(address))
-                .expectNext(address)
+                .expectNext(validatedAddress)
                 .verifyComplete();
     }
 
@@ -52,6 +56,32 @@ class ValidAddressFacadeTest {
         // Act & Assert
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
             validAddressFacade.validateAddress(nullAddress).block();
+        });
+
+        // Assert
+        assertEquals("address is marked non-null but is null", exception.getMessage());
+    }
+
+
+    @Test
+    public void resolveAddress_AddressValid_ReturnsValidatedAddress() {
+        // Arrange
+        when(validAddressService.resolveAddress(address)).thenReturn(Mono.just(cachedAddressData));
+
+        // Act & Assert
+        StepVerifier.create(validAddressFacade.resolveAddress(address))
+                .expectNext(cachedAddressData)
+                .verifyComplete();
+    }
+
+    @Test
+    public void resolveAddress_NullAddress_ThrowsNullPointerException() {
+        // Arrange
+        Address nullAddress = null;
+
+        // Act & Assert
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            validAddressFacade.resolveAddress(nullAddress).block();
         });
 
         // Assert

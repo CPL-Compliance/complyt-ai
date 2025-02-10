@@ -29,7 +29,7 @@ public class InternalSalesTaxRatesServiceImpl implements SalesTaxRatesService<In
     public Mono<CommonSalesTaxRates> findByAddress(@NonNull AddressWithDate addressWithDate) {
         return internalSalesTaxRatesRepository.find(addressWithDate)
                 .map(internalSalesTaxRates -> {
-                    InternalRates applicableRates = taxRateApplicabilityProcessor.processRates(internalSalesTaxRates, addressWithDate.getRequiredDate());
+                    InternalRates applicableRates = taxRateApplicabilityProcessor.processRates(internalSalesTaxRates, addressWithDate.getEffectiveDate());
                     return InternalRatesToCommonRatesMapper.INSTANCE.map(internalSalesTaxRates.withSalesTaxRates(applicableRates));
                 });
     }

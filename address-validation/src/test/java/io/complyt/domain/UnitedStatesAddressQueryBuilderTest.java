@@ -25,7 +25,7 @@ class UnitedStatesAddressQueryBuilderTest {
         fullAddressNoCountyAddress = TestUtilities.getAddress();
         fullAddressWithCountyAddress = fullAddressNoCountyAddress.withCounty("county");
         partialAddress = fullAddressNoCountyAddress
-                .withPartial(true)
+                .withIsPartial(true)
                 .withCity(null)
                 .withStreet(null);
     }

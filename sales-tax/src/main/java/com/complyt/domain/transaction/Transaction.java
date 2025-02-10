@@ -36,7 +36,7 @@ public class Transaction implements ComplytIdProperty, InternalTimestampsPropert
     List<Item> items;
     Boolean isTaxInclusive;
     Address billingAddress;
-    Address shippingAddress;
+    ShippingAddress shippingAddress;
     UUID customerId;
     Customer customer;
     SalesTax salesTax;
@@ -60,5 +60,4 @@ public class Transaction implements ComplytIdProperty, InternalTimestampsPropert
     String subsidiary;
     Boolean isRefundLinked;
     BigDecimal refundLinkedPercentage;
-
 }

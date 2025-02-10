@@ -2,6 +2,7 @@ package com.complyt.business.address_validation;
 
 import com.complyt.business.exceptions.ComplytAddressValidationException;
 import com.complyt.domain.Address;
+import com.complyt.domain.matched_address.MatchedAddressData;
 import com.complyt.proxies.AddressValidationServiceProxy;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,13 +22,15 @@ class ComplytAddressValidationWebClientWrapperTest {
     AddressValidationServiceProxy addressValidationServiceProxy;
     ComplytAddressValidationWebClientWrapper complytAddressValidationWebClientWrapper;
     Address address;
-    Address validateAddress;
+    MatchedAddressData validateAddress;
+    MatchedAddressData matchedAddressData;
 
     @BeforeEach
     void setUp() {
         complytAddressValidationWebClientWrapper = new ComplytAddressValidationWebClientWrapper(addressValidationServiceProxy);
         address = TestUtilities.createAddressInCalifornia();
-        validateAddress = address;
+        validateAddress = TestUtilities.createMatchedAddressInCalifornia();
+        matchedAddressData = TestUtilities.createMatchedAddressInCalifornia();
     }
 
     @Test
@@ -35,10 +38,10 @@ class ComplytAddressValidationWebClientWrapperTest {
         when(addressValidationServiceProxy.validateAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial()))
                 .thenReturn(Mono.just(validateAddress));
 
-        Mono<Address> result = complytAddressValidationWebClientWrapper.validateAddress(address.city(), address.country(), address.county(), address.state(), address.street(), address.zip(), address.isPartial());
+        Mono<MatchedAddressData> result = complytAddressValidationWebClientWrapper.validateAddress(address.city(), address.country(), address.county(), address.state(), address.street(), address.zip(), address.isPartial());
 
         StepVerifier.create(result)
-                .expectNext(address)
+                .expectNext(matchedAddressData)
                 .verifyComplete();
     }
 
@@ -47,10 +50,10 @@ class ComplytAddressValidationWebClientWrapperTest {
         when(addressValidationServiceProxy.validateAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial()))
                 .thenReturn(Mono.just(validateAddress));
 
-        Mono<Address> result = complytAddressValidationWebClientWrapper.validateAddress(address);
+        Mono<MatchedAddressData> result = complytAddressValidationWebClientWrapper.validateAddress(address);
 
         StepVerifier.create(result)
-                .expectNext(address)
+                .expectNext(matchedAddressData)
                 .verifyComplete();
     }
 
@@ -59,7 +62,7 @@ class ComplytAddressValidationWebClientWrapperTest {
         when(addressValidationServiceProxy.validateAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial()))
                 .thenReturn(Mono.error(new RuntimeException("Retries Exception")));
 
-        Mono<Address> result = complytAddressValidationWebClientWrapper.validateAddress(address);
+        Mono<MatchedAddressData> result = complytAddressValidationWebClientWrapper.validateAddress(address);
 
         StepVerifier.create(result)
                 .expectErrorMatches(throwable -> throwable instanceof ComplytAddressValidationException
@@ -72,7 +75,7 @@ class ComplytAddressValidationWebClientWrapperTest {
         when(addressValidationServiceProxy.validateAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial()))
                 .thenReturn(Mono.error(TestUtilities.create400BadRequestFeignException()));
 
-        Mono<Address> result = complytAddressValidationWebClientWrapper.validateAddress(address);
+        Mono<MatchedAddressData> result = complytAddressValidationWebClientWrapper.validateAddress(address);
 
         StepVerifier.create(result)
                 .expectError(ObjectNotValidApiException.class)

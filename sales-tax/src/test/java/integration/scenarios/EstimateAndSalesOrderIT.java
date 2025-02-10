@@ -5,6 +5,7 @@ import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
+import com.complyt.v1.models.transaction.ShippingAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.transaction.TransactionTypeDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
@@ -51,7 +52,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
     private WebTestClient webTestClient;
 
     private final LocalDateTime referenceDate = LocalDateTime.parse("2020-10-01T07:00:00");
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Louisville", "US", null, "KY", "2513 Preston Hwy", "","40217", false);
+    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Louisville", "US", null, "KY", "2513 Preston Hwy", "","40217", false, null);
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private final String source = "1";
 

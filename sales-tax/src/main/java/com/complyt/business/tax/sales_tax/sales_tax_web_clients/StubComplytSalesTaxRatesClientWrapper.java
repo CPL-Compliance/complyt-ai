@@ -5,7 +5,10 @@ import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.RatesMetaData;
 import com.complyt.domain.sales_tax.SalesTaxRates;
-import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.*;
+import com.complyt.v1.models.matched_address.enums.FieldMatchType;
+import com.complyt.v1.models.matched_address.enums.FieldsMatchScore;
+import com.complyt.v1.models.matched_address.enums.MatchLevelType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -13,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @EqualsAndHashCode
 @Generated
@@ -20,9 +24,10 @@ public class StubComplytSalesTaxRatesClientWrapper implements SalesTaxRatesWebCl
 
     @Override
     public Mono<ComplytSalesTaxRates> findByAddress(String state, String country, String county, String city, String street, String zip, String region, boolean isPartial, LocalDateTime transactionDate) {
-        Address address = new Address(
-                "Juneau", "USA", "San Joaquin", "Alaska", "2285 Trout St", "99801", "", false
-        );
+        MandatoryAddress address = new MandatoryAddress(
+                "Juneau", "USA", "San Joaquin", "Alaska", "2285 Trout St","", "99801", null);
+        Scoring scoring = new Scoring(MatchLevelType.EXCELLENT, 0.95, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT));
+        MatchedAddressData matchedAddressData = new MatchedAddressData(address, scoring);
 
         SalesTaxRates salesTaxRates = new SalesTaxRates(
                 new BigDecimal("0.06"), // state
@@ -39,12 +44,12 @@ public class StubComplytSalesTaxRatesClientWrapper implements SalesTaxRatesWebCl
                 null, // otherRate
                 new BigDecimal("0.0775") // taxRate
         );
-        ComplytSalesTaxRates complytSalesTaxRates = new ComplytSalesTaxRates(null, address, salesTaxRates);
+        ComplytSalesTaxRates complytSalesTaxRates = new ComplytSalesTaxRates(null, matchedAddressData, salesTaxRates);
         return Mono.just(complytSalesTaxRates);
     }
 
     @Override
-    public Mono<ComplytSalesTaxRates> findByAddress(@NonNull Address address, LocalDateTime transactionDate) {
+    public Mono<ComplytSalesTaxRates> findByAddress(@NonNull ShippingAddress address, LocalDateTime transactionDate) {
         return findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.region(), address.isPartial(), transactionDate);
     }
 

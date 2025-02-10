@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -18,7 +19,8 @@ import java.time.LocalDateTime;
 public class ValidatedAddress implements AddressData {
     @Id
     String id;
-    CachedAddressData address;
+    TempAddressData address; // todo remove phase 2
+    List<CachedAddressData> matchedAddresses;
     Address requestAddress;
     LocalDateTime createdDate;
 }

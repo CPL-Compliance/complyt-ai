@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CachedAddressToAddressMapperTest {
 
-    Address address = TestUtilities.getAddress().withCounty("County");
+    Address address = TestUtilities.getAddress().withCounty("County").withIsPartial(null);
 
     @Test
     void MapCachedAddressDataToAddress_CachedAddressData_ReturnsAddress() {

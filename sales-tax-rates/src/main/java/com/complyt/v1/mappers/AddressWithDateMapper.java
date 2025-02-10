@@ -12,9 +12,9 @@ import org.mapstruct.factory.Mappers;
 public interface AddressWithDateMapper {
     AddressWithDateMapper INSTANCE = Mappers.getMapper(AddressWithDateMapper.class);
 
-    @Mapping(target = "requiredDate", source = "requiredDate", qualifiedByName = "parseLocalDateTimeToString")
+    @Mapping(target = "effectiveDate", source = "effectiveDate", qualifiedByName = "parseLocalDateTimeToString")
     AddressWithDateDto addressWithDateToAddressDateDto(AddressWithDate addressWithTransactionDateDto);
 
-    @Mapping(target = "requiredDate", source = "requiredDate", qualifiedByName = "parseStringToLocalDateTime")
+    @Mapping(target = "effectiveDate", source = "effectiveDate", qualifiedByName = "parseStringToLocalDateTime")
     AddressWithDate addressWithDateDtoToAddressDate(AddressWithDateDto addressWithTransactionDateDto);
 }

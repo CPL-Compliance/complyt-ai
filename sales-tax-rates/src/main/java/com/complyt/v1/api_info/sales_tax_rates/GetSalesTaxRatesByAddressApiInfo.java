@@ -31,10 +31,10 @@ import java.lang.annotation.Target;
                         operationId = "getComplytSalesTaxRatesByAddress",
                         parameters = {
                                 @Parameter(in = ParameterIn.QUERY, required = true,
-                                        name = "requiredDate",
+                                        name = "effectiveDate",
                                         description = "date for getting the rate",
-                                        examples = @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.requiredDateExample,
-                                                name = GetSalesTaxRatesByAddressApiInfo.requiredDateExample)),
+                                        examples = @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.effectiveDateExample,
+                                                name = GetSalesTaxRatesByAddressApiInfo.effectiveDateExample)),
                                 @Parameter(in = ParameterIn.QUERY, required = true,
                                         name = "state",
                                         description = "Address state",
@@ -100,29 +100,50 @@ import java.lang.annotation.Target;
 public @interface GetSalesTaxRatesByAddressApiInfo {
     String countryExample = "US";
     String stateExample = "NY";
-    String requiredDateExample = "200-01-01";
+    String effectiveDateExample = "200-01-01";
     String cityExample = "New York";
     String streetExample = "541 6th Ave";
     String zipExample = "10011";
 
     String complytSalesTaxRatesExample = """
             {
-                "address": {
-                    "city": "New York",
-                    "country": "US",
-                    "county": "New York",
-                    "state": "NY",
-                    "street": "160 Broadway",
-                    "zip": "10038",
-                    "isPartial": false
+                "complytId": "ccf486cc-9773-4081-8838-006a0f97d673",
+                "requestAddress": {
+                    "address": {
+                        "country": "US",
+                        "state": "Texas",
+                        "zip": "73301",
+                        "isPartial": true
+                    },
+                    "effectiveDate": "2024-01-01T00:00:00"
+                },
+                "matchedAddressData": {
+                    "address": {
+                        "city": "Austin",
+                        "country": "United States",
+                        "county": "Travis",
+                        "state": "Texas",
+                        "zip": "73301"
+                    },
+                    "scoring": {
+                        "matchLevel": "EXCELLENT",
+                        "score": 1.0,
+                        "fieldScore": {
+                            "countryMatch": "EXACT",
+                            "stateMatch": "EXACT",
+                            "cityMatch": "NO_MATCH",
+                            "zipMatch": "EXACT"
+                        }
+                    }
                 },
                 "salesTaxRates": {
-                    "cityDistrictRate": 0.0,
-                    "cityRate": 0.045,
-                    "countyDistrictRate": 0.00375,
-                    "countyRate": 0.0,
-                    "stateRate": 0.04,
-                    "taxRate": 0.08875
+                    "stateRate": 0.0625,
+                    "countyRate": 0,
+                    "cityRate": 0.01,
+                    "mtaRate": 0.01,
+                    "spdRate": 0,
+                    "otherRate": 0,
+                    "taxRate": 0.0825
                 }
             }
             """;

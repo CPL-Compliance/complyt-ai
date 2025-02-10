@@ -1,5 +1,6 @@
 package io.complyt.v1.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.complyt.utils.ZipRegex;
 import io.complyt.v1.config.error_messages.DtoErrorMessages;
 import io.complyt.v1.config.error_messages.StringErrorMessages;
@@ -11,6 +12,7 @@ import lombok.With;
 
 @With
 @Schema(name = "Address")
+@JsonInclude(JsonInclude.Include.NON_NULL) // Excludes null fields in JSON response
 public record AddressDto(
         @Size(max = 100, message = "Address.city " + StringErrorMessages.MAX_100_ERROR) String city,
         @NotBlank(message = "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR) @Size(max = 50, message = "Address.country " + StringErrorMessages.MAX_50_ERROR) String country,
@@ -19,5 +21,5 @@ public record AddressDto(
         @Size(max = 200, message = "Address.street " + StringErrorMessages.MAX_200_ERROR) String street,
         @NotBlank(message = "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR)
         @Size(max = 20, message = "Address.zip " + StringErrorMessages.MAX_20_ERROR) String zip,
-        @Schema(description = "whether country, city or street are necessary") boolean isPartial) {
+        @Schema(description = "whether country, city or street are necessary") Boolean isPartial) {
 }

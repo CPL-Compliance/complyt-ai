@@ -62,7 +62,12 @@ import java.lang.annotation.Target;
                                         name = "street",
                                         description = "Address street",
                                         examples = @ExampleObject(value = GetComplytValidatedAddressByAddressApiInfo.streetExample,
-                                                name = GetComplytValidatedAddressByAddressApiInfo.streetExample))
+                                                name = GetComplytValidatedAddressByAddressApiInfo.streetExample)),
+                                @Parameter(in = ParameterIn.QUERY,
+                                        name = "county",
+                                        description = "Address county",
+                                        examples = @ExampleObject(value = GetComplytResolveAddressByAddressApiInfo.cityExample,
+                                                name = GetComplytResolveAddressByAddressApiInfo.cityExample))
                         },
                         tags = "validated_address",
                         responses = {
@@ -79,7 +84,7 @@ import java.lang.annotation.Target;
                                         }),
                                 @ApiResponse(
                                         responseCode = "400",
-                                        description = "Something is wrong with your request"
+                                        description = "Something is wrong with your request:\n ERR-ADDR-001: The Validate Address endpoint returns valid address suggestions based on the provided input address."
                                 ),
                                 @ApiResponse(
                                         responseCode = "401",
@@ -100,7 +105,6 @@ import java.lang.annotation.Target;
 })
 
 public @interface GetComplytValidatedAddressByAddressApiInfo {
-    //todo : complete this file
     String countryExample = "United States";
     String countryAbbreviationExample = "USA";
     String stateExample = "New York";
@@ -111,13 +115,56 @@ public @interface GetComplytValidatedAddressByAddressApiInfo {
 
     String complytSalesTaxRatesExample = """
             {
-                "address": {
-                    "city": "New York",
+                "matchedAddresses": [
+                    {
+                        "address": {
+                            "city": "Phoenix",
+                            "country": "United States",
+                            "county": "Maricopa",
+                            "state": "Arizona",
+                            "street": "S 3rd Ave",
+                            "zip": "85041-5705"
+                        },
+                        "scoring": {
+                            "matchLevel": "EXCELLENT",
+                            "score": 0.96,
+                            "fieldScore": {
+                                "countryMatch": "EXACT",
+                                "stateMatch": "EXACT",
+                                "cityMatch": "EXACT",
+                                "streetMatch": "GOOD",
+                                "zipMatch": "EXACT"
+                            }
+                        }
+                    },
+                    {
+                        "address": {
+                            "city": "Phoenix",
+                            "country": "United States",
+                            "county": "Maricopa",
+                            "state": "Arizona",
+                            "street": "S 3rd St",
+                            "zip": "85042-4206"
+                        },
+                        "scoring": {
+                            "matchLevel": "EXCELLENT",
+                            "score": 0.92,
+                            "fieldScore": {
+                                "countryMatch": "EXACT",
+                                "stateMatch": "EXACT",
+                                "cityMatch": "EXACT",
+                                "streetMatch": "GOOD",
+                                "zipMatch": "GOOD"
+                            }
+                        }
+                    }
+                ],
+                "requestAddress": {
+                    "city": "Phoenix",
                     "country": "USA",
-                    "county": "New York",
-                    "state": "New York",
-                    "street": "160 Broadway",
-                    "zip": "10038",
+                    "state": "Arizona",
+                    "street": "6001 W 3rd St",
+                    "zip": "85041-5705",
                     "isPartial": false
                 }
             }

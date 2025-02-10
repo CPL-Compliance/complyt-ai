@@ -1,14 +1,15 @@
 package com.complyt.v1.handler;
 
 import com.complyt.domain.TaxRates;
+import com.complyt.domain.SalesTaxRatesData;
 import com.complyt.facade.SalesTaxRatesFacade;
 import com.complyt.security.permissions.sales_tax_rates.SalesTaxRatesReadPermission;
 import com.complyt.utils.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.AddressWithDateMapper;
-import com.complyt.v1.mappers.CommonSalesTaxRatesMapper;
+import com.complyt.v1.mappers.SalesTaxRatesDataMapper;
 import com.complyt.v1.model.AddressWithDateDto;
-import com.complyt.v1.model.common_sales_tax_rates.CommonSalesTaxRatesDto;
+import com.complyt.v1.model.common_sales_tax_rates.SalesTaxRatesDataDto;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,17 +38,17 @@ public class ComplytSalesTaxRatesHandler {
     public Mono<ServerResponse> getSalesTaxRatesByAddress(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<CommonSalesTaxRatesDto> commonSalesTaxRatesDto = ContextLogger.observeCtx(logStr, log::info)
+        Mono<SalesTaxRatesDataDto> commonSalesTaxRatesDto = ContextLogger.observeCtx(logStr, log::info)
                 .then(addressDtoValidationHandler.validate(serverRequest))
                 .map(AddressWithDateMapper.INSTANCE::addressWithDateDtoToAddressDate)
-                .flatMap(complytSalesTaxRatesFacade::findByAddress)
-                .map(CommonSalesTaxRatesMapper.INSTANCE::commonSalesTaxRatesToCommonSalesTaxRatesDto)
+                .flatMap(complytSalesTaxRatesFacade::validateAddress)
+                .map(SalesTaxRatesDataMapper.INSTANCE::salesTaxRatesDataTosalesTaxRatesDataDto)
                 .flatMap(commonSalesTaxRates -> ContextLogger.observeCtx("<-- Returned Body: " + commonSalesTaxRates, log::info)
                         .thenReturn(commonSalesTaxRates))
                 .switchIfEmpty(ContextLogger.observeCtx("Failed to get SalesTaxRates by address", log::error)
                         .then(Mono.error(new ObjectNotFoundApiException())));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(commonSalesTaxRatesDto, CommonSalesTaxRatesDto.class);
+                .body(commonSalesTaxRatesDto, SalesTaxRatesData.class);
     }
 }

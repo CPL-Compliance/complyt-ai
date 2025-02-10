@@ -1,44 +1,42 @@
 package io.complyt.domain;
 
 import org.junit.jupiter.api.BeforeEach;
-import test_utils.TestUtilities;
 import org.junit.jupiter.api.Test;
+import test_utils.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CachedAddressDataTest {
+
     private CachedAddressData cachedAddressData;
     private CachedAddressData defaultAddressData;
 
     @BeforeEach
     void setUp() {
         cachedAddressData = TestUtilities.getCachedAddressData();
-        defaultAddressData = CachedAddressData.DEFAULT;
+        defaultAddressData = new CachedAddressData(cachedAddressData.address(), cachedAddressData.scoring());
     }
 
     @Test
     void testDefaultCachedAddressData() {
-        assertEquals("UNKNOWN", defaultAddressData.city());
-        assertEquals("UNKNOWN", defaultAddressData.country());
-        assertEquals("UNKNOWN", defaultAddressData.county());
-        assertEquals("UNKNOWN", defaultAddressData.state());
-        assertEquals("UNKNOWN", defaultAddressData.street());
-        assertEquals("UNKNOWN", defaultAddressData.zip());
-        assertFalse(defaultAddressData.isPartial());
-        assertEquals(0.0, defaultAddressData.score());
+        assertEquals(cachedAddressData.address(), defaultAddressData.address());
+        assertEquals(defaultAddressData.scoring(), defaultAddressData.scoring());
     }
 
     @Test
     void testCachedAddressDataWithCustomValues() {
-        CachedAddressData customData = cachedAddressData.withCity("New York")
+        Address customAddress = TestUtilities.getAddress().withCity("New York")
                 .withCountry("USA")
                 .withState("NY")
-                .withZip("10001")
-                .withScore(99.5);
+                .withZip("10001");
+        Scoring customScoring = TestUtilities.getScoring().withScore(99.5);
 
-        assertEquals("New York", customData.city());
-        assertEquals("USA", customData.country());
-        assertEquals("NY", customData.state());
-        assertEquals("10001", customData.zip());
-        assertEquals(99.5, customData.score());
-    }}
+        CachedAddressData customData = new CachedAddressData(customAddress, customScoring);
+
+        assertEquals("New York", customData.address().city());
+        assertEquals("USA", customData.address().country());
+        assertEquals("NY", customData.address().state());
+        assertEquals("10001", customData.address().zip());
+        assertEquals(99.5, customData.scoring().score());
+    }
+}

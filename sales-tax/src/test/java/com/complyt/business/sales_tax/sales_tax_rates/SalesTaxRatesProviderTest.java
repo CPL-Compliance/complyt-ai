@@ -6,6 +6,8 @@ import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.SubJurisdictionalTaxRules;
 import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.ShippingAddress;
+import com.complyt.domain.transaction.ShippingFee;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +42,7 @@ class SalesTaxRatesProviderTest {
     private SalesTaxRates salesTaxRates;
 
     UnitTestUtilities testUtilities;
-    Address address;
+    ShippingAddress address;
 
     @BeforeEach
     void setup() {
@@ -48,7 +50,7 @@ class SalesTaxRatesProviderTest {
         jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
         salesTaxRates = testUtilities.createSalesTaxRates();
         salesTaxRatesProvider = new SalesTaxRatesProvider(stateLevelSalesTaxRatesCalculator, cityLevelSalesTaxRatesCalculator);
-        address = testUtilities.createAddress();
+        address = testUtilities.createShippingAddress();
     }
 
     @Test
@@ -130,7 +132,7 @@ class SalesTaxRatesProviderTest {
     @Test
     void provide_NullAddressPassed_ThrowsException() {
         // Given
-        Address nullAddress = null;
+        ShippingAddress nullAddress = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxRatesProvider.provide(jurisdictionalSalesTaxRules, salesTaxRates, nullAddress));

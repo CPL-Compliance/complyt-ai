@@ -6,6 +6,7 @@ import com.complyt.v1.models.EconomicNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
+import com.complyt.v1.models.transaction.ShippingAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
@@ -55,7 +56,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
 
     // Given
     private final LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T04:00:00");
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Minneapolis", "US", null, "Minnesota", "4401 York Ave S", "","55410", false);
+    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Minneapolis", "US", null, "Minnesota", "4401 York Ave S", "","55410", false, null);
     private final UUID marketplaceCustomerId = UUID.fromString("e10cd4a2-6a4e-4621-bdad-4860bfa91ecb"); // complytId of an existing customer in the database
     private final UUID retailCustomerId = UUID.fromString("0b5d4d10-a5f1-411b-b11b-6c751441d256"); // complytId of an existing customer in the database
     private final String source = "1";

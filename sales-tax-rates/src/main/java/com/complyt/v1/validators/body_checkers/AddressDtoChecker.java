@@ -23,7 +23,7 @@ public class AddressDtoChecker implements DtoBodyChecker<AddressWithDateDto> {
                         address.isPartial() ?
                                 Flux.concat(checkVariableNotBlank(address.zip(), partialAddressErrorBuilder("Zip", address.zip())),
                                         checkIfZipIsValid(address.zip(), zipErrorBuilder(address.zip())),
-                                        checkIfStateExistsInPartialAddressOrNull(address.state(), stateErrorBuilder(address.state()))) :
+                                        checkIfStateExists(address.state(), stateErrorBuilder(address.state()))) :
                                 Flux.concat(checkVariableNotBlank(address.state(), nonPartialAddressErrorBuilder("State", address.state())),
                                         checkVariableNotBlank(address.street(), nonPartialAddressErrorBuilder("Street", address.street())),
                                         checkVariableNotBlank(address.city(), nonPartialAddressErrorBuilder("City", address.city())),
@@ -39,10 +39,6 @@ public class AddressDtoChecker implements DtoBodyChecker<AddressWithDateDto> {
 
     private Mono<String> checkIfStateExists(String variable, String errorMessage) {
         return StateExistsChecker.check(variable) != null ? Mono.empty() : Mono.just(errorMessage);
-    }
-
-    private Mono<String> checkIfStateExistsInPartialAddressOrNull(String variable, String errorMessage) {
-        return variable == null || variable.isEmpty() || StateExistsChecker.check(variable) != null ? Mono.empty() : Mono.just(errorMessage);
     }
 
     private Mono<String> checkIfZipIsValid(String variable, String errorMessage) {

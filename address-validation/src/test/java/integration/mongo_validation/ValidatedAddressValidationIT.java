@@ -48,15 +48,6 @@ public class ValidatedAddressValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveValidatedAddress_MissingAddress_throwsValidationError() {
-        address.remove("address");
-
-        StepVerifier.create(reactiveMongoTemplate.save(address, "california"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
     public void saveValidatedAddress_MissingRequestAddress_throwsValidationError() {
         address.remove("requestAddress");
 
@@ -135,6 +126,62 @@ public class ValidatedAddressValidationIT extends TestContainersInitializerIT {
 
         StepVerifier.create(reactiveMongoTemplate.save(address, "california"))
                 .expectErrorMatches(throwable -> throwable.getMessage().contains("additionalProperties"))
+                .verify();
+    }
+
+    @Test
+    public void saveValidatedAddress_MissingMatchedAddresses_throwsValidationError() {
+        address.remove("matchedAddresses");
+
+        StepVerifier.create(reactiveMongoTemplate.save(address, "california"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveValidatedAddress_MissingMatchedAddressFields_throwsValidationError() {
+        ((Document) ((Document) ((java.util.List<?>) address.get("matchedAddresses")).get(0)).get("address")).remove("zip");
+
+        StepVerifier.create(reactiveMongoTemplate.save(address, "california"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveValidatedAddress_MissingScoringFields_throwsValidationError() {
+        ((Document) ((Document) ((java.util.List<?>) address.get("matchedAddresses")).get(0)).get("scoring")).remove("matchLevel");
+
+        StepVerifier.create(reactiveMongoTemplate.save(address, "california"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveValidatedAddress_MissingFieldScore_throwsValidationError() {
+        ((Document) ((Document) ((java.util.List<?>) address.get("matchedAddresses")).get(0)).get("scoring")).remove("fieldScore");
+
+        StepVerifier.create(reactiveMongoTemplate.save(address, "california"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveValidatedAddress_InvalidFieldScoreType_throwsValidationError() {
+        ((Document) ((Document) ((java.util.List<?>) address.get("matchedAddresses")).get(0)).get("scoring"))
+                .put("fieldScore", "invalid_type"); // Should be an object, not a string
+
+        StepVerifier.create(reactiveMongoTemplate.save(address, "california"))
+                .expectError(DataIntegrityViolationException.class)
+                .verify();
+    }
+
+    @Test
+    public void saveValidatedAddress_InvalidMatchLevel_throwsValidationError() {
+        ((Document) ((Document) ((java.util.List<?>) address.get("matchedAddresses")).get(0)).get("scoring"))
+                .put("matchLevel", "INVALID_LEVEL");  // Invalid enum value
+
+        StepVerifier.create(reactiveMongoTemplate.save(address, "california"))
+                .expectError(DataIntegrityViolationException.class)
                 .verify();
     }
 }

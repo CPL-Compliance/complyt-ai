@@ -10,8 +10,10 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.http.MediaType;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AddressValidationEndpointsIT extends TestContainersInitializerIT implements AddressValidationEndpointsITTemplate {
@@ -24,12 +26,12 @@ public class AddressValidationEndpointsIT extends TestContainersInitializerIT im
     @Override
     public void getAddress_ValidAndInCache_Returns200() {
         String city = state;
-        JSONObject address = TestUtilities.createAddressJsonExample(city, country, city, state, street, zip, false);
+        JSONObject address = TestUtilities.createMatchedAddressJsonExample(city, country, city, state, street, zip);
 
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.ADDRESS_VALIDATION_BASE_URL)
+                        .path(TestUtilities.ADDRESS_VALIDATION_BASE_URL + "/resolve")
                         .queryParam("state", state)
                         .queryParam("zip", zip)
                         .queryParam("city", city)
@@ -52,13 +54,13 @@ public class AddressValidationEndpointsIT extends TestContainersInitializerIT im
     @Override
     public void getAddress_ValidButNotCached_Returns200() {
         // Here Stub Address
-        JSONObject address = TestUtilities.createAddressJsonExample("Beverly Hills", "US", null, "CA", "1008 Elden Way", "90210", false);
-        String expectedAddress = "{city=Beverly Hills, country=US, county=Los Angeles, state=CA, street=1008 Elden Way, zip=90210, isPartial=false}";
+        String expectedAddress = "{address={city=Beverly Hills, country=US, county=Los Angeles, state=CA, street=1008 Elden Way, zip=90210}, " +
+                "scoring={matchLevel=EXCELLENT, score=0.9, fieldScore={countryMatch=EXACT, stateMatch=EXACT, cityMatch=EXACT, streetMatch=EXACT, zipMatch=EXACT}}}";
 
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.ADDRESS_VALIDATION_BASE_URL)
+                        .path(TestUtilities.ADDRESS_VALIDATION_BASE_URL + "/resolve")
                         .queryParam("state", "CA")
                         .queryParam("zip", "90210")
                         .queryParam("city", "Beverly Hills")
@@ -84,10 +86,10 @@ public class AddressValidationEndpointsIT extends TestContainersInitializerIT im
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.ADDRESS_VALIDATION_BASE_URL)
+                        .path(TestUtilities.ADDRESS_VALIDATION_BASE_URL + "/resolve")
                         .queryParam("state", "Alabama")
                         .queryParam("zip", "00000")
-                        .queryParam("country", "Utopia")
+                        .queryParam("country", "US")
                         .queryParam("city", "Faketown")
                         .queryParam("isPartial", true)
                         .build())
@@ -100,6 +102,35 @@ public class AddressValidationEndpointsIT extends TestContainersInitializerIT im
                 .expectBody(LinkedHashMap.class)
                 .value(error -> {
                     assertEquals("ERR-ADDR-001: The address could not be validated. Please check that the street, city, state, and ZIP are correct and properly formatted.", error.get("message"));
+                });
+    }
+
+    @Test
+    @Order(0)
+    public void validate_ValidAndInCache_Returns200() {
+        String city = state;
+
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.ADDRESS_VALIDATION_BASE_URL + "/validate")
+                        .queryParam("state", state)
+                        .queryParam("zip", zip)
+                        .queryParam("city", city)
+                        .queryParam("street", street)
+                        .queryParam("country", country)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(LinkedHashMap.class)
+                .value(addressResult -> {
+                    System.out.println(addressResult);
+                    LinkedHashMap<String, Object> addressDto = (LinkedHashMap<String, Object>) ((List<?>) addressResult.get("matchedAddresses")).get(0);
+                    assertNotNull(addressDto);
                 });
     }
 }

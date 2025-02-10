@@ -3,7 +3,7 @@ package com.complyt.config;
 import com.complyt.business.address_validation.AddressValidationWebClientWrapper;
 import com.complyt.business.address_validation.ComplytAddressValidationWebClientWrapper;
 import com.complyt.business.address_validation.StubAddressValidationWebClientWrapper;
-import com.complyt.domain.Address;
+import com.complyt.domain.matched_address.MatchedAddressData;
 import com.complyt.proxies.AddressValidationServiceProxy;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,15 +22,15 @@ public class AddressValidationClientWrapperConfigTest {
 
     @Test
     void testComplytAddressValidationWebClientWrapper() {
-        AddressValidationWebClientWrapper<Address> expectedAddressAddressValidationWebClientWrapper = new ComplytAddressValidationWebClientWrapper(addressValidationServiceProxy);
-        AddressValidationWebClientWrapper<Address> addressAddressValidationWebClientWrapper = addressValidationClientWrapperConfig.complytAddressValidationWebClientWrapper(addressValidationServiceProxy);
+        AddressValidationWebClientWrapper<MatchedAddressData> expectedAddressAddressValidationWebClientWrapper = new ComplytAddressValidationWebClientWrapper(addressValidationServiceProxy);
+        AddressValidationWebClientWrapper<MatchedAddressData> addressAddressValidationWebClientWrapper = addressValidationClientWrapperConfig.complytAddressValidationWebClientWrapper(addressValidationServiceProxy);
         assertEquals(expectedAddressAddressValidationWebClientWrapper, addressAddressValidationWebClientWrapper);
     }
 
     @Test
     void testStubComplytAddressValidationWebClientWrapper() {
         StubAddressValidationWebClientWrapper expectedStubValidationAddress = new StubAddressValidationWebClientWrapper();
-        AddressValidationWebClientWrapper<Address> addressAddressValidationWebClientWrapper = addressValidationClientWrapperConfig.stubComplytAddressValidationWebClientWrapper(addressValidationServiceProxy);
+        StubAddressValidationWebClientWrapper addressAddressValidationWebClientWrapper = addressValidationClientWrapperConfig.stubComplytAddressValidationWebClientWrapper(addressValidationServiceProxy);
         assertEquals(expectedStubValidationAddress, addressAddressValidationWebClientWrapper);
 
     }

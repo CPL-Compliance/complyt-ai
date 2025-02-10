@@ -10,10 +10,7 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.transaction.Address;
-import com.complyt.domain.transaction.Item;
-import com.complyt.domain.transaction.Transaction;
-import com.complyt.domain.transaction.TransactionStatus;
+import com.complyt.domain.transaction.*;
 import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
@@ -464,7 +461,7 @@ public class TransactionFacadeTest {
     @Test
     void update_TransactionModifiedAndHasNexus_UpdatesTransaction() {
         // Given
-        Address newShippingAddress = transaction.getShippingAddress().withState("newState");
+        ShippingAddress newShippingAddress = transaction.getShippingAddress().withState("newState");
         Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished(UUID.randomUUID().toString());
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
@@ -501,7 +498,7 @@ public class TransactionFacadeTest {
     @Test
     void update_TransactionModifiedAndSalesTaxNotEnforced_UpdatesTransaction() {
         // Given
-        Address newShippingAddress = transaction.getShippingAddress().withState("newState");
+        ShippingAddress newShippingAddress = transaction.getShippingAddress().withState("newState");
         Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished(UUID.randomUUID().toString()).withEnforcesSalesTax(false);
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
@@ -534,7 +531,7 @@ public class TransactionFacadeTest {
     @Test
     void update_TransactionModifiedAndDoesNotHaveNexus_TransactionCalculatedUpdatedAndReturned() {
         // Given
-        Address newShippingAddress = transaction.getShippingAddress().withState("newState");
+        ShippingAddress newShippingAddress = transaction.getShippingAddress().withState("newState");
         Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithoutNexusEstablished(UUID.randomUUID().toString());
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
@@ -566,7 +563,7 @@ public class TransactionFacadeTest {
     @Test
     void update_TransactionModifiedAndDoesNotHaveNexus_TransactionUpdatedAndReturned() {
         // Given
-        Address newShippingAddress = transaction.getShippingAddress().withState("newState");
+        ShippingAddress newShippingAddress = transaction.getShippingAddress().withState("newState");
         Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithoutNexusEstablished(UUID.randomUUID().toString());
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
@@ -600,7 +597,7 @@ public class TransactionFacadeTest {
     @Test
     void update_TransactionModifiedWithStatusCancelledAndDoesNotHaveNexus_TransactionUpdatedAndReturnMonoEmpty() {
         // Given
-        Address newShippingAddress = transaction.getShippingAddress().withState("newState");
+        ShippingAddress newShippingAddress = newShippingAddress = transaction.getShippingAddress().withState("newState");
         Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
         Transaction transactionWithNewAddressAndStatus = transactionWithNewAddress.withTransactionStatus(TransactionStatus.CANCELLED);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithoutNexusEstablished(UUID.randomUUID().toString());
@@ -640,7 +637,7 @@ public class TransactionFacadeTest {
     @Test
     void update_TransactionsAddressModifiedButStatusWasCancelledAndDoesNotHaveNexus_TransactionUpdatedAndReturnMonoEmpty() {
         // Given
-        Address newShippingAddress = transaction.getShippingAddress().withState("newState");
+        ShippingAddress newShippingAddress = newShippingAddress = transaction.getShippingAddress().withState("newState");
         Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
         Transaction transactionWithNewAddressAndStatus = transactionWithNewAddress.withTransactionStatus(TransactionStatus.CANCELLED);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithoutNexusEstablished(UUID.randomUUID().toString());
@@ -674,7 +671,7 @@ public class TransactionFacadeTest {
     @Test
     void update_TransactionModifiedAndDoesNotHaveNexus_TransactionUpdatedAndReturnTransaction() {
         // Given
-        Address newShippingAddress = transaction.getShippingAddress().withState("newState");
+        ShippingAddress newShippingAddress = newShippingAddress = transaction.getShippingAddress().withState("newState");
         Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithoutNexusEstablished(UUID.randomUUID().toString());
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
@@ -709,7 +706,7 @@ public class TransactionFacadeTest {
     @Test
     void update_TransactionModifiedToCancelledAndHaveNexus_TransactionUpdatedAndReturnMonoEmpty() {
         // Given
-        Address newShippingAddress = transaction.getShippingAddress().withState("newState");
+        ShippingAddress newShippingAddress = transaction.getShippingAddress().withState("newState");
         Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished(UUID.randomUUID().toString());
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
@@ -741,7 +738,7 @@ public class TransactionFacadeTest {
     @Test
     void update_TransactionModifiedToDifferentShippingAddress_ShouldRemoveTransactionFromNexusTrackingAndReturnsUpdatedTransaction() {
         // Given
-        Address newShippingAddress = transaction.getShippingAddress().withState("newState");
+        ShippingAddress newShippingAddress = transaction.getShippingAddress().withState("newState");
         Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
         Transaction modifiedTransaction = createTransactionWithProductClassificationAndComplytId()
                 .withShippingAddress(newShippingAddress)

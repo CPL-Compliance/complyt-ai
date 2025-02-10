@@ -5,6 +5,10 @@ import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.*;
+import com.complyt.v1.models.matched_address.ScoringDto;
+import com.complyt.v1.models.matched_address.enums.FieldMatchType;
+import com.complyt.v1.models.matched_address.enums.FieldsMatchScore;
+import com.complyt.v1.models.matched_address.enums.MatchLevelType;
 import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.tax.sales_tax.RatesMetaDataDto;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
@@ -44,7 +48,7 @@ public interface ITUtilities {
     static TransactionDto stubTransactionDto(String externalId, UUID customerId, ItemDto... items) {
         return new TransactionDto(null, externalId, "1", "INVUS1000",
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
-                false, null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false),
+                false, null, new ShippingAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false, null),
                 customerId, null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(localDateTime, localDateTime),
                 TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED,
                 "USD", null, null, null, false, null);
@@ -53,14 +57,14 @@ public interface ITUtilities {
     static TransactionDto stubTransactionDtoWithThreeItems(String externalId, UUID customerId, ItemDto... items) {
         return new TransactionDto(null, externalId, "1", "INVUS1000",
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDtoWithDiscount(BigDecimal.valueOf(500), BigDecimal.ZERO), stubItemDtoWithDiscount(BigDecimal.valueOf(1000), BigDecimal.ZERO), stubItemDtoWithDiscount(BigDecimal.valueOf(10000), BigDecimal.ZERO)} : items),
-                false, null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false),
+                false, null, new ShippingAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false, null),
                 customerId, null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
                 TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED,
                 "USD", null, null, null, false, null);
     } // note isTaxInclusive is false, finalTransactionAmount is zero
 
     static TransactionDto stubTransactionDtoNonUsaCountry(String externalId, UUID customerId, ItemDto... items) {
-        MandatoryAddressDto shippingAddress = new MandatoryAddressDto(null, "Canada", null, null, "", "Quebec", "12345", false);
+        ShippingAddressDto shippingAddress = new ShippingAddressDto(null, "Canada", null, null, "", "Quebec", "12345", false, null);
         return stubTransactionDto(externalId, customerId, items)
                 .withShippingAddress(shippingAddress);
     }
@@ -133,13 +137,16 @@ public interface ITUtilities {
                 null, // spdRate
                 null, // otherRate
                 new BigDecimal("0.0775") // taxRate
-    );
+        );
     }
 
     static SalesTaxRatesDto createSalesTaxRatesDto(BigDecimal taxRate) {
         return new SalesTaxRatesDto(new BigDecimal("0.0"), new BigDecimal("0.0"), new BigDecimal("0.0"),null, null, null, null, taxRate, new BigDecimal("0.0"));
     }
 
+    static ScoringDto createScoringDto() {
+        return new ScoringDto(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT));
+    }
     static ClientTrackingDto stubClientTrackingDto() {
         String localDate = "2024-01-01T00:00";
         TimestampsDto internalTimestamps = new TimestampsDto(localDate, localDate);
@@ -317,7 +324,26 @@ public interface ITUtilities {
                         .append("state", "")
                         .append("street", "")
                         .append("zip", "")
-                        .append("isPartial", false))
+                        .append("isPartial", false)
+                        .append("matchedAddressData", new Document("address", new Document("city", "New York")
+                                .append("country", "USA")
+                                .append("countryCode", "USA")
+                                .append("county", "New York County")
+                                .append("state", "New York")
+                                .append("street", "5th Ave")
+                                .append("zip", "10001")
+                                .append("isPartial", false))
+                                .append("scoring", new Document("matchLevel", "GOOD")
+                                        .append("score", 0.8)
+                                        .append("fieldScore", new Document("countryMatch", "EXACT")
+                                                .append("stateMatch", "EXACT")
+                                                .append("cityMatch", "EXACT")
+                                                .append("zipMatch", "EXACT")
+                                                .append("streetMatch", "PARTIAL")
+                                        )
+                                )
+
+                        ))
                 .append("salesTax", new Document("amount", "0")
                         .append("complytId", UUID.randomUUID())
                         .append("salesTaxRates", new Document("taxRate", "0.0825")
@@ -477,8 +503,8 @@ public interface ITUtilities {
         return new ExchangeRateInfoDto(totalItemsAmountInUsd, transactionSalesTaxInUsd, finalTransactionAmountInUsd, fromCurrency, toCurrency, fxRate, source, isExchangeRateEstimated, exchangeRateDate);
     }
 
-    static MandatoryAddressDto createAddressDtoInKensas() {
-        return new MandatoryAddressDto("Kensas City", "USA", null, "KS", "101st Main st", null, "66106", false);
+    static ShippingAddressDto createAddressDtoInKensas() {
+        return new ShippingAddressDto("Kensas City", "USA", null, "KS", "101st Main st", null, "66106", false,null);
     }
 
     static ExemptionDto createExemptionDto() {

@@ -1,18 +1,19 @@
 package io.complyt.services;
 
 import io.complyt.business.address.UsaAbbreviations;
+import io.complyt.business.address_aligner.AddressAligner;
 import io.complyt.business.address_checkers.HereAddressChecker;
-import io.complyt.business.external_fetcher.FastTaxGetBestMatchCityCountyFetcher;
-import io.complyt.business.webclients.addressvalidations.FastTaxGetBestMatchWebClientWrapper;
 import io.complyt.business.webclients.addressvalidations.HereAddressValidationClientWrapper;
 import io.complyt.domain.Address;
 import io.complyt.domain.CachedAddressData;
+import io.complyt.domain.Scoring;
 import io.complyt.domain.ValidatedAddress;
-import io.complyt.domain.fast_tax.FastTaxGetBestMatchData;
+import io.complyt.domain.enums.FieldMatchType;
+import io.complyt.domain.enums.FieldsMatchScore;
 import io.complyt.domain.here.HereAddress;
 import io.complyt.domain.here.HereAddressData;
-import io.complyt.domain.mappers.ValidatedAddressToAddressMapper;
 import io.complyt.repositories.ValidationAddressRepositoryImpl;
+import io.complyt.utils.exceptions.types.ObjectNotValidException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +24,9 @@ import reactor.test.StepVerifier;
 import test_utils.TestUtilities;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,13 +44,10 @@ class ValidAddressServiceImplTest {
     private HereAddressValidationClientWrapper hereAddressValidationClientWrapper;
 
     @Mock
-    private FastTaxGetBestMatchWebClientWrapper fastTaxWebClientWrapper;
-
-    @Mock
-    private FastTaxGetBestMatchCityCountyFetcher fastTaxGetBestMatchCityCountyFetcher;
-
-    @Mock
     private HereAddressChecker hereAddressChecker;
+
+    @Mock
+    private AddressAligner addressAligner;
 
     private Address address;
     private ValidatedAddress validatedAddress;
@@ -56,9 +56,9 @@ class ValidAddressServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        validAddressService = new ValidAddressServiceImpl(validationAddressRepositoryImpl, hereAddressValidationClientWrapper, fastTaxWebClientWrapper, fastTaxGetBestMatchCityCountyFetcher, hereAddressChecker);
+        validAddressService = new ValidAddressServiceImpl(validationAddressRepositoryImpl, hereAddressValidationClientWrapper, hereAddressChecker, addressAligner);
         address = TestUtilities.getAddress();
-        cachedAddressData = TestUtilities.getCachedAddressData();
+        cachedAddressData = TestUtilities.getCachedAddressData().withScoring(TestUtilities.getScoring());
         validatedAddress = TestUtilities.getValidatedAddress();
         hereAddressData = TestUtilities.getHereAddressData();
     }
@@ -68,7 +68,7 @@ class ValidAddressServiceImplTest {
         when(validationAddressRepositoryImpl.findAddress(address)).thenReturn(Mono.just(validatedAddress));
 
         StepVerifier.create(validAddressService.validateAddress(address))
-                .expectNext(ValidatedAddressToAddressMapper.INSTANCE.map(validatedAddress))
+                .expectNext(validatedAddress)
                 .verifyComplete();
     }
 
@@ -76,12 +76,13 @@ class ValidAddressServiceImplTest {
     void validateAddress_AddressNotFoundInRepository_FindsAndSavesNewAddress() {
         Address alignedAddress = address.withCountry(UsaAbbreviations.DEFAULT_COUNTRY);
         when(validationAddressRepositoryImpl.findAddress(address)).thenReturn(Mono.empty());
+        when(addressAligner.align(address)).thenReturn(alignedAddress);
         when(hereAddressValidationClientWrapper.validateAddress(alignedAddress)).thenReturn(Mono.just(hereAddressData));
-        when(hereAddressChecker.checkAddress(cachedAddressData, address)).thenReturn(Mono.just(cachedAddressData));
+        when(hereAddressChecker.filterValidAddresses(List.of(cachedAddressData))).thenReturn(Mono.just(List.of(cachedAddressData)));
         when(validationAddressRepositoryImpl.saveAddress(any())).thenReturn(Mono.just(validatedAddress));
 
         StepVerifier.create(validAddressService.validateAddress(address))
-                .expectNext(ValidatedAddressToAddressMapper.INSTANCE.map(validatedAddress))
+                .expectNext(validatedAddress)
                 .verifyComplete();
     }
 
@@ -90,29 +91,7 @@ class ValidAddressServiceImplTest {
         when(validationAddressRepositoryImpl.findAddress(address)).thenReturn(Mono.just(validatedAddress));;
 
         StepVerifier.create(validAddressService.validateAddress(address))
-                .expectNext(ValidatedAddressToAddressMapper.INSTANCE.map(validatedAddress))
-                .verifyComplete();
-    }
-
-    @Test
-    void validateAddress_AddressNotFound_CachedAddressNoCounty_ReturnsWithCounty() {
-        // Given
-        Address alignedAddress = address.withCountry(UsaAbbreviations.DEFAULT_COUNTRY);
-        HereAddress hereAddressNoCounty = TestUtilities.getHereAddressItem().address().withCounty(null);
-        CachedAddressData cachedAddressDataNoCounty = cachedAddressData.withCounty(null);
-        HereAddressData hereAddressDataNoCounty = hereAddressData.withItems(List.of(hereAddressData.getItems().get(0).withAddress(hereAddressNoCounty)));
-        FastTaxGetBestMatchData fastTax = TestUtilities.createFastTaxGetBestMatchData();
-
-        // When
-        when(validationAddressRepositoryImpl.findAddress(address)).thenReturn(Mono.empty());
-        when(hereAddressValidationClientWrapper.validateAddress(alignedAddress)).thenReturn(Mono.just(hereAddressDataNoCounty));
-        when(hereAddressChecker.checkAddress(cachedAddressDataNoCounty, address)).thenReturn(Mono.just(cachedAddressDataNoCounty));
-        when(fastTaxWebClientWrapper.validateAddress(address)).thenReturn(Mono.just(fastTax));
-        when(fastTaxGetBestMatchCityCountyFetcher.fetch(fastTax, cachedAddressDataNoCounty)).thenReturn(Mono.just(cachedAddressData)); // withCounty
-        when(validationAddressRepositoryImpl.saveAddress(any())).thenReturn(Mono.just(validatedAddress));
-
-        StepVerifier.create(validAddressService.validateAddress(address))
-                .expectNext(ValidatedAddressToAddressMapper.INSTANCE.map(validatedAddress))
+                .expectNext(validatedAddress)
                 .verifyComplete();
     }
 
@@ -123,23 +102,25 @@ class ValidAddressServiceImplTest {
         Address alignedAddress = address.withCountry(UsaAbbreviations.DEFAULT_COUNTRY);
         Address alignedAddressWithNoStreet = alignedAddress.withStreet(null);
         HereAddress hereAddressNoStreet = TestUtilities.getHereAddressItem().address().withStreet(null);
-        CachedAddressData cachedAddressDataNoStreetBadScore = cachedAddressData.withStreet(null).withScore(badScore);
-        CachedAddressData cachedAddressDataNoStreetGoodScore = cachedAddressData.withStreet(null);
+        CachedAddressData cachedAddressDataNoStreetBadScore = cachedAddressData.withAddress(cachedAddressData.address().withStreet(null)).withScoring(cachedAddressData.scoring().withScore(badScore));
+        CachedAddressData cachedAddressDataNoStreetGoodScore = cachedAddressData.withAddress(cachedAddressData.address().withStreet(null));
         HereAddressData hereAddressDataNoStreetBadScore = hereAddressData.withItems(List.of(hereAddressData.getItems().get(0).withAddress(hereAddressNoStreet).withScoring(TestUtilities.getHereScoring().withQueryScore(badScore))));
         HereAddressData hereAddressDataNoStreetGoodScore = hereAddressData.withItems(List.of(hereAddressData.getItems().get(0).withAddress(hereAddressNoStreet)));
 
 
         // When
         when(validationAddressRepositoryImpl.findAddress(address)).thenReturn(Mono.empty());
+        when(addressAligner.align(address)).thenReturn(alignedAddress);
         when(hereAddressValidationClientWrapper.validateAddress(alignedAddress)).thenReturn(Mono.just(hereAddressDataNoStreetBadScore));
-        when(hereAddressChecker.checkAddress(cachedAddressDataNoStreetBadScore, address)).thenReturn(Mono.empty());
+        when(hereAddressChecker.filterValidAddresses(List.of(cachedAddressDataNoStreetBadScore))).thenReturn(Mono.empty());
+        when(addressAligner.align(address.withStreet(null))).thenReturn(alignedAddress.withStreet(null));
         when(hereAddressValidationClientWrapper.validateAddress(alignedAddressWithNoStreet)).thenReturn(Mono.just(hereAddressDataNoStreetGoodScore));
-        when(hereAddressChecker.checkAddress(cachedAddressDataNoStreetGoodScore, address)).thenReturn(Mono.just(cachedAddressDataNoStreetGoodScore));
+        when(hereAddressChecker.filterValidAddresses(List.of(cachedAddressDataNoStreetGoodScore))).thenReturn(Mono.just(List.of(cachedAddressDataNoStreetGoodScore)));
 
         when(validationAddressRepositoryImpl.saveAddress(any())).thenReturn(Mono.just(validatedAddress));
 
         StepVerifier.create(validAddressService.validateAddress(address))
-                .expectNext(ValidatedAddressToAddressMapper.INSTANCE.map(validatedAddress))
+                .expectNext(validatedAddress)
                 .verifyComplete();
     }
 
@@ -172,21 +153,23 @@ class ValidAddressServiceImplTest {
     @Test
     void resolveStreetIfMissing_NoStreetInCachedData_ResolvesSuccessfully() throws Exception {
         // Given
-        CachedAddressData cachedDataWithoutStreet = TestUtilities.getCachedAddressData().withStreet(null);
+        CachedAddressData cachedDataWithoutStreet = TestUtilities.getCachedAddressData().withAddress(TestUtilities.getCachedAddressData().address().withStreet(null));
         address = address.withCountry(UsaAbbreviations.DEFAULT_COUNTRY);
+        Address alignedAddress = address.withCountry(UsaAbbreviations.DEFAULT_COUNTRY);
 
         // Access the private method using reflection
-        Method method = ValidAddressServiceImpl.class.getDeclaredMethod("resolveStreetIfMissing", CachedAddressData.class, Address.class);
+        Method method = ValidAddressServiceImpl.class.getDeclaredMethod("resolveStreetIfMissing", List.class, Address.class);
         method.setAccessible(true);
 
+        when(addressAligner.align(address.withStreet(null))).thenReturn(alignedAddress.withStreet(null));
         when(hereAddressValidationClientWrapper.validateAddress(address.withStreet(null))).thenReturn(Mono.just(hereAddressData));
 
         // Explicitly cast the result to Mono<CachedAddressData> using method return type
-        Mono<CachedAddressData> result = Mono.class.cast(method.invoke(validAddressService, cachedDataWithoutStreet, address));
+        Mono<List<CachedAddressData>> result = Mono.class.cast(method.invoke(validAddressService, List.of(cachedDataWithoutStreet), address));
 
         // Then
         StepVerifier.create(result)
-                .expectNext(cachedAddressData) // Validate the street is resolved
+                .expectNext(Collections.singletonList(cachedAddressData)) // Validate the street is resolved
                 .verifyComplete();
     }
 
@@ -197,15 +180,15 @@ class ValidAddressServiceImplTest {
         address = address.withCountry(UsaAbbreviations.DEFAULT_COUNTRY);
 
         // Access the private method using reflection
-        Method method = ValidAddressServiceImpl.class.getDeclaredMethod("resolveStreetIfMissing", CachedAddressData.class, Address.class);
+        Method method = ValidAddressServiceImpl.class.getDeclaredMethod("resolveStreetIfMissing", List.class, Address.class);
         method.setAccessible(true);
 
         // Explicitly cast the result to Mono<CachedAddressData> using method return type
-        Mono<CachedAddressData> result = Mono.class.cast(method.invoke(validAddressService, cachedDataWithoutStreet, address));
+        Mono<List<CachedAddressData>> result = Mono.class.cast(method.invoke(validAddressService, List.of(cachedDataWithoutStreet), address));
 
         // Then
         StepVerifier.create(result)
-                .expectNext(cachedAddressData)
+                .expectNext(Collections.singletonList(cachedDataWithoutStreet))
                 .verifyComplete();
     }
 
@@ -222,5 +205,86 @@ class ValidAddressServiceImplTest {
     @Test
     void validateAddress_NullValidatedAddress_ThrowsNullPointerException() {
         assertThrows(NullPointerException.class, () -> validAddressService.validateAddress(null));
+    }
+
+    @Test
+    void resolveAddress_AddressFoundInRepository_ReturnsValidatedAddress() {
+        cachedAddressData = validatedAddress.getMatchedAddresses().get(0);
+        when(validationAddressRepositoryImpl.findAddress(address)).thenReturn(Mono.just(validatedAddress));
+        when(hereAddressChecker.checkStateMatch(cachedAddressData, address)).thenReturn(Mono.just(cachedAddressData));
+
+        Mono<CachedAddressData> result = validAddressService.resolveAddress(address);
+
+        StepVerifier.create(result)
+                .expectNext(cachedAddressData)
+                .verifyComplete();
+    }
+
+    @Test
+    void resolveAddress_AddressFoundInRepository_StateNotMatch_ReturnsValidatedAddress() {
+        cachedAddressData = validatedAddress.getMatchedAddresses().get(0);
+        when(validationAddressRepositoryImpl.findAddress(address)).thenReturn(Mono.just(validatedAddress));
+        when(hereAddressChecker.checkStateMatch(cachedAddressData, address)).thenReturn(Mono.error(new ObjectNotValidException("State mismatch")));
+
+        Mono<CachedAddressData> result = validAddressService.resolveAddress(address);
+
+        StepVerifier.create(result)
+                .expectErrorMatches(throwable -> throwable instanceof ObjectNotValidException &&
+                        throwable.getMessage().contains("State mismatch"))
+                .verify();
+    }
+
+    @Test
+    void resolveBestMatchAddress_EmptyList_ReturnsEmptyMono() throws Exception {
+        // Given
+        List<CachedAddressData> emptyList = List.of();
+
+        // Using reflection to access private method
+        Method method = ValidAddressServiceImpl.class.getDeclaredMethod("resolveBestMatchAddress", List.class);
+        method.setAccessible(true);
+
+        // When
+        Mono<CachedAddressData> result = (Mono<CachedAddressData>) method.invoke(validAddressService, emptyList);
+
+        // Then
+        StepVerifier.create(result)
+                .verifyComplete();
+    }
+
+    @Test
+    void resolveStreetIfMissing_CachedStreetNull_RequestStreetNull_ShouldReturnCachedData() throws Exception {
+        // Given: both cached and request street are null
+        cachedAddressData = cachedAddressData.withAddress(cachedAddressData.address().withStreet(null));
+        address = address.withStreet(null);
+
+        // Access private method using reflection
+        Method method = ValidAddressServiceImpl.class.getDeclaredMethod("resolveStreetIfMissing", List.class, Address.class);
+        method.setAccessible(true);
+
+        // When
+        Mono<List<CachedAddressData>> result = (Mono<List<CachedAddressData>>) method.invoke(validAddressService, List.of(cachedAddressData), address);
+
+        // Then
+        StepVerifier.create(result)
+                .expectNext(List.of(cachedAddressData))
+                .verifyComplete();
+    }
+
+    @Test
+    void resolveStreetIfMissing_CachedStreetNotNull_ShouldReturnCachedData() throws Exception {
+        // Given: cached street is not null
+        cachedAddressData = cachedAddressData.withAddress(cachedAddressData.address().withStreet("5th Ave"));
+
+        // Access private method using reflection
+        Method method = ValidAddressServiceImpl.class.getDeclaredMethod("resolveStreetIfMissing", List.class, Address.class);
+        method.setAccessible(true);
+
+        // When
+        Mono<List<CachedAddressData>> result = (Mono<List<CachedAddressData>>) method.invoke(validAddressService, List.of(cachedAddressData), address);
+
+        // Then
+        StepVerifier.create(result)
+                .expectNext(List.of(cachedAddressData))
+                .verifyComplete();
     }
 }

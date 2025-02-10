@@ -5,7 +5,7 @@ import com.complyt.business.strategy.StrategySelector;
 import com.complyt.business.strategy.currencyExchange.CurrenciesWebClientWrapper;
 import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.business.transaction.BigDecimalProcessor;
-import com.complyt.business.transaction.CityCountyProvider;
+import com.complyt.business.transaction.MatchedAddressProvider;
 import com.complyt.business.transaction.DiscountCalculator;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.domain.currency.CurrencyExchangeRateObject;
@@ -65,7 +65,7 @@ class TransactionServiceImplTest {
     ProductClassificationServiceImpl productClassificationService;
 
     @Mock
-    CityCountyProvider cityCountyProvider;
+    MatchedAddressProvider cityCountyProvider;
 
     @Mock
     ComplytIdHandler<Transaction> transactionComplytIdHandler;
@@ -388,9 +388,11 @@ class TransactionServiceImplTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         UUID customerId = UUID.randomUUID();
+        ShippingAddress shippingAddress = transaction.getShippingAddress();
+        Address address = new Address(shippingAddress.city(), shippingAddress.country(), shippingAddress.county(), shippingAddress.state(), shippingAddress.street(), shippingAddress.zip(), shippingAddress.region(), shippingAddress.isPartial());
         Customer customer = testUtilities.createCustomer(customerId.toString())
                 .withExternalId(externalId)
-                .withAddress(transaction.getShippingAddress());
+                .withAddress(address);
 
         Transaction transactionWithCustomer = transaction.withCustomer(customer);
         Transaction secondTransactionWithCustomer = transaction.withExternalId(externalId).withCustomerId(customerId).withCustomer(customer);
@@ -597,7 +599,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWhichIsNotFromUsa_ReturnsTransaction() {
         // Given
-        Transaction transactionToSend = transaction.withShippingAddress(testUtilities.createNonUsaAddress());
+        Transaction transactionToSend = transaction.withShippingAddress(testUtilities.createNonUsaShippingAddress());
         ShippingFee givenShippingFee = transactionToSend.getShippingFee();
         Transaction transactionWithItemsCalculatedTotal = transactionToSend
                 .withItems(testUtilities.setCalculatedTotalOnItemList(transactionToSend.getItems()));
@@ -693,7 +695,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndNullState_ReturnsTransaction() {
         // Given
-        Address partialShippingAddress = new Address(null, "US", null, null, null, "80001", null, true);
+        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, null, null, null,"80001", true, null);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         ShippingFee givenShippingFee = transactionWithPartialAddress.getShippingFee();
@@ -747,7 +749,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndBlankState_ReturnsTransaction() {
         // Given
-        Address partialShippingAddress = new Address(null, "US", null, "", null, "80001", null, true);
+        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, "",null, null,"80001",true, null);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         ShippingFee givenShippingFee = transactionWithPartialAddress.getShippingFee();
@@ -801,7 +803,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndInvalidZipCode_ReturnsAnError() {
         // Given
-        Address partialShippingAddress = new Address(null, "US", null, null, null, "InvalidZipCode", null, true);
+        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, null, null, null,"InvalidZipCode", true, null);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transactionWithPartialAddress);
@@ -1029,8 +1031,8 @@ class TransactionServiceImplTest {
     @Test
     void shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary_transactionsWithDifferentShippingAddress_ReturnsTrue() {
         // Given
-        Address newYorkAddress = testUtilities.createAddressInNewYork();
-        Address californiaAddress = testUtilities.createAddressInCalifornia();
+        ShippingAddress newYorkAddress = testUtilities.createAddressInNewYork();
+        ShippingAddress californiaAddress = testUtilities.createShippingAddressInCalifornia();
         Transaction newYorkTransaction = transaction.withShippingAddress(newYorkAddress);
         Transaction californiaTransaction = transaction.withShippingAddress(californiaAddress);
 
@@ -1056,8 +1058,8 @@ class TransactionServiceImplTest {
     @Test
     void shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary_transactionsWithDifferentCountryInShippingAddress_ReturnsTrue() {
         // Given
-        Address usaAddress = testUtilities.createUsaAddress();
-        Address nonUsaAddress = testUtilities.createNonUsaAddress();
+        ShippingAddress usaAddress = testUtilities.createUsaShippingAddress();
+        ShippingAddress nonUsaAddress = testUtilities.createNonUsaShippingAddress();
         Transaction usaTransaction = transaction.withShippingAddress(usaAddress);
         Transaction nonUsaTransaction = transaction.withShippingAddress(nonUsaAddress);
 

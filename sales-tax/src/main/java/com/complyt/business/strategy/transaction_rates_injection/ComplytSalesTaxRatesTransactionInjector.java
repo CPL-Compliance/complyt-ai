@@ -3,14 +3,13 @@ package com.complyt.business.strategy.transaction_rates_injection;
 import com.complyt.business.builder.CollectionBuilder;
 import com.complyt.business.tax.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.tax.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
-import com.complyt.business.transaction.data_injector.TransactionCityCountyInjector;
+import com.complyt.business.transaction.data_injector.TransactionMatchedAddressInjector;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRates;
-import com.complyt.domain.transaction.CityCountyWrapper;
-import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.Item;
 import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -39,7 +38,7 @@ public class ComplytSalesTaxRatesTransactionInjector implements RatesTransaction
     private SalesTaxAggregator salesTaxAggregator;
 
     @NonNull
-    private TransactionCityCountyInjector transactionCityCountyInjector;
+    private TransactionMatchedAddressInjector transactionMatchedAddressInjector;
 
 
     @Override
@@ -60,11 +59,7 @@ public class ComplytSalesTaxRatesTransactionInjector implements RatesTransaction
     }
 
     private Mono<Transaction> injectCityCountyData(Transaction transaction, ComplytSalesTaxRates complytSalesTaxRates) {
-        CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(
-                complytSalesTaxRates.address().city(),
-                complytSalesTaxRates.address().county()
-        );
-        return transactionCityCountyInjector.inject(cityCountyWrapper, transaction);
+        return transactionMatchedAddressInjector.inject(complytSalesTaxRates.matchedAddressData(), transaction);
     }
 
     private Transaction calculateFinalTransactionAmounts(Transaction transaction, ComplytSalesTaxRates complytSalesTaxRates, Boolean isExempt) {

@@ -5,6 +5,7 @@ import com.complyt.business.exceptions.FeignErrorUtils;
 import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
@@ -58,7 +59,7 @@ public class ComplytSalesTaxRatesClientWrapper implements SalesTaxRatesWebClient
     }
 
     @Override
-    public Mono<ComplytSalesTaxRates> findByAddress(Address address, LocalDateTime transactionDate) {
+    public Mono<ComplytSalesTaxRates> findByAddress(ShippingAddress address, LocalDateTime transactionDate) {
         return findByAddress(address.state(), address.country(), address.county(), address.city(),
                 address.street(), address.zip(), address.region(), address.isPartial(), transactionDate);
     }

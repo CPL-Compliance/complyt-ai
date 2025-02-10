@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"zip":{"$numberInt":"-1"}},"name":"zip_-1"}],"uuid":"ac2a44692fab403896b260ab3c6d86c8","collectionName":"geo_records","type":"collection"}

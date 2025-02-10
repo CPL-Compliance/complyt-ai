@@ -7,6 +7,7 @@ import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
+import com.complyt.v1.models.transaction.ShippingAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
@@ -53,7 +54,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
     private WebTestClient webTestClient;
 
     private final LocalDateTime referenceDate = LocalDateTime.parse("2020-10-01T07:00:00");
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Atlanta", "US", null, "GA", "50 Upper Alabama St", "","30303", false);
+    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Atlanta", "US", null, "GA", "50 Upper Alabama St", "","30303", false, null);
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private final String source = "1";
 

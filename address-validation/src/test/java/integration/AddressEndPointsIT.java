@@ -1,17 +1,18 @@
 package integration;
 
 import io.complyt.AddressValidationApplication;
-import io.complyt.business.webclients.addressvalidations.AddressValidationWebClientWrapper;
-import io.complyt.business.webclients.addressvalidations.AddressValidationWebClientWrapperBase;
 import io.complyt.business.webclients.addressvalidations.HereStubAddressValidationWebClientWrapper;
-import io.complyt.business.webclients.addressvalidations.StubFastTaxWebClientWrapper;
 import io.complyt.config.web_clients.WebClientWrapperProperties;
 import io.complyt.domain.Address;
-import io.complyt.domain.fast_tax.FastTaxGetBestMatchData;
+import io.complyt.domain.enums.FieldMatchType;
+import io.complyt.domain.enums.FieldsMatchScore;
 import io.complyt.domain.here.HereAddress;
 import io.complyt.domain.here.HereAddressData;
+import io.complyt.domain.here.HereFieldScore;
 import io.complyt.v1.mappers.AddressMapper;
 import io.complyt.v1.models.AddressDto;
+import io.complyt.v1.models.CachedAddressDataDto;
+import io.complyt.v1.models.ValidatedAddressDto;
 import io.complyt.v1.routers.AddressRouter;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +31,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import test_utils.TestUtilities;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 
@@ -52,9 +52,6 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
     HereStubAddressValidationWebClientWrapper stubHereAddressValidationWebClientWrapper;
 
     @MockBean
-    StubFastTaxWebClientWrapper fastTaxWebClientWrapper;
-
-    @MockBean
     WebClientWrapperProperties hereWebClientWrapperProperties;
 
     @Autowired
@@ -62,7 +59,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", () ->  MONGO_CONTAINER.getReplicaSetUrl("address_validation"));
+        registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("address_validation"));
     }
 
     @Order(1)
@@ -73,13 +70,15 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         AddressDto addressDto = new AddressDto(
                 "New York", "United States", "New York", "New York",
                 "164 Mulberry St", "10014", false);
+        FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT);
+        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(null), TestUtilities.getScoringDto().withFieldScore(fieldsMatchScore));
 
         // When + Then
         webTestClient
                 .mutate().responseTimeout(Duration.ofSeconds(20)).build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressRouter.BASE_URL)
+                        .path(AddressRouter.BASE_URL + "/resolve")
                         .queryParam("state", addressDto.state())
                         .queryParam("zip", addressDto.zip())
                         .queryParam("city", addressDto.city())
@@ -89,8 +88,8 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(AddressDto.class)
-                .value(receivedAddressDto -> assertEquals(addressDto, receivedAddressDto));
+                .expectBody(CachedAddressDataDto.class)
+                .value(receivedAddressDto -> assertEquals(expectedAddress, receivedAddressDto));
     }
 
     @Order(1)
@@ -99,8 +98,9 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
     public void getAddress_AddressByStubClientWrapper_Returns200() {
         // Given
         AddressDto addressDto = new AddressDto(
-                "Oxenfurt", "The Continent", "Gustfields", "NY",
+                "Oxenfurt", "USA", "Gustfields", "NY",
                 "Oxenfurt Academy", "11221", false);
+        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(null), TestUtilities.getScoringDto());
 
         Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
 
@@ -117,7 +117,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 .mutate().responseTimeout(Duration.ofSeconds(20)).build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressRouter.BASE_URL)
+                        .path(AddressRouter.BASE_URL + "/resolve")
                         .queryParam("state", addressDto.state())
                         .queryParam("zip", addressDto.zip())
                         .queryParam("city", addressDto.city())
@@ -127,8 +127,45 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(AddressDto.class)
-                .value(receivedAddressDto -> assertEquals(addressDto, receivedAddressDto));
+                .expectBody(CachedAddressDataDto.class)
+                .value(receivedAddressDto -> assertEquals(expectedAddress, receivedAddressDto));
+    }
+
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void getAddress_AddressByStubClientWrapper_DifferentState_Returns400() {
+        // Given
+        AddressDto addressDto = new AddressDto(
+                "Oxenfurt", "USA", "Gustfields", "TX",
+                "Oxenfurt Academy", "11221", false);
+        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto, TestUtilities.getScoringDto());
+
+        Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
+
+        HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
+                .withAddress(new HereAddress(null, null, address.country(), null, "Other State", address.county(), address.city(), address.street(), address.zip()))
+                .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0).withFieldScore(new HereFieldScore(1, 0, 0, null, 1)))));
+
+
+        // When
+        when(stubHereAddressValidationWebClientWrapper.validateAddress(any())).thenReturn(Mono.just(hereAddressData));
+
+        // Then
+        webTestClient
+                .mutate().responseTimeout(Duration.ofSeconds(20)).build()
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(AddressRouter.BASE_URL + "/resolve")
+                        .queryParam("state", addressDto.state())
+                        .queryParam("zip", addressDto.zip())
+                        .queryParam("city", addressDto.city())
+                        .queryParam("street", addressDto.street())
+                        .queryParam("country", addressDto.country())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(1)
@@ -137,7 +174,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
     public void getAddress_AddressByOutsource_ScoreNotValid_Returns400() {
         // Given
         AddressDto addressDto = new AddressDto(
-                "Oxenfurt", "The Continent", "Gustfields", "NY",
+                "Oxenfurt", "USA", "Gustfields", "NY",
                 "Oxenfurt Academy", "11222", false);
 
 
@@ -155,7 +192,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 .mutate().responseTimeout(Duration.ofSeconds(20)).build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressRouter.BASE_URL)
+                        .path(AddressRouter.BASE_URL + "/resolve")
                         .queryParam("state", addressDto.state())
                         .queryParam("zip", addressDto.zip())
                         .queryParam("city", addressDto.city())
@@ -173,7 +210,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
     public void getAddress_AddressByOutsource_AddressNotFoundAndCachedAddressHasNoStreetWithBadScore_Returns200() {
         // Given
         AddressDto addressDto = new AddressDto(
-                "Oxenfurt", "The Continent", "Gustfields", "NY",
+                "Oxenfurt", "USA", "Gustfields", "NY",
                 "Oxenfurt Academy", "11221", false);
 
         Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
@@ -185,6 +222,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         HereAddressData hereAddressDataNoStreetGoodScore = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
                 .withAddress(new HereAddress(null, null, address.country(), null, address.state(), address.county(), address.city(), null, address.zip()))
                 .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0))));
+        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(null), TestUtilities.getScoringDto());
 
         // When
         when(stubHereAddressValidationWebClientWrapper.validateAddress(address)).thenReturn(Mono.just(hereAddressDataNoStreetBadScore));
@@ -195,7 +233,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 .mutate().responseTimeout(Duration.ofSeconds(20)).build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressRouter.BASE_URL)
+                        .path(AddressRouter.BASE_URL + "/resolve")
                         .queryParam("state", addressDto.state())
                         .queryParam("zip", addressDto.zip())
                         .queryParam("city", addressDto.city())
@@ -205,39 +243,53 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(AddressDto.class)
-                .value(receivedAddressDto -> assertEquals(addressDto, receivedAddressDto));
+                .expectBody(CachedAddressDataDto.class)
+                .value(receivedAddressDto -> assertEquals(expectedAddress, receivedAddressDto));
     }
 
-    @Order(2)
+    @Order(1)
     @Test
     @WithMockUser
-    public void getAddress_AddressByOutsource_AddressNotFoundAndCachedAddressHasNoCounty_Returns200() {
+    public void getAddress_AddressNotInUS_Returns400() {
         // Given
         AddressDto addressDto = new AddressDto(
-                "Oxenfurt", "The Continent", null, "NY",
-                "Oxenfurt Academy", "11222", false);
+                null, "Israel", null, null,
+                null, "10014", true);
+        FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT);
+        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto, TestUtilities.getScoringDto().withFieldScore(fieldsMatchScore));
 
-
-        Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
-
-        HereAddressData hereAddressData= new HereAddressData(List.of(TestUtilities.getHereAddressItem()
-                .withAddress(new HereAddress(null, null, address.country(), null, address.state(), null, address.city(), address.street(), address.zip()))
-                .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0))));
-
-        FastTaxGetBestMatchData fastTaxGetBestMatchData = TestUtilities.createFastTaxGetBestMatchData();
-        AddressDto expectedAddress = addressDto.withCity(fastTaxGetBestMatchData.getTaxInfoItems().get(0).city()).withCounty(fastTaxGetBestMatchData.getTaxInfoItems().get(0).county());
-
-        // When
-        when(stubHereAddressValidationWebClientWrapper.validateAddress(any())).thenReturn(Mono.just(hereAddressData));
-        when(fastTaxWebClientWrapper.validateAddress(any())).thenReturn(Mono.just(fastTaxGetBestMatchData));
-
-        // Then
+        // When + Then
         webTestClient
                 .mutate().responseTimeout(Duration.ofSeconds(20)).build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressRouter.BASE_URL)
+                        .path(AddressRouter.BASE_URL + "/resolve")
+                        .queryParam("country", addressDto.country())
+                        .queryParam("isPartial", addressDto.isPartial())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void getAddress_ValidateAddress_Returns200() {
+        // Given
+        AddressDto addressDto = new AddressDto(
+                "New York", "United States", null, "New York",
+                "164 Mulberry St", "10014", false);
+        FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT);
+        CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withCounty("New York").withIsPartial(null), TestUtilities.getScoringDto().withFieldScore(fieldsMatchScore));
+        ValidatedAddressDto expectedAddress = new ValidatedAddressDto(List.of(cachedAddressDataDto), addressDto);
+
+        // When + Then
+        webTestClient
+                .mutate().responseTimeout(Duration.ofSeconds(20)).build()
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(AddressRouter.BASE_URL + "/validate")
                         .queryParam("state", addressDto.state())
                         .queryParam("zip", addressDto.zip())
                         .queryParam("city", addressDto.city())
@@ -247,7 +299,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(AddressDto.class)
+                .expectBody(ValidatedAddressDto.class)
                 .value(receivedAddressDto -> assertEquals(expectedAddress, receivedAddressDto));
     }
 }

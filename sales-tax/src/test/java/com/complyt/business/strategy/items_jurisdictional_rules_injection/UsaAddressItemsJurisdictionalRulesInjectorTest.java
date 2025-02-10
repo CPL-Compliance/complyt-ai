@@ -5,6 +5,7 @@ import com.complyt.domain.sales_tax.product_classification.ProductClassification
 import com.complyt.domain.sales_tax.product_classification.SubJurisdictionalTaxRules;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.v1.exceptions.types.StateNotFoundInJurisdictionalTaxRulesApiException;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,7 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest {
     void setUp() {
         usaAddressItemsJurisdictionalRulesInjector = new UsaAddressItemsJurisdictionalRulesInjector();
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        Address usaAddress = testUtilities.createUsaAddress();
+        ShippingAddress usaAddress = testUtilities.createUsaShippingAddress();
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString())
                 .withShippingAddress(usaAddress)
                 .withItems(testUtilities.createItems(true, false, true));
@@ -88,7 +89,7 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest {
     @Test
     void inject_TransactionWithUnsupportedState_ThrowsAnError() {
         // Given
-        Address shippingAddress = testUtilities.createAddress().withState("Upsupported State");
+        ShippingAddress shippingAddress = testUtilities.createShippingAddress().withState("Upsupported State");
         Transaction transactionNoRules = transaction.withShippingAddress(shippingAddress).withItems(
                 new ArrayList<>() {{
                     add(transaction.getItems().get(0).withJurisdictionalSalesTaxRules(null));

@@ -32,7 +32,7 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @ArraySchema(schema = @Schema(description = FieldsDescriptions.ITEM)) @NotEmpty(message = "items" + DtoErrorMessages.LIST_NOT_EMPTY_ERROR) @NotNull(message = "items " + DtoErrorMessages.NOT_NULL_ERROR) List<@Valid ItemDto> items,
                              @Schema(description = FieldsDescriptions.IS_TAX_INCLUSIVE) boolean isTaxInclusive,
                              @Schema(ref = "billingAddress") @Valid OptionalAddressDto billingAddress,
-                             @Schema(ref = "shippingAddress") @Valid @NotNull(message = "shippingAddress " + DtoErrorMessages.NOT_NULL_ERROR) MandatoryAddressDto shippingAddress,
+                             @Schema(ref = "shippingAddress") @Valid @NotNull(message = "shippingAddress " + DtoErrorMessages.NOT_NULL_ERROR) ShippingAddressDto shippingAddress,
                              @Schema(description = FieldsDescriptions.CUSTOMER_ID + "transaction") @NotNull(message = "customerId " + DtoErrorMessages.NOT_NULL_ERROR) UUID customerId,
                              @Valid CustomerDto customer,
                              @Valid SalesTaxDto salesTax,
@@ -54,6 +54,6 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(description = FieldsDescriptions.EXCHANGE_RATE_INFO) ExchangeRateInfoDto exchangeRateInfo,
                              @Schema(description = FieldsDescriptions.SUBSIDIARY_INFO) String subsidiary,
                              @Schema(description = FieldsDescriptions.IS_REFUND_LINKED_INFO) Boolean isRefundLinked,
-                             @PositiveOrZero(message = "refundLinkedPercentage " + NumericErrorMessages.NOT_NEGATIVE_ERROR)
-                             @DecimalMax(value = "1.0", message = "refundLinkedPercentage" + NumericErrorMessages.DECIMAL_MAX_1_ERROR) BigDecimal refundLinkedPercentage) implements SourceCheckable, ExternalIdCheckable {
+                             @PositiveOrZero(message = "refundLinkedPercentage " + NumericErrorMessages.NOT_NEGATIVE_ERROR) @DecimalMax(value = "1.0", message = "refundLinkedPercentage" + NumericErrorMessages.DECIMAL_MAX_1_ERROR) BigDecimal refundLinkedPercentage)
+        implements SourceCheckable, ExternalIdCheckable {
 }

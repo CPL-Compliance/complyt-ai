@@ -1,10 +1,11 @@
 package com.complyt.business.transaction;
 
 import com.complyt.business.transaction.data_checker.AddressValidationApplyChecker;
-import com.complyt.business.transaction.data_fetcher.CityCountyFetcher;
-import com.complyt.business.transaction.data_injector.TransactionCityCountyInjector;
+import com.complyt.business.transaction.data_fetcher.MatchedAddressFetcher;
+import com.complyt.business.transaction.data_injector.TransactionMatchedAddressInjector;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.transaction.CityCountyWrapper;
+import com.complyt.domain.transaction.MatchedAddressData;
 import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,13 +30,13 @@ import static org.mockito.Mockito.when;
 public class CityCountyProviderTest {
 
     @InjectMocks
-    CityCountyProvider cityCountyProvider;
+    MatchedAddressProvider cityCountyProvider;
 
     @Mock
-    CityCountyFetcher addressFetcher;
+    MatchedAddressFetcher addressFetcher;
 
     @Mock
-    TransactionCityCountyInjector transactionCityCountyInjector;
+    TransactionMatchedAddressInjector transactionCityCountyInjector;
 
     @Mock
     AddressValidationApplyChecker addressValidationApplyChecker;
@@ -43,23 +44,22 @@ public class CityCountyProviderTest {
     UnitTestUtilities testUtilities;
     SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo;
     Transaction transaction;
+    MatchedAddressData matchedAddressData;
 
     @BeforeEach
     void setup() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(testUtilities.createSalesTaxTracking("123"), false);
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
+        matchedAddressData = UnitTestUtilities.createMatchedAddressData();
     }
 
     @Test
     void provide_GetsAddressAndInjectsIt_ReturnsTransaction() {
-        // Given
-        CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(transaction.getShippingAddress().city(), transaction.getShippingAddress().county());
-
         // When
         when(addressValidationApplyChecker.shouldValidateAddress(transaction, salesTaxTrackingWithNexusInfo)).thenReturn(true);
-        when(addressFetcher.fetch(transaction.getShippingAddress())).thenReturn(Mono.just(cityCountyWrapper));
-        when(transactionCityCountyInjector.inject(cityCountyWrapper, transaction)).thenReturn(Mono.just(transaction));
+        when(addressFetcher.fetch(transaction.getShippingAddress())).thenReturn(Mono.just(matchedAddressData));
+        when(transactionCityCountyInjector.inject(matchedAddressData, transaction)).thenReturn(Mono.just(transaction));
         Mono<Transaction> transactionMono = cityCountyProvider.provide(transaction, salesTaxTrackingWithNexusInfo);
 
         // Then

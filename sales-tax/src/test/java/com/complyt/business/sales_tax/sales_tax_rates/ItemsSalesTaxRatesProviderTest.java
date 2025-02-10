@@ -6,6 +6,8 @@ import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.ShippingAddress;
+import com.complyt.domain.transaction.ShippingFee;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +38,7 @@ public class ItemsSalesTaxRatesProviderTest {
     UnitTestUtilities testUtilities;
     Address address;
     List<Item> items;
+    ShippingAddress shippingAddress;
 
     @BeforeEach
     void setUp() {
@@ -44,6 +47,7 @@ public class ItemsSalesTaxRatesProviderTest {
         salesTaxRates = testUtilities.createSalesTaxRates();
         address = testUtilities.createAddress();
         items = testUtilities.createItems(true, false, false);
+        shippingAddress = new ShippingAddress(address.country(), address.country(), address.county(), address.country(), address.street(), address.zip(), address.region(), address.isPartial(), null);
     } //note gt is null
 
 
@@ -58,8 +62,8 @@ public class ItemsSalesTaxRatesProviderTest {
         List<Item> itemsWithRates = setRatesToItems(itemList);
 
         // When
-        when(salesTaxRateCalculator.provide(jurisdictionalSalesTaxRules, salesTaxRates, address)).thenReturn(salesTaxRates);
-        List<Item> actualItems = itemsSalesTaxRatesProvider.setSalesTaxRates(itemList, salesTaxRates, address);
+        when(salesTaxRateCalculator.provide(jurisdictionalSalesTaxRules, salesTaxRates, shippingAddress)).thenReturn(salesTaxRates);
+        List<Item> actualItems = itemsSalesTaxRatesProvider.setSalesTaxRates(itemList, salesTaxRates, shippingAddress);
 
         // Then
         assertEquals(itemsWithRates, actualItems);

@@ -85,7 +85,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         source = testUtilities.getUnifiedSource();
     }
 
-    private MandatoryAddressDto changeShippingAddressToUsa(MandatoryAddressDto shippingAddress) {
+    private ShippingAddressDto changeShippingAddressToUsa(ShippingAddressDto shippingAddress) {
         return shippingAddress.withCountry("USA");
     }
 
@@ -1656,9 +1656,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry(null);
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry(null);
         Set<String> expectedErrors = Set.of(
-                "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR);
+                "ShippingAddress.country " + StringErrorMessages.NOT_BE_BLANK_ERROR);
 
         // When + Then
         webTestClient
@@ -1683,7 +1683,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(null).withCountry("USA");
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(null).withCountry("USA");
         Set<String> expectedErrors = Set.of(
                 "Address.city " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: " + givenShippingAddress.city());
 
@@ -1708,7 +1708,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(null);
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(null);
         Set<String> expectedErrors = Set.of(
                 "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: " + givenShippingAddress.state(),
                 "Address.state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA + " Invalid value: " + givenShippingAddress.state());
@@ -1736,7 +1736,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(null).withCountry("USA");
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(null).withCountry("USA");
         Set<String> expectedErrors = Set.of(
                 "Address.street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: " + givenShippingAddress.street());
 
@@ -1761,7 +1761,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip(null);
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip(null);
         Set<String> expectedErrors = Set.of(
                 "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: null",
                 "Address.zip " + DtoErrorMessages.ZIP_NOT_IN_FORMAT + " Invalid value: null");
@@ -1787,9 +1787,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry("");
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry("");
         Set<String> expectedErrors = Set.of(
-                "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR);
+                "ShippingAddress.country " + StringErrorMessages.NOT_BE_BLANK_ERROR);
 
         // When + Then
         webTestClient
@@ -1812,7 +1812,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity("");
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity("");
         Set<String> expectedErrors = Set.of(
                 "Address.city " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: " + givenShippingAddress.city());
 
@@ -1837,7 +1837,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState("");
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withState("");
         Set<String> expectedErrors = Set.of(
                 "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: " + givenShippingAddress.state(),
                 "Address.state " + DtoErrorMessages.STATE_NOT_RECOGNIZED_USA + " Invalid value: " + givenShippingAddress.state());
@@ -1864,7 +1864,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         transactionDto = transactionDto.withShippingAddress(changeShippingAddressToUsa(transactionDto.shippingAddress()));
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet("");
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet("");
         Set<String> expectedErrors = Set.of(
                 "Address.street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: " + givenShippingAddress.street());
 
@@ -1889,7 +1889,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("");
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("");
         Set<String> expectedErrors = Set.of(
                 "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX + " Invalid value: " + givenShippingAddress.zip(),
                 "Address.zip " + DtoErrorMessages.ZIP_NOT_IN_FORMAT + " Invalid value: " + givenShippingAddress.zip());
@@ -2065,9 +2065,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCounty(testUtilities.stringWithLength(101));
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withCounty(testUtilities.stringWithLength(101));
         Set<String> expectedErrors = Set.of(
-                "Address.county " + StringErrorMessages.MAX_100_ERROR);
+                "ShippingAddress.county " + StringErrorMessages.MAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -2090,9 +2090,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("baaabbaaabbaaabbaaab1");
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("baaabbaaabbaaabbaaab1");
         Set<String> expectedErrors = Set.of(
-                "Address.zip " + StringErrorMessages.MAX_20_ERROR);
+                "ShippingAddress.zip " + StringErrorMessages.MAX_20_ERROR);
 
         // When + Then
         webTestClient
@@ -2115,7 +2115,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry(testUtilities.stringWithLength(101));
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry(testUtilities.stringWithLength(101));
         Set<String> expectedErrors = Set.of(
                 "Address.country " + StringErrorMessages.MAX_50_ERROR);
 
@@ -2140,9 +2140,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(testUtilities.stringWithLength(101));
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(testUtilities.stringWithLength(101));
         Set<String> expectedErrors = Set.of(
-                "Address.city " + StringErrorMessages.MAX_100_ERROR);
+                "ShippingAddress.city " + StringErrorMessages.MAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -2165,9 +2165,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(testUtilities.stringWithLength(101));
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(testUtilities.stringWithLength(101));
         Set<String> expectedErrors = Set.of(
-                "Address.state " + StringErrorMessages.MAX_100_ERROR);
+                "ShippingAddress.state " + StringErrorMessages.MAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -2190,9 +2190,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(testUtilities.stringWithLength(201));
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(testUtilities.stringWithLength(201));
         Set<String> expectedErrors = Set.of(
-                "Address.street " + StringErrorMessages.MAX_200_ERROR);
+                "ShippingAddress.street " + StringErrorMessages.MAX_200_ERROR);
 
         // When + Then
         webTestClient
@@ -2215,7 +2215,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress()
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress()
                 .withState(null)
                 .withCountry("USA")
                 .withPartial(true);
@@ -2251,7 +2251,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress()
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress()
                 .withState("")
                 .withCountry("USA")
                 .withPartial(true);
@@ -2287,7 +2287,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress()
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress()
                 .withState("CO")
                 .withCountry("USA")
                 .withPartial(true);
@@ -2323,7 +2323,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress()
+        ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress()
                 .withZip(null)
                 .withPartial(true);
 

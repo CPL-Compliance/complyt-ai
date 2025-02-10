@@ -8,10 +8,7 @@ import com.complyt.domain.nexus.TransactionNexusSummary;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.transaction.ItemDto;
-import com.complyt.v1.models.transaction.MandatoryAddressDto;
-import com.complyt.v1.models.transaction.TransactionDto;
-import com.complyt.v1.models.transaction.TransactionStatusDto;
+import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
@@ -61,7 +58,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
 
     // Given
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Grand Rapids", "US", null, "MI", "417 Michigan St NE", "", "49503", false);
+    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Grand Rapids", "US", null, "MI", "417 Michigan St NE", "", "49503", false, null);
     private final String source = "1";
     private final String usaCountry = "USA";
     private UUID transactionUUID;

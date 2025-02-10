@@ -11,8 +11,8 @@ import lombok.With;
 @With
 public record AddressWithDateDto(
         @Valid AddressDto address,
-        @Schema(ref = "requiredDate")
-        @Valid @NotBlank(message = "requiredDate " + DtoErrorMessages.NOT_BLANK_ERROR)
-        @Pattern(regexp = ISO8601Regex.expression, message = "requiredDate " + DtoErrorMessages.DATE_FORMAT_ERROR) String requiredDate
+        @Schema(ref = "effectiveDate")
+        @Valid @NotBlank(message = "effectiveDate " + DtoErrorMessages.NOT_BLANK_ERROR)
+        @Pattern(regexp = ISO8601Regex.expression, message = "effectiveDate " + DtoErrorMessages.DATE_FORMAT_ERROR) String effectiveDate
         ) {
 }

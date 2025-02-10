@@ -88,7 +88,7 @@ public abstract class TestContainersInitializerIT {
                 .withNetworkAliases(HOSTNAME)
                 .withRealmImportFile("realm-export.json")
                 .withCreateContainerCmdModifier(cmd -> cmd.withName("keycloak_container"));
-        ;
+
         KEYCLOAK_CONTAINER.start();
         ACCESS_TOKEN_CLIENT = WebTestClient.bindToServer().baseUrl("http://localhost:" + KEYCLOAK_CONTAINER.getMappedPort(8080) + "/").build();
 
@@ -108,12 +108,12 @@ public abstract class TestContainersInitializerIT {
                 .withNetwork(NETWORK)
                 .withNetworkAliases(HOSTNAME)
                 .withCreateContainerCmdModifier(cmd -> cmd.withName("mongo_container"));
-        ;
-        MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(SALES_TAX), "/" + dumpPath(SALES_TAX), BindMode.READ_ONLY);
-        MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(SALES_TAX_RATES), "/" + dumpPath(SALES_TAX_RATES), BindMode.READ_ONLY);
-        MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(FILES), "/" + dumpPath(FILES), BindMode.READ_ONLY);
-        MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(AUTHENTICATION), "/" + dumpPath(AUTHENTICATION), BindMode.READ_ONLY);
-        MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(ADDRESS_VALIDATION), "/" + dumpPath(ADDRESS_VALIDATION), BindMode.READ_ONLY);
+
+        MONGO_CONTAINER.addFileSystemBind("../dump/sales_tax" , "/dump/sales_tax", BindMode.READ_ONLY);
+        MONGO_CONTAINER.addFileSystemBind("../dump/sales_tax_rates", "/dump/sales_tax_rates", BindMode.READ_ONLY);
+        MONGO_CONTAINER.addFileSystemBind("../dump/files", "/dump/files", BindMode.READ_ONLY);
+        MONGO_CONTAINER.addFileSystemBind("../dump/authentication", "/dump/authentication", BindMode.READ_ONLY);
+        MONGO_CONTAINER.addFileSystemBind("../dump/address_validation", "/dump/address_validation", BindMode.READ_ONLY);
 
         startContainer(MONGO_CONTAINER);
 
@@ -181,11 +181,35 @@ public abstract class TestContainersInitializerIT {
 
         // Restore Dump
         try {
-            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(SALES_TAX));
-            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(FILES));
-            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(SALES_TAX_RATES));
-            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(AUTHENTICATION));
-            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(ADDRESS_VALIDATION));
+            MONGO_CONTAINER.execInContainer(
+                    "/usr/bin/mongorestore",
+                    "--db", "sales_tax",
+                    "--dir", "/dump/sales_tax"
+            );
+
+            MONGO_CONTAINER.execInContainer(
+                    "/usr/bin/mongorestore",
+                    "--db", "files",
+                    "--dir", "/dump/files"
+            );
+
+            MONGO_CONTAINER.execInContainer(
+                    "/usr/bin/mongorestore",
+                    "--db", "sales_tax_rates",
+                    "--dir", "/dump/sales_tax_rates"
+            );
+
+            MONGO_CONTAINER.execInContainer(
+                    "/usr/bin/mongorestore",
+                    "--db", "authentication",
+                    "--dir", "/dump/authentication"
+            );
+
+            MONGO_CONTAINER.execInContainer(
+                    "/usr/bin/mongorestore",
+                    "--db", "address_validation",
+                    "--dir", "/dump/address_validation"
+            );
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -207,7 +231,7 @@ public abstract class TestContainersInitializerIT {
                                 .forHttp(TestUtilities.FILES_BASE_URL)
                                 .withHeader("Authorization", "Bearer " + TOKEN))
                         .withStrategy(Wait
-                                .forHttp(TestUtilities.ADDRESS_VALIDATION_BASE_URL + "?country=USA&state=New%20York&city=New%20York&zip=10013&isPartial=true")
+                                .forHttp(TestUtilities.ADDRESS_VALIDATION_BASE_URL + "/resolve?country=USA&state=New%20York&city=New%20York&zip=10013&isPartial=true")
                                 .withHeader("Authorization", "Bearer " + TOKEN))
                         .withStartupTimeout(Duration.ofSeconds(90)));
         API_GATEWAY_CONTAINER.start();
@@ -239,10 +263,6 @@ public abstract class TestContainersInitializerIT {
             return "../../../../" + service + "/target";
         }
         return "../" + service + "/target";
-    }
-
-    private static String dumpPath(String service) {
-        return service + ".dump";
     }
 
     private static GenericContainer initializeServiceContainer(String service, String... entrypoint) {

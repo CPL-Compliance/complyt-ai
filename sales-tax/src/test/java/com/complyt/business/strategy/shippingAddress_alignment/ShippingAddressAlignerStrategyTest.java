@@ -1,6 +1,7 @@
 package com.complyt.business.strategy.shippingAddress_alignment;
 
 import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,12 +30,12 @@ public class ShippingAddressAlignerStrategyTest {
     @Test
     void select_TransactionCountryIsUsa_RunsUsaFunction() {
         // Given
-        Address usaAbbreviationWithStateAddress = transaction.getShippingAddress()
+        ShippingAddress usaAbbreviationWithStateAddress = transaction.getShippingAddress()
                 .withCountry("u.s.a")
                 .withState("co");
         Transaction givenTransaction = transaction.withShippingAddress(usaAbbreviationWithStateAddress);
 
-        Address expectedAddress = transaction.getShippingAddress()
+        ShippingAddress expectedAddress = transaction.getShippingAddress()
                 .withCountry("USA")
                 .withState("Colorado");
         Transaction exepctedTransaction = transaction.withShippingAddress(expectedAddress);
@@ -47,11 +48,11 @@ public class ShippingAddressAlignerStrategyTest {
     @Test
     void select_TransactionCountryIsNotUsa_RunsNonUsaFunction() {
         // Given
-        Address nonUsaAbbreviationWithStateAddress = transaction.getShippingAddress()
+        ShippingAddress nonUsaAbbreviationWithStateAddress = transaction.getShippingAddress()
                 .withCountry("brazil");
         Transaction givenTransaction = transaction.withShippingAddress(nonUsaAbbreviationWithStateAddress);
 
-        Address expectedAddress = transaction.getShippingAddress()
+        ShippingAddress expectedAddress = transaction.getShippingAddress()
                 .withCountry("Brazil");
         Transaction exepctedTransaction = transaction.withShippingAddress(expectedAddress);
 
@@ -63,11 +64,11 @@ public class ShippingAddressAlignerStrategyTest {
     @Test
     void select_TransactionCountryIsNotUsaAbbreviation_RunsNonUsaFunction() {
         // Given
-        Address nonUsaAbbreviationWithStateAddress = transaction.getShippingAddress()
+        ShippingAddress nonUsaAbbreviationWithStateAddress = transaction.getShippingAddress()
                 .withCountry("br");
         Transaction givenTransaction = transaction.withShippingAddress(nonUsaAbbreviationWithStateAddress);
 
-        Address expectedAddress = transaction.getShippingAddress()
+        ShippingAddress expectedAddress = transaction.getShippingAddress()
                 .withCountry("Brazil");
         Transaction exepctedTransaction = transaction.withShippingAddress(expectedAddress);
 

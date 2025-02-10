@@ -12,11 +12,11 @@ import org.mapstruct.factory.Mappers;
 public interface CachedAddressDataToAddressMapper {
     CachedAddressDataToAddressMapper INSTANCE = Mappers.getMapper(CachedAddressDataToAddressMapper.class);
 
-    @Mapping(source = "country", target = "country")
-    @Mapping(source = "state", target = "state")
-    @Mapping(source = "street", target = "street")
-    @Mapping(source = "county", target = "county")
-    @Mapping(source = "city", target = "city")
-    @Mapping(source = "zip", target = "zip")
+    @Mapping(source = "address.country", target = "country")
+    @Mapping(source = "address.state", target = "state")
+    @Mapping(source = "address.street", target = "street")
+    @Mapping(source = "address.county", target = "county")
+    @Mapping(source = "address.city", target = "city")
+    @Mapping(source = "address.zip", target = "zip")
     Address map(CachedAddressData cachedAddressData);
 }

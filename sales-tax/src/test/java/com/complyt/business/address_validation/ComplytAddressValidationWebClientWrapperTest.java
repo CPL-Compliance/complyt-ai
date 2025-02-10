@@ -2,9 +2,12 @@ package com.complyt.business.address_validation;
 
 import com.complyt.business.exceptions.ComplytAddressValidationException;
 import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.proxies.AddressValidationServiceProxy;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
+import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
+import com.complyt.v1.models.transaction.ShippingAddressDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +30,8 @@ class ComplytAddressValidationWebClientWrapperTest {
     ComplytAddressValidationWebClientWrapper complytAddressValidationWebClientWrapper;
     UnitTestUtilities testUtilities;
     Address address;
-    MandatoryAddressDto mandatoryAddressDto;
+    MatchedAddressDataDto mandatoryAddressDto;
+    ShippingAddress shippingAddress;
 
 
     @BeforeEach
@@ -35,18 +39,18 @@ class ComplytAddressValidationWebClientWrapperTest {
         complytAddressValidationWebClientWrapper = new ComplytAddressValidationWebClientWrapper(addressValidationServiceProxy);
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         address = testUtilities.createAddress();
-        mandatoryAddressDto = testUtilities.createMandatoryAddressDto();
+        mandatoryAddressDto = testUtilities.createMatchedAddressDto();
+        shippingAddress = testUtilities.createShippingAddress();
     }
 
     @Test
     void validateAddress_success() {
         when(addressValidationServiceProxy.validateAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial()))
                 .thenReturn(Mono.just(mandatoryAddressDto));
-
-        Mono<Address> result = complytAddressValidationWebClientWrapper.validateAddress(address);
+        Mono<MatchedAddressDataDto> result = complytAddressValidationWebClientWrapper.validateAddress(shippingAddress);
 
         StepVerifier.create(result)
-                .expectNext(address)
+                .expectNext(mandatoryAddressDto)
                 .verifyComplete();
     }
 
@@ -55,10 +59,10 @@ class ComplytAddressValidationWebClientWrapperTest {
         when(addressValidationServiceProxy.validateAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial()))
                 .thenReturn(Mono.just(mandatoryAddressDto));
 
-        Mono<Address> result = complytAddressValidationWebClientWrapper.validateAddress(address.city(), address.country(), address.county(), address.state(), address.street(), address.zip(), address.isPartial());
+        Mono<MatchedAddressDataDto> result = complytAddressValidationWebClientWrapper.validateAddress(address.city(), address.country(), address.county(), address.state(), address.street(), address.zip(), address.isPartial());
 
         StepVerifier.create(result)
-                .expectNext(address)
+                .expectNext(mandatoryAddressDto)
                 .verifyComplete();
     }
 
@@ -67,7 +71,7 @@ class ComplytAddressValidationWebClientWrapperTest {
         when(addressValidationServiceProxy.validateAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial()))
                 .thenReturn(Mono.error(new RuntimeException("Retries Exception")));
 
-        Mono<Address> result = complytAddressValidationWebClientWrapper.validateAddress(address);
+        Mono<MatchedAddressDataDto> result = complytAddressValidationWebClientWrapper.validateAddress(shippingAddress);
 
         StepVerifier.create(result)
                 .expectErrorMatches(throwable -> throwable instanceof ComplytAddressValidationException
@@ -80,7 +84,7 @@ class ComplytAddressValidationWebClientWrapperTest {
         when(addressValidationServiceProxy.validateAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial()))
                 .thenReturn(Mono.error(UnitTestUtilities.create400BadRequestFeignException()));
 
-        Mono<Address> result = complytAddressValidationWebClientWrapper.validateAddress(address);
+        Mono<MatchedAddressDataDto> result = complytAddressValidationWebClientWrapper.validateAddress(shippingAddress);
 
         StepVerifier.create(result)
                 .expectError(ObjectNotValidApiException.class)

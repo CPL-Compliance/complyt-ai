@@ -2,6 +2,7 @@ package com.complyt.services;
 
 import com.complyt.business.address_validation.AddressValidationWebClientWrapper;
 import com.complyt.domain.Address;
+import com.complyt.domain.matched_address.MatchedAddressData;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,19 +21,20 @@ class AddressValidationServiceImplTest {
     @InjectMocks
     AddressValidationServiceImpl addressValidationService;
     @Mock
-    AddressValidationWebClientWrapper<Address> addressValidationWebClientWrapper;
+    AddressValidationWebClientWrapper<MatchedAddressData> addressValidationWebClientWrapper;
     private final Address address = TestUtilities.createAddressInCalifornia();
+    private final MatchedAddressData matchedAddressData = TestUtilities.createMatchedAddressInCalifornia();
 
     @Test
     void validated_AddressPassed_returnsAddress() {
         // When
-        when(addressValidationWebClientWrapper.validateAddress(address)).thenReturn(Mono.just(address));
+        when(addressValidationWebClientWrapper.validateAddress(address)).thenReturn(Mono.just(matchedAddressData));
 
-        Mono<Address> addressMono = addressValidationService.validate(address);
+        Mono<MatchedAddressData> addressMono = addressValidationService.validate(address);
 
         // Then
         StepVerifier.create(addressMono)
-                .expectNext(address).verifyComplete();
+                .expectNext(matchedAddressData).verifyComplete();
     }
 
     @Test

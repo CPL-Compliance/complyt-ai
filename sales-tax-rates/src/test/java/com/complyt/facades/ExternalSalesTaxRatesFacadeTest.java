@@ -2,6 +2,7 @@ package com.complyt.facades;
 
 import com.complyt.domain.AddressWithDate;
 import com.complyt.domain.ComplytSalesTaxRates;
+import com.complyt.domain.SalesTaxRatesData;
 import com.complyt.domain.common_rates.CommonSalesTaxRates;
 import com.complyt.facade.ExternalSalesTaxRatesFacade;
 import com.complyt.services.AddressValidationService;
@@ -36,15 +37,16 @@ public class ExternalSalesTaxRatesFacadeTest {
         // Given
         CommonSalesTaxRates expectedCommonSalesTaxRatesFacade = TestUtilities.createExternalCommonSalesTaxRates();
         AddressWithDate addressWithTransactionDate = TestUtilities.createAddressInCaliforniaWithCreationDate();
+        SalesTaxRatesData salesTaxRatesData = TestUtilities.createSalesTaxRatesData().withComplytId(expectedCommonSalesTaxRatesFacade.complytId()).withRequestAddress(addressWithTransactionDate);
 
 
-        // When
+                // When
         when(complytSalesTaxRatesService.findByAddress(addressWithTransactionDate)).thenReturn(Mono.just(expectedCommonSalesTaxRatesFacade));
-        when(addressValidationService.validate(addressWithTransactionDate.getAddress())).thenReturn(Mono.just(addressWithTransactionDate.getAddress()));
+        when(addressValidationService.validate(addressWithTransactionDate.getAddress())).thenReturn(Mono.just(salesTaxRatesData.matchedAddressData()));
 
-        Mono<CommonSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesFacade.findByAddress(addressWithTransactionDate);
+        Mono<SalesTaxRatesData> complytSalesTaxRatesMono = complytSalesTaxRatesFacade.validateAddress(addressWithTransactionDate);
         // Then
-        StepVerifier.create(complytSalesTaxRatesMono).expectNext(expectedCommonSalesTaxRatesFacade).verifyComplete();
+        StepVerifier.create(complytSalesTaxRatesMono).expectNext(salesTaxRatesData).verifyComplete();
     }
 
     @Test
@@ -53,8 +55,8 @@ public class ExternalSalesTaxRatesFacadeTest {
         AddressWithDate nullAddress = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> complytSalesTaxRatesFacade.findByAddress(nullAddress));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> complytSalesTaxRatesFacade.validateAddress(nullAddress));
 
-        assertEquals(nullPointerException.getMessage(), "addressWithDate " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
+        assertEquals(nullPointerException.getMessage(), "requestAddressWithDate " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
 }

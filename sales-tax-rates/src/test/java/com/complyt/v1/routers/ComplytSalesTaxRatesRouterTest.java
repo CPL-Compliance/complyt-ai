@@ -2,7 +2,7 @@ package com.complyt.v1.routers;
 
 import com.complyt.config.SecurityConfig;
 import com.complyt.domain.AddressWithDate;
-import com.complyt.domain.common_rates.CommonSalesTaxRates;
+import com.complyt.domain.SalesTaxRatesData;
 import com.complyt.facade.InternalSalesTaxRatesFacade;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
@@ -12,12 +12,13 @@ import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handler.ComplytSalesTaxRatesHandler;
 import com.complyt.v1.mappers.AddressWithDateMapper;
-import com.complyt.v1.mappers.CommonSalesTaxRatesMapper;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.AddressWithDateDto;
-import com.complyt.v1.model.common_sales_tax_rates.CommonSalesTaxRatesDto;
+import com.complyt.v1.model.common_sales_tax_rates.SalesTaxRatesDataDto;
+import com.complyt.v1.model.common_sales_tax_rates.SalesTaxRatesDto;
 import com.complyt.v1.router.ComplytSalesTaxRatesRouter;
 import com.complyt.v1.validators.query_params.AddressDtoQueryParamsExtractor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -63,18 +64,25 @@ public class ComplytSalesTaxRatesRouterTest {
     @MockBean
     private InternalSalesTaxRatesFacade internalSalesTaxRatesFacade; //this is not tested really
 
+    private SalesTaxRatesData salesTaxRatesData;
+
+    @BeforeEach
+    void setUp() {
+        salesTaxRatesData = TestUtilities.createSalesTaxRatesData();
+    }
+
     @Test
     @WithMockUser
     public void findByAddress_CommonRatesFound_Returns200() {
         // Given
         AddressWithDateDto addressWithDateDto = TestUtilities.createAddressWithDateDtoInCalifornia("2011-11-01T00:00:00");
-        CommonSalesTaxRates commonSalesTaxRates = TestUtilities.createExternalCommonSalesTaxRates();
+        SalesTaxRatesDto salesTaxRatesDto = TestUtilities.createSalesTaxRatesDto();
         AddressWithDate addressWithDate = AddressWithDateMapper.INSTANCE.addressWithDateDtoToAddressDate(addressWithDateDto);
+        salesTaxRatesData = salesTaxRatesData.withRequestAddress(addressWithDate);
+        SalesTaxRatesDataDto salesTaxRatesDataDto = new SalesTaxRatesDataDto(null, addressWithDate, TestUtilities.createMatchedAddressInCalifornia(), salesTaxRatesDto);
 
         // When
-        when(internalSalesTaxRatesFacade.findByAddress(addressWithDate)).thenReturn(Mono.just(commonSalesTaxRates));
-        CommonSalesTaxRatesDto commonSalesTaxRatesDto = CommonSalesTaxRatesMapper.INSTANCE
-                .commonSalesTaxRatesToCommonSalesTaxRatesDto(commonSalesTaxRates);
+        when(internalSalesTaxRatesFacade.validateAddress(addressWithDate)).thenReturn(Mono.just(salesTaxRatesData));
 
         // Then
         webTestClient
@@ -86,14 +94,14 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(CommonSalesTaxRatesDto.class)
+                .expectBody(SalesTaxRatesDataDto.class)
                 .value(responseCommonSalesTaxRatesDto ->
-                        assertEquals(commonSalesTaxRatesDto, responseCommonSalesTaxRatesDto)
+                        assertEquals(salesTaxRatesDataDto, responseCommonSalesTaxRatesDto)
                 );
     }
 
@@ -106,7 +114,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressWithDate addressWithDate = AddressWithDateMapper.INSTANCE.addressWithDateDtoToAddressDate(addressWithDateDto);
 
         // When
-        when(internalSalesTaxRatesFacade.findByAddress(addressWithDate)).thenReturn(Mono.empty());
+        when(internalSalesTaxRatesFacade.validateAddress(addressWithDate)).thenReturn(Mono.empty());
 
         // Then
         webTestClient
@@ -118,7 +126,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -132,8 +140,8 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressWithDateDto addressWithDateDto = TestUtilities.createAddressWithDateDtoInCalifornia("");
 
         Set<String> expectedErrors = Set.of(
-                "requiredDate " + DtoErrorMessages.NOT_BLANK_ERROR,
-                "requiredDate " + DtoErrorMessages.DATE_FORMAT_ERROR
+                "effectiveDate " + DtoErrorMessages.NOT_BLANK_ERROR,
+                "effectiveDate " + DtoErrorMessages.DATE_FORMAT_ERROR
         );
 
         // Then
@@ -146,7 +154,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -161,7 +169,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressWithDateDto addressWithDateDto = TestUtilities.createAddressWithDateDtoInCalifornia("2011-11-01T00:00:00");
 
         Set<String> expectedErrors = Set.of(
-                "requiredDate " + DtoErrorMessages.NOT_BLANK_ERROR
+                "Address.country " + DtoErrorMessages.NOT_BLANK_ERROR
         );
 
         // Then
@@ -169,11 +177,11 @@ public class ComplytSalesTaxRatesRouterTest {
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ComplytSalesTaxRatesRouter.BASE_URL)
-                        .queryParam("country", addressWithDateDto.address().country())
                         .queryParam("state", addressWithDateDto.address().state())
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -204,7 +212,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -231,7 +239,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("state", addressWithDateDto.address().state())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -262,7 +270,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -292,7 +300,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -322,7 +330,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -352,7 +360,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("state", addressWithDateDto.address().state())
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -382,7 +390,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -411,7 +419,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("state", addressWithDateDto.address().state())
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -441,7 +449,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -468,7 +476,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -484,7 +492,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressWithDate addressWithDate = TestUtilities.createAddressWithDateInCalifornia(LocalDateTime.now());
 
         // When
-        when(internalSalesTaxRatesFacade.findByAddress(addressWithDate)).thenThrow(RuntimeException.class);
+        when(internalSalesTaxRatesFacade.validateAddress(addressWithDate)).thenThrow(RuntimeException.class);
 
         // Then
         webTestClient
@@ -496,7 +504,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -549,7 +557,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -581,7 +589,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -612,7 +620,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -645,7 +653,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -677,7 +685,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -708,7 +716,7 @@ public class ComplytSalesTaxRatesRouterTest {
                         .queryParam("city", addressWithDateDto.address().city())
                         .queryParam("street", addressWithDateDto.address().street())
                         .queryParam("zip", addressWithDateDto.address().zip())
-                        .queryParam("requiredDate", addressWithDateDto.requiredDate())
+                        .queryParam("effectiveDate", addressWithDateDto.effectiveDate())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

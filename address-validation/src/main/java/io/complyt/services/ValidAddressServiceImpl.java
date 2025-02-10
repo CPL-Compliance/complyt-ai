@@ -1,14 +1,14 @@
 package io.complyt.services;
 
-import io.complyt.business.address.CountryToStandardizedCountry;
+import io.complyt.business.address_aligner.AddressAligner;
 import io.complyt.business.address_checkers.HereAddressChecker;
-import io.complyt.business.external_fetcher.FastTaxGetBestMatchCityCountyFetcher;
 import io.complyt.business.webclients.addressvalidations.AddressValidationWebClientWrapper;
 import io.complyt.domain.Address;
 import io.complyt.domain.CachedAddressData;
+import io.complyt.domain.TempAddressData;
 import io.complyt.domain.ValidatedAddress;
+import io.complyt.domain.mappers.CachedAddressDataToTempDataMapper;
 import io.complyt.domain.mappers.HereAddressToAddressMapper;
-import io.complyt.domain.mappers.ValidatedAddressToAddressMapper;
 import io.complyt.repositories.ValidationAddressRepositoryImpl;
 import io.complyt.utils.observability.ContextLogger;
 import lombok.AccessLevel;
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -34,22 +35,24 @@ public class ValidAddressServiceImpl implements ValidAddressService {
     private AddressValidationWebClientWrapper hereAddressValidationClientWrapper;
 
     @NonNull
-    private AddressValidationWebClientWrapper fastTaxWebClientWrapper;
-
-    @NonNull
-    private FastTaxGetBestMatchCityCountyFetcher fastTaxGetBestMatchCityCountyFetcher;
-
-    @NonNull
     private HereAddressChecker hereAddressChecker;
 
+    @NonNull
+    private AddressAligner addressAligner;
+
     @Override
-    public Mono<Address> validateAddress(Address address) {
+    public Mono<ValidatedAddress> validateAddress(Address address) {
         return findByAddress(address)
-                .map(ValidatedAddressToAddressMapper.INSTANCE::map)
                 .switchIfEmpty(Mono.defer(() -> fetchAndValidateAddress(address)
                         .flatMap(addressData -> setBeforeSave(addressData, address))
-                        .flatMap(this::saveAddress)
-                        .map(ValidatedAddressToAddressMapper.INSTANCE::map)));
+                        .flatMap(this::saveAddress)));
+    }
+
+    @Override
+    public Mono<CachedAddressData> resolveAddress(Address address) {
+        return validateAddress(address)
+                .flatMap(matchedAddresses -> resolveBestMatchAddress(matchedAddresses.getMatchedAddresses())
+                        .flatMap(bestMatchAddress -> hereAddressChecker.checkStateMatch(bestMatchAddress, address)));
     }
 
     public Mono<ValidatedAddress> findByAddress(@NonNull Address address) {
@@ -63,34 +66,34 @@ public class ValidAddressServiceImpl implements ValidAddressService {
         return validationAddressRepositoryImpl.saveAddress(address);
     }
 
-    private Mono<CachedAddressData> fetchAndValidateAddress(Address address) {
+    private Mono<List<CachedAddressData>> fetchAndValidateAddress(Address address) {
         return findByAddressClientWrapper(address)
-                .flatMap(addressData -> hereAddressChecker.checkAddress(addressData, address)
+                .flatMap(addressData -> hereAddressChecker.filterValidAddresses(addressData)
                         .switchIfEmpty(Mono.defer(() -> resolveStreetIfMissing(addressData, address))
-                                .flatMap(addressDataNoStreet -> hereAddressChecker.checkAddress(addressDataNoStreet, address))))
-                .flatMap(addressData -> resolveCountyIfMissing(addressData, address));
+                                .flatMap(hereAddressChecker::filterValidAddresses)));
     }
 
-    private Mono<CachedAddressData> findByAddressClientWrapper(Address address) {
-        Address alignedAddress = address.withCountry(CountryToStandardizedCountry.standardize(address.country()));
+    private Mono<List<CachedAddressData>> findByAddressClientWrapper(Address address) {
+        Address alignedAddress = addressAligner.align(address);
         return hereAddressValidationClientWrapper.validateAddress(alignedAddress)
                 .map(HereAddressToAddressMapper.INSTANCE::map);
     }
 
-    private Mono<ValidatedAddress> setBeforeSave(CachedAddressData addressData, Address address) {
-        addressData = addressData.withPartial(address.isPartial());
-
-        return Mono.just(new ValidatedAddress(null, addressData, address, LocalDateTime.now()));
+    private Mono<ValidatedAddress> setBeforeSave(List<CachedAddressData> addressData, Address address) {
+        TempAddressData tempAddressData = CachedAddressDataToTempDataMapper.INSTANCE.map(addressData.get(0)); // todo remove phase 2
+        return Mono.just(new ValidatedAddress(null, tempAddressData, addressData, address, LocalDateTime.now()));
     }
 
-    private Mono<CachedAddressData> resolveStreetIfMissing(CachedAddressData cachedData, Address address) {
-        return cachedData.street() == null ? findByAddressClientWrapper(address.withStreet(null))
-                : Mono.just(cachedData);
+    private Mono<List<CachedAddressData>> resolveStreetIfMissing(List<CachedAddressData> addressData, Address address) {
+        return resolveBestMatchAddress(addressData)
+                .flatMap(bestMatchedAddress -> (bestMatchedAddress.address().street() == null && address.street() != null)
+                        ? findByAddressClientWrapper(address.withStreet(null))
+                        : Mono.just(addressData)); // By default, returns the data back
     }
 
-    private Mono<CachedAddressData> resolveCountyIfMissing(CachedAddressData cachedData, Address address) {
-        return cachedData.county() == null ? fastTaxWebClientWrapper.validateAddress(address)
-                .flatMap(validatedAddress -> fastTaxGetBestMatchCityCountyFetcher.fetch(validatedAddress, cachedData))
-                : Mono.just(cachedData);
+    private Mono<CachedAddressData> resolveBestMatchAddress(List<CachedAddressData> addresses) {
+        return Mono.justOrEmpty(addresses)
+                .filter(list -> !list.isEmpty())
+                .map(list -> list.get(0));
     }
 }

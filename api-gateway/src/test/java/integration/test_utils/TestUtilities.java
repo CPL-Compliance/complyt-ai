@@ -610,33 +610,33 @@ public class TestUtilities {
         return addressJson;
     }
 
-    public static JSONObject createAddressAndRate(String state) {
-        // Creating the address part of the object
+    public static JSONObject createMatchedAddressJsonExample(String city, String country, String county, String state, String street, String zip) {
         JSONObject addressJson = new JSONObject();
+        addressJson.put("city", city);
+        addressJson.put("country", country);
+        addressJson.put("county", county);
         addressJson.put("state", state);
-        addressJson.put("county", state);
-        addressJson.put("city", "city");
-        addressJson.put("zip", "10038");
-        addressJson.put("isUnincorporated", false);
-        addressJson.put("hasPlusFourZipCode", false);
-        addressJson.put("lowerPlusFourDigits", 0);
-        addressJson.put("upperPlusFourDigits", 0);
+        addressJson.put("street", street);
+        addressJson.put("zip", zip);
 
-        // Creating the current rates part of the object
-        JSONObject currentRatesJson = new JSONObject();
-        currentRatesJson.put("stateRate", new BigDecimal("0.0"));
-        currentRatesJson.put("countyRate", new BigDecimal("0.0"));
-        currentRatesJson.put("cityRate", new BigDecimal("0.0"));
-        currentRatesJson.put("taxRate", new BigDecimal("0.123"));
-        currentRatesJson.put("effectiveDate", "2021-07-01T00:00:00.000+00:00");
-        currentRatesJson.put("source", "FAST_SALES_TAX");
-        currentRatesJson.put("internalSalesTaxRatesMetaData", new JSONObject());
+        JSONObject scoringJson = new JSONObject();
+        scoringJson.put("matchLevel", "EXCELLENT");
+        scoringJson.put("score", 1.0);
 
-        // Creating the final object
-        JSONObject json = new JSONObject();
-        json.put("address", addressJson);
-        json.put("rates", currentRatesJson);
-        return json;
+        JSONObject fieldScoreJson = new JSONObject();
+        fieldScoreJson.put("countryMatch", "EXACT");
+        fieldScoreJson.put("stateMatch", "EXACT");
+        fieldScoreJson.put("cityMatch", "EXACT");
+        fieldScoreJson.put("streetMatch", "EXACT");
+        fieldScoreJson.put("zipMatch", "EXACT");
+
+        scoringJson.put("fieldScore", fieldScoreJson);
+
+        JSONObject resultJson = new JSONObject();
+        resultJson.put("address", addressJson);
+        resultJson.put("scoring", scoringJson);
+
+        return resultJson;
     }
 
     public static MultipartBodyBuilder complytFileSaveFileExample() {

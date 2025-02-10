@@ -60,7 +60,7 @@ public class TransactionServiceImpl implements TransactionService {
     TransactionAmountsCollector<Transaction> transactionDiscountCollector;
 
     @NonNull
-    CityCountyProvider cityCountyProvider;
+    MatchedAddressProvider matchedAddressProvider;
 
     @NonNull
     ComplytIdHandler<Transaction> complytIdHandler;
@@ -136,7 +136,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Transaction> injectDataBySalesTaxTracking(@NonNull Transaction transaction, @NonNull SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {
         return Mono.just(transaction.setSubsidiary(salesTaxTrackingWithNexusInfo.getSalesTaxTracking().getSubsidiary()))
-                .flatMap(transactionWithAmounts -> cityCountyProvider.provide(transactionWithAmounts, salesTaxTrackingWithNexusInfo));
+                .flatMap(transactionWithAmounts -> matchedAddressProvider.provide(transactionWithAmounts, salesTaxTrackingWithNexusInfo));
     }
 
     private Mono<Transaction> injectCommonDataToTransaction(Transaction transaction) {

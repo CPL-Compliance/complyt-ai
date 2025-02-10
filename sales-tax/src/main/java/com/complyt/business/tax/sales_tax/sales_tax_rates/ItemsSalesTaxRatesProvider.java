@@ -3,6 +3,7 @@ package com.complyt.business.tax.sales_tax.sales_tax_rates;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.ShippingAddress;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ public class ItemsSalesTaxRatesProvider implements TaxableSalesTaxRatesProvider<
     @NonNull
     private SalesTaxRatesProvider salesTaxRatesProvider;
 
-    public List<Item> setSalesTaxRates(List<Item> items, SalesTaxRates salesTaxRates, Address address) {
+    public List<Item> setSalesTaxRates(List<Item> items, SalesTaxRates salesTaxRates, ShippingAddress address) {
         return items.stream()
                 .map(item -> item.withSalesTaxRates(salesTaxRatesProvider.provide(item.getJurisdictionalSalesTaxRules(), salesTaxRates, address)))
                 .collect(Collectors.toList());

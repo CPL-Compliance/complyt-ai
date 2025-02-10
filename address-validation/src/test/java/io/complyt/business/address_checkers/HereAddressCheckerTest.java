@@ -2,6 +2,8 @@ package io.complyt.business.address_checkers;
 
 import io.complyt.domain.Address;
 import io.complyt.domain.CachedAddressData;
+import io.complyt.domain.enums.FieldMatchType;
+import io.complyt.domain.enums.FieldsMatchScore;
 import io.complyt.utils.exceptions.types.ObjectNotValidException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,10 +14,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import test_utils.TestUtilities;
 
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-import static org.junit.Assert.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class HereAddressCheckerTest {
@@ -25,109 +26,197 @@ class HereAddressCheckerTest {
 
     private Address address;
     private CachedAddressData cachedAddressData;
-    private float score;
+    private List<CachedAddressData> cachedAddressDataList;
 
     @BeforeEach
     void setUp() {
         address = TestUtilities.getAddress();
         cachedAddressData = TestUtilities.getCachedAddressData();
-        score = 0.9f;
+        cachedAddressDataList = List.of(cachedAddressData);
     }
 
     @Test
-    void checkAddress_ScoreAboveAcceptable_ReturnsAddress() {
-        // When
-        cachedAddressData = cachedAddressData.withScore(score);
-        Mono<CachedAddressData> addressMono = hereAddressChecker.checkAddress(cachedAddressData, address);
-
-        // Then
-        StepVerifier.create(addressMono).expectNext(cachedAddressData).verifyComplete();
-    }
-
-    @Test
-    void checkAddress_ScoreUnacceptable_ReturnsError() {
+    void checkStateMatch_StateMatches_ReturnsData() {
         // Given
-        score = 0.1f;
-        cachedAddressData = cachedAddressData.withScore(score);
+        cachedAddressData = cachedAddressData.withAddress(address);
 
         // When
-        Mono<CachedAddressData> addressMono = hereAddressChecker.checkAddress(cachedAddressData, address);
+        Mono<CachedAddressData> result = hereAddressChecker.checkStateMatch(cachedAddressData, address);
 
         // Then
-        StepVerifier.create(addressMono).expectNextCount(0).verifyComplete();
+        StepVerifier.create(result).expectNext(cachedAddressData).verifyComplete();
     }
 
     @Test
-    void approveResponseIfZipIncludesRequestZip_zipIsNull_ReturnMonoEmpty() {
-        cachedAddressData = cachedAddressData.withZip(null).withScore(1);
-
-        // When
-        Mono<CachedAddressData> addressMono = hereAddressChecker.checkAddress(cachedAddressData, address);
-
-        // Then
-        StepVerifier.create(addressMono).expectNext(cachedAddressData.withZip(address.zip())).verifyComplete();
-    }
-
-    @Test
-    void approveResponseIfZipIncludesRequestZip_zipIsEmpty_ReturnsZip() {
-        cachedAddressData = cachedAddressData.withZip("").withScore(1);
-
-        // When
-        Mono<CachedAddressData> addressMono = hereAddressChecker.checkAddress(cachedAddressData, address);
-
-        // Then
-        StepVerifier.create(addressMono).expectNext(cachedAddressData.withZip(address.zip())).verifyComplete();
-    }
-
-    @Test
-    void approveResponseIfZipIncludesRequestZip_requestAddressStartsWithOutsource_ReturnsZip() {
+    void checkStateMatch_StateMismatch_ThrowsException() {
         // Given
-        cachedAddressData = cachedAddressData.withZip("11111").withScore(1);;
-        address = address.withZip("11111-12345");
+        FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.NO_MATCH, FieldMatchType.EXACT, FieldMatchType.EXACT,FieldMatchType.EXACT);
+        cachedAddressData = cachedAddressData.withScoring(TestUtilities.getScoring().withFieldScore(fieldsMatchScore));
+        cachedAddressData = cachedAddressData.withAddress(cachedAddressData.address().withState("DifferentState"));
 
         // When
-        Mono<CachedAddressData> addressMono = hereAddressChecker.checkAddress(cachedAddressData, address);
+        Mono<CachedAddressData> result = hereAddressChecker.checkStateMatch(cachedAddressData, address);
 
         // Then
-        StepVerifier.create(addressMono).expectNext(cachedAddressData).verifyComplete();
+        StepVerifier.create(result)
+                .expectErrorMatches(throwable -> throwable instanceof ObjectNotValidException &&
+                        throwable.getMessage().contains("ERR-ADDR-002"))
+                .verify();
     }
 
     @Test
-    void zipMismatch_OverrideZipToRequestZip_ReturnsZip() {
-        // Given
-        cachedAddressData = cachedAddressData.withZip("12345").withScore(1);;
-        address = address.withZip("11111");
-
+    void filterValidAddresses_ValidAddresses_ReturnsFilteredList() {
         // When
-        Mono<CachedAddressData> addressMono = hereAddressChecker.checkAddress(cachedAddressData, address);
+        cachedAddressData = cachedAddressData.withScoring(TestUtilities.getScoring().withScore(1));
+        Mono<List<CachedAddressData>> result = hereAddressChecker.filterValidAddresses(List.of(cachedAddressData));
 
         // Then
-        StepVerifier.create(addressMono).expectNext(cachedAddressData.withZip("11111")).verifyComplete();
+        StepVerifier.create(result)
+                .expectNextMatches(list -> !list.isEmpty() && list.contains(cachedAddressData))
+                .verifyComplete();
     }
 
+    @Test
+    void filterValidAddresses_InvalidAddresses_ReturnsEmptyList() {
+        // Given
+        cachedAddressData = cachedAddressData.withScoring(TestUtilities.getScoring().withScore(0.1));
+        cachedAddressDataList = List.of(cachedAddressData);
+
+        // When
+        Mono<List<CachedAddressData>> result = hereAddressChecker.filterValidAddresses(cachedAddressDataList);
+
+        // Then
+        StepVerifier.create(result).expectComplete().verify();
+    }
 
     @Test
-    void build_NullCachedAddressData_ThrowsException() {
+    void filterValidAddresses_EmptyList_ReturnsEmptyList() {
         // Given
-        CachedAddressData nullAddress = null;
+        List<CachedAddressData> emptyList = List.of();
 
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            hereAddressChecker.checkAddress(nullAddress, address);
+        // When
+        Mono<List<CachedAddressData>> result = hereAddressChecker.filterValidAddresses(emptyList);
+
+        // Then
+        StepVerifier.create(result)
+                .verifyComplete();
+    }
+
+    @Test
+    void isValidAddress_ValidAddress_ReturnsTrue() {
+        // When
+        cachedAddressData = cachedAddressData.withScoring(TestUtilities.getScoring().withScore(1));
+        boolean result = hereAddressChecker.isValidAddress(cachedAddressData);
+
+        // Then
+        assertTrue(result);
+    }
+
+    @Test
+    void isValidAddress_InvalidAddress_ReturnsFalse() {
+        // Given
+        CachedAddressData invalidData = cachedAddressData.withScoring(null).withAddress(null);
+
+        // When
+        boolean result = hereAddressChecker.isValidAddress(invalidData);
+
+        // Then
+        assertFalse(result);
+    }
+
+    @Test
+    void isValidAddress_NullAddress_ReturnsFalse() {
+        // When
+        boolean result = hereAddressChecker.isValidAddress(null);
+
+        // Then
+        assertFalse(result);
+    }
+
+    @Test
+    void isValidAddress_ZipNull_ReturnsFalse() {
+        // When
+        cachedAddressData = cachedAddressData.withAddress(TestUtilities.getAddress().withZip(null));
+        boolean result = hereAddressChecker.isValidAddress(cachedAddressData);
+
+        // Then
+        assertFalse(result);
+    }
+
+    @Test
+    void isValidAddress_CountyNull_ReturnsFalse() {
+        // When
+        cachedAddressData = cachedAddressData.withAddress(TestUtilities.getAddress().withCounty(null));
+        boolean result = hereAddressChecker.isValidAddress(cachedAddressData);
+
+        // Then
+        assertFalse(result);
+    }
+
+    @Test
+    public void resolveAddress_NullData_ThrowsNullPointerException() {
+        // Act & Assert
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            hereAddressChecker.checkStateMatch(null, address).block();
         });
 
-        assertEquals(nullPointerException.getMessage(), "data " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
+        // Assert
+        assertEquals("data is marked non-null but is null", exception.getMessage());
     }
-    @Test
-    void build_NullCachedAddress_ThrowsException() {
-        // Given
-        Address nullAddress = null;
 
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            hereAddressChecker.checkAddress(cachedAddressData, nullAddress);
+    @Test
+    public void resolveAddress_NullAddress_ThrowsNullPointerException() {
+        // Act & Assert
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            hereAddressChecker.checkStateMatch(cachedAddressData, null).block();
         });
 
-        assertEquals(nullPointerException.getMessage(), "requestAddress " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
+        // Assert
+        assertEquals("requestAddress is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void isValidAddress_NullItem_ShouldReturnFalse() {
+        // Given
+        CachedAddressData item = null;
+
+        // When
+        boolean result = hereAddressChecker.isValidAddress(item);
+
+        // Then
+        assertFalse(result, "Expected false when item is null");
+    }
+
+    @Test
+    void isValidAddress_NullScoring_ShouldReturnFalse() {
+        // Given
+        CachedAddressData item = new CachedAddressData(new Address("New York", "USA", "New York County", "NY", "5th Ave", "10001", false), null);
+
+        // When
+        boolean result = hereAddressChecker.isValidAddress(item);
+
+        // Then
+        assertFalse(result, "Expected false when scoring is null");
+    }
+
+    @Test
+    void isValidAddress_NullAddress_ShouldReturnFalse() {
+        // Given
+        CachedAddressData item = new CachedAddressData(null, cachedAddressData.scoring());
+
+        // When
+        boolean result = hereAddressChecker.isValidAddress(item);
+
+        // Then
+        assertFalse(result, "Expected false when address is null");
+    }
+
+    @Test
+    void isValidAddress_ValidItem_ShouldReturnTrue() {
+        // When
+        boolean result = hereAddressChecker.isValidAddress(cachedAddressData);
+
+        // Then
+        assertTrue(result, "Expected true when item, address, and scoring are valid");
     }
 }

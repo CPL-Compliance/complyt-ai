@@ -2376,7 +2376,13 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectBody(LinkedHashMap.class)
                 .value(transaction -> {
                     assertEquals(((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("salesTaxRates")).get("taxRate"), expectedRate);
-                    assertNotNull(((LinkedHashMap) transaction.get("shippingAddress")).get("county"), "County Can not be null");
+                    assertNotNull(
+                            ((LinkedHashMap) ((LinkedHashMap) ((LinkedHashMap) transaction.get("shippingAddress"))
+                                    .get("matchedAddressData"))
+                                    .get("address"))
+                                    .get("county"),
+                            "County cannot be null"
+                    );
                 });
     }
 
@@ -2404,7 +2410,13 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectBody(LinkedHashMap.class)
                 .value(transaction -> {
                     assertEquals(0.08, ((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("salesTaxRates")).get("taxRate"));
-                    assertNotNull(((LinkedHashMap) transaction.get("shippingAddress")).get("county"), "County Can not be null");
+                    assertNotNull(
+                            ((LinkedHashMap) ((LinkedHashMap) ((LinkedHashMap) transaction.get("shippingAddress"))
+                                    .get("matchedAddressData"))
+                                    .get("address"))
+                                    .get("county"),
+                            "County cannot be null"
+                    );
                 });
     }
 }

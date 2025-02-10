@@ -4,6 +4,7 @@ import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.TaxRules;
 import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.ShippingAddress;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -28,7 +29,7 @@ public class SalesTaxRatesProvider {
      * We must make sure that State rates are always being calculated before city's rate
      * so there won't be a tax rate override
      */
-    public SalesTaxRates provide(@NonNull JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, @NonNull SalesTaxRates originalSalesTaxRate, @NonNull Address address) {
+    public SalesTaxRates provide(@NonNull JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, @NonNull SalesTaxRates originalSalesTaxRate, @NonNull ShippingAddress address) {
         SalesTaxRates calculatedRates = stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRules, originalSalesTaxRate);
 
         if (jurisdictionalSalesTaxRules.getCities() != null && jurisdictionalSalesTaxRules.getCities().containsKey(address.city())) {
