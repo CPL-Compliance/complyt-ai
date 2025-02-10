@@ -241,21 +241,21 @@ jobs:
       
       ## Deploy to production cluster
       - aws-ecs/update_service:
-          cluster: "production"
+          cluster: "prod-1"
           container_image_name_updates: "container=<<parameters.service_name>>, tag=${IMAGE_TAG}"
-          family: "<<parameters.service_name>>-production"
+          family: "<<parameters.service_name>>-prod-1"
           service_name: "<<parameters.service_name>>"
       ## Deploy to demo cluster
       - aws-ecs/update_service:
-          cluster: "demo"
+          cluster: "demo-1"
           container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
-          family: "<<parameters.service_name>>-demo"
+          family: "<<parameters.service_name>>-demo-1"
           service_name: "<<parameters.service_name>>"
       ## Deploy to sandbox cluster
       - aws-ecs/update_service:
-          cluster: "sandbox"
+          cluster: "sandbox-1"
           container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
-          family: "<<parameters.service_name>>-sandbox"
+          family: "<<parameters.service_name>>-sandbox-1"
           service_name: "<<parameters.service_name>>"
 
 workflows:
