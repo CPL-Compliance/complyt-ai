@@ -10,7 +10,7 @@ public interface GenericErrorMessages {
 
     String ZIP_CODE_MISMATCH =  ZIP_CODE_MISMATCH_ERROR + ": The ZIP code you provided (%s) does not match the address entered. Did you mean ZIP code %s for the address '%s'?";
 
-    String STATE_CODE_MISMATCH =  ZIP_CODE_MISMATCH_ERROR + ": The state you provided (%s) does not match the address entered. The expected state for this address is'%s'.";
+    String STATE_CODE_MISMATCH =  ZIP_CODE_MISMATCH_ERROR + ": The state you provided (%s) does not match the address entered. The expected state for this address is '%s'.";
 
     String ZIP_FORMAT_INVALID = "The ZIP code you provided is invalid. Please enter a valid ZIP code in either the 5-digit format (e.g., 12345) or the 9-digit format with a hyphen (e.g., 12345-6789).";
 
