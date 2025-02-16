@@ -96,7 +96,7 @@ public class GoogleStorageWrapper extends StorageWrapperBase {
 
         String fullPath = fullPathBuilder.toString();
         BlobId blobId = BlobId.of(bucketName, fullPath);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setMetadata(complytFile.getMetadata().metadata()).build();
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentDisposition("filename=" + complytFile.getFile().filename()).setMetadata(complytFile.getMetadata().metadata()).build();
         return ContextLogger.observeCtx("GoogleStorageWrapper -> saveFile " + fullPath, log::info).then(fileContentToByteArray(complytFile.getFile().content())
                 .flatMap(bytes -> Mono.fromCallable(() -> storage.create(blobInfo, bytes)))
                 .map(blob -> new ComplytFileMetadata(
