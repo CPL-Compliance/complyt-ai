@@ -60,6 +60,12 @@ import java.lang.annotation.Target;
                                         description = "Address street",
                                         examples = @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.streetExample,
                                                 name = GetSalesTaxRatesByAddressApiInfo.streetExample)),
+                                @Parameter(in = ParameterIn.QUERY,
+                                        name = "detailed",
+                                        description = "Indication to include the rates' metadata",
+                                        schema = @Schema(type = "boolean"),
+                                        examples = @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.detailed,
+                                                name = GetSalesTaxRatesByAddressApiInfo.detailed)),
 
                         },
                         tags = "sales_tax_rates",
@@ -105,6 +111,9 @@ public @interface GetSalesTaxRatesByAddressApiInfo {
     String streetExample = "541 6th Ave";
     String zipExample = "10011";
 
+    String detailed = "true";
+
+
     String complytSalesTaxRatesExample = """
             {
                 "complytId": "ccf486cc-9773-4081-8838-006a0f97d673",
@@ -144,7 +153,33 @@ public @interface GetSalesTaxRatesByAddressApiInfo {
                     "spdRate": 0,
                     "otherRate": 0,
                     "taxRate": 0.0825
-                }
+                },
+                  "ratesMetaData": {
+                    "recordType": "Z",
+                    "stateAbbrev": "TX",
+                    "stateUseTax": ".040000",
+                    "countyUseTax": ".020000",
+                    "cityUseTax": ".040000",
+                    "mtaUseTax": ".000000",
+                    "spdUseTax": ".000000",
+                    "other1UseTax": ".000000",
+                    "other2UseTax": ".000000",
+                    "other3UseTax": ".000000",
+                    "other4UseTax": ".000000",
+                    "totalUseTax": ".100000",
+                    "countyRptCode": "7059",
+                    "cityRptCode": "9671",
+                    "taxShippingAlone": "Y",
+                    "taxShippingAndHandlingTogether": "Y",
+                    "fipsState": "01",
+                    "fipsCounty": "115",
+                    "fipsCity": "51096",
+                    "fipsGeocode": "0111551096",
+                    "countyTaxCollectedBy": "County of Travis",
+                    "cityTaxCollectedBy": "State of TEXAS",
+                    "countyTaxableMax": "N",
+                    "cityTaxableMax": "N"
+                    }
             }
             """;
 }

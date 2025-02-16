@@ -63,6 +63,7 @@ import java.lang.annotation.Target;
                                 )
                         }))
 })
+
 public @interface DeleteFilesApiInfo {
     String complytFileMetadataExample = "{\n" +
             "        \"complytId\": \"143431c4-cdd6-4d01-95bc-cd5b17eedfc8\",\n" +
