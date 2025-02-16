@@ -31,12 +31,11 @@ public class InternalSalesTaxRatesFacade implements SalesTaxRatesFacade<Internal
 
 
     @Override
-    public Mono<SalesTaxRatesData> validateAddress(@NonNull AddressWithDate addressWithDate) {
+    public Mono<SalesTaxRatesData> validateAddress(@NonNull AddressWithDate addressWithDate, Boolean detailed) {
         return addressValidationService.validate(addressWithDate.getAddress())
                 .flatMap(matchedAddress -> findByAddress(addressWithDate.withAddress(matchedAddress.address()))
-                        .map(salesTaxRates -> CommonSalesTaxRatesToSalesTaxRatesMapper.INSTANCE.map(addressWithDate, matchedAddress, salesTaxRates)));
+                        .map(salesTaxRates -> CommonSalesTaxRatesToSalesTaxRatesMapper.INSTANCE.map(addressWithDate, matchedAddress, salesTaxRates, detailed)));
     }
-
 
     public Mono<InternalSalesTaxRates> save(@NonNull InternalSalesTaxRates internalSalesTaxRates) {
         return internalSalesTaxRatesService.save(internalSalesTaxRates);

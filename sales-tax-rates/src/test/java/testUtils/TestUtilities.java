@@ -27,6 +27,7 @@ import com.complyt.v1.model.gt.GtRatesDto;
 import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalAddressDto;
 import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalRateDto;
 import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalSalesTaxRatesDto;
+import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalSalesTaxRatesMetaDataDto;
 import feign.FeignException;
 import feign.Request;
 import org.bson.Document;
@@ -51,7 +52,11 @@ public interface TestUtilities {
     }
 
     static SalesTaxRatesData createSalesTaxRatesData() {
-        return new SalesTaxRatesData(null, TestUtilities.createAddressInCaliforniaWithCreationDate(), createMatchedAddressInCalifornia(), createCommonRates(), SalesTaxSources.FAST_SALES_TAX);
+        return new SalesTaxRatesData(null, TestUtilities.createAddressInCaliforniaWithCreationDate(), createMatchedAddressInCalifornia(), createCommonRates(), SalesTaxSources.FAST_SALES_TAX, null);
+    }
+
+    static SalesTaxRatesData createSalesTaxRatesDataWithMetadata() {
+        return new SalesTaxRatesData(null, TestUtilities.createAddressInCaliforniaWithCreationDate(), createMatchedAddressInCalifornia(), createCommonRates(), SalesTaxSources.FAST_SALES_TAX, createStubInternalSalesTaxRatesMetaData());
     }
 
     static AddressWithDate createAddressInCaliforniaWithCreationDate() {
@@ -144,7 +149,13 @@ public interface TestUtilities {
     static CommonSalesTaxRates createExternalCommonSalesTaxRates() {
         CommonAddress commonAddress = new CommonAddress("California", null, "Fresno", null, false, "12345", 0, 0, "", true);
         CommonRates commonRates = createCommonRates();
-        return new CommonSalesTaxRates(UUID.randomUUID(), commonAddress, commonRates, SalesTaxSources.FAST_SALES_TAX);
+        return new CommonSalesTaxRates(UUID.randomUUID(), commonAddress, commonRates, SalesTaxSources.FAST_SALES_TAX, null);
+    }
+
+    static CommonSalesTaxRates createExternalCommonSalesTaxRatesWithMetadata() {
+        CommonAddress commonAddress = new CommonAddress("California", null, "Fresno", null, false, "12345", 0, 0, "", true);
+        CommonRates commonRates = createCommonRates();
+        return new CommonSalesTaxRates(UUID.randomUUID(), commonAddress, commonRates, SalesTaxSources.FAST_SALES_TAX, createStubInternalSalesTaxRatesMetaData());
     }
 
     static InternalSalesTaxRates createInternalSalesTaxRates(LocalDateTime dateTime, UUID uuid) {
@@ -477,4 +488,91 @@ public interface TestUtilities {
                         Map.of("Authorization", List.of("Dummy Bearer")),
                         null, null, null), null, Map.of("Authorization", List.of("Dummy Bearer")));
     }
+
+    static InternalSalesTaxRatesMetaData createStubInternalSalesTaxRatesMetaData(){
+        return new InternalSalesTaxRatesMetaData(
+                "MTA",                        // recordType
+                "SPD",                        // stateAbbrev
+                "Other1",                     // stateUseTax
+                "Other2",                     // countyUseTax
+                "Other3",                     // cityUseTax
+                "mtaUseTax",                  // mtaUseTax (new field, value identical to name)
+                "spdUseTax",                  // spdUseTax (new field, value identical to name)
+                "other1UseTax",               // other1UseTax (new field, value identical to name)
+                "other2UseTax",               // other2UseTax (new field, value identical to name)
+                "other3UseTax",               // other3UseTax (new field, value identical to name)
+                "other4UseTax",               // other4UseTax (new field, value identical to name)
+                "44444",                      // totalUseTax
+                "06",                         // countyRptCode
+                "037",                        // cityRptCode
+                "mtaName",                    // mtaName (new field, value identical to name)
+                "0603744000",                 // mtaNumber
+                "spdName",                    // spdName (new field, value identical to name)
+                "100000",                     // spdNumber
+                "other1Name",                 // other1Name (new field, value identical to name)
+                "2%",                         // other1Number
+                "other2Name",                 // other2Name (new field, value identical to name)
+                "50000",                      // other2Number
+                "other3Name",                 // other3Name (new field, value identical to name)
+                "1%",                         // other3Number
+                "other4Name",                 // other4Name (new field, value identical to name)
+                "Yes",                        // other4Number
+                "taxShippingAlone",           // taxShippingAlone (new field, value identical to name)
+                "taxShippingAndHandlingTogether", // taxShippingAndHandlingTogether (new field, value identical to name)
+                "06",                         // fipsState
+                "037",                        // fipsCounty
+                "44000",                      // fipsCity
+                "0603744000",                 // fipsGeocode
+                "countyTaxCollectedBy",       // countyTaxCollectedBy (new field, value identical to name)
+                "cityTaxCollectedBy",         // cityTaxCollectedBy (new field, value identical to name)
+                "countyTaxableMax",           // countyTaxableMax (new field, value identical to name)
+                "countyTaxOverMax",           // countyTaxOverMax (new field, value identical to name)
+                "cityTaxableMax",             // cityTaxableMax (new field, value identical to name)
+                "cityTaxOverMax"               // cityTaxOverMax (new field, value identical to name)
+        );
+    }
+
+    static InternalSalesTaxRatesMetaDataDto createStubInternalSalesTaxRatesMetaDataDto(){
+        return new InternalSalesTaxRatesMetaDataDto(
+                "MTA",                        // recordType
+                "SPD",                        // stateAbbrev
+                "Other1",                     // stateUseTax
+                "Other2",                     // countyUseTax
+                "Other3",                     // cityUseTax
+                "mtaUseTax",                  // mtaUseTax (new field, value identical to name)
+                "spdUseTax",                  // spdUseTax (new field, value identical to name)
+                "other1UseTax",               // other1UseTax (new field, value identical to name)
+                "other2UseTax",               // other2UseTax (new field, value identical to name)
+                "other3UseTax",               // other3UseTax (new field, value identical to name)
+                "other4UseTax",               // other4UseTax (new field, value identical to name)
+                "44444",                      // totalUseTax
+                "06",                         // countyRptCode
+                "037",                        // cityRptCode
+                "mtaName",                    // mtaName (new field, value identical to name)
+                "0603744000",                 // mtaNumber
+                "spdName",                    // spdName (new field, value identical to name)
+                "100000",                     // spdNumber
+                "other1Name",                 // other1Name (new field, value identical to name)
+                "2%",                         // other1Number
+                "other2Name",                 // other2Name (new field, value identical to name)
+                "50000",                      // other2Number
+                "other3Name",                 // other3Name (new field, value identical to name)
+                "1%",                         // other3Number
+                "other4Name",                 // other4Name (new field, value identical to name)
+                "Yes",                        // other4Number
+                "taxShippingAlone",           // taxShippingAlone (new field, value identical to name)
+                "taxShippingAndHandlingTogether", // taxShippingAndHandlingTogether (new field, value identical to name)
+                "06",                         // fipsState
+                "037",                        // fipsCounty
+                "44000",                      // fipsCity
+                "0603744000",                 // fipsGeocode
+                "countyTaxCollectedBy",       // countyTaxCollectedBy (new field, value identical to name)
+                "cityTaxCollectedBy",         // cityTaxCollectedBy (new field, value identical to name)
+                "countyTaxableMax",           // countyTaxableMax (new field, value identical to name)
+                "countyTaxOverMax",           // countyTaxOverMax (new field, value identical to name)
+                "cityTaxableMax",             // cityTaxableMax (new field, value identical to name)
+                "cityTaxOverMax"               // cityTaxOverMax (new field, value identical to name)
+        );
+    }
+
 }

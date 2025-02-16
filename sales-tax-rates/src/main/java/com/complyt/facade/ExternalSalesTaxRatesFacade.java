@@ -19,9 +19,9 @@ public class ExternalSalesTaxRatesFacade implements SalesTaxRatesFacade<ComplytS
     SalesTaxRatesService<ComplytSalesTaxRates> externalSalesTaxRatesService;
 
     @Override
-    public Mono<SalesTaxRatesData> validateAddress(@NonNull AddressWithDate requestAddressWithDate) {
+    public Mono<SalesTaxRatesData> validateAddress(@NonNull AddressWithDate requestAddressWithDate, Boolean detailed) {
         return addressValidationService.validate(requestAddressWithDate.getAddress())
                 .flatMap(matchedAddress -> externalSalesTaxRatesService.findByAddress(requestAddressWithDate.withAddress(matchedAddress.address()))
-                .map(salesTaxRates -> CommonSalesTaxRatesToSalesTaxRatesMapper.INSTANCE.map(requestAddressWithDate, matchedAddress, salesTaxRates)));
+                .map(salesTaxRates -> CommonSalesTaxRatesToSalesTaxRatesMapper.INSTANCE.map(requestAddressWithDate, matchedAddress, salesTaxRates, detailed)));
     }
 }

@@ -2,6 +2,7 @@ package com.complyt.domain.common_rates;
 
 
 import com.complyt.domain.enums.SalesTaxSources;
+import com.complyt.domain.internal_rates.InternalSalesTaxRatesMetaData;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.With;
 
@@ -14,5 +15,5 @@ import java.util.UUID;
  */
 @With
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record CommonSalesTaxRates(UUID complytId, CommonAddress address, CommonRates salesTaxRates, SalesTaxSources source) {
+public record CommonSalesTaxRates(UUID complytId, CommonAddress address, CommonRates salesTaxRates, SalesTaxSources source, InternalSalesTaxRatesMetaData ratesMetaData) {
 }

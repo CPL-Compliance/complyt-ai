@@ -32,7 +32,7 @@ import testUtils.TestUtilities;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -95,6 +95,43 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
                 .value(salesTaxRatesDataDto -> {
                     assertEquals(matchedAddressData, salesTaxRatesDataDto.matchedAddressData());
                     assertEquals(stubInternalTaxSalesTaxRates, salesTaxRatesDataDto.salesTaxRates());
+                    assertNull(salesTaxRatesDataDto.ratesMetaData());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void findAddress_InternalRateFound_DateBeforeMaxEffectiveDateAndDetailedTrue_Return200() {
+        // Given
+        AddressDto stubInternalRatesDto = TestUtilities.createStubInternalTaxAddressDto();
+        Address address = new Address(stubInternalRatesDto.city(), stubInternalRatesDto.country(), stubInternalRatesDto.county(), stubInternalRatesDto.state(), stubInternalRatesDto.street(), stubInternalRatesDto.zip(), false);
+        requestedTime = LocalDateTime.parse("2021-01-01T00:00:00.000");
+        MatchedAddressData matchedAddressData = TestUtilities.createMatchedAddressInCalifornia().withAddress(address);
+
+        SalesTaxRatesDto stubInternalTaxSalesTaxRates = TestUtilities.createStubInternalTax_SalesTaxRatesDto(BigDecimal.valueOf(0.1));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
+                        .queryParam("country", stubInternalRatesDto.country())
+                        .queryParam("state", stubInternalRatesDto.state())
+                        .queryParam("city", stubInternalRatesDto.city())
+                        .queryParam("street", stubInternalRatesDto.street())
+                        .queryParam("zip", stubInternalRatesDto.zip())
+                        .queryParam("effectiveDate", requestedTime)
+                        .queryParam("detailed", true)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxRatesDataDto.class)
+                .value(salesTaxRatesDataDto -> {
+                    assertEquals(matchedAddressData, salesTaxRatesDataDto.matchedAddressData());
+                    assertEquals(stubInternalTaxSalesTaxRates, salesTaxRatesDataDto.salesTaxRates());
+                    assertNotNull(salesTaxRatesDataDto.ratesMetaData());
                 });
     }
 

@@ -22,6 +22,7 @@ public interface InternalRatesToCommonRatesMapper {
     @Mapping(target = "salesTaxRates", source = "salesTaxRates", qualifiedByName = "mapSalesTaxRatesWithOtherSum")
     @Mapping(target = "address", source = "address")
     @Mapping(target = "source", expression = "java(SalesTaxSources.FAST_SALES_TAX)")
+    @Mapping(target = "ratesMetaData", source = "internalSalesTaxRatesMetaData")
     CommonSalesTaxRates map(InternalSalesTaxRates internalSalesTaxRates);
 
     // Custom method to map InternalRates to CommonRates and calculate the sum of other1-4

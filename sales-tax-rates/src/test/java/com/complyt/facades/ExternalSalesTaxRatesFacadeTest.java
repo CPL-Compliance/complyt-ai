@@ -44,7 +44,7 @@ public class ExternalSalesTaxRatesFacadeTest {
         when(complytSalesTaxRatesService.findByAddress(addressWithTransactionDate)).thenReturn(Mono.just(expectedCommonSalesTaxRatesFacade));
         when(addressValidationService.validate(addressWithTransactionDate.getAddress())).thenReturn(Mono.just(salesTaxRatesData.matchedAddressData()));
 
-        Mono<SalesTaxRatesData> complytSalesTaxRatesMono = complytSalesTaxRatesFacade.validateAddress(addressWithTransactionDate);
+        Mono<SalesTaxRatesData> complytSalesTaxRatesMono = complytSalesTaxRatesFacade.validateAddress(addressWithTransactionDate, false);
         // Then
         StepVerifier.create(complytSalesTaxRatesMono).expectNext(salesTaxRatesData).verifyComplete();
     }
@@ -55,7 +55,7 @@ public class ExternalSalesTaxRatesFacadeTest {
         AddressWithDate nullAddress = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> complytSalesTaxRatesFacade.validateAddress(nullAddress));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> complytSalesTaxRatesFacade.validateAddress(nullAddress, false));
 
         assertEquals(nullPointerException.getMessage(), "requestAddressWithDate " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }

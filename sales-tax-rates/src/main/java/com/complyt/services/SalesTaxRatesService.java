@@ -9,4 +9,5 @@ import reactor.core.publisher.Mono;
 public interface SalesTaxRatesService<S extends TaxRates> {
     Mono<CommonSalesTaxRates> findByAddress(@NonNull AddressWithDate addressWithDate);
     Mono<S> save(@NonNull S taxRate);
+
 }
