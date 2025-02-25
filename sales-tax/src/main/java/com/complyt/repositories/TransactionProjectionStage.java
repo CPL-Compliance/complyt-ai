@@ -50,6 +50,8 @@ public interface TransactionProjectionStage {
         add("exchangeRateInfo.fxRate");
         add("exchangeRateInfo.fromCurrency");
         add("exchangeRateInfo.toCurrency");
+        add("isRefundLinked");
+        add("refundLinkedPercentage");
     }};
 
     static Document projectionStageDocument() {
