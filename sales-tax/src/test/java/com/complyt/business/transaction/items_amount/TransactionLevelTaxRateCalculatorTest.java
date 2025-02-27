@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 public class TransactionLevelTaxRateCalculatorTest {
 
-    private UnitTestUtilities testUtilities;
     @InjectMocks
     private TransactionLevelTaxRateCalculator transactionLevelTaxRateCalculator;
 
@@ -41,6 +40,5 @@ public class TransactionLevelTaxRateCalculatorTest {
         // Then
         assertEquals("transaction is marked non-null but is null", exception.getMessage());
     }
-
-
+        
 }
