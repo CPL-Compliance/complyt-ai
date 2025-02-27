@@ -20,13 +20,13 @@ import java.util.Objects;
 public class TransactionLevelTaxRateCalculator implements AmountCalculator<Transaction> {
 
     @NonNull
-    private CollectionBuilder<Taxable> taxableCollectionBuilder;
+    CollectionBuilder<Taxable> taxableCollectionBuilder;
 
     @NonNull
     AmountCalculator<List<Taxable>> totalItemsAmountCalculator;
 
     @Override
-    public BigDecimal calculate(Transaction transaction, Boolean isTaxInclusive) {
+    public BigDecimal calculate(@NonNull Transaction transaction, Boolean isTaxInclusive) {
         List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transaction);
         BigDecimal totalItemsAmount = totalItemsAmountCalculator.calculate(taxables, transaction.getIsTaxInclusive());
 
