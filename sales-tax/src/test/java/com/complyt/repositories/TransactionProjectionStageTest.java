@@ -1,18 +1,13 @@
 package com.complyt.repositories;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.bson.Document;
 import org.junit.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@ExtendWith(SpringExtension.class)
-@ExtendWith(MockitoExtension.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class TransactionProjectionStageTest {
     ArrayList<String> expectedPropertiesList = new ArrayList<>() {{
         add("complytId");
@@ -56,6 +51,8 @@ public class TransactionProjectionStageTest {
         add("exchangeRateInfo.fxRate");
         add("exchangeRateInfo.fromCurrency");
         add("exchangeRateInfo.toCurrency");
+        add("isRefundLinked");
+        add("refundLinkedPercentage");
     }};
 
     @Test
@@ -111,4 +108,5 @@ public class TransactionProjectionStageTest {
 
         assertEquals(itemsDocument, TransactionProjectionStage.itemsMapAddFeildStageDocument());
     }
+
 }

@@ -24,7 +24,7 @@ public class UsaAddressExemptionListGenerator implements ExemptionListGenerator 
                 exemptionList.add(exemptionWrapper.exemption().withState(state));
             }
 
-            return ContextLogger.observeCtx("Created Exemptions list: " + exemptionList, log::info)
+            return ContextLogger.observeCtx("Creating Exemptions list: " + exemptionList, log::info)
                     .thenMany(Flux.fromIterable(exemptionList));
         };
     }
