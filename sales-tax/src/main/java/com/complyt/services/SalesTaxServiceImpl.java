@@ -64,7 +64,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
                 .flatMap(complytInternalRates -> (Mono<Transaction>) transactionRatesInjectionStrategy.select(transaction).apply(Pair.with(complytInternalRates, isExempt)));
     }
 
-    public Mono<Transaction> calculateTransactionLevelTaxRate(@NonNull Transaction transaction) {
+    private Mono<Transaction> calculateTransactionLevelTaxRate(Transaction transaction) {
         if (transaction.getSalesTax() != null) {
             BigDecimal transactionLevelTaxRate = transactionLevelTaxRateCalculator.calculate(transaction, transaction.getIsTaxInclusive());
             SalesTax salesTax = transaction.getSalesTax().withRate(transactionLevelTaxRate);

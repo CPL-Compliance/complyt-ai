@@ -26,7 +26,7 @@ public class TransactionLevelTaxRateCalculator implements AmountCalculator<Trans
     AmountCalculator<List<Taxable>> totalItemsAmountCalculator;
 
     @Override
-    public BigDecimal calculate(@NonNull Transaction transaction, Boolean isTaxInclusive) {
+    public BigDecimal calculate(Transaction transaction, Boolean isTaxInclusive) {
         List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transaction);
         BigDecimal totalItemsAmount = totalItemsAmountCalculator.calculate(taxables, transaction.getIsTaxInclusive());
 
