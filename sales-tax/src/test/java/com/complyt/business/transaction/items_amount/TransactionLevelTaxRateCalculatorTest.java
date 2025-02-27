@@ -18,7 +18,6 @@ import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,7 +38,6 @@ public class TransactionLevelTaxRateCalculatorTest {
     AmountCalculator<List<Taxable>> totalItemsAmountCalculator;
 
     private Transaction transaction;
-    private List<Taxable> items;
     private UnitTestUtilities testUtilities;
 
     @BeforeEach
@@ -47,7 +45,6 @@ public class TransactionLevelTaxRateCalculatorTest {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(new ObjectId().toString())
                 .withSalesTax(new SalesTax(null, BigDecimal.valueOf(10), BigDecimal.valueOf(0.01), null, null));
-        items = new ArrayList<>(transaction.getItems());
     }
 
     @Test
