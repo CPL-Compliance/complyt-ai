@@ -1,12 +1,8 @@
 package com.complyt.services;
 
-import com.complyt.business.builder.TaxableCollectionBuilder;
 import com.complyt.business.strategy.StrategySelector;
-import com.complyt.business.tax.gt.TransactionGtRatesHandler;
-import com.complyt.business.tax.sales_tax.sales_tax_amount.SalesTaxAggregator;
-import com.complyt.business.tax.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
-import com.complyt.business.tax.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
 import com.complyt.business.transaction.RefundTransactionProcessor;
+import com.complyt.business.transaction.items_amounts.AmountCalculator;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.SalesTaxTracking;
@@ -46,31 +42,19 @@ public class SalesTaxServiceImplTest {
     SalesTaxServiceImpl salesTaxService;
 
     @Mock
-    StubComplytSalesTaxRatesClientWrapper complytSalesTaxRatesClientWrapper;
-
-    @Mock
     ExemptionService exemptionService;
-
-    @Mock
-    SalesTaxAggregator salesTaxAggregator;
-
-    @Mock
-    TransactionSalesTaxRatesHandler transactionSalesTaxRatesHandler;
-
-    @Mock
-    TransactionGtRatesHandler transactionGstRatesHandler;
-
-    @Mock
-    RefundTransactionProcessor refundTransactionProcessor;
-
-    @Mock
-    TaxableCollectionBuilder taxableCollectionBuilder;
 
     @Mock
     StrategySelector salesTaxRatesWrapperStrategy;
 
     @Mock
     StrategySelector transactionRatesInjectionStrategy;
+
+    @Mock
+    RefundTransactionProcessor refundTransactionProcessor;
+
+    @Mock
+    AmountCalculator<Transaction> transactionLevelTaxRateCalculator;
 
     Transaction transaction;
     Customer customer;
@@ -215,11 +199,14 @@ public class SalesTaxServiceImplTest {
         Transaction invoice = transaction.withTransactionType(TransactionType.INVOICE).withExternalId(externalIdOfTheInvoice)
                 .withSalesTax(salesTax);
 
-        Transaction expectedRefund = refund.withSalesTax(invoice.getSalesTax());
+        BigDecimal expectedRate = BigDecimal.valueOf(0.08);
+        Transaction expectedRefund = refund.withSalesTax(invoice.getSalesTax())
+                .withSalesTax(invoice.getSalesTax().withRate(expectedRate));
 
         // When
         when(refundTransactionProcessor.isLinkedRefundFromAnInvoice(refund)).thenReturn(true);
         when(refundTransactionProcessor.setInvoiceSalesTaxToLinkedRefund(refund)).thenReturn(Mono.just(refund.withSalesTax(invoice.getSalesTax())));
+        when(transactionLevelTaxRateCalculator.calculate(expectedRefund, expectedRefund.getIsTaxInclusive())).thenReturn(expectedRate);
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(refund, tracking, customer);
 
         // Then
