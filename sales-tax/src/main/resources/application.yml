@@ -7,11 +7,6 @@ spring.profiles.active:
   - @activeCurrencyClient@
   - @activeVatValidationClient@
 
-#  - development
-#  - complytStubTax
-#  - complytStubCurrency
-#  - stubVatValidation
-
 # Eureka HealthCheck
 # Make sure that a microservice will not be listed 'UP' in eureka before it passes the healthcheck.
 # Will mark it as 'UP' after it's ready to serve requests.
