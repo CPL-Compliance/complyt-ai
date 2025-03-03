@@ -43,6 +43,12 @@ public class SalesTaxTrackingFacade {
                 .flatMap(recalculateCurrentNexusSummaryIfNeeded());
     }
 
+    public Function<SalesTaxTracking, Mono<LocalDateTime>>  findSalesTaxDate() {
+        return salesTaxTracking -> salesTaxTracking.getEconomicNexusTracker().isEstablished()
+                ? Mono.just(salesTaxTracking.getAppliedDate())
+                : Mono.just(salesTaxTracking.getEconomicNexusTracker().getEstablishedDate());
+    }
+
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull SalesTaxTracking originalSalesTaxTracking) {
         return salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, originalSalesTaxTracking)
                 .flatMap(salesTaxTrackingService::addClientAndStateDetails)
@@ -65,6 +71,8 @@ public class SalesTaxTrackingFacade {
         return salesTaxTrackingService.findAll(page, size, filterMap, sortOrder, sortBy)
                 .flatMapSequential(recalculateCurrentNexusSummaryIfNeeded());
     }
+
+
 
     private Function<SalesTaxTracking, Mono<SalesTaxTracking>> recalculateCurrentNexusSummaryIfNeeded() {
         return salesTaxTracking -> salesTaxTracking.getNexusStateRule() != null
