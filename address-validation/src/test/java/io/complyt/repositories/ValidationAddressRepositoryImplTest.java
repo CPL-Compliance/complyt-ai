@@ -4,6 +4,7 @@ import io.complyt.business.collection_fetcher.UsaStatesMap;
 import io.complyt.domain.Address;
 import io.complyt.domain.UnitedStatesAddressQueryBuilder;
 import io.complyt.domain.ValidatedAddress;
+import io.complyt.security.TenantResolver;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,6 +32,9 @@ public class ValidationAddressRepositoryImplTest {
     @Mock
     private UnitedStatesAddressQueryBuilder unitedStatesAddressQueryBuilder;
 
+    @Mock
+    TenantResolver tenantResolver;
+
     private final Address address = TestUtilities.getAddress();
     private final ValidatedAddress validatedAddress = TestUtilities.getValidatedAddress();
     private final String collection = UsaStatesMap.statesToCollections.get(address.state());
@@ -40,6 +44,7 @@ public class ValidationAddressRepositoryImplTest {
     void saveAddress_ValidAddress_ReturnsSavedAddress() {
         when(reactiveMongoTemplate.save(validatedAddress, collection))
                 .thenReturn(Mono.just(validatedAddress));
+        when(tenantResolver.resolve()).thenReturn(Mono.just("12345"));
 
         StepVerifier.create(validationAddressRepository.saveAddress(validatedAddress))
                 .expectNext(validatedAddress)
@@ -52,6 +57,7 @@ public class ValidationAddressRepositoryImplTest {
         when(unitedStatesAddressQueryBuilder.build(address)).thenReturn(query);
         when(reactiveMongoTemplate.findOne(query, ValidatedAddress.class, collection))
                 .thenReturn(Mono.just(validatedAddress));
+        when(tenantResolver.resolve()).thenReturn(Mono.just("12345"));
 
         StepVerifier.create(validationAddressRepository.findAddress(address))
                 .expectNext(validatedAddress)
@@ -64,6 +70,7 @@ public class ValidationAddressRepositoryImplTest {
         when(unitedStatesAddressQueryBuilder.build(address)).thenReturn(query);
         when(reactiveMongoTemplate.findOne(query, ValidatedAddress.class, collection))
                 .thenReturn(Mono.empty());
+        when(tenantResolver.resolve()).thenReturn(Mono.just("12345"));
 
         StepVerifier.create(validationAddressRepository.findAddress(address))
                 .verifyComplete();

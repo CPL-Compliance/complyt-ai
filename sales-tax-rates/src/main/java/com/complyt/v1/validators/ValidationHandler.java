@@ -3,6 +3,7 @@ package com.complyt.v1.validators;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.exceptions.types.MissingBodyApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
+import com.complyt.v1.exceptions.types.PathVariableErrorException;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 @AllArgsConstructor
@@ -44,6 +47,23 @@ public class ValidationHandler<T, U extends Validator> {
 
     @NonNull
     ShouldCallValidate shouldCallValidate;
+
+    public Mono<T> handle(final ServerRequest serverRequest) {
+        return validateQueryParam(serverRequest)
+                .then(Mono.defer(() -> shouldCallValidate.apply(serverRequest) ? validate(serverRequest) : Mono.empty()));
+    }
+
+    private Mono<Boolean> validateQueryParam(final ServerRequest serverRequest) {
+        return queryParamChecksProvider.doesParamExist(serverRequest)
+                .then(Flux.fromIterable(serverRequest.queryParams().entrySet())
+                        .flatMap(entry -> Flux.fromIterable(entry.getValue())
+                                .flatMap(paramValue -> queryParamChecksProvider.getFunctionCheck(entry.getKey())
+                                        .flatMapMany(check -> check.apply(paramValue))))
+                        .collectList()
+                        .flatMap(errorList -> errorList.isEmpty() ? Mono.just(true) :
+                                Mono.error(new PathVariableErrorException(errorList))))
+                .switchIfEmpty(Mono.just(true));
+    }
 
     public Mono<T> validate(final ServerRequest serverRequest) {
         return validateRequestBody(serverRequest)

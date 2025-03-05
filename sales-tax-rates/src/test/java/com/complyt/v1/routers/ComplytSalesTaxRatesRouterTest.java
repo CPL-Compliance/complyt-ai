@@ -3,7 +3,10 @@ package com.complyt.v1.routers;
 import com.complyt.config.SecurityConfig;
 import com.complyt.domain.AddressWithDate;
 import com.complyt.domain.SalesTaxRatesData;
+import com.complyt.domain.enums.RatesStatus;
+import com.complyt.domain.internal_rates.InternalSalesTaxRates;
 import com.complyt.facade.InternalSalesTaxRatesFacade;
+import com.complyt.services.AddressValidationService;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
@@ -12,12 +15,18 @@ import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handler.ComplytSalesTaxRatesHandler;
 import com.complyt.v1.mappers.AddressWithDateMapper;
+import com.complyt.v1.mappers.InternalSalesTaxRatesMapper;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.AddressWithDateDto;
 import com.complyt.v1.model.common_sales_tax_rates.SalesTaxRatesDataDto;
 import com.complyt.v1.model.common_sales_tax_rates.SalesTaxRatesDto;
+import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalSalesTaxRatesDto;
 import com.complyt.v1.router.ComplytSalesTaxRatesRouter;
+import com.complyt.v1.validators.ValidationHandler;
+import com.complyt.v1.validators.body_checkers.InternalSalesTaxRatesDtoChecker;
 import com.complyt.v1.validators.query_params.AddressDtoQueryParamsExtractor;
+import com.complyt.v1.validators.query_params.QueryParamsExtractorEmpty;
+import lombok.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +39,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import reactor.core.publisher.Mono;
 import testUtils.TestUtilities;
 
@@ -39,9 +49,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -51,24 +65,73 @@ import static org.mockito.Mockito.when;
         GlobalExceptionHandler.class,
         GlobalErrorAttributes.class,
         SecurityConfig.class,
-        AddressDtoQueryParamsExtractor.class
+        AddressDtoQueryParamsExtractor.class,
+        QueryParamsExtractorEmpty.class,
+        InternalSalesTaxRatesDtoChecker.class,
 })
 public class ComplytSalesTaxRatesRouterTest {
-
-    @Autowired
-    ComplytSalesTaxRatesRouter complytSalesTaxRatesRouter;
+    @MockBean
+    private InternalSalesTaxRatesFacade internalSalesTaxRatesFacade;
 
     @Autowired
     private WebTestClient webTestClient;
-
-    @MockBean
-    private InternalSalesTaxRatesFacade internalSalesTaxRatesFacade; //this is not tested really
 
     private SalesTaxRatesData salesTaxRatesData;
 
     @BeforeEach
     void setUp() {
         salesTaxRatesData = TestUtilities.createSalesTaxRatesData();
+    }
+
+    @Test
+    @WithMockUser
+    public void putSalesTaxRatesByAddress_CommonRatesFound_Returns200() {
+        // Given
+        InternalSalesTaxRatesDto internalSalesTaxRatesDto = TestUtilities.createInternalSalesTaxRatesDto();
+        InternalSalesTaxRates internalSalesTaxRates = InternalSalesTaxRatesMapper.INSTANCE.internalRatesDtoToInternalRates(internalSalesTaxRatesDto);
+
+        // When
+        when(internalSalesTaxRatesFacade.updateRate(any(InternalSalesTaxRates.class), eq(RatesStatus.NEW)))
+                .thenReturn(Mono.just(internalSalesTaxRates));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
+                        .queryParam("status", RatesStatus.NEW)
+                        .build())
+                .bodyValue(internalSalesTaxRatesDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(InternalSalesTaxRatesDto.class)
+                .value(InternalSalesTaxRatesDto::address, equalTo(internalSalesTaxRatesDto.address()));
+    }
+
+    @Test
+    @WithMockUser
+    public void putSalesTaxRatesByAddress_CommonRatesNotFound_Returns200() {
+        // Given
+        InternalSalesTaxRatesDto internalSalesTaxRatesDto = TestUtilities.createInternalSalesTaxRatesDto();
+
+        // When
+        when(internalSalesTaxRatesFacade.updateRate(any(InternalSalesTaxRates.class), eq(RatesStatus.NEW)))
+                .thenReturn(Mono.empty());
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
+                        .queryParam("status", RatesStatus.NEW)
+                        .build())
+                .bodyValue(internalSalesTaxRatesDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
     @Test
@@ -739,4 +802,22 @@ public class ComplytSalesTaxRatesRouterTest {
         // Then
         assertEquals("complytSalesTaxRatesHandler " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE, exception.getMessage());
     }
+
+    @Test
+    public void putComplytSalesTaxRatesByAddress_NullHandler_ThrowsNullPointerException() {
+        // Given
+        ComplytSalesTaxRatesHandler nullComplytSalesTaxRatesHandler = null;
+        ComplytSalesTaxRatesRouter complytSalesTaxRates = new ComplytSalesTaxRatesRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            complytSalesTaxRates.putComplytSalesTaxRatesByAddress(nullComplytSalesTaxRatesHandler);
+        });
+
+        // Then
+        assertEquals("complytSalesTaxRatesHandler " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE, exception.getMessage());
+    }
+
+
+
 }

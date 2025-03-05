@@ -4,6 +4,7 @@ import com.complyt.domain.AddressWithDate;
 import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.domain.common_rates.CommonSalesTaxRates;
 import com.complyt.domain.SalesTaxRatesData;
+import com.complyt.domain.enums.RatesStatus;
 import com.complyt.domain.internal_rates.InternalSalesTaxRates;
 import com.complyt.domain.mappers.CommonSalesTaxRatesToSalesTaxRatesMapper;
 import com.complyt.services.AddressValidationService;
@@ -13,11 +14,13 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Value
 @Slf4j
 @RequiredArgsConstructor
+@Component
 public class InternalSalesTaxRatesFacade implements SalesTaxRatesFacade<InternalSalesTaxRates> {
 
     @NonNull
@@ -44,7 +47,11 @@ public class InternalSalesTaxRatesFacade implements SalesTaxRatesFacade<Internal
     public Mono<CommonSalesTaxRates> findByAddress(@NonNull AddressWithDate addressWithDate) {
         return internalSalesTaxRatesService.findByAddress(addressWithDate)
                 .switchIfEmpty(Mono.defer(() ->
-                        ContextLogger.observeCtx("Warning: sales tax rates was not found in internal data", log::info)
+                        ContextLogger.observeCtx("Warning: sales tax rates was not found in internal data", log::warn)
                                 .then(externalSalesTaxRatesService.findByAddress(addressWithDate))));
+    }
+
+    public Mono<InternalSalesTaxRates> updateRate(@NonNull InternalSalesTaxRates internalRates, @NonNull RatesStatus status) {
+        return internalSalesTaxRatesService.updateRate(internalRates, status);
     }
 }

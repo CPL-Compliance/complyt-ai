@@ -1,5 +1,6 @@
 package com.complyt.v1.config;
 
+import com.complyt.domain.internal_rates.InternalSalesTaxRates;
 import com.complyt.v1.model.AddressWithDateDto;
 import com.complyt.v1.model.gt.GtAddressDto;
 import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalSalesTaxRatesDto;
@@ -8,7 +9,11 @@ import com.complyt.v1.validators.ParameterChecksProvider;
 import com.complyt.v1.validators.ShouldCallValidate;
 import com.complyt.v1.validators.ValidationHandler;
 import com.complyt.v1.validators.body_checkers.AddressDtoChecker;
-import com.complyt.v1.validators.query_params.QueryParamsExtractor;
+import com.complyt.v1.validators.body_checkers.InternalSalesTaxRatesDtoChecker;
+import com.complyt.v1.validators.param_checker.ParamCheckerFunctions;
+import com.complyt.v1.validators.query_params.AddressDtoQueryParamsExtractor;
+import com.complyt.v1.validators.query_params.GtAddressQueryParamsExtractor;
+import com.complyt.v1.validators.query_params.QueryParamsExtractorEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,15 +28,15 @@ public class ValidatorConfig {
 
     ParameterChecksProvider pathVariableChecker = new ParameterChecksProvider(Map.of());
 
-    ParameterChecksProvider queryParamChecker = new ParameterChecksProvider(Map.of());
+    ParameterChecksProvider queryParamChecker = new ParameterChecksProvider(Map.of(
+            "status", ParamCheckerFunctions.STATUS_CHECK));
 
     ShouldCallValidate shouldCallValidate = new ShouldCallValidate(Map.of(
             HttpMethod.PUT, "^/v1/sales_tax_rates$"));
 
 
     @Bean
-    public ValidationHandler<AddressWithDateDto, SpringValidatorAdapter> addressDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter,
-                                                                                                     @Autowired QueryParamsExtractor addressDtoQueryParamsExtractor) {
+    public ValidationHandler<AddressWithDateDto, SpringValidatorAdapter> addressDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
 
         return new ValidationHandler<>(
                 AddressWithDateDto.class,
@@ -39,7 +44,7 @@ public class ValidatorConfig {
                 new DataConflictChecksProvider(new BodyCheckConfig<AddressWithDateDto>(List.of(
                         new AddressDtoChecker()
                 )).entityDtoFluxFunction(), Map.of()),
-                addressDtoQueryParamsExtractor,
+                new AddressDtoQueryParamsExtractor(),
                 pathVariableChecker,
                 queryParamChecker,
                 shouldCallValidate
@@ -47,12 +52,11 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public ValidationHandler<GtAddressDto, SpringValidatorAdapter> gtAddressDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter,
-                                                                                                 @Autowired QueryParamsExtractor gtAddressQueryParamsExtractor) {
+    public ValidationHandler<GtAddressDto, SpringValidatorAdapter> gtAddressDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
         return new ValidationHandler<>(
                 GtAddressDto.class, springValidatorAdapter,
                 new DataConflictChecksProvider(new BodyCheckConfig<InternalSalesTaxRatesDto>(List.of()).entityDtoFluxFunction(), Map.of()),
-                gtAddressQueryParamsExtractor,
+                new GtAddressQueryParamsExtractor(),
                 pathVariableChecker,
                 queryParamChecker,
                 shouldCallValidate
@@ -60,13 +64,12 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public ValidationHandler<InternalSalesTaxRatesDto, SpringValidatorAdapter> internalRatesDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter,
-                                                                                                                 @Autowired QueryParamsExtractor queryParamsExtractorEmpty) {
+    public ValidationHandler<InternalSalesTaxRatesDto, SpringValidatorAdapter> internalRatesDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
         return new ValidationHandler<>(
                 InternalSalesTaxRatesDto.class,
                 springValidatorAdapter,
-                new DataConflictChecksProvider(new BodyCheckConfig<AddressWithDateDto>(List.of()).entityDtoFluxFunction(), Map.of()),
-                queryParamsExtractorEmpty,
+                new DataConflictChecksProvider(new BodyCheckConfig<InternalSalesTaxRates>(List.of(new InternalSalesTaxRatesDtoChecker())).entityDtoFluxFunction(), Map.of()),
+                new QueryParamsExtractorEmpty<>(),
                 pathVariableChecker,
                 queryParamChecker,
                 shouldCallValidate

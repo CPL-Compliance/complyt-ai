@@ -31,4 +31,10 @@ public interface DtoErrorMessages {
             "For date/time fields please provide a " + FieldsDescriptions.TIMESTAMP_FORMAT;
 
     String INVALID_COUNTRY_ERROR =  "Invalid country provided. Only US addresses are supported. Please provide a valid US address";
+
+    String INVALID_DATE_ERROR = "The max effective date must be the maximum among all provided effective dates.";
+
+    String INVALID_SUM_ERROR = "The tax rate does not match the sum of individual rates.";
+
+    String INVALID_STATUS = "Invalid status value. Allowed values are: UPDATE, ARCHIVE, NEW.";
 }

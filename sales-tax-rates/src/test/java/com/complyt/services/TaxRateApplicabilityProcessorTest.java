@@ -1,6 +1,5 @@
 package com.complyt.services;
 
-import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.internal_rates.InternalEffectiveDates;
 import com.complyt.domain.internal_rates.InternalRates;
 import com.complyt.domain.internal_rates.InternalSalesTaxRates;
@@ -14,7 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class TaxRateApplicabilityProcessorTest {
@@ -49,7 +48,7 @@ class TaxRateApplicabilityProcessorTest {
                 new BigDecimal("0.25")  // taxRate
         );
 
-        internalSalesTaxRates = new InternalSalesTaxRates(UUID.randomUUID(), null, null, rates, effectiveDates,null, null);
+        internalSalesTaxRates = new InternalSalesTaxRates(UUID.randomUUID(), null, null, rates, effectiveDates,null, null, null);
     }
 
     @Test

@@ -3,9 +3,12 @@ package com.complyt.services;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.domain.AddressWithDate;
 import com.complyt.domain.common_rates.CommonSalesTaxRates;
+import com.complyt.domain.enums.RatesStatus;
 import com.complyt.domain.internal_rates.InternalSalesTaxRates;
 import com.complyt.domain.mappers.InternalRatesToCommonRatesMapper;
 import com.complyt.repositories.internal_rates.InternalSalesTaxRatesRepository;
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,7 +24,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class InternalSalesTaxRatesServiceImplTest {
@@ -40,7 +43,6 @@ class InternalSalesTaxRatesServiceImplTest {
 
     private final AddressWithDate addressWithDate = TestUtilities.createAddressInCaliforniaWithCreationDate();
     private final InternalSalesTaxRates internalSalesTaxRates = TestUtilities.createInternalSalesTaxRates(LocalDateTime.now(), UUID.randomUUID());
-
 
     @Test
     void findByAddress_AddressFound_ReturnsAddress() {
@@ -74,7 +76,7 @@ class InternalSalesTaxRatesServiceImplTest {
     void save_WithValidInternalSalesTaxRates() {
         // Arrange
         InternalSalesTaxRates newInternalSalesTaxRates = new InternalSalesTaxRates(null, null, internalSalesTaxRates.getAddress(), internalSalesTaxRates.getSalesTaxRates(),
-                internalSalesTaxRates.getEffectiveDates(), internalSalesTaxRates.getInternalSalesTaxRatesMetaData(), internalSalesTaxRates.getCreatedDate());
+                internalSalesTaxRates.getEffectiveDates(), internalSalesTaxRates.getInternalSalesTaxRatesMetaData(), internalSalesTaxRates.getCreatedDate(), internalSalesTaxRates.getExpiredDate());
 
         when(complytIdHandler.insertComplytIdToNew(any())).thenReturn(newInternalSalesTaxRates);
         when(internalSalesTaxRatesRepository.save(newInternalSalesTaxRates)).thenReturn(Mono.just(newInternalSalesTaxRates));
@@ -108,5 +110,77 @@ class InternalSalesTaxRatesServiceImplTest {
         assertEquals("addressWithDate is marked non-null but is null", nullPointerException.getMessage());
     }
 
+    @Test
+    void updateRate_whenInvalidEnumValue_throwsException() {
+        RatesStatus invalidStatus = mock(RatesStatus.class); // Create a fake enum value
 
+        Mono<InternalSalesTaxRates> result = internalSalesTaxRatesServiceImp.updateRate(internalSalesTaxRates, invalidStatus);
+
+        StepVerifier.create(result)
+                .expectError(ObjectNotValidApiException.class)
+                .verify();
+
+    }
+
+    @Test
+    void updateRate_whenStatusIsNew_callsSaveMethod() {
+        // Given
+        when(internalSalesTaxRatesRepository.save(internalSalesTaxRates)).thenReturn(Mono.just(internalSalesTaxRates));
+        when(complytIdHandler.insertComplytIdToNew(any())).thenReturn(internalSalesTaxRates);
+
+        // When
+        Mono<InternalSalesTaxRates> result = internalSalesTaxRatesServiceImp.updateRate(internalSalesTaxRates, RatesStatus.NEW);
+
+        // Then
+        StepVerifier.create(result)
+                .expectNext(internalSalesTaxRates)
+                .verifyComplete();
+    }
+
+    @Test
+    void updateRate_whenStatusIsArchive_callsArchiveMethod() {
+        // Given
+        when(internalSalesTaxRatesRepository.archive(internalSalesTaxRates)).thenReturn(Mono.just(internalSalesTaxRates));
+
+        // When
+        Mono<InternalSalesTaxRates> result = internalSalesTaxRatesServiceImp.updateRate(internalSalesTaxRates, RatesStatus.ARCHIVE);
+
+        // Then
+        StepVerifier.create(result)
+                .expectNext(internalSalesTaxRates)
+                .verifyComplete();
+    }
+
+    @Test
+    void updateRate_whenStatusIsUpdate_callsFindAndUpdateMethod() {
+        // Given
+        when(internalSalesTaxRatesRepository.updateRate(internalSalesTaxRates)).thenReturn(Mono.just(internalSalesTaxRates));
+        when(complytIdHandler.insertComplytIdToNew(any())).thenReturn(internalSalesTaxRates);
+
+        // When
+        Mono<InternalSalesTaxRates> result = internalSalesTaxRatesServiceImp.updateRate(internalSalesTaxRates, RatesStatus.UPDATE);
+
+        // Then
+        StepVerifier.create(result)
+                .expectNext(internalSalesTaxRates)
+                .verifyComplete();
+    }
+
+    @Test
+    void updateRate_whenInternalSalesTaxRatesIsNull_throwsException() {
+        // Then
+        assertThrows(NullPointerException.class, () -> internalSalesTaxRatesServiceImp.updateRate(null, RatesStatus.NEW));
+    }
+
+    @Test
+    void updateRate_whenRatesStatusIsNull_throwsException() {
+        // Then
+        assertThrows(NullPointerException.class, () -> internalSalesTaxRatesServiceImp.updateRate(internalSalesTaxRates, null));
+    }
+
+    @Test
+    void setBeforeSave_whenRatesStatusIsNull_throwsException() {
+        // Then
+        assertThrows(NullPointerException.class, () -> internalSalesTaxRatesServiceImp.setBeforeSave(null));
+    }
 }
