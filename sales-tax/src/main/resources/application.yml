@@ -15,6 +15,13 @@ eureka:
     healthcheck:
       enabled: true
 
+currencyClient:
+  health:
+    url: http://localhost:8080/exchange-rate
+    currency: ILS
+    date: 2024-05-01
+
+
 # There is no need to check the vault health in runtime - we use fast-fail so the service will not start if vault is unavailable.
 management:
   health:

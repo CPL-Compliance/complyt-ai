@@ -56,6 +56,8 @@ public class TransactionProjectionStageTest {
         add("exchangeRateInfo.fxRate");
         add("exchangeRateInfo.fromCurrency");
         add("exchangeRateInfo.toCurrency");
+        add("isRefundLinked");
+        add("refundLinkedPercentage");
     }};
 
     @Test
