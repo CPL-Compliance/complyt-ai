@@ -59,7 +59,7 @@ public class TransactionLevelTaxRateCalculatorTest {
         // Then
         assertEquals("transaction is marked non-null but is null", exception.getMessage());
     }
-    
+
     @Test
     public void calculate_CalculatesRate_ReturnsRate() {
         // Given
