@@ -4,12 +4,17 @@ import com.complyt.business.collection_fetcher.UsaStatesMap;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.domain.*;
+import com.complyt.domain.Address;
+import com.complyt.domain.AddressWithDate;
+import com.complyt.domain.ComplytSalesTaxRates;
+import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.common_rates.CommonSalesTaxRates;
+import com.complyt.domain.enums.RatesStatus;
 import com.complyt.domain.mappers.ComplytSalesTaxRatesToCommonRatesMapper;
 import com.complyt.repositories.ComplytSalesTaxRatesRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.springframework.expression.AccessException;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -45,15 +50,19 @@ public class ExternalSalesTaxRatesServiceImpl <T extends ComplytSalesTaxRates> i
 
     private Mono<ComplytSalesTaxRates> setBeforeSave(Address address, SalesTaxData salesTaxData) {
         return salesTaxDataToSalesTaxRate.map(salesTaxData)
-                        .map(salesTaxRates -> complytIdHandler.insertComplytIdToNew(
-                                    new ComplytSalesTaxRates(null, null, address, salesTaxRates,
-                                            LocalDateTime.now(), LocalDateTime.now().plusWeeks(2))));
+                .map(salesTaxRates -> complytIdHandler.insertComplytIdToNew(
+                        new ComplytSalesTaxRates(null, null, address, salesTaxRates,
+                                LocalDateTime.now(), LocalDateTime.now().plusWeeks(2))));
     }
-
 
     @Override
     public Mono<ComplytSalesTaxRates> save(@NonNull ComplytSalesTaxRates complytSalesTaxRates) {
         String collection = UsaStatesMap.statesToCollections.get(complytSalesTaxRates.getAddress().state().toUpperCase());
         return complytSalesTaxRatesRepository.save(complytSalesTaxRates, collection);
+    }
+
+    @Override
+    public Mono<ComplytSalesTaxRates> updateRate(@NonNull ComplytSalesTaxRates internalRate, @NonNull RatesStatus status) {
+        return Mono.error(new AccessException("Endpoint Not Accessible"));
     }
 }

@@ -19,13 +19,12 @@ import com.complyt.domain.matched_address.MatchedAddressData;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.AddressWithDateDto;
-import com.complyt.v1.model.common_sales_tax_rates.CommonAddressDto;
 import com.complyt.v1.model.common_sales_tax_rates.SalesTaxRatesDto;
 import com.complyt.v1.model.gt.ComplytGtRatesDto;
 import com.complyt.v1.model.gt.GtAddressDto;
 import com.complyt.v1.model.gt.GtRatesDto;
+import com.complyt.v1.model.internal_sales_tax_rates_dto.*;
 import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalAddressDto;
-import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalRateDto;
 import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalSalesTaxRatesDto;
 import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalSalesTaxRatesMetaDataDto;
 import feign.FeignException;
@@ -106,16 +105,6 @@ public interface TestUtilities {
         return new ComplytSalesTaxRates(UUID.randomUUID(), UUID.randomUUID().toString(), address, salesTaxRates, now, now.plusMinutes(1));
     }
 
-    /***
-     *  getting the complytId because commonSalesTaxRates are sometimes received from conversion
-     *  of ComplytSalesTaxRates, by ComplytSalesTaxRatesToCommonRatesMapper.INSTANCE::map
-     */
-    static CommonSalesTaxRates createExternalCommonSalesTaxRates(UUID complytId) {
-        CommonSalesTaxRates commonSalesTaxRates = createExternalCommonSalesTaxRates();
-        CommonRates commonRates = commonSalesTaxRates.salesTaxRates();
-        return commonSalesTaxRates.withSalesTaxRates(commonRates);
-    }
-
     static CommonAddress createCommonAddressFromAddress(InternalAddress address) {
         return new CommonAddress(null, address.state(), address.county(), address.city(), address.isUnincorporated(), address.zip(), address.lowerPlusFourDigits(), address.upperPlusFourDigits(), null, null);
     }
@@ -167,12 +156,17 @@ public interface TestUtilities {
     static InternalSalesTaxRates createInternalSalesTaxRates(LocalDateTime dateTime) {
 
         return new InternalSalesTaxRates(UUID.randomUUID(), null, createInternalAddress(),
-                createInternalRates(dateTime), createInternalEffectiveDates(), null, LocalDateTime.now());
+                createInternalRates(dateTime), createInternalEffectiveDates(), null, LocalDateTime.now(), null);
     }
 
     static InternalEffectiveDates createInternalEffectiveDates() {
         LocalDateTime initialDate = LocalDateTime.of(2000, 1, 1, 0, 0, 0);
         return new InternalEffectiveDates(initialDate, initialDate, null, null, null, null, null, null, null, initialDate);
+    }
+
+    static InternalEffectiveDatesDto createInternalEffectiveDatesDto() {
+        LocalDateTime initialDate = LocalDateTime.of(2000, 1, 1, 0, 0);
+        return new InternalEffectiveDatesDto(initialDate.toString(), initialDate.toString(), null, null, null, null, null, null, null, initialDate.toString());
     }
 
 
@@ -202,11 +196,15 @@ public interface TestUtilities {
     }
 
     static InternalSalesTaxRatesDto createInternalSalesTaxRatesDto() {
-        return new InternalSalesTaxRatesDto(createInternalAddressDto(), createInternalRatesDto());
+        return new InternalSalesTaxRatesDto(null, createInternalAddressDto(), createInternalRatesDto(), createInternalEffectiveDatesDto(), createInternalSalesTaxRatesMetaDataDto(), LocalDateTime.now(), null);
+    }
+
+    static InternalSalesTaxRatesMetaDataDto createInternalSalesTaxRatesMetaDataDto() {
+        return new InternalSalesTaxRatesMetaDataDto(null, null, null, null, null, null, null, null, null, null, null, null, null, null, "test", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     static InternalAddressDto createInternalAddressDto() {
-        return new InternalAddressDto("California", "Fresno", "Fresno", false, "", 0, 0);
+        return new InternalAddressDto("California", "Fresno", "Fresno", false, "12345", 0, 0);
     }
 
     static InternalAddressDto createInternalAddressDto(String state, String county, String city) {
@@ -218,25 +216,27 @@ public interface TestUtilities {
         return new InternalAddressDto(state, county, city, isUnincorporated, zip, lowerPlusFour, upperPlusFour);
     }
 
-    static InternalRateDto createInternalRatesDto(UUID complytId) {
+    static InternalRatesDto createInternalRatesDto(UUID complytId) {
         return createInternalRatesDto(complytId,
                 LocalDateTime.of(2021, 01, 07, 0, 0).toString());
     }
 
-    static InternalRateDto createInternalRatesDto(UUID complytId, String effectiveDate) {
-        return new InternalRateDto(
-                complytId,
+    static InternalRatesDto createInternalRatesDto(UUID complytId, String effectiveDate) {
+        return new InternalRatesDto(
                 new BigDecimal("0.06"),
                 new BigDecimal("0.01975"),
                 new BigDecimal("0.00375"),
                 new BigDecimal("0.0835"),
-                effectiveDate,
-                SalesTaxSources.FAST_SALES_TAX,
-                null
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                new BigDecimal("0.167")
         );
     }
 
-    static InternalRateDto createInternalRatesDto() {
+    static InternalRatesDto createInternalRatesDto() {
         return createInternalRatesDto(null);
     }
 
@@ -256,14 +256,6 @@ public interface TestUtilities {
 
     static AddressDto createStubFastTaxAddressDto() {
         return new AddressDto("Englewood", "US", null, "Colorado", null, "80112", true);
-    }
-
-    static CommonAddressDto createCommonAddressDto(AddressDto addressDto) {
-        return  new CommonAddressDto(addressDto.country(), addressDto.state(), addressDto.county(), addressDto.city(), null, addressDto.zip(), null, null, addressDto.street(), addressDto.isPartial());
-    }
-
-    static CommonAddressDto createCommonAddressDto() {
-        return new CommonAddressDto(null, "AK", "ANCHORAGE", "ANCHORAGE", false, "99501", 0, 0, null, null);
     }
 
     static AddressDto createStubInternalTaxAddressDto() {
@@ -305,9 +297,9 @@ public interface TestUtilities {
     }
 
     static InternalSalesTaxRatesDto createInternalSalesTaxRatesDtoToInsert(String effectiveDate) {
-        return new InternalSalesTaxRatesDto(createInternalAddressDto("Alaska", "Anchorage", "Anchorage",
+        return new InternalSalesTaxRatesDto(null, createInternalAddressDto("Alaska", "Anchorage", "Anchorage",
                 "99501", false, true, 0, 123)
-                , createInternalRatesDto(null, effectiveDate));
+                , createInternalRatesDto(null, effectiveDate), null, null, null, null);
     }
 
     static Result createResult() {
@@ -328,7 +320,7 @@ public interface TestUtilities {
     }
 
     static SalesTaxRatesDto createStubFastTaxSalesTaxRatesDto() {
-        return  new SalesTaxRatesDto(
+        return new SalesTaxRatesDto(
                 new BigDecimal("0.0425"), // stateRate
                 new BigDecimal("0.0125"), // countyRate
                 new BigDecimal("0"),    // cityRate
@@ -489,7 +481,7 @@ public interface TestUtilities {
                         null, null, null), null, Map.of("Authorization", List.of("Dummy Bearer")));
     }
 
-    static InternalSalesTaxRatesMetaData createStubInternalSalesTaxRatesMetaData(){
+    static InternalSalesTaxRatesMetaData createStubInternalSalesTaxRatesMetaData() {
         return new InternalSalesTaxRatesMetaData(
                 "MTA",                        // recordType
                 "SPD",                        // stateAbbrev
@@ -532,7 +524,7 @@ public interface TestUtilities {
         );
     }
 
-    static InternalSalesTaxRatesMetaDataDto createStubInternalSalesTaxRatesMetaDataDto(){
+    static InternalSalesTaxRatesMetaDataDto createStubInternalSalesTaxRatesMetaDataDto() {
         return new InternalSalesTaxRatesMetaDataDto(
                 "MTA",                        // recordType
                 "SPD",                        // stateAbbrev

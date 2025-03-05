@@ -9,6 +9,7 @@ import io.complyt.domain.enums.FieldsMatchScore;
 import io.complyt.domain.here.HereAddress;
 import io.complyt.domain.here.HereAddressData;
 import io.complyt.domain.here.HereFieldScore;
+import io.complyt.security.TenantResolver;
 import io.complyt.v1.mappers.AddressMapper;
 import io.complyt.v1.models.AddressDto;
 import io.complyt.v1.models.CachedAddressDataDto;
@@ -31,6 +32,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import test_utils.TestUtilities;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.List;
 
@@ -54,12 +56,20 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
     @MockBean
     WebClientWrapperProperties hereWebClientWrapperProperties;
 
+    @MockBean
+    TenantResolver tenantResolver;
+
     @Autowired
     private WebTestClient webTestClient;
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("address_validation"));
+    }
+
+    @BeforeEach
+    void setup() {
+        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
     }
 
     @Order(1)

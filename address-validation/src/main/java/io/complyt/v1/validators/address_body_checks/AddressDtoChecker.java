@@ -49,22 +49,22 @@ public class AddressDtoChecker implements DtoBodyChecker<AddressDto> {
     }
 
     private String nonPartialAddressErrorBuilder(String fieldName, String fieldValue) {
-        log.info("Invalid non-partial address field: {} - Value: {}", fieldName, fieldValue);
+        log.info("fieldName: {} - Value: {}", fieldName, fieldValue);
         return fieldName + " " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX;
     }
 
     private String partialAddressErrorBuilder(String fieldName, String fieldValue) {
-        log.info("Invalid partial address field: {} - Value: {}", fieldName, fieldValue);
+        log.info("fieldName: {} - Value: {}", fieldName, fieldValue);
         return fieldName + " " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.PARTIAL_ERROR_SUFFIX;
     }
 
     private String stateErrorBuilder(String fieldValue) {
-        log.info("Invalid state value in USA address: {}", fieldValue);
+        log.info("state value in USA address: {}", fieldValue);
         return DtoErrorMessages.STATE_NOT_RECOGNIZED_USA;
     }
 
     private String zipErrorBuilder(String fieldValue) {
-        log.info("Invalid ZIP code format: {}", fieldValue);
+        log.info("ZIP code format: {}", fieldValue);
         return DtoErrorMessages.ZIP_NOT_IN_FORMAT;
     }
 }

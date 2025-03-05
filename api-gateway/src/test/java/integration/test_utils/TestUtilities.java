@@ -660,6 +660,50 @@ public class TestUtilities {
         return new MutablePair<>("AT", "U28609707");
     }
 
-    // Vat Validation Objects End
+    public static JSONObject createInternalSalesTaxRatesJson(String mtaName, String zip) {
+        JSONObject jsonObject = new JSONObject();
+
+        // Address
+        JSONObject addressJson = new JSONObject();
+        addressJson.put("state", "California");
+        addressJson.put("county", "Fresno");
+        addressJson.put("city", "Fresno");
+        addressJson.put("isUnincorporated", false);
+        addressJson.put("zip", zip);
+        addressJson.put("lowerPlusFourDigits", 0);
+        addressJson.put("upperPlusFourDigits", 0);
+        jsonObject.put("address", addressJson);
+
+        // Sales Tax Rates
+        JSONObject salesTaxRatesJson = new JSONObject();
+        salesTaxRatesJson.put("stateRate", 0.06);
+        salesTaxRatesJson.put("countyRate", 0.01975);
+        salesTaxRatesJson.put("cityRate", 0.00375);
+        salesTaxRatesJson.put("mtaRate", 0.0835);
+        salesTaxRatesJson.put("spdRate", 0);
+        salesTaxRatesJson.put("other1Rate", 0);
+        salesTaxRatesJson.put("other2Rate", 0);
+        salesTaxRatesJson.put("other3Rate", 0);
+        salesTaxRatesJson.put("other4Rate", 0);
+        salesTaxRatesJson.put("taxRate", 0.167);
+        jsonObject.put("salesTaxRates", salesTaxRatesJson);
+
+        // Effective Dates
+        JSONObject effectiveDatesJson = new JSONObject();
+        effectiveDatesJson.put("state", "2000-01-01T00:00");
+        effectiveDatesJson.put("county", "2000-01-01T00:00");
+        effectiveDatesJson.put("maxEffectiveDate", "2000-01-01T00:00");
+        jsonObject.put("effectiveDates", effectiveDatesJson);
+
+        // Internal Sales Tax Rates MetaData
+        JSONObject metadataJson = new JSONObject();
+        metadataJson.put("mtaName", mtaName);
+        jsonObject.put("internalSalesTaxRatesMetaData", metadataJson);
+
+        // Created Date
+        jsonObject.put("createdDate", "2025-02-27T13:44:32.865386");
+
+        return jsonObject;
+    }
 
 }

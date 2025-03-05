@@ -5,8 +5,12 @@ import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.data_fetcher.CityCountyFetcher;
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.domain.*;
+import com.complyt.domain.Address;
+import com.complyt.domain.AddressWithDate;
+import com.complyt.domain.ComplytSalesTaxRates;
+import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.common_rates.CommonSalesTaxRates;
+import com.complyt.domain.enums.RatesStatus;
 import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
 import com.complyt.domain.mappers.ComplytSalesTaxRatesToCommonRatesMapper;
 import com.complyt.repositories.ComplytSalesTaxRatesRepository;
@@ -15,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.expression.AccessException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.TestUtilities;
@@ -150,5 +155,31 @@ public class ExternalSalesTaxRatesServiceImplTest {
 
         // Then
         StepVerifier.create(externalSalesTaxRatesServiceImpl.save(complytSalesTaxRates)).expectNext(complytSalesTaxRates).verifyComplete();
+    }
+
+    @Test
+    void updateRate_whenInternalSalesTaxRatesIsNull_throwsException() {
+        // Then
+        assertThrows(NullPointerException.class, () -> externalSalesTaxRatesServiceImpl.updateRate(null, RatesStatus.NEW));
+    }
+
+    @Test
+    void updateRate_whenRatesStatusIsNull_throwsException() {
+        // Then
+        ComplytSalesTaxRates complytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
+        assertThrows(NullPointerException.class, () -> externalSalesTaxRatesServiceImpl.updateRate(complytSalesTaxRates, null));
+    }
+
+    @Test
+    void updateRate_alwaysThrowsAccessException() {
+        // When
+        ComplytSalesTaxRates complytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
+        Mono<ComplytSalesTaxRates> result = externalSalesTaxRatesServiceImpl.updateRate(complytSalesTaxRates, RatesStatus.NEW);
+
+        // Then
+        StepVerifier.create(result)
+                .expectErrorMatches(throwable -> throwable instanceof AccessException &&
+                        throwable.getMessage().equals("Endpoint Not Accessible"))
+                .verify();
     }
 }

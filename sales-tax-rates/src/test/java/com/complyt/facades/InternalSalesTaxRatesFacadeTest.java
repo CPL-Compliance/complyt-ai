@@ -1,17 +1,19 @@
 package com.complyt.facades;
 
-import com.complyt.domain.*;
+import com.complyt.domain.Address;
+import com.complyt.domain.AddressWithDate;
+import com.complyt.domain.ComplytSalesTaxRates;
+import com.complyt.domain.SalesTaxRatesData;
 import com.complyt.domain.common_rates.CommonSalesTaxRates;
+import com.complyt.domain.enums.RatesStatus;
 import com.complyt.domain.internal_rates.InternalSalesTaxRates;
 import com.complyt.facade.InternalSalesTaxRatesFacade;
 import com.complyt.services.AddressValidationService;
 import com.complyt.services.ExternalSalesTaxRatesServiceImpl;
 import com.complyt.services.InternalSalesTaxRatesServiceImpl;
-import com.complyt.services.SalesTaxRatesService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
@@ -143,5 +145,40 @@ class InternalSalesTaxRatesFacadeTest {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> internalSalesTaxRatesFacade.save(nullTaxRates));
 
         assertEquals("internalSalesTaxRates is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void updateRate_NullRatesPassed_ThrowsException() {
+        // Given
+        InternalSalesTaxRates nullTaxRates = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> internalSalesTaxRatesFacade.updateRate(nullTaxRates, RatesStatus.UPDATE));
+
+        assertEquals("internalRates is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void updateRate_NullRatesStatus_ThrowsException() {
+        // Given
+        RatesStatus status = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> internalSalesTaxRatesFacade.updateRate(internalSalesTaxRates, status));
+
+        assertEquals("status is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void updateRate_validObject_ReturnsUpdatedRate() {
+        // When
+        when(internalSalesTaxRatesService.updateRate(internalSalesTaxRates, RatesStatus.UPDATE)).thenReturn(Mono.just(internalSalesTaxRates));
+
+        Mono<InternalSalesTaxRates> internalSalesTaxRatesMono = internalSalesTaxRatesFacade.updateRate(internalSalesTaxRates, RatesStatus.UPDATE);
+
+        // Then
+        StepVerifier.create(internalSalesTaxRatesMono)
+                .expectNext(internalSalesTaxRates)
+                .verifyComplete();
     }
 }

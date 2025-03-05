@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InternalSalesTaxRatesTest {
     InternalSalesTaxRates internalSalesTaxRates;
@@ -29,14 +28,15 @@ public class InternalSalesTaxRatesTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "InternalSalesTaxRates(complytId=" + internalSalesTaxRates.getComplytId() +
-                ", id=" + internalSalesTaxRates.getId() +
-                ", address=" + internalSalesTaxRates.getAddress() +
-                ", salesTaxRates=" + internalSalesTaxRates.getSalesTaxRates() +
-                ", effectiveDates=" + internalSalesTaxRates.getEffectiveDates() +
-                ", internalSalesTaxRatesMetaData=" + internalSalesTaxRates.getInternalSalesTaxRatesMetaData() +
-                ", createdDate=" + internalSalesTaxRates.getCreatedDate() + ")";
-;
+        String expectedString = "InternalSalesTaxRates(complytId=" + internalSalesTaxRates.getComplytId() + ", " +
+                "id=" + internalSalesTaxRates.getId() + ", " +
+                "address=" + internalSalesTaxRates.getAddress() + ", " +
+                "salesTaxRates=" + internalSalesTaxRates.getSalesTaxRates() + ", " +
+                "effectiveDates=" + internalSalesTaxRates.getEffectiveDates() + ", " +
+                "internalSalesTaxRatesMetaData=" + internalSalesTaxRates.getInternalSalesTaxRatesMetaData() + ", " +
+                "createdDate=" + internalSalesTaxRates.getCreatedDate() + ", " +
+                "expiredDate=" + internalSalesTaxRates.getExpiredDate() + ")";
+        ;
         // When
         String actualString = internalSalesTaxRates.toString();
 

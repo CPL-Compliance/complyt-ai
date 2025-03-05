@@ -14,20 +14,22 @@ class InternalRateDtoTest {
     private final BigDecimal validRate = new BigDecimal("0.5");
     private final String effectiveDate = "2023-08-04T00:00:00Z";
     private final SalesTaxSources source = SalesTaxSources.FAST_SALES_TAX;
-    private final InternalRateDto internalRateDto = new InternalRateDto(complytId, validRate, validRate, validRate, validRate, effectiveDate, source, null);
+    private final InternalRatesDto internalRateDto = new InternalRatesDto(validRate, validRate, validRate, validRate, validRate,validRate,validRate,validRate,validRate,validRate);
+
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "InternalRateDto[" +
-                "complytId=" + complytId +
-                ", stateRate=" + validRate +
-                ", countyRate=" + validRate +
-                ", cityRate=" + validRate +
-                ", taxRate=" + validRate +
-                ", effectiveDate=" + effectiveDate +
-                ", source=" + source +
-                ", internalSalesTaxRatesMetaData=null" +
-                "]";
+        String expectedString = "InternalRatesDto(" +
+                "stateRate=" + validRate + ", " +
+                "countyRate=" + validRate + ", " +
+                "cityRate=" + validRate + ", " +
+                "mtaRate=" + validRate + ", " +
+                "spdRate=" + validRate + ", " +
+                "other1Rate=" + validRate + ", " +
+                "other2Rate=" + validRate + ", " +
+                "other3Rate=" + validRate + ", " +
+                "other4Rate=" + validRate + ", " +
+                "taxRate=" + validRate + ")";
 
         // When
         String actualString = internalRateDto.toString();
@@ -39,7 +41,7 @@ class InternalRateDtoTest {
     @Test
     void Equals_SameInternalRateDto_ReturnTrue() {
         // Given
-        InternalRateDto givenInternalRateDto = new InternalRateDto(complytId, validRate, validRate, validRate, validRate, effectiveDate, source, null);
+        InternalRatesDto givenInternalRateDto = new InternalRatesDto(validRate, validRate, validRate, validRate, validRate,validRate,validRate,validRate,validRate,validRate);
 
         // When
         boolean isEquals = internalRateDto.equals(givenInternalRateDto);

@@ -30,6 +30,7 @@ public class ApiExceptionConfig {
                 ObjectNotFoundApiException.class, HttpStatus.NOT_FOUND,
                 ObjectNotValidApiException.class, HttpStatus.BAD_REQUEST,
                 ConflictedDataApiException.class, HttpStatus.BAD_REQUEST,
+                PathVariableErrorException.class, HttpStatus.BAD_REQUEST,
                 FastTaxException.class, HttpStatus.BAD_REQUEST
         );
     }

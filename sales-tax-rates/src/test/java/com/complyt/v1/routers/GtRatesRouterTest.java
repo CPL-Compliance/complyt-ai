@@ -13,6 +13,7 @@ import com.complyt.v1.mappers.ComplytGtRatesMapper;
 import com.complyt.v1.model.gt.ComplytGtRatesDto;
 import com.complyt.v1.router.GtRatesRouter;
 import com.complyt.v1.validators.query_params.GtAddressQueryParamsExtractor;
+import com.complyt.v1.validators.query_params.QueryParamsExtractorEmpty;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.when;
         GlobalErrorAttributes.class,
         SecurityConfig.class,
         GtAddressQueryParamsExtractor.class,
+        QueryParamsExtractorEmpty.class,
 })
 public class GtRatesRouterTest {
 
