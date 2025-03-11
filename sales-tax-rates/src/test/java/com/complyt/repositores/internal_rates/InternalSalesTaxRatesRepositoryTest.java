@@ -157,9 +157,9 @@ class InternalSalesTaxRatesRepositoryTest {
     void updateRate_validRate_callsFindAndReplaceThenSave() {
         // Given
         when(internalRatesAddressQueryBuilder.build(internalSalesTaxRates)).thenReturn(query);
+        when(reactiveMongoTemplate.findOne(query, InternalSalesTaxRates.class, collectionName)).thenReturn(Mono.just(internalSalesTaxRates));
         when(reactiveMongoTemplate.findAndReplace(eq(query), eq(internalSalesTaxRates), any(FindAndReplaceOptions.class), eq(collectionName)))
                 .thenReturn(Mono.just(internalSalesTaxRates));
-
         when(reactiveMongoTemplate.save(internalSalesTaxRates, InternalRatesCollectionNames.ARCHIVED_COLLECTION_NAME)).thenReturn(Mono.just(internalSalesTaxRates));
 
         // When
@@ -175,9 +175,7 @@ class InternalSalesTaxRatesRepositoryTest {
     void updateRate_noRateFound_returnsEmptyMono() {
         // Given
         when(internalRatesAddressQueryBuilder.build(internalSalesTaxRates)).thenReturn(query);
-        when(reactiveMongoTemplate.findAndReplace(eq(query), eq(internalSalesTaxRates), any(FindAndReplaceOptions.class), eq(collectionName)))
-                .thenReturn(Mono.empty());
-
+        when(reactiveMongoTemplate.findOne(query, InternalSalesTaxRates.class, collectionName)).thenReturn(Mono.empty());
 
         // When
         Mono<InternalSalesTaxRates> result = repository.updateRate(internalSalesTaxRates);

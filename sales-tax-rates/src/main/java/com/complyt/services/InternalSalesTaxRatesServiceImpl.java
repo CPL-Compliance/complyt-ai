@@ -69,6 +69,6 @@ public class InternalSalesTaxRatesServiceImpl implements SalesTaxRatesService<In
     public Mono<InternalSalesTaxRates> setBeforeSave(@NonNull InternalSalesTaxRates internalSalesTaxRates) {
         return Mono.just(complytIdHandler.insertComplytIdToNew(
                 new InternalSalesTaxRates(null, null, internalSalesTaxRates.getAddress(), internalSalesTaxRates.getSalesTaxRates(),
-                        internalSalesTaxRates.getEffectiveDates(), internalSalesTaxRates.getInternalSalesTaxRatesMetaData(), LocalDateTime.now(), internalSalesTaxRates.getExpiredDate())));
+                        internalSalesTaxRates.getEffectiveDates(), internalSalesTaxRates.getInternalSalesTaxRatesMetaData(), LocalDateTime.now(), internalSalesTaxRates.getExpiredDate(), internalSalesTaxRates.getAppliedDate(), internalSalesTaxRates.getUpdatedFrom(), internalSalesTaxRates.getUpdatedTo())));
     }
 }

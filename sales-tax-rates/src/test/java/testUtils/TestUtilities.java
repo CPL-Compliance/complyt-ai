@@ -156,7 +156,7 @@ public interface TestUtilities {
     static InternalSalesTaxRates createInternalSalesTaxRates(LocalDateTime dateTime) {
 
         return new InternalSalesTaxRates(UUID.randomUUID(), null, createInternalAddress(),
-                createInternalRates(dateTime), createInternalEffectiveDates(), null, LocalDateTime.now(), null);
+                createInternalRates(dateTime), createInternalEffectiveDates(), null, LocalDateTime.now(), null, null, null, null);
     }
 
     static InternalEffectiveDates createInternalEffectiveDates() {
@@ -196,7 +196,7 @@ public interface TestUtilities {
     }
 
     static InternalSalesTaxRatesDto createInternalSalesTaxRatesDto() {
-        return new InternalSalesTaxRatesDto(null, createInternalAddressDto(), createInternalRatesDto(), createInternalEffectiveDatesDto(), createInternalSalesTaxRatesMetaDataDto(), LocalDateTime.now(), null);
+        return new InternalSalesTaxRatesDto(null, createInternalAddressDto(), createInternalRatesDto(), createInternalEffectiveDatesDto(), createInternalSalesTaxRatesMetaDataDto(), LocalDateTime.now(), null, null, null, null);
     }
 
     static InternalSalesTaxRatesMetaDataDto createInternalSalesTaxRatesMetaDataDto() {
@@ -299,7 +299,7 @@ public interface TestUtilities {
     static InternalSalesTaxRatesDto createInternalSalesTaxRatesDtoToInsert(String effectiveDate) {
         return new InternalSalesTaxRatesDto(null, createInternalAddressDto("Alaska", "Anchorage", "Anchorage",
                 "99501", false, true, 0, 123)
-                , createInternalRatesDto(null, effectiveDate), null, null, null, null);
+                , createInternalRatesDto(null, effectiveDate), null, null, null, null, null, null, null);
     }
 
     static Result createResult() {

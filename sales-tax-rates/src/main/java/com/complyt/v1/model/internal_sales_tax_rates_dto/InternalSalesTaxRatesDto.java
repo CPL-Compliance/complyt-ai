@@ -16,6 +16,9 @@ public record InternalSalesTaxRatesDto(
         @Valid InternalEffectiveDatesDto effectiveDates,
         @Valid InternalSalesTaxRatesMetaDataDto internalSalesTaxRatesMetaData,
         LocalDateTime createdDate,
-        LocalDateTime expiredDate
-        ) {
+        LocalDateTime expiredDate,
+        LocalDateTime appliedDate,
+        UUID updatedFrom,
+        UUID updatedTo
+) {
 }

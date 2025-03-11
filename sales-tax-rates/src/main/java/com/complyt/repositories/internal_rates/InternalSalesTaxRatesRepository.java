@@ -65,9 +65,10 @@ public class InternalSalesTaxRatesRepository {
         String state = updatedRate.getAddress().state();
         Query query = internalRatesAddressQueryBuilder.build(updatedRate);
 
-        return reactiveMongoTemplate.findAndReplace(query, updatedRate, FindAndReplaceOptions.options(), getCollectionName(state))
+        return reactiveMongoTemplate.findOne(query, InternalSalesTaxRates.class, getCollectionName(state))
+                .flatMap(foundInternalRate -> reactiveMongoTemplate.findAndReplace(query, updatedRate.setUpdatedFrom(foundInternalRate.getComplytId()), FindAndReplaceOptions.options(), getCollectionName(state))
                 .doOnNext(cachedInternalRate ->   log.info("Archiving old rate with complytId: {} to new rate: {}", cachedInternalRate.getComplytId(), updatedRate))
-                .flatMap(oldInternalRate -> reactiveMongoTemplate.save(oldInternalRate.setExpiredDate(LocalDateTime.now()).setId(null), InternalRatesCollectionNames.ARCHIVED_COLLECTION_NAME));
+                .flatMap(oldInternalRate -> reactiveMongoTemplate.save(oldInternalRate.setExpiredDate(LocalDateTime.now()).setUpdatedTo(updatedRate.getComplytId()).setId(null), InternalRatesCollectionNames.ARCHIVED_COLLECTION_NAME)));
     }
 }
 

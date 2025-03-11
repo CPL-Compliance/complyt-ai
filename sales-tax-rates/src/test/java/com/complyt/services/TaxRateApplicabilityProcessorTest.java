@@ -48,7 +48,7 @@ class TaxRateApplicabilityProcessorTest {
                 new BigDecimal("0.25")  // taxRate
         );
 
-        internalSalesTaxRates = new InternalSalesTaxRates(UUID.randomUUID(), null, null, rates, effectiveDates,null, null, null);
+        internalSalesTaxRates = new InternalSalesTaxRates(UUID.randomUUID(), null, null, rates, effectiveDates,null, null, null, null, null, null);
     }
 
     @Test

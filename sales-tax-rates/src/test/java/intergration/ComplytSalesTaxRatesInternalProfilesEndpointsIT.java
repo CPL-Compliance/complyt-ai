@@ -341,7 +341,6 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
         String collectionName = InternalRatesCollectionNames.stateInternalCollectionName(internalSalesTaxRatesDto.address().state());
         int numOfDocumentsInCollection = Objects.requireNonNull(reactiveMongoTemplate.findAll(InternalSalesTaxRatesDto.class, collectionName)
                 .collectList().block()).size();
-
         int numOfDocumentsInCollectionArchived = Objects.requireNonNull(reactiveMongoTemplate.findAll(InternalSalesTaxRatesDto.class, InternalRatesCollectionNames.ARCHIVED_COLLECTION_NAME)
                 .collectList().block()).size();
 

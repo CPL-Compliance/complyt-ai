@@ -194,7 +194,7 @@ class InternalSalesTaxRatesDtoCheckerTest {
                 "2024-01-01T00:00:00" // Incorrect maxEffectiveDate
         );
 
-        InternalSalesTaxRatesDto salesTaxRatesDto = new InternalSalesTaxRatesDto(null, null, rates, effectiveDates, null, null, null);
+        InternalSalesTaxRatesDto salesTaxRatesDto = new InternalSalesTaxRatesDto(null, null, rates, effectiveDates, null, null, null, null, null, null);
 
         // When
         Flux<String> result = checker.check(salesTaxRatesDto);
