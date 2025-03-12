@@ -109,7 +109,6 @@ class InternalSalesTaxRatesRepositoryTest {
     @Test
     void testSave_WithValidInternalSalesTaxRates() {
         when(reactiveMongoTemplate.save(internalSalesTaxRates, collectionName)).thenReturn(Mono.just(internalSalesTaxRates));
-        when(tenantResolver.resolve()).thenReturn(Mono.just("12345"));
 
         // Act
         Mono<InternalSalesTaxRates> result = repository.save(internalSalesTaxRates);

@@ -43,9 +43,8 @@ public class InternalSalesTaxRatesRepository {
     public Mono<InternalSalesTaxRates> save(@NonNull InternalSalesTaxRates internalSalesTaxRates) {
         String state = internalSalesTaxRates.getAddress().state();
 
-        return tenantResolver.resolve()
-                .flatMap(tenantId -> reactiveMongoTemplate.save(internalSalesTaxRates, getCollectionName(state))
-                .doOnSuccess(cachedInternalRate -> log.info("Saving internal of tenantId {} rate: {}", tenantId, cachedInternalRate)));
+        return reactiveMongoTemplate.save(internalSalesTaxRates, getCollectionName(state))
+                .doOnSuccess(cachedInternalRate -> log.info("Saving internal rate: {}", cachedInternalRate));
     }
 
     private String getCollectionName(String state) {
