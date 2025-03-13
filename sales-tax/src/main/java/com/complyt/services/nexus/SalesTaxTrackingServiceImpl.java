@@ -3,6 +3,7 @@ package com.complyt.services.nexus;
 import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
+import com.complyt.business.nexus.ISalesTaxTrackingDateDeterminer;
 import com.complyt.business.timestamps_injection.SalesTaxTrackingPhysicalNexusDateApplierInjector;
 import com.complyt.business.timestamps_injection.SalesTaxTrackingRegisteredDateTimestampsInjector;
 import com.complyt.domain.nexus.EconomicNexusTracker;
@@ -55,6 +56,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @NonNull
     private NexusService nexusService;
 
+    private final ISalesTaxTrackingDateDeterminer salesTaxTrackingDateDeterminer;
+
     @Override
     public Mono<SalesTaxTracking> findById(@NonNull String id) {
         return salesTaxTrackingRepository.findById(id);
@@ -62,6 +65,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> handleSalesTaxTrackingAfterTransactionCalculated(@NonNull SalesTaxTracking salesTaxTracking) {
+        salesTaxTracking.setAppliedDate(salesTaxTrackingDateDeterminer.getSalesTaxTrackingAppliedDate(salesTaxTracking));
         return salesTaxTracking.getEconomicNexusTracker().isEstablished() ?
                 updateEconomicNexus(salesTaxTracking) :
                 save(salesTaxTracking);
@@ -118,7 +122,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull NexusStateRule stateRule, @NonNull LocalDateTime referenceDate) {
         EconomicNexusTracker newTracker = new EconomicNexusTracker(true, referenceDate);
-        LocalDateTime appliedDate = applicationDateCreator.create(stateRule.timeFrame(), referenceDate);
+        LocalDateTime appliedDate = salesTaxTrackingDateDeterminer.getSalesTaxTrackingAppliedDate(salesTaxTracking);
 
         SalesTaxTracking modifiedTracking = salesTaxTracking
                 .withEconomicNexusTracker(newTracker)

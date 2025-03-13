@@ -1,6 +1,8 @@
 package com.complyt.facades;
 
+import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.services.CustomerService;
 import com.complyt.services.TransactionService;
 import com.complyt.services.nexus.NexusService;
@@ -43,10 +45,14 @@ public class SalesTaxTrackingFacade {
                 .flatMap(recalculateCurrentNexusSummaryIfNeeded());
     }
 
-    public Function<SalesTaxTracking, Mono<LocalDateTime>>  findSalesTaxDate() {
-        return salesTaxTracking -> salesTaxTracking.getEconomicNexusTracker().isEstablished()
-                ? Mono.just(salesTaxTracking.getAppliedDate())
-                : Mono.just(salesTaxTracking.getEconomicNexusTracker().getEstablishedDate());
+
+    public void findSalesTaxDate(SalesTaxTracking salesTaxTracking) {
+        if (salesTaxTracking.getEconomicNexusTracker().isEstablished()) {
+            salesTaxTracking.setAppliedDate(salesTaxTracking.getEconomicNexusTracker().getEstablishedDate());
+        } else {
+            LocalDateTime defaultEstablishedDate = EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE;
+            salesTaxTracking.setAppliedDate(defaultEstablishedDate);
+        }
     }
 
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull SalesTaxTracking originalSalesTaxTracking) {
@@ -71,7 +77,6 @@ public class SalesTaxTrackingFacade {
         return salesTaxTrackingService.findAll(page, size, filterMap, sortOrder, sortBy)
                 .flatMapSequential(recalculateCurrentNexusSummaryIfNeeded());
     }
-
 
 
     private Function<SalesTaxTracking, Mono<SalesTaxTracking>> recalculateCurrentNexusSummaryIfNeeded() {
