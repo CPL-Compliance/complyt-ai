@@ -32,4 +32,7 @@ public class InternalSalesTaxRates extends TaxRates implements ComplytIdProperty
     InternalSalesTaxRatesMetaData internalSalesTaxRatesMetaData;
     LocalDateTime createdDate;
     LocalDateTime expiredDate;
+    LocalDateTime appliedDate;
+    UUID updatedFrom;
+    UUID updatedTo;
 }

@@ -76,7 +76,7 @@ class InternalSalesTaxRatesServiceImplTest {
     void save_WithValidInternalSalesTaxRates() {
         // Arrange
         InternalSalesTaxRates newInternalSalesTaxRates = new InternalSalesTaxRates(null, null, internalSalesTaxRates.getAddress(), internalSalesTaxRates.getSalesTaxRates(),
-                internalSalesTaxRates.getEffectiveDates(), internalSalesTaxRates.getInternalSalesTaxRatesMetaData(), internalSalesTaxRates.getCreatedDate(), internalSalesTaxRates.getExpiredDate());
+                internalSalesTaxRates.getEffectiveDates(), internalSalesTaxRates.getInternalSalesTaxRatesMetaData(), internalSalesTaxRates.getCreatedDate(), internalSalesTaxRates.getExpiredDate(), internalSalesTaxRates.getAppliedDate(), internalSalesTaxRates.getUpdatedFrom(), internalSalesTaxRates.getUpdatedTo());
 
         when(complytIdHandler.insertComplytIdToNew(any())).thenReturn(newInternalSalesTaxRates);
         when(internalSalesTaxRatesRepository.save(newInternalSalesTaxRates)).thenReturn(Mono.just(newInternalSalesTaxRates));

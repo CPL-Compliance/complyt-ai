@@ -69,7 +69,7 @@ class InternalSalesTaxRatesDtoCheckerTest {
 
         // Then
         StepVerifier.create(result)
-                .expectNext(DtoErrorMessages.INVALID_DATE_ERROR)
+                .expectNext("EffectiveDates " + DtoErrorMessages.NOT_NULL_ERROR)
                 .verifyComplete();
     }
 
@@ -194,7 +194,7 @@ class InternalSalesTaxRatesDtoCheckerTest {
                 "2024-01-01T00:00:00" // Incorrect maxEffectiveDate
         );
 
-        InternalSalesTaxRatesDto salesTaxRatesDto = new InternalSalesTaxRatesDto(null, null, rates, effectiveDates, null, null, null);
+        InternalSalesTaxRatesDto salesTaxRatesDto = new InternalSalesTaxRatesDto(null, null, rates, effectiveDates, null, null, null, null, null, null);
 
         // When
         Flux<String> result = checker.check(salesTaxRatesDto);
@@ -203,6 +203,25 @@ class InternalSalesTaxRatesDtoCheckerTest {
         StepVerifier.create(result)
                 .expectNext("rates.taxRate " + DtoErrorMessages.INVALID_SUM_ERROR)
                 .expectNext(DtoErrorMessages.INVALID_DATE_ERROR)
+                .verifyComplete();
+    }
+
+    @Test
+    void check_DefaultMaxEffectiveDate_returnsMonoEmpty() {
+        // Given
+        InternalEffectiveDatesDto effectiveDates = new InternalEffectiveDatesDto(
+                null, null, null,
+                null, null, null, null, null, null,
+                "1970-01-01T00:00:00" // DEFAULT DATE
+        );
+
+        internalSalesTaxRatesDto = internalSalesTaxRatesDto.withEffectiveDates(effectiveDates);
+        // When
+
+        Flux<String> result = checker.check(internalSalesTaxRatesDto);
+
+        // Then
+        StepVerifier.create(result)
                 .verifyComplete();
     }
 }

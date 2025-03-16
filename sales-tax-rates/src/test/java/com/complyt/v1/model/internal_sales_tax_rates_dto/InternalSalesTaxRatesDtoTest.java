@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class InternalSalesTaxRatesDtoTest {
     private final InternalAddressDto internalAddressDto = TestUtilities.createInternalAddressDto("CA", "US", "city");
     private final InternalRatesDto internalRateDto = TestUtilities.createInternalRatesDto(UUID.randomUUID());
-    private final InternalSalesTaxRatesDto internalSalesTaxRatesDto = new InternalSalesTaxRatesDto(null, internalAddressDto, internalRateDto, null ,null ,null ,null);
+    private final InternalSalesTaxRatesDto internalSalesTaxRatesDto = new InternalSalesTaxRatesDto(null, internalAddressDto, internalRateDto, null ,null ,null ,null, null, null, null);
 
     @Test
     void toString_ReturnString() {
@@ -23,7 +23,8 @@ class InternalSalesTaxRatesDtoTest {
                 "effectiveDates=" + internalSalesTaxRatesDto.effectiveDates() + ", " +
                 "internalSalesTaxRatesMetaData=" + internalSalesTaxRatesDto.internalSalesTaxRatesMetaData() + ", " +
                 "createdDate=" + internalSalesTaxRatesDto.createdDate() + ", " +
-                "expiredDate=" + internalSalesTaxRatesDto.expiredDate() + "]";
+                "expiredDate=" + internalSalesTaxRatesDto.expiredDate() +
+                ", appliedDate=null, updatedFrom=null, updatedTo=null]";
 
         // When
         String actualString = internalSalesTaxRatesDto.toString();
@@ -35,7 +36,7 @@ class InternalSalesTaxRatesDtoTest {
     @Test
     void Equals_SameInternalSalesTaxRatesDto_ReturnTrue() {
         // Given
-        InternalSalesTaxRatesDto givenInternalSalesTaxRatesDto = new InternalSalesTaxRatesDto(null, internalAddressDto, internalRateDto, null ,null ,null ,null);
+        InternalSalesTaxRatesDto givenInternalSalesTaxRatesDto = new InternalSalesTaxRatesDto(null, internalAddressDto, internalRateDto, null ,null ,null ,null, null ,null, null);
 
         // When
         boolean isEquals = internalSalesTaxRatesDto.equals(givenInternalSalesTaxRatesDto);

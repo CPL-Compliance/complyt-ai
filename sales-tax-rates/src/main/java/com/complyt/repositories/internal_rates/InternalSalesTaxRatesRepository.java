@@ -43,9 +43,8 @@ public class InternalSalesTaxRatesRepository {
     public Mono<InternalSalesTaxRates> save(@NonNull InternalSalesTaxRates internalSalesTaxRates) {
         String state = internalSalesTaxRates.getAddress().state();
 
-        return tenantResolver.resolve()
-                .flatMap(tenantId -> reactiveMongoTemplate.save(internalSalesTaxRates, getCollectionName(state))
-                .doOnSuccess(cachedInternalRate -> log.info("Saving internal of tenantId {} rate: {}", tenantId, cachedInternalRate)));
+        return reactiveMongoTemplate.save(internalSalesTaxRates, getCollectionName(state))
+                .doOnSuccess(cachedInternalRate -> log.info("Saving internal rate: {}", cachedInternalRate));
     }
 
     private String getCollectionName(String state) {
@@ -65,9 +64,10 @@ public class InternalSalesTaxRatesRepository {
         String state = updatedRate.getAddress().state();
         Query query = internalRatesAddressQueryBuilder.build(updatedRate);
 
-        return reactiveMongoTemplate.findAndReplace(query, updatedRate, FindAndReplaceOptions.options(), getCollectionName(state))
+        return reactiveMongoTemplate.findOne(query, InternalSalesTaxRates.class, getCollectionName(state))
+                .flatMap(foundInternalRate -> reactiveMongoTemplate.findAndReplace(query, updatedRate.setUpdatedFrom(foundInternalRate.getComplytId()), FindAndReplaceOptions.options(), getCollectionName(state))
                 .doOnNext(cachedInternalRate ->   log.info("Archiving old rate with complytId: {} to new rate: {}", cachedInternalRate.getComplytId(), updatedRate))
-                .flatMap(oldInternalRate -> reactiveMongoTemplate.save(oldInternalRate.setExpiredDate(LocalDateTime.now()).setId(null), InternalRatesCollectionNames.ARCHIVED_COLLECTION_NAME));
+                .flatMap(oldInternalRate -> reactiveMongoTemplate.save(oldInternalRate.setExpiredDate(LocalDateTime.now()).setUpdatedTo(updatedRate.getComplytId()).setId(null), InternalRatesCollectionNames.ARCHIVED_COLLECTION_NAME)));
     }
 }
 

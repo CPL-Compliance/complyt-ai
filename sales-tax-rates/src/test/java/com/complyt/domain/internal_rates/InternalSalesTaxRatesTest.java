@@ -35,7 +35,8 @@ public class InternalSalesTaxRatesTest {
                 "effectiveDates=" + internalSalesTaxRates.getEffectiveDates() + ", " +
                 "internalSalesTaxRatesMetaData=" + internalSalesTaxRates.getInternalSalesTaxRatesMetaData() + ", " +
                 "createdDate=" + internalSalesTaxRates.getCreatedDate() + ", " +
-                "expiredDate=" + internalSalesTaxRates.getExpiredDate() + ")";
+                "expiredDate=" + internalSalesTaxRates.getExpiredDate() +
+                ", appliedDate=null, updatedFrom=null, updatedTo=null)";
         ;
         // When
         String actualString = internalSalesTaxRates.toString();

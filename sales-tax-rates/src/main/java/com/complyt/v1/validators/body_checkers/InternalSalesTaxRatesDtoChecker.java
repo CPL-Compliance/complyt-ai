@@ -6,12 +6,15 @@ import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalRatesDto;
 import com.complyt.v1.model.internal_sales_tax_rates_dto.InternalSalesTaxRatesDto;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cloud.client.actuator.HasFeatures;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Comparator;
@@ -52,13 +55,13 @@ public class InternalSalesTaxRatesDtoChecker implements DtoBodyChecker<InternalS
      * Ensures that `maxEffectiveDate` is the latest date among all provided effective dates.
      */
     private Mono<String> checkMaxEffectiveDate(InternalEffectiveDatesDto effectiveDates) {
-        if (effectiveDates == null) {
+        if (effectiveDates == null || effectiveDates.getMaxEffectiveDate() == null) {
             return Mono.just("EffectiveDates " + DtoErrorMessages.NOT_NULL_ERROR);
         }
 
         Optional<LocalDate> maxDate = getMaxEffectiveDate(effectiveDates);
 
-        if (maxDate.isEmpty() || !maxDate.get().equals(LocalDate.parse(effectiveDates.getMaxEffectiveDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME))) {
+        if (maxDate.isPresent() && !maxDate.get().equals(LocalDate.parse(effectiveDates.getMaxEffectiveDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME))) {
             log.info("Invalid maxEffectiveDate. Expected: {}, Provided: {}", maxDate.orElse(null), effectiveDates.getMaxEffectiveDate());
             return Mono.just(DtoErrorMessages.INVALID_DATE_ERROR);
         }

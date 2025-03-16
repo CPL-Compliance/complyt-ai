@@ -16,7 +16,6 @@ import lombok.With;
 public class InternalEffectiveDatesDto {
 
     @Pattern(regexp = ISO8601Regex.expression, message = "effectiveDates.state " + DtoErrorMessages.DATE_FORMAT_ERROR)
-    @NotNull(message = "effectiveDates.state " + DtoErrorMessages.NOT_NULL_ERROR)
     String state;
 
     @Pattern(regexp = ISO8601Regex.expression, message = "effectiveDates.county " + DtoErrorMessages.DATE_FORMAT_ERROR)
