@@ -144,6 +144,29 @@ public class SalesTaxServiceImplTest {
     }
 
     @Test
+    void handleSalesTaxCalculation_TransactionWithSalesTaxWithOutAmount_TransactionModified() {
+        // Given
+        SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
+        ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //todo: note gst is null
+
+        List<Item> itemsWithRates = new ArrayList<>() {{
+            add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
+        }};
+        Transaction transactionWithSalesTaxWithOutAmount = transaction.withItems(itemsWithRates).withSalesTax(salesTax.withAmount(null));
+        SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
+
+        // When
+        when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
+        when(salesTaxRatesWrapperStrategy.select(transaction)).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
+        when(transactionRatesInjectionStrategy.select(transaction)).thenReturn(transaction -> Mono.just(transactionWithSalesTaxWithOutAmount));
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, customer);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionWithSalesTaxWithOutAmount).verifyComplete();
+    }
+
+    @Test
     void handleSalesTaxCalculation_SalesTaxDataIsUnincorporated_SalesTaxCalculatedAndTransactionModified() {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();

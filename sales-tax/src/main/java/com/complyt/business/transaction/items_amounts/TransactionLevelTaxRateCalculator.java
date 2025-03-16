@@ -30,7 +30,7 @@ public class TransactionLevelTaxRateCalculator implements AmountCalculator<Trans
         List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transaction);
         BigDecimal totalItemsAmount = totalItemsAmountCalculator.calculate(taxables, transaction.getIsTaxInclusive());
 
-        return Objects.equals(totalItemsAmount, BigDecimal.ZERO) ?
+        return Objects.equals(totalItemsAmount, BigDecimal.ZERO)  ?
                 BigDecimal.ZERO :
                 transaction.getSalesTax().amount().divide(totalItemsAmount, 5, RoundingMode.HALF_UP);
     }

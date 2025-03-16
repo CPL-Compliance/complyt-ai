@@ -65,7 +65,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     }
 
     private Mono<Transaction> calculateTransactionLevelTaxRate(Transaction transaction) {
-        if (transaction.getSalesTax() != null) {
+        if (transaction.getSalesTax() != null && transaction.getSalesTax().amount() != null) {
             BigDecimal transactionLevelTaxRate = transactionLevelTaxRateCalculator.calculate(transaction, transaction.getIsTaxInclusive());
             SalesTax salesTax = transaction.getSalesTax().withRate(transactionLevelTaxRate);
 
