@@ -5,9 +5,8 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-@Component
 public interface ISalesTaxTrackingDateDeterminer{
-    default LocalDateTime getSalesTaxTrackingAppliedDate(SalesTaxTracking salesTaxTracking) {
+     static LocalDateTime getSalesTaxTrackingAppliedDate(SalesTaxTracking salesTaxTracking) {
         LocalDateTime physicalDate = salesTaxTracking.getPhysicalNexusTracker().getEstablishedDate();
         LocalDateTime economicNexusDate = salesTaxTracking.getEconomicNexusTracker().getEstablishedDate();
 
@@ -15,6 +14,8 @@ public interface ISalesTaxTrackingDateDeterminer{
                 ? physicalDate.isBefore(economicNexusDate)
                 ? physicalDate
                 : economicNexusDate
+                : salesTaxTracking.getPhysicalNexusTracker().isEstablished()
+                ? physicalDate
                 : salesTaxTracking.getEconomicNexusTracker().isEstablished()
                 ? economicNexusDate
                 : EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE;

@@ -56,7 +56,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @NonNull
     private NexusService nexusService;
 
-    private final ISalesTaxTrackingDateDeterminer salesTaxTrackingDateDeterminer;
+//    @NonNull
+//    private final SalesTaxTrackingPhysicalNexusDateApplierInjector salesTaxTrackingPhysicalNexusDateApplierInjector;
 
     @Override
     public Mono<SalesTaxTracking> findById(@NonNull String id) {
@@ -65,7 +66,6 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> handleSalesTaxTrackingAfterTransactionCalculated(@NonNull SalesTaxTracking salesTaxTracking) {
-        salesTaxTracking.setAppliedDate(salesTaxTrackingDateDeterminer.getSalesTaxTrackingAppliedDate(salesTaxTracking));
         return salesTaxTracking.getEconomicNexusTracker().isEstablished() ?
                 updateEconomicNexus(salesTaxTracking) :
                 save(salesTaxTracking);
@@ -122,7 +122,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull NexusStateRule stateRule, @NonNull LocalDateTime referenceDate) {
         EconomicNexusTracker newTracker = new EconomicNexusTracker(true, referenceDate);
-        LocalDateTime appliedDate = salesTaxTrackingDateDeterminer.getSalesTaxTrackingAppliedDate(salesTaxTracking);
+        LocalDateTime appliedDate = applicationDateCreator.create(stateRule.timeFrame(), referenceDate);
 
         SalesTaxTracking modifiedTracking = salesTaxTracking
                 .withEconomicNexusTracker(newTracker)
@@ -204,8 +204,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> updateAppliedDateIfIsPhysicalNexusEstablished(@NonNull SalesTaxTracking salesTaxTracking) {
-        return salesTaxTracking.getPhysicalNexusTracker().isEstablished() ?
-                injectAppliedDateIfIsPhysicalEconomicEnabled(salesTaxTracking) : Mono.just(salesTaxTracking);
+        return injectAppliedDateIfIsPhysicalEconomicEnabled(salesTaxTracking);
     }
 
     private Mono<SalesTaxTracking> injectAppliedDateIfIsPhysicalEconomicEnabled(SalesTaxTracking salesTaxTracking) {
