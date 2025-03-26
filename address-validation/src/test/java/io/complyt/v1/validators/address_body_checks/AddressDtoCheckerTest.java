@@ -31,7 +31,7 @@ class AddressDtoCheckerTest {
     @Test
     void check_PartialAddressWithMissingZipCode_ShouldReturnErrors() {
         // Given
-        AddressDto addressWithoutZip = new AddressDto(null, "USA", null, "CO", null, null, true);
+        AddressDto addressWithoutZip = new AddressDto(null, "USA", null, "CO", null, null, null, true);
 
         Flux<String> errorMessages = addressDtoChecker.check(addressWithoutZip);
 
@@ -44,7 +44,7 @@ class AddressDtoCheckerTest {
     @Test
     void check_PartialAddressWithInvalidState_ShouldReturnErrors() {
         // Given
-        AddressDto addressWithoutZip = new AddressDto(null, "USA", null, "Invalid State", null, "80001", true);
+        AddressDto addressWithoutZip = new AddressDto(null, "USA", null, "Invalid State", null, "80001", null, true);
 
         Flux<String> errorMessages = addressDtoChecker.check(addressWithoutZip);
 
@@ -56,7 +56,7 @@ class AddressDtoCheckerTest {
     @Test
     void check_PartialAddressWithStateNull_ShouldReturnNoError() {
         // Given
-        AddressDto addressWithoutZip = new AddressDto(null, "USA", null, "CA", null, "80001", true);
+        AddressDto addressWithoutZip = new AddressDto(null, "USA", null, "CA", null, "80001", null, true);
 
         Flux<String> errorMessages = addressDtoChecker.check(addressWithoutZip);
 
@@ -67,7 +67,7 @@ class AddressDtoCheckerTest {
     @Test
     void check_PartialAddressWithStateBlank_ShouldReturnsError() {
         // Given
-        AddressDto addressWithoutZip = new AddressDto(null, "USA", null, "", null, "80001", true);
+        AddressDto addressWithoutZip = new AddressDto(null, "USA", null, "", null, "80001", null, true);
 
         Flux<String> errorMessages = addressDtoChecker.check(addressWithoutZip);
 
@@ -79,7 +79,7 @@ class AddressDtoCheckerTest {
     @Test
     void check_FullValidAddress_ShouldReturnEmpty() {
         // Given
-        AddressDto addressWithoutZip = new AddressDto("City", "USA", "County", "CO", "Street", "80001", false);
+        AddressDto addressWithoutZip = new AddressDto("City", "USA", "County", "CO", "Street", "80001", null, false);
 
         Flux<String> errorMessages = addressDtoChecker.check(addressWithoutZip);
 
@@ -89,7 +89,7 @@ class AddressDtoCheckerTest {
     @Test
     void check_FullAddressWithInvalidStateAndNullZip_ShouldReturnErrors() {
         // Given
-        AddressDto addressWithoutZip = new AddressDto("City", "USA", "County", "Invalid State", "Street", "Region", false);
+        AddressDto addressWithoutZip = new AddressDto("City", "USA", "County", "Invalid State", "Street", "Region", null, false);
 
         Flux<String> errorMessages = addressDtoChecker.check(addressWithoutZip);
 
@@ -102,7 +102,7 @@ class AddressDtoCheckerTest {
     @Test
     void check_FullAddressWithMissingFields_ShouldReturnErrors() {
         // Given
-        AddressDto addressWithoutZip = new AddressDto(null, "USA", null, null, null, "80001", false);
+        AddressDto addressWithoutZip = new AddressDto(null, "USA", null, null, null, "80001", null, false);
 
         Flux<String> errorMessages = addressDtoChecker.check(addressWithoutZip);
 
@@ -117,7 +117,7 @@ class AddressDtoCheckerTest {
     @Test
     void check_PartialAddressWithMissingZipAndBlankState_ShouldReturnErrors() {
         // Given
-        AddressDto address = new AddressDto(null, "USA", null, "", null, null, true);
+        AddressDto address = new AddressDto(null, "USA", null, "", null, null, null, true);
 
         Flux<String> errorMessages = addressDtoChecker.check(address);
 
@@ -129,21 +129,9 @@ class AddressDtoCheckerTest {
     }
 
     @Test
-    void check_PartialAddressWithUnsupportedCountry_ShouldReturnError() {
-        // Given
-        AddressDto address = new AddressDto(null, "UnsupportedCountry", null, null, null, "80001", true);
-
-        Flux<String> errorMessages = addressDtoChecker.check(address);
-
-        StepVerifier.create(errorMessages)
-                .expectNext(DtoErrorMessages.NOT_SUPPORTED_COUNTRY_FORMAT_ERROR)
-                .verifyComplete();
-    }
-
-    @Test
     void check_FullAddressWithBlankCity_ShouldReturnError() {
         // Given
-        AddressDto address = new AddressDto("", "USA", null, "CO", "Street", "80001", false);
+        AddressDto address = new AddressDto("", "USA", null, "CO", "Street", "80001", null, false);
 
         Flux<String> errorMessages = addressDtoChecker.check(address);
 
@@ -155,7 +143,7 @@ class AddressDtoCheckerTest {
     @Test
     void check_PartialAddressWithEmptyFields_ShouldReturnError() {
         // Given
-        AddressDto address = new AddressDto("", "USA", "", "", "", "", true);
+        AddressDto address = new AddressDto("", "USA", "", "", "", "", null, true);
 
         Flux<String> errorMessages = addressDtoChecker.check(address);
 
@@ -169,7 +157,7 @@ class AddressDtoCheckerTest {
     @Test
     void check_FullAddressWithAllFieldsMissing_ShouldReturnErrors() {
         // Given
-        AddressDto address = new AddressDto(null, "USA", null, null, null, null, false);
+        AddressDto address = new AddressDto(null, "USA", null, null, null, null, null, false);
 
         Flux<String> errorMessages = addressDtoChecker.check(address);
 
@@ -186,7 +174,7 @@ class AddressDtoCheckerTest {
     @Test
     void check_PartialAddressWithNullZipAndValidState_ShouldReturnErrors() {
         // Given
-        AddressDto address = new AddressDto(null, "USA", null, "CO", null, null, true);
+        AddressDto address = new AddressDto(null, "USA", null, "CO", null, null, null, true);
 
         Flux<String> errorMessages = addressDtoChecker.check(address);
 
@@ -199,7 +187,7 @@ class AddressDtoCheckerTest {
     @Test
     void check_PartialAddressWithLongZip_ShouldReturnErrors() {
         // Given
-        AddressDto address = new AddressDto(null, "USA", null, "CO", null, "1232434324324-3424123", true);
+        AddressDto address = new AddressDto(null, "USA", null, "CO", null, "1232434324324-3424123", null, true);
 
         Flux<String> errorMessages = addressDtoChecker.check(address);
 

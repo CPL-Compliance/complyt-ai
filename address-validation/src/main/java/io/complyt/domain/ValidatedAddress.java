@@ -19,7 +19,6 @@ import java.util.List;
 public class ValidatedAddress implements AddressData {
     @Id
     String id;
-    TempAddressData address; // todo remove phase 2
     List<CachedAddressData> matchedAddresses;
     Address requestAddress;
     LocalDateTime createdDate;

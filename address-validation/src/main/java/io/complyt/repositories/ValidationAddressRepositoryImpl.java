@@ -1,8 +1,8 @@
 package io.complyt.repositories;
 
-import io.complyt.business.collection_fetcher.UsaStatesMap;
+import io.complyt.business.address.CollectionNameResolver;
 import io.complyt.domain.Address;
-import io.complyt.domain.UnitedStatesAddressQueryBuilder;
+import io.complyt.domain.AddressQueryBuilder;
 import io.complyt.domain.ValidatedAddress;
 import io.complyt.security.TenantResolver;
 import io.complyt.utils.observability.ContextLogger;
@@ -25,18 +25,19 @@ public class ValidationAddressRepositoryImpl {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     @NonNull
-    private UnitedStatesAddressQueryBuilder unitedStatesAddressQueryBuilder;
+    private AddressQueryBuilder addressQueryBuilder;
 
     public Mono<ValidatedAddress> saveAddress(@NonNull ValidatedAddress address) {
-        String collection = UsaStatesMap.statesToCollections.get(address.getRequestAddress().state().toUpperCase());
+        String collection = CollectionNameResolver.resolve(address.getRequestAddress());
+
         return tenantResolver.resolve()
                 .flatMap(tenantId -> ContextLogger.observeCtx("--> saving validated address of tenantId " + tenantId + ": " + address, log::info)
                 .then(reactiveMongoTemplate.save(address, collection)));
     }
 
     public Mono<ValidatedAddress> findAddress(@NonNull Address address) {
-        Query query = unitedStatesAddressQueryBuilder.build(address);
-        String collection = UsaStatesMap.statesToCollections.get(address.state().toUpperCase());
+        Query query = addressQueryBuilder.build(address);
+        String collection = CollectionNameResolver.resolve(address);
 
         return tenantResolver.resolve()
                 .flatMap(tenantId -> ContextLogger.observeCtx("--> find validated address of tenantId " + tenantId + ": " + address + " with query: " + query, log::info)

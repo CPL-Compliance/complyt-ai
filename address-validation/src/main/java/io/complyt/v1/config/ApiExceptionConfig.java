@@ -1,7 +1,6 @@
 package io.complyt.v1.config;
 
 import io.complyt.utils.exceptions.types.ObjectNotValidException;
-import io.complyt.utils.exceptions.types.ZipCodeMismatchException;
 import io.complyt.utils.exceptions.types.fastTax.FastTaxException;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +26,6 @@ public class ApiExceptionConfig {
     public Map<Class<? extends Exception>, HttpStatus> exceptionToStatusCode() {
         return Map.of(
                 ObjectNotValidException.class, HttpStatus.BAD_REQUEST,
-                ZipCodeMismatchException.class, HttpStatus.BAD_REQUEST,
                 FastTaxException.class, HttpStatus.BAD_REQUEST
         );
     }

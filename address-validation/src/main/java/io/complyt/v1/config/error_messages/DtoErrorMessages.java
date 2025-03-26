@@ -6,6 +6,5 @@ public interface DtoErrorMessages {
     String STATE_NOT_RECOGNIZED_USA = "The state in the provided USA address is not recognized. Please verify and provide a valid state";
     String NON_PARTIAL_ERROR_SUFFIX = "in a non-partial address"; // Appended to other errors messages
     String PARTIAL_ERROR_SUFFIX = "in a partial address"; // Appended to other errors messages
-    String NOT_SUPPORTED_COUNTRY_FORMAT_ERROR =  "Invalid country provided. Only US addresses are supported. Please provide a valid US address";
 }
 

@@ -30,7 +30,7 @@ public class AddressDtoChecker implements DtoBodyChecker<AddressDto> {
                                         checkVariableNotBlank(address.zip(), nonPartialAddressErrorBuilder("Zip", address.zip())),
                                         checkIfZipIsValid(address.zip(), zipErrorBuilder(address.zip())),
                                         checkIfStateExists(address.state(), stateErrorBuilder(address.state()))) :
-                        Flux.just(DtoErrorMessages.NOT_SUPPORTED_COUNTRY_FORMAT_ERROR));
+                        Flux.empty());
     }
 
     private Mono<String> checkVariableNotBlank(String variable, String errorMessage) {

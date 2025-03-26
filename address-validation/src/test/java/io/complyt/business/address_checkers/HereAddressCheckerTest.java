@@ -36,26 +36,26 @@ class HereAddressCheckerTest {
     }
 
     @Test
-    void checkStateMatch_StateMatches_ReturnsData() {
+    void validateCountryAndStateMatch_StateMatches_ReturnsData() {
         // Given
         cachedAddressData = cachedAddressData.withAddress(address);
 
         // When
-        Mono<CachedAddressData> result = hereAddressChecker.checkStateMatch(cachedAddressData, address);
+        Mono<CachedAddressData> result = hereAddressChecker.validateCountryAndStateMatch(cachedAddressData, address);
 
         // Then
         StepVerifier.create(result).expectNext(cachedAddressData).verifyComplete();
     }
 
     @Test
-    void checkStateMatch_StateMismatch_ThrowsException() {
+    void validateCountryAndStateMatch_StateMismatch_ThrowsException() {
         // Given
-        FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.NO_MATCH, FieldMatchType.EXACT, FieldMatchType.EXACT,FieldMatchType.EXACT);
+        FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.NO_MATCH, FieldMatchType.EXACT, FieldMatchType.EXACT,FieldMatchType.EXACT, null);
         cachedAddressData = cachedAddressData.withScoring(TestUtilities.getScoring().withFieldScore(fieldsMatchScore));
         cachedAddressData = cachedAddressData.withAddress(cachedAddressData.address().withState("DifferentState"));
 
         // When
-        Mono<CachedAddressData> result = hereAddressChecker.checkStateMatch(cachedAddressData, address);
+        Mono<CachedAddressData> result = hereAddressChecker.validateCountryAndStateMatch(cachedAddressData, address);
 
         // Then
         StepVerifier.create(result)
@@ -153,11 +153,22 @@ class HereAddressCheckerTest {
         assertFalse(result);
     }
 
+
+    @Test
+    void isValidAddress_CountyAndZipNullNonUS_ReturnsTrue() {
+        // When
+        cachedAddressData = cachedAddressData.withAddress(TestUtilities.getAddress().withCountry("Canada").withCounty(null));
+        boolean result = hereAddressChecker.isValidAddress(cachedAddressData);
+
+        // Then
+        assertTrue(result);
+    }
+
     @Test
     public void resolveAddress_NullData_ThrowsNullPointerException() {
         // Act & Assert
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            hereAddressChecker.checkStateMatch(null, address).block();
+            hereAddressChecker.validateCountryAndStateMatch(null, address).block();
         });
 
         // Assert
@@ -168,7 +179,7 @@ class HereAddressCheckerTest {
     public void resolveAddress_NullAddress_ThrowsNullPointerException() {
         // Act & Assert
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            hereAddressChecker.checkStateMatch(cachedAddressData, null).block();
+            hereAddressChecker.validateCountryAndStateMatch(cachedAddressData, null).block();
         });
 
         // Assert
@@ -190,7 +201,7 @@ class HereAddressCheckerTest {
     @Test
     void isValidAddress_NullScoring_ShouldReturnFalse() {
         // Given
-        CachedAddressData item = new CachedAddressData(new Address("New York", "USA", "New York County", "NY", "5th Ave", "10001", false), null);
+        CachedAddressData item = new CachedAddressData(new Address("New York", "USA", "New York County", "NY", "5th Ave", "10001", null,false), null);
 
         // When
         boolean result = hereAddressChecker.isValidAddress(item);
@@ -218,5 +229,116 @@ class HereAddressCheckerTest {
 
         // Then
         assertTrue(result, "Expected true when item, address, and scoring are valid");
+    }
+
+    @Test
+    void validateCountryAndStateMatch_countryMismatch_shouldReturnError() {
+        // given
+        CachedAddressData dataWithNoCountryMatch = cachedAddressData.withScoring(
+                cachedAddressData.scoring().withFieldScore(
+                        cachedAddressData.scoring().fieldScore().withCountryMatch(FieldMatchType.NO_MATCH)
+                )
+        );
+
+        // when & then
+        StepVerifier.create(hereAddressChecker.validateCountryAndStateMatch(dataWithNoCountryMatch, address))
+                .expectErrorSatisfies(ex -> {
+                    assertTrue(ex instanceof ObjectNotValidException);
+                    assertTrue(ex.getMessage().contains("The country you provided (US) does not match "));
+                })
+                .verify();
+    }
+
+    @Test
+    void validateCountryAndStateMatch_nonUsaCountry_shouldReturnSuccessEvenIfStateMismatch() {
+        // given
+        Address nonUsAddress = address.withCountry("FR"); // France or any non-USA country
+        CachedAddressData dataWithStateMismatch = cachedAddressData.withScoring(
+                cachedAddressData.scoring().withFieldScore(
+                        cachedAddressData.scoring().fieldScore()
+                                .withCountryMatch(FieldMatchType.EXACT)
+                                .withStateMatch(FieldMatchType.NO_MATCH)
+                )
+        );
+
+        // when & then
+        StepVerifier.create(hereAddressChecker.validateCountryAndStateMatch(dataWithStateMismatch, nonUsAddress))
+                .expectNext(dataWithStateMismatch)
+                .verifyComplete();
+    }
+
+    @Test
+    void validateCountryAndStateMatch_usaCountryStateMismatch_shouldReturnError() {
+        // given
+        Address usAddress = address.withCountry("US");
+        CachedAddressData dataWithStateMismatch = cachedAddressData.withScoring(
+                cachedAddressData.scoring().withFieldScore(
+                        cachedAddressData.scoring().fieldScore()
+                                .withCountryMatch(FieldMatchType.EXACT)
+                                .withStateMatch(FieldMatchType.NO_MATCH)
+                )
+        );
+
+        // when & then
+        StepVerifier.create(hereAddressChecker.validateCountryAndStateMatch(dataWithStateMismatch, usAddress))
+                .expectErrorSatisfies(ex -> {
+                    assertTrue(ex instanceof ObjectNotValidException);
+                    assertTrue(ex.getMessage().contains("The state you provided (CA) does not match"));
+                })
+                .verify();
+    }
+
+    @Test
+    void validateCountryAndStateMatch_usaCountryStateMatch_shouldReturnSuccess() {
+        // given
+        Address usAddress = address.withCountry("US");
+        CachedAddressData validData = cachedAddressData.withScoring(
+                cachedAddressData.scoring().withFieldScore(
+                        cachedAddressData.scoring().fieldScore()
+                                .withCountryMatch(FieldMatchType.EXACT)
+                                .withStateMatch(FieldMatchType.EXACT)
+                )
+        );
+
+        // when & then
+        StepVerifier.create(hereAddressChecker.validateCountryAndStateMatch(validData, usAddress))
+                .expectNext(validData)
+                .verifyComplete();
+    }
+
+    @Test
+    void validateCountryAndStateMatch_NotUsaCountryMatchStateMatchNull_shouldReturnError() {
+        // given
+        Address usAddress = address.withCountry("Germany");
+        CachedAddressData dataWithStateMismatch = cachedAddressData.withScoring(
+                cachedAddressData.scoring().withFieldScore(
+                        cachedAddressData.scoring().fieldScore()
+                                .withCountryMatch(FieldMatchType.EXACT)
+                                .withStateMatch(null)
+                )
+        );
+
+        // when & then
+        StepVerifier.create(hereAddressChecker.validateCountryAndStateMatch(dataWithStateMismatch, usAddress))
+                .expectNext(dataWithStateMismatch).verifyComplete();
+    }
+
+    // Shouldn't happen but just in case - If US, has to have the stateMatch
+    @Test
+    void validateCountryAndStateMatch_usaCountry_stateMatchNull_shouldReturnSuccess() {
+        // given
+        Address usAddress = address.withCountry("US");
+        CachedAddressData dataWithNullStateMatch = cachedAddressData.withScoring(
+                cachedAddressData.scoring().withFieldScore(
+                        cachedAddressData.scoring().fieldScore()
+                                .withCountryMatch(FieldMatchType.EXACT)
+                                .withStateMatch(null) // critical case
+                )
+        );
+
+        // when & then
+        StepVerifier.create(hereAddressChecker.validateCountryAndStateMatch(dataWithNullStateMatch, usAddress))
+                .expectNext(dataWithNullStateMatch)
+                .verifyComplete();
     }
 }

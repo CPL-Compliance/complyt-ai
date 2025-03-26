@@ -6,6 +6,7 @@ import io.complyt.config.web_clients.WebClientWrapperProperties;
 import io.complyt.domain.Address;
 import io.complyt.domain.enums.FieldMatchType;
 import io.complyt.domain.enums.FieldsMatchScore;
+import io.complyt.domain.enums.MatchLevelType;
 import io.complyt.domain.here.HereAddress;
 import io.complyt.domain.here.HereAddressData;
 import io.complyt.domain.here.HereFieldScore;
@@ -13,6 +14,7 @@ import io.complyt.security.TenantResolver;
 import io.complyt.v1.mappers.AddressMapper;
 import io.complyt.v1.models.AddressDto;
 import io.complyt.v1.models.CachedAddressDataDto;
+import io.complyt.v1.models.ScoringDto;
 import io.complyt.v1.models.ValidatedAddressDto;
 import io.complyt.v1.routers.AddressRouter;
 import org.junit.jupiter.api.*;
@@ -79,8 +81,8 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         // Given
         AddressDto addressDto = new AddressDto(
                 "New York", "United States", "New York", "New York",
-                "164 Mulberry St", "10014", false);
-        FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT);
+                "164 Mulberry St", "10014", null, false);
+        FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, null);
         CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(null), TestUtilities.getScoringDto().withFieldScore(fieldsMatchScore));
 
         // When + Then
@@ -109,7 +111,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         // Given
         AddressDto addressDto = new AddressDto(
                 "Oxenfurt", "USA", "Gustfields", "NY",
-                "Oxenfurt Academy", "11221", false);
+                "Oxenfurt Academy", "11221", null, false);
         CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(null), TestUtilities.getScoringDto());
 
         Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
@@ -148,7 +150,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         // Given
         AddressDto addressDto = new AddressDto(
                 "Oxenfurt", "USA", "Gustfields", "TX",
-                "Oxenfurt Academy", "11221", false);
+                "Oxenfurt Academy", "11221", null, false);
         CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto, TestUtilities.getScoringDto());
 
         Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
@@ -185,7 +187,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         // Given
         AddressDto addressDto = new AddressDto(
                 "Oxenfurt", "USA", "Gustfields", "NY",
-                "Oxenfurt Academy", "11222", false);
+                "Oxenfurt Academy", "11222", null, false);
 
 
         double score = 0.2f;
@@ -221,7 +223,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         // Given
         AddressDto addressDto = new AddressDto(
                 "Oxenfurt", "USA", "Gustfields", "NY",
-                "Oxenfurt Academy", "11221", false);
+                "Oxenfurt Academy", "11221", null, false);
 
         Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
         double badScore = 0.1;
@@ -260,13 +262,86 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
     @Order(1)
     @Test
     @WithMockUser
-    public void getAddress_AddressNotInUS_Returns400() {
+    public void getAddress_AddressNotInUS_Returns200() {
         // Given
         AddressDto addressDto = new AddressDto(
                 null, "Israel", null, null,
-                null, "10014", true);
-        FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT);
-        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto, TestUtilities.getScoringDto().withFieldScore(fieldsMatchScore));
+                null, "10014", null, false);
+        ScoringDto scoringDto = TestUtilities.getScoringGlobalDto();
+        CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withIsPartial(null), scoringDto);
+        ValidatedAddressDto expectedAddress = new ValidatedAddressDto(List.of(cachedAddressDataDto), addressDto);
+
+        HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
+                .withAddress(new HereAddress(null, null, addressDto.country(), null, addressDto.state(), addressDto.county(), addressDto.city(), addressDto.street(), addressDto.zip()))
+                .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0))));
+
+        when(stubHereAddressValidationWebClientWrapper.validateAddress(any())).thenReturn(Mono.just(hereAddressData));
+
+        // When + Then
+        webTestClient
+                .mutate().responseTimeout(Duration.ofSeconds(20)).build()
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(AddressRouter.BASE_URL + "/validate")
+                        .queryParam("country", addressDto.country())
+                        .queryParam("zip", addressDto.zip())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ValidatedAddressDto.class)
+                .value(receivedAddressDto -> assertEquals(expectedAddress, receivedAddressDto));
+    }
+
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void getAddress_AddressNotInUS_RegionNotEmpty_Returns200() {
+        // Given
+        AddressDto addressDto = new AddressDto(
+                null, "Canada", null, null,
+                null, "10015", "Quebec", false);
+        ScoringDto scoringDto = TestUtilities.getScoringGlobalDto();
+        CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withIsPartial(null), scoringDto);
+        ValidatedAddressDto expectedAddress = new ValidatedAddressDto(List.of(cachedAddressDataDto), addressDto);
+
+        HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
+                .withAddress(new HereAddress(null, null, addressDto.country(), null, addressDto.region(), addressDto.county(), addressDto.city(), addressDto.street(), addressDto.zip()))
+                .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0))));
+
+        when(stubHereAddressValidationWebClientWrapper.validateAddress(any())).thenReturn(Mono.just(hereAddressData));
+
+        // When + Then
+        webTestClient
+                .mutate().responseTimeout(Duration.ofSeconds(20)).build()
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(AddressRouter.BASE_URL + "/validate")
+                        .queryParam("country", addressDto.country())
+                        .queryParam("zip", addressDto.zip())
+                        .queryParam("region", addressDto.region())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ValidatedAddressDto.class)
+                .value(receivedAddressDto -> assertEquals(expectedAddress, receivedAddressDto));
+    }
+
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void resolve_AddressNotInUS_CountryNotMatch_Returns400() {
+        // Given
+        AddressDto addressDto = new AddressDto(
+                null, "Canada", null, null,
+                null, "10014", "Quebec", false);
+
+        HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
+                .withAddress(new HereAddress(null, null, "Other Country", null, addressDto.region(), addressDto.county(), addressDto.city(), addressDto.street(), addressDto.zip()))
+                .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0).withFieldScore(TestUtilities.getHereScoring().fieldScore().withCountry(0)))));
+
+        when(stubHereAddressValidationWebClientWrapper.validateAddress(any())).thenReturn(Mono.just(hereAddressData));
 
         // When + Then
         webTestClient
@@ -275,7 +350,24 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 .uri(uriBuilder -> uriBuilder
                         .path(AddressRouter.BASE_URL + "/resolve")
                         .queryParam("country", addressDto.country())
-                        .queryParam("isPartial", addressDto.isPartial())
+                        .queryParam("zip", addressDto.zip())
+                        .queryParam("region", addressDto.region())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void getAddress_AddressNotInUS_CountryNull_Returns400() {
+        // When + Then
+        webTestClient
+                .mutate().responseTimeout(Duration.ofSeconds(20)).build()
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(AddressRouter.BASE_URL + "/validate")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -289,8 +381,8 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         // Given
         AddressDto addressDto = new AddressDto(
                 "New York", "United States", null, "New York",
-                "164 Mulberry St", "10014", false);
-        FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT);
+                "164 Mulberry St", "10014", null, false);
+        FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, null);
         CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withCounty("New York").withIsPartial(null), TestUtilities.getScoringDto().withFieldScore(fieldsMatchScore));
         ValidatedAddressDto expectedAddress = new ValidatedAddressDto(List.of(cachedAddressDataDto), addressDto);
 
@@ -311,5 +403,40 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 .expectStatus().isOk()
                 .expectBody(ValidatedAddressDto.class)
                 .value(receivedAddressDto -> assertEquals(expectedAddress, receivedAddressDto));
+    }
+
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void resolve_ValidateAddress_StateMismatch_Returns400() {
+        // Given
+        AddressDto addressDto = new AddressDto(
+                "New York", "United States", null, "New York",
+                "164 Mulberry St", "12345", null, false);
+        FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, null);
+        CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withCounty("New York").withIsPartial(null), TestUtilities.getScoringDto().withFieldScore(fieldsMatchScore));
+
+        HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
+                .withAddress(new HereAddress(null, null, addressDto.country(), null, addressDto.region(), addressDto.county(), addressDto.city(), addressDto.street(), addressDto.zip()))
+                .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0).withFieldScore(TestUtilities.getHereScoring().fieldScore().withState(0)))));
+
+
+        when(stubHereAddressValidationWebClientWrapper.validateAddress(any())).thenReturn(Mono.just(hereAddressData));
+
+        // When + Then
+        webTestClient
+                .mutate().responseTimeout(Duration.ofSeconds(20)).build()
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(AddressRouter.BASE_URL + "/resolve")
+                        .queryParam("state", addressDto.state())
+                        .queryParam("zip", addressDto.zip())
+                        .queryParam("city", addressDto.city())
+                        .queryParam("street", addressDto.street())
+                        .queryParam("country", addressDto.country())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 }

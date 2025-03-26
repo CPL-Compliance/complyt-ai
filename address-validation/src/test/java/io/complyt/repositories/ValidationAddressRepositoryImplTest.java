@@ -2,7 +2,7 @@ package io.complyt.repositories;
 
 import io.complyt.business.collection_fetcher.UsaStatesMap;
 import io.complyt.domain.Address;
-import io.complyt.domain.UnitedStatesAddressQueryBuilder;
+import io.complyt.domain.AddressQueryBuilder;
 import io.complyt.domain.ValidatedAddress;
 import io.complyt.security.TenantResolver;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ public class ValidationAddressRepositoryImplTest {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     @Mock
-    private UnitedStatesAddressQueryBuilder unitedStatesAddressQueryBuilder;
+    private AddressQueryBuilder addressQueryBuilder;
 
     @Mock
     TenantResolver tenantResolver;
@@ -54,7 +54,7 @@ public class ValidationAddressRepositoryImplTest {
     @Test
     void findAddress_AddressFound_ReturnsValidatedAddress() {
         Query query = new Query();
-        when(unitedStatesAddressQueryBuilder.build(address)).thenReturn(query);
+        when(addressQueryBuilder.build(address)).thenReturn(query);
         when(reactiveMongoTemplate.findOne(query, ValidatedAddress.class, collection))
                 .thenReturn(Mono.just(validatedAddress));
         when(tenantResolver.resolve()).thenReturn(Mono.just("12345"));
@@ -67,7 +67,7 @@ public class ValidationAddressRepositoryImplTest {
     @Test
     void findAddress_AddressNotFound_ReturnsEmpty() {
         Query query = new Query();
-        when(unitedStatesAddressQueryBuilder.build(address)).thenReturn(query);
+        when(addressQueryBuilder.build(address)).thenReturn(query);
         when(reactiveMongoTemplate.findOne(query, ValidatedAddress.class, collection))
                 .thenReturn(Mono.empty());
         when(tenantResolver.resolve()).thenReturn(Mono.just("12345"));

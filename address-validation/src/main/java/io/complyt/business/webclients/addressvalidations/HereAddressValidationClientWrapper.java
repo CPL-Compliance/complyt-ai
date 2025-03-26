@@ -80,6 +80,7 @@ public class HereAddressValidationClientWrapper extends AddressValidationWebClie
                 .host(host)
                 .path(path)
                 .queryParam("qq", qureyParamsStringBuilder.toString())
+                .queryParam("lang", "en") // Parse text to english
                 .queryParam(licenseKey.getValue0(), licenseKey.getValue1())
                 .build().toUri();
     }

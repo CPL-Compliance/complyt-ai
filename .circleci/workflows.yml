@@ -245,6 +245,12 @@ jobs:
           container_image_name_updates: "container=<<parameters.service_name>>, tag=${IMAGE_TAG}"
           family: "<<parameters.service_name>>-prod-1"
           service_name: "<<parameters.service_name>>"
+      ## Deploy to production ec2 cluster
+      - aws-ecs/update_service:
+          cluster: "prod-2-ec2"
+          container_image_name_updates: "container=<<parameters.service_name>>, tag=${IMAGE_TAG}"
+          family: "<<parameters.service_name>>-prod-2"
+          service_name: "<<parameters.service_name>>"
       ## Deploy to demo cluster
       - aws-ecs/update_service:
           cluster: "demo-1"

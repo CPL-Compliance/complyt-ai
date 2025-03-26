@@ -34,12 +34,14 @@ import test_utils.TestUtilities;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
@@ -67,6 +69,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
         address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
         validatedAddress = TestUtilities.getValidatedAddress();
     }
+
     @Override
     @WithMockUser
     @Test
@@ -288,7 +291,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
                 .value(map -> TestUtilities.checkErrorMessages(map,
-                        Set.of("Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR)));
+                        Set.of("State may not be blank in a non-partial address", DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)));
     }
 
     @Override
@@ -345,8 +348,8 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
-                .value(map -> TestUtilities.checkErrorMessages(map,
-                        Set.of("Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR)));
+                .value(map -> assertEquals(map.get("message").toString(),
+                        List.of("Zip may not be blank in a non-partial address", DtoErrorMessages.ZIP_NOT_IN_FORMAT).toString()));
     }
 
     @Override
@@ -374,8 +377,8 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
-                .value(map -> TestUtilities.checkErrorMessages(map,
-                        Set.of("Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR)));
+                .value(map -> assertEquals(map.get("message").toString(),
+                        List.of("Zip may not be blank in a non-partial address", DtoErrorMessages.ZIP_NOT_IN_FORMAT).toString()));
     }
 
     @Override
@@ -434,9 +437,9 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
                 .value(map -> TestUtilities.checkErrorMessages(map,
-                        Set.of(new StringBuilder().append("Street ")
-                                .append(StringErrorMessages.NOT_BE_BLANK_ERROR).append(" ")
-                                .append(DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX).toString())));
+                        Set.of("Street " +
+                                StringErrorMessages.NOT_BE_BLANK_ERROR + " " +
+                                DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX)));
     }
 
     @Override
@@ -490,7 +493,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
                 .value(map -> TestUtilities.checkErrorMessages(map,
-                        Set.of("Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR)));
+                        Set.of("State may not be blank in a non-partial address", DtoErrorMessages.STATE_NOT_RECOGNIZED_USA)));
     }
 
     @Override
@@ -645,7 +648,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     @Test
     public void get_partialAddressWithMinimumParams_Returns200() {
         // Given
-        AddressDto givenAddressDto = new AddressDto(null, addressDto.country(), null, addressDto.state(), null, addressDto.zip(), true);
+        AddressDto givenAddressDto = new AddressDto(null, addressDto.country(), null, addressDto.state(), null, addressDto.zip(), null, true);
         Address mappedAddress = AddressMapper.INSTANCE.addressDtoToAddress(givenAddressDto);
         ValidatedAddressDto expectedValidatedAddressDto = ValidateAddressMapper.INSTANCE.validatedAddressToValidatedAddressDto(validatedAddress);
 
@@ -769,15 +772,14 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
                 .value(map -> TestUtilities.checkErrorMessages(map,
-                        Set.of("Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR,
-                                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR)));
+                        Set.of("Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR)));
     }
 
     @WithMockUser
     @Test
     public void resolve_PartialAddressWithMinimumParams_Returns200() {
         // Given
-        AddressDto partialAddressDto = new AddressDto(null, addressDto.country(), null, addressDto.state(), null, addressDto.zip(), true);
+        AddressDto partialAddressDto = new AddressDto(null, addressDto.country(), null, addressDto.state(), null, addressDto.zip(), null, true);
         Address mappedAddress = AddressMapper.INSTANCE.addressDtoToAddress(partialAddressDto);
         CachedAddressData cachedAddressData = TestUtilities.getCachedAddressData();
         CachedAddressDataDto expectedCachedAddressDataDto = CachedAddressDataMapper.INSTANCE.cachedAddressDataToCachedAddressDataDto(cachedAddressData);
@@ -800,5 +802,30 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
                 .expectStatus().isOk()
                 .expectBody(CachedAddressDataDto.class)
                 .isEqualTo(expectedCachedAddressDataDto);
+    }
+
+    @WithMockUser
+    @Test
+    public void validate_CountryNonUS_Returns200() {
+        // Given
+        ValidatedAddressDto expectedValidatedAddressDto = ValidateAddressMapper.INSTANCE.validatedAddressToValidatedAddressDto(validatedAddress);
+
+        // When
+        when(validAddressFacade.validateAddress(any())).thenReturn(Mono.just(validatedAddress));
+
+        // Then
+        webTestClient
+                .mutate()
+                .responseTimeout(Duration.ofSeconds(100)).build()
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(AddressRouter.BASE_URL + "/validate")
+                        .queryParam("country", "Israel")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ValidatedAddressDto.class)
+                .value(addressWithSalesTaxRatesItem -> addressWithSalesTaxRatesItem, equalTo(expectedValidatedAddressDto));
     }
 }

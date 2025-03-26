@@ -17,11 +17,12 @@ public class AddressDtoQueryParamsExtractor implements QueryParamsExtractor<Addr
         String street = serverRequest.queryParam("street").orElse(null);
         String zip = serverRequest.queryParam("zip").orElse(null);
         String county = serverRequest.queryParam("county").orElse(null);
+        String region = serverRequest.queryParam("region").orElse(null);
         boolean isPartial = serverRequest.queryParam("isPartial")
                 .map(Boolean::valueOf)
                 .orElse(false);
 
-        AddressDto addressDto = new AddressDto(city, country, county, state, street, zip, isPartial);
+        AddressDto addressDto = new AddressDto(city, country, county, state, street, zip, region, isPartial);
         return ContextLogger.observeCtx("Address extracted from request query params: " + addressDto, log::info)
                 .then(Mono.just(addressDto));
     }

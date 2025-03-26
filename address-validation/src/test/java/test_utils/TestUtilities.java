@@ -25,31 +25,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public interface TestUtilities {
 
     static Address getAddress() {
-        return new Address("Beverly Hills", "US", null, "CA", "1008 Elden Way", "90210", false);
+        return new Address("Beverly Hills", "US", null, "CA", "1008 Elden Way", "90210", null,false);
     }
 
     static ValidatedAddress getValidatedAddress() {
-        return new ValidatedAddress(null, null, List.of(getCachedAddressData()), getAddress(), LocalDateTime.now());
+        return new ValidatedAddress(null, List.of(getCachedAddressData()), getAddress(), LocalDateTime.now());
     }
 
     static CachedAddressData getCachedAddressData() {
-        Address address = new Address("Beverly Hills", "US", "County", "CA", "1008 Elden Way", "90210", null);
-        Scoring scoring = new Scoring(MatchLevelType.GOOD, 0.8, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL));
+        Address address = new Address("Beverly Hills", "US", "County", "CA", "1008 Elden Way", "90210", null, null);
+        Scoring scoring = new Scoring(MatchLevelType.GOOD, 0.8, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, null));
         return new CachedAddressData(address, scoring);
     }
 
     static CachedAddressDataDto getCachedAddressDataDto() {
-        AddressDto address = new AddressDto("Beverly Hills", "US", "County", "CA", "1008 Elden Way", "90210", true);
-        ScoringDto scoring = new ScoringDto(MatchLevelType.GOOD, 0.8, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL));
+        AddressDto address = new AddressDto("Beverly Hills", "US", "County", "CA", "1008 Elden Way", "90210", null, true);
+        ScoringDto scoring = new ScoringDto(MatchLevelType.GOOD, 0.8, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, null));
         return new CachedAddressDataDto(address, scoring);
     }
 
     static Scoring getScoring() {
-        return new Scoring(MatchLevelType.POOR, 0.5f, new FieldsMatchScore(FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL));
+        return new Scoring(MatchLevelType.POOR, 0.5f, new FieldsMatchScore(FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, null));
     }
 
     static ScoringDto getScoringDto() {
-        return new ScoringDto(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL));
+        return new ScoringDto(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, null));
+    }
+
+    static ScoringDto getScoringGlobalDto() {
+        return new ScoringDto(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.PARTIAL,null, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL));
     }
 
     static HereAddressData getHereAddressData() {
@@ -68,7 +72,7 @@ public interface TestUtilities {
     }
 
     static AddressDto getAddressDto() {
-        return new AddressDto("Beverly Hills", "US", null, "CA", "1008 Elden Way", "90210", false);
+        return new AddressDto("Beverly Hills", "US", null, "CA", "1008 Elden Way", "90210", null,false);
     }
 
     static String stringByLength(int length) {
@@ -116,6 +120,7 @@ public interface TestUtilities {
                                 .append("state", "California")
                                 .append("street", "123 Hollywood Blvd")
                                 .append("zip", "90028")
+                                .append("region", "region")
                                 .append("isPartial", false))
                                 .append("scoring", new Document("matchLevel", "EXCELLENT")
                                         .append("score", 1.0)
@@ -124,6 +129,7 @@ public interface TestUtilities {
                                                 .append("cityMatch", "PARTIAL")
                                                 .append("zipMatch", "EXACT")
                                                 .append("streetMatch", "NO_MATCH")
+                                                .append("regionMatch", "NO_MATCH")
                                         )
                                 )
                 ))
@@ -132,7 +138,9 @@ public interface TestUtilities {
                         .append("state", "California")
                         .append("zip", "90210")
                         .append("street", "10 5th Ave")
-                        .append("isPartial", false))
+                        .append("isPartial", false)
+                        .append("region", "region")
+                )
                 .append("createdDate", LocalDateTime.now())
                 .append("_class", "io.complyt.domain.ValidatedAddress");
     }

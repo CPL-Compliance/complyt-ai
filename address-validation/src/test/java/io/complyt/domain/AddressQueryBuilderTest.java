@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UnitedStatesAddressQueryBuilderTest {
-    UnitedStatesAddressQueryBuilder addressQueryBuilder;
+class AddressQueryBuilderTest {
+    AddressQueryBuilder addressQueryBuilder;
 
     Address fullAddressNoCountyAddress;
     Address fullAddressWithCountyAddress;
@@ -21,7 +21,7 @@ class UnitedStatesAddressQueryBuilderTest {
 
     @BeforeEach
     void setUp() {
-        addressQueryBuilder = new UnitedStatesAddressQueryBuilder();
+        addressQueryBuilder = new AddressQueryBuilder();
         fullAddressNoCountyAddress = TestUtilities.getAddress();
         fullAddressWithCountyAddress = fullAddressNoCountyAddress.withCounty("county");
         partialAddress = fullAddressNoCountyAddress
@@ -90,8 +90,47 @@ class UnitedStatesAddressQueryBuilderTest {
             expectedQuery.addCriteria(Criteria.where("requestAddress.county").regex(escapedSearchString, "i"));
         });
 
+        Optional.ofNullable(fullAddressWithCountyAddress.county()).ifPresent(value -> {
+            String escapedSearchString = Pattern.quote(value);
+            expectedQuery.addCriteria(Criteria.where("requestAddress.region").regex(escapedSearchString, "i"));
+        });
+
         // When
         Query actualQuery = addressQueryBuilder.build(fullAddressWithCountyAddress);
+
+        // Then
+        Assertions.assertEquals(expectedQuery, actualQuery);
+    }
+
+    @Test
+    void build_FullAddressNonUSPassed_ReturnsQuery() {
+        // Given
+        partialAddress = partialAddress.withCountry("Germany");
+        Query expectedQuery = Query.query(Criteria.where("requestAddress.zip").is(partialAddress.zip()));
+
+        Optional.ofNullable(partialAddress.city()).ifPresent(value -> {
+            String escapedSearchString = Pattern.quote(value);
+            expectedQuery.addCriteria(Criteria.where("requestAddress.city").regex(escapedSearchString, "i"));
+        });
+
+        Optional.ofNullable(partialAddress.street()).ifPresent(value -> {
+            String escapedSearchString = Pattern.quote(value);
+            expectedQuery.addCriteria(Criteria.where("requestAddress.street").regex(escapedSearchString, "i"));
+        });
+
+        Optional.ofNullable(partialAddress.county()).ifPresent(value -> {
+            String escapedSearchString = Pattern.quote(value);
+            expectedQuery.addCriteria(Criteria.where("requestAddress.county").regex(escapedSearchString, "i"));
+        });
+
+        Optional.ofNullable(partialAddress.county()).ifPresent(value -> {
+            String escapedSearchString = Pattern.quote(value);
+            expectedQuery.addCriteria(Criteria.where("requestAddress.region").regex(escapedSearchString, "i"));
+        });
+        expectedQuery.addCriteria(Criteria.where("requestAddress.country").is(partialAddress.country()));
+
+        // When
+        Query actualQuery = addressQueryBuilder.build(partialAddress);
 
         // Then
         Assertions.assertEquals(expectedQuery, actualQuery);

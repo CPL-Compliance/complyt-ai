@@ -5,9 +5,7 @@ import io.complyt.business.address_checkers.HereAddressChecker;
 import io.complyt.business.webclients.addressvalidations.AddressValidationWebClientWrapper;
 import io.complyt.domain.Address;
 import io.complyt.domain.CachedAddressData;
-import io.complyt.domain.TempAddressData;
 import io.complyt.domain.ValidatedAddress;
-import io.complyt.domain.mappers.CachedAddressDataToTempDataMapper;
 import io.complyt.domain.mappers.HereAddressToAddressMapper;
 import io.complyt.repositories.ValidationAddressRepositoryImpl;
 import io.complyt.utils.observability.ContextLogger;
@@ -42,9 +40,10 @@ public class ValidAddressServiceImpl implements ValidAddressService {
 
     @Override
     public Mono<ValidatedAddress> validateAddress(Address address) {
-        return findByAddress(address)
-                .switchIfEmpty(Mono.defer(() -> fetchAndValidateAddress(address)
-                        .flatMap(addressData -> setBeforeSave(addressData, address))
+        Address alignedAddress = addressAligner.alignGlobalAddress(address);
+        return findByAddress(alignedAddress)
+                .switchIfEmpty(Mono.defer(() -> fetchAndValidateAddress(alignedAddress)
+                        .flatMap(addressData -> setBeforeSave(addressData, alignedAddress))
                         .flatMap(this::saveAddress)));
     }
 
@@ -52,7 +51,7 @@ public class ValidAddressServiceImpl implements ValidAddressService {
     public Mono<CachedAddressData> resolveAddress(Address address) {
         return validateAddress(address)
                 .flatMap(matchedAddresses -> resolveBestMatchAddress(matchedAddresses.getMatchedAddresses())
-                        .flatMap(bestMatchAddress -> hereAddressChecker.checkStateMatch(bestMatchAddress, address)));
+                        .flatMap(bestMatchAddress -> hereAddressChecker.validateCountryAndStateMatch(bestMatchAddress, address)));
     }
 
     public Mono<ValidatedAddress> findByAddress(@NonNull Address address) {
@@ -74,14 +73,13 @@ public class ValidAddressServiceImpl implements ValidAddressService {
     }
 
     private Mono<List<CachedAddressData>> findByAddressClientWrapper(Address address) {
-        Address alignedAddress = addressAligner.align(address);
+        Address alignedAddress = addressAligner.alignForOutsource(address);
         return hereAddressValidationClientWrapper.validateAddress(alignedAddress)
                 .map(HereAddressToAddressMapper.INSTANCE::map);
     }
 
     private Mono<ValidatedAddress> setBeforeSave(List<CachedAddressData> addressData, Address address) {
-        TempAddressData tempAddressData = CachedAddressDataToTempDataMapper.INSTANCE.map(addressData.get(0)); // todo remove phase 2
-        return Mono.just(new ValidatedAddress(null, tempAddressData, addressData, address, LocalDateTime.now()));
+        return Mono.just(new ValidatedAddress(null, addressData, address, LocalDateTime.now()));
     }
 
     private Mono<List<CachedAddressData>> resolveStreetIfMissing(List<CachedAddressData> addressData, Address address) {

@@ -10,6 +10,8 @@ import com.complyt.domain.matched_address.MatchedAddressData;
 import lombok.EqualsAndHashCode;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 @Generated
 @EqualsAndHashCode
 public class StubAddressValidationWebClientWrapper implements AddressValidationWebClientWrapper<MatchedAddressData> {

@@ -66,24 +66,6 @@ public class ValidatedAddressValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveValidatedAddress_MissingZip_throwsValidationError() {
-        ((Document) address.get("address")).remove("zip");
-
-        StepVerifier.create(reactiveMongoTemplate.save(address, "california"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveValidatedAddress_MissingScore_throwsValidationError() {
-        ((Document) address.get("address")).remove("score");
-
-        StepVerifier.create(reactiveMongoTemplate.save(address, "california"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
     public void saveValidatedAddress_MissingCounty_throwsValidationError() {
         ((Document) address.get("address")).remove("county");
 
@@ -132,15 +114,6 @@ public class ValidatedAddressValidationIT extends TestContainersInitializerIT {
     @Test
     public void saveValidatedAddress_MissingMatchedAddresses_throwsValidationError() {
         address.remove("matchedAddresses");
-
-        StepVerifier.create(reactiveMongoTemplate.save(address, "california"))
-                .expectError(DataIntegrityViolationException.class)
-                .verify();
-    }
-
-    @Test
-    public void saveValidatedAddress_MissingMatchedAddressFields_throwsValidationError() {
-        ((Document) ((Document) ((java.util.List<?>) address.get("matchedAddresses")).get(0)).get("address")).remove("zip");
 
         StepVerifier.create(reactiveMongoTemplate.save(address, "california"))
                 .expectError(DataIntegrityViolationException.class)
