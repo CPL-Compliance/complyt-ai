@@ -69,6 +69,34 @@ class CredentialsRepositoryTest {
         StepVerifier.create(credentialsMono).verifyComplete();
     }
 
+    @Test
+    void findByTenantId_credentialsWithComplytClientIdExists_returnsCredentials() {
+        // Given
+        String tenantId = "tenantId";
+        Query query = Query.query(Criteria.where("tenantId").is(tenantId));
+
+        // When
+        when(reactiveMongoTemplate.findOne(query, Credentials.class)).thenReturn(Mono.just(credentials));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsRepository.findByTenantId(tenantId);
+        StepVerifier.create(credentialsMono).expectNext(credentials).verifyComplete();
+    }
+
+    @Test
+    void findByTenantId_credentialsWithComplytClientIdNotExists_returnsMonoEmpty() {
+        // Given
+        String tenantId = "tenantId";
+        Query query = Query.query(Criteria.where("tenantId").is(tenantId));
+
+        // When
+        when(reactiveMongoTemplate.findOne(query, Credentials.class)).thenReturn(Mono.empty());
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsRepository.findByTenantId(tenantId);
+        StepVerifier.create(credentialsMono).verifyComplete();
+    }
+
 
     @Test
     void findActiveCredentialsByComplytClientId_credentialsWithComplytClientIdNotExists_returnsMonoEmpty() {
@@ -124,6 +152,15 @@ class CredentialsRepositoryTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "complytClientId is marked non-null but is null");
+    }
+
+    @Test
+    void findByTenantId_tenantIdIsNull_ThrowsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsRepository.findByTenantId(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "tenantId is marked non-null but is null");
     }
 
     @Test

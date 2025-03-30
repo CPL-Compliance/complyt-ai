@@ -78,7 +78,8 @@
         "read:link",
         "read:state",
         "read:address_validation",
-        "read:vat_validation"
+        "read:vat_validation",
+        "read:partnerships"
       ]
     },
     {
@@ -217,6 +218,10 @@
     },
     {
       "name": "read:vat_validation",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "read:partnerships",
       "protocol": "openid-connect"
     }
   ],

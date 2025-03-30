@@ -1,5 +1,6 @@
 package io.complyt.authentication.domain;
 
+import io.complyt.authentication.domain.enums.TokenSource;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -41,4 +42,8 @@ public class Token {
     LocalDateTime createdAt;
 
     LocalDateTime expireAt;
+
+    String tenantId;
+
+    TokenSource tokenSource;
 }

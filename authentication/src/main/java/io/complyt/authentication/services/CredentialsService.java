@@ -55,6 +55,19 @@ public class CredentialsService {
                 .flatMap(this::decrypt);
     }
 
+    public Mono<Credentials> getCredentialsForPartnerByApiKeyAndDecrypt(final @NonNull ApiKey apiKey) {
+        return credentialsRepository.findByComplytClientId(apiKey.clientId())
+                .filter(credentials -> apiKey.clientSecret().equals(credentials.getComplytClientSecret()))
+                .filter(credentials -> isValidStatus(credentials.getStatus()))
+                .switchIfEmpty(Mono.empty())
+                .flatMap(this::decrypt);
+    }
+
+    public Mono<String> getTenantByApiKey(final @NonNull ApiKey apiKey) {
+        return credentialsRepository.findByComplytClientId(apiKey.clientId())
+                .map(Credentials::getTenantId);
+    }
+
     public Mono<Credentials> markAsCancelled(final @NonNull ApiKey apiKey) {
         return credentialsRepository.markAsCancelled(apiKey.clientId());
     }
@@ -69,6 +82,11 @@ public class CredentialsService {
         String complytClientSecretEncoded = passwordEncoder.encode(complytClientSecret);
         return  createNewCredentialsByExistingCredentials(apiKey, credentials, complytClientSecretEncoded)
                 .flatMap(credentialsRepository::save);
+    }
+
+    public Mono<ApiKey> getApiKeyByTenantId(String requestedTenantId) {
+        return credentialsRepository.findByTenantId(requestedTenantId)
+                .map(credentials -> new ApiKey(credentials.getComplytClientId(), credentials.getComplytClientSecret()));
     }
 
     public Mono<Credentials> rotateOldCredentials(@NonNull ApiKey apiKey) {

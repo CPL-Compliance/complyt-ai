@@ -35,9 +35,16 @@ public class AuthorizationService {
     @NonNull
     Crypto cryptoAesGcmNoPadding;
 
+
     public Mono<Token> getToken(@NonNull Credentials credentials) {
         return authorizationServerWrapper.getAccessToken(credentials.getClientId(), credentials.getClientSecret(),
                         credentials.getAudience(), credentials.getGrantType())
+                .mapNotNull(accessToken -> createToken(credentials, accessToken));
+    }
+
+    public Mono<Token> getTokenForPartner(@NonNull Credentials credentials, @NonNull String partnerTenantId) {
+        return authorizationServerWrapper.getAccessToken(credentials.getClientId(), credentials.getClientSecret(),
+                        credentials.getAudience(), credentials.getGrantType(), partnerTenantId)
                 .mapNotNull(accessToken -> createToken(credentials, accessToken));
     }
 

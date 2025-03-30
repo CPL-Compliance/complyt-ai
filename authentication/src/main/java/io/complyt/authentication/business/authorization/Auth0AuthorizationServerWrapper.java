@@ -57,6 +57,26 @@ public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapp
                         .map(Auth0AccessTokenToAccessToken.INSTANCE::map));
     }
 
+    @Override
+    public Mono<AccessToken> getAccessToken(final @NonNull String clientId, final @NonNull String clientSecret,
+                                            final @NonNull String audience, final @NonNull String grantType, @NonNull String partnerTenantId) {
+        return ContextLogger.observeCtx("Getting Auth0 Token", log::info)
+                .then(webClient.post()
+                        .uri("/oauth/token")
+                        .header("Content-Type", "application/x-www-form-urlencoded")
+                        .bodyValue("client_id=" + clientId +
+                                "&client_secret=" + clientSecret +
+                                "&audience=" + audience +
+                                "&grant_type=" + grantType +
+                                "&partner_tenant_id=" + partnerTenantId)
+                        .retrieve()
+                        .bodyToMono(Auth0AccessToken.class)
+                        .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
+                                .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
+                                        new ComplytAuth0Exception(retrySignal.totalRetries() + " Retries Exhausted"))))
+                        .map(Auth0AccessTokenToAccessToken.INSTANCE::map));
+    }
+
     /*
     When newClientId/newClientSecret is null the metadata is deleted, otherwise it changes the metadata
      */

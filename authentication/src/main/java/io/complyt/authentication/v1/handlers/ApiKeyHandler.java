@@ -3,7 +3,6 @@ package io.complyt.authentication.v1.handlers;
 import io.complyt.authentication.facades.ApiKeyFacade;
 import io.complyt.authentication.security.permissions.api_key.ApiKeyCreatePermission;
 import io.complyt.authentication.utils.observability.ContextLogger;
-import io.complyt.authentication.v1.exceptions.types.ApiKeyNotValidException;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
 import io.complyt.authentication.v1.mappers.ApiKeyMapper;
 import io.complyt.authentication.v1.mappers.CredentialsMapper;

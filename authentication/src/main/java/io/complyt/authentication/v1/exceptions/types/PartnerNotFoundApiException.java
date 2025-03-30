@@ -1,0 +1,14 @@
+package io.complyt.authentication.v1.exceptions.types;
+
+
+import io.complyt.authentication.v1.config.error_messages.GenericErrorMessages;
+import lombok.Generated;
+
+@Generated
+public class PartnerNotFoundApiException extends ComplytApiException {
+    private static final String message = GenericErrorMessages.PARTNERSHIP_NOT_FOUND_ERROR;
+
+    public PartnerNotFoundApiException() {
+        super(message);
+    }
+}

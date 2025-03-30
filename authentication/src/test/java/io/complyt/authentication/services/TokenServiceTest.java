@@ -50,10 +50,13 @@ class TokenServiceTest {
 
     final int tokenExpirationSafeWindowSec = 10;
 
+    String partnerTenantId;
+
     @BeforeEach
     void setUp() {
         tokenService = new TokenService(tokenRepository, passwordEncoder, cryptoAesGcmNoPadding,
                 tokenExpirationSafeWindowSec);
+        partnerTenantId = TestUtilities.createTenantId();
     }
 
     @Test
@@ -359,6 +362,304 @@ class TokenServiceTest {
     }
 
     @Test
+    void saveToken_ForPartner_validToken_returnsSavedToken() throws InvalidAlgorithmParameterException, NoSuchPaddingException,
+            IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+        String accessTokenPlainText = "accessTokenPlainText";
+        String scopePlainText = "scopePlainText";
+        EncryptedData accessTokenEncryptedData = new EncryptedData("accessTokenIv",
+                "accessTokenCipherText");
+        EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
+
+        Token encryptedToken = TestUtilities.createEncryptedToken(token, accessTokenEncryptedData, scopeEncryptedData);
+        encryptedToken = encryptedToken.withExpireAt(createDocumentExpirationDateTime(encryptedToken.getExpiresIn()));
+
+        // When
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(cryptoAesGcmNoPadding.decrypt(accessTokenEncryptedData)).thenReturn(accessTokenPlainText);
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenReturn(scopePlainText);
+        when(tokenRepository.save(any())).thenReturn(Mono.just(encryptedToken));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+
+        Token finalEncryptedToken = encryptedToken;
+        StepVerifier.create(tokenMono).consumeNextWith(tkn ->
+                assertThat(tkn.getAccessToken().equals(finalEncryptedToken.getAccessToken()) &&
+                        tkn.getAccessTokenIv().equals(finalEncryptedToken.getAccessTokenIv()) &&
+                        tkn.getTokenType().equals(finalEncryptedToken.getTokenType()) &&
+                        tkn.getId().equals(finalEncryptedToken.getId()) &&
+                        tkn.getScope().equals(finalEncryptedToken.getScope()) &&
+                        tkn.getComplytClientId().equals(finalEncryptedToken.getComplytClientId()) &&
+                        tkn.getComplytClientSecret().equals(finalEncryptedToken.getComplytClientSecret()) &&
+                        tkn.getExpiresIn() == finalEncryptedToken.getExpiresIn() &&
+                        tkn.getCreatedAt().isBefore(finalEncryptedToken.getCreatedAt()) &&
+                        tkn.getExpireAt().isBefore(finalEncryptedToken.getExpireAt()))).verifyComplete();
+    }
+
+    @Test
+    void saveToken_ForPartner_validToken_expiredAtSmallesThenExpiresInMinus10Secs() throws InvalidAlgorithmParameterException,
+            NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException,
+            InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+        String accessTokenPlainText = "accessTokenPlainText";
+        String scopePlainText = "scopePlainText";
+        EncryptedData accessTokenEncryptedData = new EncryptedData("accessTokenIv",
+                "accessTokenCipherText");
+        EncryptedData scopeEncryptedData = new EncryptedData("scopeIv",
+                "scopeCipherText");
+
+        // When
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(cryptoAesGcmNoPadding.decrypt(accessTokenEncryptedData)).thenReturn(accessTokenPlainText);
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenReturn(scopePlainText);
+        when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+
+        StepVerifier.create(tokenMono).consumeNextWith(tkn ->
+                assertThat(ChronoUnit.SECONDS.between(LocalDateTime.now(), tkn.getExpireAt()) >=
+                        TestUtilities.expiresIn - tokenExpirationSafeWindowSec)).verifyComplete();
+    }
+
+    @Test
+    void saveToken_ForPartner_encryptionThrowsNoSuchAlgorithmException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+
+        // When
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken()))
+                .thenThrow(new NoSuchAlgorithmException("Error"));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+
+        StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveToken_ForPartner_encryptionThrowsBadPaddingException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+
+        // When
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenThrow(new BadPaddingException("Error"));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+
+        StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveToken_ForPartner_encryptionThrowsIllegalBlockSizeException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+
+        // When
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken()))
+                .thenThrow(new IllegalBlockSizeException("Error"));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+
+        StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveToken_ForPartner_encryptionThrowsInvalidAlgorithmParameterException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+
+        // When
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken()))
+                .thenThrow(new InvalidAlgorithmParameterException("Error"));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+
+        StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveToken_ForPartner_encryptionThrowsInvalidKeyException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+
+        // When
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenThrow(new InvalidKeyException("Error"));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+
+        StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveToken_ForPartner_encryptionThrowsNoSuchPaddingException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+
+        // When
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenThrow(new NoSuchPaddingException("Error"));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+
+        StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveToken_ForPartner_decryptionThrowsNoSuchAlgorithmException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+        EncryptedData accessTokenEncryptedData = new EncryptedData("accessTokenIv",
+                "accessTokenCipherText");
+        EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
+
+        // When
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new NoSuchAlgorithmException("Error"));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+
+        StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveToken_ForPartner_decryptionThrowsBadPaddingException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+        EncryptedData accessTokenEncryptedData = new EncryptedData("accessTokenIv",
+                "accessTokenCipherText");
+        EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
+
+        // When
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new BadPaddingException("Error"));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+
+        StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveToken_ForPartner_decryptionThrowsIllegalBlockSizeException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+        EncryptedData accessTokenEncryptedData = new EncryptedData("accessTokenIv",
+                "accessTokenCipherText");
+        EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
+
+        // When
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new IllegalBlockSizeException("Error"));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+
+        StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveToken_ForPartner_decryptionThrowsInvalidAlgorithmParameterException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+        EncryptedData accessTokenEncryptedData = new EncryptedData("accessTokenIv",
+                "accessTokenCipherText");
+        EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
+
+        // When
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData))
+                .thenThrow(new InvalidAlgorithmParameterException("Error"));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+
+        StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveToken_ForPartner_decryptionThrowsInvalidKeyException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+        EncryptedData accessTokenEncryptedData = new EncryptedData("accessTokenIv",
+                "accessTokenCipherText");
+        EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
+
+        // When
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new InvalidKeyException("Error"));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+
+        StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveToken_ForPartner_decryptionThrowsNoSuchPaddingException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+        EncryptedData accessTokenEncryptedData = new EncryptedData("accessTokenIv",
+                "accessTokenCipherText");
+        EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
+
+        // When
+        when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenReturn(accessTokenEncryptedData);
+        when(cryptoAesGcmNoPadding.encrypt(token.getScope())).thenReturn(scopeEncryptedData);
+        when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new NoSuchPaddingException("Error"));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+
+        StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
     void findByApiKeyAndDecrypt_apiKeyExists_returnsMonoToken() throws InvalidAlgorithmParameterException,
             IllegalBlockSizeException, NoSuchPaddingException, BadPaddingException, NoSuchAlgorithmException,
             InvalidKeyException {
@@ -461,6 +762,88 @@ class TokenServiceTest {
     }
 
     @Test
+    void findByApiKeyAndTenantIdForPartnerAndDecrypt_apiKeyExists_returnsMonoToken() throws InvalidAlgorithmParameterException,
+            IllegalBlockSizeException, NoSuchPaddingException, BadPaddingException, NoSuchAlgorithmException,
+            InvalidKeyException {
+        // Given
+        Token token = TestUtilities.createToken();
+        ApiKey apiKey = new ApiKey(token.getComplytClientId(), token.getComplytClientSecret());
+
+        token = token.withAccessToken("accessTokenPlainText").withScope("scopePlainText")
+                .withAccessTokenIv("accessTokenIv").withScopeIv("scopeIv");
+
+        EncryptedData accessTokenEncryptedData = new EncryptedData("accessTokenIv",
+                "accessTokenCipherText");
+
+        EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
+        String accessTokenPlainText = "accessTokenPlainText";
+        String scopePlainText = "scopePlainText";
+
+        Token encryptedToken = TestUtilities.createEncryptedToken(token, accessTokenEncryptedData, scopeEncryptedData);
+
+        // When
+        when(tokenRepository.findByComplytClientIdAndTenantId(apiKey.clientId(), partnerTenantId)).thenReturn(Mono.just(encryptedToken));
+        when(cryptoAesGcmNoPadding.decrypt(accessTokenEncryptedData)).thenReturn(accessTokenPlainText);
+        when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenReturn(scopePlainText);
+
+        // Then
+        Mono<Token> tokenMono = tokenService.findByApiKeyAndTenantIdForPartnerAndDecrypt(apiKey, partnerTenantId);
+
+        StepVerifier.create(tokenMono).expectNext(token).verifyComplete();
+    }
+
+    @Test
+    void findByApiKeyAndTenantIdForPartnerAndDecrypt_apiKeyDoesntExist_returnsMonoEmpty() {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+
+        // When
+        when(tokenRepository.findByComplytClientIdAndTenantId(apiKey.clientId(), partnerTenantId)).thenReturn(Mono.empty());
+
+        // Then
+        Mono<Token> tokenMono = tokenService.findByApiKeyAndTenantIdForPartnerAndDecrypt(apiKey, partnerTenantId);
+
+        StepVerifier.create(tokenMono).verifyComplete();
+    }
+
+    @Test
+    void findByApiKeyAndTenantIdForPartnerAndDecrypt_authenticationFails_returnsMonoEmpty() {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Token token = TestUtilities.createToken();
+
+
+        token = token.withAccessToken("accessTokenPlainText").withScope("scopePlainText")
+                .withAccessTokenIv("accessTokenIv").withScopeIv("scopeIv");
+
+        EncryptedData accessTokenEncryptedData = new EncryptedData("accessTokenIv",
+                "accessTokenCipherText");
+
+        EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
+        String accessTokenPlainText = "accessTokenPlainText";
+        String scopePlainText = "scopePlainText";
+
+        Token encryptedToken = TestUtilities.createEncryptedToken(token, accessTokenEncryptedData, scopeEncryptedData);
+
+        // When
+        when(tokenRepository.findByComplytClientIdAndTenantId(apiKey.clientId(), partnerTenantId)).thenReturn(Mono.just(encryptedToken));
+
+        // Then
+        Mono<Token> tokenMono = tokenService.findByApiKeyAndTenantIdForPartnerAndDecrypt(apiKey, partnerTenantId);
+
+        StepVerifier.create(tokenMono).verifyComplete();
+    }
+
+    @Test
+    void findByApiKeyAndTenantIdForPartnerAndDecrypt_apiKeyIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            tokenService.findByApiKeyAndTenantIdForPartnerAndDecrypt(null, partnerTenantId);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
+    }
+
+    @Test
     void findByApiKeyAndDecrypt_apiKeyIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             tokenService.findByApiKeyAndDecrypt(null);
@@ -473,6 +856,15 @@ class TokenServiceTest {
     void saveToken_tokenIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             tokenService.saveToken(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "token is marked non-null but is null");
+    }
+
+    @Test
+    void saveToken_forPartnership_tokenIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            tokenService.saveToken(null, "tenantId");
         });
 
         assertEquals(nullPointerException.getMessage(), "token is marked non-null but is null");

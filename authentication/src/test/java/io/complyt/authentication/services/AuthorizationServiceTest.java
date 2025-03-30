@@ -72,6 +72,33 @@ class AuthorizationServiceTest {
     }
 
     @Test
+    void getTokenForPartner_validCredentials_returnToken() {
+        // Given
+        Credentials credentials = TestUtilities.createCredentials();
+        String partnerTenantId = TestUtilities.tenantId;
+        AccessToken accessToken = TestUtilities.createAccessToken();
+        Token expectedToken = TestUtilities.createToken(credentials, accessToken);
+        final Token expectedTokenWithAccessToken = expectedToken.withAccessToken("Access Token");
+
+        // When
+        when(authorizationServerWrapper.getAccessToken(credentials.getClientId(), credentials.getClientSecret(),
+                credentials.getAudience(), credentials.getGrantType(), partnerTenantId)).thenReturn(Mono.just(accessToken));
+
+        Mono<Token> actualToken = authorizationService.getTokenForPartner(credentials, partnerTenantId);
+
+        // Then
+        StepVerifier
+                .create(actualToken)
+                .expectNextMatches(
+                        token -> token.getAccessToken().equals(expectedTokenWithAccessToken.getAccessToken()) &&
+                                token.getComplytClientId().equals(expectedTokenWithAccessToken.getComplytClientId()) &&
+                                token.getCreatedAt().isAfter(expectedTokenWithAccessToken.getCreatedAt()) &&
+                                token.getExpiresIn() == expectedTokenWithAccessToken.getExpiresIn() &&
+                                token.getComplytClientSecret().equals(expectedTokenWithAccessToken.getComplytClientSecret()))
+                .verifyComplete();
+    }
+
+    @Test
     void getTenantIdAndClientName_validCredentials_returnTenantIdAndNameObject() {
         // Given
         AccessToken managementToken = TestUtilities.createManagementAccessToken();
@@ -130,7 +157,7 @@ class AuthorizationServiceTest {
         // Given
         Credentials credentials = TestUtilities.createCredentials();
         String managementToken = TestUtilities.createManagementAccessToken().accessToken();
-        EncryptedData encryptedClientId  = TestUtilities.createEncryptedClientId(credentials);
+        EncryptedData encryptedClientId = TestUtilities.createEncryptedClientId(credentials);
         Auth0Client expectedAuth0Client = TestUtilities.createAuth0Client();
 
         // When
@@ -276,6 +303,24 @@ class AuthorizationServiceTest {
     }
 
     @Test
+    void getTokenForPartner_credentialsIsNull_ThrowsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            authorizationService.getTokenForPartner(null, "tenantId");
+        });
+
+        assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");
+    }
+
+    @Test
+    void getTokenForPartner_partnerTenantIdIsNull_ThrowsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            authorizationService.getTokenForPartner(TestUtilities.createCredentials(), null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "partnerTenantId is marked non-null but is null");
+    }
+
+    @Test
     void getTenantIdAndClientName_credentialsIsNull_ThrowsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             authorizationService.getTenantIdAndClientName(null);
@@ -334,7 +379,7 @@ class AuthorizationServiceTest {
     void rotateClientMetadata_validInputs_returnAuth0Client() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         Credentials credentials = TestUtilities.createCredentials();
         String managementToken = TestUtilities.createManagementAccessToken().accessToken();
-        EncryptedData encryptedClientId  = TestUtilities.createEncryptedClientId(credentials);
+        EncryptedData encryptedClientId = TestUtilities.createEncryptedClientId(credentials);
         Auth0Client expectedAuth0Client = TestUtilities.createAuth0Client();
         ApiKey apiKey = TestUtilities.createApiKey();
 

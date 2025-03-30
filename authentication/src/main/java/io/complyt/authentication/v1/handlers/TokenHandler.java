@@ -1,6 +1,7 @@
 package io.complyt.authentication.v1.handlers;
 
 import io.complyt.authentication.facades.TokenFacade;
+import io.complyt.authentication.security.permissions.partner.PartnerPermission;
 import io.complyt.authentication.utils.observability.ContextLogger;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
 import io.complyt.authentication.v1.mappers.ApiKeyMapper;
@@ -29,6 +30,8 @@ public class TokenHandler {
 
     @NonNull
     ValidationHandler<ApiKeyDto, SpringValidatorAdapter> apiKeyDtoValidationHandler;
+    @NonNull
+    ValidationHandler<TokenDto, SpringValidatorAdapter> tokenDtoValidationHandler;
 
     public Mono<ServerResponse> post(@NonNull ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(),
@@ -43,6 +46,24 @@ public class TokenHandler {
                         log::info).thenReturn(tokenDto))
                 .switchIfEmpty(ContextLogger.observeCtx("Failed to post Token", log::error)
                         .then(Mono.error(new ObjectNotFoundApiException())));
+
+        return ServerResponse.ok().body(value, TokenDto.class);
+    }
+
+    @PartnerPermission
+    public Mono<ServerResponse> getTokenForPartner(@NonNull ServerRequest serverRequest) {
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(),
+                serverRequest.path());
+        String requestedTenantId = serverRequest.queryParam("tenantId")
+                .orElse("Invalid TenantId");
+
+        Mono<TokenDto> value = ContextLogger.observeCtx(logStr, log::info)
+                .then(tokenDtoValidationHandler.handle(serverRequest))
+                .switchIfEmpty(Mono.defer(() -> tokenFacade.getTokenForPartnerByTenantId(requestedTenantId))
+                        .map(TokenMapper.INSTANCE::tokentoTokenDto)
+                        .flatMap(tokenDto -> ContextLogger.observeCtx("<-- Returned Body: Token", log::info).thenReturn(tokenDto))
+                        .switchIfEmpty(ContextLogger.observeCtx("Failed to post Token", log::error)
+                                .then(Mono.error(new ObjectNotFoundApiException()))));
 
         return ServerResponse.ok().body(value, TokenDto.class);
     }

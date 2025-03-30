@@ -24,4 +24,10 @@ public interface DeleteRouterTestMonoTemplate {
     @Test
     void delete_missingCsrfToken_return403();
 
+    @Test
+    void delete_ContentTypeIsJson_Returns204();
+
+    @Test
+    void delete_DoesntExistAndNoContentType_Returns415();
+
 }

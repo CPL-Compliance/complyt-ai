@@ -96,6 +96,33 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     }
 
     @Test
+    @WithMockUser
+    @Override
+    public void post_ExistsAndMediaTypeJson_Returns201() {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        ApiKeyDto apiKeyDto = ApiKeyMapper.INSTANCE.apiKeyToApiKeyDto(apiKey);
+
+        // When
+        when(apiKeyFacade.saveNewCredentials(credentials)).thenReturn(Mono.just(apiKey));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .build())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(credentialsDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(ApiKeyDto.class)
+                .isEqualTo(apiKeyDto);
+    }
+
+    @Test
     @Override
     @WithMockUser
     public void post_DoesntExist_Returns401() {
@@ -264,6 +291,45 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue(body)
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void delete_DoesntExistAndNoContentType_Returns415() {
+        // When
+        when(apiKeyFacade.markAsCancelled(apiKey)).thenReturn(Mono.empty());
+        String body = "clientId=" + apiKeyDto.clientId() +
+                "&clientSecret=" + apiKeyDto.clientSecret();
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .build())
+                .bodyValue(body)
+                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED)
+                .exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void delete_ContentTypeIsJson_Returns204() {
+        when(apiKeyFacade.markAsCancelled(apiKey)).thenReturn(Mono.empty());
+
+        webTestClient
+                .mutateWith(csrf())
+                .method(HttpMethod.DELETE)
+                .uri(uriBuilder -> uriBuilder
+                        .path(ApiKeyRouter.BASE_URL)
+                        .build())
+                .contentType(MediaType.APPLICATION_JSON) // not FORM_URLENCODED
+                .bodyValue(apiKeyDto)
                 .exchange()
                 .expectStatus().isNoContent();
     }

@@ -1,11 +1,14 @@
 package io.complyt.authentication.v1.validators;
 
+import io.complyt.authentication.v1.exceptions.types.QueryParamErrorException;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
+import io.complyt.authentication.v1.validators.query_params.QueryParamsExtractor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -34,15 +37,34 @@ class ValidationHandlerTest {
     ValidationHandler<CredentialsDto, SpringValidatorAdapter> credentialsDtoValidationHandler;
 
     @MockBean
+    ParameterChecksProvider queryParamChecksProvider;
+
+    @MockBean
+    QueryParamsExtractor<ApiKeyDto> queryParamsExtractor;
+
+    @MockBean
     ServerRequest serverRequest;
+
+    @MockBean
+    ShouldCallValidate shouldCallValidate;
+
+    MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
 
     @Test
     void handle_validCredentials_returnCredentialsDto() {
         // Given
         CredentialsDto credentialsDto = TestUtilities.createCredentialsDto();
+        ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
 
         // When
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(queryParamsExtractor.extract(serverRequest)).thenReturn(Mono.just(apiKeyDto));
         when(serverRequest.bodyToMono(CredentialsDto.class)).thenReturn(Mono.just(credentialsDto));
+
         Mono<CredentialsDto> credentialsDtoMono = credentialsDtoValidationHandler.handle(serverRequest);
 
         // Then
@@ -53,9 +75,18 @@ class ValidationHandlerTest {
     void handle_notValidCredentialsMissingClientId_returnCredentialsDto() {
         // Given
         CredentialsDto credentialsDto = TestUtilities.createCredentialsDtoMissingClientId();
+        ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
 
         // When
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(queryParamsExtractor.extract(serverRequest)).thenReturn(Mono.just(apiKeyDto));
         when(serverRequest.bodyToMono(CredentialsDto.class)).thenReturn(Mono.just(credentialsDto));
+
+
         Mono<CredentialsDto> credentialsDtoMono = credentialsDtoValidationHandler.handle(serverRequest);
 
         // Then
@@ -66,9 +97,18 @@ class ValidationHandlerTest {
     void handle_notValidCredentialsBlankClientId_returnCredentialsDto() {
         // Given
         CredentialsDto credentialsDto = TestUtilities.createCredentialsDtoBlankClientId();
+        ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
 
         // When
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(queryParamsExtractor.extract(serverRequest)).thenReturn(Mono.just(apiKeyDto));
         when(serverRequest.bodyToMono(CredentialsDto.class)).thenReturn(Mono.just(credentialsDto));
+
+
         Mono<CredentialsDto> credentialsDtoMono = credentialsDtoValidationHandler.handle(serverRequest);
 
         // Then
@@ -79,9 +119,17 @@ class ValidationHandlerTest {
     void handle_notValidCredentialsMissingClientSecret_returnCredentialsDto() {
         // Given
         CredentialsDto credentialsDto = TestUtilities.createCredentialsDtoMissingClientSecret();
+        ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
 
         // When
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(queryParamsExtractor.extract(serverRequest)).thenReturn(Mono.just(apiKeyDto));
         when(serverRequest.bodyToMono(CredentialsDto.class)).thenReturn(Mono.just(credentialsDto));
+
         Mono<CredentialsDto> credentialsDtoMono = credentialsDtoValidationHandler.handle(serverRequest);
 
         // Then
@@ -92,9 +140,17 @@ class ValidationHandlerTest {
     void handle_notValidCredentialsBlankClientSecret_returnCredentialsDto() {
         // Given
         CredentialsDto credentialsDto = TestUtilities.createCredentialsDtoBlankClientSecret();
+        ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
 
         // When
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(queryParamsExtractor.extract(serverRequest)).thenReturn(Mono.just(apiKeyDto));
         when(serverRequest.bodyToMono(CredentialsDto.class)).thenReturn(Mono.just(credentialsDto));
+
         Mono<CredentialsDto> credentialsDtoMono = credentialsDtoValidationHandler.handle(serverRequest);
 
         // Then
@@ -111,6 +167,13 @@ class ValidationHandlerTest {
         ServerRequest.Headers headersMock = mock(ServerRequest.Headers.class);
         when(serverRequest.headers()).thenReturn(headersMock);
         when(serverRequest.headers().contentType()).thenReturn(Optional.of(MediaType.APPLICATION_JSON));
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(queryParamsExtractor.extract(serverRequest)).thenReturn(Mono.just(apiKeyDto));
+
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 
         // Then
@@ -124,12 +187,18 @@ class ValidationHandlerTest {
         formData.add("clientId", apiKeyDto.clientId());
         formData.add("clientSecret", apiKeyDto.clientSecret());
         // When
-
         when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.just(apiKeyDto));
         when(serverRequest.formData()).thenReturn(Mono.just(formData));
         ServerRequest.Headers headersMock = mock(ServerRequest.Headers.class);
         when(serverRequest.headers()).thenReturn(headersMock);
         when(serverRequest.headers().contentType()).thenReturn(Optional.of(MediaType.APPLICATION_FORM_URLENCODED));
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(queryParamsExtractor.extract(serverRequest)).thenReturn(Mono.just(apiKeyDto));
+
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 
         // Then
@@ -145,6 +214,14 @@ class ValidationHandlerTest {
         ServerRequest.Headers headersMock = mock(ServerRequest.Headers.class);
         when(serverRequest.headers()).thenReturn(headersMock);
         when(serverRequest.headers().contentType()).thenReturn(Optional.of(MediaType.APPLICATION_JSON));
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(queryParamsExtractor.extract(serverRequest)).thenReturn(Mono.just(apiKeyDto));
+
+
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 
         // Then
@@ -163,6 +240,13 @@ class ValidationHandlerTest {
         ServerRequest.Headers headersMock = mock(ServerRequest.Headers.class);
         when(serverRequest.headers()).thenReturn(headersMock);
         when(serverRequest.headers().contentType()).thenReturn(Optional.of(MediaType.APPLICATION_FORM_URLENCODED));
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(queryParamsExtractor.extract(serverRequest)).thenReturn(Mono.just(apiKeyDto));
+
 
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 
@@ -179,6 +263,13 @@ class ValidationHandlerTest {
         ServerRequest.Headers headersMock = mock(ServerRequest.Headers.class);
         when(serverRequest.headers()).thenReturn(headersMock);
         when(serverRequest.headers().contentType()).thenReturn(Optional.of(MediaType.APPLICATION_JSON));
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(queryParamsExtractor.extract(serverRequest)).thenReturn(Mono.just(apiKeyDto));
+
 
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 
@@ -200,6 +291,13 @@ class ValidationHandlerTest {
         ServerRequest.Headers headersMock = mock(ServerRequest.Headers.class);
         when(serverRequest.headers()).thenReturn(headersMock);
         when(serverRequest.headers().contentType()).thenReturn(Optional.of(MediaType.APPLICATION_FORM_URLENCODED));
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(queryParamsExtractor.extract(serverRequest)).thenReturn(Mono.just(apiKeyDto));
+
 
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 
@@ -217,6 +315,13 @@ class ValidationHandlerTest {
         when(serverRequest.headers()).thenReturn(headersMock);
         when(serverRequest.headers().contentType()).thenReturn(Optional.of(MediaType.APPLICATION_JSON));
         when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.just(apiKeyDto));
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(queryParamsExtractor.extract(serverRequest)).thenReturn(Mono.just(apiKeyDto));
+
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 
         // Then
@@ -235,7 +340,14 @@ class ValidationHandlerTest {
         when(serverRequest.formData()).thenReturn(Mono.just(formData));
         when(serverRequest.headers()).thenReturn(headersMock);
         when(serverRequest.headers().contentType()).thenReturn(Optional.of(MediaType.APPLICATION_FORM_URLENCODED));
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
         when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.just(apiKeyDto));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
+        when(queryParamsExtractor.extract(serverRequest)).thenReturn(Mono.just(apiKeyDto));
+
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 
         // Then
@@ -253,8 +365,12 @@ class ValidationHandlerTest {
         // When
         ServerRequest.Headers headersMock = mock(ServerRequest.Headers.class);
         when(serverRequest.formData()).thenReturn(Mono.just(formData));
-        when(serverRequest.headers()).thenReturn(headersMock);
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
         when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.error(new UnsupportedMediaTypeException("error")));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
 
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 
@@ -266,11 +382,35 @@ class ValidationHandlerTest {
         // When
         ServerRequest.Headers headersMock = mock(ServerRequest.Headers.class);
         when(serverRequest.headers()).thenReturn(headersMock);
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
         when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.error(new UnsupportedMediaTypeException("error")));
+        when(serverRequest.queryParams()).thenReturn(queryParams);
+        when(serverRequest.method()).thenReturn(HttpMethod.POST);
+        when(serverRequest.path()).thenReturn("/v1/api_key");
+        when(shouldCallValidate.apply(serverRequest)).thenReturn(true);
 
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 
         // Then
         StepVerifier.create(apiKeyDtoMono).expectError().verify();
+    }
+
+    @Test
+    void validateQueryParam_ErrorListNotEmpty_ThrowsException() {
+        // Given
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("tenantId", "");
+
+        when(queryParamChecksProvider.doesParamExist(serverRequest)).thenReturn(Mono.just(true));
+        when(serverRequest.queryParams()).thenReturn(map);
+        when(queryParamChecksProvider.getFunctionCheck("key")).thenReturn(Mono.just(param -> Mono.empty())); // Simulate validation failure
+
+        // When
+        Mono<ApiKeyDto> validationResult = apiKeyDtoValidationHandler.handle(serverRequest);
+
+        // Then
+        StepVerifier.create(validationResult)
+                .expectError(QueryParamErrorException.class)
+                .verify();
     }
 }

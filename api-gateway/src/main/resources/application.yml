@@ -409,7 +409,37 @@ spring:
             - Path=/v1/token
           filters:
             - SetPath=/v1/token
+        - id: authentication-partnership-get-token
+          uri: lb://authentication
+          predicates:
+            - Method=GET
+            - Path=/v1/token/partnerships
+          filters:
+            - SetPath=/v1/token/partnerships
         # ---- Token ----
+        # ---- Partnership ----
+        - id: authentication-Partnership
+          uri: lb://authentication
+          predicates:
+            - Method=GET
+            - Path=/v1/partnership
+          filters:
+            - SetPath=/v1/partnership
+        - id: authentication-Partnership-save-Client
+          uri: lb://authentication
+          predicates:
+            - Method=POST
+            - Path=/v1/partnership/client
+          filters:
+            - SetPath=/v1/partnership/client
+        - id: authentication-Partnership-Delete-Client
+          uri: lb://authentication
+          predicates:
+            - Method=DELETE
+            - Path=/v1/partnership/client
+          filters:
+            - SetPath=/v1/partnership/client
+        # ---- Partnership ----
         # ==== Authentication Service ====
       default-filters:
         - name: Retry

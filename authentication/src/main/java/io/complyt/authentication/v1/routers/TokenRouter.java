@@ -22,4 +22,13 @@ public class TokenRouter {
 
         return RouterFunctions.route(postTokenRoute, tokenHandler::post);
     }
+
+    @Bean
+    public RouterFunction<ServerResponse> getTokenForPartnersRouterFunction(@NonNull final TokenHandler tokenHandler) {
+        RequestPredicate postTokenRoute = RequestPredicates
+                .GET(BASE_URL + "/partnerships")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED));
+
+        return RouterFunctions.route(postTokenRoute, tokenHandler::getTokenForPartner);
+    }
 }

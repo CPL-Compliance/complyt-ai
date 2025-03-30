@@ -277,6 +277,229 @@ class CredentialsServiceTest {
     }
 
     @Test
+    void getCredentialsForPartnerByApiKeyAndDecrypt_noDocumentWithClientId_returnsMonoEmpty() {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.empty());
+
+        // Then
+        Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsForPartnerByApiKeyAndDecrypt(apiKey);
+        StepVerifier.create(credentialsByApiKeyMono).verifyComplete();
+    }
+
+    @Test
+    void getCredentialsForPartnerByApiKeyAndDecrypt_credentialsExists_returnsCredentials()
+            throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
+            BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        // Given
+        ApiKey tempApiKey = TestUtilities.createApiKey();
+        ApiKey apiKey = new ApiKey(tempApiKey.clientId(), "complytClientSecret");
+        Credentials credentials = TestUtilities.createCredentials().withStatus(ApiKeyStatus.ACTIVE);
+        Credentials decryptedCreds = TestUtilities.createDecryptedCreds(credentials);
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientIdIv(),
+                credentials.getClientId()))).thenReturn(credentials.getClientId());
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientSecretIv(),
+                credentials.getClientSecret()))).thenReturn(credentials.getClientSecret());
+
+        // Then
+        Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsForPartnerByApiKeyAndDecrypt(apiKey);
+        StepVerifier.create(credentialsByApiKeyMono).expectNext(decryptedCreds).verifyComplete();
+    }
+
+    @Test
+    void getCredentialsForPartnerByApiKeyAndDecrypt_credentialsRotatedExists_returnsCredentials()
+            throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
+            BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        // Given
+        ApiKey tempApiKey = TestUtilities.createApiKey();
+        ApiKey apiKey = new ApiKey(tempApiKey.clientId(), "complytClientSecret");
+        Credentials credentials = TestUtilities.createCredentials().withStatus(ApiKeyStatus.ROTATED);
+        Credentials decryptedCreds = TestUtilities.createDecryptedCreds(credentials);
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientIdIv(),
+                credentials.getClientId()))).thenReturn(credentials.getClientId());
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientSecretIv(),
+                credentials.getClientSecret()))).thenReturn(credentials.getClientSecret());
+
+        // Then
+        Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsForPartnerByApiKeyAndDecrypt(apiKey);
+        StepVerifier.create(credentialsByApiKeyMono).expectNext(decryptedCreds).verifyComplete();
+    }
+
+    @Test
+    void getCredentialsForPartnerByApiKeyAndDecrypt_credentialsExistsButCancelled_returnsMonoEmpty() {
+        // Given
+        ApiKey tempApiKey = TestUtilities.createApiKey();
+        ApiKey apiKey = new ApiKey(tempApiKey.clientId(), "complytClientSecret");
+        Credentials credentials = TestUtilities.createCredentials().withStatus(ApiKeyStatus.CANCELLED);
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+
+        // Then
+        Mono<Credentials> credentialsByApiKeyMono = credentialsService.getCredentialsForPartnerByApiKeyAndDecrypt(apiKey);
+        StepVerifier.create(credentialsByApiKeyMono).verifyComplete();
+    }
+
+    @Test
+    void getCredentialsForPartnerByApiKeyAndDecrypt_decryptionThrowsBadPaddingException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
+            BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        // Given
+        ApiKey tempApiKey = TestUtilities.createApiKey();
+        ApiKey apiKey = new ApiKey(tempApiKey.clientId(), "complytClientSecret");
+        Credentials credentials = TestUtilities.createCredentials();
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientIdIv(),
+                credentials.getClientId()))).thenThrow(new BadPaddingException("Error"));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsService.getCredentialsForPartnerByApiKeyAndDecrypt(apiKey);
+
+        StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void getCredentialsForPartnerByApiKeyAndDecrypt_decryptionThrowsIllegalBlockSizeException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
+            BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        // Given
+        ApiKey tempApiKey = TestUtilities.createApiKey();
+        ApiKey apiKey = new ApiKey(tempApiKey.clientId(), "complytClientSecret");
+        Credentials credentials = TestUtilities.createCredentials();
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientIdIv(),
+                credentials.getClientId()))).thenThrow(new IllegalBlockSizeException("Error"));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsService.getCredentialsForPartnerByApiKeyAndDecrypt(apiKey);
+
+        StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void getCredentialsForPartnerByApiKeyAndDecrypt_decryptionThrowsInvalidAlgorithmParameterException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
+            BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        // Given
+        ApiKey tempApiKey = TestUtilities.createApiKey();
+        ApiKey apiKey = new ApiKey(tempApiKey.clientId(), "complytClientSecret");
+        Credentials credentials = TestUtilities.createCredentials();
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientIdIv(),
+                credentials.getClientId()))).thenThrow(new InvalidAlgorithmParameterException("Error"));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsService.getCredentialsForPartnerByApiKeyAndDecrypt(apiKey);
+
+        StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void getCredentialsForPartnerByApiKeyAndDecrypt_decryptionThrowsInvalidKeyException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
+            BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        // Given
+        ApiKey tempApiKey = TestUtilities.createApiKey();
+        ApiKey apiKey = new ApiKey(tempApiKey.clientId(), "complytClientSecret");
+        Credentials credentials = TestUtilities.createCredentials();
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientIdIv(),
+                credentials.getClientId()))).thenThrow(new InvalidKeyException("Error"));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsService.getCredentialsForPartnerByApiKeyAndDecrypt(apiKey);
+
+        StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void getCredentialsForPartnerByApiKeyAndDecrypt_decryptionThrowsNoSuchPaddingException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
+            BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        // Given
+        ApiKey tempApiKey = TestUtilities.createApiKey();
+        ApiKey apiKey = new ApiKey(tempApiKey.clientId(), "complytClientSecret");
+        Credentials credentials = TestUtilities.createCredentials();
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientIdIv(),
+                credentials.getClientId()))).thenThrow(new NoSuchPaddingException("Error"));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsService.getCredentialsForPartnerByApiKeyAndDecrypt(apiKey);
+
+        StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void getCredentialsForPartnerByApiKeyAndDecrypt_decryptionThrowsNoSuchAlgorithmException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchPaddingException,
+            BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        // Given
+        ApiKey tempApiKey = TestUtilities.createApiKey();
+        ApiKey apiKey = new ApiKey(tempApiKey.clientId(), "complytClientSecret");
+        Credentials credentials = TestUtilities.createCredentials();
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+        when(cryptoAesGcmNoPadding.decrypt(new EncryptedData(credentials.getClientIdIv(),
+                credentials.getClientId()))).thenThrow(new NoSuchAlgorithmException("Error"));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsService.getCredentialsForPartnerByApiKeyAndDecrypt(apiKey);
+
+        StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void getTenantByApiKey_credentialsExists_returnsTenantId(){
+        // Given
+        ApiKey tempApiKey = TestUtilities.createApiKey();
+        ApiKey apiKey = new ApiKey(tempApiKey.clientId(), "complytClientSecret");
+        Credentials credentials = TestUtilities.createCredentials();
+        String expectedTenantId = credentials.getTenantId();
+
+        // When
+        when(credentialsRepository.findByComplytClientId(apiKey.clientId())).thenReturn(Mono.just(credentials));
+
+        // Then
+        Mono<String> tenantIdMono = credentialsService.getTenantByApiKey(apiKey);
+        StepVerifier.create(tenantIdMono).expectNext(expectedTenantId).verifyComplete();
+    }
+
+    @Test
+    void getApiKeyByTenantId_credentialsExists_returnsApiKey() {
+        // Given
+        Credentials credentials = TestUtilities.createCredentials().withStatus(ApiKeyStatus.ACTIVE);
+        ApiKey expectedApiKey = new ApiKey(credentials.getComplytClientId(), credentials.getComplytClientSecret());
+
+        // When
+        when(credentialsRepository.findByTenantId(credentials.getTenantId())).thenReturn(Mono.just(credentials));
+
+        // Then
+        Mono<ApiKey> apiKeyMono = credentialsService.getApiKeyByTenantId(credentials.getTenantId());
+
+        StepVerifier.create(apiKeyMono).expectNext(expectedApiKey).verifyComplete();
+    }
+
+    @Test
     void saveCredentials_validCredentialsAndValidApiKey_returnsSavedCredentials()
             throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
             NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
@@ -528,6 +751,24 @@ class CredentialsServiceTest {
     void getCredentialsByApiKeyAndDecrypt_apiKeyIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             credentialsService.getCredentialsByApiKeyAndDecrypt(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
+    }
+
+    @Test
+    void getCredentialsForPartnerByApiKeyAndDecrypt_apiKeyIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsService.getCredentialsForPartnerByApiKeyAndDecrypt(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
+    }
+
+    @Test
+    void getTenantByApiKey_apiKeyIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsService.getTenantByApiKey(null);
         });
 
         assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");

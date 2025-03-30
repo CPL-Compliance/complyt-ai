@@ -99,6 +99,121 @@ class StubAuth0AuthorizationServerWrapperTest {
         assertEquals("grantType is marked non-null but is null", exception.getMessage());
     }
 
+    @Test
+    void getAccessToken_referralTokenForPartner_validCredentials_ReturnsAccessToken() {
+        // Given
+        StubAuth0AuthorizationServerWrapper auth0AuthorizationServerWrapper = new StubAuth0AuthorizationServerWrapper();
+        String clientId = "client ID";
+        String clientSecret = "Client Secret";
+        String audience = "Audience";
+        String grantType = "Grant Type";
+        String partnerTenantId = "Partner Tenant Id";
+        AccessToken accessToken = TestUtilities.createStubAccessToken();
+
+        // When
+        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken(clientId, clientSecret, audience, grantType, partnerTenantId);
+
+        // Then
+        StepVerifier.create(accessTokenMono).expectNext(accessToken).verifyComplete();
+    }
+
+    @Test
+    void getAccessToken_referralTokenForPartner_clientIdIsNull_ThrowNullException() {
+        // Given
+        StubAuth0AuthorizationServerWrapper auth0AuthorizationServerWrapper = new StubAuth0AuthorizationServerWrapper();
+        String clientId = null;
+        String clientSecret = "Client Secret";
+        String audience = "Audience";
+        String grantType = "Grant Type";
+        String partnerTenantId = "Partner Tenant Id";
+
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getAccessToken(clientId, clientSecret, audience, grantType, partnerTenantId);
+        });
+
+        assertEquals("clientId is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void getAccessToken_referralTokenForPartner_clientSecretIsNull_ThrowNullException() {
+        // Given
+        StubAuth0AuthorizationServerWrapper auth0AuthorizationServerWrapper = new StubAuth0AuthorizationServerWrapper();
+        String clientId = "clientId";
+        String clientSecret = null;
+        String audience = "Audience";
+        String grantType = "Grant Type";
+        String partnerTenantId = "Partner Tenant Id";
+
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getAccessToken(clientId, clientSecret, audience, grantType, partnerTenantId);
+        });
+
+        assertEquals("clientSecret is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void getAccessToken_referralTokenForPartner_audienceIsNull_ThrowNullException() {
+        // Given
+        StubAuth0AuthorizationServerWrapper auth0AuthorizationServerWrapper = new StubAuth0AuthorizationServerWrapper();
+        String clientId = "clientId";
+        String clientSecret = "clientSecret";
+        String audience = null;
+        String grantType = "Grant Type";
+        String partnerTenantId = "Partner Tenant Id";
+
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getAccessToken(clientId, clientSecret, audience, grantType, partnerTenantId);
+        });
+
+        assertEquals("audience is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void getAccessToken_referralTokenForPartner_grantTypeIsNull_ThrowNullException() {
+        // Given
+        StubAuth0AuthorizationServerWrapper auth0AuthorizationServerWrapper = new StubAuth0AuthorizationServerWrapper();
+        String clientId = "clientId";
+        String clientSecret = "clientSecret";
+        String audience = "Audience";
+        String grantType = null;
+        String partnerTenantId = "Partner Tenant Id";
+
+        AccessToken accessToken = TestUtilities.createStubAccessToken();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getAccessToken(clientId, clientSecret, audience, grantType, partnerTenantId);
+        });
+
+        assertEquals("grantType is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void getAccessToken_referralTokenForPartner_partnerTenantIdIsNull_ThrowNullException() {
+        // Given
+        StubAuth0AuthorizationServerWrapper auth0AuthorizationServerWrapper = new StubAuth0AuthorizationServerWrapper();
+        String clientId = "clientId";
+        String clientSecret = "clientSecret";
+        String audience = "Audience";
+        String grantType = "Grant Type";
+        String partnerTenantId = null;
+
+        AccessToken accessToken = TestUtilities.createStubAccessToken();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getAccessToken(clientId, clientSecret, audience, grantType, partnerTenantId);
+        });
+
+        assertEquals("partnerTenantId is marked non-null but is null", exception.getMessage());
+    }
+
 
     @Test
     void getManagementAccessToken_validCredentials_ReturnsManagementAccessToken() {

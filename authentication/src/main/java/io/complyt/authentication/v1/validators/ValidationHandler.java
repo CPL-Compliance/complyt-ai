@@ -2,6 +2,7 @@ package io.complyt.authentication.v1.validators;
 
 import io.complyt.authentication.utils.observability.ContextLogger;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotValidApiException;
+import io.complyt.authentication.v1.exceptions.types.QueryParamErrorException;
 import io.complyt.authentication.v1.validators.query_params.QueryParamsExtractor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
@@ -31,12 +33,19 @@ public class ValidationHandler<T, U extends Validator> {
     @NonNull
     QueryParamsExtractor<T> queryParamsExtractor;
 
+    @NonNull
+    ParameterChecksProvider queryParamChecksProvider;
+
+    @NonNull
+    ShouldCallValidate shouldCallValidate;
+
     /**
      * @param serverRequest
      * @return
      */
-    public final @NonNull Mono<T> handle(final ServerRequest serverRequest) {
-        return validateRequest(serverRequest);
+    public Mono<T> handle(final ServerRequest serverRequest) {
+        return validateQueryParam(serverRequest)
+                .then(Mono.defer(() -> shouldCallValidate.apply(serverRequest) ? validateRequest(serverRequest) : Mono.empty()));
     }
 
     /**
@@ -63,6 +72,18 @@ public class ValidationHandler<T, U extends Validator> {
             return ContextLogger.observeCtx("Failed to validate the format " + errors.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList(), log::info)
                     .then(onValidationErrors());
         }
+    }
+
+    private Mono<Boolean> validateQueryParam(final ServerRequest serverRequest) {
+        return queryParamChecksProvider.doesParamExist(serverRequest)
+                .then(Flux.fromIterable(serverRequest.queryParams().entrySet())
+                        .flatMap(entry -> Flux.fromIterable(entry.getValue())
+                                .flatMap(paramValue -> queryParamChecksProvider.getFunctionCheck(entry.getKey())
+                                        .flatMapMany(check -> check.apply(paramValue))))
+                        .collectList()
+                        .flatMap(errorList -> errorList.isEmpty() ? Mono.just(true) :
+                                Mono.error(new QueryParamErrorException(errorList))))
+                .switchIfEmpty(Mono.just(true));
     }
 
     private @NonNull Mono<T> onValidationErrors() {

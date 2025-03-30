@@ -28,6 +28,14 @@ public class TokenRepository {
                 .then(reactiveMongoTemplate.findOne(query, Token.class));
     }
 
+    public Mono<Token> findByComplytClientIdAndTenantId(final @NonNull String complytClientId, @NonNull String tenantId) {
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId))
+                .addCriteria(Criteria.where("tenantId").is(tenantId));
+
+        return ContextLogger.observeCtx("Searching for token by ComplytClientId " + complytClientId, log::info)
+                .then(reactiveMongoTemplate.findOne(query, Token.class));
+    }
+
     public Mono<Token> save(final @NonNull Token token) {
         return ContextLogger.observeCtx("Saving token: " + token, log::info)
                 .then(reactiveMongoTemplate.save(token));

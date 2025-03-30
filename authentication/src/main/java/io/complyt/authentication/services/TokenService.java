@@ -2,6 +2,7 @@ package io.complyt.authentication.services;
 
 import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Token;
+import io.complyt.authentication.domain.enums.TokenSource;
 import io.complyt.authentication.repositories.TokenRepository;
 import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
@@ -45,10 +46,31 @@ public class TokenService {
                 .map(this::decryptToken);
     }
 
+    // In the ApiKey the secret is already decrypted because we fetched it from credentials collection
+    // Thus we do not need to use passwordEncoder.matches()
+    public Mono<Token> findByApiKeyAndTenantIdForPartnerAndDecrypt(final @NonNull ApiKey apiKey, String tenantId) {
+        return tokenRepository.findByComplytClientIdAndTenantId(apiKey.clientId(), tenantId)
+                .filter(token -> apiKey.clientSecret().equals(token.getComplytClientSecret()))
+                .map(this::decryptToken);
+    }
+
     public Mono<Token> saveToken(@NonNull Token token) {
         return Mono.just(createDocumentExpirationDateTime(token.getExpiresIn()))
                 .map(token::withExpireAt)
+                .map(tokenWithDate -> tokenWithDate.withTokenSource(TokenSource.CLIENT))
                 .map(this::encryptToken)
+                .flatMap(tokenRepository::save)
+                .map(this::decryptToken);
+    }
+
+    // In use only for partnership
+    // Function had tenantId argument - only for partner issuing a token of behalf of its client
+    public Mono<Token> saveToken(@NonNull Token token, String tenantId) {
+        return Mono.just(createDocumentExpirationDateTime(token.getExpiresIn()))
+                .map(token::withExpireAt)
+                .map(tokenWithDate -> tokenWithDate.withTokenSource(TokenSource.PARTNER))
+                .map(this::encryptToken)
+                .map(encryptedToken -> encryptedToken.withTenantId(tenantId))
                 .flatMap(tokenRepository::save)
                 .map(this::decryptToken);
     }
@@ -110,6 +132,7 @@ public class TokenService {
                 .expireAt(token.getExpireAt())
                 .createdAt(token.getCreatedAt())
                 .id(token.getId())
+                .tokenSource(token.getTokenSource())
                 .build();
     }
 
@@ -127,6 +150,7 @@ public class TokenService {
                 .expireAt(token.getExpireAt())
                 .createdAt(token.getCreatedAt())
                 .id(token.getId())
+                .tokenSource(token.getTokenSource())
                 .build();
     }
 }

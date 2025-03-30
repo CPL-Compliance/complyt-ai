@@ -1,9 +1,7 @@
 package io.complyt.authentication.v1.config;
 
 import io.complyt.authentication.annotations.Generated;
-import io.complyt.authentication.v1.exceptions.types.ApiKeyNotValidException;
-import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
-import io.complyt.authentication.v1.exceptions.types.ObjectNotValidApiException;
+import io.complyt.authentication.v1.exceptions.types.*;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +28,12 @@ public class ApiExceptionConfig {
         return Map.of(
                 ObjectNotFoundApiException.class, HttpStatus.UNAUTHORIZED,
                 ObjectNotValidApiException.class, HttpStatus.UNAUTHORIZED,
-                ApiKeyNotValidException.class, HttpStatus.UNAUTHORIZED
+                ApiKeyNotValidException.class, HttpStatus.UNAUTHORIZED,
+                TenantNotSupportedException.class, HttpStatus.UNAUTHORIZED,
+                ReferralsNotFoundApiException.class, HttpStatus.NOT_FOUND,
+                SpecificReferralNotFoundApiException.class, HttpStatus.NOT_FOUND,
+                PartnerNotFoundApiException.class, HttpStatus.NOT_FOUND,
+                FailedToCreateJWTException.class, HttpStatus.UNAUTHORIZED
         );
     }
 }

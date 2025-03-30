@@ -8,6 +8,7 @@ import io.complyt.authentication.v1.config.ApiExceptionConfig;
 import io.complyt.authentication.v1.config.error_messages.GenericErrorMessages;
 import io.complyt.authentication.v1.exceptions.GlobalErrorAttributes;
 import io.complyt.authentication.v1.exceptions.GlobalExceptionHandler;
+import io.complyt.authentication.v1.exceptions.types.ReferralsNotFoundApiException;
 import io.complyt.authentication.v1.handlers.TokenHandler;
 import io.complyt.authentication.v1.mappers.TokenMapper;
 import io.complyt.authentication.v1.models.ApiKeyDto;
@@ -282,5 +283,132 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isUnauthorized();
+    }
+
+    @Test
+//    @Override
+    @WithMockUser
+    public void getTokenForPartner_Exists_Returns200() {
+        // Given
+        String requestedTenantId = TestUtilities.tenantId;
+
+        // When
+        when(tokenFacade.getTokenForPartnerByTenantId(requestedTenantId)).thenReturn(Mono.just(token));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL + "/partnerships")
+                        .queryParam("tenantId", requestedTenantId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TokenDto.class)
+                .value(actualTokenDto -> actualTokenDto, equalTo(tokenDto));
+    }
+
+    @Test
+//    @Override
+    @WithMockUser
+    public void getTokenForPartner_DoesntExist_Returns401() {
+        // Given
+        String requestedTenantId = TestUtilities.tenantId;
+
+        // When
+        when(tokenFacade.getTokenForPartnerByTenantId(requestedTenantId)).thenReturn(Mono.empty());
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL + "/partnerships")
+                        .queryParam("tenantId", requestedTenantId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+//    @Override
+    @WithMockUser
+    public void getTokenForPartner_InternalServerError_Returns500() {
+        // Given
+        String requestedTenantId = TestUtilities.tenantId;
+
+        // When
+        when(tokenFacade.getTokenForPartnerByTenantId(requestedTenantId)).thenThrow(OperationFailedException.class);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL + "/partnerships")
+                        .queryParam("tenantId", requestedTenantId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+//    @Override
+    @WithMockUser
+    public void getTokenForPartner_ReferralsNotFoundApiException_Returns400() {
+        // Given
+        String requestedTenantId = TestUtilities.tenantId;
+
+        // When
+        when(tokenFacade.getTokenForPartnerByTenantId(requestedTenantId)).thenThrow(ReferralsNotFoundApiException.class);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL + "/partnerships")
+                        .queryParam("tenantId", requestedTenantId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Test
+//    @Override
+    public void getTokenForPartner_NullHandler_ThrowsNullPointerException() {
+        // Given
+        TokenRouter tokenRouter = new TokenRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            tokenRouter.getTokenForPartnersRouterFunction(null);
+        });
+
+        // Then
+        assertEquals("tokenHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    @WithMockUser
+    public void getTokenForPartner_invalidTenantId_return404() {
+        String requestedTenantId = "Invalid Tenant Id";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL)
+                        .queryParam("tenantId", requestedTenantId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatusCode.valueOf(404));
     }
 }

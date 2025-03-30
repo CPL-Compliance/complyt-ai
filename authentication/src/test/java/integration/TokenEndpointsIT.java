@@ -65,6 +65,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .expectStatus().isUnauthorized()
                 .expectBody(TokenDto.class);
     }
+
     @Order(2)
     @Test
     @WithMockUser
@@ -86,6 +87,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .expectStatus().isUnauthorized()
                 .expectBody(TokenDto.class);
     }
+
     @Order(3)
     @Test
     @WithMockUser
@@ -109,6 +111,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .value(tokenDto -> assertTrue(tokenDto.expireAt().isBefore(LocalDateTime.now()
                         .plusSeconds(tokenDto.expiresIn()))));
     }
+
     @Order(4)
     @Test
     @WithMockUser
@@ -153,4 +156,19 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .value(map -> assertEquals(GenericErrorMessages.UNSUPPORTED_MEDIA_TYPE, map.get("message")));
     }
 
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void getTokenForPartner_TenantIdMissing_Returns403() {
+
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL + "/partnerships")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isForbidden();
+    }
 }

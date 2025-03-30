@@ -37,5 +37,8 @@ public interface PostCreatedRouterMonoTest {
     @Test
     void rotate_UnsupportedMediaType_Returns415();
 
+    @Test
+    void post_ExistsAndMediaTypeJson_Returns201();
+
 
 }

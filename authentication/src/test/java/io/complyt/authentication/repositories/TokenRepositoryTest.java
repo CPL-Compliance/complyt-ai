@@ -66,6 +66,38 @@ class TokenRepositoryTest {
     }
 
     @Test
+    void findByComplytClientIdAndTenantId_tokenExists_returnsToken() {
+        // Given
+        String complytClientId = "complytClientId";
+        String tenantId = "tenantId";
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId))
+                .addCriteria(Criteria.where("tenantId").is(tenantId));
+
+        // When
+        when(reactiveMongoTemplate.findOne(query, Token.class)).thenReturn(Mono.just(token));
+
+        // Then
+        Mono<Token> tokenMono = tokenRepository.findByComplytClientIdAndTenantId(complytClientId, tenantId);
+        StepVerifier.create(tokenMono).expectNext(token).verifyComplete();
+    }
+
+    @Test
+    void findByComplytClientIdAndTenantId_tokenNotExists_returnEmpty() {
+        // Given
+        String complytClientId = "complytClientId";
+        String tenantId = "tenantId";
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId))
+                .addCriteria(Criteria.where("tenantId").is(tenantId));
+
+        // When
+        when(reactiveMongoTemplate.findOne(query, Token.class)).thenReturn(Mono.empty());
+
+        // Then
+        Mono<Token> tokenMono = tokenRepository.findByComplytClientIdAndTenantId(complytClientId, tenantId);
+        StepVerifier.create(tokenMono).verifyComplete();
+    }
+
+    @Test
     void save_tokenIsValid_returnsTokenFromDb() {
         // When
         when(reactiveMongoTemplate.save(token)).thenReturn(Mono.just(token));
@@ -112,6 +144,27 @@ class TokenRepositoryTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "complytClientId is marked non-null but is null");
+    }
+
+    @Test
+    void findByComplytClientIdAndTenantId_complytClientIdIsNull_throwsNullPointerException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            tokenRepository.findByComplytClientIdAndTenantId(null, "tenantId");
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "complytClientId is marked non-null but is null");
+    }
+    @Test
+    void findByComplytClientIdAndTenantId_tenantIdIsNull_throwsNullPointerException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            tokenRepository.findByComplytClientIdAndTenantId("complytClientId",null);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "tenantId is marked non-null but is null");
     }
 
     @Test

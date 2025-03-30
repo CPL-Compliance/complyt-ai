@@ -22,6 +22,7 @@ public class TestUtilities {
     public static final String FILES_BASE_URL = "/v1/files_old";
     public static final String COMPLYT_FILES_BASE_URL = "/v1/files";
     public static final String TOKEN_BASE_URL = "/v1/token";
+    public static final String PARTNERSHIP_BASE_URL = "/v1/partnership";
     public static final String API_KEY_BASE_URL = "/v1/api_key";
     public static final String SECRET_KEY_BASE_URL = "/v1/secret_key";
     public static final String ADDRESS_VALIDATION_BASE_URL = "/v1/addresses";
@@ -706,4 +707,69 @@ public class TestUtilities {
         return jsonObject;
     }
 
+    public static String partnershipJsonExample(String tenantId, String partnerName) {
+        StringBuilder supportedReferralsBuilder = new StringBuilder();
+
+        for (int i = 0; i < 3; i++) {
+            String id = "tenantId #" + i+1;
+            supportedReferralsBuilder.append(String.format("""
+                {
+                    "tenantId": "%s",
+                    "name": "some name #%d",
+                    "partnershipStatus": "ACTIVE",
+                    "timestamps": {
+                        "createdDate": "2025-03-12T08:37:09.333",
+                        "updatedDate": "2025-03-12T08:52:28.639"
+                    }
+                }%s
+                """, id, i + 1, i < 2 ? "," : ""));
+        }
+
+        return String.format("""
+            {
+                "tenantId": "%s",
+                "supportedReferrals": [
+                    %s
+                ],
+                "partnerName": "%s"
+            }
+            """, tenantId, supportedReferralsBuilder.toString(), partnerName);
+    }
+
+    public static String referralJsonExample(String tenantId, String referralName) {
+        return String.format("""
+                {
+                    "tenantId": "%s",
+                    "name": "%s",
+                    "partnershipStatus": "ACTIVE",
+                    "timestamps": {
+                        "createdDate": "2025-03-12T08:37:09.333",
+                        "updatedDate": "2025-03-12T08:52:28.639"
+                    }
+                }
+                """, tenantId, referralName);
+    }
+
+    public static String partialReferralJsonExample(String tenantId, String referralName) {
+        return String.format("""
+                {
+                    "tenantId": "%s",
+                    "name": "%s"
+                }
+                """, tenantId, referralName);
+    }
+
+    public static String referralWithNullTenantIdJsonExample(String referralName) {
+        return String.format("""
+                {
+                    "tenantId": null,
+                    "name": "%s",
+                    "partnershipStatus": "ACTIVE",
+                    "timestamps": {
+                        "createdDate": "2025-03-12T08:37:09.333",
+                        "updatedDate": "2025-03-12T08:52:28.639"
+                    }
+                }
+                """, referralName);
+    }
 }

@@ -8,4 +8,7 @@ public interface AccessTokenAuthorizationServerWrapper {
     Mono<AccessToken> getAccessToken(final @NonNull String clientId, final @NonNull String clientSecret,
                                      final @NonNull String audience, final @NonNull String grantType);
 
+    Mono<AccessToken> getAccessToken(final @NonNull String clientId, final @NonNull String clientSecret,
+                                     final @NonNull String audience, final @NonNull String grantType, @NonNull String partnerTenantId);
+
 }

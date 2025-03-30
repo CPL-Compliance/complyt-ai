@@ -57,6 +57,7 @@ public class Auth0AuthorizationServerWrapperTest {
     String tenantId = "tenant ID";
     String newClientId = "New Client ID";
     String newClientSecret = "New Client Secret";
+    String partnerTenantId = "Partner Tenant Id";
 
     @BeforeEach
     void setUp() {
@@ -102,6 +103,55 @@ public class Auth0AuthorizationServerWrapperTest {
 
         Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken(clientId,
                 clientSecret, audience, grantType);
+
+        //Then
+        StepVerifier.create(accessTokenMono)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof ComplytAuth0Exception
+                                && throwable.getMessage().equals("5 Retries Exhausted"))
+                .verify();
+    }
+
+    @Test
+    void getAccessToken_ReferralTokenForPartner_validCredentials_ReturnsAccessToken() {
+        // When
+        when(webClient.post()).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.uri("/oauth/token")).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.header(contentTypeHeaderName, contentTypeHeaderValue)).thenReturn(requestBodySpecMock);
+        when(requestBodySpecMock.bodyValue("client_id=" + clientId +
+                "&client_secret=" + clientSecret +
+                "&audience=" + audience +
+                "&grant_type=" + grantType +
+                "&partner_tenant_id=" + partnerTenantId)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToMono(ArgumentMatchers.<Class<Auth0AccessToken>>notNull()))
+                .thenReturn(Mono.just(auth0AccessToken));
+
+
+        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken(clientId,
+                clientSecret, audience, grantType, partnerTenantId);
+
+        // Then
+        StepVerifier.create(accessTokenMono).expectNext(accessToken).verifyComplete();
+    }
+
+    @Test
+    void getAccessToken_ReferralTokenForPartner_Auth0ServiceIsUnavailable_is5RetriesExhausted() {
+        // When
+        when(webClient.post()).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.uri("/oauth/token")).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.header(contentTypeHeaderName, contentTypeHeaderValue)).thenReturn(requestBodySpecMock);
+        when(requestBodySpecMock.bodyValue("client_id=" + clientId +
+                "&client_secret=" + clientSecret +
+                "&audience=" + audience +
+                "&grant_type=" + grantType +
+                "&partner_tenant_id=" + partnerTenantId)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToMono(Auth0AccessToken.class))
+                .thenReturn(Mono.error(new Exception("Retries Exception")));
+
+        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken(clientId,
+                clientSecret, audience, grantType, partnerTenantId);
 
         //Then
         StepVerifier.create(accessTokenMono)
@@ -357,6 +407,57 @@ public class Auth0AuthorizationServerWrapperTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "grantType is marked non-null but is null");
+    }
+
+    @Test
+    void getAccessToken_forPartner_clientIdIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getAccessToken(null,
+                    "Client Secret", "Audience", "Grant Type", "partnerTenantId");
+        });
+
+        assertEquals(nullPointerException.getMessage(), "clientId is marked non-null but is null");
+    }
+
+
+    @Test
+    void getAccessToken_forPartner_clientSecretIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getAccessToken("client ID",
+                    null, "Audience", "Grant Type", "partnerTenantId");
+        });
+
+        assertEquals(nullPointerException.getMessage(), "clientSecret is marked non-null but is null");
+    }
+
+    @Test
+    void getAccessToken_forPartner_audienceIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getAccessToken("Client ID",
+                    "Client Secret", null, "Grant Type", "partnerTenantId");
+        });
+
+        assertEquals(nullPointerException.getMessage(), "audience is marked non-null but is null");
+    }
+
+    @Test
+    void getAccessToken_forPartner_grantTypeIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getAccessToken("Client ID",
+                    "Client Secret", "audience", null, "partnerTenantId");
+        });
+
+        assertEquals(nullPointerException.getMessage(), "grantType is marked non-null but is null");
+    }
+
+    @Test
+    void getAccessToken_forPartner_partnerTenantIdIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getAccessToken("Client ID",
+                    "Client Secret", "audience", "Grant Type", null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "partnerTenantId is marked non-null but is null");
     }
 
     @Test

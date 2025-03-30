@@ -26,11 +26,17 @@ public class StubAuth0AuthorizationServerWrapper implements AuthorizationServerW
     }
 
     @Override
+    public Mono<AccessToken> getAccessToken(@NonNull String clientId, @NonNull String clientSecret,
+                                            @NonNull String audience, @NonNull String grantType, @NonNull String partnerTenantId) {
+        return Mono.just(new AccessToken(accessToken, scope, expiresIn, tokenType));
+    }
+
+    @Override
     public Mono<Auth0Client> updateApiKeyFromClient(@NonNull String clientName, @NonNull String clientId, @NonNull String tenantId, @NonNull String accessToken,
                                                     final String newClientId, final String newClientSecret) {
         return Mono.just(new Auth0Client("tenant", false, false, "name", new ClientMetadata("tenantId", "ClientId", "clientSecret"),
-                true, true, false, false,null, null, "clientId", true, "clientSecret",
-                null, "appType", null, true ));
+                true, true, false, false, null, null, "clientId", true, "clientSecret",
+                null, "appType", null, true));
     }
 
     @Override

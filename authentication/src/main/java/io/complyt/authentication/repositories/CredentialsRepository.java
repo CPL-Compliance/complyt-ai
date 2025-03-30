@@ -30,6 +30,13 @@ public class CredentialsRepository {
                 .then(reactiveMongoTemplate.findOne(query, Credentials.class));
     }
 
+    public Mono<Credentials> findByTenantId(final @NonNull String tenantId) {
+        Query query = Query.query(Criteria.where("tenantId").is(tenantId));
+
+        return ContextLogger.observeCtx("Searching for credentials by tenantId " + tenantId, log::info)
+                .then(reactiveMongoTemplate.findOne(query, Credentials.class));
+    }
+
     public Mono<Credentials> findActiveCredentialsByComplytClientId(final @NonNull String complytClientId) {
         Criteria statusCriteria = Criteria.where("status").is(ApiKeyStatus.ACTIVE);
         Criteria clientIdCriteria = Criteria.where("complytClientId").is(complytClientId);

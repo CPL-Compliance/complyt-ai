@@ -4,14 +4,15 @@ import io.complyt.authentication.auth0_client.Auth0Client;
 import io.complyt.authentication.auth0_client.ClientMetadata;
 import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.business.authorization.Auth0AccessToken;
-import io.complyt.authentication.domain.ApiKey;
-import io.complyt.authentication.domain.Credentials;
-import io.complyt.authentication.domain.TenantIdAndNameObject;
-import io.complyt.authentication.domain.Token;
+import io.complyt.authentication.domain.*;
 import io.complyt.authentication.domain.enums.ApiKeyStatus;
+import io.complyt.authentication.domain.enums.PartnershipStatus;
+import io.complyt.authentication.domain.enums.TokenSource;
+import io.complyt.authentication.domain.timestamps.Timestamps;
 import io.complyt.authentication.security.EncryptedData;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
+import io.complyt.authentication.v1.models.ReferralDto;
 import io.complyt.authentication.v1.models.TokenDto;
 import lombok.NonNull;
 import org.bson.Document;
@@ -19,6 +20,7 @@ import org.bson.types.ObjectId;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
@@ -41,6 +43,9 @@ public class TestUtilities {
     public static int expiresIn = 86400;
     static String tokenType = "Bearer";
 
+    public static String createTenantId() {
+        return UUID.randomUUID().toString();
+    }
 
     public static Jwt.Builder stubJwt() {
         return Jwt.withTokenValue("token").header("typ", "JWT")
@@ -49,7 +54,7 @@ public class TestUtilities {
 
     public static Token createOutputToken() {
         return new Token("", "", "", "", "", "",
-                "", 0, "", LocalDateTime.now(), LocalDateTime.now());
+                "", 0, "", LocalDateTime.now(), LocalDateTime.now(), null, TokenSource.CLIENT);
     }
 
     public static Token createInputToken() {
@@ -58,7 +63,7 @@ public class TestUtilities {
 
     public static Token createInputToken(String apiKey) {
         return new Token(apiKey, "", "", "", "", "",
-                "", 0, "", LocalDateTime.now(), LocalDateTime.now());
+                "", 0, "", LocalDateTime.now(), LocalDateTime.now(), null, TokenSource.CLIENT);
     }
 
     public static TokenDto createTokenDto() {
@@ -80,6 +85,7 @@ public class TestUtilities {
     public static AccessToken createManagementAccessToken() {
         return new AccessToken("Access Token", "Scope", expiresIn, "Token Type");
     }
+
     public static AccessToken createStubManagementAccessToken() {
         return new AccessToken(managementToken, managementScope, expiresIn, tokenType);
     }
@@ -96,8 +102,8 @@ public class TestUtilities {
 
     public static Auth0Client createAuth0Client() {
         return new Auth0Client("tenant", false, false, "name", new ClientMetadata("tenantId", "ClientId", "clientSecret"),
-                true, true, false, false,null, null, "clientId", true, "clientSecret",
-                null, "appType", null, true );
+                true, true, false, false, null, null, "clientId", true, "clientSecret",
+                null, "appType", null, true);
     }
 
     public static ApiKey createApiKey() {
@@ -123,6 +129,22 @@ public class TestUtilities {
                 .createdAt(LocalDateTime.now())
                 .accessToken("")
                 .build();
+    }
+
+    public static Partnership createPartnership() {
+        return new Partnership("id", "partnerTenantId", "partnerName", new ArrayList<Referral>());
+    }
+
+    public static Referral createReferral() {
+        return new Referral("tenantId", "name", PartnershipStatus.ACTIVE, new Timestamps(LocalDateTime.now(), LocalDateTime.now()));
+    }
+
+    public static Referral createNewReferralWithTenantId(String tenantId) {
+        return new Referral(tenantId, "name", PartnershipStatus.ACTIVE, new Timestamps(LocalDateTime.now(), LocalDateTime.now()));
+    }
+
+    public static ReferralDto createReferralDto() {
+        return new ReferralDto("tenantId", "name", PartnershipStatus.ACTIVE, new Timestamps(LocalDateTime.now(), LocalDateTime.now()));
     }
 
     public static CredentialsDto createCredentialsDto() {
@@ -173,8 +195,8 @@ public class TestUtilities {
     }
 
     public static Credentials createEncryptedCredentialsByExistingCredentials(@NonNull ApiKey apiKey,
-                                                         @NonNull Credentials existingCredentials,
-                                                         @NonNull String complytClientSecret) {
+                                                                              @NonNull Credentials existingCredentials,
+                                                                              @NonNull String complytClientSecret) {
         return Credentials.builder().clientId(existingCredentials.getClientId())
                 .clientIdIv(existingCredentials.getClientIdIv())
                 .clientSecret(existingCredentials.getClientSecret())
@@ -202,10 +224,12 @@ public class TestUtilities {
                 .createdAt(token.getCreatedAt())
                 .build();
     }
-    public static EncryptedData createEncryptedClientId(Credentials credentials){
+
+    public static EncryptedData createEncryptedClientId(Credentials credentials) {
         return new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
     }
-    public static TenantIdAndNameObject createTenantIdAndNameObject(Credentials credentials){
+
+    public static TenantIdAndNameObject createTenantIdAndNameObject(Credentials credentials) {
         return new TenantIdAndNameObject(credentials.getTenantId(), credentials.getName());
     }
 
