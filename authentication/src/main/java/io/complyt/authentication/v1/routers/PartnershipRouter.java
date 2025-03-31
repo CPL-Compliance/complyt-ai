@@ -1,5 +1,8 @@
 package io.complyt.authentication.v1.routers;
 
+import io.complyt.authentication.v1.api_info.partnership.DeleteClientApiInfo;
+import io.complyt.authentication.v1.api_info.partnership.GetPartnershipsApiInfo;
+import io.complyt.authentication.v1.api_info.partnership.UpsertClientApiInfo;
 import io.complyt.authentication.v1.handlers.PartnershipHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +16,7 @@ public class PartnershipRouter {
     public static final String BASE_URL = "/v1/partnership";
 
     @Bean
+    @GetPartnershipsApiInfo
     public RouterFunction<ServerResponse> getPartnership(@NonNull final PartnershipHandler partnershipHandler) {
         RequestPredicate postTokenRoute = RequestPredicates
                 .GET(BASE_URL)
@@ -22,6 +26,7 @@ public class PartnershipRouter {
     }
 
     @Bean
+    @UpsertClientApiInfo
     public RouterFunction<ServerResponse> upsertReferral(@NonNull final PartnershipHandler partnershipHandler) {
         RequestPredicate postTokenRoute = RequestPredicates
                 .POST(BASE_URL + "/client")
@@ -31,6 +36,7 @@ public class PartnershipRouter {
     }
 
     @Bean
+    @DeleteClientApiInfo
     public RouterFunction<ServerResponse> deleteReferral(@NonNull final PartnershipHandler partnershipHandler) {
         RequestPredicate postTokenRoute = RequestPredicates
                 .DELETE(BASE_URL + "/client")

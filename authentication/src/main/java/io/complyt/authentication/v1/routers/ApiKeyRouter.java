@@ -1,7 +1,7 @@
 package io.complyt.authentication.v1.routers;
 
-import io.complyt.authentication.v1.api_info.DeleteApiKeyApiInfo;
-import io.complyt.authentication.v1.api_info.RotateApiKeyApiInfo;
+import io.complyt.authentication.v1.api_info.api_key.DeleteApiKeyApiInfo;
+import io.complyt.authentication.v1.api_info.api_key.RotateApiKeyApiInfo;
 import io.complyt.authentication.v1.handlers.ApiKeyHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;

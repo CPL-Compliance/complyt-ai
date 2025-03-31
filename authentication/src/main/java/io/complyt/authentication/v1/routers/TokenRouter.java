@@ -1,6 +1,7 @@
 package io.complyt.authentication.v1.routers;
 
-import io.complyt.authentication.v1.api_info.PostTokenApiInfo;
+import io.complyt.authentication.v1.api_info.token.GetPartnershipTokenApiInfo;
+import io.complyt.authentication.v1.api_info.token.PostTokenApiInfo;
 import io.complyt.authentication.v1.handlers.TokenHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,7 @@ public class TokenRouter {
     }
 
     @Bean
+    @GetPartnershipTokenApiInfo
     public RouterFunction<ServerResponse> getTokenForPartnersRouterFunction(@NonNull final TokenHandler tokenHandler) {
         RequestPredicate postTokenRoute = RequestPredicates
                 .GET(BASE_URL + "/partnerships")

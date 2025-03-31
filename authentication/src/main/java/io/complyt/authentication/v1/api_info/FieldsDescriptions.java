@@ -12,6 +12,7 @@ public interface FieldsDescriptions {
     // Resources
     String TOKEN = "Contains the data about the access token";
     String PARTNERSHIP = "Contains the data about the partnership";
+    String REFERRAL = "Contains the data about the referral client";
     String CLIENT_ID = "The Client ID part of the Client Credentials";
     String CLIENT_SECRET = "The Client Secret part of the Client Credentials";
     String API_KEY = "The API key to get the access token";

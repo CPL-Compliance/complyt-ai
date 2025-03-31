@@ -1,7 +1,7 @@
-package io.complyt.authentication.v1.api_info;
+package io.complyt.authentication.v1.api_info.partnership;
 
-import io.complyt.authentication.v1.models.ApiKeyDto;
-import io.complyt.authentication.v1.models.TokenDto;
+import io.complyt.authentication.v1.models.PartnershipDto;
+import io.complyt.authentication.v1.models.ReferralDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -25,18 +25,17 @@ import java.lang.annotation.Target;
                 method = RequestMethod.POST,
                 operation =
                 @Operation(
-                        description = "Get access token by API key",
+                        description = "Upsert client by tenantId and name",
                         operationId = "post",
-                        tags = "token",
+                        tags = "partnership",
                         requestBody =
                         @RequestBody(
-                                description = "Api-Key parameters",
+                                description = "Client parameters",
                                 required = true,
                                 content = @Content(
-                                        schema = @Schema(implementation = ApiKeyDto.class, required = true),
+                                        schema = @Schema(implementation = ReferralDto.class),
                                         examples = {
-                                                @ExampleObject(value = io.complyt.authentication.v1.api_info
-                                                        .PostTokenApiInfo.apiKeyBody)
+                                                @ExampleObject(value = UpsertClientApiInfo.referralDtoRequest)
                                         })
                         ),
                         responses = {
@@ -46,35 +45,52 @@ import java.lang.annotation.Target;
                                         content = {
                                                 @Content(
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                        schema = @Schema(implementation = TokenDto.class),
+                                                        schema = @Schema(implementation = PartnershipDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = PostTokenApiInfo.tokenDtoResponse)
+                                                                @ExampleObject(value = UpsertClientApiInfo.partnershipDtoResponse)
                                                         })
                                         }),
                                 @ApiResponse(
-                                        responseCode = "401",
-                                        description = "Api Key Unauthorized"),
+                                        responseCode = "404",
+                                        description = "Partnership could not be found"),
                                 @ApiResponse(
                                         responseCode = "500",
                                         description = "Internal Error"
                                 )
                         }))
 })
-public @interface PostTokenApiInfo {
+public @interface UpsertClientApiInfo {
 
-    String apiKeyBody = """
+    String referralDtoRequest = """
             {
-                "clientId": "bce87cba-1756-417f-942c-23930e9f7b1c",
-                "clientSecret": "b4332d97-97a4-46d8-887a-0e8b4bea161b"\s
+                "tenantId": "org_123456789",
+                "name": "client name #1"
             }""";
 
-    String tokenDtoResponse = """
-            {
-                "accessToken": "stub_access_token",
-                "scope": "read:stub create:stub delete:stub update:stub",
-                "expiresIn": 86400,
-                "tokenType": "Bearer",
-                "expireAt": "2023-08-30T11:22:48.411272"
-            }""";
+    String partnershipDtoResponse = """
+        {
+            "tenantId": "org_1234512345",
+            "partnerName": "PartnerCorp",
+            "supportedReferrals": [
+                {
+                    "tenantId": "org_123456789",
+                    "name": "client name #1",
+                    "partnershipStatus": "ACTIVE",
+                    "timestamps": {
+                            "createdDate": "2024-01-01T00:00:00",
+                            "updatedDate": "2024-01-01T00:00:00"
+                            }
+                },
+                {
+                    "tenantId": "org_111111111",
+                    "name": "client name #2",
+                    "partnershipStatus": "CANCELLED",
+                    "timestamps": {
+                            "createdDate": "2024-01-01T00:00:00",
+                            "updatedDate": "2024-01-01T00:00:00"
+                            }
+                }
+            ]
+        }""";
 
 }

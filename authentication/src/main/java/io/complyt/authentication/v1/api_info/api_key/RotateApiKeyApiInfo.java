@@ -1,4 +1,4 @@
-package io.complyt.authentication.v1.api_info;
+package io.complyt.authentication.v1.api_info.api_key;
 
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,11 +20,11 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @RouterOperations({
         @RouterOperation(
-                method = RequestMethod.DELETE,
+                method = RequestMethod.POST,
                 operation =
                 @Operation(
-                        description = "Revoke API key by API key",
-                        operationId = "delete",
+                        description = "Rotate API key ",
+                        operationId = "rotate",
                         tags = "api_key",
                         requestBody =
                         @RequestBody(
@@ -33,21 +33,20 @@ import java.lang.annotation.Target;
                                 content = @Content(
                                         schema = @Schema(implementation = ApiKeyDto.class, required = true),
                                         examples = {
-                                                @ExampleObject(value = io.complyt.authentication.v1.api_info
-                                                        .DeleteApiKeyApiInfo.apiKeyBody)
+                                                @ExampleObject(value = RotateApiKeyApiInfo.apiKeyBody)
                                         })
                         ),
                         responses = {
                                 @ApiResponse(
-                                        responseCode = "204",
+                                        responseCode = "201",
                                         description = "Successful operation"),
                                 @ApiResponse(
-                                        responseCode = "500",
-                                        description = "Internal Error"
+                                        responseCode = "401",
+                                        description = "Unauthorized Error"
                                 )
                         }))
 })
-public @interface DeleteApiKeyApiInfo {
+public @interface RotateApiKeyApiInfo {
 
     String apiKeyBody = """
             {
