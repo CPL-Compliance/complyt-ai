@@ -327,6 +327,22 @@ public class UnitTestUtilities {
                 BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, null, null, null, null, false, null);
     }
 
+    public Transaction createTransactionWithCustomer(String id, Customer customer) {
+        String documentName = "INVUS1000";
+        Address billingAddress = new Address("City", "USA", "County", "CA", "Street", "10000", "", false);
+        ShippingAddress shippingAddress = new ShippingAddress("City", "USA", "County", "CA", "Street","", "10000", false, null);
+        List<Item> items = createItems(true, false, false);
+        Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
+        ShippingFee shippingFee = createShippingFee(true, false, false);
+
+        return new Transaction(UUID.randomUUID(), id, id, source,
+                documentName, items, false, billingAddress, shippingAddress,
+                customerIdOtherDomains, customer,
+                null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps,
+                TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO,
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatus.NOT_FILED, null, null, null, null, false, null);
+    }
+
     public Transaction createTransactionProjectionAfterProjection(String id) {
         String documentName = "INVUS1000";
         Address billingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);

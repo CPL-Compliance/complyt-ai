@@ -66,7 +66,7 @@ class TransactionRepositoryTest {
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
-        when(reactiveMongoTemplate.findOne(query, Transaction.class)).thenReturn(Mono.just(transaction));
+        when(reactiveMongoTemplate.aggregate(any(), eq(Transaction.class))).thenReturn(Flux.just(transaction));
         Mono<Transaction> transactionMono = transactionRepository.findByExternalIdAndSource(transaction.getExternalId(), source);
 
         // Then
@@ -96,8 +96,7 @@ class TransactionRepositoryTest {
                 .and("source").is(source));
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
-        when(reactiveMongoTemplate.findOne(transactionQuery, Transaction.class)).thenReturn(Mono.just(transaction));
-
+        when(reactiveMongoTemplate.aggregate(any(), eq(Transaction.class))).thenReturn(Flux.just(transaction));
 
         Mono<Transaction> transactionMono = transactionRepository.findByExternalIdAndSource(transaction.getExternalId(), source);
 
