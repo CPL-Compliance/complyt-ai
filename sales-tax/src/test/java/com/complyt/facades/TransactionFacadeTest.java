@@ -321,7 +321,7 @@ public class TransactionFacadeTest {
         // When
         when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transactionToSearchFor));
-        Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source, true);
+        Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionToSearchFor.withCustomer(customer)).verifyComplete();
@@ -339,7 +339,7 @@ public class TransactionFacadeTest {
         // When
         when(customerService.findByComplytIdProjection(transaction.getCustomerId())).thenReturn(Mono.just(customerProjection));
         when(transactionService.findByExternalIdAndSourceProjection(externalId, source)).thenReturn(Mono.just(transactionToSearchFor));
-        Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source, detailed);
+        Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionToSearchFor.withCustomer(customerProjection)).verifyComplete();
@@ -350,12 +350,12 @@ public class TransactionFacadeTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         String source = "1";
-        Transaction transactionToSearchFor = transaction.withExternalId(externalId);
+        Transaction transactionToSearchFor = transaction.withCustomer(customer).withExternalId(externalId);
 
         // When
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+//        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transactionToSearchFor));
-        Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source, true);
+        Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionToSearchFor.withCustomer(customer)).verifyComplete();

@@ -48,7 +48,9 @@ public class TransactionFacade {
     private NexusService nexusService;
 
     public Mono<Transaction> saveTransaction(Transaction transaction) {
+        //not having complytID == new record
         return transactionService.checkTransactionNotHavingComplytId(transaction)
+                //die is die een getCustomer request
                 .flatMap(transactionNoComplytId -> getCustomerByTransaction(transaction)
                         .flatMap(customer -> transactionService.injectDataToNewTransaction(transactionNoComplytId)
                                 .flatMap(transactionWithData -> findSalesTaxTrackingByTransaction(transactionWithData)
@@ -85,7 +87,9 @@ public class TransactionFacade {
                         .thenReturn(savedTransaction));
     }
 
+    //todo when upserting without an existing customer - should create it
     public Mono<Transaction> update(@NonNull String externalId, @NonNull String source, @NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
+        //as ons weg beweeg van die complyt id dan kan jy nie hierop bet nie? tensy ons meer granular wil wees - onthou die issue is 2 api calls - stay focussed
         return transactionService.checkComplytIdOfModifiedEqualsToOriginal(modifiedTransaction, originalTransaction)
                 .flatMap(checkedModifiedTransaction -> getCustomerByTransaction(modifiedTransaction)
                         .flatMap(customer -> transactionService.injectDataToExistingTransaction(checkedModifiedTransaction, originalTransaction)
@@ -133,18 +137,14 @@ public class TransactionFacade {
                         removeTransactionFromNexusTracking(updatedTransactionWithCustomer) :
                         Mono.empty());
     }
+//
+//    public Mono<Transaction> findByExternalIdAndSource(String externalId, String source) {
+//        //todo always true
+//        return findByExternalIdAndSource(externalId, source);
+//    }
 
     public Mono<Transaction> findByExternalIdAndSource(String externalId, String source) {
-        return findByExternalIdAndSource(externalId, source, true);
-    }
-
-    public Mono<Transaction> findByExternalIdAndSource(String externalId, String source, boolean detailed) {
-        return detailed ? transactionService.findByExternalIdAndSource(externalId, source)
-                .flatMap(transaction -> getCustomerByTransaction(transaction)
-                        .map(transaction::setCustomer)) :
-                transactionService.findByExternalIdAndSourceProjection(externalId, source)
-                        .flatMap(transaction -> getCustomerProjectionByTransaction(transaction)
-                                .map(transaction::setCustomer));
+        return transactionService.findByExternalIdAndSource(externalId, source);
     }
 
     public Mono<Transaction> findByComplytId(@NonNull UUID complytId) {
@@ -180,7 +180,10 @@ public class TransactionFacade {
     }
 
     public Mono<Customer> getCustomerByTransaction(Transaction transaction) {
+        //todo upserting without an existing customer should create it - maar teen hierdie punt behoort ons dit te he? is die n fundamental change - ie not using complytId anymore? seems existing
+       //todo as ons nie die customer kan kry volgens complyt id nie, dan moet ons soek volgens externalRef en source, maar as ons dit dan nie kan kry nie - moet ons die customer create?
         return customerService.findByComplytId(transaction.getCustomerId())
+                //create a nuwe customer hierso?
                 .switchIfEmpty(Mono.error(CustomerNotFoundApiException::new));
     }
 

@@ -54,7 +54,7 @@ public class TransactionHandler {
 
         Mono<TransactionDto> transactionDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(transactionDtoValidationHandler.handle(serverRequest))
-                .switchIfEmpty(Mono.defer(() -> transactionFacade.findByExternalIdAndSource(externalId, source, detailed))
+                .switchIfEmpty(Mono.defer(() -> transactionFacade.findByExternalIdAndSource(externalId, source))
                         .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
                         .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto))
                         .switchIfEmpty(ContextLogger.observeCtx("Failed to get transaction by externalId " + externalId + " and source " + source, log::error)
@@ -133,6 +133,9 @@ public class TransactionHandler {
                                 .thenReturn(transactionDto))
                         .map(TransactionMapper.INSTANCE::transactionDtoToTransaction)
                         .flatMap(receivedTransaction ->
+                                //of hier, waar hy eers die transaction kry deur die ext id and source
+
+                                //todo so die moet die customer klaar he wat ek wil he right?
                                 transactionFacade.findByExternalIdAndSource(externalId, source)
                                         .flatMap(originalTransaction -> transactionFacade.update(externalId, source, receivedTransaction, originalTransaction)
                                                 .flatMap(savedTransaction -> ContextLogger.observeCtx("<-- Returned Body: " + savedTransaction, log::info)

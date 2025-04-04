@@ -23,7 +23,6 @@ import com.complyt.v1.models.tax.sales_tax.SalesTaxDto;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.validators.Patcher;
-import com.complyt.v1.validators.query_extractors.VatDetailsToValidateQueryExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -99,7 +98,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         boolean detailed = true;
 
-        when(transactionFacade.findByExternalIdAndSource(externalId, source, true)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
 
         // When + Then
         webTestClient
@@ -123,7 +122,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = "null";
         boolean detailed = true;
         String source = transactionDto.source();
-        when(transactionFacade.findByExternalIdAndSource(externalId, source, detailed)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
 
         // When + Then
         webTestClient
@@ -148,7 +147,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         SalesTaxDto salesTaxDto = new SalesTaxDto(null, BigDecimal.ZERO, BigDecimal.ZERO, new SalesTaxRatesDto(null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO), null);
         TransactionDto transactionDtoWithSalesTax = transactionDto.withSalesTax(salesTaxDto);
         Transaction returnedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDtoWithSalesTax);
-        when(transactionFacade.findByExternalIdAndSource(externalId, source, detailed)).thenReturn(Mono.just(returnedTransaction));
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(returnedTransaction));
 
         // When + Then
         webTestClient
@@ -173,7 +172,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         boolean detailed = true;
 
-        when(transactionFacade.findByExternalIdAndSource(externalId, source, detailed)).thenReturn(Mono.empty());
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
 
         // When + Then
         webTestClient
@@ -197,7 +196,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         boolean detailed = true;
 
-        when(transactionFacade.findByExternalIdAndSource(externalId, source, detailed)).thenReturn(Mono.empty());
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
 
         // When + Then
         webTestClient
@@ -222,7 +221,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         boolean detailed = true;
 
-        when(transactionFacade.findByExternalIdAndSource(externalId, source, detailed)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
 
         // When + Then
         webTestClient
@@ -251,7 +250,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         boolean detailed = true;
 
-        when(transactionFacade.findByExternalIdAndSource(externalId, source, detailed)).thenReturn(Mono.error(new OperationFailedException()));
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.error(new OperationFailedException()));
 
         // When + Then
         webTestClient

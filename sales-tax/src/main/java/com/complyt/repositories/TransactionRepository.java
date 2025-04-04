@@ -61,15 +61,25 @@ public class TransactionRepository {
                 });
     }
 
+    //die gaan nou die customer ook return so dit behoort nei meer nodig te wees om n customer lookup te doen na die nie
     public Mono<Transaction> findByExternalIdAndSource(String externalId, String source) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
-                    Query query = Query.query(TransactionRepositoryCommonStagesBuilder
-                            .tenantIdExternalIdAndSourceExactCriteria(tenantId, externalId, source));
+                    TypedAggregation<Transaction> aggregation = Aggregation.newAggregation(Transaction.class,
+                            Aggregation.match(TransactionRepositoryCommonStagesBuilder
+                                    .tenantIdExternalIdAndSourceExactCriteria(tenantId, externalId, source)),
+                            Aggregation.lookup()
+                                    .from("customer")
+                                    .localField("customerId")
+                                    .foreignField("complytId")
+                                    .pipeline(Aggregation.match(Criteria.where("tenantId").is(tenantId)))
+                                    .as("customer"),
+                            Aggregation.unwind("customer", true),
+                            Aggregation.addFields().addFieldWithValue("items", TransactionProjectionStage.itemsMapAddFeildStageDocument()).build(),
+                            Aggregation.stage(TransactionProjectionStage.projectionStageDocument()));
 
-                    return ContextLogger.observeCtx("Searching for transaction with external ID " + externalId + ", source" + source + ", and tenant ID " + tenantId, tenantId, log::info)
-                            .then(reactiveMongoTemplate
-                                    .findOne(query, Transaction.class));
+                    return ContextLogger.observeCtx("Searching for transaction with external ID " + externalId + ", source" + source + ", and tenant ID " + tenantId,log::info)
+                            .then(reactiveMongoTemplate.aggregate(aggregation, Transaction.class).next());
                 });
     }
 
