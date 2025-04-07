@@ -61,8 +61,8 @@ public class InternalTimestampsInjectorTest {
         LocalDateTime afterActionTime = LocalDateTime.now();
 
         // Then
-        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isAfter(beforeActionTime) || actualTransaction.getInternalTimestamps().getUpdatedDate().isEqual(beforeActionTime));
-        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isBefore(afterActionTime) || actualTransaction.getInternalTimestamps().getUpdatedDate().isEqual(afterActionTime));
+        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isAfter(beforeActionTime));
+        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isBefore(afterActionTime));
     }
 
     @Test
@@ -88,10 +88,10 @@ public class InternalTimestampsInjectorTest {
         LocalDateTime afterActionTime = LocalDateTime.now();
 
         // Then
-        assertTrue(actualTransaction.getInternalTimestamps().getCreatedDate().isAfter(beforeActionTime) || actualTransaction.getInternalTimestamps().getCreatedDate().isEqual(beforeActionTime));
-        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isAfter(beforeActionTime) || actualTransaction.getInternalTimestamps().getUpdatedDate().isEqual(beforeActionTime));
-        assertTrue(actualTransaction.getInternalTimestamps().getCreatedDate().isBefore(afterActionTime) || actualTransaction.getInternalTimestamps().getCreatedDate().isEqual(afterActionTime));
-        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isBefore(afterActionTime) || actualTransaction.getInternalTimestamps().getUpdatedDate().isEqual(afterActionTime));
+        assertTrue(actualTransaction.getInternalTimestamps().getCreatedDate().isAfter(beforeActionTime));
+        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isAfter(beforeActionTime));
+        assertTrue(actualTransaction.getInternalTimestamps().getCreatedDate().isBefore(afterActionTime));
+        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isBefore(afterActionTime));
     }
 
     @Test

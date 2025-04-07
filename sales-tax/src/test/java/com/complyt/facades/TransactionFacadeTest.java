@@ -72,7 +72,6 @@ public class TransactionFacadeTest {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         MockitoAnnotations.openMocks(this);
 
-        //creates a transaction with a new customer that has a random UUID as an ID
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         customer = testUtilities.createCustomer(UUID.randomUUID().toString());
         transactionNoId = testUtilities.createTransaction(null).withComplytId(null).withExternalId(transaction.getExternalId());
@@ -317,15 +316,15 @@ public class TransactionFacadeTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         String source = "1";
-        Transaction transactionToSearchFor = testUtilities.createTransactionWithCustomer(UUID.randomUUID().toString(), customer);
+        Transaction transactionToSearchFor = transaction.withExternalId(externalId);
 
         // When
-        //when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transactionToSearchFor));
         Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source);
 
         // Then
-        StepVerifier.create(transactionMono).expectNext(transactionToSearchFor).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transactionToSearchFor.withCustomer(customer)).verifyComplete();
     }
 
     @Test
@@ -333,13 +332,13 @@ public class TransactionFacadeTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         String source = "1";
+        Transaction transactionToSearchFor = testUtilities.createTransactionProjectionAfterProjection(UUID.randomUUID().toString());
         Customer customerProjection = testUtilities.createCustomerProjection(UUID.randomUUID().toString());
-        Transaction transactionToSearchFor = testUtilities.createTransactionProjectionAfterProjection(UUID.randomUUID().toString()).withCustomer(customerProjection);
         boolean detailed = false;
 
         // When
-        //when(customerService.findByComplytIdProjection(transaction.getCustomerId())).thenReturn(Mono.just(customerProjection));
-        when(transactionService.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transactionToSearchFor));
+        when(customerService.findByComplytIdProjection(transaction.getCustomerId())).thenReturn(Mono.just(customerProjection));
+        when(transactionService.findByExternalIdAndSourceProjection(externalId, source)).thenReturn(Mono.just(transactionToSearchFor));
         Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source);
 
         // Then
@@ -351,12 +350,9 @@ public class TransactionFacadeTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         String source = "1";
-        transaction = testUtilities.createTransactionWithCustomer(UUID.randomUUID().toString(), customer);
-        Transaction transactionToSearchFor = transaction.withExternalId(externalId);
+        Transaction transactionToSearchFor = transaction.withCustomer(customer).withExternalId(externalId);
 
         // When
-
-        //this mocking made up for the fact that the transaction had a random customer id embedded
 //        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transactionToSearchFor));
         Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source);
