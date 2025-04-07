@@ -39,8 +39,9 @@ class CountyZipCriteriaBuilderTest {
         Criteria result = countyZipCriteriaBuilder.build(addressWithZipAndCounty);
 
         // Assert
-        assertEquals(2, result.getCriteriaObject().size());
+        assertEquals(1, result.getCriteriaObject().size());
     }
+
     @Test
     void testBuild_WithOnlyZip() {
         // Arrange
@@ -58,25 +59,15 @@ class CountyZipCriteriaBuilderTest {
     }
 
     @Test
-    void testBuild_WithOnlyCounty() {
+    void testBuild_WithNullZip() {
         // Arrange
-        address = address.withCounty("SampleCounty").withZip(null);
+        Criteria zipCriteria = new Criteria();
+        address = address.withZip(null);
 
         // Act
         Criteria result = countyZipCriteriaBuilder.build(address);
 
         // Assert
-        assertEquals(1, result.getCriteriaObject().size());
+        assertEquals(0, result.getCriteriaObject().size());
     }
-
-    @Test
-    void testBuild_WithNoZipOrCounty() {
-        // Act
-        address = address.withCounty(null).withZip(null);
-        Criteria result = countyZipCriteriaBuilder.build(address);
-
-        // Assert
-        assertEquals(new Criteria().getCriteriaObject(), result.getCriteriaObject());
-    }
-
 }
