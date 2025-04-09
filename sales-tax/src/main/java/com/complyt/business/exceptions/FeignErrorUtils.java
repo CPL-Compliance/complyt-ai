@@ -1,9 +1,9 @@
 package com.complyt.business.exceptions;
+
+import com.complyt.annotations.Generated;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
-
-import com.complyt.annotations.Generated;
 
 @Generated
 public class FeignErrorUtils {

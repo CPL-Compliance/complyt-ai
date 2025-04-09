@@ -8,11 +8,15 @@ import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.security.TenantResolver;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
@@ -26,6 +30,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -43,6 +48,24 @@ public class TransactionSalesTaxRatesHandlerTest {
 
     UnitTestUtilities testUtilities;
     Address address;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setup() {
@@ -62,6 +85,8 @@ public class TransactionSalesTaxRatesHandlerTest {
         Transaction expectedTransaction = transaction.withItems(modifiedItems);
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
         when(itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRates, transaction.getShippingAddress())).thenReturn(modifiedItems);
         Mono<Transaction> actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates);
 
@@ -83,6 +108,8 @@ public class TransactionSalesTaxRatesHandlerTest {
         Transaction expectedTransaction = transaction.withItems(modifiedItems).withShippingFee(shippingFeeWithRates);
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
         when(itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRates, transaction.getShippingAddress())).thenReturn(modifiedItems);
         when(shippingFeeSalesTaxRatesProvider.setSalesTaxRates(shippingFee, salesTaxRates, transaction.getShippingAddress())).thenReturn(shippingFeeWithRates);
         Mono<Transaction> actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates);

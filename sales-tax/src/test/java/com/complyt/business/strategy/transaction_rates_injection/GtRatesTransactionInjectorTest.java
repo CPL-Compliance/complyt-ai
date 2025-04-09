@@ -5,18 +5,21 @@ import com.complyt.business.tax.gt.TransactionGtRatesHandler;
 import com.complyt.business.tax.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.sales_tax.SalesTax;
-import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.tax.ComplytGtRates;
 import com.complyt.domain.transaction.tax.GtRates;
+import com.complyt.security.TenantResolver;
 import org.javatuples.Pair;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -29,6 +32,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,6 +47,24 @@ public class GtRatesTransactionInjectorTest {
     SalesTaxAggregator salesTaxAggregator;
     Transaction transaction;
     UnitTestUtilities testUtilities;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {
@@ -116,6 +138,7 @@ public class GtRatesTransactionInjectorTest {
         Transaction transactionWithRatesAndNullSalesTax = transactionWithRates.withSalesTax(null).withFinalTransactionAmount(BigDecimal.valueOf(0)); // finalTransactionAmount equals to the salesTaxAmount because the finalTransactionAmount in 0
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(transactionGtRatesHandler.setRates(transaction,gtRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxables);
         Mono<Transaction> transactionMono = gtRatesTransactionInjector.inject(transaction).apply(Pair.with(complytGtRates, true));
@@ -145,6 +168,7 @@ public class GtRatesTransactionInjectorTest {
         Transaction transactionWithRatesAndNullSalesTax = transactionWithRates.withSalesTax(salesTax).withFinalTransactionAmount(BigDecimal.valueOf(800)); // finalTransactionAmount equals to the salesTaxAmount because the finalTransactionAmount in 0
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(transactionGtRatesHandler.setRates(transaction,gtRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxables);
         when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
@@ -176,6 +200,7 @@ public class GtRatesTransactionInjectorTest {
         Transaction transactionWithRatesAndNullSalesTax = transactionWithRates.withSalesTax(salesTax).withFinalTransactionAmount(BigDecimal.valueOf(1600)); // finalTransactionAmount equals to the salesTaxAmount because the finalTransactionAmount in 0
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(transactionGtRatesHandler.setRates(transaction,gtRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxables);
         when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());

@@ -3,6 +3,7 @@ package com.complyt.v1.routers;
 import com.complyt.domain.ValidatedVat;
 import com.complyt.domain.VatDetailsToValidate;
 import com.complyt.facades.VatValidationFacade;
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
@@ -12,21 +13,24 @@ import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handlers.VatValidationHandler;
 import com.complyt.v1.models.vat_validation.ValidatedVatDto;
 import com.complyt.v1.models.vat_validation.VatDetailsToValidateDto;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import testUtils.integration_test.WithMockJwt;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -35,6 +39,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -64,8 +69,29 @@ public class VatValidationRouterTest implements VatValidationRouterTestTemplate 
     ValidatedVat validatedVat;
     LocalDateTime localDateTime;
 
+    static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+            when(TenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
+
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
+
     @BeforeEach
     void setUp() {
+        webTestClient = webTestClient.mutate().responseTimeout(Duration.ofSeconds(10)).build();
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         localDateTime = LocalDateTime.now();
 
@@ -78,12 +104,11 @@ public class VatValidationRouterTest implements VatValidationRouterTestTemplate 
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ValidateNewVatDetails_Return201() {
         // Given
         ValidatedVatDto expectedValidatedVat = testUtilities.createValidatedVatDto(localDateTime, localDateTime);
 
-        // When
         when(vatValidationFacade.findValidatedVat(vatDetailsToValidate)).thenReturn(Mono.empty());
         when(vatValidationFacade.validateVat(vatDetailsToValidate)).thenReturn(Mono.just(validatedVat));
 
@@ -103,7 +128,7 @@ public class VatValidationRouterTest implements VatValidationRouterTestTemplate 
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ValidateAlreadyExistingVatDetails_Return200() {
         // Given
         ValidatedVatDto expectedValidatedVat = testUtilities.createValidatedVatDto(localDateTime, localDateTime);
@@ -130,7 +155,7 @@ public class VatValidationRouterTest implements VatValidationRouterTestTemplate 
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ValidateVatDetailsNotValid_Return400CountryNotValid() {
         // Given
         VatDetailsToValidateDto brokenVatDetailsDto = testUtilities.createVatDetailsToValidateDto()
@@ -156,7 +181,7 @@ public class VatValidationRouterTest implements VatValidationRouterTestTemplate 
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_VatDetailsCouldNotBeValidatedDueToInternalError_Return500() {
         // When
         when(vatValidationFacade.findValidatedVat(vatDetailsToValidate)).thenReturn(Mono.empty());
@@ -176,7 +201,8 @@ public class VatValidationRouterTest implements VatValidationRouterTestTemplate 
 
     @Override
     @Test
-    @WithMockUser    public void upsert_NullHandler_ThrowsNullPointerException() {
+    @WithMockJwt
+    public void upsert_NullHandler_ThrowsNullPointerException() {
         // Given
         VatValidationHandler nullVatValidationHandler = null;
         vatValidationRouter = new VatValidationRouter();
@@ -192,7 +218,7 @@ public class VatValidationRouterTest implements VatValidationRouterTestTemplate 
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_CountryCodeIsBlank_Return400() {
         // Given
         VatDetailsToValidateDto problematicVatValidationDetails = vatDetailsToValidateDto.withCountryCode("");
@@ -215,7 +241,7 @@ public class VatValidationRouterTest implements VatValidationRouterTestTemplate 
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_CountryCodeIsNull_Return400() {
         // Given
         VatDetailsToValidateDto problematicVatValidationDetails = vatDetailsToValidateDto.withCountryCode(null);
@@ -239,7 +265,7 @@ public class VatValidationRouterTest implements VatValidationRouterTestTemplate 
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_CountryCodeIsMoreThan50Characters_Return400() {
         // Given
         VatDetailsToValidateDto problematicVatValidationDetails = vatDetailsToValidateDto
@@ -263,12 +289,12 @@ public class VatValidationRouterTest implements VatValidationRouterTestTemplate 
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_VatNumberIsBlank_Return400() {
         // Given
         VatDetailsToValidateDto problematicVatValidationDetails = vatDetailsToValidateDto.withVatNumber("");
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "vatNumber parameter " +  GenericErrorMessages.MIN_1_MAX_20_ERROR));
+                "vatNumber parameter " + GenericErrorMessages.MIN_1_MAX_20_ERROR));
 
         webTestClient
                 .mutateWith(csrf())
@@ -286,7 +312,7 @@ public class VatValidationRouterTest implements VatValidationRouterTestTemplate 
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_VatNumberIsNull_Return400() {
         // Given
         VatDetailsToValidateDto problematicVatValidationDetails = vatDetailsToValidateDto.withVatNumber(null);
@@ -309,7 +335,7 @@ public class VatValidationRouterTest implements VatValidationRouterTestTemplate 
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_VatNumberIsMoreThan20Characters_Return400() {
         // Given
         VatDetailsToValidateDto problematicVatValidationDetails = vatDetailsToValidateDto
@@ -318,6 +344,7 @@ public class VatValidationRouterTest implements VatValidationRouterTestTemplate 
                 "vatNumber parameter " + GenericErrorMessages.MIN_1_MAX_20_ERROR));
 
 
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
 
         // When + Then
         webTestClient

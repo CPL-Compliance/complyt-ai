@@ -134,7 +134,7 @@ public class TransactionSchemaValidationIT extends TestContainersInitializerIT {
                 .expectErrorMatches(throwable -> throwable.getMessage().contains("tangibleItemsAmount"))
                 .verify();
     }
-    
+
     @Test
     public void saveTransaction_missingTotalItemsAmount_Failure() {
         transactionDocument.remove("totalItemsAmount");
@@ -306,8 +306,8 @@ public class TransactionSchemaValidationIT extends TestContainersInitializerIT {
                 .expectErrorMatches(throwable -> throwable.getMessage().contains("taxCode"))
                 .verify();
     }
-    
-    
+
+
     @Test
     public void saveTransaction_item_missingName_Failure() {
         transactionDocument.getList("items", Document.class).get(0).remove("name");
@@ -499,7 +499,7 @@ public class TransactionSchemaValidationIT extends TestContainersInitializerIT {
                 .expectErrorMatches(throwable -> throwable.getMessage().contains("transactionFilingStatus"))
                 .verify();
     }
-    
+
     @Test
     public void saveTransaction_missingAddressInMatchedAddressData_Failure() {
         ((Document) ((Document) transactionDocument.get("shippingAddress")).get("matchedAddressData")).remove("address");

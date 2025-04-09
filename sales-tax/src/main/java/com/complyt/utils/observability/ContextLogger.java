@@ -1,5 +1,6 @@
 package com.complyt.utils.observability;
 
+import com.complyt.security.TenantResolver;
 import io.micrometer.context.ContextSnapshot;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import org.slf4j.MDC;
@@ -24,11 +25,19 @@ public class ContextLogger {
     }
 
     public static Mono<Object> observeCtx(String data, Consumer<String> log) {
-        return Mono.deferContextual(contextView -> {
-            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView, ObservationThreadLocalAccessor.KEY)) {
-                log.accept(data);
-                return Mono.empty();
-            }
-        });
+        return TenantResolver.resolve()
+                .flatMap(tenantId -> {
+                    return Mono.deferContextual(contextView -> {
+                        // Set the tenantId in MDC
+                        MDC.put("tenantId", tenantId);
+                        try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView, ObservationThreadLocalAccessor.KEY)) {
+                            log.accept(data);
+                            return Mono.empty();
+                        } finally {
+                            // Clear the MDC to prevent memory leaks
+                            MDC.remove("tenantId");
+                        }
+                    });
+                });
     }
 }

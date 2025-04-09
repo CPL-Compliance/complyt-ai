@@ -1,8 +1,8 @@
 package com.complyt.domain.transaction;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import com.complyt.security.TenantResolver;
+import org.junit.jupiter.api.*;
+import org.mockito.MockedStatic;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.lang.reflect.Field;
@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mockStatic;
 
 public class TransactionTest {
 
@@ -23,6 +24,24 @@ public class TransactionTest {
         /* In case there is a new property added, If its of type Taxable - handle rates and amount calculation for it */
         Field[] fields = Transaction.class.getDeclaredFields();
         Assertions.assertEquals(32, fields.length);
+    }
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
     }
 
     @BeforeEach

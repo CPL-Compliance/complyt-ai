@@ -1,11 +1,15 @@
 package com.complyt.v1.config;
 
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.body_checkers.transaction.ItemsAlignmentChecker;
 import com.complyt.v1.validators.body_checkers.transaction.TransactionDtoShippingAddressChecker;
 import com.complyt.v1.validators.body_checkers.transaction.TransactionTotalAmountChecker;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
@@ -17,6 +21,7 @@ import java.util.List;
 import static com.fasterxml.jackson.databind.jsonFormatVisitors.JsonValueFormat.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
 
 public class BodyCheckConfigTest {
 
@@ -24,6 +29,24 @@ public class BodyCheckConfigTest {
     TransactionDto transactionDto;
 
     BodyCheckConfig<TransactionDto> bodyCheckConfig;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {

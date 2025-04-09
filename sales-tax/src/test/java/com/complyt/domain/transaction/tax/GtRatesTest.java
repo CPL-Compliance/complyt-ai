@@ -1,13 +1,14 @@
 package com.complyt.domain.transaction.tax;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import com.complyt.security.TenantResolver;
+import org.junit.jupiter.api.*;
+import org.mockito.MockedStatic;
 
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mockStatic;
 
 public class GtRatesTest {
     private final BigDecimal rate = new BigDecimal("0.2");
@@ -15,6 +16,24 @@ public class GtRatesTest {
 
     private GtRates createGtRates() {
         return new GtRates(rate, rate, rate.multiply(BigDecimal.valueOf(2)));
+    }
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
     }
 
     @BeforeEach

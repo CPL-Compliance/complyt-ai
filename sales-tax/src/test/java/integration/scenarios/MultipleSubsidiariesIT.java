@@ -4,7 +4,6 @@ import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.transaction.ItemDto;
-import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.ShippingAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
@@ -18,12 +17,11 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
+import testUtils.integration_test.WithMockJwt;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -31,7 +29,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(MockitoExtension.class)
@@ -62,21 +59,18 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
         transactionDto = ITUtilities.stubTransactionDto(null, customerId,
                         ITUtilities.stubItemDto().withTotalPrice(new BigDecimal("10000")).withQuantity(new BigDecimal("2")).withUnitPrice(new BigDecimal("5000")))
                 .withShippingAddress(referenceAddress);
-
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
     }
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(0)
     public void getOneSalesTaxTracking_NullSubsidiary_EstablishedByIsNullAndEconomicNexusEstablishedIsFalse() {
         // Given
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("state", "ID")
@@ -94,15 +88,14 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(0)
     public void getOneSalesTaxTracking_SubsidiaryB_EstablishedByIsNullAndEconomicNexusEstablishedIsFalse() {
         // Given
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("state", "ID")
@@ -122,7 +115,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(0)
     public void upsert_FirstTransactionToNullSubsidiary_AddsCalculationToNullSubsidiary_DidNotPassNexus() {
         // Given
@@ -131,8 +124,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -146,7 +138,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(0)
     public void upsert_SecondTransactionWithNonExistingSubsidiary_AddsCalculationToNullSubsidiary_DidNotPassNexus() {
         // Given
@@ -156,8 +148,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -171,7 +162,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(0)
     public void upsert_FirstTransactionToSubsidiaryA_AddsCalculationToSubsidiaryA_DidNotPassNexus() {
         // Given
@@ -181,8 +172,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -196,7 +186,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(0)
     public void upsert_FirstTransactionToSubsidiaryB_AddsCalculationToSubsidiaryB_DidNotPassNexus() {
         // Given
@@ -206,8 +196,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -221,7 +210,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(0)
     public void upsert_FirstTransactionToSubsidiaryC_AddsCalculationToSubsidiaryC_DidNotPassNexus() {
         // Given
@@ -231,8 +220,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -246,7 +234,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(1)
     public void upsert_SecondTransactionToSubsidiaryC_AddsCalculationToSubsidiaryC_DidNotPassNexus() {
         // Given
@@ -260,8 +248,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -275,7 +262,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(1)
     public void upsert_SecondTransactionToSubsidiaryB_AddsCalculationToSubsidiaryB_PassedNexus() {
         // Given
@@ -289,8 +276,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -304,7 +290,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(2)
     public void upsert_SecondTransactionToSubsidiaryA_TransactionReturnedWithSalesTax() {
         // Given
@@ -314,8 +300,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -329,7 +314,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(2)
     public void upsert_SecondTransactionToNullSubsidiary_TransactionReturnedWithSalesTax() {
         // Given
@@ -338,8 +323,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -353,7 +337,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(3)
     public void upsert_ThirdTransactionToNullSubsidiaryB_TransactionReturnedWithSalesTax() {
         // Given
@@ -363,8 +347,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -378,7 +361,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(2)
     public void upsert_ThirdTransactionToNullSubsidiaryC_TransactionReturnedWithSalesTax() {
         // Given
@@ -388,8 +371,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -403,7 +385,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(2)
     public void upsert_TransactionWithNonExistingSubsidiary_TransactionReturnedWithSalesTax() {
         // Given
@@ -413,8 +395,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -428,7 +409,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(2)
     public void upsert_TransactionWithNullSubsidiary_TransactionReturnedWithSalesTax() {
         // Given
@@ -438,8 +419,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -453,15 +433,14 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(3)
     public void getOneSalesTaxTracking_SubsidiaryA_EstablishedBySubsidiaryB() {
         // Given
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("state", "ID")
@@ -477,7 +456,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(3)
     public void getOneSalesTaxTracking_SubsidiaryB_EstablishedBySubsidiaryB() {
         // Given
@@ -487,8 +466,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("state", "ID")
@@ -504,15 +482,14 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(3)
     public void getOneSalesTaxTracking_SubsidiaryC_EstablishedBySubsidiaryB() {
         // Given
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("state", "ID")
@@ -528,15 +505,14 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Order(3)
     public void getOneSalesTaxTracking_NullSubsidiary_EstablishedBySubsidiaryB() {
         // Given
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("state", "ID")

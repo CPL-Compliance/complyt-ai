@@ -88,6 +88,4 @@ public class ClientTrackingRepository {
         return ContextLogger.observeCtx("Searching for client tracking by tenant ID: " + tenantId, tenantId, log::info)
                 .then(reactiveMongoTemplate.findOne(query, ClientTracking.class));
     }
-
-
 }

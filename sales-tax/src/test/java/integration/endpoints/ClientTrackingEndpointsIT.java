@@ -14,13 +14,12 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
+import testUtils.integration_test.WithMockJwt;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
@@ -30,7 +29,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(SpringExtension.class)
@@ -56,17 +54,15 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
         // Given
         String tenantId = "org_12345";
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
     }
 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_Exists_Returns200() {
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL)
                         .build())
@@ -78,11 +74,10 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_QueryParamInvalid_Returns400() {
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL)
                         .queryParam("size", "null")
@@ -95,14 +90,13 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByAll_DoesntExists_Returns200EmptyList() {
         // Given - Doing it by setting page that does not exist
         int page = 5;
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL)
                         .queryParam("page", page)
@@ -117,11 +111,10 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByAll_QueryParamInvalid_Returns400() {
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL)
                         .queryParam("page", "null")
@@ -134,14 +127,13 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_GetByParamSize_ReturnsExpectedSize() {
         // Given
         int size = 1;
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL)
                         .queryParam("size", size)
@@ -156,7 +148,7 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_GetByParamPage_ReturnsExpectedPage() {
         // Given
         int size = 1;
@@ -164,8 +156,7 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
         String expectedTenantId = "it_tenant";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL)
                         .queryParam("size", size)
@@ -181,7 +172,7 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_GetByDefaultsSizeAndPage_ReturnsExpectedEntries() {
         // Given
         int size = 1;
@@ -204,14 +195,13 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByName_Exists_Returns200() {
         // Given
         String name = "RAZ";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL + "/name/" + name)
                         .build())
@@ -225,14 +215,13 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByName_DoesntExists_Returns404() {
         // Given
         String name = "nameNotInDB";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL + "/name/" + name)
                         .build())
@@ -244,14 +233,13 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByName_PathVariableInvalid_Returns400() {
         // Given
         String invalidName = testUtilities.stringWithLength(257);
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL + "/name/" + invalidName)
                         .build())
@@ -266,14 +254,13 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByTenantId_Exists_Returns200() {
         // Given
         String tenantId = "org_12345";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId)
                         .build())
@@ -287,14 +274,13 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByTenantId_NotExists_Returns404() {
         // Given
         String tenantId = "org_notFound";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId)
                         .build())
@@ -306,14 +292,13 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByTenantId_PathVariableInvalid_Returns400() {
         // Given
         String invalidTenantId = testUtilities.stringWithLength(50);
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + invalidTenantId)
                         .build())
@@ -327,14 +312,13 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_Exists_Returns200() {
         // Given
         String tenantId = "org_12345";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId)
                         .build())
@@ -348,7 +332,7 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_PathVariableInvalid_Returns400() {
         // Given
         String name = "name";
@@ -358,8 +342,7 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + invalidTenantId)
                         .build())
@@ -374,7 +357,7 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_ConflictedTenantId_Returns400() {
         // Given
         String name = "name";
@@ -384,8 +367,8 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId)
                         .build())
@@ -400,7 +383,7 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_DoesntExistsAndHasListOfSubsidiaries_Returns201() {
         // Given
         String tenantId = "org_12345";
@@ -410,8 +393,7 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId)
                         .build())
@@ -427,7 +409,7 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_UnsupportedMediaType_Returns415() {
         // Given
         String name = "name";
@@ -436,8 +418,8 @@ public class ClientTrackingEndpointsIT extends TestContainersInitializerIT imple
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(ClientTrackingRouter.BASE_URL + "/tenantId/" + tenantId)
                         .build())

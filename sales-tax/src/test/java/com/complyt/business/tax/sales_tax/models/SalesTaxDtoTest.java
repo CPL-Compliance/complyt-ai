@@ -1,18 +1,42 @@
 package com.complyt.business.tax.sales_tax.models;
 
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.tax.global_tax.GtRatesDto;
 import com.complyt.v1.models.tax.sales_tax.RatesMetaDataDto;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.mockStatic;
 
 class SalesTaxDtoTest {
     SalesTaxDto salesTaxDto;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {

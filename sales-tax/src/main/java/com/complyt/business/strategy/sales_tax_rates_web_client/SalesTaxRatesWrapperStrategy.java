@@ -3,7 +3,6 @@ package com.complyt.business.strategy.sales_tax_rates_web_client;
 import com.complyt.business.strategy.FunctionSelectorByTransactionAddressStrategy;
 import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
-import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.tax.ComplytGtRates;

@@ -3,14 +3,12 @@ package com.complyt.business.vat_validation.web_clients;
 import com.complyt.domain.ValidatedVat;
 import com.complyt.domain.VatDetailsToValidate;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import org.springframework.http.HttpHeaders;
 import reactor.util.retry.Retry;
-
 
 import java.net.URI;
 import java.time.Duration;

@@ -2,16 +2,13 @@ package com.complyt.v1.handlers;
 
 
 import com.complyt.facades.VatValidationFacade;
-import com.complyt.security.permissions.exemption.ExemptionReadPermission;
 import com.complyt.security.permissions.vat_validation.VatValidationReadPermission;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ComplytApiException;
-import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.ValidatedVatMapper;
 import com.complyt.v1.mappers.VatDetailsToValidateMapper;
 import com.complyt.v1.models.vat_validation.ValidatedVatDto;
 import com.complyt.v1.models.vat_validation.VatDetailsToValidateDto;
-import com.complyt.v1.routers.TransactionRouter;
 import com.complyt.v1.routers.VatValidationRouter;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;

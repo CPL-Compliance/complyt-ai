@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.With;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @With
 @JsonInclude(JsonInclude.Include.NON_NULL) // Excludes null fields in JSON response

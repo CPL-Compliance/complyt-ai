@@ -2,7 +2,6 @@ package com.complyt.v1.config;
 
 import com.complyt.v1.models.ClientTrackingDtoTenant;
 import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.vat_validation.VatDetailsToValidateDto;
 import com.complyt.v1.models.checkables.ComplytIdCheckable;
 import com.complyt.v1.models.checkables.CountryCheckable;
 import com.complyt.v1.models.checkables.StateCheckable;
@@ -11,6 +10,7 @@ import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import com.complyt.v1.models.customer.exemption.ExemptionWrapperDto;
 import com.complyt.v1.models.nexus.DateWrapperDto;
 import com.complyt.v1.models.transaction.TransactionDto;
+import com.complyt.v1.models.vat_validation.VatDetailsToValidateDto;
 import com.complyt.v1.validators.DataConflictChecksProvider;
 import com.complyt.v1.validators.ParameterChecksProvider;
 import com.complyt.v1.validators.ShouldCallValidate;
@@ -20,7 +20,6 @@ import com.complyt.v1.validators.body_checkers.exemption.ExemptionWrapperCountry
 import com.complyt.v1.validators.body_checkers.sales_tax_tracking.RegisteredChecker;
 import com.complyt.v1.validators.body_checkers.sales_tax_tracking.SalesTaxTrackingCountryAndStateChecker;
 import com.complyt.v1.validators.body_checkers.transaction.*;
-import com.complyt.v1.validators.custom_body.CustomBodyExtractor;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractorEmpty;
 import com.complyt.v1.validators.custom_body.DateWrapperDtoCustomBodyExtractor;
 import com.complyt.v1.validators.param_checker.ParamCheckerFunctions;

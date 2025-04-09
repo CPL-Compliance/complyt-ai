@@ -1,15 +1,16 @@
 package com.complyt.business.strategy.shippingAddress_alignment;
 
-import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import com.complyt.security.TenantResolver;
+import org.junit.jupiter.api.*;
+import org.mockito.MockedStatic;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import static org.mockito.Mockito.mockStatic;
 
 public class ShippingAddressAlignerStrategyTest {
 
@@ -19,6 +20,24 @@ public class ShippingAddressAlignerStrategyTest {
     Transaction transaction;
     UnitTestUtilities testUtilities;
 
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {

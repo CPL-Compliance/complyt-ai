@@ -1,7 +1,6 @@
 package com.complyt.business.tax;
 
 import com.complyt.domain.sales_tax.ComplytInternalRates;
-import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.ShippingAddress;
 import reactor.core.publisher.Mono;
 

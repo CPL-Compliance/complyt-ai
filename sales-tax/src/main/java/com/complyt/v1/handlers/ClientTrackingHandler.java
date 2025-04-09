@@ -1,7 +1,7 @@
 package com.complyt.v1.handlers;
 
-import com.complyt.facades.ClientTrackingFacade;
 import com.complyt.business.pagination.PaginationConstants;
+import com.complyt.facades.ClientTrackingFacade;
 import com.complyt.security.permissions.client_tracking.ClientTrackingReadPermission;
 import com.complyt.security.permissions.client_tracking.ClientTrackingUpdatePermission;
 import com.complyt.utils.observability.ContextLogger;

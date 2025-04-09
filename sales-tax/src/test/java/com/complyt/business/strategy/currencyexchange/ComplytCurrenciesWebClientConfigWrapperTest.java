@@ -3,13 +3,13 @@ package com.complyt.business.strategy.currencyexchange;
 
 import com.complyt.business.strategy.currencyExchange.ComplytCurrenciesWebClientWrapper;
 import com.complyt.domain.currency.CurrencyExchangeRateObject;
+import com.complyt.security.TenantResolver;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -53,6 +53,24 @@ class ComplytCurrenciesWebClientConfigWrapperTest {
 
     UnitTestUtilities unitTestUtilities;
 
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
+
     @BeforeEach
     void setUp() {
         unitTestUtilities = new UnitTestUtilities(LocalDateTime.now(), "tenant_id");
@@ -66,6 +84,8 @@ class ComplytCurrenciesWebClientConfigWrapperTest {
         CurrencyExchangeRateObject currencyExchangeRateResponse = unitTestUtilities.createCurrencyExchangeRateObject(currency, date, BigDecimal.ONE);
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
         when(webClient.get()).thenReturn(requestHeadersUriSpecMock);
         when(requestHeadersUriSpecMock.uri(any(Function.class))).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)).thenReturn(requestHeadersSpecMock);
@@ -87,6 +107,8 @@ class ComplytCurrenciesWebClientConfigWrapperTest {
         LocalDateTime date = LocalDateTime.now();
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
         when(webClient.get()).thenReturn(requestHeadersUriSpecMock);
         when(requestHeadersUriSpecMock.uri(any(Function.class))).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)).thenReturn(requestHeadersSpecMock);
@@ -111,6 +133,8 @@ class ComplytCurrenciesWebClientConfigWrapperTest {
         CurrencyExchangeRateObject currencyExchangeRateResponse = unitTestUtilities.createCurrencyExchangeRateObject(currency, date, BigDecimal.ONE);
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
         when(webClient.get()).thenReturn(requestHeadersUriSpecMock);
         when(requestHeadersUriSpecMock.uri(uriFunctionCaptor.capture())).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)).thenReturn(requestHeadersSpecMock);

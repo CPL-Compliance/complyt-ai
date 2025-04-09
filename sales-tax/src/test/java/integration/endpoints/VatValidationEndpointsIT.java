@@ -4,7 +4,6 @@ import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
-import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.vat_validation.ValidatedVatDto;
 import com.complyt.v1.models.vat_validation.VatDetailsToValidateDto;
 import com.complyt.v1.routers.VatValidationRouter;
@@ -16,19 +15,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
+import testUtils.integration_test.WithMockJwt;
 
 import java.util.LinkedHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(SpringExtension.class)
@@ -52,14 +48,13 @@ public class VatValidationEndpointsIT extends TestContainersInitializerIT implem
 
     @BeforeEach
     void setup() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
         vatDetailsToValidateDto = ITUtilities.createVatDetailsToValidateDto();
     }
 
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ValidateExitingVatDetails_Return200() {
         // Given
         VatDetailsToValidateDto vatDetails = new VatDetailsToValidateDto("AT", "U28609707");
@@ -88,7 +83,7 @@ public class VatValidationEndpointsIT extends TestContainersInitializerIT implem
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ValidateExitingVatDetailsCountryCodeIsFullCountryNameAndCodeExistsInVatNumber_Return200() {
 
         // Given
@@ -118,7 +113,7 @@ public class VatValidationEndpointsIT extends TestContainersInitializerIT implem
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ValidateNewVatDetails_Return201() {
         // Given
         VatDetailsToValidateDto vatDetails = new VatDetailsToValidateDto("BE", "0835221567");
@@ -147,7 +142,7 @@ public class VatValidationEndpointsIT extends TestContainersInitializerIT implem
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ValidateAlreadyExistingVatDetails_Return200() {
         // Given
         VatDetailsToValidateDto vatDetails = new VatDetailsToValidateDto("BE", "0835221567");
@@ -176,7 +171,7 @@ public class VatValidationEndpointsIT extends TestContainersInitializerIT implem
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ValidateVatDetailsNotValid_Return201WithSameValuesAsInputAndValidFalse() {
         // Given
         VatDetailsToValidateDto vatDetails = new VatDetailsToValidateDto("FR", "INVALID123");
@@ -204,7 +199,7 @@ public class VatValidationEndpointsIT extends TestContainersInitializerIT implem
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_CountryCodeIsBlank_Return400() {
         // Given
         VatDetailsToValidateDto vatDetails = new VatDetailsToValidateDto("", "0835221567");
@@ -229,7 +224,7 @@ public class VatValidationEndpointsIT extends TestContainersInitializerIT implem
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_CountryCodeIsNull_Return400() {
         // Given
         VatDetailsToValidateDto vatDetails = new VatDetailsToValidateDto(null, "0835221567");
@@ -254,7 +249,7 @@ public class VatValidationEndpointsIT extends TestContainersInitializerIT implem
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_CountryCodeIsMoreThan50Characters_Return400() {
         // Given
         VatDetailsToValidateDto vatDetails = new VatDetailsToValidateDto("A".repeat(51), "0835221567");
@@ -279,15 +274,14 @@ public class VatValidationEndpointsIT extends TestContainersInitializerIT implem
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_VatNumberIsBlank_Return400() {
         // Given
         VatDetailsToValidateDto vatDetails = new VatDetailsToValidateDto("BE", "");
 
         // When + Then
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder.path(VatValidationRouter.BASE_URL + "/validate")
                         .queryParam("countryCode", vatDetails.countryCode())
                         .queryParam("vatNumber", vatDetails.vatNumber())
@@ -304,7 +298,7 @@ public class VatValidationEndpointsIT extends TestContainersInitializerIT implem
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_VatNumberIsNull_Return400() {
         // Given
         VatDetailsToValidateDto vatDetails = new VatDetailsToValidateDto("BE", null);
@@ -329,15 +323,14 @@ public class VatValidationEndpointsIT extends TestContainersInitializerIT implem
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_VatNumberIsMoreThan20Characters_Return400() {
         // Given
         VatDetailsToValidateDto vatDetails = new VatDetailsToValidateDto("BE", "1".repeat(21));
 
         // When + Then
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder.path(VatValidationRouter.BASE_URL + "/validate")
                         .queryParam("countryCode", vatDetails.countryCode())
                         .queryParam("vatNumber", vatDetails.vatNumber())
@@ -354,7 +347,7 @@ public class VatValidationEndpointsIT extends TestContainersInitializerIT implem
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ErrorInValidationWebClient_Return400BadCountry() {
         // Given
         VatDetailsToValidateDto vatDetails = new VatDetailsToValidateDto("Error", "0835221567");
@@ -370,9 +363,9 @@ public class VatValidationEndpointsIT extends TestContainersInitializerIT implem
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody(LinkedHashMap.class)
-                .value(map ->{
-                            String message = map.get("message").toString();
-                            assertTrue(message.contains(vatDetails.countryCode() + ": " + DtoErrorMessages.NOT_SUPPORTED_COUNTRY_FORMAT_ERROR));
-                        });
+                .value(map -> {
+                    String message = map.get("message").toString();
+                    assertTrue(message.contains(vatDetails.countryCode() + ": " + DtoErrorMessages.NOT_SUPPORTED_COUNTRY_FORMAT_ERROR));
+                });
     }
 }

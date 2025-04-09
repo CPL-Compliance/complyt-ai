@@ -2,13 +2,15 @@ package com.complyt.repositories;
 
 import com.complyt.domain.ValidatedVat;
 import com.complyt.domain.VatDetailsToValidate;
-import com.complyt.domain.transaction.GeoRecord;
-import com.complyt.domain.transaction.Transaction;
+import com.complyt.security.TenantResolver;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -23,6 +25,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -41,6 +44,24 @@ class VatValidationRepositoryTest {
 
     ValidatedVat validatedVat;
 
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
+
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
@@ -55,6 +76,7 @@ class VatValidationRepositoryTest {
                 .and("vatNumber").is(vatDetailsToValidate.getVatNumber()));
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(reactiveMongoTemplate.findOne(query, ValidatedVat.class)).thenReturn(Mono.just(validatedVat));
 
         Mono<ValidatedVat> resultValidatedVat = vatValidationRepository.find(vatDetailsToValidate);

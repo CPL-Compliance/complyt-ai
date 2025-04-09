@@ -6,11 +6,15 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.security.TenantResolver;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -24,6 +28,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,6 +42,24 @@ class TransactionItemsJurisdictionalRulesInjectorTest {
 
     Transaction transaction;
     UnitTestUtilities testUtilities;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {
@@ -75,6 +98,8 @@ class TransactionItemsJurisdictionalRulesInjectorTest {
         Transaction expectedTransaction = transaction.withItems(itemsWithJurisdictionalRules);
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
         when(itemsJurisdictionalRulesInjectionStrategy.select(transaction)).thenReturn(transaction -> itemsWithJurisdictionalRules);
         Mono<Transaction> result = transactionItemsJurisdictionalRulesInjector.inject(classifications, transaction);
 
@@ -91,6 +116,8 @@ class TransactionItemsJurisdictionalRulesInjectorTest {
         Transaction expectedTransaction = transactionToSend.withItems(itemsWithJurisdictionalRules);
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
         when(itemsJurisdictionalRulesInjectionStrategy.select(transactionToSend)).thenReturn(transaction -> itemsWithJurisdictionalRules);
         Mono<Transaction> result = transactionItemsJurisdictionalRulesInjector.inject(classifications, transactionToSend);
 

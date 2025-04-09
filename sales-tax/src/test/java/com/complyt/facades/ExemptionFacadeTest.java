@@ -6,14 +6,18 @@ import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.domain.customer.exemption.Status;
+import com.complyt.security.TenantResolver;
 import com.complyt.services.CustomerServiceImpl;
 import com.complyt.services.ExemptionServiceImpl;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,6 +29,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,6 +49,24 @@ public class ExemptionFacadeTest {
     Exemption exemption;
 
     UnitTestUtilities testUtilities;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {
@@ -125,6 +148,7 @@ public class ExemptionFacadeTest {
         Exemption expectedExemption = newExemption.withCustomer(customer);
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(exemptionService.update(newExemption, exemption, id)).thenReturn(Mono.just(newExemption));
         when(customerService.findByComplytIdProjection(newExemption.getCustomerId())).thenReturn(Mono.just(customer));
         when(exemptionService.findByComplytId(id)).thenReturn(Mono.just(exemption));
@@ -142,6 +166,8 @@ public class ExemptionFacadeTest {
         UUID idThatDoesNotExist = UUID.randomUUID();
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
         when(exemptionService.findByComplytId(idThatDoesNotExist)).thenReturn(Mono.empty());
         Mono<Exemption> exemptionMono = exemptionFacade.update(newExemption, idThatDoesNotExist);
 

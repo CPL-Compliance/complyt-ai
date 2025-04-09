@@ -4,15 +4,17 @@ package com.complyt.business.strategy;
 import com.complyt.business.strategy.items_jurisdictional_rules_injection.UsaAddressItemsJurisdictionalRulesInjector;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.SubJurisdictionalTaxRules;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import com.complyt.security.TenantResolver;
+import org.junit.jupiter.api.*;
+import org.mockito.MockedStatic;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import static org.mockito.Mockito.mockStatic;
 
 public class UsaAddressCityExtractorTest {
 
@@ -22,6 +24,24 @@ public class UsaAddressCityExtractorTest {
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     SubJurisdictionalTaxRules firstSubJurisdictionalTaxRules;
     SubJurisdictionalTaxRules secondSubJurisdictionalTaxRules;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {

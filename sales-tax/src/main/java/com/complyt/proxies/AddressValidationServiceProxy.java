@@ -1,7 +1,6 @@
 package com.complyt.proxies;
 
 import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
-import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import reactivefeign.spring.config.ReactiveFeignClient;

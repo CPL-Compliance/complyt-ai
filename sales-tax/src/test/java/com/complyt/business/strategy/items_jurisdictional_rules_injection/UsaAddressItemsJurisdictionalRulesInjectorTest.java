@@ -2,14 +2,17 @@ package com.complyt.business.strategy.items_jurisdictional_rules_injection;
 
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
-import com.complyt.domain.sales_tax.product_classification.SubJurisdictionalTaxRules;
-import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.exceptions.types.StateNotFoundInJurisdictionalTaxRulesApiException;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import reactor.core.publisher.Mono;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
@@ -18,7 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 public class UsaAddressItemsJurisdictionalRulesInjectorTest {
 
@@ -27,6 +33,24 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest {
     UnitTestUtilities testUtilities;
 
     Transaction transaction;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {
@@ -54,6 +78,8 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest {
         );
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
         List<Item> actualItems = usaAddressItemsJurisdictionalRulesInjector.inject(transactionNoRules).apply(classifications);
 
         // Then
@@ -80,6 +106,8 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest {
         }};
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
         List<Item> actualItems = usaAddressItemsJurisdictionalRulesInjector.inject(transactionNoRules).apply(classifications);
 
         // Then
@@ -102,7 +130,10 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest {
                 transaction.getItems().get(1).getJurisdictionalSalesTaxRules()
         );
 
-        // When & Then
+        // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
+        // Then
         assertThrows(StateNotFoundInJurisdictionalTaxRulesApiException.class, () ->
                 usaAddressItemsJurisdictionalRulesInjector.inject(transactionNoRules).apply(classifications)
         );

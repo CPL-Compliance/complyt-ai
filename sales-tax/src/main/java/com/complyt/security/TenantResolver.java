@@ -9,18 +9,19 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Slf4j
-@Component
 @Generated
+@Component
 public class TenantResolver {
-    public Mono<String> resolve() {
+
+    public static Mono<String> resolve() {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> {
-                    if (securityContext.getAuthentication() instanceof AbstractAuthenticationToken) {
-                        AbstractOAuth2TokenAuthenticationToken token = (AbstractOAuth2TokenAuthenticationToken) securityContext.getAuthentication();
-                        return (String) token.getTokenAttributes().get("tenant_id");
-                    }
+                        if (securityContext.getAuthentication() instanceof AbstractAuthenticationToken) {
+                            AbstractOAuth2TokenAuthenticationToken token = (AbstractOAuth2TokenAuthenticationToken) securityContext.getAuthentication();
+                            return (String) token.getTokenAttributes().get("tenant_id");
+                        }
 
-                    return "none";
+                        return "none";
                 });
     }
 }

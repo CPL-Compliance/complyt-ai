@@ -1,6 +1,5 @@
 package testUtils.annotations;
 
-import testUtils.annotations.WithOAuth2TokenMockUser;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;

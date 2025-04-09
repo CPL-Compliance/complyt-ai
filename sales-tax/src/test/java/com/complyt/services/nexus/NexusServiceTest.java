@@ -10,13 +10,17 @@ import com.complyt.domain.nexus.*;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionType;
+import com.complyt.security.TenantResolver;
 import com.complyt.utils.factory.DateRange;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.query.Query;
@@ -32,6 +36,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 
@@ -55,6 +60,24 @@ class NexusServiceTest {
     private SalesTaxTracking salesTaxTracking;
     @Mock
     NexusAppliedDateProvider nexusAppliedDateProvider;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {
@@ -129,6 +152,8 @@ class NexusServiceTest {
                 .withEconomicNexusTracker(salesTaxTrackingAfterCalculation.getEconomicNexusTracker().withEstablished(true).withEstablishedDate(referenceDate));
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
         when(nexusChecker.hasNexus(salesTaxTracking)).thenReturn(false);
         when(nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusCalculator.subtractTransactionFromNexusSummary(transaction.getComplytId(), salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
@@ -161,6 +186,8 @@ class NexusServiceTest {
                 .withEconomicNexusTracker(salesTaxTrackingAfterCalculation.getEconomicNexusTracker().withEstablished(true).withEstablishedDate(referenceDate));
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
         when(nexusChecker.hasNexus(givenSalesTaxTracking)).thenReturn(false);
         when(nexusCalculator.subtractTransactionFromNexusSummary(transaction.getComplytId(), givenSalesTaxTracking, summaryDate)).thenReturn(Mono.just(givenSalesTaxTracking));
         when(nexusCalculator.addTransactionToNexusSummary(transaction, givenSalesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTrackingAfterCalculation));
@@ -241,6 +268,8 @@ class NexusServiceTest {
                 .withAppliedDate(referenceDate);
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
         when(nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusCalculator.subtractTransactionFromNexusSummary(complytId, salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusChecker.passedThreshold(salesTaxTracking, summaryDate)).thenReturn(true);
@@ -646,6 +675,7 @@ class NexusServiceTest {
         LocalDateTime resDate = nexusProvider.getAppliedDate(salesTaxTracking, appliedDate);
         SalesTaxTracking expectedSalesTaxTracking = salesTaxTracking.withEconomicNexusTracker(new EconomicNexusTracker(true, transaction.getExternalTimestamps().getCreatedDate())).withAppliedDate(resDate);
 
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
 
         when(nexusCalculator.initNexusCalculationSummaryByDateRange(salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusCalculator.addTransactionToNexusSummary(transaction, salesTaxTracking, summaryDateTransaction)).thenReturn(Mono.just(salesTaxTracking));

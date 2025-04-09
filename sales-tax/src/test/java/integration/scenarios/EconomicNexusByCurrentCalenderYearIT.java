@@ -4,13 +4,15 @@ import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TimestampsDto;
-import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.ShippingAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +20,11 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
+import testUtils.integration_test.WithMockJwt;
 import testUtils.integration_test.templates.economic_nexus.EconomicNexusOnlyTangibleItemsITTemplate;
 
 import java.math.BigDecimal;
@@ -33,7 +34,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,7 +52,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
     // Given
     private final LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T07:00:00");
     private final UUID customerId = UUID.fromString("9ff0912a-2d60-4e8a-a6ba-1a9e7385338e"); // complytId of an existing customer in the database
-    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("New York", "US", null, "NY", "20 W 34th St.", "","10001", false, null);
+    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("New York", "US", null, "NY", "20 W 34th St.", "", "10001", false, null);
     private final String source = "1";
     @MockBean
     private TenantResolver tenantResolver;
@@ -64,22 +64,17 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
     }
 
-    @BeforeEach
-    void setup() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-    }
 
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshSalesTaxTrackingByStateAndDate_CheckEconomicNexusNotPassed_Returns200() {
         String state = "NY";
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+                .mutateWith(csrf()).mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
@@ -98,7 +93,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_ChangedTangibilityToNotIncludedInNexusCalculation_Returns200() {
         // Given
         String externalId = "10039";
@@ -109,8 +104,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
 
         // Then
         webTestClient
-                .mutate().responseTimeout(Duration.ofMinutes(1)).build()
-                .mutateWith(csrf())
+                .mutate().responseTimeout(Duration.ofMinutes(1)).build().mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -126,8 +120,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
         TransactionDto transactionWithIntangibleItem = givenTransaction.withItems(List.of(ITUtilities.stubItemDto().withQuantity(new BigDecimal(2)).withUnitPrice(new BigDecimal(700)).withTotalPrice(new BigDecimal(1400)).withTaxCode("C2S1")));
 
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -143,7 +136,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_NewAndDoesntPassedEconomicNexus_Returns201() {
         // Given
         String externalId = "10038";
@@ -155,8 +148,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -168,8 +160,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
                 .value(receivedTransaction ->
                         assertNull(receivedTransaction.salesTax()));
 
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", referenceAddress.country())
@@ -188,7 +179,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_NewAndNotTangibleItem_Returns201() {
         // Given
         String externalId = "10037";
@@ -199,8 +190,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -216,10 +206,9 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getSalesTaxTracking_CheckEconomicNexusNotPassed_Returns200() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", referenceAddress.country())
@@ -240,7 +229,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
     @Order(4)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_NewAndPassedEconomicNexus_Returns201() {
         // Given
         String externalId = "10032";
@@ -252,8 +241,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -270,10 +258,9 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
     @Order(5)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertSalesTaxTracking_ApproveEconomicNexus_Returns200() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", referenceAddress.country())
@@ -292,6 +279,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
 
                     webTestClient
                             .mutateWith(csrf())
+
                             .put()
                             .uri(uriBuilder -> uriBuilder
                                     .path(SalesTaxTrackingRouter.BASE_URL)
@@ -310,7 +298,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
     @Order(6)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_NewInRangeOfEconomicNexus_Returns201WithSalesTax() {
         // Given
         String externalId = "10033";
@@ -320,8 +308,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -336,7 +323,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
     @Order(6)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_NewOutOfRangeOfEconomicNexus_Returns201() {
         // Given
         String externalId = "10034";
@@ -346,8 +333,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())

@@ -202,5 +202,4 @@ public class CustomerSchemaValidationIT extends TestContainersInitializerIT {
     }
 
 
-
 }
