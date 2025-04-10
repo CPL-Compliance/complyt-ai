@@ -1,5 +1,6 @@
 package com.complyt.v1.routers;
 
+import com.complyt.domain.customer.Customer;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
@@ -27,6 +28,7 @@ import com.complyt.v1.validators.query_extractors.VatDetailsToValidateQueryExtra
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -48,6 +50,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -74,6 +77,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     Patcher<TransactionDto> transactionPatcher;
     @Autowired
     private WebTestClient webTestClient;
+
+    @Mock
+    Customer customer;
 
 
     @BeforeEach
@@ -857,8 +863,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         UUID complytId = UUID.randomUUID();
 
         // When + Then
+        doReturn(Mono.just(customer))
+                .when(transactionFacade)
+                .determineCustomerForNewTransaction(any(), any(), any());
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
-        when(transactionFacade.saveTransaction(sentTransaction)).thenReturn(Mono.just(sentTransaction.withComplytId(complytId)));
+        doReturn(Mono.just(sentTransaction.withComplytId(complytId))).when(transactionFacade).saveTransaction(sentTransaction);
         TransactionDto expectedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(sentTransaction.withComplytId(complytId))
                 .withComplytId(complytId);
 
@@ -884,6 +893,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
 
         // When + Then
+        when(transactionFacade.determineCustomerForNewTransaction(transactionDto.customerId(), transactionDto.customerExternalRef(), transactionDto.customerSource())).thenReturn(Mono.just(transaction.getCustomer()));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto))).thenReturn(Mono.just(transaction));
         TransactionDto expectedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transaction);
@@ -4343,6 +4353,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
+        when(transactionFacade.determineCustomerForNewTransaction(transactionDto.customerId(), transactionDto.customerExternalRef(), transactionDto.customerSource())).thenReturn(Mono.just(customer));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));

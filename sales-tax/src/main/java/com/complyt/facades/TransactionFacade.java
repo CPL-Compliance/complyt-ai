@@ -9,6 +9,7 @@ import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
 import com.complyt.services.nexus.NexusService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
+import com.complyt.utils.StringChecker;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.CustomerNotFoundApiException;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
@@ -49,7 +50,7 @@ public class TransactionFacade {
 
     public Mono<Transaction> saveTransaction(Transaction transaction) {
         return transactionService.checkTransactionNotHavingComplytId(transaction)
-                .flatMap(transactionNoComplytId -> getCustomerByTransaction(transaction)
+                .flatMap(transactionNoComplytId -> Mono.just(transactionNoComplytId.getCustomer())
                         .flatMap(customer -> transactionService.injectDataToNewTransaction(transactionNoComplytId)
                                 .flatMap(transactionWithData -> findSalesTaxTrackingByTransaction(transactionWithData)
                                 .flatMap(salesTaxTracking -> nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)
@@ -87,7 +88,7 @@ public class TransactionFacade {
 
     public Mono<Transaction> update(@NonNull String externalId, @NonNull String source, @NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
         return transactionService.checkComplytIdOfModifiedEqualsToOriginal(modifiedTransaction, originalTransaction)
-                .flatMap(checkedModifiedTransaction -> getCustomerByTransaction(modifiedTransaction)
+                .flatMap(checkedModifiedTransaction -> Mono.just(checkedModifiedTransaction.getCustomer())
                         .flatMap(customer -> transactionService.injectDataToExistingTransaction(checkedModifiedTransaction, originalTransaction)
                                 .flatMap(transactionWithData -> findSalesTaxTrackingByTransaction(transactionWithData)
                                         .flatMap(salesTaxTracking -> nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)
@@ -203,5 +204,18 @@ public class TransactionFacade {
                 .switchIfEmpty(ContextLogger.observeCtx("ObjectNotFoundApiException thrown in TransactionFacade.findSalesTaxTrackingByTransaction because could not find SalesTaxTracking by state " + transaction.getShippingAddress().state() + " and subsidiary " + transaction.getSubsidiary() + " or null", log::error)
                         .then(Mono.error(new ObjectNotFoundApiException())));
 
+    }
+
+
+    public Mono<Customer> determineCustomerForNewTransaction(final UUID complytId,
+                                                             final String externalReference,
+                                                             final String source){
+        if (complytId != null){
+            return customerService.findByComplytId(complytId);
+        } else if (StringChecker.isInputValid(externalReference, source)) {
+            return customerService.findByExternalIdAndSource(externalReference, source);
+        } else {
+            return Mono.error(CustomerNotFoundApiException::new);
+        }
     }
 }

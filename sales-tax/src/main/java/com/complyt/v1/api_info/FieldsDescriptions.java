@@ -78,6 +78,10 @@ public interface FieldsDescriptions {
 
     String CURRENCY = "The currency of the transaction. not mandatory";
 
+    String CUSTOMER_EXTERNAL_REFERENCE = "(Optional) External Reference of the customer";
+
+    String CUSTOMER_SOURCE = "(Optional) Source of the customer";
+
     // In Customer
 
     String ADDRESS_OF_CUSTOMER = "The customer's Address";

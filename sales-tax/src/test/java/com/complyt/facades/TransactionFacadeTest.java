@@ -124,7 +124,7 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.checkTransactionNotHavingComplytId(transactionNoId)).thenReturn(Mono.just(transactionNoId));
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+       // when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(transactionWithInjectedData.getShippingAddress().country(), transactionWithInjectedData.getShippingAddress().state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
@@ -153,7 +153,7 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.checkTransactionNotHavingComplytId(transactionNoId)).thenReturn(Mono.just(transactionNoId));
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        //when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(transactionWithInjectedData.getShippingAddress().country(), transactionWithInjectedData.getShippingAddress().state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
@@ -178,11 +178,11 @@ public class TransactionFacadeTest {
         Transaction transactionWithInjectedDataAndId = transactionWithCustomer.withId(transaction.getId());
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished(UUID.randomUUID().toString());
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
-
+        Transaction transactionToSave = transactionNoId.withCustomer(customer);
         // When
-        when(transactionService.checkTransactionNotHavingComplytId(transactionNoId)).thenReturn(Mono.just(transactionNoId));
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
-        when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
+        when(transactionService.checkTransactionNotHavingComplytId(transactionToSave)).thenReturn(Mono.just(transactionToSave));
+       // when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        when(transactionService.injectDataToNewTransaction(transactionToSave)).thenReturn(Mono.just(transactionWithCustomer));
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(transactionWithInjectedData.getShippingAddress().country(), transactionWithInjectedData.getShippingAddress().state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(salesTaxService.handleSalesTaxCalculation(transactionWithCustomer, salesTaxTrackingDecorator.getSalesTaxTracking(), customer)).thenReturn(Mono.just(transactionWithInjectedDataAndId));
@@ -193,7 +193,7 @@ public class TransactionFacadeTest {
         when(salesTaxTrackingService.handleSalesTaxEnforcement(transactionWithInjectedDataAndId, salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
         when(transactionService.injectDataBySalesTaxTracking(transactionWithCustomer, salesTaxTrackingDecorator)).thenReturn(Mono.just(transactionWithCustomer));
 
-        Mono<Transaction> actualTransaction = transactionFacade.saveTransaction(transactionNoId);
+        Mono<Transaction> actualTransaction = transactionFacade.saveTransaction(transactionToSave);
 
         // Then
         StepVerifier.create(actualTransaction).expectNext(transactionWithInjectedDataAndId).verifyComplete();
@@ -209,9 +209,14 @@ public class TransactionFacadeTest {
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
 
         // When
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(transactionWithCustomer.getCustomer()));
-        when(transactionService.checkTransactionNotHavingComplytId(transactionNoId)).thenReturn(Mono.just(transactionNoId));
-        when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
+        Transaction transactionToSave = transactionNoId.withCustomer(customer);
+        // When
+        when(transactionService.checkTransactionNotHavingComplytId(transactionToSave)).thenReturn(Mono.just(transactionToSave));
+        // when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        when(transactionService.injectDataToNewTransaction(transactionToSave)).thenReturn(Mono.just(transactionWithCustomer));
+//        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(transactionWithCustomer.getCustomer()));
+//        when(transactionService.checkTransactionNotHavingComplytId(transactionNoId)).thenReturn(Mono.just(transactionNoId));
+//        when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(transactionWithInjectedDataAndId.getShippingAddress().country(), transactionWithInjectedDataAndId.getShippingAddress().state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(transactionService.calculateTotalAmounts(transactionWithCustomer)).thenReturn(Mono.just(transactionWithCustomer));
@@ -222,7 +227,7 @@ public class TransactionFacadeTest {
         when(transactionService.isTransactionWithStatusCancelled(transactionWithInjectedDataAndId)).thenReturn(false);
         when(transactionService.injectDataBySalesTaxTracking(transactionWithCustomer, salesTaxTrackingDecorator)).thenReturn(Mono.just(transactionWithCustomer));
 
-        Mono<Transaction> actualTransaction = transactionFacade.saveTransaction(transactionNoId);
+        Mono<Transaction> actualTransaction = transactionFacade.saveTransaction(transactionToSave);
 
         // Then
         StepVerifier.create(actualTransaction).expectNext(transactionWithInjectedDataAndId).verifyComplete();
@@ -236,11 +241,15 @@ public class TransactionFacadeTest {
         Transaction transactionWithInjectedDataAndId = transactionWithCustomer.withId(transaction.getId());
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished(UUID.randomUUID().toString());
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
-
+        Transaction transactionToSave = transactionNoId.withCustomer(customer);
         // When
-        when(transactionService.checkTransactionNotHavingComplytId(transactionNoId)).thenReturn(Mono.just(transactionNoId));
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
-        when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
+        when(transactionService.checkTransactionNotHavingComplytId(transactionToSave)).thenReturn(Mono.just(transactionToSave));
+        // when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        when(transactionService.injectDataToNewTransaction(transactionToSave)).thenReturn(Mono.just(transactionWithCustomer));
+        // When
+//        when(transactionService.checkTransactionNotHavingComplytId(transactionNoId)).thenReturn(Mono.just(transactionNoId));
+//      //when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+//        when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(transactionWithInjectedData.getShippingAddress().country(), transactionWithInjectedData.getShippingAddress().state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(salesTaxService.handleSalesTaxCalculation(transactionWithCustomer, salesTaxTracking, customer)).thenReturn(Mono.just(transactionWithCustomer));
@@ -251,7 +260,7 @@ public class TransactionFacadeTest {
         when(salesTaxTrackingService.handleSalesTaxEnforcement(transactionWithInjectedDataAndId, salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
         when(transactionService.injectDataBySalesTaxTracking(transactionWithCustomer, salesTaxTrackingDecorator)).thenReturn(Mono.just(transactionWithCustomer));
 
-        Mono<Transaction> actualTransaction = transactionFacade.saveTransaction(transactionNoId);
+        Mono<Transaction> actualTransaction = transactionFacade.saveTransaction(transactionToSave);
 
         // Then
         StepVerifier.create(actualTransaction).verifyComplete();
@@ -268,11 +277,17 @@ public class TransactionFacadeTest {
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished(UUID.randomUUID().toString());
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
 
+        Transaction transactionToSave = transactionNoId.withCustomer(customer);
         // When
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
-        when(transactionService.checkTransactionNotHavingComplytId(transactionNoId)).thenReturn(Mono.just(transactionNoId));
-        when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
-        when(salesTaxTrackingService.findByCountryStateAndSubsidiary(transactionWithInjectedData.getShippingAddress().country(), transactionWithInjectedDataAndSalesTaxAndId.getShippingAddress().state(), transactionNoId.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
+        when(transactionService.checkTransactionNotHavingComplytId(transactionToSave)).thenReturn(Mono.just(transactionToSave));
+        // when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        when(transactionService.injectDataToNewTransaction(transactionToSave)).thenReturn(Mono.just(transactionWithCustomer));
+
+        // When
+        //when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        when(transactionService.checkTransactionNotHavingComplytId(transactionToSave)).thenReturn(Mono.just(transactionToSave));
+        when(transactionService.injectDataToNewTransaction(transactionToSave)).thenReturn(Mono.just(transactionWithCustomer));
+        when(salesTaxTrackingService.findByCountryStateAndSubsidiary(transactionWithInjectedData.getShippingAddress().country(), transactionWithInjectedDataAndSalesTaxAndId.getShippingAddress().state(), transactionToSave.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(salesTaxService.handleSalesTaxCalculation(transactionWithCustomer, salesTaxTracking, customer)).thenReturn(Mono.just(transactionWithInjectedDataAndSalesTax));
         when(transactionService.calculateTotalAmounts(transactionWithInjectedDataAndSalesTax)).thenReturn(Mono.just(transactionWithInjectedDataAndSalesTax));
@@ -281,7 +296,7 @@ public class TransactionFacadeTest {
         when(salesTaxTrackingService.handleSalesTaxEnforcement(transactionWithInjectedDataAndSalesTaxAndId, salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
         when(transactionService.injectDataBySalesTaxTracking(transactionWithCustomer, salesTaxTrackingDecorator)).thenReturn(Mono.just(transactionWithCustomer));
 
-        Mono<Transaction> transactionMono = transactionFacade.saveTransaction(transactionNoId);
+        Mono<Transaction> transactionMono = transactionFacade.saveTransaction(transactionToSave);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionWithInjectedDataAndSalesTaxAndId).verifyComplete();
@@ -294,7 +309,7 @@ public class TransactionFacadeTest {
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
 
         // When
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(transaction.getCustomer()));
+        //when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(transaction.getCustomer()));
         when(transactionService.checkTransactionNotHavingComplytId(transaction)).thenReturn(Mono.just(transaction));
         when(transactionService.injectDataToNewTransaction(transaction)).thenReturn(Mono.just(transaction));
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(transaction.getShippingAddress().country(), transaction.getShippingAddress().state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
@@ -462,7 +477,7 @@ public class TransactionFacadeTest {
     void update_TransactionModifiedAndHasNexus_UpdatesTransaction() {
         // Given
         ShippingAddress newShippingAddress = transaction.getShippingAddress().withState("newState");
-        Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
+        Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress).withCustomer(customer);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished(UUID.randomUUID().toString());
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
         SalesTax salesTax = new SalesTax(null, new BigDecimal(100), BigDecimal.ZERO,
@@ -477,7 +492,7 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.checkComplytIdOfModifiedEqualsToOriginal(transactionWithNewAddress, transaction)).thenReturn(Mono.just(transactionWithNewAddress));
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+//        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.injectDataToExistingTransaction(transactionWithNewAddress, transaction))
                 .thenReturn(Mono.just(modifiedTransaction));
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(newShippingAddress.country(), newShippingAddress.state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
@@ -511,7 +526,7 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.checkComplytIdOfModifiedEqualsToOriginal(transactionWithNewAddress, transaction)).thenReturn(Mono.just(transactionWithNewAddress));
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        //when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.injectDataToExistingTransaction(transactionWithNewAddress, transaction))
                 .thenReturn(Mono.just(modifiedTransaction));
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(newShippingAddress.country(), newShippingAddress.state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
@@ -542,7 +557,7 @@ public class TransactionFacadeTest {
                 .withCustomer(customer);
         // When
         when(transactionService.checkComplytIdOfModifiedEqualsToOriginal(transactionWithNewAddress, transaction)).thenReturn(Mono.just(transactionWithNewAddress));
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        //when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.injectDataToExistingTransaction(transactionWithNewAddress, transaction))
                 .thenReturn(Mono.just(modifiedTransaction));
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(newShippingAddress.country(), newShippingAddress.state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
@@ -575,7 +590,7 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.checkComplytIdOfModifiedEqualsToOriginal(transactionWithNewAddress, transaction)).thenReturn(Mono.just(transactionWithNewAddress));
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+       // when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.injectDataToExistingTransaction(transactionWithNewAddress, transaction))
                 .thenReturn(Mono.just(modifiedTransaction));
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(newShippingAddress.country(), newShippingAddress.state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
@@ -611,7 +626,7 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.checkComplytIdOfModifiedEqualsToOriginal(transactionWithNewAddress, transaction)).thenReturn(Mono.just(transactionWithNewAddressAndStatus));
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        //when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.injectDataToExistingTransaction(transactionWithNewAddressAndStatus, transaction)).thenReturn(Mono.just(modifiedTransaction));
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(newShippingAddress.country(), newShippingAddress.state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
@@ -651,7 +666,7 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.checkComplytIdOfModifiedEqualsToOriginal(transactionWithNewAddress, transaction)).thenReturn(Mono.just(transactionWithNewAddressAndStatus));
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+       // when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.injectDataToExistingTransaction(transactionWithNewAddressAndStatus, transaction)).thenReturn(Mono.just(modifiedTransaction));
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(newShippingAddress.country(), newShippingAddress.state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
@@ -683,7 +698,7 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.checkComplytIdOfModifiedEqualsToOriginal(transactionWithNewAddress, transaction)).thenReturn(Mono.just(transactionWithNewAddress));
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+       // when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.injectDataToExistingTransaction(transactionWithNewAddress, transaction)).thenReturn(Mono.just(modifiedTransaction));
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(newShippingAddress.country(), newShippingAddress.state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
@@ -706,8 +721,9 @@ public class TransactionFacadeTest {
     @Test
     void update_TransactionModifiedToCancelledAndHaveNexus_TransactionUpdatedAndReturnMonoEmpty() {
         // Given
-        ShippingAddress newShippingAddress = transaction.getShippingAddress().withState("newState");
-        Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
+        Transaction originalTransaction = transaction.withCustomer(customer);
+        ShippingAddress newShippingAddress = originalTransaction.getShippingAddress().withState("newState");
+        Transaction transactionWithNewAddress = originalTransaction.withShippingAddress(newShippingAddress);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished(UUID.randomUUID().toString());
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
         Transaction modifiedTransaction = createTransactionWithProductClassificationAndComplytId()
@@ -717,10 +733,10 @@ public class TransactionFacadeTest {
                 .withCustomer(customer);
 
         // When
-        when(transactionService.checkComplytIdOfModifiedEqualsToOriginal(transactionWithNewAddress, transaction)).thenReturn(Mono.just(transactionWithNewAddress));
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
-        when(transactionService.injectDataToExistingTransaction(transactionWithNewAddress, transaction)).thenReturn(Mono.just(modifiedTransaction));
-        when(salesTaxTrackingService.findByCountryStateAndSubsidiary(newShippingAddress.country(), newShippingAddress.state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
+        when(transactionService.checkComplytIdOfModifiedEqualsToOriginal(transactionWithNewAddress, originalTransaction)).thenReturn(Mono.just(transactionWithNewAddress));
+       // when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        when(transactionService.injectDataToExistingTransaction(transactionWithNewAddress, originalTransaction)).thenReturn(Mono.just(modifiedTransaction));
+        when(salesTaxTrackingService.findByCountryStateAndSubsidiary(newShippingAddress.country(), newShippingAddress.state(), originalTransaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(salesTaxService.handleSalesTaxCalculation(modifiedTransaction, salesTaxTrackingDecorator.getSalesTaxTracking(), customer)).thenReturn(Mono.just(modifiedTransaction));
         when(transactionService.calculateTotalAmounts(modifiedTransaction)).thenReturn(Mono.just(modifiedTransaction));
@@ -729,7 +745,7 @@ public class TransactionFacadeTest {
         when(salesTaxTrackingService.handleSalesTaxEnforcement(modifiedTransaction, salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
         when(transactionService.injectDataBySalesTaxTracking(modifiedTransaction, salesTaxTrackingDecorator)).thenReturn(Mono.just(modifiedTransaction));
 
-        Mono<Transaction> transactionMono = transactionFacade.update(transactionWithNewAddress.getExternalId(), source, transactionWithNewAddress, transaction);
+        Mono<Transaction> transactionMono = transactionFacade.update(transactionWithNewAddress.getExternalId(), source, transactionWithNewAddress, originalTransaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(modifiedTransaction).verifyComplete();
@@ -750,7 +766,7 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.checkComplytIdOfModifiedEqualsToOriginal(transactionWithNewAddress, transaction)).thenReturn(Mono.just(transactionWithNewAddress));
-        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+       // when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.injectDataToExistingTransaction(transactionWithNewAddress, transaction)).thenReturn(Mono.just(modifiedTransaction));
         when(salesTaxTrackingService.findByCountryStateAndSubsidiary(newShippingAddress.country(), newShippingAddress.state(), transaction.getSubsidiary())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
