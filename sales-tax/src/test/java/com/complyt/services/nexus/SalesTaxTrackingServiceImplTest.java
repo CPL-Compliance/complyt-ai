@@ -422,7 +422,7 @@ public class SalesTaxTrackingServiceImplTest {
     void injectRegisteredDateToSalesTaxTracking_notNullSalesTaxTracking_ReturnsSalesTaxTrackingWithData() {
         //Given
         SalesTaxTrackingRegisteredDateTimestampsInjector injector = new SalesTaxTrackingRegisteredDateTimestampsInjector(salesTaxTracking);
-        SalesTaxTracking salesTaxTrackingWithUpdatedDate = injector.inject();
+        SalesTaxTracking salesTaxTrackingWithUpdatedDate = injector.init();
 
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.injectRegisteredDateToSalesTaxTracking(salesTaxTracking);
 

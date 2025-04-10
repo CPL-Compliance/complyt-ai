@@ -15,7 +15,7 @@ public class SalesTaxTrackingRegisteredDateTimestampsInjector implements Timesta
     private final SalesTaxTracking salesTaxTracking;
 
     @Override
-    public SalesTaxTracking inject() {
+    public SalesTaxTracking init() {
         LocalDateTime timestamp = LocalDateTime.now();
         return salesTaxTracking.withRegistrationDate(timestamp);
     }

@@ -1,7 +1,6 @@
 package com.complyt.business.timestamps_injection;
 
 import com.complyt.business.nexus.ISalesTaxTrackingDateDeterminer;
-import com.complyt.business.timestamps_injection.provider.NexusAppliedDateProvider;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -12,15 +11,14 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @AllArgsConstructor
-public class SalesTaxTrackingPhysicalNexusDateApplierInjector implements TimestampsInjector<SalesTaxTracking> {
-
+@Component
+public class NexusDateApplyDateInitializer {
     @NonNull
-    private final SalesTaxTracking salesTaxTracking;
+    private ISalesTaxTrackingDateDeterminer dateDeterminer;
 
-    @Override
-    public SalesTaxTracking inject() {
+    public SalesTaxTracking init(@NonNull SalesTaxTracking salesTaxTracking) {
         LocalDateTime physicalEstablishedDate = salesTaxTracking.getPhysicalNexusTracker().getEstablishedDate();
-        LocalDateTime appliedDate = ISalesTaxTrackingDateDeterminer.getSalesTaxTrackingAppliedDate(salesTaxTracking);
+        LocalDateTime appliedDate = dateDeterminer.getSalesTaxTrackingAppliedDate(salesTaxTracking);
 
         log.info("Setting appliedDate based on physicalNexusTracker: appliedDate={}, physicalEstablishedDate={}, AppliedDateUpdated={}", appliedDate, physicalEstablishedDate, !appliedDate.equals(salesTaxTracking.getAppliedDate()));
         return salesTaxTracking.setAppliedDate(appliedDate)

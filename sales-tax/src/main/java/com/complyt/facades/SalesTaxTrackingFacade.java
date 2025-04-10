@@ -46,15 +46,6 @@ public class SalesTaxTrackingFacade {
     }
 
 
-    public void findSalesTaxDate(SalesTaxTracking salesTaxTracking) {
-        if (salesTaxTracking.getEconomicNexusTracker().isEstablished()) {
-            salesTaxTracking.setAppliedDate(salesTaxTracking.getEconomicNexusTracker().getEstablishedDate());
-        } else {
-            LocalDateTime defaultEstablishedDate = EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE;
-            salesTaxTracking.setAppliedDate(defaultEstablishedDate);
-        }
-    }
-
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull SalesTaxTracking originalSalesTaxTracking) {
         return salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, originalSalesTaxTracking)
                 .flatMap(salesTaxTrackingService::addClientAndStateDetails)

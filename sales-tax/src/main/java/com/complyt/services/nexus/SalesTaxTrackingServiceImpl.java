@@ -3,8 +3,7 @@ package com.complyt.services.nexus;
 import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
-import com.complyt.business.nexus.ISalesTaxTrackingDateDeterminer;
-import com.complyt.business.timestamps_injection.SalesTaxTrackingPhysicalNexusDateApplierInjector;
+import com.complyt.business.timestamps_injection.NexusDateApplyDateInitializer;
 import com.complyt.business.timestamps_injection.SalesTaxTrackingRegisteredDateTimestampsInjector;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -56,8 +55,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @NonNull
     private NexusService nexusService;
 
-//    @NonNull
-//    private final SalesTaxTrackingPhysicalNexusDateApplierInjector salesTaxTrackingPhysicalNexusDateApplierInjector;
+    @NonNull
+    NexusDateApplyDateInitializer nexusDateApplyDateInitializer;
 
     @Override
     public Mono<SalesTaxTracking> findById(@NonNull String id) {
@@ -193,7 +192,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     public Mono<SalesTaxTracking> injectRegisteredDateToSalesTaxTracking(@NonNull SalesTaxTracking salesTaxTracking) {
         return Mono.just(salesTaxTracking)
                 .map(SalesTaxTrackingRegisteredDateTimestampsInjector::new)
-                .map(SalesTaxTrackingRegisteredDateTimestampsInjector::inject);
+                .map(SalesTaxTrackingRegisteredDateTimestampsInjector::init);
     }
 
     @Override
@@ -202,15 +201,9 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                 injectRegisteredDateToSalesTaxTracking(salesTaxTracking) : Mono.just(salesTaxTracking);
     }
 
-    @Override
-    public Mono<SalesTaxTracking> updateAppliedDateIfIsPhysicalNexusEstablished(@NonNull SalesTaxTracking salesTaxTracking) {
-        return injectAppliedDateIfIsPhysicalEconomicEnabled(salesTaxTracking);
-    }
 
-    private Mono<SalesTaxTracking> injectAppliedDateIfIsPhysicalEconomicEnabled(SalesTaxTracking salesTaxTracking) {
-        return Mono.just(salesTaxTracking)
-                .map(SalesTaxTrackingPhysicalNexusDateApplierInjector::new)
-                .map(SalesTaxTrackingPhysicalNexusDateApplierInjector::inject);
+    public Mono<SalesTaxTracking> updateAppliedDateIfIsPhysicalNexusEstablished(SalesTaxTracking salesTaxTracking) {
+        return Mono.just(nexusDateApplyDateInitializer.init(salesTaxTracking));
     }
 
     @Override
