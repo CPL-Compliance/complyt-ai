@@ -1,6 +1,8 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.domain.transaction.*;
+import com.complyt.domain.transaction.MatchedAddressData;
+import com.complyt.domain.transaction.ShippingAddress;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.utils.observability.ContextLogger;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

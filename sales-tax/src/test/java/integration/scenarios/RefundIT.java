@@ -6,14 +6,16 @@ import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.TimestampsDto;
-import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.ShippingAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.transaction.TransactionTypeDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +23,11 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
+import testUtils.integration_test.WithMockJwt;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -35,7 +36,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,15 +67,11 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
     }
 
-    @BeforeEach
-    void setup() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-    }
 
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_NotPassingEconomicNexus_Returns201() {
         // Given
         String externalId = "10081";
@@ -86,8 +82,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -102,15 +97,14 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_RefundBeforeEconomicNexusPassed_Returns201() {
         // Given
         String externalIdOfOriginal = "10081";
         String externalIdOfRefund = "10082";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder.path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalIdOfOriginal)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -121,6 +115,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
 
                         webTestClient
                                 .mutateWith(csrf())
+
                                 .put()
                                 .uri(uriBuilder -> uriBuilder
                                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalIdOfRefund)
@@ -141,7 +136,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_WouldHavePassedWithoutTheRefund_Returns201() {
         // Given
         String externalId = "10083";
@@ -152,8 +147,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -168,14 +162,13 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
     @Order(4)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getSalesTaxTracking_checkEconomicNexusNotPassed_Returns200() {
         // Given
         StateDto state = new StateDto("ME", "23", "Maine");
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", referenceAddress.country())
                         .queryParam("state", state.name())
@@ -196,10 +189,9 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
     @Order(5)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertSalesTaxTracking_AddPhysicalNexus_Returns200() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", referenceAddress.country())
@@ -213,6 +205,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
 
                         webTestClient
                                 .mutateWith(csrf())
+
                                 .put()
                                 .uri(uriBuilder -> uriBuilder
                                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -235,7 +228,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
     @Order(6)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_NewAfterPhysicalNexus_Returns201WithTaxes() {
         // Given
         String externalId = "10084";
@@ -246,8 +239,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -262,15 +254,14 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
     @Order(7)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_RefundOfHalfTheAmount_Returns201() {
         // Given
         String externalIdOfOriginal = "10084";
         String externalIdOfRefund = "10085";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder.path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalIdOfOriginal)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -281,6 +272,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
 
                         webTestClient
                                 .mutateWith(csrf())
+
                                 .put()
                                 .uri(uriBuilder -> uriBuilder
                                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalIdOfRefund)

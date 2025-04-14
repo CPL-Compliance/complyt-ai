@@ -1,9 +1,9 @@
 package com.complyt.v1.handlers;
 
 import com.complyt.business.address.CountryIsUsaChecker;
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
-import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.security.permissions.sales_tax_tracking.NexusReadPermission;
 import com.complyt.security.permissions.sales_tax_tracking.NexusUpdatePermission;
 import com.complyt.utils.observability.ContextLogger;

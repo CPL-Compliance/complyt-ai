@@ -1,8 +1,8 @@
 package com.complyt.v1.models.matched_address.enums;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MatchLevelTypeTest {
 

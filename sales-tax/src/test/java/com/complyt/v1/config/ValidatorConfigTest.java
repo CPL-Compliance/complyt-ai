@@ -1,5 +1,6 @@
 package com.complyt.v1.config;
 
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.ClientTrackingDtoTenant;
 import com.complyt.v1.models.SalesTaxTrackingDto;
@@ -8,9 +9,12 @@ import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.DataConflictChecksProvider;
 import com.complyt.v1.validators.ValidationHandler;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -27,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -45,6 +50,24 @@ class ValidatorConfigTest {
     DataConflictChecksProvider dataConflictChecksProvider;
 
     UnitTestUtilities testUtilities;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {

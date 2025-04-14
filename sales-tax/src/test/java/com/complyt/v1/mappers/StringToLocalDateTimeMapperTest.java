@@ -1,18 +1,41 @@
 package com.complyt.v1.mappers;
 
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mockStatic;
 
 public class StringToLocalDateTimeMapperTest {
     private String dateString;
     private LocalDateTime dateLocalDateTime;
     private String exceptionMessage;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {

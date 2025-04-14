@@ -1,10 +1,11 @@
 package com.complyt.v1.routers;
 
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
-import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.repositories.exceptions.OperationFailedException;
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.PatcherConfig;
 import com.complyt.v1.config.ValidatorConfig;
@@ -20,18 +21,17 @@ import com.complyt.v1.models.EconomicNexusTrackerDto;
 import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import testUtils.integration_test.WithMockJwt;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDate;
@@ -40,7 +40,7 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -65,6 +65,24 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     UnitTestUtilities testUtilities;
 
+    static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
+
     @BeforeEach
     void setUp() {
         salesTaxTrackingRouter = new SalesTaxTrackingRouter();
@@ -75,7 +93,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByState_Exists_Returns200WithList() {
 
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
@@ -103,7 +121,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByState_ExistsOutsideOfUSA_Returns200WithList() {
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking)
@@ -131,7 +149,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByState_QueryParamError_Returns400() {
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
@@ -156,7 +174,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_UsaCountry_Returns201() {
         // Given
         SalesTaxTrackingDto newSalesTaxTrackingDto = salesTaxTrackingDto
@@ -196,7 +214,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_NonUsaCountry_Returns201() {
         // Given
         SalesTaxTrackingDto newSalesTaxTrackingDto = salesTaxTrackingDto
@@ -236,7 +254,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_Exists_Returns200() {
 
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
@@ -258,7 +276,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_QueryParamInvalid_Returns400() {
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
@@ -280,7 +298,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByState_DoesntExists_Returns404() {
 
         String country = salesTaxTrackingDto.country();
@@ -313,7 +331,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_NoBody_Returns400() {
         // Given
         String state = "CA";
@@ -337,14 +355,14 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByState_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByState_InternalServerError_Returns500() {
 
         String country = salesTaxTrackingDto.country();
@@ -368,7 +386,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_DoesntExists_Returns404() {
 
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
@@ -402,14 +420,14 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_InternalServerError_Returns500() {
         UUID complytId = salesTaxTrackingDto.complytId();
 
@@ -426,7 +444,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void
     upsertByState_OutsideOfUsaAndDoesntExists_Returns201() {
         // Given
@@ -462,7 +480,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_DoesntExists_Returns201() {
         // Given
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null).withId(null).withTenantId(null);
@@ -498,7 +516,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_UnSupportedNonUsaCountrySentInBodyAndParam_Returns400() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDtoToSend = salesTaxTrackingDto.withCountry("Canadaa");
@@ -519,7 +537,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_UnSupportedNonUsaCountrySentOnlyInBody_Returns400() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDtoToSend = salesTaxTrackingDto.withCountry("Canadaa");
@@ -540,7 +558,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_UnSupportedNonUsaCountrySentOnlyInQueryParam_Returns400() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDtoToSend = salesTaxTrackingDto.withCountry("Canada");
@@ -561,7 +579,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
 //    @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankStateInQueryParam_Returns400() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDtoToSend = salesTaxTrackingDto.withCountry("USA");
@@ -582,7 +600,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_UsaCountryConflictCheck_Returns400() {
         // Given
         String country = "nonUsaCountry";
@@ -606,7 +624,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_NonUsaCountryConflictCheck_Returns400() {
         // Given
         String country = "nonUsCountry";
@@ -631,7 +649,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_QueryParamError_Returns400() {
         // Given
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null).withId(null).withTenantId(null);
@@ -663,7 +681,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_CoupleValidationsFailure_Returns400WithErrorList() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -693,7 +711,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_QueryParamStateIsBlank_Returns200Ok() {
         // Given
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
@@ -727,7 +745,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_DifferentStateInBody_Returns400ConflictedData() {
         // Given
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
@@ -755,7 +773,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_ExistWithDifferentComplytId_Returns400ConflictedData() {
         // Given
         String country = salesTaxTrackingDto.country();
@@ -789,7 +807,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_DoesntExistAndHasComplytId_Returns400ConflictedData() {
         // Given
         String country = salesTaxTrackingDto.country();
@@ -820,7 +838,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_NotRegisteredButDateGiven_Returns400ConflictedData() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -853,7 +871,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_ComplytIdFailedToParse_Returns400() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -919,14 +937,14 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_UserWithoutCSRFToken_Returns403() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -948,7 +966,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_InternalServerError_Returns500() {
         // Given
         String country = salesTaxTrackingDto.country();
@@ -975,7 +993,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_Exists_Returns200WithList() {
         // Given
         SalesTaxTracking secondSalesTaxTracking = salesTaxTracking
@@ -1013,7 +1031,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_QueryParamInvalid_Returns400() {
         // Given
         SalesTaxTracking secondSalesTaxTracking = salesTaxTracking
@@ -1043,7 +1061,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         // Given
         List<SalesTaxTrackingDto> salesTaxTrackingDtoList = new ArrayList<>();
@@ -1079,14 +1097,14 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_InternalServerError_Returns500() {
         // When
         when(salesTaxTrackingFacade.findAll(0, 0, null, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
@@ -1104,7 +1122,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByStateName_Exists_Returns200() {
         // Given
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null).withId(null).withTenantId(null);
@@ -1144,7 +1162,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByStateAbbreviation_Exists_Returns200() {
         // Given
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null).withId(null).withTenantId(null);
@@ -1184,7 +1202,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByState_NullHandler_ThrowsNullPointerException() {
         // Given
         SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
@@ -1199,7 +1217,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_NullHandler_ThrowsNullPointerException() {
         // Given
         SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
@@ -1215,7 +1233,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_NullHandler_ThrowsNullPointerException() {
         // Given
         SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
@@ -1231,7 +1249,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_NullHandler_ThrowsNullPointerException() {
         // Given
         SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
@@ -1247,7 +1265,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAny_InvalidUrl_Returns404() {
         // Then
         webTestClient
@@ -1260,7 +1278,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void putAny_InvalidUrl_Returns404() {
         // Then
         webTestClient
@@ -1274,7 +1292,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void postAny_InvalidUrl_Returns404() {
         // Then
         webTestClient
@@ -1288,7 +1306,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullPhysicalNexusTrackerDto_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -1314,7 +1332,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullEstablishedDatePhysicalNexusTrackerDto_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -1342,7 +1360,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullEconomicNexusTrackerDto_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -1368,7 +1386,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullEstablishedDateEconomicNexusTrackerDto_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -1396,7 +1414,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen200Comment_Returns400ValidationError() {
         // Given
         String commentOfLength201 = " This sentence is absolutely 50 characters long! | This sentence is absolutely 50 characters long! | This sentence is absolutely 50 characters long! | This sentence is absolutely 50 characters long! |$";
@@ -1424,7 +1442,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NewWithBlankComment_Returns201() {
         // Given
         String country = salesTaxTrackingDto.country();
@@ -1456,7 +1474,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_ReturnsSalesTaxTracking_Returns200() {
         // Given
         LocalDate localDate = LocalDate.now();
@@ -1487,7 +1505,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_NonUsaCountryReturnsSalesTaxTracking_Returns200() {
         // Given
         LocalDate localDate = LocalDate.now();
@@ -1518,7 +1536,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByDate_ReturnsSalesTaxTracking_Returns200() {
         // Given
         LocalDate localDate = LocalDate.now();
@@ -1550,7 +1568,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_FacadeReturnsEmpty_Returns404NotFound() {
         // Given
         LocalDate localDate = LocalDate.now();
@@ -1576,7 +1594,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_DateNotInFormat_Returns400() {
         // Given
         LocalDate localDate = LocalDate.now();
@@ -1632,14 +1650,14 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_UserWithoutCSRFToken_Returns403() {
         // Given
         LocalDate localDate = LocalDate.now();
@@ -1664,7 +1682,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_QueryParamError_Returns400() {
         // Given
         LocalDate localDate = LocalDate.now();
@@ -1693,7 +1711,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_InternalServerError_Returns500() {
         // Given
         LocalDate localDate = LocalDate.now();
@@ -1721,7 +1739,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_NullHandler_ThrowsNullPointerException() {
         // Given
         SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
@@ -1737,7 +1755,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -1765,7 +1783,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankAbbreviationInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -1794,7 +1812,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankCodeInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -1822,7 +1840,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankNameInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -1850,7 +1868,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthOf257AbbreviationInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -1878,7 +1896,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthOf257CodeInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -1906,7 +1924,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthOf257NameInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -1934,7 +1952,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullAbbreviationInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -1962,7 +1980,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullCodeInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -1990,7 +2008,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullNameInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
@@ -2018,7 +2036,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
     // Patch
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void patch_PatchingByFewFields_Returns200() {
         // Given
         LocalDateTime establishedDateToPatch = salesTaxTrackingDto.physicalNexusTracker().establishedDate().plusMonths(1);
@@ -2061,7 +2079,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void patch_PatchingCountryDifferentThanUsa_Returns200() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingOutsideOfUSA = salesTaxTrackingDto
@@ -2104,6 +2122,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     }
 
     @Test
+    @WithMockJwt
     public void patch_NullHandler_ThrowsNullPointerException() {
         // Given
         SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;

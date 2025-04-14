@@ -1,9 +1,10 @@
 package com.complyt.v1.routers;
 
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.domain.ClientTracking;
 import com.complyt.facades.ClientTrackingFacade;
-import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.repositories.exceptions.OperationFailedException;
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
@@ -13,23 +14,27 @@ import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handlers.ClientTrackingHandler;
 import com.complyt.v1.mappers.ClientTrackingMapper;
 import com.complyt.v1.models.ClientTrackingDtoTenant;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import testUtils.integration_test.WithMockJwt;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -57,6 +62,24 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     @MockBean
     private ClientTrackingFacade clientTrackingFacade;
 
+    static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
+
     @BeforeEach
     void setUp() {
         name = "name";
@@ -75,7 +98,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAll_Exists_Returns200WithList() {
         // When
         Map<String, String> filterMap = new LinkedHashMap<>();
@@ -95,7 +118,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAll_QueryParamInvalid_Returns400() {
         // When
         Map<String, String> filterMap = new LinkedHashMap<>();
@@ -119,13 +142,14 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     }
 
     @Override
+    @WithMockJwt
     public void getAll_UserWithoutAuthorities_Returns403() {
         //???
     }
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         // When
         Map<String, String> filterMap = new LinkedHashMap<>();
@@ -163,7 +187,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAll_InternalServerError_Returns500() {
         // When
         when(clientTrackingFacade.getAll(0, 0, null, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
@@ -181,7 +205,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAll_NullHandler_ThrowsNullPointerException() {
         ClientTrackingHandler nullClientTrackingHandler = null;
         ClientTrackingRouter clientTrackingRouter = new ClientTrackingRouter();
@@ -197,7 +221,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByName_Exists_Returns200WithList() {
         // WHen
         when(clientTrackingFacade.getByName(name)).thenReturn(Flux.fromIterable(clientTrackingList));
@@ -233,7 +257,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByName_PathVariableInvalid_Returns400() {
         String invalidName = testUtilities.stringWithLength(258);
 
@@ -258,7 +282,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByName_InternalServerError_Returns500() {
         // When
         when(clientTrackingFacade.getByName(name)).thenReturn(Flux.error(new OperationFailedException()));
@@ -276,7 +300,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByName_NullHandler_ThrowsNullPointerException() {
         ClientTrackingHandler nullClientTrackingHandler = null;
         ClientTrackingRouter clientTrackingRouter = new ClientTrackingRouter();
@@ -292,7 +316,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByTenantId_Exists_Returns200WithList() {
         // When
         when(clientTrackingFacade.getByTenantId(tenantId)).thenReturn(Mono.just(clientTracking));
@@ -311,7 +335,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByTenantId_PathVariableInvalid_Returns400() {
         String invalidTenantId = testUtilities.stringWithLength(50);
 
@@ -352,7 +376,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByTenantId_InternalServerError_Returns500() {
         // When
         when(clientTrackingFacade.getByTenantId(tenantId)).thenReturn(Mono.error(new OperationFailedException()));
@@ -370,7 +394,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByTenantId_NullHandler_ThrowsNullPointerException() {
         ClientTrackingHandler nullClientTrackingHandler = null;
         ClientTrackingRouter clientTrackingRouter = new ClientTrackingRouter();
@@ -386,7 +410,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_Exists_Returns200() {
         // When
         when(clientTrackingFacade.getByTenantId(tenantId)).thenReturn(Mono.just(clientTracking));
@@ -410,7 +434,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_PathVariableInvalid_Returns400() {
         String invalidTenantId = testUtilities.stringWithLength(50);
         // When
@@ -438,7 +462,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_BlankNexus_Returns400ValidationError() {
         // Then
         webTestClient
@@ -464,7 +488,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_BlankName_Returns400ValidationError() {
         // Then
         webTestClient
@@ -491,7 +515,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_BlankTenantId_Returns400ValidationError() {
         // Then
         webTestClient
@@ -519,7 +543,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_LengthGreaterThen256Name_Returns400ValidationError() {
         String name = testUtilities.stringWithLength(257);
 
@@ -548,7 +572,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_DifferentTenantIdInBody_Returns400ConflictedData() {
         // Then
         webTestClient
@@ -576,7 +600,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_DoesntExists_Returns201() {
         // When
         when(clientTrackingFacade.getByTenantId(tenantId)).thenReturn(Mono.empty());
@@ -620,7 +644,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_InternalServerError_Returns500() {
         // When
         when(clientTrackingFacade.updateIfModified(clientTracking, clientTrackingList.get(1), tenantId)).thenReturn(Mono.error(new OperationFailedException()));
@@ -638,7 +662,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_NullHandler_ThrowsNullPointerException() {
         ClientTrackingHandler nullClientTrackingHandler = null;
         ClientTrackingRouter clientTrackingRouter = new ClientTrackingRouter();
@@ -654,7 +678,7 @@ public class ClientTrackingRouterTest implements ClientTrackingRouterTestTemplat
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByTenantId_UnsupportedMediaType_Returns415() {
         // When
         when(clientTrackingFacade.getByTenantId(tenantId)).thenReturn(Mono.empty());

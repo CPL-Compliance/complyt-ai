@@ -17,13 +17,12 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
+import testUtils.integration_test.WithMockJwt;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -32,7 +31,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(SpringExtension.class)
@@ -55,20 +53,17 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
     }
 
-    @BeforeEach
-    void setup() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-    }
-
     @Override
+    @Test
+    @Order(0)
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NoBody_Returns400() {
         // Given
         String externalId = "0";
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -82,14 +77,13 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_Exists_Returns200() {
         // Given
         String differentSource = "2";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + differentSource)
                         .build())
@@ -104,14 +98,13 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_QueryParamInvalid_Returns400() {
         // Given
         String differentSource = "2";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + differentSource)
                         .queryParam("page", "null")
@@ -124,14 +117,13 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_PathVariableInvalid_Returns400() {
         // Given
         String sourceError = "null";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + sourceError)
                         .queryParam("page", "null")
@@ -144,14 +136,13 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_DoesntExists_Returns200EmptyList() {
         // Given
         String differentSource = "9";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + differentSource)
                         .build())
@@ -166,11 +157,10 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_Exists_Returns200() {
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL)
                         .build())
@@ -185,11 +175,10 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_QueryParamInvalid_Returns400() {
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL)
                         .queryParam("size", "null")
@@ -202,9 +191,8 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "different_tenant")
     public void getByAll_DoesntExists_Returns200EmptyList() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
 
         // Then
         webTestClient
@@ -223,9 +211,8 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "different_tenant")
     public void getByAll_QueryParamInvalid_Returns400() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
 
         // Then
         webTestClient
@@ -242,14 +229,13 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_Exists_Returns200() {
         // Given
         String complytId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"; //complytId of existing customer
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/complytId/" + complytId)
                         .build())
@@ -262,13 +248,13 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Override
+    @WithMockJwt
     public void getByComplytId_PathVariableInvalid_Returns400() {
         // Given
         String complytId = "null";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/complytId/" + complytId)
                         .build())
@@ -280,11 +266,10 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_DoesntExists_Returns404() {
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/complytId/" + ITUtilities.NON_EXISTING_COMPLYT_ID)
                         .build())
@@ -296,15 +281,14 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UnsupportedMediaType_Returns415() {
         // Given
         String externalId = "1001";
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -319,14 +303,13 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = "1586";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -336,13 +319,13 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Override
+    @WithMockJwt
     public void getByExternalIdAndSource_PathVariableInvalid_Returns400() {
         // Given
         String externalId = "undefined";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -354,14 +337,13 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_DoesntExists_Returns404() {
         // Given
         String externalId = "nonExisting";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -373,7 +355,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = "1001";
@@ -381,8 +363,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -393,6 +374,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Override
+    @WithMockJwt
     public void upsertByExternalIdAndSource_PathVariableError_Returns400() {
         // Given
         String nullExternalId = "null";
@@ -400,8 +382,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + nullExternalId)
                         .build())
@@ -414,7 +395,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntExists_Returns201() {
         // Given
         String externalId = "1001";
@@ -422,8 +403,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -436,7 +416,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntExistsWithComplytId_Returns400ConflictedData() {
         // Given
         String externalId = "1002";
@@ -444,8 +424,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -458,7 +437,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ConflictingSource_Returns400ConflictedData() {
         // Given
         String externalId = "1002";
@@ -467,8 +446,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + differentSource + "/externalId/" + externalId)
                         .build())
@@ -481,7 +459,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ConflictingExternalId_Returns400ConflictedData() {
         // Given
         String externalId = "someId";
@@ -490,8 +468,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + differentExternalId)
                         .build())
@@ -504,7 +481,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError() {
         // Given
         String externalId = "1003";
@@ -516,8 +493,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -540,12 +516,11 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_GetByParamSize_ReturnsExpectedSize() {
         int size = 5;
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL)
                         .queryParam("size", size)
@@ -560,15 +535,14 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_GetByParamPage_ReturnsExpectedPage() {
         int page = 2;
         int size = 1;
         String expectedComplyId = "9ff0912a-2d60-4e8a-a6ba-1a9e7385338e";
 
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL) // Set your API endpoint
                         .queryParam("page", page)
@@ -585,13 +559,12 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_GetByDefaultsSizeAndPage_ReturnsExpectedEntries() {
         int size = 1;
         String expectedComplyId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL)
                         .queryParam("size", size)
@@ -606,11 +579,10 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
     @Order(0)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAll_SortedByExternalTimestampsCreatedDate_ReturnsSortedEntries() {
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL)
                         .build())
@@ -635,7 +607,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(1)
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void patch_PatchesOneField_ReturnsPatchedResource() {
         String expectedComplyId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
         OptionalAddressDto addressToPatch = ITUtilities.createOptionalAddressDtoInCalifornia().withStreet("10010 Patch Street");
@@ -645,8 +617,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
         }};
 
         webTestClient
-                .mutateWith(csrf())
-                .patch()
+                .mutateWith(csrf()).patch()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/complytId/" + expectedComplyId)
                         .build())
@@ -660,7 +631,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void patch_PatchesTwoFields_ReturnsPatchedResource() {
         String expectedComplyId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
         OptionalAddressDto addressToPatch = ITUtilities.createOptionalAddressDtoInCalifornia().withStreet("10010 Patch Street");
@@ -672,8 +643,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
         }};
 
         webTestClient
-                .mutateWith(csrf())
-                .patch()
+                .mutateWith(csrf()).patch()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/complytId/" + expectedComplyId)
                         .build())
@@ -689,10 +659,9 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt(tenantId = "sorted_by_date_pagination_tenant")
     public void getAll_PaginationSortedByDateDesc_ReturnsSortedList() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
 
         webTestClient
                 .get()
@@ -716,10 +685,9 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt(tenantId = "sorted_by_date_pagination_tenant")
     public void getAll_PaginationSortedByDateAsc_ReturnsSortedList() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
 
         webTestClient
                 .get()
@@ -744,10 +712,9 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt(tenantId = "sorted_by_date_pagination_tenant")
     public void getAll_PaginationSortedByNameDesc_ReturnsSortedCustomers() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
 
         webTestClient
                 .get()
@@ -772,10 +739,9 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt(tenantId = "sorted_by_date_pagination_tenant")
     public void getAll_PaginationSortedByNameAsc_ReturnsSortedCustomer() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
 
         webTestClient
                 .get()
@@ -801,10 +767,9 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt(tenantId = "sorted_by_date_pagination_tenant")
     public void getAll_PaginationFilteredByMarketPlaceCustomerType_ReturnsCustomers() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
 
         webTestClient
                 .get()
@@ -825,10 +790,9 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt(tenantId = "sorted_by_date_pagination_tenant")
     public void getAll_PaginationFilteredByRetailCustomerType_ReturnsCustomers() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
 
         webTestClient
                 .get()
@@ -849,10 +813,9 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt(tenantId = "sorted_by_date_pagination_tenant")
     public void getAll_PaginationFilteredByStateType_ReturnsCustomers() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
 
         webTestClient
                 .get()
@@ -877,10 +840,9 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt(tenantId = "filtered_by_customer_type_and_state_pagination_tenant")
     public void getAll_PaginationFilteredByCustomerTypeAndState_ReturnsCustomers() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("filtered_by_customer_type_and_state_pagination_tenant"));
 
         // Making sure that there are 4 customers when querying without filter
         webTestClient
@@ -915,11 +877,10 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt
     public void getAll_InvalidSortOrderSent_Throws400() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL)
                         .queryParam("sortOrder", "ascc")
@@ -935,11 +896,10 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt
     public void getAll_InvalidPageValuePassed_Throws400() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL)
                         .queryParam("page", "0")
@@ -955,10 +915,9 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt(tenantId = "sorted_by_date_pagination_tenant")
     public void getAll_PartialFilterValuePassed_ReturnsList() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
 
         webTestClient
                 .get()
@@ -979,11 +938,9 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     }
 
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt(tenantId = "sorted_by_date_pagination_tenant")
     public void getAll_BlankFilterValuePassed_ReturnsFullList() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
-
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder

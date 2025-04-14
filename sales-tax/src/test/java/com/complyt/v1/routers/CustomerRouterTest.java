@@ -1,9 +1,10 @@
 package com.complyt.v1.routers;
 
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.domain.customer.Customer;
 import com.complyt.facades.CustomerFacade;
-import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.repositories.exceptions.OperationFailedException;
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.PatcherConfig;
 import com.complyt.v1.config.ValidatorConfig;
@@ -19,18 +20,20 @@ import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.transaction.OptionalAddressDto;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import testUtils.integration_test.WithMockJwt;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
@@ -38,7 +41,7 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -64,6 +67,24 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     private UnitTestUtilities testUtilities;
 
+    static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
+
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
@@ -74,7 +95,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntExists_Returns201() {
         // Given
         String externalId = customerDto.externalId();
@@ -101,7 +122,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_CoupleValidationsFailure_Returns400WithErrorList() {
         // Given
         CustomerDto givenCustomerDto = customerDto
@@ -129,7 +150,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DifferentSourceInBody_Returns400ConflictedData() {
         // Given
         String externalId = customerDto.externalId();
@@ -156,7 +177,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DifferentExternalIdInBody_Returns400ConflictedData() {
         // Given
         String source = customerDto.source();
@@ -179,7 +200,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ExistWithDifferentComplytId_Returns400ConflictedData() {
         // Given
         String source = customerDto.source();
@@ -211,7 +232,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntExistAndHasComplytId_Returns400ConflictedData() {
         // Given
         String source = customerDto.source();
@@ -240,7 +261,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NoBody_Returns400() {
         // Given
         String source = "1";
@@ -262,7 +283,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UnsupportedMediaType_Returns415() {
         // Given
         String source = "1";
@@ -286,7 +307,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_BlankSource_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -311,7 +332,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_nonDigitSource_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -335,7 +356,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_SourceWithHigherValueThan10_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -359,7 +380,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_BlankExternalId_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -384,7 +405,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_LengthGreaterThen256ExternalId_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -408,7 +429,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ComplytIdFailedToParse_Returns400() {
         // Given
         String externalId = customerDto.externalId();
@@ -470,7 +491,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UserWithoutCSRFToken_Returns403() {
         /// Given
         String source = customerDto.source();
@@ -490,7 +511,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAny_InvalidUrl_Returns404() {
         /// Given
 
@@ -508,7 +529,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser()
+            ()
+    @WithMockJwt
     public void putAny_InvalidUrl_Returns404() {
         // Given
         String externalId = customerDto.externalId();
@@ -533,7 +555,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen256Name_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -557,7 +579,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankEmail_Returns201Created() {
         // Given
         String externalId = customerDto.externalId();
@@ -585,7 +607,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NotInFormatEmail_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -610,7 +632,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen100Email_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -635,7 +657,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen100CountyAddress_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -659,7 +681,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen20ZipInAddress_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -683,7 +705,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen50CountryInAddress_Returns400ValidationError() {
         /// Given
         String externalId = customerDto.externalId();
@@ -707,7 +729,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen100CityInAddress_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -731,7 +753,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen100StateInAddress_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -754,7 +776,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen200StreetInAddress_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -778,7 +800,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullCustomerType_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -803,7 +825,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser()
+            ()
+    @WithMockJwt
     public void upsertByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = customer.getExternalId();
@@ -829,7 +852,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails
+    @WithMockJwt
     public void upsertByExternalIdAndSource_PathVariableInvalid_Returns400() {
         // Given
         String nullExternalId = "null";
@@ -855,7 +878,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = UUID.randomUUID().toString();
@@ -876,7 +899,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails
+    @WithMockJwt
     public void getByExternalIdAndSource_PathVariableInvalid_Returns400() {
         // Given
         String externalId = UUID.randomUUID().toString();
@@ -896,7 +919,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_Exists_Returns200() {
         // Given
         UUID complytId = UUID.randomUUID();
@@ -916,7 +939,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails
+    @WithMockJwt
     public void getByComplytId_QueryParamInvalid_Returns400() {
         // Given
         String complytId = "uuidError";
@@ -936,7 +959,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails
+    @WithMockJwt
     public void upsertByExternalIdAndSource_InternalServerError_Returns500() {
         // Given
         String externalId = customerDto.externalId();
@@ -962,7 +985,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails
+    @WithMockJwt
     public void getByExternalIdAndSource_DoesntExists_Returns404() {
         // Given
         String externalId = UUID.randomUUID().toString();
@@ -996,14 +1019,14 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
         // TODO
     }
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_InternalServerError_Returns500() {
         /// Given
         String externalId = customerDto.externalId();
@@ -1024,7 +1047,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     }
 
     @Test
-    @WithUserDetails
+    @WithMockJwt
     public void getByComplytId_DoesntExists_Returns404() {
         // Given
         UUID complytId = UUID.randomUUID();
@@ -1057,14 +1080,14 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_InternalServerError_Returns500() {
         /// Given
         UUID complytId = customerDto.complytId();
@@ -1085,7 +1108,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails
+    @WithMockJwt
     public void getAll_Exists_Returns200WithList() {
         // Given
         String id = UUID.randomUUID().toString();
@@ -1113,7 +1136,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails
+    @WithMockJwt
     public void getAll_QueryParamInvalid_Returns400() {
         // Given
         String id = UUID.randomUUID().toString();
@@ -1141,7 +1164,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         /// Given
         List<Customer> emptyCustomerList = new ArrayList<>();
@@ -1184,14 +1207,14 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAll_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAll_InternalServerError_Returns500() {
         // Given + When
         when(customerFacade.getAll(0, 0, null, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
@@ -1209,7 +1232,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails
+    @WithMockJwt
     public void getAllBySource_Exists_Returns200WithList() {
         // Given
         String id = UUID.randomUUID().toString();
@@ -1237,7 +1260,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_QueryParamInvalid_Returns400() {
         /// Given
         String source = customer.getSource();
@@ -1259,6 +1282,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     }
 
     @Override
+    @WithMockJwt
     public void getAllBySource_PathVariableInvalid_Returns400() {
         /// Given
         String source = customer.getSource();
@@ -1281,7 +1305,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_EmptyCollection_Returns200WithEmptyList() {
         /// Given
         String source = customer.getSource();
@@ -1325,14 +1349,14 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_InternalServerError_Returns500() {
         /// Given
         String source = customer.getSource();
@@ -1352,6 +1376,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     }
 
     @Test
+    @WithMockJwt
     public void getAll_NullHandler_ThrowsNullPointerException() {
         // Given
         CustomerHandler nullCustomerHandler = null;
@@ -1367,6 +1392,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     }
 
     @Test
+    @WithMockJwt
     public void getByExternalIdAndSource_NullHandler_ThrowsNullPointerException() {
         // Given
         CustomerHandler nullCustomerHandler = null;
@@ -1382,6 +1408,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     }
 
     @Test
+    @WithMockJwt
     public void getAllBySource_NullHandler_ThrowsNullPointerException() {
         // Given
         CustomerHandler nullCustomerHandler = null;
@@ -1397,6 +1424,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     }
 
     @Test
+    @WithMockJwt
     public void getByComplytId_NullHandler_ThrowsNullPointerException() {
         // Given
         CustomerHandler nullCustomerHandler = null;
@@ -1412,6 +1440,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     }
 
     @Test
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NullHandler_ThrowsNullPointerException() {
         // Given
         CustomerHandler nullCustomerHandler = null;
@@ -1428,7 +1457,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -1465,7 +1494,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -1504,7 +1533,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullUpdatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -1544,7 +1573,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankTimestampInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
 // Given
         String externalId = customerDto.externalId();
@@ -1585,7 +1614,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankTimestampInCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -1626,7 +1655,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -1667,7 +1696,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -1708,7 +1737,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -1745,7 +1774,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -1782,7 +1811,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -1823,7 +1852,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -1864,7 +1893,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfZInCreatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -1901,7 +1930,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -1938,7 +1967,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -1975,7 +2004,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -2012,7 +2041,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -2049,7 +2078,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -2086,7 +2115,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -2127,7 +2156,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -2168,7 +2197,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -2205,7 +2234,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -2248,7 +2277,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -2290,7 +2319,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -2336,7 +2365,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankTimestampInCreatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -2380,7 +2409,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -2425,7 +2454,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -2470,7 +2499,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -2507,7 +2536,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -2544,7 +2573,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -2589,7 +2618,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -2634,7 +2663,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfZInCreatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -2671,7 +2700,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -2708,7 +2737,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -2745,7 +2774,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -2782,7 +2811,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -2819,7 +2848,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -2856,7 +2885,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInInternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -2901,7 +2930,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInInternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -2945,7 +2974,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInInternalTimestamps_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -2982,7 +3011,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_JustDateWithNoTimeOffsetInCreatedDateInInternalTimestamps_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -3019,7 +3048,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_JustDateWithNoTimeOffsetInCreatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = customer.getExternalId();
@@ -3056,7 +3085,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     // Patch
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void patch_PatchingByFewFields_Returns200() {
         // Given
         String now = LocalDateTime.now().toString();
@@ -3096,6 +3125,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
 
 
     @Test
+    @WithMockJwt
     public void patch_NullHandler_ThrowsNullPointerException() {
         // Given
         CustomerHandler nullCustomerHandler = null;

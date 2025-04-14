@@ -1,9 +1,7 @@
 package com.complyt.repositories;
 
 import org.bson.Document;
-import org.bson.conversions.Bson;
 
-import javax.print.Doc;
 import java.util.ArrayList;
 import java.util.Arrays;
 

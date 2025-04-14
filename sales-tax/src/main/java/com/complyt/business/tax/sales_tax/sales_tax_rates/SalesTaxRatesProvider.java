@@ -3,7 +3,6 @@ package com.complyt.business.tax.sales_tax.sales_tax_rates;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.TaxRules;
-import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.ShippingAddress;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

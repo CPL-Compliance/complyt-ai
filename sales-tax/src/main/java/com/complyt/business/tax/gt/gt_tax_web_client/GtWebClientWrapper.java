@@ -3,7 +3,6 @@ package com.complyt.business.tax.gt.gt_tax_web_client;
 import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.exceptions.ComplytSalesTaxRatesException;
 import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
-import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.tax.ComplytGtRates;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;

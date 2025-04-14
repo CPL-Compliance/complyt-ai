@@ -4,7 +4,6 @@ import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.models.vat_validation.VatDetailsToValidateDto;
 import com.complyt.v1.validators.custom_body.CustomBodyExtractor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 

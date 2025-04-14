@@ -3,10 +3,10 @@ package com.complyt.business.sales_tax.checker;
 import com.complyt.business.tax.sales_tax.checker.TaxableItemExistChecker;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.transaction.Item;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import com.complyt.security.TenantResolver;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import testUtils.unit_test.UnitTestUtilities;
@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mockStatic;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -26,6 +27,24 @@ public class TaxableItemExistCheckerTest {
     private UnitTestUtilities testUtilities;
 
     private TaxableItemExistChecker taxableItemExistenceCheck;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {

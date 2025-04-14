@@ -1,23 +1,43 @@
 package com.complyt.v1.config.patch;
 
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.transaction.OptionalAddressDto;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.mockito.MockedStatic;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
+import static org.mockito.Mockito.mockStatic;
+
 public class CustomerPatcherFunctionsTest {
 
     private CustomerDto customer;
 
     UnitTestUtilities unitTestUtilities;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {

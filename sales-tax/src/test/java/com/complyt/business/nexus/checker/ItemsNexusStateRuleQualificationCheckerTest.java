@@ -8,13 +8,13 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.security.TenantResolver;
 import org.javatuples.Pair;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import testUtils.unit_test.UnitTestUtilities;
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -40,6 +41,24 @@ public class ItemsNexusStateRuleQualificationCheckerTest {
     private NexusStateRule nexusStateRule;
 
     UnitTestUtilities testUtilities;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {

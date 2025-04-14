@@ -24,6 +24,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import testUtils.integration_test.ITUtilities;
+import testUtils.integration_test.WithMockJwt;
 
 import java.time.Duration;
 import java.util.LinkedHashMap;
@@ -57,6 +58,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Order(1)
     @Test
     @Override
+    @WithMockJwt
     public void getCustomer_ExistsInOtherTenant_Returns404() {
         // Given
         String externalId = "1586";
@@ -86,6 +88,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Order(1)
     @Test
     @Override
+    @WithMockJwt
     public void getTransaction_ExistsInOtherTenant_Returns404() {
         // Given
         String externalId = "10002";
@@ -115,6 +118,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Order(1)
     @Test
     @Override
+    @WithMockJwt
     public void getSalesTaxTracking_ExistsInOtherTenant_Returns404() {
         // Given
         String stateName = "Arizona";
@@ -148,6 +152,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Order(1)
     @Test
     @Override
+    @WithMockJwt
     public void putCustomer_WithComplytIdAndExistsInOtherTenant_Returns400DataConflict() {
         // Given - details of a customer from the database: "Bestcompany Com"
         String externalId = "1586";
@@ -183,6 +188,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Order(1)
     @Test
     @Override
+    @WithMockJwt
     public void putTransaction_WithComplytIdAndExistsInOtherTenant_Returns400DataConflict() {
         // Given - details of a transaction from the database
         String externalId = "10002";
@@ -219,6 +225,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Order(1)
     @Test
     @Override
+    @WithMockJwt
     public void putSalesTaxTracking_WithComplytIdAndExistsInOtherTenant_Returns400DataConflict() {
         // Given - details of a salesTaxTracking from the database
         StateDto state = new StateDto("AZ", "04", "Arizona");
@@ -259,6 +266,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Order(3)
     @Test
     @Override
+    @WithMockJwt
     public void putCustomer_ExistsInOtherTenant_Returns200WithoutDataLeak() {
         // Given - details of a customer from the database: "Bestcompany Com"
         String externalId = "1586";
@@ -307,6 +315,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Order(4)
     @Test
     @Override
+    @WithMockJwt
     public void putTransaction_ExistsInOtherTenant_Returns200WithoutDataLeak() {
         // Given - details of a transaction from the database
         String externalId = "10002";
@@ -369,6 +378,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Order(2)
     @Test
     @Override
+    @WithMockJwt
     public void putSalesTaxTracking_ExistsInOtherTenant_Returns200WithoutDataLeak() {
         // Given - details of a customer from the database: "Bestcompany Com"
         StateDto state = new StateDto("AZ", "04", "Arizona");
@@ -423,6 +433,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Order(5)
     @Test
     @Override
+    @WithMockJwt
     public void putTransaction_CustomerIdExistingInAnotherTenant_Returns404() {
         // Given
         String externalId = "10001";
@@ -432,6 +443,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .mutateWith(differentTenantMutator)
                 .put()
                 .uri(uriBuilder -> uriBuilder
@@ -447,6 +459,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Order(5)
     @Test
     @Override
+    @WithMockJwt
     public void putTransaction_SalesTaxTrackingOfShippingAddressExistInAnotherTenant_Returns404() {
         // Given
         String externalId = "10001";
@@ -488,6 +501,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Order(6)
     @Test
     @Override
+    @WithMockJwt
     public void putSalesTaxTracking_ClientTrackingNotFoundForTenant_Returns404NoClientTracking() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, new StateDto("CA", "3463456", "California"));
@@ -495,6 +509,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .mutateWith(differentTenantMutatorWithoutClientTracking)
                 .put()
                 .uri(uriBuilder -> uriBuilder

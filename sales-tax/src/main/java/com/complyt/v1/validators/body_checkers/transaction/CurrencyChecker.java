@@ -5,8 +5,6 @@ import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.body_checkers.DtoBodyChecker;
 import reactor.core.publisher.Flux;
 
-import java.util.Arrays;
-
 import static com.complyt.business.strategy.currencyExchange.CurrencyMap.currencyToStandardizedCurrency;
 
 public class CurrencyChecker implements DtoBodyChecker<TransactionDto> {

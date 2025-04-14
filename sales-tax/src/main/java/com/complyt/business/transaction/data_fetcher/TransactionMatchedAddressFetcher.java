@@ -1,7 +1,6 @@
 package com.complyt.business.transaction.data_fetcher;
 
 import com.complyt.business.address_validation.AddressValidationWebClientWrapper;
-import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.MatchedAddressData;
 import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.v1.mappers.MatchedAddressMapper;

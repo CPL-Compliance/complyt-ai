@@ -1,12 +1,13 @@
 package com.complyt.v1.routers;
 
 import com.complyt.domain.customer.Customer;
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.facades.TransactionFacade;
-import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.repositories.exceptions.OperationFailedException;
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
@@ -24,28 +25,32 @@ import com.complyt.v1.models.tax.sales_tax.SalesTaxDto;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.validators.Patcher;
-import com.complyt.v1.validators.query_extractors.VatDetailsToValidateQueryExtractor;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import testUtils.integration_test.WithMockJwt;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -53,7 +58,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -64,6 +69,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
         GlobalExceptionHandler.class})
+@ActiveProfiles(profiles = {"default"})
 public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     Transaction transaction;
@@ -85,8 +91,27 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     Customer customer;
 
 
+    static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
+
     @BeforeEach
     void setUp() {
+        webTestClient = webTestClient.mutate().responseTimeout(Duration.ofMinutes(10)).build();
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString())
                 .withCustomer(null);
@@ -103,7 +128,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = transactionDto.externalId();
@@ -128,7 +153,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_PathVariableInvalid_Returns400() {
         // Given
         String externalId = "null";
@@ -149,14 +174,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_ExistsWithSalesTax_Returns200() {
         // Given
-         String externalId = transactionDto.externalId();
+        String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         boolean detailed = true;
 
-        SalesTaxDto salesTaxDto = new SalesTaxDto(null, BigDecimal.ZERO, BigDecimal.ZERO, new SalesTaxRatesDto(null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO), null);
+        SalesTaxDto salesTaxDto = new SalesTaxDto(null, BigDecimal.ZERO, BigDecimal.ZERO, new SalesTaxRatesDto(null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO), null);
         TransactionDto transactionDtoWithSalesTax = transactionDto.withSalesTax(salesTaxDto);
         Transaction returnedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDtoWithSalesTax).withCustomer(null);
         when(transactionFacade.findByExternalIdAndSource(externalId, source, detailed)).thenReturn(Mono.just(returnedTransaction));
@@ -177,7 +202,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_DoesntExists_Returns404() {
         // Given
         String externalId = transactionDto.externalId();
@@ -201,7 +226,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UnsupportedMediaType_Returns415() {
         // Given
         String externalId = transactionDto.externalId();
@@ -248,14 +273,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
         // Todo
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_InternalServerError_Returns500() {
         // Given
         String externalId = transactionDto.externalId();
@@ -277,7 +302,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAll_Exists_Returns200WithList() {
         // Given
         boolean detailed = true;
@@ -315,7 +340,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAll_ExistsAndDetailedFalse_Returns200WithList() {
         // Given
         boolean detailed = false;
@@ -353,7 +378,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_QueryParamInvalid_Returns400() {
         // Given
         String firstId = UUID.randomUUID().toString();
@@ -381,11 +406,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         // Given
         List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
-        Map<String, String> filterMap = new LinkedHashMap<>(){{
+        Map<String, String> filterMap = new LinkedHashMap<>() {{
             put("detailed", "true");
         }};
 
@@ -394,7 +419,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When
         when(transactionFacade.getAll(PaginationConstants.DEFAULT_PAGE_NUM, PaginationConstants.DEFAULT_PAGE_SIZE, filterMap, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY, detailed))
-        .thenReturn(Flux.empty());
+                .thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -429,14 +454,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_UserWithoutAuthorities_Returns403() {
         // TODO
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_InternalServerError_Returns500() {
         // Given + When
         when(transactionFacade.getAll(0, 0, null, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
@@ -454,7 +479,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_Exists_Returns200WithList() {
         // Given
         String firstId = UUID.randomUUID().toString();
@@ -486,7 +511,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_QueryParamInvalid_Returns400() {
         // Given
         String firstId = UUID.randomUUID().toString();
@@ -513,7 +538,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_PathVariableInvalid_Returns400() {
         // Given
         String firstId = UUID.randomUUID().toString();
@@ -538,7 +563,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_EmptyCollection_Returns200WithEmptyList() {
         // Given
         List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
@@ -584,14 +609,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
     public void getAllBySource_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_InternalServerError_Returns500() {
         // Given + When
         when(transactionFacade.getAllBySource(source)).thenReturn(Flux.error(new OperationFailedException()));
@@ -609,7 +633,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_Exists_Returns200() {
         // Given
         UUID complytId = transaction.getComplytId();
@@ -630,7 +654,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_QueryParamInvalid_Returns400() {
         // Given
         UUID complytId = transaction.getComplytId();
@@ -650,7 +674,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_DoesntExists_Returns404() {
         // Given
         UUID complytId = transaction.getComplytId();
@@ -687,14 +711,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_InternalServerError_Returns500() {
         // Given
         UUID complytId = transaction.getComplytId();
@@ -713,7 +737,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_WithShippingFeeAndOutsideOfUsaAndDoesntExists_Returns201() {
         // Given
         List<ItemDto> items = testUtilities.createItemDtos(false, true, true);
@@ -745,7 +769,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NonUseTransactionWithShippingFeeAndDoesntExists_Returns201() {
         // Given
         List<ItemDto> items = testUtilities.createItemDtos(false, true, true);
@@ -784,7 +808,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NonUseTransactionAndDoesntExists_Returns201() {
         // Given
         List<ItemDto> items = testUtilities.createItemDtos(false, true, true);
@@ -817,7 +841,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NonUseTransactionWithNonSupportedCountry_Returns400() {
         // Given + When
         TransactionDto transactionDtoToSend = transactionDto.withShippingAddress(transactionDto.shippingAddress().withCountry("Canadaa"));
@@ -836,7 +860,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_TransactionWithUnsupportedCurrency_Returns400() {
         // Given
         TransactionDto transactionDtoToSend = transactionDto.withCurrency("Non existing currency");
@@ -859,7 +883,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntExistsAndNullCurrency_Returns201() {
         // Given
         String externalId = transactionDto.externalId();
@@ -891,7 +915,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntExists_Returns201() {
         // Given
         String externalId = transactionDto.externalId();
@@ -919,7 +943,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_CoupleValidationsFailure_Returns400WithErrorList() {
         // Given
         TransactionDto givenTransaction = transactionDto.withShippingAddress(null).withSource(null);
@@ -947,7 +971,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DifferentSourceInBody_Returns400ConflictedData() {
         // Given
         String externalId = transactionDto.externalId();
@@ -971,7 +995,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DifferentExternalIdInBody_Returns400ConflictedData() {
         // Given
         String externalId = transactionDto.externalId();
@@ -995,7 +1019,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ExistWithDifferentComplytId_Returns400ConflictedData() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1024,7 +1048,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntExistAndHasComplytId_Returns400ConflictedData() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1050,7 +1074,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_BlankSource_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1075,7 +1099,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_nonDigitSource_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1099,7 +1123,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_SourceWithHigherValueThan10_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1123,7 +1147,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_BlankExternalId_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1148,7 +1172,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_LengthGreaterThen256ExternalId_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1172,7 +1196,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ComplytIdFailedToParse_Returns400() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1251,7 +1275,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UserWithoutCSRFToken_Returns403() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1270,7 +1294,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_InternalServerError_Returns500() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1292,7 +1316,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1323,7 +1347,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_PathVariableInvalid_Returns400() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1350,7 +1374,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void deleteByExternalIdAndSource_Exists_Returns204() {
         // Given
         Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
@@ -1371,7 +1395,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void deleteByExternalIdAndSource_PathVariableInvalid_Returns400() {
         // Given
         Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
@@ -1393,7 +1417,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void deleteByExternalIdAndSource_DoesntExists_Returns404() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1431,14 +1455,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void deleteByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void deleteByExternalIdAndSource_UserWithoutCSRFToken_Returns403() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1456,7 +1480,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void deleteByExternalIdAndSource_InternalServerError_Returns500() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1476,7 +1500,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_NullHandler_ThrowsNullPointerException() {
         // Given
         TransactionHandler nullTransactionHandler = null;
@@ -1493,7 +1517,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAll_NullHandler_ThrowsNullPointerException() {
         // Given
         TransactionHandler nullTransactionHandler = null;
@@ -1510,7 +1534,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_NullHandler_ThrowsNullPointerException() {
         // Given
         TransactionHandler nullTransactionHandler = null;
@@ -1527,7 +1551,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_NullHandler_ThrowsNullPointerException() {
         // Given
         TransactionHandler nullTransactionHandler = null;
@@ -1544,7 +1568,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NullHandler_ThrowsNullPointerException() {
         // Given
         TransactionHandler nullTransactionHandler = null;
@@ -1561,7 +1585,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NoBody_Returns400() {
         // Given
         String externalId = "0";
@@ -1582,7 +1606,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void deleteByExternalIdAndSource_NullHandler_ThrowsNullPointerException() {
         // Given
         TransactionHandler nullTransactionHandler = null;
@@ -1599,7 +1623,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAny_InvalidUrl_Returns404() {
         // Given + When + Then
         webTestClient
@@ -1615,7 +1639,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void deleteAny_InvalidUrl_Returns404() {
         // Given + When + Then
         webTestClient
@@ -1631,7 +1655,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void putAny_InvalidUrl_Returns404() {
         // Given + When + Then
         webTestClient
@@ -1647,7 +1671,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1671,7 +1695,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullCountryShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1698,7 +1722,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_UsaAddressNullCityShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1723,7 +1747,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_CountryUsaNullStateShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1751,7 +1775,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullStreetShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1776,7 +1800,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullZipShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1802,7 +1826,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankCountryShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1827,7 +1851,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankCityShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1852,7 +1876,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankStateShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1878,7 +1902,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankStreetShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1904,7 +1928,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankZipShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1930,7 +1954,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen100CountyBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1955,7 +1979,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen20ZipInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -1980,7 +2004,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen50CountryInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2005,7 +2029,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen100CityInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2030,7 +2054,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen100StateInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2055,7 +2079,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen200StreetInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2080,7 +2104,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen100CountyShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2105,7 +2129,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen20ZipInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2130,7 +2154,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen50CountryInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2155,7 +2179,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen100CityInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2180,7 +2204,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen100StateInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2205,7 +2229,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen200StreetInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2230,7 +2254,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_PartialAddressWithNullState_ReturnsTransaction() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2266,7 +2290,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_PartialAddressWithBlankState_ReturnsTransaction() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2302,7 +2326,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_PartialAddressWithStateAndZip_ReturnsTransaction() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2338,7 +2362,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_PartialAddressWithNullZip_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2367,7 +2391,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullTransactionType_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2391,7 +2415,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullItemsList_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2416,7 +2440,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_EmptyItemsList_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2440,7 +2464,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ItemWithQuantityAndAmountThatDoesNotHaveTheSameSignAsTotalAmount_Returns400DataConflict() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2468,7 +2492,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_TotalItemsAmountIsNegative_Returns400DataConflict() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2493,7 +2517,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ItemWithNegativeAmountAndTotalTransactionAmountIsAboveZero_Returns200() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2526,7 +2550,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ItemDiscountIsEqualsToTotal_Returns200() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2560,7 +2584,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ItemDiscountIsEqualsToUnitPriceMultiplyByQuantity_Returns200() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2596,7 +2620,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ConflictingItemHasNoUnitPriceAndQuantityAndTotal_Returns400ConflictedData() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2626,7 +2650,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ConflictingItemHasNegativeTotalAndDiscount_Returns400ConflictedData() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2656,7 +2680,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ConflictingItemHasNegativeUnitPriceAndQuantityAndDiscount_Returns400ConflictedData() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2686,7 +2710,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ConflictingItemHasNegativeDiscount_Returns400ConflictedData() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2714,7 +2738,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NegativeAmountInSalesTax_Returns400validationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2739,7 +2763,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThan256CreatedFrom_Returns400validationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2764,7 +2788,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_CustomerIdFailedToParse_Returns400() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2825,7 +2849,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Disabled
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullCustomerId_Returns400() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2847,7 +2871,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_InvalidCustomer_Returns400() {
         // Given
         String lengthOf101City = testUtilities.stringWithLength(101);
@@ -2876,7 +2900,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_nullDocumentName_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2908,7 +2932,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_blankDocumentName_Returns400() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2941,7 +2965,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_moreThan50ChartsDocumentName_Returns400() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3005,7 +3029,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_50ChartsDocumentName_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3037,7 +3061,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3094,7 +3118,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3153,7 +3177,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullUpdatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3211,7 +3235,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankTimestampInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3270,7 +3294,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankTimestampInCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3329,7 +3353,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3390,7 +3414,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3451,7 +3475,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3484,7 +3508,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3518,7 +3542,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3552,7 +3576,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3613,7 +3637,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfZInCreatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3647,7 +3671,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3681,7 +3705,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3715,7 +3739,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3749,7 +3773,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3783,7 +3807,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3817,7 +3841,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3878,7 +3902,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3939,7 +3963,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -3974,7 +3998,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4036,7 +4060,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4098,7 +4122,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4161,7 +4185,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankTimestampInCreatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4224,7 +4248,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4288,7 +4312,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4352,7 +4376,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4387,7 +4411,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4421,7 +4445,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4485,7 +4509,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4549,7 +4573,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfZInCreatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4583,7 +4607,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4617,7 +4641,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4651,7 +4675,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4685,7 +4709,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4719,7 +4743,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4753,7 +4777,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInInternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4818,7 +4842,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInInternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4883,7 +4907,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInInternalTimestamps_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4916,7 +4940,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_JustDateWithNoTimeOffsetInCreatedDateInInternalTimestamps_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4948,7 +4972,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_JustDateWithNoTimeOffsetInCreatedDateInExternalTimestamps_Returns200Ok() {
         // Given
         String externalId = transactionDto.externalId();
@@ -4979,7 +5003,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NegativeQuantityInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
@@ -5007,7 +5031,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NegativeTotalPriceInItemWithDiscount_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
@@ -5035,7 +5059,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullNameInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
@@ -5062,8 +5086,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     }
 
     @Test
-    @WithMockUser
+
     @Override
+    @WithMockJwt
     public void upsert_BlankNameInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
@@ -5091,7 +5116,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen256NameInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
@@ -5120,7 +5145,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullTaxCodeInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
@@ -5149,7 +5174,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThen256TaxCodeInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
@@ -5178,7 +5203,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NegativeManualSalesTaxRateInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
@@ -5207,7 +5232,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LargerThanMaxManualSalesTaxRateInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
@@ -5236,7 +5261,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NegativeDiscountInItem_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -5261,7 +5286,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NegativeManualSalesRateTaxInShippingFee_Returns400ValidationError() {
         // Given
         ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("-0.5"), new BigDecimal("5000"), BigDecimal.ZERO, null, testUtilities.createSalesTaxRatesDto(), null, "C1S1", null, null);
@@ -5286,7 +5311,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NegativeTotalPriceInShippingFee_Returns400ValidationError() {
         // Given
         ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("-5000"), BigDecimal.ZERO, null, testUtilities.createSalesTaxRatesDto(), null, "C1S1", null, null);
@@ -5311,7 +5336,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullTaxCodeInShippingFee_Returns400ValidationError() {
         // Given
         ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("5000"), BigDecimal.ZERO, null, testUtilities.createSalesTaxRatesDto(), null, null, null, null);
@@ -5336,7 +5361,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthGreaterThan256TaxCodeInShippingFee_Returns400ValidationError() {
         // Given
         ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, new BigDecimal("0.1"), new BigDecimal("5000"), BigDecimal.ZERO, null, testUtilities.createSalesTaxRatesDto(), null, testUtilities.stringWithLength(257), null, null);

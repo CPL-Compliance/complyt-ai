@@ -6,13 +6,15 @@ import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TimestampsDto;
-import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.ShippingAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +22,17 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
+import testUtils.integration_test.WithMockJwt;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,7 +54,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
     private WebTestClient webTestClient;
 
     private final LocalDateTime referenceDate = LocalDateTime.parse("2020-10-01T07:00:00");
-    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Atlanta", "US", null, "GA", "50 Upper Alabama St", "","30303", false, null);
+    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Atlanta", "US", null, "GA", "50 Upper Alabama St", "", "30303", false, null);
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private final String source = "1";
 
@@ -64,15 +64,11 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
     }
 
-    @BeforeEach
-    void setup() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-    }
 
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_NewAndDoesntHavePhysicalNexus_Returns201NoTaxes() {
         //Given
         String externalId = "10061";
@@ -82,6 +78,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -97,13 +94,14 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertSalesTaxTracking_createdPhysicalNexus_Returns200() {
         //Given
         State state = new State("GA", "13", "Georgia");
 
         // Then
         webTestClient
+
                 .get()
                 .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", referenceAddress.country())
@@ -118,6 +116,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
 
                         webTestClient
                                 .mutateWith(csrf())
+
                                 .put()
                                 .uri(uriBuilder -> uriBuilder
                                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -140,7 +139,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_NewAndAfterPhysicalNexus_Returns201WithTaxes() {
         //Given
         String externalId = "10062";
@@ -151,6 +150,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -166,7 +166,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
     @Order(4)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_NewAndBeforeApprovedPhysicalNexus_Returns201NoTaxes() {
         //Given
         String externalId = "10063";
@@ -177,6 +177,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -192,13 +193,14 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
     @Order(5)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertSalesTaxTracking_ApprovedDateBeforeAppliedDate_Returns200() {
         //Given
         State state = new State("GA", "13", "Georgia");
 
         // Then
         webTestClient
+
                 .get()
                 .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", referenceAddress.country())
@@ -213,6 +215,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
 
                         webTestClient
                                 .mutateWith(csrf())
+
                                 .put()
                                 .uri(uriBuilder -> uriBuilder
                                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -232,7 +235,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
     @Order(6)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_NewAndBeforeAppliedPhysicalNexus_Returns201NoTaxes() {
         //Given
         String externalId = "10064";
@@ -243,6 +246,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -258,13 +262,14 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
     @Order(7)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertSalesTaxTracking_EnforcesSalesTaxToFalse_Returns200() {
         //Given
         State state = new State("GA", "13", "Georgia");
 
         // Then
         webTestClient
+
                 .get()
                 .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", referenceAddress.country())
@@ -279,6 +284,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
 
                         webTestClient
                                 .mutateWith(csrf())
+
                                 .put()
                                 .uri(uriBuilder -> uriBuilder
                                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -298,7 +304,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
     @Order(8)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_WithPhysicalNexusButNoEnforcedSalesTax_Returns201NoTaxes() {
         //Given
         String externalId = "10065";
@@ -309,6 +315,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)

@@ -4,8 +4,12 @@ import com.complyt.business.transaction.items_amounts.TangibleItemsAmountCalcula
 import com.complyt.domain.Taxable;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.transaction.Item;
+import com.complyt.security.TenantResolver;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
@@ -16,6 +20,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
 
 public class TangibleItemsAmountCalculatorTest {
 
@@ -23,6 +28,24 @@ public class TangibleItemsAmountCalculatorTest {
     private TangibleItemsAmountCalculator tangibleItemsAmountCalculator;
 
     List<Taxable> items;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {

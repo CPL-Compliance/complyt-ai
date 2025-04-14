@@ -4,14 +4,16 @@ import com.complyt.business.exceptions.ComplytAddressValidationException;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.proxies.AddressValidationServiceProxy;
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
-import com.complyt.v1.models.transaction.MandatoryAddressDto;
-import com.complyt.v1.models.transaction.ShippingAddressDto;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -20,6 +22,7 @@ import testUtils.unit_test.UnitTestUtilities;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +36,24 @@ class ComplytAddressValidationWebClientWrapperTest {
     MatchedAddressDataDto mandatoryAddressDto;
     ShippingAddress shippingAddress;
 
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {

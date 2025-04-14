@@ -12,13 +12,17 @@ import com.complyt.domain.customer.exemption.Status;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.ExemptionRepository;
+import com.complyt.security.TenantResolver;
 import com.mongodb.client.result.DeleteResult;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.webjars.NotFoundException;
@@ -32,6 +36,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -60,6 +65,24 @@ public class ExemptionServiceImplTest {
     UnitTestUtilities testUtilities;
     LocalDateTime now = LocalDateTime.now();
     Timestamps internalTimestamps = new Timestamps(now, now);
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {
@@ -154,6 +177,7 @@ public class ExemptionServiceImplTest {
         // Given
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(exemptionRepository.findFullyExempted(transaction.getCustomerId(),
                 transaction.getShippingAddress().country(), transaction.getShippingAddress().state(),
                 transaction.getExternalTimestamps().getCreatedDate())).thenReturn(Mono.just(exemption));
@@ -168,6 +192,7 @@ public class ExemptionServiceImplTest {
         // Given
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(exemptionRepository.findFullyExempted(transaction.getCustomerId(),
                 transaction.getShippingAddress().country(), transaction.getShippingAddress().state(),
                 transaction.getExternalTimestamps().getCreatedDate())).thenReturn(Mono.empty());
@@ -184,6 +209,7 @@ public class ExemptionServiceImplTest {
         Exemption cancelledExemption = exemption.withExemptionStatus(ExemptionStatus.CANCELLED);
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(exemptionRepository.findByComplytId(id)).thenReturn(Mono.just(exemption));
         when(exemptionRepository.save(cancelledExemption)).thenReturn(Mono.just(cancelledExemption));
         Mono<Exemption> deleteResultMono = exemptionService.markAsCancelled(id);

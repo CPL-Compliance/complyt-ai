@@ -2,11 +2,15 @@ package com.complyt.business.transaction;
 
 import com.complyt.domain.transaction.Item;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.exceptions.types.InvalidDiscountAmountException;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -20,6 +24,8 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionDiscountCalculatorTest {
@@ -30,6 +36,24 @@ class TransactionDiscountCalculatorTest {
     Transaction transaction;
 
     UnitTestUtilities testUtilities;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {
@@ -142,6 +166,8 @@ class TransactionDiscountCalculatorTest {
         Transaction transactionWithExcessiveDiscount = transaction.withTransactionLevelDiscount(BigDecimal.valueOf(10000000)); // Ensures the discount is larger than the total amount
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
         Mono<Transaction> actualTransactionMono = transactionDiscountCalculator.injectRecalculatedTotalAfterDiscount(transactionWithExcessiveDiscount);
 
         // Then

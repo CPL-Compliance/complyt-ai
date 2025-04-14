@@ -4,14 +4,16 @@ import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.ShippingAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.transaction.TransactionTypeDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +21,17 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
+import testUtils.integration_test.WithMockJwt;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,7 +52,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
     private WebTestClient webTestClient;
 
     private final LocalDateTime referenceDate = LocalDateTime.parse("2020-10-01T07:00:00");
-    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Louisville", "US", null, "KY", "2513 Preston Hwy", "","40217", false, null);
+    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Louisville", "US", null, "KY", "2513 Preston Hwy", "", "40217", false, null);
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private final String source = "1";
 
@@ -61,15 +61,11 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
     }
 
-    @BeforeEach
-    void setup() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-    }
 
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_SalesOrderOverTheThreshold_Returns201() {
         //Given
         String externalId = "10091";
@@ -81,6 +77,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -96,7 +93,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_EstimateOverTheThreshold_Returns201() {
         //Given
         String externalId = "10092";
@@ -108,6 +105,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -123,9 +121,10 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getSalesTaxTracking_CheckEconomicNexusNotPassed_Returns200() {
         webTestClient
+
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -147,9 +146,10 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertSalesTaxTracking_AddPhysicalNexus_Returns200() {
         webTestClient
+
                 .get()
                 .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", referenceAddress.country())
@@ -164,6 +164,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
 
                         webTestClient
                                 .mutateWith(csrf())
+
                                 .put()
                                 .uri(uriBuilder -> uriBuilder
                                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -186,7 +187,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
     @Order(4)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_EstimateAfterNexusApplied_Returns201WthTaxes() {
         //Given
         String externalId = "10093";
@@ -198,6 +199,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -213,7 +215,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
     @Order(4)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertTransaction_SalesOrderAfterNexusApplied_Returns201WthTaxes() {
         //Given
         String externalId = "10094";
@@ -225,6 +227,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)

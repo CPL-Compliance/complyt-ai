@@ -9,6 +9,5 @@ public interface ClientTrackingRouterTestTemplate extends
         GetAllRouterTestTemplate,
         GetByNameRouterTestTemplate,
         GetByTenantIdTestTemplate,
-        UpsertByTenantIdRouterTestTemplate
-{
+        UpsertByTenantIdRouterTestTemplate {
 }

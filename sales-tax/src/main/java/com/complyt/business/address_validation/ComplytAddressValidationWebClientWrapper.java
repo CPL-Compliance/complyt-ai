@@ -2,11 +2,9 @@ package com.complyt.business.address_validation;
 
 import com.complyt.business.exceptions.ComplytAddressValidationException;
 import com.complyt.business.exceptions.FeignErrorUtils;
-import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.proxies.AddressValidationServiceProxy;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
-import com.complyt.v1.mappers.AddressMapper;
 import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
 import feign.FeignException;
 import lombok.AccessLevel;

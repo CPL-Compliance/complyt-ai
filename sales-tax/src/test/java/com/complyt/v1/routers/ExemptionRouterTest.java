@@ -1,11 +1,12 @@
 package com.complyt.v1.routers;
 
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.facades.ExemptionFacade;
-import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.repositories.exceptions.OperationFailedException;
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.PatcherConfig;
 import com.complyt.v1.config.ValidatorConfig;
@@ -20,18 +21,20 @@ import com.complyt.v1.mappers.ExemptionWrapperMapper;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.customer.exemption.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import testUtils.integration_test.WithMockJwt;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
@@ -40,7 +43,7 @@ import java.util.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -62,6 +65,24 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     UnitTestUtilities testUtilities;
     ExemptionWrapper exemptionWrapper;
 
+    static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
+
     @BeforeEach
     void setup() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
@@ -74,7 +95,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails()
+    @WithMockJwt
     public void getByComplytId_Exists_Returns200() {
         // Given
         String url = ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId();
@@ -84,7 +105,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
 
         // Then
-        webTestClient.get()
+        webTestClient
+                .get()
                 .uri(uriBuilder -> uriBuilder.path(url).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -95,7 +117,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails()
+    @WithMockJwt
     public void getByComplytId_QueryParamInvalid_Returns400() {
         // Given
         String complytId = "null";
@@ -106,7 +128,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
 
         // Then
-        webTestClient.get()
+        webTestClient
+                .get()
                 .uri(uriBuilder -> uriBuilder.path(url).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -115,7 +138,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails()
+    @WithMockJwt
     public void getByComplytId_DoesntExists_Returns404() {
         // Given
         String url = ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId();
@@ -124,7 +147,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         when(exemptionFacade.findByComplytId(exemption.getComplytId())).thenReturn(Mono.empty());
 
         // Then
-        webTestClient.get()
+        webTestClient
+                .get()
                 .uri(uriBuilder -> uriBuilder.path(url).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -147,14 +171,14 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_InternalServerError_Returns500() {
         // Given
         String url = ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId();
@@ -163,7 +187,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         when(exemptionFacade.findByComplytId(exemption.getComplytId())).thenReturn(Mono.error(new OperationFailedException()));
 
         // Then
-        webTestClient.get()
+        webTestClient
+                .get()
                 .uri(uriBuilder -> uriBuilder.path(url).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -172,7 +197,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByComplytId_NoBody_Returns400() {
         // Given
         UUID complytId = UUID.randomUUID();
@@ -193,7 +218,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void createByComplytId_CoupleValidationsFailure_Returns400WithErrorList() {
         // Given
         ExemptionDto givenExemptionDto = exemptionDto
@@ -241,14 +266,14 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void createByComplytId_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void createByComplytId_UserWithoutCSRFToken_Returns403() {
         // Given
         ExemptionDto requestExemptionDto = exemptionDto.withComplytId(null);
@@ -265,7 +290,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void createByComplytId_InternalServerError_Returns500() {
         // Given
         Exemption exemptionNoId = exemption.withId(null).withTenantId(null).withComplytId(null);
@@ -289,7 +314,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails()
+    @WithMockJwt
     public void upsertByComplytId_Exists_Returns200() {
         // Given
         ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
@@ -314,7 +339,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails()
+    @WithMockJwt
     public void upsertByComplytId_PathVariableInvalid_Returns400() {
         // Given
         ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
@@ -338,7 +363,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails()
+    @WithMockJwt
     public void upsertByComplytId_DoesntExists_Returns404() {
         // Given + When
         when(exemptionFacade.update(exemption, exemption.getComplytId())).thenReturn(Mono.empty());
@@ -357,7 +382,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByComplytId_CoupleValidationsFailure_Returns400WithErrorList() {
         // Given
         ExemptionDto givenExemptionDto = exemptionDto
@@ -386,7 +411,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByComplytId_DifferentComplytIdInBody_Returns400ConflictedData() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -410,7 +435,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByComplytId_NullComplytId_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -432,7 +457,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByComplytId_BlankComplytId_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -483,7 +508,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByComplytId_ComplytIdFailedToParse_Returns400() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -544,14 +569,14 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByComplytId_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByComplytId_UserWithoutCSRFToken_Returns403() {
         // Given + When + Then
         webTestClient
@@ -566,7 +591,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByComplytId_InternalServerError_Returns500() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -588,7 +613,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails()
+    @WithMockJwt
     public void getAll_Exists_Returns200WithList() {
         // Given
         Exemption secondExemption = exemption.withId(UUID.randomUUID().toString())
@@ -626,7 +651,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails()
+    @WithMockJwt
     public void getAll_QueryParamInvalid_Returns400() {
         // Given
         Exemption secondExemption = exemption.withId(UUID.randomUUID().toString())
@@ -658,7 +683,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
         // Given
         List<ExemptionDto> exemptionDtos = new ArrayList<>();
@@ -696,14 +721,14 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_UserWithoutAuthorities_Returns403() {
         // ??
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_InternalServerError_Returns500() {
         // Given + When
         when(exemptionFacade.findAll(0, 0, null, PaginationConstants.DEFAULT_SORT_ORDER, PaginationConstants.DEFAULT_TRANSACTION_SORT_BY)).thenReturn(Flux.error(new OperationFailedException()));
@@ -721,7 +746,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails()
+    @WithMockJwt
     public void deleteByComplytId_Exists_Returns204() {
         // Given
         UUID complytId = UUID.randomUUID();
@@ -741,7 +766,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithUserDetails()
+    @WithMockJwt
     public void deleteByComplytId_PathVariableInvalid_Returns400() {
         // Given
         UUID complytId = UUID.randomUUID();
@@ -752,6 +777,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
         // Then
         webTestClient.mutateWith(csrf())
+
                 .delete()
                 .uri(uriBuilder -> uriBuilder.path(url).build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -761,7 +787,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void deleteByComplytId_DoesntExists_Returns404() {
         // Given
         UUID complytId = UUID.randomUUID();
@@ -771,7 +797,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         when(exemptionFacade.markAsCancelled(complytId)).thenReturn(Mono.empty());
 
         // Then
-        webTestClient.mutateWith(csrf())
+        webTestClient
+                .mutateWith(csrf())
                 .delete()
                 .uri(uriBuilder -> uriBuilder.path(url).build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -797,14 +824,14 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void deleteByComplytId_UserWithoutAuthorities_Returns403() {
         // ???
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void deleteByComplytId_UserWithoutCSRFToken_Returns403() {
         // Given
         UUID complytId = UUID.randomUUID();
@@ -821,7 +848,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void deleteByComplytId_InternalServerError_Returns500() {
         // Given
         UUID complytId = UUID.randomUUID();
@@ -841,7 +868,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     }
 
     @Test
-    @WithUserDetails()
+    @WithMockJwt
     public void delete_ExemptionDoesNoExistInDB_Throws404NotFound() {
         // Given
         UUID complytId = UUID.randomUUID();
@@ -852,6 +879,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
         // Then
         webTestClient.mutateWith(csrf())
+
                 .delete()
                 .uri(uriBuilder -> uriBuilder.path(url).build())
                 .accept(MediaType.APPLICATION_JSON)
@@ -861,7 +889,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_NullHandler_ThrowsNullPointerException() {
         // Given
         ExemptionHandler nullExemptionHandler = null;
@@ -877,7 +905,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_NullHandler_ThrowsNullPointerException() {
         // Given
         ExemptionHandler nullExemptionHandler = null;
@@ -893,7 +921,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void createByComplytId_NullHandler_ThrowsNullPointerException() {
         // Given
         ExemptionHandler nullExemptionHandler = null;
@@ -909,7 +937,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByComplytId_NullHandler_ThrowsNullPointerException() {
         // Given
         ExemptionHandler nullExemptionHandler = null;
@@ -925,7 +953,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void deleteByComplytId_NullHandler_ThrowsNullPointerException() {
         // Given
         ExemptionHandler nullExemptionHandler = null;
@@ -942,7 +970,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAny_InvalidUrl_Returns404() {
         // Given + When + Then
         webTestClient
@@ -956,7 +984,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void putAny_InvalidUrl_Returns404() {
         // Given + When + Then
         webTestClient
@@ -970,7 +998,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void deleteAny_InvalidUrl_Returns404() {
         // Given + When + Then
         webTestClient
@@ -984,7 +1012,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void postAny_InvalidUrl_Returns404() {
         // Given + When + Then
         webTestClient
@@ -998,7 +1026,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void create_UpsertsMany_Returns201() {
         // Given
         List<Exemption> exemptionList = UnitTestUtilities.createExemptionsListFromWrapper(exemptionWrapper);
@@ -1023,7 +1051,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void create_EmptyMonoReturnedFromFacade_Returns404() {
         // Given
         ExemptionWrapperDto exemptionWrapperDto = ExemptionWrapperMapper.INSTANCE.exemptionWrapperToExemptionWrapperDto(exemptionWrapper);
@@ -1044,7 +1072,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void create_EmptyStatesListPassed_Returns400() {
         // Given
         ExemptionWrapperDto exemptionWrapperDto = ExemptionWrapperMapper.INSTANCE.exemptionWrapperToExemptionWrapperDto
@@ -1067,7 +1095,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void create_NullExemptionPassed_Returns400() {
         // Given
         ExemptionWrapperDto exemptionWrapperDto = ExemptionWrapperMapper.INSTANCE.exemptionWrapperToExemptionWrapperDto
@@ -1090,7 +1118,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullClassification_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1113,6 +1141,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     }
 
     @Override
+    @WithMockJwt
     public void upsert_PathVariableError_Returns400() {
         // Given
         String complytIdError = "null";
@@ -1133,7 +1162,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankCodeInClassification_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1158,7 +1187,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankDescriptionInClassification_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1183,7 +1212,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullCodeInClassification_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1208,7 +1237,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullDescriptionInClassification_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1232,7 +1261,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthOf257CodeInClassification_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1256,7 +1285,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthOf257DescriptionInClassification_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1280,7 +1309,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullStatus_Returns400validationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1304,7 +1333,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullCodeInStatus_Returns400validationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1328,7 +1357,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullNameInStatus_Returns400validationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1352,7 +1381,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_blankCodeInStatus_Returns400validationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1376,7 +1405,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_blankNameInStatus_Returns400validationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1400,7 +1429,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthOf257NameInStatus_Returns400validationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1424,7 +1453,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthOf257CodeInStatus_Returns400validationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1448,7 +1477,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1472,7 +1501,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullCertificateIdInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1497,7 +1526,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullUrlInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1521,7 +1550,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullNameInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1545,7 +1574,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankCertificateIdInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1569,7 +1598,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankUrlInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1593,7 +1622,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankNameInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1617,7 +1646,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthOf257CertificateIdInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1641,7 +1670,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthOf257UrlInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1665,7 +1694,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthOf257NameInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1689,7 +1718,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullExemptionType_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1712,7 +1741,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullValidationDates_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1764,7 +1793,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1820,7 +1849,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1876,7 +1905,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1932,7 +1961,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankTimestampInCreatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -1988,7 +2017,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2044,7 +2073,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2100,7 +2129,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2134,7 +2163,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2168,7 +2197,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2224,7 +2253,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2280,7 +2309,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfZInCreatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2314,7 +2343,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2348,7 +2377,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2383,7 +2412,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2418,7 +2447,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2453,7 +2482,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2488,7 +2517,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInInternalTimestamps_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2544,7 +2573,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInInternalTimestamps_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2600,7 +2629,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInInternalTimestamps_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2634,13 +2663,14 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     }
 
     @Override
+    @WithMockJwt
     public void upsert_JustDateWithNoTimeOffsetInCreatedDateInInternalTimestamps_Returns200Ok() {
 
     }
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2663,7 +2693,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankAbbreviationInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2687,7 +2717,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankCodeInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2711,7 +2741,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankNameInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2735,7 +2765,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthOf257AbbreviationInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2759,7 +2789,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthOf257CodeInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2783,7 +2813,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_LengthOf257NameInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2807,7 +2837,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullAbbreviationInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2831,7 +2861,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullCodeInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2855,7 +2885,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullNameInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2879,7 +2909,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullFromDateInValidationDates_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2930,7 +2960,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NullToDateInValidationDates_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -2956,7 +2986,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankTimestampInToDateInValidationDates_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3008,7 +3038,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_BlankTimestampInFromDateInValidationDates_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3060,7 +3090,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_29OfFebruaryNotInLeapYearInFromDateInValidationDates_Returns400ValidationError() {
 // Given
         UUID complytId = exemptionDto.complytId();
@@ -3116,7 +3146,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_29OfFebruaryNotInLeapYearInToDateInValidationDates_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3172,7 +3202,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_9DigitsAfterTheDotInSecondsInFromDateInValidationDates_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3206,7 +3236,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_9DigitsAfterTheDotInSecondsInToDateInValidationDates_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3241,7 +3271,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_10DigitsAfterTheDotInSecondsInFromDateInValidationDates_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3293,7 +3323,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_10DigitsAfterTheDotInSecondsInToDateInValidationDates_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3345,7 +3375,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfZInFromDateInValidationDates_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3379,7 +3409,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfZInToDateInValidationDates_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3413,7 +3443,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfPlusTimeInFromDateInValidationDates_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3447,7 +3477,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfPlusTimeInToDateInValidationDates_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3481,7 +3511,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMinusTimeInFromDateInValidationDates_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3514,7 +3544,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMinusTimeInToDateInValidationDates_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3547,7 +3577,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMoreThan18InFromDateInValidationDates_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3603,7 +3633,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_ZoneSetWithOffsetOfMoreThan18InToDateInValidationDates_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3659,7 +3689,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_JustDateWithNoTimeOffsetToDateInValidationDates_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3693,7 +3723,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_NonUsaCountrySent_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3723,7 +3753,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_UnSupportedNonUsaCountrySent_Returns400() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3751,7 +3781,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_JustDateWithNoTimeOffsetFromDateInValidationDates_Returns200Ok() {
         // Given
         UUID complytId = exemptionDto.complytId();
@@ -3785,7 +3815,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     // Patch
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void patch_PatchingByFewFields_Returns200() {
         // Given
         CertificateDto certificateToPatch = exemptionDto.certificate().withName("Patched Cert.");
@@ -3818,6 +3848,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     }
 
     @Test
+    @WithMockJwt
     public void patch_NullHandler_ThrowsNullPointerException() {
         // Given
         ExemptionHandler nullExemptionHandler = null;

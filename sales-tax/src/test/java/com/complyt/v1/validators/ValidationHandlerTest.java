@@ -1,13 +1,17 @@
 package com.complyt.v1.validators;
 
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import com.complyt.v1.exceptions.types.PathVariableErrorException;
 import com.complyt.v1.exceptions.types.QueryParamErrorException;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.param_checker.ParamCheckerFunctions;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,6 +32,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest()
@@ -52,6 +57,24 @@ class ValidationHandlerTest {
     ShouldCallValidate shouldCallValidate;
 
     UnitTestUtilities testUtilities;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setup() {

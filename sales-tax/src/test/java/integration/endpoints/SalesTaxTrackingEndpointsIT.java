@@ -1,9 +1,9 @@
 package integration.endpoints;
 
 import com.complyt.SalesTaxApplication;
+import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.sales_tax.RegisteredType;
-import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
@@ -21,13 +21,12 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
+import testUtils.integration_test.WithMockJwt;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -36,7 +35,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(SpringExtension.class)
@@ -65,22 +63,16 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
     }
 
-    @BeforeEach
-    void setup() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-    }
-
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_NoBody_Returns400() {
         // Given
         String state = "CA";
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -95,15 +87,14 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_UnsupportedMediaType_Returns415() {
         // Given
         String state = "CA";
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -120,7 +111,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_Exists_Returns200WithSummaryAndNewNexusRule() {
         LocalDate localDate = LocalDate.now();
         LocalDate summaryDate = localDate.isAfter(localDate.withDayOfMonth(1).withMonth(6))
@@ -129,8 +120,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+                .mutateWith(csrf()).mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
@@ -154,14 +144,13 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_ExistsAndHasNexus_Returns200NoSummary() {
         LocalDate localDate = LocalDate.now();
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+                .mutateWith(csrf()).mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
@@ -179,14 +168,13 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_DoesntExists_Returns404NotFound() {
         String state = "OR"; // Oregon
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+                .mutateWith(csrf()).mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
@@ -202,15 +190,14 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_DoesNotPassValidation_Returns400() {
         String state = "DE";
         String badDate = "4323/200/23";
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+                .mutateWith(csrf()).mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
@@ -232,14 +219,13 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_DoesNotPassThreshold_returnsEconomicTrackerFalse() {
         String refreshState = "Virginia";
         String date = "2021-01-01";
 
         webTestClient
-                .mutateWith(csrf())
-                .mutate()
+                .mutateWith(csrf()).mutate()
                 .build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
@@ -271,14 +257,13 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateAndDate_PassedNexus_returnsEconomicTrackerTrue() {
         String refreshState = "Virginia";
         String date = "2022-01-01";
 
         webTestClient
-                .mutateWith(csrf())
-                .mutate()
+                .mutateWith(csrf()).mutate()
                 .build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
@@ -311,13 +296,12 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateNoRefDate_DoesNotPassThreshold_returnsEconomicTrackerFalse() {
         String refreshState = "Utah";
 
         webTestClient
-                .mutateWith(csrf())
-                .mutate()
+                .mutateWith(csrf()).mutate()
                 .build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
@@ -342,13 +326,12 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByStateNoRefDate_PassedNexus_returnsEconomicTrackerTrue() {
         String refreshState = "Virginia";
 
         webTestClient
-                .mutateWith(csrf())
-                .mutate()
+                .mutateWith(csrf()).mutate()
                 .build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
@@ -377,15 +360,14 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByCountryAndState_NonUsaCountryDoesntExists_Returns201() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingNonUsaDto(nonUsaCountry);
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", nonUsaCountry)
@@ -408,15 +390,14 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByCountryAndState_NonUsaCountryAbbreviation_Returns200() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingNonUsaDto("BR");
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", nonUsaCountry)
@@ -439,10 +420,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByCountry_Exists_Returns200() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", nonUsaCountry)
@@ -457,10 +437,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByCountryAbbreviation_Exists_Returns200() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", "BR")
@@ -476,7 +455,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void refreshByCountryAndDate_NonUsaCountryExistsAndHasNexus_Returns200NoSummary() {
         LocalDate localDate = LocalDate.now();
         LocalDate summaryDate = localDate.isAfter(localDate.withDayOfMonth(1).withMonth(6))
@@ -485,8 +464,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+                .mutateWith(csrf()).mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
@@ -509,7 +487,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByCountryAndState_StateIsNull_Returns400() {
         // Given
         StateDto nullState = null;
@@ -517,8 +495,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", nonUsaCountry)
@@ -533,7 +510,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByCountryAndState_CountryIsNull_Returns400() {
         // Given
         String nullCountry = "null";
@@ -541,8 +518,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", nullCountry)
@@ -557,15 +533,14 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByCountryAndState_UsaAndStateIsDifferentInBody_Returns400ConflictedData() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, stateWithNexus);
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -580,15 +555,14 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByCountryAndState_CountryInQueryAndBodyAreDifferent_Returns400ConflictedData() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, stateWithNexus);
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", nonUsaCountry)
@@ -603,10 +577,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_Exists_Returns200() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/all")
                         .build())
@@ -620,10 +593,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_QueryParamInvalid_Returns400() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/all")
                         .queryParam("page", "null")
@@ -636,12 +608,10 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "different_tenant")
     public void getByAll_DoesntExists_Returns200EmptyList() {
-        // Given
-        when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
 
-        // Then
+        // Given + Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -657,12 +627,10 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "different_tenant")
     public void getByAll_QueryParamInvalid_Returns400() {
-        // Given
-        when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
 
-        // Then
+        // Given + Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -677,14 +645,13 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_Exists_Returns200() {
         // Given
         String complytId = "6eaa133c-df9c-4f88-bba9-6dd3845c803a";
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/complytId/" + complytId)
                         .build())
@@ -698,11 +665,10 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_PathVariableInvalid_Returns400() {
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/complytId/" + "null")
                         .build())
@@ -714,11 +680,10 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_DoesntExists_Returns404() {
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/complytId/" + ITUtilities.NON_EXISTING_COMPLYT_ID)
                         .build())
@@ -730,10 +695,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByStateName_Exists_Returns200() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -749,10 +713,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByStateName_PathVariableInvalid_Returns400() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -766,10 +729,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByStateAbbreviation_Exists_Returns200() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -785,10 +747,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByStateAbbreviation_DoesntExists_Returns404() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -802,10 +763,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByCountryStateAndSubsidiary_DoesntExists_Returns404() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -820,10 +780,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     @Order(0)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getByCountryStateAndSubsidiary_Exists_Returns200() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -841,7 +800,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void path_AppliedDateIsWrongFormat_Returns400() {
         String invalidFormatAppliedDate = "T00:00:00";
         String state = "CA";
@@ -854,8 +813,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         ));
 
         webTestClient
-                .mutateWith(csrf())
-                .patch()
+                .mutateWith(csrf()).patch()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -872,7 +830,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void path_ApprovalDateIsWrongFormat_Returns400() {
         String invalidFormatApprovalDate = "T00:00:00";
         String state = "CA";
@@ -885,8 +843,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         ));
 
         webTestClient
-                .mutateWith(csrf())
-                .patch()
+                .mutateWith(csrf()).patch()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -903,7 +860,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void path_RegistrationDateIsWrongFormat_Returns400() {
         String invalidFormatRegistrationDate = "T00:00:00";
         String state = "CA";
@@ -916,8 +873,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         ));
 
         webTestClient
-                .mutateWith(csrf())
-                .patch()
+                .mutateWith(csrf()).patch()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -934,10 +890,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByStateName_DoesntExists_Returns404() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -951,7 +906,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_DoesntExists_Returns201() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, newState)
@@ -959,8 +914,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -983,7 +937,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(4)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_Exists_Returns200() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, newState).withComment("a new comment")
@@ -991,8 +945,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -1017,15 +970,14 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByCountryAndState_StateQueryParamInvalid_Returns400() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, newState).withComment("a new comment");
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -1040,7 +992,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_DoesntExistsWithComplytId_Returns400ConflictedData() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, newState)
@@ -1048,8 +1000,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", salesTaxTrackingDto.country())
@@ -1064,7 +1015,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_ConflictingState_Returns400ConflictedData() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, newState)
@@ -1072,8 +1023,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", salesTaxTrackingDto.country())
@@ -1088,7 +1038,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_DoesntPassValidation_Returns400CValidationError() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(usaCountry, new StateDto("AL", "01", null))
@@ -1099,8 +1049,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", salesTaxTrackingDto.country())
@@ -1123,15 +1072,14 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Order(0)
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt
     public void getAll_GetByParamSize_ReturnsExpectedSize() {
         int size = 1;
         String expectedComplyId = "6eaa133c-df9c-4f88-bba9-6dd3845c803a";
 
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/all") // Set your API endpoint
                         .queryParam("size", size)
@@ -1146,16 +1094,15 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Order(0)
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt
     public void getAll_GetByParamPage_ReturnsExpectedPage() {
         int page = 2;
         int size = 1;
         String expectedComplyId = "42b6d733-decc-4608-bfd3-d45bf868827c";
 
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/all") // Set your API endpoint
                         .queryParam("size", size)
@@ -1172,14 +1119,13 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Order(0)
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt
     public void getAll_GetByDefaultsSizeAndPage_ReturnsExpectedEntries() {
         String expectedComplyId = "6eaa133c-df9c-4f88-bba9-6dd3845c803a";
 
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/all") // Set your API endpoint
                         .build())
@@ -1193,7 +1139,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void patch_PatchesOneField_ReturnsPatchedResource() {
         String country = "USA";
         String state = "NJ";
@@ -1206,8 +1152,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         }};
 
         webTestClient
-                .mutateWith(csrf())
-                .patch()
+                .mutateWith(csrf()).patch()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL) // Set your API endpoint
                         .queryParam("country", country)
@@ -1228,7 +1173,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Order(2)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void patch_PatchesTwoFields_ReturnsPatchedResource() {
         String country = "USA";
         String state = "NJ";
@@ -1241,8 +1186,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         }};
 
         webTestClient
-                .mutateWith(csrf())
-                .patch()
+                .mutateWith(csrf()).patch()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", country)
@@ -1262,8 +1206,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Order(4)
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt
     public void upsertByState_RegisteredAndDateNull_ReturnsSalesTaxTrackingWithDate() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", newState).withRegistered(RegisteredTypeDto.REGISTERED)
@@ -1271,8 +1215,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", salesTaxTrackingDto.country())
@@ -1287,8 +1230,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Order(4)
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt
     public void upsertByState_RegisteredAndDate_ReturnsSalesTaxTrackingWithGivenDate() {
         // Given
         LocalDateTime registrationDate = LocalDateTime.now();
@@ -1297,8 +1240,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", salesTaxTrackingDto.country())
@@ -1318,8 +1260,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Order(4)
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt
     public void upsertByState_NonRegisteredAndDateNull_ReturnsSalesTaxTracking() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", newState).withRegistered(null)
@@ -1327,8 +1269,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", salesTaxTrackingDto.country())
@@ -1343,8 +1284,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Order(4)
     @Test
-    @WithMockUser
     @Override
+    @WithMockJwt
     public void upsertByState_NonRegisteredAndDate_Returns400() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", newState).withRegistered(null)
@@ -1353,6 +1294,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -1369,7 +1311,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Order(4)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void patch_PatchesRegistered_ReturnsPatchedResource() {
         RegisteredType registered = RegisteredType.REGISTERED;
         String state = "NJ";
@@ -1379,6 +1321,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         webTestClient
                 .mutateWith(csrf())
+
                 .patch()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -1398,7 +1341,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Order(4)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void patch_PatchesFilingFrequency_ReturnsPatchedResource() {
         FilingFrequencyDto filingFrequencyDto = FilingFrequencyDto.MONTHLY;
         String state = "NJ";
@@ -1408,6 +1351,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         webTestClient
                 .mutateWith(csrf())
+
                 .patch()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -1427,7 +1371,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Order(4)
     @Test
-    @WithMockUser
     public void patch_PatchesFilingFrequency_ReturnsError() {
         String invalidFilingFrequency = "invalidFilingFrequency";
         String state = "NJ";
@@ -1437,6 +1380,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         webTestClient
                 .mutateWith(csrf())
+
                 .patch()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -1452,7 +1396,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(7)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_WithDefaultAppliedDateAndPhysicalTrue_ShouldUpdateAppliedDate() {
         LocalDateTime appliedDate = EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE;
         LocalDateTime physicalEstablishedDate = LocalDateTime.now().minusYears(1);
@@ -1466,6 +1410,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -1488,7 +1433,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(7)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_WithFutureAppliedDateAndPhysicalTrue_ShouldUpdateAppliedDate() {
         LocalDateTime appliedDate = LocalDateTime.now().plusYears(1);
         LocalDateTime physicalEstablishedDate = LocalDateTime.now().plusDays(1);
@@ -1502,6 +1447,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -1524,7 +1470,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(7)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_WithPastAppliedDateAndPhysicalTrue_ShouldNotUpdateAppliedDate() {
         LocalDateTime appliedDate = LocalDateTime.now().minusYears(2).minusMonths(2);
         LocalDateTime physicalEstablishedDate = LocalDateTime.now().plusDays(1);
@@ -1538,6 +1484,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -1560,7 +1507,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(8)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_WithPhysicalTrueAndEconomicNexusInFuture_ShouldNotUpdateAppliedDate() {
         LocalDateTime appliedDate = LocalDateTime.now().minusYears(5);
         LocalDateTime physicalEstablishedDate = LocalDateTime.now().plusDays(1);
@@ -1574,6 +1521,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         // put Physical True SalesTaxTracking
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -1595,6 +1543,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         // Upsert Transaction Which PassedNexus
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + "1" + "/externalId/" + externalId)
@@ -1607,6 +1556,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         // Economic, Physical True, AppliedDate shouldn't be updated
         webTestClient
                 .mutateWith(csrf())
+
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -1629,7 +1579,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(8)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByState_WithPhysicalTrueAndPassedNexusByEconomic_ShouldUpdateAppliedDate() {
         LocalDateTime appliedDate = EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE;
         LocalDateTime physicalEstablishedDate = LocalDateTime.now().plusYears(10); // In the future
@@ -1643,6 +1593,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         // Then
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -1670,6 +1621,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         webTestClient
                 .mutateWith(csrf())
+
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + "1" + "/externalId/" + externalId)
@@ -1681,6 +1633,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         webTestClient
                 .mutateWith(csrf())
+
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)

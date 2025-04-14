@@ -1,7 +1,6 @@
 package com.complyt.v1.routers;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.security.test.context.support.WithMockUser;
 import testUtils.unit_test.templates.endpoints.*;
 import testUtils.unit_test.templates.validations.InternalTimestampsValidationTestTemplate;
 import testUtils.unit_test.templates.validations.StateValidationTestTemplate;
@@ -95,10 +94,8 @@ public interface ExemptionRouterTestTemplate extends
     void create_NullExemptionPassed_Returns400();
 
     @Test
-    @WithMockUser
     void upsert_NonUsaCountrySent_Returns200Ok();
 
     @Test
-    @WithMockUser
     void upsert_UnSupportedNonUsaCountrySent_Returns400();
 }

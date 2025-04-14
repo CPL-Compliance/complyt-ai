@@ -1,7 +1,6 @@
 package com.complyt.business.address;
 
 
-import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.ShippingAddress;
 import lombok.NonNull;
 

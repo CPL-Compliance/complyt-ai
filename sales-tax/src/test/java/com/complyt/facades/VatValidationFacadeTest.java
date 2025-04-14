@@ -2,20 +2,26 @@ package com.complyt.facades;
 
 import com.complyt.domain.ValidatedVat;
 import com.complyt.domain.VatDetailsToValidate;
+import com.complyt.security.TenantResolver;
 import com.complyt.services.VatValidationService;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
-import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 
 
@@ -30,6 +36,24 @@ public class VatValidationFacadeTest {
     UnitTestUtilities testUtilities;
     VatDetailsToValidate vatDetailsToValidate;
     ValidatedVat validatedVat;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {

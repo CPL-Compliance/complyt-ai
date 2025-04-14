@@ -4,9 +4,13 @@ import com.complyt.domain.Nexus;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.enums.TimeFrame;
+import com.complyt.security.TenantResolver;
 import com.complyt.utils.factory.DateRange;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -15,6 +19,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
 
 public class TimeFrameQueryBuilderTest {
 
@@ -22,6 +27,24 @@ public class TimeFrameQueryBuilderTest {
     Nexus nexusInfo;
     NexusStateRule nexusStateRule;
 
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {

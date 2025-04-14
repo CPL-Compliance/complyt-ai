@@ -4,7 +4,6 @@ package com.complyt.config;
 import com.complyt.business.address_validation.AddressValidationWebClientWrapper;
 import com.complyt.business.address_validation.ComplytAddressValidationWebClientWrapper;
 import com.complyt.business.address_validation.StubAddressValidationWebClientWrapper;
-import com.complyt.domain.transaction.Address;
 import com.complyt.proxies.AddressValidationServiceProxy;
 import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
 import org.springframework.context.annotation.Bean;

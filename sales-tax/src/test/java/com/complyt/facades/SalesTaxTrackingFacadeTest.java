@@ -8,17 +8,21 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.TransactionNexusSummary;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.security.TenantResolver;
 import com.complyt.services.CustomerService;
 import com.complyt.services.TransactionService;
 import com.complyt.services.nexus.NexusService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
 import com.complyt.utils.factory.DateRange;
 import com.complyt.utils.query.DateRangeStrategy;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.query.Query;
 import reactor.core.publisher.Flux;
@@ -38,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,6 +61,24 @@ public class SalesTaxTrackingFacadeTest {
     NexusService nexusService;
     UnitTestUtilities testUtilities;
     private SalesTaxTracking salesTaxTracking;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {

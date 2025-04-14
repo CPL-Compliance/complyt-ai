@@ -1,7 +1,5 @@
 package integration.endpoints;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.security.test.context.support.WithMockUser;
 import testUtils.integration_test.templates.endpoints.*;
 
 public interface TransactionEndpointsITTemplate extends
@@ -176,12 +174,17 @@ public interface TransactionEndpointsITTemplate extends
     void upsertByExternalIdAndSource_NonUsaCountryTransactionWithNullZipAndTaxInclusiveAndNewItems_Returns201();
 
     void upsertByExternalIdAndSource_CustomerIsFullyExemptAndUsaTransactionWithoutManualSalesTax_ReturnsTransactionWithoutSalesTax();
+
     void upsertByExternalIdAndSource_CustomerIsFullyExemptAndUsaTransactionWithSomeItemsWithManualSalesTax_ReturnsTransactionWithSalesTax();
+
     void upsertByExternalIdAndSource_CustomerIsFullyExemptAndUsaTransactionWithAllItemsWithManualSalesTax_ReturnsTransactionWithSalesTax();
 
     void upsertByExternalIdAndSource_CustomerIsFullyExemptAndNonUsaTransactionWithoutManualSalesTax_ReturnsTransactionWithoutSalesTax();
+
     void upsertByExternalIdAndSource_CustomerIsFullyExemptAndNonUsaTransactionWithSomeItemsWithManualSalesTax_ReturnsTransactionWithSalesTax();
+
     void upsertByExternalIdAndSource_CustomerIsFullyExemptAndNonUsaTransactionWithAllItemsWithManualSalesTax_ReturnsTransactionWithSalesTax();
+
     // Testing taxableItemsAmount property
     void upsertByExternalIdAndSource_TransactionWithTaxableState_ReturnsTaxableItemsAmountOfItemsPrice();
 

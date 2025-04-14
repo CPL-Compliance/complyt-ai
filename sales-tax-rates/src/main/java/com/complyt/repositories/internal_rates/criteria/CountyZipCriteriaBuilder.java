@@ -25,9 +25,6 @@ public class CountyZipCriteriaBuilder implements CriteriaBuilder {
             criteria.andOperator(zipCriteriaBuilder.build(address.zip()));
         }
 
-        if (address.county() != null) {
-            criteria.and("address.county").regex(Pattern.quote(address.county().toUpperCase()), "i");
-        }
         return criteria;
     }
 }

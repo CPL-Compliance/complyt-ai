@@ -9,15 +9,16 @@ import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.transaction.*;
-import com.complyt.domain.transaction.CityCountyWrapper;
-import com.complyt.domain.transaction.Item;
-import com.complyt.domain.transaction.Transaction;
+import com.complyt.security.TenantResolver;
 import org.javatuples.Pair;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -30,6 +31,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,6 +54,24 @@ public class ComplytSalesTaxRatesTransactionInjectorTest {
     Transaction transaction;
     UnitTestUtilities testUtilities;
     MatchedAddressData matchedAddressData;
+
+     static MockedStatic mockedStatic;
+
+    @BeforeAll
+    static void beforeAll() {
+        try {
+            mockedStatic = mockStatic(TenantResolver.class);
+        } catch (Exception e) {
+            // Log the error or fail the test setup
+            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        mockedStatic.close();
+    }
 
     @BeforeEach
     void setUp() {
@@ -134,6 +154,7 @@ public class ComplytSalesTaxRatesTransactionInjectorTest {
 
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRatesAndCityCounty)).thenReturn(taxables);
         when(transactionCityCountyInjector.inject(matchedAddressData, transactionWithRates)).thenReturn(Mono.just(transactionWithRatesAndCityCounty));
@@ -167,6 +188,7 @@ public class ComplytSalesTaxRatesTransactionInjectorTest {
 
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRatesAndCityCounty)).thenReturn(taxables);
         when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
@@ -201,6 +223,7 @@ public class ComplytSalesTaxRatesTransactionInjectorTest {
 
 
         // When
+        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRatesAndCityCounty)).thenReturn(taxables);
         when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());

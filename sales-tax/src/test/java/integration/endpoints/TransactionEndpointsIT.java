@@ -29,13 +29,12 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
+import testUtils.integration_test.WithMockJwt;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -46,7 +45,6 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 
@@ -77,14 +75,13 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @BeforeEach
     void setup() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
         expectedSt = new SalesTaxDto(null, new BigDecimal("775"), new BigDecimal("0.07750"), salesTaxRatesDto, null);
     }
 
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     /*
      This transaction's customer has an exemption in state PA with validation dates of:
      fromDate: 2025-01-01, toDate: 26-01-01, therefore transaction is sales-tax exempt
@@ -113,7 +110,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NonUsaCountry_ReturnsTaxableTransaction() {
         String externalId = "newNonExistingTransactionID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -139,7 +136,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaShippingAddressWithEurCurrency_ReturnsTransactionWithExchangeRateInfo() {
         String externalId = "newNonExistingTransactionWithEurCurrency";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -170,7 +167,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaShippingAddressWithEuroCurrency_ReturnsTransactionWithExchangeRateInfo() {
         String externalId = "newNonExistingTransactionWithEuroCurrency";
 
@@ -201,7 +198,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaShippingAddressWithEuroCurrencyAndFutureCreatedDate_ReturnsTransactionWithExchangeRateInfo() { // Future createdDate = Future trandate
         String externalId = "newNonExistingFutureTransactionWithEurCurrency";
 
@@ -233,7 +230,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaShippingAddressWithEuroCurrencyAndRefRate_ReturnsTransactionWithExchangeRateInfo() { // refRate is a manually entered rate
         String externalId = "newNonExistingTransactionWithEurCurrencyAndRefRate";
 
@@ -266,7 +263,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaShippingAddressWithUsdCurrency_ReturnsTransactionWithoutExchangeRateInfo() {
         String externalId = "newNonExistingTransactionWithUsdCurrency";
 
@@ -296,7 +293,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaShippingAddressWithUsDollarCurrency_ReturnsTransactionWithoutExchangeRateInfo() {
         String externalId = "newNonExistingTransactionWithUsDollarCurrency";
 
@@ -326,7 +323,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaShippingAddressWithNullCurrency_ReturnsTransactionWithoutExchangeRateInfo() {
         String externalId = "newNonExistingTransactionWithNullCurrency";
 
@@ -356,7 +353,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaShippingAddressWithNullCurrencyAndRefRate_ReturnsTransactionWithoutExchangeRateInfo() {
         String externalId = "newNonExistingTransactionWithNullCurrencyAndRefRate";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -386,7 +383,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NonUsaCountryAndRegion_ReturnsTaxableTransaction() {
         String externalId = "newNonUsaWithShippingExistingTransactionID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDtoNonUsaCountry(externalId, customerId)
@@ -418,7 +415,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaCountryTaxInclusive_Returns200() {
         String externalId = "newNonExistingTransactionID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -454,7 +451,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaShippingWithSpacesInTheAddress_Returns200() { // Same as the test above just changed the state.abbreviation to check the spaces trimming
         String externalId = "newNonExistingTransactionID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -490,7 +487,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaTransactionWithNonExistingTaxCode_Returns400BadRequest() { // Same as the test above just changed the state.abbreviation to check the spaces trimming
         String externalId = "newNonExistingTransactionID";
         TransactionDto transactionDto = ITUtilities.stubTransactionDto(externalId, customerId);
@@ -518,7 +515,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaCountryTaxInclusiveTransactionTypeTaxableRefund_Returns200() {
         String externalId = "newNonExistingTransactionID_TAXABLE_REFUND1";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -557,7 +554,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaCountryTransactionTypeTaxableRefundDidNotPassNexus_Returns200TransactionWithoutSalesTax() {
         String externalId = "newNonExistingTransactionID_TAXABLE_REFUND2";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -586,7 +583,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaCountryTransactionTypeTaxableRefundDidNotPassNexus_Returns200TransactionAmountShouldBeSubtractedFromNexusSummaryAmount() {
         String externalId = "newNonExistingTransactionID_TAXABLE_REFUND3";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -599,6 +596,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto finalGivenTransaction = givenTransaction;
         SalesTaxTrackingDto initialSalesTaxTrackingDto = webTestClient
                 .mutateWith(csrf())
+
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
@@ -636,6 +634,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     // Get Sales Tax Tracking information after taxable refund transaction
                     SalesTaxTrackingDto salesTaxTrackingDtoAfterTaxableRefund = webTestClient
                             .mutateWith(csrf())
+
+
                             .get()
                             .uri(uriBuilder -> uriBuilder
                                     .path(SalesTaxTrackingRouter.BASE_URL)
@@ -669,7 +669,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NewTransaction_PhysicalNexusTrackingTrue_salesTaxTrackingGotUpdated() {
         String state = "Utah";
         String country = "USA";
@@ -684,8 +684,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         // upsertTransaction
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -724,7 +723,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ExistingTransaction_PhysicalNexusTrackingTrue_salesTaxTrackingGotUpdated() {
         String state = "Utah";
         String country = "USA";
@@ -749,8 +748,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectBody(TransactionDto.class);
 
         // Checks salesTaxTracking economicNexus got updated
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", country)
@@ -770,7 +768,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(4)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaShippingAddressPassedNexus_Returns200AddressWithCityCounty() {
         String externalId = "newNonExistingTransactionForCityCounty";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -798,7 +796,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaShippingAddressPassedNexus_Returns201AddressWithCityCounty() {
         String externalId = "newNonExistingTransactionForCityCounty";
 
@@ -827,7 +825,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaShippingAddressDidNotPassedNexus_Returns201AddressWithCityCounty() {
         String externalId = "newNonExistingTransactionID_TAXABLE_REFUND_FOR_CITY";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -858,7 +856,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaShippingAddressDidNotPassedNexus_Returns200AddressWithCityCounty() {
         String externalId = "newNonExistingTransactionID_TAXABLE_REFUND2";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -889,7 +887,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaCountryButSentAsAbbreviation_Returns201() {
         String externalId = "newNonExistingTransactionIDUsaAbbreviation";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -925,7 +923,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaCountryWithPartialAddressWithoutState_Returns201() {
         String externalId = "newNonExistingTransactionWithPartialAddressWithoutState";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -953,7 +951,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaCountryWithPartialAddressAndBlankState_Returns201() {
         String externalId = "newNonExistingTransactionWithPartialAddressAndBlankState";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -981,7 +979,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaCountryTransactionWithTaxInclusive_Returns201() {
         String externalId = "newNonExistingUsaCountryTransactionWithTaxInclusive";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -1014,7 +1012,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaCountryTransactionWithTaxExclusiveAndNewItems_Returns201() {
         String externalId = "newNonExistingUsaCountryTransactionWithTaxExclusiveAndNewItems";
         BigDecimal firstItemAmount = BigDecimal.valueOf(5000);
@@ -1059,7 +1057,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaCountryTransactionWithTaxInclusiveAndNewItems_Returns201() {
         String externalId = "newNonExistingUsaCountryTransactionWithTaxInclusiveAndNewItems";
         BigDecimal firstItemAmount = BigDecimal.valueOf(5000);
@@ -1106,7 +1104,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaCountryTransactionWithTaxInclusiveAndNewItemsAndNoNexus_Returns201() {
         String externalId = "newNonExistingUsaCountryTransactionWithTaxInclusiveAndNewItemsAndNoNexus";
         BigDecimal firstItemAmount = BigDecimal.valueOf(5000);
@@ -1150,7 +1148,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NonUsaCountryTransactionWithTaxInclusiveAndNewItems_Returns201() {
         String externalId = "newNonExistingNonUsaCountryTransactionWithTaxInclusiveAndNewItems";
         BigDecimal firstItemAmount = BigDecimal.valueOf(5000);
@@ -1198,7 +1196,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NonUsaCountryTransactionWithNullZipAndTaxInclusiveAndNewItems_Returns201() {
         String externalId = "newNonExistingNonUsaCountryTransactionWithNullZipAndTaxInclusiveAndNewItems";
         BigDecimal firstItemAmount = BigDecimal.valueOf(5000);
@@ -1245,7 +1243,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NonUsaCountryButSentAsAbbreviationReturnUpperCase_Returns201() {
         String externalId = "newNonExistingTransactionIDNonUsaAbbreviation";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -1277,7 +1275,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NonUsaCountryButSentLowerCaseReturnsUpperCase_Returns201() {
         String externalId = "newNonExistingTransactionIDNonUsaLowercase";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -1310,7 +1308,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NonUsaCountryAndRegionTaxInclusive_ReturnsTaxableTransaction() {
         String externalId = "newNonExistingTransactionIDC";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDtoNonUsaCountry(externalId, customerId)
@@ -1344,7 +1342,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NonUsaCountryNotSupported_Returns400() {
         //Given
         String nullExternalId = "null";
@@ -1367,7 +1365,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaCountryWithNoState_Returns400() {
         //Given
         String externalId = "errorTransaction";
@@ -1390,7 +1388,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UsaCountryWithNoZip_Returns400() {
         //Given
         String externalId = "errorTransaction";
@@ -1413,7 +1411,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NonUsaCountryNotSupportedCountry_Returns400() {
         //Given
         String externalId = "errorTransaction";
@@ -1436,7 +1434,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
+
     /*
      This transaction's customer has an exemption in state PA with validation dates of:
      fromDate: 2025-01-01, toDate: 26-01-01, therefore transaction is NOT sales-tax exempt
@@ -1465,7 +1464,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
+
     /*
      This transaction's customer has an exemption in state FL with Exemption Status - CANCELLED,
      therefore transaction is NOT sales-tax exempt
@@ -1502,7 +1502,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndPartiallyExemption_Exempt() {
         String externalId = "nonExistingTransactionID_A";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -1534,7 +1534,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_CustomerIsPartiallyExempt_NotExempted() {
         String externalId = "nonExistingTransactionID_B";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -1566,7 +1566,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_CustomerIsNotNoExempt_NoExempted() {
         String externalId = "nonExistingTransactionID_C";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -1598,7 +1598,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NotActiveExemptionAndFullyExempt_Exempted() {
         String externalId = "nonExistingTransactionID_D";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -1630,7 +1630,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NotActiveExemption_NoExempted() {
         String externalId = "nonExistingTransactionID_E";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -1655,7 +1655,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntExistsAndCustomerDoesntExists_Returns404() {
         String externalId = "10001";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, UUID.fromString(ITUtilities.NON_EXISTING_COMPLYT_ID))
@@ -1677,7 +1677,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ExistsAndCustomerDoesntExists_Returns404() {
         // Given
         String externalId = "10002";
@@ -1699,7 +1699,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntExistsAndSaleTaxTrackingDoesntExists_Returns400() {
         // Given
         String externalId = "10003";
@@ -1723,7 +1723,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ExistsAndSaleTaxTrackingDoesntExists_Returns400() {
         // Given
         String externalId = "10002";
@@ -1743,8 +1743,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .exchange()
                 .expectStatus().is4xxClientError();
 
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -1759,7 +1758,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_TransactionWithStatusCancelled_Returns204() {
         // Given
         String externalId = "10005"; // new externalID that does not exist
@@ -1768,8 +1767,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -1782,10 +1780,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_Exists_Returns200() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/2")
                         .build())
@@ -1799,10 +1796,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_QueryParamInvalid_Returns400() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/null")
                         .build())
@@ -1814,10 +1810,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_PathVariableInvalid_Returns400() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/1")
                         .queryParam("size", "null")
@@ -1830,10 +1825,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAllBySource_DoesntExists_Returns200EmptyList() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/9")
                         .build())
@@ -1847,10 +1841,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_Exists_Returns200() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL)
                         .build())
@@ -1864,10 +1857,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_QueryParamInvalid_Returns400() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL)
                         .queryParam("page", "null")
@@ -1880,9 +1872,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "different_tenant")
     public void getByAll_DoesntExists_Returns200EmptyList() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
 
         // Then
         webTestClient
@@ -1900,10 +1891,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByAll_QueryParamInvalid_Returns400() {
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL)
                         .queryParam("page", "null")
@@ -1917,15 +1907,14 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_Exists_Returns200() {
         //Given
         String externalId = "10002";
         UUID complytId = UUID.fromString("a6469aaf-e838-41df-8106-6a8927917985"); // complytId of existing transaction
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -1941,15 +1930,14 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_Exists_Returns200CheckingDefaultNullFields() {
         //Given
         String externalId = "transactionToCheckProjectionWithSalesTax";
         UUID complytId = UUID.fromString("607f3926-61d3-40a4-9b3a-a6bf7c3a1d95"); // complytId of existing transaction
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -2029,7 +2017,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_ExistsDetailedTrue_Returns200CheckingProjectedFields() {
         //Given
         String externalId = "transactionToCheckProjectionWithSalesTax";
@@ -2037,8 +2025,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
 
         // Then
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .queryParam("detailed", true)
@@ -2119,12 +2106,13 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_PathVariableInvalid_Returns400() {
         String externalId = "null";
 
         // Then
         webTestClient
+
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -2137,9 +2125,10 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByExternalIdAndSource_DoesntExists_Returns404() {
         webTestClient
+
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/notExisting")
@@ -2152,7 +2141,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_Exists_Returns200() {
         //Given
         String externalId = "10004";
@@ -2176,7 +2165,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
+
     public void upsertByExternalIdAndSource_PathVariableError_Returns400() {
         //Given
         String nullExternalId = "null";
@@ -2199,7 +2189,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntExists_Returns201() {
         //Given
         String externalId = "10004";
@@ -2222,7 +2212,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntExistsWithComplytId_Returns400ConflictedData() {
         // Given
         String externalId = "10005";
@@ -2246,7 +2236,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ConflictingSource_Returns400ConflictedData() {
         // Given
         String externalId = "10005";
@@ -2270,7 +2260,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ConflictingExternalId_Returns400ConflictedData() {
         // Given
         String externalId = "someId";
@@ -2295,7 +2285,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError() {
         // Given
         String externalId = "someId";
@@ -2331,7 +2321,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NoBody_Returns400() {
         // Given
         String externalId = "0";
@@ -2353,7 +2343,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_UnsupportedMediaType_Returns415() {
         // Given
         String externalId = "0";
@@ -2376,7 +2366,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(4)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void deleteByExternalIdAndSource_Exists_Returns204() {
         // Given
         String externalId = "10004";
@@ -2384,6 +2374,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         // Then
         webTestClient
                 .mutateWith(csrf())
+
+
                 .delete()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -2396,7 +2388,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(5)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void get_checkDeletion_Returns200() {
         // Given
         String externalId = "10004";
@@ -2418,10 +2410,12 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void deleteByExternalIdAndSource_DoesntExists_Returns404() {
         webTestClient
                 .mutateWith(csrf())
+
+
                 .delete()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/notExisting")
@@ -2434,7 +2428,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_Exists_Returns200() {
         // Given
         String complytId = "88d951b8-4804-4bef-929a-cfd3670a82fa"; // complytId of existing transaction
@@ -2454,7 +2448,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_PathVariableInvalid_Returns400() {
         // Given
         String complytId = "null";
@@ -2474,7 +2468,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getByComplytId_DoesntExists_Returns404() {
         // Then
         webTestClient
@@ -2492,7 +2486,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_GetByParamSize_ReturnsExpectedSize() {
         int size = 1;
         String expectedComplyId = "6ee574bb-0300-4c74-9e4f-1852f234a028";
@@ -2514,7 +2508,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_GetByParamPage_ReturnsExpectedPage() {
         int page = 2;
         int size = 1;
@@ -2538,7 +2532,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_GetByDefaultsSizeAndPage_ReturnsExpectedEntries() {
         String expectedComplyId = "6ee574bb-0300-4c74-9e4f-1852f234a028";
 
@@ -2558,7 +2552,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Order(0)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAll_SortedByExternalTimestampsCreatedDate_ReturnsSortedEntries() {
         webTestClient
                 .mutateWith(csrf())
@@ -2587,7 +2581,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_OneItemIsNegativeAmount_ReturnsTaxableTransaction() {
         // Given
         String externalId = "NonExistingIdNegativeAmount";
@@ -2615,7 +2609,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_TransactionWithShippingFee_ReturnsTaxableTransactionWithShippingFeeAndItemsCalculatedTotal() {
         //Given
         String externalId = "NonExistingIdTransactionWithShipping";
@@ -2647,7 +2641,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ItemWithManualSalesTax_ReturnsTaxableTransactionWithCalculatedTotal() {
         //Given
         String externalId = "NonExistingIdTransactionWithManualSalesTax";
@@ -2681,7 +2675,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_NoItemHasDiscount_ReturnsTaxableTransactionWithDiscountTotal0() {
         //Given
         String externalId = "NonExistingIdTransactionWithNoDiscount";
@@ -2712,7 +2706,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_OneItemHasDiscount_ReturnsTaxableTransactionWithDiscountTotal() {
         //Given
         String externalId = "NonExistingIdTransactionOneItemHaveDiscount";
@@ -2743,7 +2737,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_TwoItemHaveDiscount_ReturnsTaxableTransactionWithDiscountTotal() {
         //Given
         String externalId = "NonExistingIdTransactionTwoItemsHaveDiscount";
@@ -2775,7 +2769,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_OneItemHasDiscountOneItemIsNegative_ReturnsTaxableTransactionWithDiscount() {
         //Given
         String externalId = "NonExistingIdTransactionOneItemHaveDiscountOneNegative";
@@ -2807,7 +2801,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ItemUnitPriceAndQuantityNullAndTotalNotNull_ReturnsTaxableTransaction() {
         //Given
         String externalId = "NonExistingIdTransactionUnitPriceQuantityNull";
@@ -2838,7 +2832,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ItemUnitPriceAndQuantityNotNullAndTotalNull_ReturnsTaxableTransaction() {
         //Given
         String externalId = "NonExistingIdTransactionItemUnitPriceAndQuantityNotNullAndTotalNull";
@@ -2868,7 +2862,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ItemDiscountIsEqualsToTotal_ReturnsTaxableTransactionWithItemAmount0() {
         //Given
         String externalId = "NonExistingIdTransactionItemDiscountIsEqualsToTotal";
@@ -2901,7 +2895,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ItemDiscountIsEqualsToUnitPriceMultiplyByQuantity_ReturnsTaxableTransactionWithItemAmount0() {
         //Given
         String externalId = "NonExistingIdTransactionItemDiscountIsEqualsToUnitPriceMultiplyByQuantity";
@@ -2936,7 +2930,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ConflictingItemHasNoUnitPriceAndQuantityAndTotal_Returns400ConflictedData() {
         //Given
         String externalId = "NonExistingIdTransactionItemHasNoUnitPriceAndQuantityAndTotal";
@@ -2962,7 +2956,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ConflictingItemHasNegativeTotalAndDiscount_Returns400ConflictedData() {
         //Given
         String externalId = "NonExistingIdTransactionItemHasNegativeTotalAndDiscount";
@@ -2989,7 +2983,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ConflictingItemHasNegativeUnitPriceAndQuantityAndDiscount_Returns400ConflictedData() {
         //Given
         String externalId = "NonExistingIdTransactionItemHasNegativeUnitPriceAndQuantityAndDiscount";
@@ -3017,7 +3011,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(0)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_ConflictingItemHasNegativeDiscount_Returns400ConflictedData() {
         //Given
         String externalId = "NonExistingIdTransactionItemHasNegativeDiscount";
@@ -3045,7 +3039,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_TransactionWithTransactionLevelDiscount_Returns201() {
         // Given
         String externalId = "10006"; // new externalID that does not exist
@@ -3078,7 +3072,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_TransactionWithBothItemAndTransactionDiscount_Returns201() {
         // Given
         String externalId = "10007"; // new externalID that does not exist
@@ -3114,9 +3108,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "sorted_by_date_pagination_tenant")
     public void getAll_PaginationSortedByDateDesc_ReturnsSortedList() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
 
         webTestClient
                 .get()
@@ -3138,9 +3131,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "sorted_by_date_pagination_tenant")
     public void getAll_PaginationSortedByDateAsc_ReturnsSortedList() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("sorted_by_date_pagination_tenant"));
 
         webTestClient
                 .get()
@@ -3163,9 +3155,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "pagination_filtered_by_transaction_type_tenant")
     public void getAll_PaginationFilteredByTransactionType_ReturnsRefunds() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_filtered_by_transaction_type_tenant"));
 
         webTestClient
                 .get()
@@ -3186,9 +3177,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "pagination_filtered_by_transaction_type_tenant")
     public void getAll_PaginationFilteredByTransactionType_ReturnsInvoices() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_filtered_by_transaction_type_tenant"));
 
         webTestClient
                 .get()
@@ -3209,9 +3199,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "pagination_sort_by_transaction_city_tenant")
     public void getAll_PaginationSortedByCityDesc_ReturnsSortedTransactions() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_sort_by_transaction_city_tenant"));
 
         webTestClient
                 .get()
@@ -3235,9 +3224,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "pagination_sort_by_transaction_city_tenant")
     public void getAll_PaginationSortedByCityAsc_ReturnsSortedTransactions() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_sort_by_transaction_city_tenant"));
 
         webTestClient
                 .get()
@@ -3262,9 +3250,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "dump_tenant")
     public void getAll_PaginationFilteredByExternalId_PartialIdSent_ReturnsEmptyList() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
 
         webTestClient
                 .get()
@@ -3281,9 +3268,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "dump_tenant")
     public void getAll_PaginationFilteredByExternalId_fullIdSent_ReturnsTransaction() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
 
         webTestClient
                 .get()
@@ -3300,9 +3286,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "pagination_filter_by_transaction_city_and_type_tenant")
     public void getAll_PaginationFilteredByCityAndTransactionType_ReturnsTransactions() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_filter_by_transaction_city_and_type_tenant"));
         String city = "A-city";
 
         // Making sure that there are 7 transactions when querying without filter
@@ -3338,6 +3323,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     }
 
     @Override
+    @WithMockJwt
     public void getAll_DetailedTrue_Returns200CheckingProjectedFields() {
         //Given
         String externalId = "transactionToCheckProjectionWithSalesTax";
@@ -3346,6 +3332,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient
+
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL)
@@ -3427,7 +3414,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_InvalidSortOrderSent_Throws400() {
         webTestClient
                 .get()
@@ -3447,9 +3434,10 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAll_InvalidPageValuePassed_Throws400() {
         webTestClient
+
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL)
@@ -3467,9 +3455,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "pagination_filtered_by_transaction_type_tenant")
     public void getAll_PartialFilterValuePassed_ReturnsList() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_filtered_by_transaction_type_tenant"));
 
         webTestClient
                 .get()
@@ -3490,9 +3477,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "pagination_filtered_by_transaction_type_tenant")
     public void getAll_BlankFilterValuePassed_ReturnsFullList() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("pagination_filtered_by_transaction_type_tenant"));
 
         webTestClient
                 .get()
@@ -3511,11 +3497,10 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "dump_tenant")
     public void upsert_TransactionIsLinkedRefund_Returns201WithFullSalesTaxOfInvoice() {
         // Given + When
         String invoiceExternalId = "4123658121";
-        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
 
 
         // Then
@@ -3561,7 +3546,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_TransactionIsLinkedRefundAndInvoiceNotFound_Returns201WithSameRefund() {
         // Given + When
         String notFoundInvoiceExternalId = "4123658121-not found";
@@ -3589,7 +3574,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_TransactionIsLinkedRefundWithNullCreatedFrom_Returns201WithSameRefund() {
         // Given + When
         TransactionDto refund = ITUtilities.stubTransactionDto("externalIdOfRefund2", customerId,
@@ -3616,7 +3601,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_IsLinkedRefundFieldIsNull_Returns201WithSameRefund() {
         // Given + When
         TransactionDto refund = ITUtilities.stubTransactionDto("externalIdOfRefund3", customerId,
@@ -3643,11 +3628,10 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "dump_tenant")
     public void upsert_TransactionIsLinkedRefundWithPercentage_Returns201WithHalfSalesTaxOfInvoice() {
         // Given + When
         String invoiceExternalId = "4123658121";
-        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
 
         // Then
         webTestClient
@@ -3695,11 +3679,10 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "dump_tenant")
     public void upsert_TransactionIsLinkedButInvoiceHasSalesTaxNull_Returns201WithNullSalesTax() {
         // Given + When
         String invoiceExternalId = "4123658121222";
-        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
 
         // Then
         webTestClient
@@ -3743,11 +3726,10 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "dump_tenant")
     public void upsert_TransactionIsLinkedRefundWithPercentage_Returns201WithQuarterSalesTaxOfInvoice() {
         // Given + When
         String invoiceExternalId = "4123658121";
-        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
 
         // Then
         webTestClient
@@ -3793,11 +3775,10 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "dump_tenant")
     public void upsert_Transaction_RefundLinkedPercentageHasNegativeValue_Returns400() {
         // Given + When
         String externalId = "externalIdOfRefund3";
-        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
         TransactionDto refund = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withQuantity(null).withUnitPrice(null))
                 .withShippingAddress(ITUtilities.createAddressDtoInKensas())
@@ -3831,11 +3812,10 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt(tenantId = "dump_tenant")
     public void upsert_Transaction_RefundLinkedPercentageHasValueGreaterThan1_Returns400() {
         // Given + When
         String externalId = "externalIdOfRefund4";
-        when(tenantResolver.resolve()).thenReturn(Mono.just("dump_tenant"));
         TransactionDto refund = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withQuantity(null).withUnitPrice(null))
                 .withShippingAddress(ITUtilities.createAddressDtoInKensas())
@@ -3872,7 +3852,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     // Testing taxableItemsAmount property
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_TransactionWithTaxableState_ReturnsTaxableItemsAmountOfItemsPrice() {
         //Given
         String externalId = "externalIdOfTaxabilityTestTransaction";
@@ -3885,6 +3865,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient.mutateWith(csrf())
+
+
                 .put()
                 .uri(uriBuilder -> uriBuilder.path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -3901,7 +3883,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_TransactionWithTaxableCityAndNotTaxableState_ReturnsTaxableItemsAmountOfItemsPrice() {
         //Given
         String externalId = "externalIdOfTaxabilityTestTransaction";
@@ -3914,6 +3896,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient.mutateWith(csrf())
+
+
                 .put()
                 .uri(uriBuilder -> uriBuilder.path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -3928,7 +3912,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_TransactionWithOutTaxableCityAndState_ReturnsTaxableItemsAmountOfZero() {
         //Given
         String externalId = "externalIdOfTaxabilityTestTransaction1";
@@ -3941,6 +3925,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient.mutateWith(csrf())
+
+
                 .put()
                 .uri(uriBuilder -> uriBuilder.path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -3957,7 +3943,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_TransactionWithOutTaxableCityAndStateWithZeroThatDoesNotExist_ReturnsTaxableItemsAmountOfZero() {
         //Given
         String externalId = "externalIdOfTaxabilityTestTransaction2";
@@ -3970,6 +3956,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient.mutateWith(csrf())
+
+
                 .put()
                 .uri(uriBuilder -> uriBuilder.path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -3987,7 +3975,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_GTTransactionWithTaxableCountry_ReturnsTaxableItemsAmountOfItemsPrice() {
         //Given
         String externalId = "externalIdOfTaxabilityTestTransaction4";
@@ -4000,6 +3988,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
         // Then
         webTestClient.mutateWith(csrf())
+
+
                 .put()
                 .uri(uriBuilder -> uriBuilder.path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -4017,7 +4007,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndUsaTransactionWithoutManualSalesTax_ReturnsTransactionWithoutSalesTax() {
         String externalId = "CustomerIsFullyExemptAndUsaTransactionWithoutManualSalesTax_ID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId)
@@ -4042,7 +4032,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndUsaTransactionWithSomeItemsWithManualSalesTax_ReturnsTransactionWithSalesTax() {
         String externalId = "CustomerIsFullyExemptAndUsaTransactionWithSomeItemsWithManualSalesTax_ID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId);
@@ -4084,7 +4074,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndUsaTransactionWithAllItemsWithManualSalesTax_ReturnsTransactionWithSalesTax() {
         String externalId = "CustomerIsFullyExemptAndUsaTransactionWithAllItemsWithManualSalesTax_ID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId);
@@ -4119,7 +4109,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndNonUsaTransactionWithoutManualSalesTax_ReturnsTransactionWithoutSalesTax() {
         String externalId = "CustomerIsFullyExemptAndNonUsaTransactionWithoutManualSalesTax_ID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId)
@@ -4144,7 +4134,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndNonUsaTransactionWithSomeItemsWithManualSalesTax_ReturnsTransactionWithSalesTax() {
         String externalId = "CustomerIsFullyExemptAndNonUsaTransactionWithSomeItemsWithManualSalesTax_ID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId);
@@ -4186,7 +4176,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndNonUsaTransactionWithAllItemsWithManualSalesTax_ReturnsTransactionWithSalesTax() {
         String externalId = "CustomerIsFullyExemptAndNonUsaTransactionWithAllItemsWithManualSalesTax_ID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId);
@@ -4221,7 +4211,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
 //    @Override
-    @WithMockUser
+    @WithMockJwt
     public void upsert_TTestingSalesTaxRateField_Returns201With0Rate() {
         // Given
         String externalId = "10006898"; // new externalID that does not exist

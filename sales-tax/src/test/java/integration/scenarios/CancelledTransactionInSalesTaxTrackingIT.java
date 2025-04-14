@@ -8,11 +8,17 @@ import com.complyt.domain.nexus.TransactionNexusSummary;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.transaction.*;
+import com.complyt.v1.models.transaction.ItemDto;
+import com.complyt.v1.models.transaction.ShippingAddressDto;
+import com.complyt.v1.models.transaction.TransactionDto;
+import com.complyt.v1.models.transaction.TransactionStatusDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +29,13 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.integration_test.ITUtilities;
+import testUtils.integration_test.WithMockJwt;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -38,7 +43,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(SpringExtension.class)
@@ -68,15 +72,11 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
     }
 
-    @BeforeEach
-    void setup() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-    }
 
     // Successfully upserting salesTaxTracking for Arizona
     @Order(0)
     @Test
-    @WithMockUser
+@WithMockJwt
     public void salesTaxTracking_upsertByCountryAndState_UsaCountryDoesntExists_Returns201() {
         // Given
         StateDto stateDto = new StateDto("MI", "26", "Michigan");
@@ -85,8 +85,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
@@ -110,7 +109,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
     // Making sure that the transaction is added to transactionNexusSummaries in the corresponding salesTaxTracking
     @Order(1)
     @Test
-    @WithMockUser
+@WithMockJwt
     public void transaction_upsertByExternalIdAndSource_ActiveUsaTransaction_InSalesTaxTrackingAndReturns201() {
         String externalId = "newNonExistingTransactionIDUsaAbbreviationForThisScenario";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -122,8 +121,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -150,7 +148,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
     // Making sure that the transaction is saved to the DB but not added to transactionNexusSummaries
     @Order(2)
     @Test
-    @WithMockUser
+@WithMockJwt
     public void transaction_upsertByExternalIdAndSource_CancelledUsaTransaction_NotInSalesTaxTrackingAndReturns204() {
         String externalId = "newNonExistingTransactionIDUsaAbbreviationForThisScenario1";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -162,8 +160,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -173,8 +170,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
                 .expectStatus().isNoContent();
 
         webTestClient
-                .mutateWith(csrf())
-                .get()
+                .mutateWith(csrf()).get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -203,7 +199,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
     // then Successfully deletes the transaction and making sure it has been deleted from the transactionNexusSummaries in SalesTaxTracking
     @Order(4)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void transaction_deleteTransaction_ActiveUsaTransaction_NotInSalesTaxTrackingAndReturns204() {
         String externalId = "newNonExistingTransactionIDUsaAbbreviationForThisScenario2";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -213,8 +209,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -234,6 +229,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
 
                     webTestClient
                             .mutateWith(csrf())
+
                             .delete()
                             .uri(uriBuilder -> uriBuilder
                                     .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -257,7 +253,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
     // then Successfully deletes the transaction and making sure it hadn't been deleted from the transactionNexusSummaries in SalesTaxTracking and the nexus is still true
     @Order(5)
     @Test
-    @WithMockUser
+@WithMockJwt
     public void transaction_deleteTransaction_ActiveUsaTransactionPassesNexus_InSalesTaxTrackingAndReturns204() {
         String externalId = "newNonExistingTransactionIDUsaAbbreviationForThisScenario3";
         List<ItemDto> items = List.of(ITUtilities.stubItemDto().withTotalPrice(new BigDecimal("1000000")));
@@ -268,8 +264,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
 
         // Then
         webTestClient
-                .mutateWith(csrf())
-                .put()
+                .mutateWith(csrf()).put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
@@ -293,6 +288,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
 
                     webTestClient
                             .mutateWith(csrf())
+
                             .delete()
                             .uri(uriBuilder -> uriBuilder
                                     .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)

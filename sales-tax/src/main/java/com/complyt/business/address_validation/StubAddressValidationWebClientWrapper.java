@@ -1,7 +1,6 @@
 package com.complyt.business.address_validation;
 
 import com.complyt.annotations.Generated;
-import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
 import com.complyt.v1.models.matched_address.ScoringDto;

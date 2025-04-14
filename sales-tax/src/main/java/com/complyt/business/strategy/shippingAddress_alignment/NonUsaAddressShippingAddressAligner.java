@@ -1,7 +1,6 @@
 package com.complyt.business.strategy.shippingAddress_alignment;
 
 import com.complyt.business.address.CountryToStandardizedCountry;
-import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
 import org.springframework.stereotype.Component;

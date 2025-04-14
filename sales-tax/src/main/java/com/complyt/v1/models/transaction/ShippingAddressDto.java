@@ -2,12 +2,12 @@ package com.complyt.v1.models.transaction;
 
 import com.complyt.domain.transaction.BaseAddress;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
+import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
 import lombok.With;
 
 @With
