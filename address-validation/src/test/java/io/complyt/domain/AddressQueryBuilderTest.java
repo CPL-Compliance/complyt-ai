@@ -90,7 +90,7 @@ class AddressQueryBuilderTest {
             expectedQuery.addCriteria(Criteria.where("requestAddress.county").regex(escapedSearchString, "i"));
         });
 
-        Optional.ofNullable(fullAddressWithCountyAddress.county()).ifPresent(value -> {
+        Optional.ofNullable(fullAddressWithCountyAddress.region()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
             expectedQuery.addCriteria(Criteria.where("requestAddress.region").regex(escapedSearchString, "i"));
         });
