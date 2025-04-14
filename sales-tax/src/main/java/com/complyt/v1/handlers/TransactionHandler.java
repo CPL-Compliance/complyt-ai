@@ -141,8 +141,6 @@ public class TransactionHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(),
                 serverRequest.path());
         String resourceURI = TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId;
-        AtomicReference<String> customerExternalRef = new AtomicReference<>("");
-        AtomicReference<String> customerSource = new AtomicReference<>("");
 
         return ContextLogger.observeCtx(logStr, log::info)
                 .then(transactionDtoValidationHandler.handle(serverRequest)

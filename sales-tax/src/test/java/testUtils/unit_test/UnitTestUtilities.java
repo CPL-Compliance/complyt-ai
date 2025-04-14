@@ -399,7 +399,7 @@ public class UnitTestUtilities {
                 createCustomerDto(customerIdOtherDomains.toString()), null,
                 TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE,
                 shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, null, null, null, null, false, null);
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, null, null, null, null, false, null, null, null);
     }
 
     public List<Item> createItems(boolean withJurisdictionalSalesTaxRules, boolean withJurisdictionalGtTaxRules, boolean withTangibleCategory) {
