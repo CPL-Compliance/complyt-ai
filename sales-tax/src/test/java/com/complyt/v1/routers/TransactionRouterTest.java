@@ -31,7 +31,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -42,7 +41,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -118,7 +116,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         transaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
         source = testUtilities.getUnifiedSource();
 
-        when(transactionFacade.determineCustomerForNewTransaction(any(), any(), any())).thenReturn(Mono.just(customer));
+        when(transactionFacade.determineCustomerForTransaction(any(), any(), any())).thenReturn(Mono.just(customer));
     }
 
     private ShippingAddressDto changeShippingAddressToUsa(ShippingAddressDto shippingAddress) {
@@ -892,7 +890,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         UUID complytId = UUID.randomUUID();
 
         // When + Then
-        when(transactionFacade.determineCustomerForNewTransaction(transactionDtoToSend.customerId(), transactionDtoToSend.customerExternalRef(), transactionDtoToSend.customerSource()))
+        when(transactionFacade.determineCustomerForTransaction(transactionDtoToSend.customerId(), transactionDtoToSend.customerExternalRef(), transactionDtoToSend.customerSource()))
                 .thenReturn(Mono.just(customer));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(sentTransaction)).thenReturn(Mono.just(sentTransaction.withComplytId(complytId)));
@@ -921,7 +919,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
 
         // When + Then
-        when(transactionFacade.determineCustomerForNewTransaction(transactionDto.customerId(), transactionDto.customerExternalRef(), transactionDto.customerSource()))
+        when(transactionFacade.determineCustomerForTransaction(transactionDto.customerId(), transactionDto.customerExternalRef(), transactionDto.customerSource()))
                 .thenReturn(Mono.just(customer));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto).withCustomer(customer))).thenReturn(Mono.just(transaction));
@@ -1325,7 +1323,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(mappedTransaction);
 
         // When + Then
-        when(transactionFacade.determineCustomerForNewTransaction(transactionDto.customerId(), transactionDto.customerExternalRef(), transactionDto.customerSource()))
+        when(transactionFacade.determineCustomerForTransaction(transactionDto.customerId(), transactionDto.customerExternalRef(), transactionDto.customerSource()))
                 .thenReturn(Mono.just(customer));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionFacade.saveTransaction(mappedTransaction)).thenReturn(Mono.empty());
@@ -4390,7 +4388,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
-        when(transactionFacade.determineCustomerForNewTransaction(givenTransactionDto.customerId(), givenTransactionDto.customerExternalRef(), givenTransactionDto.customerSource())).thenReturn(Mono.just(customer));
+        when(transactionFacade.determineCustomerForTransaction(givenTransactionDto.customerId(), givenTransactionDto.customerExternalRef(), givenTransactionDto.customerSource())).thenReturn(Mono.just(customer));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
