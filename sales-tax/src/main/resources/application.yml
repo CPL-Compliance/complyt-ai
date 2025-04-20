@@ -2,10 +2,10 @@ spring.application.name: sales-tax
 server.port: ${PORT:9898}
 
 spring.profiles.active:
-  - development
-  - complytStubTax
-  - complytStubCurrency
-  - vowVatValidationWebClient
+  - @activeEnv@
+  - @activeTaxClient@
+  - @activeCurrencyClient@
+  - @activeVatValidationClient@
 
 # Eureka HealthCheck
 # Make sure that a microservice will not be listed 'UP' in eureka before it passes the healthcheck.
