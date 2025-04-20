@@ -93,7 +93,7 @@ class TokenFacadeTest {
         when(tokenService.findByApiKeyAndDecrypt(any())).thenReturn(Mono.empty());
         when(credentialsService.getCredentialsByApiKeyAndDecrypt(any())).thenReturn(Mono.just(credentials));
         when(authorizationService.getToken(any())).thenReturn(Mono.just(somethingElseToken));
-        when(tokenService.saveToken(any())).thenReturn(Mono.just(somethingElseToken));
+        when(tokenService.saveToken(any(), any())).thenReturn(Mono.just(somethingElseToken));
 
         // Then
         Mono<Token> actualtokenMono = tokenFacade.getToken(apiKey);
@@ -175,7 +175,7 @@ class TokenFacadeTest {
         when(tokenService.findByApiKeyAndTenantIdForPartnerAndDecrypt(apiKey, partnerTenantId)).thenReturn(Mono.empty());
         when(credentialsService.getCredentialsForPartnerByApiKeyAndDecrypt(apiKey)).thenReturn(Mono.just(credentials));
         when(authorizationService.getTokenForPartner(credentials, partnerTenantId)).thenReturn(Mono.just(token));
-        when(tokenService.saveToken(token, partnerTenantId)).thenReturn(Mono.just(token));
+        when(tokenService.saveToken(token, requestedTenantId, partnerTenantId)).thenReturn(Mono.just(token));
 
         // Then
         Mono<Token> actualtokenMono = tokenFacade.getTokenForPartnerByTenantId(requestedTenantId);

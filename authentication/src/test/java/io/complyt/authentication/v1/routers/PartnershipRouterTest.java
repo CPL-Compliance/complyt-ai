@@ -28,8 +28,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import test_utils.unit_tests.TestUtilities;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -65,8 +65,8 @@ class PartnershipRouterTest {
     @WithMockUser
     public void getAllReferrals_Exists_Returns200() {
         // Given
-        List<Referral> referrals = new ArrayList<>();
-        referrals.add(referral);
+        Map<String, Referral> referrals = new HashMap<>();
+        referrals.put(referral.getTenantId(), referral);
         Partnership updatedPartnership = partnership.withSupportedReferrals(referrals);
 
         PartnershipDto partnershipDto = PartnershipMapper.INSTANCE.partnershipToPartnershipDto(updatedPartnership);
@@ -128,8 +128,8 @@ class PartnershipRouterTest {
     @WithMockUser
     public void upsertReferral_newReferral_Returns200() {
         // Given
-        List<Referral> referrals = new ArrayList<>();
-        referrals.add(referral);
+        Map<String, Referral> referrals = new HashMap<>();
+        referrals.put(referral.getTenantId(), referral);
         Partnership updatedPartnership = partnership.withSupportedReferrals(referrals);
 
         PartnershipDto partnershipDto = PartnershipMapper.INSTANCE.partnershipToPartnershipDto(updatedPartnership);
@@ -156,8 +156,8 @@ class PartnershipRouterTest {
     @WithMockUser
     public void upsertReferral_newReferralWithContentTypeJson_Returns200() {
         // Given
-        List<Referral> referrals = new ArrayList<>();
-        referrals.add(referral);
+        Map<String, Referral> referrals = new HashMap<>();
+        referrals.put(referral.getTenantId(), referral);
         Partnership updatedPartnership = partnership.withSupportedReferrals(referrals);
 
         PartnershipDto partnershipDto = PartnershipMapper.INSTANCE.partnershipToPartnershipDto(updatedPartnership);
@@ -185,8 +185,8 @@ class PartnershipRouterTest {
     public void upsertReferral_newReferralWithContentTypeUrlEncoded_Returns401() {
         // Given
         String body = "tenantId=tenantId&name=name&partnershipStatus=ACTIVE";
-        List<Referral> referrals = new ArrayList<>();
-        referrals.add(referral);
+        Map<String, Referral> referrals = new HashMap<>();
+        referrals.put(referral.getTenantId(), referral);
         Partnership updatedPartnership = partnership.withSupportedReferrals(referrals);
 
         // When
@@ -248,8 +248,8 @@ class PartnershipRouterTest {
     @WithMockUser
     public void deleteReferral_newReferral_Returns200() {
         // Given
-        List<Referral> referrals = new ArrayList<>();
-        referrals.add(referral.withPartnershipStatus(PartnershipStatus.CANCELLED));
+        Map<String, Referral> referrals = new HashMap<>();
+        referrals.put(referral.getTenantId(), referral.withPartnershipStatus(PartnershipStatus.CANCELLED));
         Partnership updatedPartnership = partnership.withSupportedReferrals(referrals);
 
         PartnershipDto partnershipDto = PartnershipMapper.INSTANCE.partnershipToPartnershipDto(updatedPartnership);

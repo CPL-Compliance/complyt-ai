@@ -51,12 +51,14 @@ class TokenServiceTest {
     final int tokenExpirationSafeWindowSec = 10;
 
     String partnerTenantId;
+    String requestedTenantId;
 
     @BeforeEach
     void setUp() {
         tokenService = new TokenService(tokenRepository, passwordEncoder, cryptoAesGcmNoPadding,
                 tokenExpirationSafeWindowSec);
         partnerTenantId = TestUtilities.createTenantId();
+        requestedTenantId = TestUtilities.createTenantId();
     }
 
     @Test
@@ -81,7 +83,7 @@ class TokenServiceTest {
         when(tokenRepository.save(any())).thenReturn(Mono.just(encryptedToken));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId);
 
         Token finalEncryptedToken = encryptedToken;
         StepVerifier.create(tokenMono).consumeNextWith(tkn ->
@@ -122,7 +124,7 @@ class TokenServiceTest {
         when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId);
 
         StepVerifier.create(tokenMono).consumeNextWith(tkn ->
                 assertThat(ChronoUnit.SECONDS.between(LocalDateTime.now(), tkn.getExpireAt()) >=
@@ -141,7 +143,7 @@ class TokenServiceTest {
                 .thenThrow(new NoSuchAlgorithmException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -157,7 +159,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenThrow(new BadPaddingException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -174,7 +176,7 @@ class TokenServiceTest {
                 .thenThrow(new IllegalBlockSizeException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -191,7 +193,7 @@ class TokenServiceTest {
                 .thenThrow(new InvalidAlgorithmParameterException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -207,7 +209,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenThrow(new InvalidKeyException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -223,7 +225,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenThrow(new NoSuchPaddingException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -245,7 +247,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new NoSuchAlgorithmException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -267,7 +269,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new BadPaddingException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -289,7 +291,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new IllegalBlockSizeException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -312,7 +314,7 @@ class TokenServiceTest {
                 .thenThrow(new InvalidAlgorithmParameterException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -334,7 +336,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new InvalidKeyException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -356,7 +358,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new NoSuchPaddingException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -383,7 +385,7 @@ class TokenServiceTest {
         when(tokenRepository.save(any())).thenReturn(Mono.just(encryptedToken));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId, partnerTenantId);
 
         Token finalEncryptedToken = encryptedToken;
         StepVerifier.create(tokenMono).consumeNextWith(tkn ->
@@ -420,7 +422,7 @@ class TokenServiceTest {
         when(tokenRepository.save(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId, partnerTenantId);
 
         StepVerifier.create(tokenMono).consumeNextWith(tkn ->
                 assertThat(ChronoUnit.SECONDS.between(LocalDateTime.now(), tkn.getExpireAt()) >=
@@ -439,7 +441,7 @@ class TokenServiceTest {
                 .thenThrow(new NoSuchAlgorithmException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId, partnerTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -455,7 +457,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenThrow(new BadPaddingException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId, partnerTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -472,7 +474,7 @@ class TokenServiceTest {
                 .thenThrow(new IllegalBlockSizeException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId, partnerTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -489,7 +491,7 @@ class TokenServiceTest {
                 .thenThrow(new InvalidAlgorithmParameterException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId, partnerTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -505,7 +507,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenThrow(new InvalidKeyException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId, partnerTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -521,7 +523,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.encrypt(token.getAccessToken())).thenThrow(new NoSuchPaddingException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId, partnerTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -543,7 +545,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new NoSuchAlgorithmException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId, partnerTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -565,7 +567,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new BadPaddingException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId, partnerTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -587,7 +589,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new IllegalBlockSizeException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId, partnerTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -610,7 +612,7 @@ class TokenServiceTest {
                 .thenThrow(new InvalidAlgorithmParameterException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId, partnerTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -632,7 +634,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new InvalidKeyException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId, partnerTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -654,7 +656,7 @@ class TokenServiceTest {
         when(cryptoAesGcmNoPadding.decrypt(scopeEncryptedData)).thenThrow(new NoSuchPaddingException("Error"));
 
         // Then
-        Mono<Token> tokenMono = tokenService.saveToken(token, partnerTenantId);
+        Mono<Token> tokenMono = tokenService.saveToken(token, requestedTenantId, partnerTenantId);
 
         StepVerifier.create(tokenMono).expectError(RuntimeException.class).verify();
     }
@@ -855,7 +857,7 @@ class TokenServiceTest {
     @Test
     void saveToken_tokenIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            tokenService.saveToken(null);
+            tokenService.saveToken(null, requestedTenantId);
         });
 
         assertEquals(nullPointerException.getMessage(), "token is marked non-null but is null");
@@ -864,7 +866,7 @@ class TokenServiceTest {
     @Test
     void saveToken_forPartnership_tokenIsNull_throwsNullException() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            tokenService.saveToken(null, "tenantId");
+            tokenService.saveToken(null, requestedTenantId, partnerTenantId);
         });
 
         assertEquals(nullPointerException.getMessage(), "token is marked non-null but is null");

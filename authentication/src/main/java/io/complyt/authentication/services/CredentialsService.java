@@ -148,7 +148,7 @@ public class CredentialsService {
                                                           String clientSecret) {
         return Credentials.builder().clientId(clientId).clientSecret(clientSecret).audience(credentials.getAudience())
                 .grantType(credentials.getGrantType()).status(credentials.getStatus()).complytClientId(credentials.getComplytClientId())
-                .complytClientSecret(credentials.getComplytClientSecret()).build();
+                .complytClientSecret(credentials.getComplytClientSecret()).tenantId(credentials.getTenantId()).build();
     }
 
     private Credentials createEncryptedCredentials(ApiKey apiKey, EncryptedData clientIdEncryptedData,

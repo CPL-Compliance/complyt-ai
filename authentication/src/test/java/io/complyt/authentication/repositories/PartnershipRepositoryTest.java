@@ -22,8 +22,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import test_utils.unit_tests.TestUtilities;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -42,14 +42,12 @@ class PartnershipRepositoryTest {
     TenantResolver tenantResolver;
 
     String partnerTenantId;
-    String referralTenant;
     Referral referral;
     Partnership partnership;
 
     @BeforeEach
     void setup() {
         partnerTenantId = "partnerTenantId";
-        referralTenant = "referralTenant";
         referral = TestUtilities.createReferral();
         partnership = TestUtilities.createPartnership();
     }
@@ -116,8 +114,8 @@ class PartnershipRepositoryTest {
     void saveReferral_validReferral_returnPartnershipDocument() {
         // Given
         Query query = Query.query(Criteria.where("tenantId").is(partnerTenantId));
-        Update update = new Update().push("supportedReferrals", referral);
-
+        String dynamicMapKey = "supportedReferrals." + referral.getTenantId();
+        Update update = new Update().set(dynamicMapKey, referral);
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(partnerTenantId));
         when(reactiveMongoTemplate.findAndModify(eq(query), eq(update), any(FindAndModifyOptions.class), eq(Partnership.class)))
@@ -135,18 +133,15 @@ class PartnershipRepositoryTest {
     void updateReferral_ValidReferral_ReturnsUpdatedPartnership() {
         // Given
         Query expectedQuery = Query.query(Criteria.where("tenantId").is(partnerTenantId)
-                .and("supportedReferrals").elemMatch(
-                        Criteria.where("tenantId").is(referral.getTenantId())
-                                .and("partnershipStatus").is(PartnershipStatus.ACTIVE)
-                ));
+                .and("supportedReferrals." + referral.getTenantId() + ".partnershipStatus").is(PartnershipStatus.ACTIVE));
 
         Update expectedUpdate = new Update()
-                .set("supportedReferrals.$.name", referral.getName())
-                .set("supportedReferrals.$.partnershipStatus", referral.getPartnershipStatus())
-                .set("supportedReferrals.$.timestamps", referral.getTimestamps());
+                .set("supportedReferrals." + referral.getTenantId() + ".name", referral.getName())
+                .set("supportedReferrals." + referral.getTenantId() + ".partnershipStatus", referral.getPartnershipStatus())
+                .set("supportedReferrals." + referral.getTenantId() + ".timestamps", referral.getTimestamps());
 
-        List<Referral> referrals = new ArrayList<>();
-        referrals.add(referral);
+        Map<String, Referral> referrals = new HashMap<>();
+        referrals.put(referral.getTenantId(), referral);
         Partnership expectedPartnership = partnership.withSupportedReferrals(referrals);
 
         // When
@@ -166,15 +161,12 @@ class PartnershipRepositoryTest {
     void updateReferral_NoMatchingReferral_ThrowsObjectNotFoundException() {
         // Given
         Query expectedQuery = Query.query(Criteria.where("tenantId").is(partnerTenantId)
-                .and("supportedReferrals").elemMatch(
-                        Criteria.where("tenantId").is(referral.getTenantId())
-                                .and("partnershipStatus").is(PartnershipStatus.ACTIVE)
-                ));
+                .and("supportedReferrals." + referral.getTenantId() + ".partnershipStatus").is(PartnershipStatus.ACTIVE));
 
         Update expectedUpdate = new Update()
-                .set("supportedReferrals.$.name", referral.getName())
-                .set("supportedReferrals.$.partnershipStatus", referral.getPartnershipStatus())
-                .set("supportedReferrals.$.timestamps", referral.getTimestamps());
+                .set("supportedReferrals." + referral.getTenantId() + ".name", referral.getName())
+                .set("supportedReferrals." + referral.getTenantId() + ".partnershipStatus", referral.getPartnershipStatus())
+                .set("supportedReferrals." + referral.getTenantId() + ".timestamps", referral.getTimestamps());
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(partnerTenantId));
@@ -211,7 +203,7 @@ class PartnershipRepositoryTest {
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "tenantId is marked non-null but is null");
+        assertEquals("tenantId is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
@@ -222,7 +214,7 @@ class PartnershipRepositoryTest {
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "referral is marked non-null but is null");
+        assertEquals("referral is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
@@ -233,6 +225,6 @@ class PartnershipRepositoryTest {
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "referral is marked non-null but is null");
+        assertEquals("referral is marked non-null but is null", nullPointerException.getMessage());
     }
 }
