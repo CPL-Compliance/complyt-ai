@@ -29,6 +29,6 @@ public class EconomicNexusTracker {
 
     public static EconomicNexusTracker build() {
         return new EconomicNexusTracker(DEFAULT_ESTABLISHED,
-                LocalDateTime.of(DEFAULT_YEAR_ESTABLISHED_DATE, DEFAULT_MONTH_ESTABLISHED_DATE, DEFAULT_DAY_ESTABLISHED_DATE,0,0,0));
+                LocalDateTime.of(DEFAULT_YEAR_ESTABLISHED_DATE, DEFAULT_MONTH_ESTABLISHED_DATE, DEFAULT_DAY_ESTABLISHED_DATE, 0, 0, 0));
     }
 }

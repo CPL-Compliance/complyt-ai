@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class WebClientWrapperPropertiesConfig {
+
     @Profile({"vowVatValidation"})
     @Bean("vowVatValidationWebClientWrapperProperties")
     public WebClientWrapperProperties vowVatValidationWebClientWrapperProperties() {
@@ -22,4 +23,18 @@ public class WebClientWrapperPropertiesConfig {
     public WebClientWrapperProperties stubVatValidationWebClientWrapperProperties() {
         return WebClientWrapperProperties.WebClientWrapperPropertiesStub();
     }
+
+    @Bean("webhookWebClientWrapperProperties")
+    public WebClientWrapperProperties webhookWebClientWrapperProperties() {
+        return WebClientWrapperProperties
+                .builder()
+                .scheme("https")
+                .host("")
+                .path("")
+                .build();
+
+        // host = vat-archives.dev.vatcompliance.com
+        // path = webhook_debug_endpoint%27
+    }
+
 }

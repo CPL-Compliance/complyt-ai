@@ -20,7 +20,7 @@ public class WebClientsConfig {
     public WebClient complytCurrencyEngineWebClient(WebClient.Builder webClientBuilder, @Value("${currency-conversion-service-url}") String currencyConversionServiceUrl) {
         return webClientBuilder.clientConnector(
                         new ReactorClientHttpConnector(
-                                 HttpClient.create()
+                                HttpClient.create()
                                         .wiretap("reactor.netty.client.HttpClient",
                                                 LogLevel.DEBUG,
                                                 AdvancedByteBufFormat.TEXTUAL)))
@@ -31,6 +31,18 @@ public class WebClientsConfig {
     @Profile({"vowVatValidation", "default"})
     @Bean(name = "vowVatValidationWebClient")
     public WebClient vowVatValidationWebClient(WebClient.Builder webClientBuilder) {
+        return webClientBuilder.clientConnector(
+                        new ReactorClientHttpConnector(
+                                HttpClient.create()
+                                        .wiretap("reactor.netty.client.HttpClient",
+                                                LogLevel.DEBUG,
+                                                AdvancedByteBufFormat.TEXTUAL)))
+                .build();
+    }
+
+    @Profile({"webhookWebClient", "default"})
+    @Bean(name = "webhookWebClient")
+    public WebClient webhookWebClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder.clientConnector(
                         new ReactorClientHttpConnector(
                                 HttpClient.create()
