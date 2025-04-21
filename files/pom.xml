@@ -13,7 +13,6 @@
         <tag>files-0.30.0</tag>
     </scm>
     <!-- Maven Coordinates -->
-    
     <artifactId>files</artifactId>
     <version>0.50.0-SNAPSHOT</version>
     <!-- Maven Coordinates -->
