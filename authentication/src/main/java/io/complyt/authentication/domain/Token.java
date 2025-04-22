@@ -43,7 +43,9 @@ public class Token {
 
     LocalDateTime expireAt;
 
-    String tenantId;
+    String partnerTenantId;
+
+    String clientTenantId;
 
     TokenSource tokenSource;
 }

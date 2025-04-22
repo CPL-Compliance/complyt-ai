@@ -27,8 +27,8 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
                 .expectBody()
                 .jsonPath("$.tenantId").isEqualTo("it_tenant")
                 .jsonPath("$.partnerName").isEqualTo("partner name #1")
-                .jsonPath("$.supportedReferrals.length()").isEqualTo(7)
-                .jsonPath("$.supportedReferrals[?(@.tenantId == 'org_Wf01rJjWqDZ9vCaO')]").exists();
+                .jsonPath("$.supportedReferrals.length()").isEqualTo(5)
+                .jsonPath("$.supportedReferrals.*[?(@.tenantId == 'org_Wf01rJjWqDZ9vCaO')]").exists();
     }
 
     @Order(1)
@@ -81,9 +81,9 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
                 .expectBody()
                 .jsonPath("$.tenantId").isEqualTo("it_tenant")
                 .jsonPath("$.partnerName").isEqualTo("partner name #1")
-                .jsonPath("$.supportedReferrals.length()").isEqualTo(8)
-                .jsonPath("$.supportedReferrals[?(@.tenantId == 'sysTest referral tenantId #1' && @.partnershipStatus == 'ACTIVE')]").exists()
-                .jsonPath("$.supportedReferrals[?(@.tenantId == 'sysTest referral tenantId #1' && @.partnershipStatus == 'CANCELLED')]").doesNotExist();
+                .jsonPath("$.supportedReferrals.length()").isEqualTo(6)
+                .jsonPath("$.supportedReferrals.*[?(@.tenantId == 'sysTest referral tenantId #1' && @.partnershipStatus == 'ACTIVE')]").exists()
+                .jsonPath("$.supportedReferrals.*[?(@.tenantId == 'sysTest referral tenantId #1' && @.partnershipStatus == 'CANCELLED')]").doesNotExist();
     }
 
     @Order(2)
@@ -104,8 +104,8 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
                 .expectBody()
                 .jsonPath("$.tenantId").isEqualTo("it_tenant")
                 .jsonPath("$.partnerName").isEqualTo("partner name #1")
-                .jsonPath("$.supportedReferrals.length()").isEqualTo(9)
-                .jsonPath("$.supportedReferrals[?(@.tenantId == 'sysTest referral tenantId #2')]").exists();
+                .jsonPath("$.supportedReferrals.length()").isEqualTo(7)
+                .jsonPath("$.supportedReferrals.*[?(@.tenantId == 'sysTest referral tenantId #2')]").exists();
     }
 
     @Order(2)
@@ -159,9 +159,9 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
                 .expectBody()
                 .jsonPath("$.tenantId").isEqualTo("it_tenant")
                 .jsonPath("$.partnerName").isEqualTo("partner name #1")
-                .jsonPath("$.supportedReferrals.length()").isEqualTo(9)
-                .jsonPath("$.supportedReferrals[?(@.tenantId == 'sysTest referral tenantId #1' && @.partnershipStatus == 'CANCELLED')]").exists()
-                .jsonPath("$.supportedReferrals[?(@.tenantId == 'sysTest referral tenantId #1' && @.partnershipStatus == 'ACTIVE')]").doesNotExist();
+                .jsonPath("$.supportedReferrals.length()").isEqualTo(7)
+                .jsonPath("$.supportedReferrals.*[?(@.tenantId == 'sysTest referral tenantId #1' && @.partnershipStatus == 'CANCELLED')]").exists()
+                .jsonPath("$.supportedReferrals.*[?(@.tenantId == 'sysTest referral tenantId #1' && @.partnershipStatus == 'ACTIVE')]").doesNotExist();
     }
 
     @Order(5)

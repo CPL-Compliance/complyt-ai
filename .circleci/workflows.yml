@@ -263,6 +263,12 @@ jobs:
           container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
           family: "<<parameters.service_name>>-sandbox-1"
           service_name: "<<parameters.service_name>>"
+      ## Deploy to assessment cluster
+      - aws-ecs/update_service:
+          cluster: "assessment"
+          container_image_name_updates: "container=<<parameters.service_name>>, tag=latest"
+          family: "<<parameters.service_name>>-assessment"
+          service_name: "<<parameters.service_name>>"
 
 workflows:
   sales-tax-workflow:
