@@ -22,4 +22,8 @@ public class ClientTracking implements InternalTimestampsProperty {
     private final String name;
     private final Timestamps internalTimestamps;
     private final List<String> subsidiaries;
+    private final Boolean shouldForwardWriteOperations;
+    private final String host;
+    private final String path;
+
 }

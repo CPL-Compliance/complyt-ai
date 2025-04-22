@@ -7,6 +7,7 @@ import com.complyt.business.strategy.currencyExchange.CurrenciesWebClientWrapper
 import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.business.transaction.*;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
+import com.complyt.business.web_hook.WebhookHandler;
 import com.complyt.domain.currency.CurrencyExchangeRateObject;
 import com.complyt.domain.currency.CurrencySource;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
@@ -83,9 +84,13 @@ public class TransactionServiceImpl implements TransactionService {
     @NonNull
     private InternalTimestampsInjector<Transaction> internalTimestampsInjector;
 
+    @NonNull
+    private WebhookHandler<Transaction> webhookHandler;
+
     @Override
     public Mono<Transaction> save(Transaction transaction) {
-        return transactionRepository.save(transaction);
+        return transactionRepository.save(transaction)
+                .flatMap(t -> webhookHandler.handleWebhook(Transaction.class, transaction));
     }
 
     @Override
@@ -112,7 +117,8 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findByExternalIdAndSource(externalId, source)
                 .switchIfEmpty(Mono.error(new NotFoundException("No Transaction with externalId: " + externalId + ", in source: " + source)))
                 .map(createFunctionUpdateTransaction(transaction))
-                .flatMap(transactionRepository::save);
+                .flatMap(transactionRepository::save)
+                .flatMap(updatedTransaction -> webhookHandler.handleWebhook(Transaction.class, updatedTransaction));
     }
 
     @Override
@@ -190,10 +196,11 @@ public class TransactionServiceImpl implements TransactionService {
     public Mono<Transaction> markAsCancelled(@NonNull String externalId, @NonNull String source) {
         return transactionRepository
                 .findByExternalIdAndSource(externalId, source)
-                .map(transaction -> transaction
+                .map(transaction -> (Transaction) transaction
                         .setTransactionStatus(TransactionStatus.CANCELLED)
                         .setCustomer(null))
-                .flatMap(transactionRepository::save);
+                .flatMap(transactionRepository::save)
+                .flatMap(updatedTransaction -> webhookHandler.handleWebhook(Transaction.class, updatedTransaction));
     }
 
     @Override

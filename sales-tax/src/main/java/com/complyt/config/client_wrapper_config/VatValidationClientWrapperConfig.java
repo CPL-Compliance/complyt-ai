@@ -1,6 +1,6 @@
 package com.complyt.config.client_wrapper_config;
 
-//import com.complyt.business.vat_validation.web_clients.StubVatValidationWebClientWrapper;
+import com.complyt.business.vat_validation.web_clients.StubVatValidationWebClientWrapper;
 import com.complyt.business.vat_validation.web_clients.VatValidationWebClientWrapper;
 import com.complyt.business.vat_validation.web_clients.VowVatValidationWebClientWrapper;
 import com.complyt.config.WebClientWrapperProperties;
@@ -24,9 +24,9 @@ public class VatValidationClientWrapperConfig {
         );
     }
 
-//    @Profile({"stubVatValidation", "default"})
-//    @Bean("vatValidationWebClientWrapper")
-//    public StubVatValidationWebClientWrapper stubVatValidationWebClientWrapper(WebClientWrapperProperties vowVatValidationWebClientWrapperProperties) {
-//        return new StubVatValidationWebClientWrapper(null, "", "", "");
-//    }
+    @Profile({"stubVatValidation", "default"})
+    @Bean("vatValidationWebClientWrapper")
+    public StubVatValidationWebClientWrapper stubVatValidationWebClientWrapper(WebClientWrapperProperties vowVatValidationWebClientWrapperProperties) {
+        return new StubVatValidationWebClientWrapper(null, "", "", "");
+    }
 }

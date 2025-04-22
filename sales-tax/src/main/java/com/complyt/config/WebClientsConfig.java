@@ -40,7 +40,6 @@ public class WebClientsConfig {
                 .build();
     }
 
-    @Profile({"webhookWebClient", "default"})
     @Bean(name = "webhookWebClient")
     public WebClient webhookWebClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder.clientConnector(
