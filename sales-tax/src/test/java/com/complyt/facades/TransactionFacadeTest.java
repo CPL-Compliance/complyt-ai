@@ -1,6 +1,7 @@
 package com.complyt.facades;
 
 import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.CustomerLookupDetail;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.PhysicalNexusTracker;
@@ -15,6 +16,7 @@ import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.security.TenantResolver;
+import com.complyt.services.CustomerDeterminationService;
 import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
@@ -28,7 +30,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
@@ -43,11 +44,9 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class})
 public class TransactionFacadeTest {
 
     @InjectMocks
@@ -58,6 +57,9 @@ public class TransactionFacadeTest {
 
     @Mock
     CustomerService customerService;
+
+    @Mock
+    CustomerDeterminationService customerDeterminationService;
 
     @Mock
     SalesTaxService salesTaxService;
@@ -75,7 +77,7 @@ public class TransactionFacadeTest {
 
     String source;
 
-    static MockedStatic mockedStatic;
+    static MockedStatic<TenantResolver> mockedStatic;
 
     @BeforeAll
     static void beforeAll() {
@@ -96,8 +98,6 @@ public class TransactionFacadeTest {
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        MockitoAnnotations.openMocks(this);
-
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         customer = testUtilities.createCustomer(UUID.randomUUID().toString());
         transactionNoId = testUtilities.createTransaction(null).withComplytId(null).withExternalId(transaction.getExternalId());
@@ -1003,4 +1003,12 @@ public class TransactionFacadeTest {
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
     }
 
+    @Test
+    void whenDeterminingCustomerForTransaction_AndCustomerIdAndCustomerExternalRefAndSourceArePresent_shouldUseCustomerId() {
+
+        when(customerDeterminationService.determineCustomerForTransaction(any())).thenReturn(Mono.just(customer));
+        CustomerLookupDetail customerLookupDetails = new CustomerLookupDetail(UUID.randomUUID(), "externalReference", "customerSource");
+        Mono<Customer> customerMono = transactionFacade.determineCustomerForTransaction(customerLookupDetails);
+        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
+    }
 }

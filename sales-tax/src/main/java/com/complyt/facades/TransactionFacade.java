@@ -5,12 +5,12 @@ import com.complyt.domain.customer.CustomerLookupDetail;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.services.CustomerDeterminationService;
 import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
 import com.complyt.services.nexus.NexusService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
-import com.complyt.utils.StringChecker;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.CustomerNotFoundApiException;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
@@ -45,6 +45,9 @@ public class TransactionFacade {
     @NonNull
     @Qualifier("salesTaxTrackingServiceImpl")
     private SalesTaxTrackingService salesTaxTrackingService;
+
+    @NonNull
+    private final CustomerDeterminationService customerDeterminationService;
 
     @NonNull
     private NexusService nexusService;
@@ -209,15 +212,6 @@ public class TransactionFacade {
 
 
     public Mono<Customer> determineCustomerForTransaction(final CustomerLookupDetail customerLookupDetail){
-        Mono<Customer> customerMono = Mono.empty();
-        final String externalReference = customerLookupDetail.customerExternalReference();
-        final String source = customerLookupDetail.customerSource();
-        final UUID customerId = customerLookupDetail.customerId();
-        if (customerId != null){
-            customerMono = customerService.findByComplytId(customerId);
-        } else if (StringChecker.isInputValid(customerLookupDetail.customerExternalReference(), customerLookupDetail.customerExternalReference())) {
-            customerMono = customerService.findByExternalIdAndSource(externalReference, source);
-        }
-        return customerMono.switchIfEmpty(Mono.error(CustomerNotFoundApiException::new));
+        return customerDeterminationService.determineCustomerForTransaction(customerLookupDetail);
     }
 }
