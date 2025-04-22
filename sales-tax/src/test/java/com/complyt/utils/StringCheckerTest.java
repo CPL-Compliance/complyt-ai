@@ -6,6 +6,11 @@ import org.junit.jupiter.api.Test;
 class StringCheckerTest {
 
     @Test
+    void testStringCheckerConstructor() {
+        StringChecker stringChecker = new StringChecker();
+    }
+
+    @Test
     void givenValidInputs_ShouldReturnTrue() {
         boolean result = StringChecker.isInputValid("inputs","anotherInput");
         Assertions.assertTrue(result);

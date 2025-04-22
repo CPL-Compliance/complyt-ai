@@ -167,30 +167,6 @@ public class TransactionHandler {
                                                         .flatMap(savedTransaction -> ServerResponse.created(URI.create(resourceURI)).contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class)))
                                                 .switchIfEmpty(ServerResponse.noContent().build()
                                                         .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse))))));
-//        return ContextLogger.observeCtx(logStr, log::info)
-//                .then(transactionDtoValidationHandler.handle(serverRequest)
-//                        .flatMap(transactionDto -> ContextLogger.observeCtx("--> Body: " + transactionDto, log::info)
-//                                .thenReturn(transactionDto))
-//                        .flatMap(transactionDto ->
-//                                transactionFacade.determineCustomerForNewTransaction(transactionDto.customerId(),
-//                                                transactionDto.customerExternalRef(), transactionDto.customerSource())
-//                                        .map(customer -> TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto).setCustomer(customer)
-//                                        )
-//                                        .flatMap(receivedTransaction ->
-//                                                //todo die is heeltemal fine want die kry die ORIGINAL transaction
-//                                                transactionFacade.findByExternalIdAndSource(externalId, source)
-//                                                        .flatMap(originalTransaction -> transactionFacade.update(externalId, source, receivedTransaction, originalTransaction)
-//                                                                .flatMap(savedTransaction -> ContextLogger.observeCtx("<-- Returned Body: " + savedTransaction, log::info)
-//                                                                        .thenReturn(savedTransaction))
-//                                                                .flatMap(savedTransaction -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-//                                                                        .body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class))
-//                                                                .switchIfEmpty(ServerResponse.noContent().build()
-//                                                                        .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse))))
-//                                                        .switchIfEmpty(Mono.defer(() -> transactionFacade.saveTransaction(receivedTransaction)
-//                                                                        .flatMap(savedTransaction -> ContextLogger.observeCtx("<-- Returned Body: " + savedTransaction, log::info).thenReturn(savedTransaction))
-//                                                                        .flatMap(savedTransaction -> ServerResponse.created(URI.create(resourceURI)).contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class)))
-//                                                                .switchIfEmpty(ServerResponse.noContent().build()
-//                                                                        .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse)))))));
     }
 
     @TransactionDeletePermission
