@@ -1,6 +1,7 @@
 package com.complyt.v1.handlers;
 
 import com.complyt.business.pagination.PaginationConstants;
+import com.complyt.domain.customer.CustomerLookupDetail;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.security.permissions.transaction.TransactionCreatePermission;
 import com.complyt.security.permissions.transaction.TransactionDeletePermission;
@@ -147,10 +148,10 @@ public class TransactionHandler {
                         .flatMap(transactionDto -> ContextLogger.observeCtx("--> Body: " + transactionDto, log::info)
                                 .thenReturn(transactionDto))
                         .flatMap(transactionDto -> transactionFacade
-                                .determineCustomerForTransaction(
+                                .determineCustomerForTransaction( new CustomerLookupDetail(
                                         transactionDto.customerId(),
                                         transactionDto.customerExternalRef(),
-                                        transactionDto.customerSource()
+                                        transactionDto.customerSource())
                                 )
                                 .map(customer -> TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto).setCustomer(customer)))
                         .flatMap(receivedTransaction ->

@@ -2,6 +2,7 @@ package com.complyt.v1.routers;
 
 import com.complyt.domain.customer.Customer;
 import com.complyt.business.pagination.PaginationConstants;
+import com.complyt.domain.customer.CustomerLookupDetail;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
@@ -116,7 +117,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         transaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
         source = testUtilities.getUnifiedSource();
 
-        when(transactionFacade.determineCustomerForTransaction(any(), any(), any())).thenReturn(Mono.just(customer));
+        when(transactionFacade.determineCustomerForTransaction(any())).thenReturn(Mono.just(customer));
     }
 
     private ShippingAddressDto changeShippingAddressToUsa(ShippingAddressDto shippingAddress) {
@@ -890,7 +891,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         UUID complytId = UUID.randomUUID();
 
         // When + Then
-        when(transactionFacade.determineCustomerForTransaction(transactionDtoToSend.customerId(), transactionDtoToSend.customerExternalRef(), transactionDtoToSend.customerSource()))
+        when(transactionFacade.determineCustomerForTransaction(new CustomerLookupDetail(transactionDtoToSend.customerId(), transactionDtoToSend.customerExternalRef(), transactionDtoToSend.customerSource())))
                 .thenReturn(Mono.just(customer));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(sentTransaction)).thenReturn(Mono.just(sentTransaction.withComplytId(complytId)));
@@ -919,7 +920,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
 
         // When + Then
-        when(transactionFacade.determineCustomerForTransaction(transactionDto.customerId(), transactionDto.customerExternalRef(), transactionDto.customerSource()))
+        when(transactionFacade.determineCustomerForTransaction(new CustomerLookupDetail(transactionDto.customerId(), transactionDto.customerExternalRef(), transactionDto.customerSource())))
                 .thenReturn(Mono.just(customer));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto).withCustomer(customer))).thenReturn(Mono.just(transaction));
@@ -1323,7 +1324,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(mappedTransaction);
 
         // When + Then
-        when(transactionFacade.determineCustomerForTransaction(transactionDto.customerId(), transactionDto.customerExternalRef(), transactionDto.customerSource()))
+        when(transactionFacade.determineCustomerForTransaction(new CustomerLookupDetail(transactionDto.customerId(), transactionDto.customerExternalRef(), transactionDto.customerSource())))
                 .thenReturn(Mono.just(customer));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionFacade.saveTransaction(mappedTransaction)).thenReturn(Mono.empty());
@@ -4388,7 +4389,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
-        when(transactionFacade.determineCustomerForTransaction(givenTransactionDto.customerId(), givenTransactionDto.customerExternalRef(), givenTransactionDto.customerSource())).thenReturn(Mono.just(customer));
+        when(transactionFacade.determineCustomerForTransaction(new CustomerLookupDetail(givenTransactionDto.customerId(), givenTransactionDto.customerExternalRef(), givenTransactionDto.customerSource()))).thenReturn(Mono.just(customer));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));

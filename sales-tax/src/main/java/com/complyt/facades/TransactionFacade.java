@@ -1,6 +1,7 @@
 package com.complyt.facades;
 
 import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.CustomerLookupDetail;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.transaction.Transaction;
@@ -207,13 +208,14 @@ public class TransactionFacade {
     }
 
 
-    public Mono<Customer> determineCustomerForTransaction(final UUID complytId,
-                                                          final String externalReference,
-                                                          final String source){
+    public Mono<Customer> determineCustomerForTransaction(final CustomerLookupDetail customerLookupDetail){
         Mono<Customer> customerMono = Mono.empty();
-        if (complytId != null){
-            customerMono = customerService.findByComplytId(complytId);
-        } else if (StringChecker.isInputValid(externalReference, source)) {
+        final String externalReference = customerLookupDetail.customerExternalReference();
+        final String source = customerLookupDetail.customerSource();
+        final UUID customerId = customerLookupDetail.customerId();
+        if (customerId != null){
+            customerMono = customerService.findByComplytId(customerId);
+        } else if (StringChecker.isInputValid(customerLookupDetail.customerExternalReference(), customerLookupDetail.customerExternalReference())) {
             customerMono = customerService.findByExternalIdAndSource(externalReference, source);
         }
         return customerMono.switchIfEmpty(Mono.error(CustomerNotFoundApiException::new));
