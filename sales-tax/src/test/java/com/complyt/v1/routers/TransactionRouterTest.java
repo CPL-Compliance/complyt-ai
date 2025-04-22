@@ -1,7 +1,7 @@
 package com.complyt.v1.routers;
 
-import com.complyt.domain.customer.Customer;
 import com.complyt.business.pagination.PaginationConstants;
+import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerLookupDetail;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
 import com.complyt.domain.transaction.Transaction;
@@ -29,7 +29,6 @@ import com.complyt.v1.validators.Patcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -2844,12 +2843,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .value(map -> assertEquals("Failed to read HTTP message", map.get("message")));
     }
 
-    //TODO die een wat fail is valid
-    @Disabled
     @Test
-    @Override
     @WithMockJwt
-    public void upsert_NullCustomerId_Returns400() {
+    public void upsert_NullCustomerIdAndNullCustomerExternalReferenceAndNullCustomerSource_Returns400() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
@@ -2865,7 +2861,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> assertEquals("[customerId may not be null]", map.get("message")));
+                .value(map -> assertEquals("[Either a customerID OR customerExternalReference and customerSource should be in the body.]", map.get("message")));
     }
 
     @Test

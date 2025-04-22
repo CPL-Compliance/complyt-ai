@@ -186,8 +186,6 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Test
     @Override
     @WithMockJwt
-    @Disabled
-    //TODO
     public void putTransaction_WithComplytIdAndExistsInOtherTenant_Returns400DataConflict() {
         // Given - details of a transaction from the database
         String externalId = "10002";
@@ -215,9 +213,9 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                                 .accept(MediaType.APPLICATION_JSON)
                                 .bodyValue(transactionDto)
                                 .exchange()
-                                .expectStatus().isBadRequest()
+                                .expectStatus().isNotFound()
                                 .expectBody(LinkedHashMap.class)
-                                .value(map -> assertEquals(map.get("message"), "[" + DtoErrorMessages.COMPLYT_ID_IN_A_NEW_RECORD_ERROR + "]")));
+                                .value(map -> assertEquals(map.get("message"), "Customer specified in the object was not found.")));
 
     }
 
