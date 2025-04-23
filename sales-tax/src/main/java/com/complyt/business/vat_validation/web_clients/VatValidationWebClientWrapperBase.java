@@ -7,8 +7,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 @AllArgsConstructor
 @ToString
 public abstract class VatValidationWebClientWrapperBase implements VatValidationWebClientWrapper {
-    protected WebClient webClient;
-    protected  String scheme;
-    protected  String host;
-    protected  String path;
+    protected final WebClient webClient;
+    protected final String scheme;
+    protected final String host;
+    protected final String path;
 }
