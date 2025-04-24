@@ -38,6 +38,7 @@ class ISalesTaxTrackingDateDeterminerTest {
     @Test
     void getSalesTaxTrackingAppliedDate_EconomicFalsePhysicalFalse_ReturnDefaultDate() {
          LocalDateTime appliedDate = salesTaxTrackingDateDeterminer.getSalesTaxTrackingAppliedDate(salesTaxTracking);
+
          assertEquals(appliedDate, EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE);
     }
 
