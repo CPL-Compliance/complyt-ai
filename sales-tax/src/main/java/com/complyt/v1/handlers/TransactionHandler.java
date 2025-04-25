@@ -156,7 +156,7 @@ public class TransactionHandler {
                                         transactionDto.customerExternalRef(),
                                         transactionDto.customerSource())
                                 )
-                                .map(customer -> TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto).setCustomer(customer)))
+                                .map(customer -> TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto).setCustomer(customer).setCustomerId(customer.getComplytId())))
                         .flatMap(receivedTransaction ->
                                 transactionFacade.findByExternalIdAndSource(externalId, source)
                                         .flatMap(originalTransaction -> transactionFacade.update(externalId, source, receivedTransaction, originalTransaction)
