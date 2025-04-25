@@ -84,8 +84,8 @@ public class InternalTimestampsInjectorTest {
         LocalDateTime afterActionTime = LocalDateTime.now();
 
         // Then
-        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isAfter(beforeActionTime));
-        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isBefore(afterActionTime));
+        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isAfter(beforeActionTime) || actualTransaction.getInternalTimestamps().getUpdatedDate().isEqual(beforeActionTime));
+        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isBefore(afterActionTime) || actualTransaction.getInternalTimestamps().getUpdatedDate().isEqual(afterActionTime));
     }
 
     @Test

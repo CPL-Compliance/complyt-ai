@@ -16,20 +16,20 @@ import java.util.UUID;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CustomerDeterminationServiceTest {
+class CustomerDeterminationUtilityTest {
     @Mock
     Customer customer;
     @Mock
     CustomerService customerService;
     @InjectMocks
-    CustomerDeterminationService customerDeterminationService;
+    CustomerDeterminationUtility customerDeterminationUtility;
 
     @Test
     void whenDeterminingCustomer_AndComplytCustomerIDIsNotNull_shouldCallFindByComplytId_andReturnCustomer() {
         when(customerService.findByComplytId(any(UUID.class))).thenReturn(Mono.just(customer));
         CustomerLookupDetail customerLookupDetail = new CustomerLookupDetail(UUID.randomUUID(),"externalRef","");
 
-        Mono<Customer> result = customerDeterminationService.determineCustomerForTransaction(customerLookupDetail);
+        Mono<Customer> result = customerDeterminationUtility.determineCustomerForTransaction(customerLookupDetail);
         verify(customerService).findByComplytId(any());
         StepVerifier.create(result).expectNext(customer).verifyComplete();
     }
@@ -38,7 +38,7 @@ class CustomerDeterminationServiceTest {
     void whenDeterminingCustomer_AndComplytCustomerIDAndExternalReferenceAndCustomerSourceNull_returnError() {
         CustomerLookupDetail customerLookupDetail = new CustomerLookupDetail(null,null,null);
 
-        Mono<Customer> result = customerDeterminationService.determineCustomerForTransaction(customerLookupDetail);
+        Mono<Customer> result = customerDeterminationUtility.determineCustomerForTransaction(customerLookupDetail);
 
         StepVerifier.create(result).expectError(CustomerNotFoundApiException.class).verify();
     }
@@ -47,7 +47,7 @@ class CustomerDeterminationServiceTest {
     void whenDeterminingCustomer_AndComplytCustomerIDAndExternalReference_returnError() {
         CustomerLookupDetail customerLookupDetail = new CustomerLookupDetail(null,null,"source");
 
-        Mono<Customer> result = customerDeterminationService.determineCustomerForTransaction(customerLookupDetail);
+        Mono<Customer> result = customerDeterminationUtility.determineCustomerForTransaction(customerLookupDetail);
 
         StepVerifier.create(result).expectError(CustomerNotFoundApiException.class).verify();
     }
@@ -56,7 +56,7 @@ class CustomerDeterminationServiceTest {
     void whenDeterminingCustomer_AndComplytCustomerIDAndCustomerSource_returnError() {
         CustomerLookupDetail customerLookupDetail = new CustomerLookupDetail(null,"externalRef",null);
 
-        Mono<Customer> result = customerDeterminationService.determineCustomerForTransaction(customerLookupDetail);
+        Mono<Customer> result = customerDeterminationUtility.determineCustomerForTransaction(customerLookupDetail);
 
         StepVerifier.create(result).expectError(CustomerNotFoundApiException.class).verify();
     }
@@ -67,7 +67,7 @@ class CustomerDeterminationServiceTest {
         when(customerService.findByExternalIdAndSource(anyString(), anyString())).thenReturn(Mono.just(customer));
         CustomerLookupDetail customerLookupDetail = new CustomerLookupDetail(null,"externalRef","source");
 
-        Mono<Customer> result = customerDeterminationService.determineCustomerForTransaction(customerLookupDetail);
+        Mono<Customer> result = customerDeterminationUtility.determineCustomerForTransaction(customerLookupDetail);
         verify(customerService).findByExternalIdAndSource(any(), any());
         StepVerifier.create(result).expectNext(customer).verifyComplete();
     }
@@ -77,7 +77,7 @@ class CustomerDeterminationServiceTest {
         when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
         CustomerLookupDetail customerLookupDetail = new CustomerLookupDetail(UUID.randomUUID(),"externalRef","source");
 
-        Mono<Customer> result = customerDeterminationService.determineCustomerForTransaction(customerLookupDetail);
+        Mono<Customer> result = customerDeterminationUtility.determineCustomerForTransaction(customerLookupDetail);
         verify(customerService).findByComplytId(any());
         StepVerifier.create(result).expectNext(customer).verifyComplete();
     }

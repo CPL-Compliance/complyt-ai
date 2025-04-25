@@ -1,7 +1,6 @@
 package com.complyt.facades;
 
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerLookupDetail;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.PhysicalNexusTracker;
@@ -16,7 +15,7 @@ import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.security.TenantResolver;
-import com.complyt.services.CustomerDeterminationService;
+import com.complyt.services.CustomerDeterminationUtility;
 import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
@@ -31,7 +30,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -44,7 +42,8 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class})
 public class TransactionFacadeTest {
@@ -59,7 +58,7 @@ public class TransactionFacadeTest {
     CustomerService customerService;
 
     @Mock
-    CustomerDeterminationService customerDeterminationService;
+    CustomerDeterminationUtility customerDeterminationUtility;
 
     @Mock
     SalesTaxService salesTaxService;
@@ -1001,14 +1000,5 @@ public class TransactionFacadeTest {
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
-    }
-
-    @Test
-    void whenDeterminingCustomerForTransaction_AndCustomerIdAndCustomerExternalRefAndSourceArePresent_shouldUseCustomerId() {
-
-        when(customerDeterminationService.determineCustomerForTransaction(any())).thenReturn(Mono.just(customer));
-        CustomerLookupDetail customerLookupDetails = new CustomerLookupDetail(UUID.randomUUID(), "externalReference", "customerSource");
-        Mono<Customer> customerMono = transactionFacade.determineCustomerForTransaction(customerLookupDetails);
-        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
 }

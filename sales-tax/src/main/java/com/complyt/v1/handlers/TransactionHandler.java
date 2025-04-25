@@ -6,8 +6,8 @@ import com.complyt.facades.TransactionFacade;
 import com.complyt.security.permissions.transaction.TransactionCreatePermission;
 import com.complyt.security.permissions.transaction.TransactionDeletePermission;
 import com.complyt.security.permissions.transaction.TransactionReadPermission;
+import com.complyt.services.CustomerDeterminationUtility;
 import com.complyt.utils.observability.ContextLogger;
-import com.complyt.v1.exceptions.types.CustomerNotFoundApiException;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.transaction.TransactionMapper;
 import com.complyt.v1.models.transaction.TransactionDto;
@@ -38,6 +38,9 @@ public class TransactionHandler {
 
     @NonNull
     TransactionFacade transactionFacade;
+
+    @NonNull
+    CustomerDeterminationUtility customerDeterminationUtility;
 
     @NonNull
     ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler;
@@ -147,7 +150,7 @@ public class TransactionHandler {
                 .then(transactionDtoValidationHandler.handle(serverRequest)
                         .flatMap(transactionDto -> ContextLogger.observeCtx("--> Body: " + transactionDto, log::info)
                                 .thenReturn(transactionDto))
-                        .flatMap(transactionDto -> transactionFacade
+                        .flatMap(transactionDto -> customerDeterminationUtility
                                 .determineCustomerForTransaction( new CustomerLookupDetail(
                                         transactionDto.customerId(),
                                         transactionDto.customerExternalRef(),

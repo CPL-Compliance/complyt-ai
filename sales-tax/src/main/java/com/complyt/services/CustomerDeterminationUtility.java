@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class CustomerDeterminationService {
+public class CustomerDeterminationUtility {
 
     final CustomerService customerService;
 
@@ -23,7 +23,7 @@ public class CustomerDeterminationService {
         final UUID customerId = customerLookupDetail.customerId();
         if (customerId != null){
             customerMono = customerService.findByComplytId(customerId);
-        } else if (StringChecker.isInputValid(customerLookupDetail.customerExternalReference(), customerLookupDetail.customerSource())) {
+        } else if (StringChecker.isInputValid(externalReference, source)) {
             customerMono = customerService.findByExternalIdAndSource(externalReference, source);
         }
         return customerMono.switchIfEmpty(Mono.error(CustomerNotFoundApiException::new));

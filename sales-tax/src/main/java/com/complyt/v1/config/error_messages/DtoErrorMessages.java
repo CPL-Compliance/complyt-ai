@@ -70,5 +70,5 @@ public interface DtoErrorMessages {
 
     String ITEMS_MISSING_TOTAL_OR_QUANTITY_AND_UNITPRICE = "All items should have either total price OR quantity and unitPrice";
 
-    String CUSTOMER_MISSING_ID_OR_EXTERNAL_REFERENCE_AND_SOURCE = "Either a customerID OR customerExternalReference and customerSource should be in the body.";
+    String CUSTOMER_MISSING_ID_OR_EXTERNAL_REFERENCE_AND_SOURCE = "Either a customerID OR customerExternalReference and customerSource should be provided.";
 }

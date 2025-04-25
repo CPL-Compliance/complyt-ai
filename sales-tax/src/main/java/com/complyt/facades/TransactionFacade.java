@@ -1,11 +1,10 @@
 package com.complyt.facades;
 
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerLookupDetail;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.transaction.Transaction;
-import com.complyt.services.CustomerDeterminationService;
+import com.complyt.services.CustomerDeterminationUtility;
 import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
@@ -47,7 +46,7 @@ public class TransactionFacade {
     private SalesTaxTrackingService salesTaxTrackingService;
 
     @NonNull
-    private final CustomerDeterminationService customerDeterminationService;
+    private final CustomerDeterminationUtility customerDeterminationUtility;
 
     @NonNull
     private NexusService nexusService;
@@ -208,10 +207,5 @@ public class TransactionFacade {
                 .switchIfEmpty(ContextLogger.observeCtx("ObjectNotFoundApiException thrown in TransactionFacade.findSalesTaxTrackingByTransaction because could not find SalesTaxTracking by state " + transaction.getShippingAddress().state() + " and subsidiary " + transaction.getSubsidiary() + " or null", log::error)
                         .then(Mono.error(new ObjectNotFoundApiException())));
 
-    }
-
-
-    public Mono<Customer> determineCustomerForTransaction(final CustomerLookupDetail customerLookupDetail){
-        return customerDeterminationService.determineCustomerForTransaction(customerLookupDetail);
     }
 }
