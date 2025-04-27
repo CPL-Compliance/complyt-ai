@@ -90,7 +90,8 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Transaction> save(Transaction transaction) {
         return transactionRepository.save(transaction)
-                .flatMap(t -> webhookHandler.handleWebhook(Transaction.class, transaction));
+                .flatMap(savedTransaction -> webhookHandler.handleWebhook(Transaction.class, transaction)
+                        .thenReturn(savedTransaction));
     }
 
     @Override
@@ -196,7 +197,7 @@ public class TransactionServiceImpl implements TransactionService {
     public Mono<Transaction> markAsCancelled(@NonNull String externalId, @NonNull String source) {
         return transactionRepository
                 .findByExternalIdAndSource(externalId, source)
-                .map(transaction -> (Transaction) transaction
+                .map(transaction -> transaction
                         .setTransactionStatus(TransactionStatus.CANCELLED)
                         .setCustomer(null))
                 .flatMap(transactionRepository::save)

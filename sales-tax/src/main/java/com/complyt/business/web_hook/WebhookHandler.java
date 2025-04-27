@@ -16,17 +16,19 @@ public class WebhookHandler<T extends ComplytIdProperty> {
     private ClientTrackingService clientTrackingService;
 
     @NonNull
-    private WebhookWebClientWrapper webhookWebClientWrapper;
+    private WebhookWebClientWrapper<T> webhookWebClientWrapper;
+
+    @NonNull
+    private WebhookEntityCreator<T> webhookEntityCreator;
 
     public Mono<T> handleWebhook(Class<T> resource, T obj) {
+
         return clientTrackingService.getClientTracking()
                 .flatMap(clientTracking -> clientTracking.getShouldForwardWriteOperations() ?
-                        webhookWebClientWrapper.sendWebhook(resource, obj, clientTracking.getHost(), clientTracking.getPath()) : null)
+                        webhookEntityCreator.create(resource, obj)
+                                .flatMap(webhookEntityWrapper ->
+                                        webhookWebClientWrapper.sendWebhook(webhookEntityWrapper, clientTracking.getHost(), clientTracking.getPath())) : null)
                 .thenReturn(obj);
     }
-
-//    private Mono<Boolean> shouldExecuteWebHook(ClientTracking clientTracking) {
-//        return clientTracking.shouldForwardWriteOperations;
-//    }
 
 }

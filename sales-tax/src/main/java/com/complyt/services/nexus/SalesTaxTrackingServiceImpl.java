@@ -2,11 +2,9 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.complyt_id.ComplytIdHandler;
-import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.business.timestamps_injection.SalesTaxTrackingPhysicalNexusDateApplierInjector;
 import com.complyt.business.timestamps_injection.SalesTaxTrackingRegisteredDateTimestampsInjector;
-import com.complyt.domain.nexus.EconomicNexusTracker;
-import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.business.web_hook.WebhookHandler;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.RegisteredType;
@@ -26,7 +24,6 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -40,8 +37,6 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @NonNull
     SalesTaxTrackingRepository salesTaxTrackingRepository;
-    @NonNull
-    ApplicationDateCreator applicationDateCreator;
 
     @NonNull
     ComplytIdHandler<SalesTaxTracking> complytIdHandler;
@@ -55,16 +50,12 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @NonNull
     private NexusService nexusService;
 
+    @NonNull
+    private WebhookHandler<SalesTaxTracking> webhookHandler;
+
     @Override
     public Mono<SalesTaxTracking> findById(@NonNull String id) {
         return salesTaxTrackingRepository.findById(id);
-    }
-
-    @Override
-    public Mono<SalesTaxTracking> handleSalesTaxTrackingAfterTransactionCalculated(@NonNull SalesTaxTracking salesTaxTracking) {
-        return salesTaxTracking.getEconomicNexusTracker().isEstablished() ?
-                updateEconomicNexus(salesTaxTracking) :
-                save(salesTaxTracking);
     }
 
     @Override
@@ -85,7 +76,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                         ? salesTaxTracking.withNexusCalculationSummaries(Map.of())
                         : salesTaxTracking)
                 .flatMap(salesTaxTrackingRepository::save)
-                .map(upsertedSalesTaxTracking -> upsertedSalesTaxTracking.withNexusCalculationSummaries(salesTaxTracking.getNexusCalculationSummaries()));
+                .flatMap(savedSalesTaxTracking -> webhookHandler.handleWebhook(SalesTaxTracking.class, savedSalesTaxTracking)
+                .map(upsertedSalesTaxTracking -> upsertedSalesTaxTracking.withNexusCalculationSummaries(salesTaxTracking.getNexusCalculationSummaries())));
     }
 
     @Override
@@ -97,35 +89,6 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                         .map(salesTaxTrackingWithClient::setNexusStateRule))
                 .switchIfEmpty(ContextLogger.observeCtx("ObjectNotFoundApiException thrown in SalesTaxTrackingServiceImpl.addClientAndStateDetails for stateName " + stateName, log::error)
                         .then(Mono.error(new ObjectNotFoundApiException())));
-    }
-
-    @Override
-    public Mono<SalesTaxTracking> findByCountryStateAndSubsidiary(@NonNull String country, String state, String subsidiaryId) {
-        return salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiaryId);
-    }
-
-    @Override
-    public Mono<SalesTaxTracking> findByComplytId(@NonNull UUID complytId) {
-        return salesTaxTrackingRepository.findByComplytId(complytId);
-    }
-
-    @Override
-    public Flux<SalesTaxTracking> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
-        return salesTaxTrackingRepository.findAll(page, size);
-    }
-
-    @Deprecated
-    @Override
-    public Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull NexusStateRule stateRule, @NonNull LocalDateTime referenceDate) {
-        EconomicNexusTracker newTracker = new EconomicNexusTracker(true, referenceDate);
-        LocalDateTime appliedDate = applicationDateCreator.create(stateRule.timeFrame(), referenceDate);
-
-        SalesTaxTracking modifiedTracking = salesTaxTracking
-                .withEconomicNexusTracker(newTracker)
-                .withAppliedDate(appliedDate);
-
-        return ContextLogger.observeCtx("Saving modified sales tax tracking:  " + modifiedTracking, log::debug)
-                .then(save(modifiedTracking));
     }
 
     @Override
@@ -216,5 +179,27 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                 ? nexusService.upsertToNexusTracking(transaction, salesTaxTracking)
                 .flatMap(this::handleSalesTaxTrackingAfterTransactionCalculated)
                 : Mono.just(salesTaxTracking);
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> handleSalesTaxTrackingAfterTransactionCalculated(@NonNull SalesTaxTracking salesTaxTracking) {
+        return salesTaxTracking.getEconomicNexusTracker().isEstablished() ?
+                updateEconomicNexus(salesTaxTracking) :
+                save(salesTaxTracking);
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> findByCountryStateAndSubsidiary(@NonNull String country, String state, String subsidiaryId) {
+        return salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiaryId);
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> findByComplytId(@NonNull UUID complytId) {
+        return salesTaxTrackingRepository.findByComplytId(complytId);
+    }
+
+    @Override
+    public Flux<SalesTaxTracking> findAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
+        return salesTaxTrackingRepository.findAll(page, size);
     }
 }

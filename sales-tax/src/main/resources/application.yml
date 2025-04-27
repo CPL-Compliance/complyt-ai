@@ -6,7 +6,6 @@ spring.profiles.active:
   - @activeTaxClient@
   - @activeCurrencyClient@
   - @activeVatValidationClient@
-  -
 
 # Eureka HealthCheck
 # Make sure that a microservice will not be listed 'UP' in eureka before it passes the healthcheck.

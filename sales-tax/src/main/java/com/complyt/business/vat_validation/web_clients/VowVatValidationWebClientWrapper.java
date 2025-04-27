@@ -13,7 +13,7 @@ import reactor.util.retry.Retry;
 import java.net.URI;
 import java.time.Duration;
 
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 public class VowVatValidationWebClientWrapper extends VatValidationWebClientWrapperBase {
     public VowVatValidationWebClientWrapper(WebClient webClient, String scheme, String host, String path) {
         super(webClient, scheme, host, path);

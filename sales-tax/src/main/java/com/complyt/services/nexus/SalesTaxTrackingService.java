@@ -1,13 +1,11 @@
 package com.complyt.services.nexus;
 
-import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.services.crud.CrudService;
 import lombok.NonNull;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -22,8 +20,6 @@ public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, S
     Mono<SalesTaxTracking> findByCountryStateAndSubsidiary(@NonNull String country, String state, String subsidiaryId);
 
     Mono<SalesTaxTracking> findByComplytId(@NonNull UUID complytId);
-
-    Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull NexusStateRule stateRule, @NonNull LocalDateTime referenceDate);
 
     Mono<SalesTaxTracking> injectDataToNewSalesTaxTracking(@NonNull SalesTaxTracking SalesTaxTracking);
 

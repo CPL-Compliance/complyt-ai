@@ -32,9 +32,6 @@ public class WebClientWrapperPropertiesConfig {
                 .host("")
                 .path("")
                 .build();
-
-        // host = vat-archives.dev.vatcompliance.com
-        // path = webhook_debug_endpoint%27
     }
 
 }
