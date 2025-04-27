@@ -84,8 +84,8 @@ public class NexusService {
                 })
                 .switchIfEmpty(Mono.defer(() -> {
                     salesTaxTracking.setNexusCalculationSummaries(new HashMap<>())
-                    .setTransactionNexusSummaries(new HashMap<>())
-                    .setEconomicNexusTracker(EconomicNexusTracker.build());
+                            .setTransactionNexusSummaries(new HashMap<>())
+                            .setEconomicNexusTracker(EconomicNexusTracker.build());
                     return Mono.just(salesTaxTracking);
                 }));
     }
@@ -119,12 +119,12 @@ public class NexusService {
                 .flatMap(salesTaxTrackingReadyForCalculation -> nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTrackingReadyForCalculation, summaryDateRange));
     }
 
-    public Mono<SalesTaxTracking> recalculationOfNexusSummaryIfRequired(@NonNull SalesTaxTracking salesTaxTracking, @NonNull Mono<SalesTaxTracking> calculationMono) {
-        return salesTaxTrackingWithNexusIndication(salesTaxTracking)
-                .flatMap(salesTaxTrackingWithNexusInfo -> !salesTaxTrackingWithNexusInfo.isHasNexus() &&
-                        salesTaxTracking.getNexusStateRule().timeFrame().equals(TimeFrame.PREVIOUS_TWELVE_MONTHS)
-                        ? calculationMono
-                        : Mono.just(salesTaxTracking));
+    public Mono<SalesTaxTracking> recalculationOfNexusSummaryIfRequired(@NonNull SalesTaxTracking salesTaxTracking, @NonNull DateRange summaryDateRange) {
+        boolean isPreviousTwelveMonths = salesTaxTracking.getNexusStateRule().timeFrame().equals(TimeFrame.PREVIOUS_TWELVE_MONTHS);
+        boolean shouldCalculateNexus = isPreviousTwelveMonths && salesTaxTracking.isEnforcesSalesTax() && !salesTaxTracking.getEconomicNexusTracker().isEstablished();
+
+        return shouldCalculateNexus ? calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDateRange)
+                : Mono.just(salesTaxTracking);
     }
 
     public Mono<Query> getTransactionsQueryByNexusCalculation(@NonNull NexusStateRule nexusStateRule, @NonNull ClientTracking clientTracking, LocalDate referenceDate, String subsidiary) {
@@ -135,7 +135,7 @@ public class NexusService {
     public Mono<SalesTaxTracking> upsertToNexusTracking(@NonNull Transaction updatedTransaction, @NonNull SalesTaxTracking salesTaxTracking) {
         return getNexusSummaryDate(salesTaxTracking, updatedTransaction.getExternalTimestamps().getCreatedDate())
                 .flatMap(summaryDateRange -> getSalesTaxTrackingReadyForRecalculation(salesTaxTracking)
-                        .flatMap(salesTaxTrackingReadyForCalculation -> recalculationOfNexusSummaryIfRequired(salesTaxTrackingReadyForCalculation, calculateNexusSummaryFromTransactionSummaries(salesTaxTrackingReadyForCalculation, summaryDateRange))
+                        .flatMap(salesTaxTrackingReadyForCalculation -> recalculationOfNexusSummaryIfRequired(salesTaxTrackingReadyForCalculation, summaryDateRange)
                                 .flatMap(salesTaxTrackingWithNexusSummary -> nexusCalculator.subtractTransactionFromNexusSummary(updatedTransaction.getComplytId(), salesTaxTrackingWithNexusSummary, summaryDateRange)
                                         .flatMap(salesTaxTrackingAfterSubtraction ->
                                                 isNexusTrackingCalculationRequired(updatedTransaction, salesTaxTrackingAfterSubtraction)
@@ -153,9 +153,9 @@ public class NexusService {
     public Mono<SalesTaxTracking> removeFromNexusTracking(@NonNull Transaction cancelledTransaction, @NonNull SalesTaxTracking salesTaxTracking) {
         return getNexusSummaryDate(salesTaxTracking, cancelledTransaction.getExternalTimestamps().getCreatedDate())
                 .flatMap(summaryDateRange -> getSalesTaxTrackingReadyForRecalculation(salesTaxTracking)
-                        .flatMap(salesTaxTrackingReadyForCalculation -> recalculationOfNexusSummaryIfRequired(salesTaxTrackingReadyForCalculation, calculateNexusSummaryFromTransactionSummaries(salesTaxTrackingReadyForCalculation, summaryDateRange))
-                                .flatMap(salesTaxTrackingWithNexusSummary -> nexusCalculator.subtractTransactionFromNexusSummary(cancelledTransaction.getComplytId(), salesTaxTrackingWithNexusSummary, summaryDateRange)
-                                        .flatMap(salesTaxTrackingAfterUpsertion -> checkAndHandleThreshold(salesTaxTrackingAfterUpsertion, cancelledTransaction, summaryDateRange)))));
+                        .flatMap(salesTaxTrackingReadyForCalculation -> recalculationOfNexusSummaryIfRequired(salesTaxTrackingReadyForCalculation, summaryDateRange))
+                        .flatMap(salesTaxTrackingWithNexusSummary -> nexusCalculator.subtractTransactionFromNexusSummary(cancelledTransaction.getComplytId(), salesTaxTrackingWithNexusSummary, summaryDateRange)
+                                .flatMap(salesTaxTrackingAfterUpsertion -> checkAndHandleThreshold(salesTaxTrackingAfterUpsertion, cancelledTransaction, summaryDateRange))));
     }
 
     private Mono<SalesTaxTracking> checkAndHandleThreshold(SalesTaxTracking salesTaxTracking, Transaction transaction, DateRange dateRange) {
