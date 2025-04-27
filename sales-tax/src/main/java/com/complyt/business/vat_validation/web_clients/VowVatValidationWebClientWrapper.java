@@ -1,5 +1,6 @@
 package com.complyt.business.vat_validation.web_clients;
 
+import com.complyt.business.web_hook.web_clients.WebClientWrapperBase;
 import com.complyt.domain.ValidatedVat;
 import com.complyt.domain.VatDetailsToValidate;
 import lombok.EqualsAndHashCode;
@@ -14,7 +15,7 @@ import java.net.URI;
 import java.time.Duration;
 
 @EqualsAndHashCode(callSuper = false)
-public class VowVatValidationWebClientWrapper extends VatValidationWebClientWrapperBase {
+public class VowVatValidationWebClientWrapper extends WebClientWrapperBase implements VatValidationWebClientWrapper{
     public VowVatValidationWebClientWrapper(WebClient webClient, String scheme, String host, String path) {
         super(webClient, scheme, host, path);
     }
