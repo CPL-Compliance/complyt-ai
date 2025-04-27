@@ -23,7 +23,7 @@ class ClientTrackingTest {
     private ClientTracking clientTracking;
     private LocalDateTime nexusDate;
 
-     static MockedStatic mockedStatic;
+    static MockedStatic mockedStatic;
 
     @BeforeAll
     static void beforeAll() {
@@ -46,13 +46,14 @@ class ClientTrackingTest {
         id = UUID.randomUUID().toString();
         tenantId = UUID.randomUUID().toString();
         nexusDate = LocalDateTime.now();
-        clientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name", null, null);
+        clientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name", null, null,
+                false, "", "");
     }
 
     @Test
     void Equals_sameClientTracking_ReturnsTrue() {
         // Given
-        ClientTracking givenClientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name", null, null);
+        ClientTracking givenClientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name", null, null, false, "", "");
 
         // When
         boolean isEquals = clientTracking.equals(givenClientTracking);
@@ -70,6 +71,9 @@ class ClientTrackingTest {
                 ", name=" + clientTracking.getName() +
                 ", internalTimestamps=" + clientTracking.getInternalTimestamps() +
                 ", subsidiaries=" + clientTracking.getSubsidiaries() +
+                ", shouldForwardWriteOperations=" + clientTracking.getShouldForwardWriteOperations() +
+                ", host=" + clientTracking.getHost() +
+                ", path=" + clientTracking.getPath() +
                 ")";
 
         // When

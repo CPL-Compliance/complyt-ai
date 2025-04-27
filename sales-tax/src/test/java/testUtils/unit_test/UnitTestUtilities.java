@@ -81,7 +81,7 @@ public class UnitTestUtilities {
     }
 
     public static ShippingAddress createAddressInNewYork() {
-        return new ShippingAddress("New York City", "US", "county", "NY", "160 Broadway","", "10038", false, null);
+        return new ShippingAddress("New York City", "US", "county", "NY", "160 Broadway", "", "10038", false, null);
     }
 
     public static ShippingAddressDto createAddressDtoInCalifornia() {
@@ -101,7 +101,7 @@ public class UnitTestUtilities {
         return new Scoring(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT));
     }
 
-        public static SalesTaxRates createCaliforniaSalesTaxRates() {
+    public static SalesTaxRates createCaliforniaSalesTaxRates() {
         return new SalesTaxRates(
                 new BigDecimal("0.06"), // stateRate
                 new BigDecimal("0.0125"), // countyRate
@@ -314,7 +314,7 @@ public class UnitTestUtilities {
     public Transaction createTransaction(String id) {
         String documentName = "INVUS1000";
         Address billingAddress = new Address("City", "USA", "County", "CA", "Street", "10000", "", false);
-        ShippingAddress shippingAddress = new ShippingAddress("City", "USA", "County", "CA", "Street","", "10000", false, null);
+        ShippingAddress shippingAddress = new ShippingAddress("City", "USA", "County", "CA", "Street", "", "10000", false, null);
         List<Item> items = createItems(true, false, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false, false);
@@ -348,7 +348,7 @@ public class UnitTestUtilities {
     public Transaction createTransactionWithCalculatedTotalItem(String id) {
         String documentName = "INVUS1000";
         Address billingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
-        ShippingAddress shippingAddress = new ShippingAddress("City", "USA", "County", "CA", "Street", "","Zip", false, null);
+        ShippingAddress shippingAddress = new ShippingAddress("City", "USA", "County", "CA", "Street", "", "Zip", false, null);
         List<Item> items = createItemsWithCalculatedTotal(true, false, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false, false);
@@ -365,7 +365,7 @@ public class UnitTestUtilities {
     public Transaction createTransactionWithThreeItemsAndCalculatedTotal(String id) {
         String documentName = "INVUS1000";
         Address billingAddress = new Address("City", "USA", "County", "CA", "Street", "Zip", "", false);
-        ShippingAddress shippingAddress = new ShippingAddress("City", "USA", "County", "CA", "Street", "","Zip", false, null);
+        ShippingAddress shippingAddress = new ShippingAddress("City", "USA", "County", "CA", "Street", "", "Zip", false, null);
         List<Item> items = createThreeItemsWithCalculatedTotal(true, false, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false, false);
@@ -832,7 +832,8 @@ public class UnitTestUtilities {
 
     public ClientTracking createClientTracking(String tenantId) {
         Timestamps internalTimestamp = new Timestamps(localDateTime, localDateTime);
-        return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope", internalTimestamp, null);
+        return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope", internalTimestamp, null
+                , null, null, null);
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
@@ -901,7 +902,7 @@ public class UnitTestUtilities {
     }
 
     public ShippingAddress createShippingAddress() {
-        return new ShippingAddress("City", "Country", "County", "CA", "Street","region", "Zip", false, null);
+        return new ShippingAddress("City", "Country", "County", "CA", "Street", "region", "Zip", false, null);
     }
 
     public MandatoryAddressDto createMandatoryAddressDto() {
@@ -909,7 +910,7 @@ public class UnitTestUtilities {
     }
 
     public MatchedAddressDataDto createMatchedAddressDto() {
-        return new MatchedAddressDataDto(createMandatoryAddressDto(), new ScoringDto(MatchLevelType.EXCELLENT, 0.9,new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT)));
+        return new MatchedAddressDataDto(createMandatoryAddressDto(), new ScoringDto(MatchLevelType.EXCELLENT, 0.9, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT)));
     }
 
     public Address createUsaAddress() {
@@ -917,7 +918,7 @@ public class UnitTestUtilities {
     }
 
     public ShippingAddress createUsaShippingAddress() {
-        return new ShippingAddress("Fresno", "USA", "County", "CA", "7498 Ave","region", "55591", false, null);
+        return new ShippingAddress("Fresno", "USA", "County", "CA", "7498 Ave", "region", "55591", false, null);
     }
 
 
@@ -1030,7 +1031,7 @@ public class UnitTestUtilities {
     }
 
     public ShippingAddress createNonUsaShippingAddress() {
-        return new ShippingAddress(null, "ARM", null, null, null, null,"12345", false, null);
+        return new ShippingAddress(null, "ARM", null, null, null, null, "12345", false, null);
     }
 
     public Map<String, ProductClassification> createMapTaxCodesToClassifications() {

@@ -21,14 +21,14 @@ public class WebhookHandler<T extends ComplytIdProperty> {
     @NonNull
     private WebhookEntityCreator<T> webhookEntityCreator;
 
-    public Mono<T> handleWebhook(Class<T> resource, T obj) {
+    public Mono<T> handleWebhook(Class<T> webhookClass, T object) {
 
         return clientTrackingService.getClientTracking()
                 .flatMap(clientTracking -> clientTracking.getShouldForwardWriteOperations() ?
-                        webhookEntityCreator.create(resource, obj)
+                        webhookEntityCreator.create(webhookClass, object)
                                 .flatMap(webhookEntityWrapper ->
                                         webhookWebClientWrapper.sendWebhook(webhookEntityWrapper, clientTracking.getHost(), clientTracking.getPath())) : null)
-                .thenReturn(obj);
+                .thenReturn(object);
     }
 
 }

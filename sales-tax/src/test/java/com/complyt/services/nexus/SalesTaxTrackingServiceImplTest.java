@@ -3,6 +3,7 @@ package com.complyt.services.nexus;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.business.timestamps_injection.SalesTaxTrackingRegisteredDateTimestampsInjector;
+import com.complyt.business.web_hook.WebhookHandler;
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.CustomerType;
@@ -68,6 +69,9 @@ public class SalesTaxTrackingServiceImplTest {
     @Mock
     NexusService nexusService;
 
+    @Mock
+    WebhookHandler<SalesTaxTracking> webhookHandler;
+
     SalesTaxTracking salesTaxTracking;
 
     ClientTracking clientTracking;
@@ -78,7 +82,7 @@ public class SalesTaxTrackingServiceImplTest {
 
     private NexusStateRule nexusStateRule;
 
-     static MockedStatic mockedStatic;
+    static MockedStatic mockedStatic;
 
     @BeforeAll
     static void beforeAll() {
@@ -174,6 +178,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         when(salesTaxTrackingRepository.save(salesTaxTrackingWithNoSummary)).thenReturn(Mono.just(savedSalesTaxTracking));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, savedSalesTaxTracking)).thenReturn(Mono.just(savedSalesTaxTracking));
         Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.save(givenSalesTaxTracking);
 
         // Then
@@ -192,6 +197,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         when(salesTaxTrackingRepository.save(givenSalesTaxTracking)).thenReturn(Mono.just(savedSalesTaxTracking));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, savedSalesTaxTracking)).thenReturn(Mono.just(savedSalesTaxTracking));
         Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.save(givenSalesTaxTracking);
 
         // Then
@@ -276,24 +282,6 @@ public class SalesTaxTrackingServiceImplTest {
     }
 
     @Test
-    void saveWithEconomicQualified_SavesModifiedSalesTaxTracking_ReturnsModifiedSalesTaxTracking() {
-        // Given
-        SalesTaxTracking salesTaxTrackingWithNexusEstablished = createSalesTaxTrackingWithNexusEstablished();
-        NexusStateRule stateRule = createNexusStateRule();
-        LocalDateTime referenceDate = LocalDateTime.now();
-
-        // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
-
-        when(salesTaxTrackingRepository.save(any())).thenReturn(Mono.just(salesTaxTrackingWithNexusEstablished));
-        when(applicationDateCreator.create(stateRule.timeFrame(), referenceDate)).thenReturn(LocalDateTime.now());
-        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking, stateRule, referenceDate);
-
-        // Then
-        StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTrackingWithNexusEstablished).verifyComplete();
-    }
-
-    @Test
     void update_SalesTaxTrackingUpdated_SalesTaxTrackingReturned() {
         // Given
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.
@@ -307,6 +295,7 @@ public class SalesTaxTrackingServiceImplTest {
         when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
         when(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiary)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingRepository.save(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(newSalesTaxTracking);
 
         // Then
@@ -328,6 +317,7 @@ public class SalesTaxTrackingServiceImplTest {
         when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
         when(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiary)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingRepository.save(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(newSalesTaxTracking);
 
         // Then
@@ -350,6 +340,7 @@ public class SalesTaxTrackingServiceImplTest {
         when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
         when(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiary)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingRepository.save(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(newSalesTaxTracking);
 
         // Then
@@ -631,6 +622,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         when(salesTaxTrackingRepository.save(salesTaxTrackingWithEconomicNexusNotEstablished)).thenReturn(Mono.just(salesTaxTrackingWithEconomicNexusNotEstablished));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, salesTaxTrackingWithEconomicNexusNotEstablished)).thenReturn(Mono.just(salesTaxTrackingWithEconomicNexusNotEstablished));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTrackingWithEconomicNexusNotEstablished);
 
         // Then
@@ -728,52 +720,6 @@ public class SalesTaxTrackingServiceImplTest {
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.updateAppliedDateIfIsPhysicalNexusEstablished(salesTaxTracking);
 
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
-    }
-
-    @Test
-    void saveWithEconomicQualified_NullSalesTaxTrackingPassed_ThrowsException() {
-        // Given
-        SalesTaxTracking nullSalesTaxTracking = null;
-        NexusStateRule nexusStateRule = createNexusStateRule();
-        LocalDateTime referenceDate = LocalDateTime.now();
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.saveWithEconomicQualified(nullSalesTaxTracking, nexusStateRule, referenceDate);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
-    }
-
-    @Test
-    void saveWithEconomicQualified_NullStateRulePassed_ThrowsException() {
-        // Given
-        NexusStateRule nullNexusStateRule = null;
-        LocalDateTime referenceDate = LocalDateTime.now();
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking, nullNexusStateRule, referenceDate);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "stateRule is marked non-null but is null");
-    }
-
-    @Test
-    void saveWithEconomicQualified_NullReferenceDatePassed_ThrowsException() {
-        // Given
-        NexusStateRule nullNexusStateRule = createNexusStateRule();
-        LocalDateTime nullReferenceDate = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking, nullNexusStateRule, nullReferenceDate);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
     }
 
     @Test
@@ -888,6 +834,7 @@ public class SalesTaxTrackingServiceImplTest {
         // When
         when(nexusService.upsertToNexusTracking(transaction, salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingRepository.save(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
 
         Mono<SalesTaxTracking> result = salesTaxTrackingService.handleSalesTaxEnforcement(transaction, salesTaxTracking);
 

@@ -26,7 +26,7 @@ public class VatValidationClientWrapperConfig {
 
     @Profile({"stubVatValidation", "default"})
     @Bean("vatValidationWebClientWrapper")
-    public StubVatValidationWebClientWrapper stubVatValidationWebClientWrapper(WebClientWrapperProperties vowVatValidationWebClientWrapperProperties) {
+    public StubVatValidationWebClientWrapper stubVatValidationWebClientWrapper(WebClientWrapperProperties stubVatValidationWebClientWrapperProperties) {
         return new StubVatValidationWebClientWrapper(null, "", "", "");
     }
 }

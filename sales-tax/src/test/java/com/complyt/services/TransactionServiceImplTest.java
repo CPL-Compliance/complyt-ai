@@ -8,6 +8,7 @@ import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.business.transaction.DiscountCalculator;
 import com.complyt.business.transaction.MatchedAddressProvider;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
+import com.complyt.business.web_hook.WebhookHandler;
 import com.complyt.domain.currency.CurrencyExchangeRateObject;
 import com.complyt.domain.currency.CurrencySource;
 import com.complyt.domain.customer.Customer;
@@ -101,6 +102,9 @@ class TransactionServiceImplTest {
     @Mock
     InternalTimestampsInjector<Transaction> internalTimestampsInjector;
 
+    @Mock
+    WebhookHandler<Transaction> webhookHandler;
+
     SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo;
     Transaction transaction;
     Customer customer;
@@ -109,7 +113,7 @@ class TransactionServiceImplTest {
     LocalDateTime now = LocalDateTime.now();
     Timestamps internalTimestamps = new Timestamps(now, now);
 
-     static MockedStatic mockedStatic;
+    static MockedStatic mockedStatic;
 
     @BeforeAll
     static void beforeAll() {
@@ -155,6 +159,7 @@ class TransactionServiceImplTest {
 
         // When
         when(transactionRepository.save(transaction)).thenReturn(Mono.just(transaction));
+        when(webhookHandler.handleWebhook(Transaction.class, transaction)).thenReturn(Mono.just(transaction));
         Mono<Transaction> transactionMono = transactionService.save(transaction);
 
         // Then
@@ -313,7 +318,7 @@ class TransactionServiceImplTest {
         // When
         when(transactionRepository.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionRepository.save(transaction.withCustomer(null))).thenReturn(Mono.just(transaction));
-
+        when(webhookHandler.handleWebhook(Transaction.class, transaction)).thenReturn(Mono.just(transaction));
         Mono<Transaction> transactionMono = transactionService.update(externalId, source, transaction);
 
         // Then
@@ -352,7 +357,7 @@ class TransactionServiceImplTest {
         // When
         when(transactionRepository.findByExternalIdAndSource(transaction.getExternalId(), source)).thenReturn(Mono.just(transaction));
         when(transactionRepository.save(cancelledTransaction)).thenReturn(Mono.just(cancelledTransaction));
-
+        when(webhookHandler.handleWebhook(Transaction.class, cancelledTransaction)).thenReturn(Mono.just(cancelledTransaction));
         Mono<Transaction> transactionMono = transactionService.markAsCancelled(transaction.getExternalId(), source);
 
         // Then
@@ -718,7 +723,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndNullState_ReturnsTransaction() {
         // Given
-        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, null, null, null,"80001", true, null);
+        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, null, null, null, "80001", true, null);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         ShippingFee givenShippingFee = transactionWithPartialAddress.getShippingFee();
@@ -772,7 +777,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndBlankState_ReturnsTransaction() {
         // Given
-        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, "",null, null,"80001",true, null);
+        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, "", null, null, "80001", true, null);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         ShippingFee givenShippingFee = transactionWithPartialAddress.getShippingFee();
@@ -826,7 +831,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndInvalidZipCode_ReturnsAnError() {
         // Given
-        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, null, null, null,"InvalidZipCode", true, null);
+        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, null, null, null, "InvalidZipCode", true, null);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transactionWithPartialAddress);

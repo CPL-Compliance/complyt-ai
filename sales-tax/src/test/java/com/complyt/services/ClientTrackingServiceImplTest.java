@@ -43,7 +43,7 @@ class ClientTrackingServiceImplTest {
 
     private ClientTracking clientTracking;
 
-     static MockedStatic mockedStatic;
+    static MockedStatic mockedStatic;
 
     @BeforeAll
     static void beforeAll() {
@@ -65,7 +65,8 @@ class ClientTrackingServiceImplTest {
     void setUp() {
         Nexus nexus = new Nexus(null);
         Timestamps internalTimestamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
-        clientTracking = new ClientTracking(UUID.randomUUID().toString(), UUID.randomUUID().toString(), nexus, "name", internalTimestamps, null);
+        clientTracking = new ClientTracking(UUID.randomUUID().toString(), UUID.randomUUID().toString(), nexus, "name", internalTimestamps, null
+                , false, "", "");
     }
 
     @Test
@@ -149,7 +150,7 @@ class ClientTrackingServiceImplTest {
         // Given
         ClientTracking anotherClientTracking = clientTracking.withName("changedName");
         LocalDateTime now = LocalDateTime.now();
-        Timestamps internalTimestamps = new Timestamps(clientTracking.getInternalTimestamps().getCreatedDate(),now);
+        Timestamps internalTimestamps = new Timestamps(clientTracking.getInternalTimestamps().getCreatedDate(), now);
         ClientTracking clientTrackingWithUpdatedDates = clientTracking.withInternalTimestamps(internalTimestamps);
 
         // Then
@@ -171,7 +172,7 @@ class ClientTrackingServiceImplTest {
     void injectDataToNewClientTracking_InjectsData_ReturnsInjectedClientTracking() {
         // Given
         LocalDateTime now = LocalDateTime.now();
-        Timestamps internalTimestamps = new Timestamps(clientTracking.getInternalTimestamps().getCreatedDate(),now);
+        Timestamps internalTimestamps = new Timestamps(clientTracking.getInternalTimestamps().getCreatedDate(), now);
         ClientTracking clientTrackingWithUpdatedDates = clientTracking.withInternalTimestamps(internalTimestamps);
 
 
