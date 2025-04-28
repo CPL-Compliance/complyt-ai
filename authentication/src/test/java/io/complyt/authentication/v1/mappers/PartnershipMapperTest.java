@@ -2,14 +2,13 @@ package io.complyt.authentication.v1.mappers;
 
 import io.complyt.authentication.domain.Partnership;
 import io.complyt.authentication.v1.models.PartnershipDto;
-import io.complyt.authentication.v1.models.ReferralDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test_utils.unit_tests.TestUtilities;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -22,7 +21,7 @@ class PartnershipMapperTest {
     void partnershipToPartnershipDto_Partnership_returnPartnershipDto() {
         // Given
         Partnership partnership = TestUtilities.createPartnership();
-        PartnershipDto partnershipDto = new PartnershipDto(partnership.getId(), partnership.getTenantId(), partnership.getPartnerName(), new ArrayList<ReferralDto>());
+        PartnershipDto partnershipDto = new PartnershipDto(partnership.getId(), partnership.getTenantId(), partnership.getPartnerName(), new HashMap<>());
 
         // When
         PartnershipDto actualPartnershipDto = PartnershipMapper.INSTANCE.partnershipToPartnershipDto(partnership);

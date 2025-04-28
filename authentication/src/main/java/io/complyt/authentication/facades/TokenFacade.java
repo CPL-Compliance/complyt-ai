@@ -39,9 +39,10 @@ public class TokenFacade {
     public Mono<Token> getToken(final @NonNull ApiKey apiKey) {
         return tokenService.findByApiKeyAndDecrypt(apiKey)
                 .switchIfEmpty(Mono.defer(() -> credentialsService.getCredentialsByApiKeyAndDecrypt(apiKey)
-                                .flatMap(credentials -> authorizationService.getToken(credentials))
-                                .switchIfEmpty(Mono.error(new ApiKeyNotValidException())))
-                        .flatMap(tokenService::saveToken));
+                                .flatMap(credentials -> authorizationService.getToken(credentials)
+                                        .switchIfEmpty(Mono.error(new ApiKeyNotValidException()))
+                                        .flatMap(token -> tokenService.saveToken(token, credentials.getTenantId()))))
+                        .switchIfEmpty(Mono.error(new ApiKeyNotValidException())));
 
     }
 
@@ -53,7 +54,7 @@ public class TokenFacade {
                                         .flatMap(apiKey -> tokenService.findByApiKeyAndTenantIdForPartnerAndDecrypt(apiKey, partnerTenantId)
                                                 .switchIfEmpty(Mono.defer(() -> credentialsService.getCredentialsForPartnerByApiKeyAndDecrypt(apiKey)
                                                         .flatMap(credentials -> authorizationService.getTokenForPartner(credentials, partnerTenantId))
-                                                        .flatMap(token -> tokenService.saveToken(token, partnerTenantId))
+                                                        .flatMap(token -> tokenService.saveToken(token, requestedTenantId, partnerTenantId))
                                                         .switchIfEmpty(Mono.error(new FailedToCreateJWTException()))))) :
                                 Mono.error(new TenantNotSupportedException())));
 

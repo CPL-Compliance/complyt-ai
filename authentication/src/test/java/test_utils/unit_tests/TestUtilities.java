@@ -22,6 +22,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class TestUtilities {
@@ -54,7 +55,7 @@ public class TestUtilities {
 
     public static Token createOutputToken() {
         return new Token("", "", "", "", "", "",
-                "", 0, "", LocalDateTime.now(), LocalDateTime.now(), null, TokenSource.CLIENT);
+                "", 0, "", LocalDateTime.now(), LocalDateTime.now(), null, null, TokenSource.CLIENT);
     }
 
     public static Token createInputToken() {
@@ -63,7 +64,7 @@ public class TestUtilities {
 
     public static Token createInputToken(String apiKey) {
         return new Token(apiKey, "", "", "", "", "",
-                "", 0, "", LocalDateTime.now(), LocalDateTime.now(), null, TokenSource.CLIENT);
+                "", 0, "", LocalDateTime.now(), LocalDateTime.now(), null, null, TokenSource.CLIENT);
     }
 
     public static TokenDto createTokenDto() {
@@ -132,7 +133,7 @@ public class TestUtilities {
     }
 
     public static Partnership createPartnership() {
-        return new Partnership("id", "partnerTenantId", "partnerName", new ArrayList<Referral>());
+        return new Partnership("id", "partnerTenantId", "partnerName", new HashMap<>());
     }
 
     public static Referral createReferral() {
@@ -175,7 +176,8 @@ public class TestUtilities {
         return Credentials.builder().clientId(credentials.getClientId()).clientSecret(credentials.getClientSecret())
                 .audience(credentials.getAudience())
                 .grantType(credentials.getGrantType()).complytClientId(credentials.getComplytClientId()).status(credentials.getStatus())
-                .complytClientSecret(credentials.getComplytClientSecret()).build();
+                .complytClientSecret(credentials.getComplytClientSecret())
+                .tenantId(credentials.getTenantId()).build();
     }
 
     public static Credentials createEncryptedCredentials(@NonNull ApiKey apiKey,

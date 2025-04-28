@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 
-import java.util.List;
+import java.util.Map;
 
 @Schema(name = "Partnership", description = FieldsDescriptions.PARTNERSHIP)
 public record PartnershipDto(
@@ -21,6 +21,6 @@ public record PartnershipDto(
         String partnerName,
 
         @NotNull(message = "Partnership.supportedReferrals " + DtoErrorMessages.NOT_NULL_ERROR)
-        List<ReferralDto> supportedReferrals
+        Map<String, ReferralDto> supportedReferrals
 ) {
 }

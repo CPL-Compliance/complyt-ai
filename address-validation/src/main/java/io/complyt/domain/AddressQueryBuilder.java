@@ -41,7 +41,7 @@ public class AddressQueryBuilder {
             query.addCriteria(Criteria.where("requestAddress.county").regex(escapedSearchString, "i"));
         });
 
-        Optional.ofNullable(address.county()).ifPresent(value -> {
+        Optional.ofNullable(address.region()).ifPresent(value -> {
             String escapedSearchString = Pattern.quote(value);
             query.addCriteria(Criteria.where("requestAddress.region").regex(escapedSearchString, "i"));
         });

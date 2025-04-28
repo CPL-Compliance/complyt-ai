@@ -17,7 +17,9 @@ import reactor.test.StepVerifier;
 import test_utils.unit_tests.TestUtilities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.when;
 
@@ -63,8 +65,8 @@ class PartnershipFacadeTest {
     @Test
     void upsertReferralClient_validRequest_returnPartnership() {
         // Given
-        List<Referral> referrals = new ArrayList<>();
-        referrals.add(referral);
+        Map<String, Referral> referrals = new HashMap<>();
+        referrals.put(referral.getTenantId(), referral);
         Partnership updatedPartnership = partnership.withSupportedReferrals(referrals);
 
         // When
@@ -88,8 +90,8 @@ class PartnershipFacadeTest {
     @Test
     void markReferralAsCancelled_validRequest_returnPartnership() {
         // Given
-        List<Referral> referrals = new ArrayList<>();
-        referrals.add(referral.withPartnershipStatus(PartnershipStatus.CANCELLED));
+        Map<String, Referral> referrals = new HashMap<>();
+        referrals.put(referral.getTenantId(), referral.withPartnershipStatus(PartnershipStatus.CANCELLED));
         Partnership updatedPartnership = partnership.withSupportedReferrals(referrals);
 
         // When

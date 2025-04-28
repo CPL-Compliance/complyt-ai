@@ -54,23 +54,24 @@ public class TokenService {
                 .map(this::decryptToken);
     }
 
-    public Mono<Token> saveToken(@NonNull Token token) {
+    public Mono<Token> saveToken(@NonNull Token token, String clientTenantId) {
         return Mono.just(createDocumentExpirationDateTime(token.getExpiresIn()))
                 .map(token::withExpireAt)
                 .map(tokenWithDate -> tokenWithDate.withTokenSource(TokenSource.CLIENT))
                 .map(this::encryptToken)
+                .map(encryptedToken -> encryptedToken.withClientTenantId(clientTenantId))
                 .flatMap(tokenRepository::save)
                 .map(this::decryptToken);
     }
 
     // In use only for partnership
     // Function had tenantId argument - only for partner issuing a token of behalf of its client
-    public Mono<Token> saveToken(@NonNull Token token, String tenantId) {
+    public Mono<Token> saveToken(@NonNull Token token, String clientTenantId, String partnerTenantId) {
         return Mono.just(createDocumentExpirationDateTime(token.getExpiresIn()))
                 .map(token::withExpireAt)
                 .map(tokenWithDate -> tokenWithDate.withTokenSource(TokenSource.PARTNER))
                 .map(this::encryptToken)
-                .map(encryptedToken -> encryptedToken.withTenantId(tenantId))
+                .map(encryptedToken -> encryptedToken.withClientTenantId(clientTenantId).withPartnerTenantId(partnerTenantId))
                 .flatMap(tokenRepository::save)
                 .map(this::decryptToken);
     }

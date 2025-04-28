@@ -370,4 +370,78 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
                     assertEquals(receivedSalesTaxTracking.appliedDate(), LocalDateTime.parse(referenceDate.toString()));
                 });
     }
+
+    @Order(9)
+    @Test
+    @WithMockJwt
+    public void upsertTransaction_PhysicalNexusTrue_EconomicNexusFalse_CrossEconomicNexusThreshold_EconomicNexusAlsoTrue() {
+        // Given: update existing SalesTaxTracking to have physical nexus = true
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", referenceAddress.country())
+                        .queryParam("state", referenceAddress.state())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTracking -> {
+
+                    SalesTaxTrackingDto withPhysicalTrue = salesTaxTracking.withPhysicalNexusTracker(
+                            salesTaxTracking.physicalNexusTracker().withEstablished(true))
+                            .withEconomicNexusTracker(salesTaxTracking.economicNexusTracker().withEstablished(false));
+
+                    // Update SalesTaxTracking with physical nexus = true
+                    webTestClient
+                            .mutateWith(csrf()).put()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(SalesTaxTrackingRouter.BASE_URL)
+                                    .queryParam("country", referenceAddress.country())
+                                    .queryParam("state", referenceAddress.state())
+                                    .build())
+                            .bodyValue(withPhysicalTrue)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .exchange()
+                            .expectStatus().isOk();
+                });
+
+        // When: insert a transaction that crosses the economic threshold
+        String externalId = "20001";
+        TransactionDto transaction = ITUtilities.stubTransactionDto(externalId, marketplaceCustomerId,
+                        ITUtilities.stubItemDto()
+                                .withQuantity(BigDecimal.ONE)
+                                .withUnitPrice(new BigDecimal("5000000"))
+                                .withTotalPrice(new BigDecimal("5000000")))
+                .withShippingAddress(referenceAddress)
+                .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
+
+        webTestClient
+                .mutateWith(csrf()).put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(transaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(receivedTransaction -> assertNull(receivedTransaction.salesTax()));
+
+        // Then: economic nexus should still be established
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("country", referenceAddress.country())
+                        .queryParam("state", referenceAddress.state())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(receivedSalesTaxTracking -> {
+                    assertTrue(receivedSalesTaxTracking.physicalNexusTracker().established(), "Physical nexus should still be true");
+                    assertTrue(receivedSalesTaxTracking.economicNexusTracker().established(), "Economic nexus should be true after crossing threshold");
+                });
+    }
 }

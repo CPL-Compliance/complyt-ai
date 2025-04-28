@@ -6,6 +6,7 @@ import io.complyt.authentication.domain.enums.PartnershipStatus;
 import io.complyt.authentication.security.TenantResolver;
 import io.complyt.authentication.utils.observability.ContextLogger;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
+import io.complyt.authentication.v1.exceptions.types.PartnerNotFoundApiException;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +52,8 @@ public class PartnershipRepository {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
-                    Update update = new Update().push("supportedReferrals", referral);
+                    String dynamicMapKey = "supportedReferrals." + referral.getTenantId();
+                    Update update = new Update().set(dynamicMapKey, referral);
 
                     return ContextLogger.observeCtx("Adding referral to Partnership with tenantId: " + tenantId, log::info)
                             .then(reactiveMongoTemplate.findAndModify(query, update, FindAndModifyOptions.options().returnNew(true), Partnership.class));
@@ -61,24 +63,24 @@ public class PartnershipRepository {
     public Mono<Partnership> updateReferral(final @NonNull Referral referral) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
+                    String referralTenantId = referral.getTenantId();
+
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)
-                            .and("supportedReferrals").elemMatch(
-                                    Criteria.where("tenantId").is(referral.getTenantId())
-                                            .and("partnershipStatus").is(PartnershipStatus.ACTIVE)
-                            ));
+                            .and("supportedReferrals." + referralTenantId + ".partnershipStatus").is(PartnershipStatus.ACTIVE));
 
                     Update update = new Update()
-                            .set("supportedReferrals.$.name", referral.getName())
-                            .set("supportedReferrals.$.partnershipStatus", referral.getPartnershipStatus())
-                            .set("supportedReferrals.$.timestamps", referral.getTimestamps());
+                            .set("supportedReferrals." + referralTenantId + ".name", referral.getName())
+                            .set("supportedReferrals." + referralTenantId + ".partnershipStatus", referral.getPartnershipStatus())
+                            .set("supportedReferrals." + referralTenantId + ".timestamps", referral.getTimestamps());
 
                     return reactiveMongoTemplate.findAndModify(query, update,
                                     FindAndModifyOptions.options().returnNew(true), Partnership.class)
-                            .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()))
+                                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()))
                             .flatMap(updatedPartnership ->
                                     ContextLogger.observeCtx("Updated referral for Partnership with tenantId: " + tenantId, log::info)
-                                    .thenReturn(updatedPartnership)
+                                            .thenReturn(updatedPartnership)
                             );
                 });
     }
+
 }

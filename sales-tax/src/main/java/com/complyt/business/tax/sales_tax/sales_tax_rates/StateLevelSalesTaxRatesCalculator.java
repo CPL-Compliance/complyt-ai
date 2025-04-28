@@ -1,5 +1,6 @@
 package com.complyt.business.tax.sales_tax.sales_tax_rates;
 
+import com.complyt.domain.sales_tax.RatesMetaData;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
@@ -40,7 +41,7 @@ public class StateLevelSalesTaxRatesCalculator implements TaxRatesCalculator<Jur
 
         if (jurisdictionalSalesTaxRules.getCalculationType() == CalculationType.FIXED) {
             log.debug("Returning fixed sales tax rate of: " + jurisdictionalSalesTaxRules.getCalculationValue());
-            SalesTaxRates modifiedRateByFixedTreatment = modifyRateByFixedTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
+            SalesTaxRates modifiedRateByFixedTreatment = modifyRateByFixedTreatment(jurisdictionalSalesTaxRules.getCalculationValue());
 
             return modifiedRateByFixedTreatment;
         }
@@ -51,19 +52,40 @@ public class StateLevelSalesTaxRatesCalculator implements TaxRatesCalculator<Jur
         return modifiedRateByPercentageTreatment;
     }
 
-    private SalesTaxRates modifyRateByFixedTreatment(BigDecimal jurisdictionalRuleStateRate, SalesTaxRates salesTaxRates) {
-        BigDecimal newTaxRate = salesTaxRates.taxRate().subtract(salesTaxRates.stateRate()).add(jurisdictionalRuleStateRate);
-        SalesTaxRates calculatedRate = salesTaxRates.withStateRate(jurisdictionalRuleStateRate).withTaxRate(newTaxRate);
+    private SalesTaxRates modifyRateByFixedTreatment(BigDecimal jurisdictionalRuleStateRate) {
+        SalesTaxRates zeroSalesTaxRate = SalesTaxRates.zeroSalesTaxRate();
+        SalesTaxRates calculatedRate = zeroSalesTaxRate.withStateRate(jurisdictionalRuleStateRate).withTaxRate(jurisdictionalRuleStateRate);
         log.debug("State sales tax rate after fixed modification: " + calculatedRate);
 
         return calculatedRate;
     }
 
     private SalesTaxRates modifyRateByPercentageTreatment(BigDecimal percentageToCut, SalesTaxRates salesTaxRates) {
-        BigDecimal newTaxRate = salesTaxRates.taxRate().multiply(percentageToCut);
-        SalesTaxRates calculatedRate = salesTaxRates.withTaxRate(newTaxRate);
-        log.debug("State Sales tax rate after percentage modification: " + calculatedRate);
+        RatesMetaData originalMetaData = salesTaxRates.ratesMetaData();
+        RatesMetaData updatedMetaData = null;
 
-        return calculatedRate;
+        if (originalMetaData != null) {
+            updatedMetaData = new RatesMetaData(
+                    multiplyIfPresent(originalMetaData.cityDistrictRate(), percentageToCut),
+                    multiplyIfPresent(originalMetaData.countyDistrictRate(), percentageToCut),
+                    multiplyIfPresent(originalMetaData.specialDistrictRate(), percentageToCut)
+            );
+        }
+
+        return new SalesTaxRates(
+                multiplyIfPresent(salesTaxRates.stateRate(), percentageToCut), // state
+                multiplyIfPresent(salesTaxRates.countyRate(), percentageToCut), // county
+                multiplyIfPresent(salesTaxRates.cityRate(), percentageToCut), // city
+                multiplyIfPresent(salesTaxRates.combinedDistrictRate(), percentageToCut), // combined
+                updatedMetaData, // Metadata
+                multiplyIfPresent(salesTaxRates.mtaRate(), percentageToCut), // mta
+                multiplyIfPresent(salesTaxRates.spdRate(), percentageToCut), // spd
+                multiplyIfPresent(salesTaxRates.otherRate(), percentageToCut), // other
+                multiplyIfPresent(salesTaxRates.taxRate(), percentageToCut) // taxRate
+        );
+    }
+
+    private BigDecimal multiplyIfPresent(BigDecimal value, BigDecimal multiplier) {
+        return value != null ? value.multiply(multiplier).stripTrailingZeros() : null;
     }
 }

@@ -75,7 +75,7 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
                 .expectStatus().isOk()
                 .expectBody(PartnershipDto.class)
                 .value(partnershipDto -> {
-                    assertEquals(7, partnershipDto.supportedReferrals().size());
+                    assertEquals(5, partnershipDto.supportedReferrals().size());
                     assertEquals("partner name #1", partnershipDto.partnerName());
 
                 });
@@ -142,10 +142,10 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
                 .value(partnershipDto -> {
                     assertEquals(1, partnershipDto.supportedReferrals().size());
                     assertEquals("partner name #2", partnershipDto.partnerName());
-                    assertEquals("test referral name", partnershipDto.supportedReferrals().get(0).getName());
-                    assertEquals(partnershipDto.supportedReferrals().get(0).getTimestamps().getCreatedDate(), partnershipDto.supportedReferrals().get(0).getTimestamps().getUpdatedDate());
-                    assertEquals(partnershipDto.supportedReferrals().get(0).getPartnershipStatus(), PartnershipStatus.ACTIVE);
-
+                    ReferralDto firstReferralDto = partnershipDto.supportedReferrals().values().iterator().next();
+                    assertEquals("test referral name", firstReferralDto.getName());
+                    assertEquals(firstReferralDto.getTimestamps().getCreatedDate(), firstReferralDto.getTimestamps().getUpdatedDate());
+                    assertEquals(PartnershipStatus.ACTIVE, firstReferralDto.getPartnershipStatus());
                 });
     }
 
@@ -168,8 +168,10 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
                 .expectStatus().isOk()
                 .expectBody(PartnershipDto.class)
                 .value(partnershipDto -> {
+                    ReferralDto firstReferralDto = partnershipDto.supportedReferrals().values().iterator().next();
+
                     assertEquals(1, partnershipDto.supportedReferrals().size());
-                    assertNotEquals(partnershipDto.supportedReferrals().get(0).getTimestamps().getCreatedDate(), partnershipDto.supportedReferrals().get(0).getTimestamps().getUpdatedDate());
+                    assertNotEquals(firstReferralDto.getTimestamps().getCreatedDate(), firstReferralDto.getTimestamps().getUpdatedDate());
                 });
     }
 
@@ -252,7 +254,10 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(PartnershipDto.class)
-                .value(partnershipDto -> assertEquals(partnershipDto.supportedReferrals().get(0).getPartnershipStatus(), PartnershipStatus.CANCELLED));
+                .value(partnershipDto -> {
+                    ReferralDto firstReferralDto = partnershipDto.supportedReferrals().values().iterator().next();
+                    assertEquals(PartnershipStatus.CANCELLED, firstReferralDto.getPartnershipStatus());
+                });
     }
 
     @Order(5)

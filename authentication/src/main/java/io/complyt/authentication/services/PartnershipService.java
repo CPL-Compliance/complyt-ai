@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -42,6 +43,7 @@ public class PartnershipService {
     public Mono<List<String>> findSupportedTenantsForPartnerByTenantId(final @NonNull String tenantId) {
         return findByTenantId(tenantId)
                 .map(Partnership::getSupportedReferrals)
+                .map(Map::values)
                 .map(referrals -> referrals.stream()
                         .filter(referral -> referral.getPartnershipStatus() == PartnershipStatus.ACTIVE)
                         .map(Referral::getTenantId)
@@ -51,8 +53,8 @@ public class PartnershipService {
 
     public Mono<Partnership> upsertReferralClient(Referral referral) {
         return partnershipRepository.findPartnership()
-                .flatMap(partnershipDocument -> {
-                    List<Referral> existingReferralList = partnershipDocument.getSupportedReferrals().stream()
+                .flatMap(partnership -> {
+                    List<Referral> existingReferralList = partnership.getSupportedReferrals().values().stream()
                             .filter(existingReferral -> existingReferral.getTenantId().equals(referral.getTenantId()) && existingReferral.getPartnershipStatus().equals(PartnershipStatus.ACTIVE)).toList();
 
                     if (!existingReferralList.isEmpty()) {
@@ -68,8 +70,8 @@ public class PartnershipService {
 
     public Mono<Partnership> markAsCancelledReferralClient(String tenantId) {
         return partnershipRepository.findPartnership()
-                .flatMap(partnershipDocument -> {
-                    List<Referral> existingReferralList = partnershipDocument.getSupportedReferrals().stream()
+                .flatMap(partnership -> {
+                    List<Referral> existingReferralList = partnership.getSupportedReferrals().values().stream()
                             .filter(existingReferral -> existingReferral.getTenantId().equals(tenantId) && existingReferral.getPartnershipStatus().equals(PartnershipStatus.ACTIVE)).toList();
 
                     Referral updatedReferralToDelete = !existingReferralList.isEmpty() ?

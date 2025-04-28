@@ -18,7 +18,9 @@ import reactor.test.StepVerifier;
 import test_utils.unit_tests.TestUtilities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -92,8 +94,8 @@ class PartnershipsServiceTest {
     @Test
     void findSupportedTenantsForPartnerByTenantId_validTenantIdButAllReferralsCancelled_returnException(){
         // Given
-        List<Referral> expectedReferralList = new ArrayList<>();
-        expectedReferralList.add(referral.withPartnershipStatus(PartnershipStatus.CANCELLED));
+        Map<String, Referral> expectedReferralList = new HashMap<>();
+        expectedReferralList.put(referral.getTenantId(), referral.withPartnershipStatus(PartnershipStatus.CANCELLED));
 
         Partnership partnershipWithReferrals = partnership.withSupportedReferrals(expectedReferralList);
 
@@ -108,8 +110,8 @@ class PartnershipsServiceTest {
     @Test
     void findSupportedTenantsForPartnerByTenantId_validTenantId_returnReferralsList(){
         // Given
-        List<Referral> expectedReferralList = new ArrayList<>();
-        expectedReferralList.add(referral);
+        Map<String, Referral> expectedReferralList = new HashMap<>();
+        expectedReferralList.put(referral.getTenantId(), referral);
 
         List<String> expectedReferralTenantIdList = new ArrayList<>();
         expectedReferralTenantIdList.add(referral.getTenantId());
@@ -127,15 +129,15 @@ class PartnershipsServiceTest {
     @Test
     void upsertReferralClient_validNewReferral_returnPartnership(){
         // Given
-        List<Referral> expectedReferralList = new ArrayList<>();
-        expectedReferralList.add(referral);
+        Map<String, Referral> expectedReferralList = new HashMap<>();
+        expectedReferralList.put(referral.getTenantId(), referral);
         Partnership partnershipWithReferrals = partnership.withSupportedReferrals(expectedReferralList);
 
         Referral newReferral = TestUtilities.createNewReferralWithTenantId("newReferralTenantId");
 
-        List<Referral> expectedUpdatedReferralList = new ArrayList<>();
-        expectedUpdatedReferralList.add(referral);
-        expectedUpdatedReferralList.add(newReferral);
+        Map<String, Referral> expectedUpdatedReferralList = new HashMap<>();
+        expectedUpdatedReferralList.put(referral.getTenantId(), referral);
+        expectedUpdatedReferralList.put(newReferral.getTenantId(), newReferral);
         Partnership partnershipWithUpdatedReferrals = partnershipWithReferrals.withSupportedReferrals(expectedUpdatedReferralList);
 
         // When
@@ -150,8 +152,8 @@ class PartnershipsServiceTest {
     @Test
     void upsertReferralClient_existingReferral_getsUpdatedAndReturnPartnership(){
         // Given
-        List<Referral> expectedReferralList = new ArrayList<>();
-        expectedReferralList.add(referral);
+        Map<String, Referral> expectedReferralList = new HashMap<>();
+        expectedReferralList.put(referral.getTenantId(), referral);
         Partnership partnershipWithReferrals = partnership.withSupportedReferrals(expectedReferralList);
 
         // When
@@ -166,14 +168,14 @@ class PartnershipsServiceTest {
     @Test
     void upsertReferralClient_existingReferralWithStatusCancelled_saveNewAndReturnPartnership(){
         // Given
-        List<Referral> expectedReferralList = new ArrayList<>();
+        Map<String, Referral> expectedReferralList = new HashMap<>();
         Referral referralWithStatusCancelled = referral.withPartnershipStatus(PartnershipStatus.CANCELLED);
-        expectedReferralList.add(referralWithStatusCancelled);
+        expectedReferralList.put(referralWithStatusCancelled.getTenantId(), referralWithStatusCancelled);
         Partnership partnershipWithReferrals = partnership.withSupportedReferrals(expectedReferralList);
 
-        List<Referral> expectedUpdatedReferralList = new ArrayList<>();
-        expectedUpdatedReferralList.add(referralWithStatusCancelled);
-        expectedUpdatedReferralList.add(referral);
+        Map<String, Referral> expectedUpdatedReferralList = new HashMap<>();
+        expectedUpdatedReferralList.put(referralWithStatusCancelled.getTenantId(), referralWithStatusCancelled);
+        expectedUpdatedReferralList.put(referral.getTenantId(), referral);
         Partnership partnershipWithUpdatedReferrals = partnershipWithReferrals.withSupportedReferrals(expectedUpdatedReferralList);
 
         // When
@@ -198,13 +200,13 @@ class PartnershipsServiceTest {
     @Test
     void markAsCancelledReferralClient_validReferral_returnPartnership(){
         // Given
-        List<Referral> expectedReferralList = new ArrayList<>();
-        expectedReferralList.add(referral);
+        Map<String, Referral> expectedReferralList = new HashMap<>();
+        expectedReferralList.put(referral.getTenantId(), referral);
         Partnership partnershipWithReferrals = partnership.withSupportedReferrals(expectedReferralList);
 
         Referral cancelledReferral = referral.withPartnershipStatus(PartnershipStatus.CANCELLED);
-        List<Referral> expectedUpdatedReferralList = new ArrayList<>();
-        expectedUpdatedReferralList.add(cancelledReferral);
+        Map<String, Referral> expectedUpdatedReferralList = new HashMap<>();
+        expectedUpdatedReferralList.put(cancelledReferral.getTenantId(), cancelledReferral);
         Partnership partnershipWithUpdatedReferrals = partnershipWithReferrals.withSupportedReferrals(expectedUpdatedReferralList);
 
         // When
@@ -220,8 +222,8 @@ class PartnershipsServiceTest {
     void markAsCancelledReferralClient_existingReferralAlreadyCancelled_returnException(){
         // Given
         Referral cancelledReferral = referral.withPartnershipStatus(PartnershipStatus.CANCELLED);
-        List<Referral> expectedReferralList = new ArrayList<>();
-        expectedReferralList.add(cancelledReferral);
+        Map<String, Referral> expectedReferralList = new HashMap<>();
+        expectedReferralList.put(cancelledReferral.getTenantId(), cancelledReferral);
         Partnership partnershipWithReferrals = partnership.withSupportedReferrals(expectedReferralList);
 
         // When
@@ -236,15 +238,15 @@ class PartnershipsServiceTest {
     void markAsCancelledReferralClient_validReferralWithExistingTenants_returnPartnership(){
         // Given
         Referral newReferral = TestUtilities.createNewReferralWithTenantId("newTenantId");
-        List<Referral> expectedReferralList = new ArrayList<>();
-        expectedReferralList.add(referral);
-        expectedReferralList.add(newReferral);
+        Map<String, Referral> expectedReferralList = new HashMap<>();
+        expectedReferralList.put(referral.getTenantId(), referral);
+        expectedReferralList.put(newReferral.getTenantId(), newReferral);
         Partnership partnershipWithReferrals = partnership.withSupportedReferrals(expectedReferralList);
 
         Referral cancelledReferral = referral.withPartnershipStatus(PartnershipStatus.CANCELLED);
-        List<Referral> expectedUpdatedReferralList = new ArrayList<>();
-        expectedUpdatedReferralList.add(cancelledReferral);
-        expectedUpdatedReferralList.add(newReferral);
+        Map<String, Referral> expectedUpdatedReferralList = new HashMap<>();
+        expectedUpdatedReferralList.put(cancelledReferral.getTenantId(), cancelledReferral);
+        expectedUpdatedReferralList.put(newReferral.getTenantId(), newReferral);
         Partnership partnershipWithUpdatedReferrals = partnershipWithReferrals.withSupportedReferrals(expectedUpdatedReferralList);
 
         // When
