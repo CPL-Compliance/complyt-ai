@@ -1167,4 +1167,7 @@ public class UnitTestUtilities {
         );
     }
 
+    public WebhookDetails createWebhookDetails() {
+        return new WebhookDetails(false, null, null);
+    }
 }

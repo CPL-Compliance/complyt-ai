@@ -23,7 +23,6 @@ public class WebhookEntityWrapperTest {
 
     @Test
     void toString_SameStrings_Equal() {
-        boolean isPartial = false;
         String referenceString = "WebhookEntityWrapper[id=" + webhookEntityWrapper.id() +
                 ", timestamp=" + webhookEntityWrapper.timestamp() +
                 ", webhookClass=" + webhookEntityWrapper.webhookClass() +
