@@ -833,7 +833,7 @@ public class UnitTestUtilities {
     public ClientTracking createClientTracking(String tenantId) {
         Timestamps internalTimestamp = new Timestamps(localDateTime, localDateTime);
         return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope", internalTimestamp, null
-                , null, null, null);
+                , null);
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {

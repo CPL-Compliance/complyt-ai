@@ -47,13 +47,13 @@ class ClientTrackingTest {
         tenantId = UUID.randomUUID().toString();
         nexusDate = LocalDateTime.now();
         clientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name", null, null,
-                false, "", "");
+                null);
     }
 
     @Test
     void Equals_sameClientTracking_ReturnsTrue() {
         // Given
-        ClientTracking givenClientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name", null, null, false, "", "");
+        ClientTracking givenClientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name", null, null, null);
 
         // When
         boolean isEquals = clientTracking.equals(givenClientTracking);
@@ -71,9 +71,7 @@ class ClientTrackingTest {
                 ", name=" + clientTracking.getName() +
                 ", internalTimestamps=" + clientTracking.getInternalTimestamps() +
                 ", subsidiaries=" + clientTracking.getSubsidiaries() +
-                ", shouldForwardWriteOperations=" + clientTracking.getShouldForwardWriteOperations() +
-                ", host=" + clientTracking.getHost() +
-                ", path=" + clientTracking.getPath() +
+                ", webhookDetails=" + clientTracking.getWebhookDetails() +
                 ")";
 
         // When

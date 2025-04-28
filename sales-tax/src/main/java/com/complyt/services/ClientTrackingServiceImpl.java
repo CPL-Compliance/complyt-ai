@@ -87,7 +87,6 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
         return clientTrackingInfo ->
                 new ClientTracking(clientTrackingInfo.getId(), clientTrackingInfo.getTenantId(),
                         clientTracking.getNexus(), clientTracking.getName(), clientTracking.getInternalTimestamps(),
-                        clientTracking.getSubsidiaries(), clientTracking.getShouldForwardWriteOperations(),
-                        clientTracking.getHost(), clientTracking.getPath());
+                        clientTracking.getSubsidiaries(), clientTracking.getWebhookDetails());
     }
 }

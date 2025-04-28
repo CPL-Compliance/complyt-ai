@@ -65,8 +65,7 @@ class ClientTrackingServiceImplTest {
     void setUp() {
         Nexus nexus = new Nexus(null);
         Timestamps internalTimestamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
-        clientTracking = new ClientTracking(UUID.randomUUID().toString(), UUID.randomUUID().toString(), nexus, "name", internalTimestamps, null
-                , false, "", "");
+        clientTracking = new ClientTracking(UUID.randomUUID().toString(), UUID.randomUUID().toString(), nexus, "name", internalTimestamps, null, null);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.complyt.business.web_hook;
 
 import com.complyt.business.web_hook.web_clients.WebhookWebClientWrapper;
+import com.complyt.domain.ClientTracking;
 import com.complyt.domain.properties.ComplytIdProperty;
 import com.complyt.services.ClientTrackingService;
 import lombok.AllArgsConstructor;
@@ -24,11 +25,15 @@ public class WebhookHandler<T extends ComplytIdProperty> {
     public Mono<T> handleWebhook(Class<T> webhookClass, T object) {
 
         return clientTrackingService.getClientTracking()
-                .flatMap(clientTracking -> clientTracking.getShouldForwardWriteOperations() ?
+                .flatMap(clientTracking -> shouldForwardRequest(clientTracking) ?
                         webhookEntityCreator.create(webhookClass, object)
                                 .flatMap(webhookEntityWrapper ->
-                                        webhookWebClientWrapper.sendWebhook(webhookEntityWrapper, clientTracking.getHost(), clientTracking.getPath())) : null)
+                                        webhookWebClientWrapper.sendWebhook(webhookEntityWrapper, clientTracking.getWebhookDetails().host(), clientTracking.getWebhookDetails().path())) : Mono.empty())
                 .thenReturn(object);
+    }
+
+    private boolean shouldForwardRequest(ClientTracking clientTracking) {
+        return clientTracking.getWebhookDetails() != null && clientTracking.getWebhookDetails().shouldForwardWriteOperations();
     }
 
 }

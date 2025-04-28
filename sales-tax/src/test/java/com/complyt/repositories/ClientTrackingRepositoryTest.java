@@ -74,8 +74,8 @@ public class ClientTrackingRepositoryTest {
     }
 
     private ClientTracking createClientTracking() {
-        return new ClientTracking(tenantId, UUID.randomUUID().toString(), new Nexus(null), "name",null, null
-                , false, "", "");
+        return new ClientTracking(tenantId, UUID.randomUUID().toString(), new Nexus(null), "name",null, null,
+                null);
     }
 
     @Test
