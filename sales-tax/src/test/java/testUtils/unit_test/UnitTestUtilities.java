@@ -1157,4 +1157,14 @@ public class UnitTestUtilities {
 
         return vatDetailsToValidateDto;
     }
+
+    public WebhookEntityWrapper<Transaction> createWebhookEntityWrapper() {
+        return new WebhookEntityWrapper<>(
+                UUID.randomUUID(),
+                LocalDateTime.now(),
+                Transaction.class,
+                createTransaction(UUID.randomUUID().toString())
+        );
+    }
+
 }
