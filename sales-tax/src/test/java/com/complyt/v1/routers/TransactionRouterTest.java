@@ -2,14 +2,13 @@ package com.complyt.v1.routers;
 
 import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerLookupDetail;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.security.TenantResolver;
-import com.complyt.services.CustomerDeterminationUtility;
+import com.complyt.services.TransactionEnrichmentService;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
@@ -32,7 +31,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,14 +80,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @MockBean
     private TransactionFacade transactionFacade;
     @MockBean
-    private CustomerDeterminationUtility customerDeterminationUtility;
+    private TransactionEnrichmentService transactionEnrichmentService;
     @MockBean
     Patcher<TransactionDto> transactionPatcher;
     @Autowired
     private WebTestClient webTestClient;
 
-    @Mock
     Customer customer;
+
 
 
     static MockedStatic mockedStatic;
@@ -118,8 +116,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .withCustomer(null);
         transaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
         source = testUtilities.getUnifiedSource();
+        customer = testUtilities.createCustomer("customerId").withTenantId("it_tenant");
 
-        when(customerDeterminationUtility.determineCustomerForTransaction(any())).thenReturn(Mono.just(customer));
+
+        when(transactionEnrichmentService.enrich(any())).thenReturn(Mono.just(transaction.withCustomer(customer).withCustomerId(customer.getComplytId())));
     }
 
     private ShippingAddressDto changeShippingAddressToUsa(ShippingAddressDto shippingAddress) {
@@ -893,8 +893,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         UUID complytId = UUID.randomUUID();
 
         // When + Then
-        when(customerDeterminationUtility.determineCustomerForTransaction(new CustomerLookupDetail(transactionDtoToSend.customerId(), transactionDtoToSend.customerExternalRef(), transactionDtoToSend.customerSource())))
-                .thenReturn(Mono.just(customer));
+//        when(transactionEnrichmentService.determineCustomerForTransaction(new CustomerLookupDetail(transactionDtoToSend.customerId(), transactionDtoToSend.customerExternalRef(), transactionDtoToSend.customerSource())))
+//                .thenReturn(Mono.just(customer));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(sentTransaction)).thenReturn(Mono.just(sentTransaction.withComplytId(complytId)));
         TransactionDto expectedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(sentTransaction.withComplytId(complytId))
@@ -922,8 +922,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
 
         // When + Then
-        when(customerDeterminationUtility.determineCustomerForTransaction(new CustomerLookupDetail(transactionDto.customerId(), transactionDto.customerExternalRef(), transactionDto.customerSource())))
-                .thenReturn(Mono.just(customer));
+//        when(transactionEnrichmentService.determineCustomerForTransaction(new CustomerLookupDetail(transactionDto.customerId(), transactionDto.customerExternalRef(), transactionDto.customerSource())))
+//                .thenReturn(Mono.just(customer));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto).withCustomer(customer))).thenReturn(Mono.just(transaction));
         TransactionDto expectedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transaction);
@@ -1326,8 +1326,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(mappedTransaction);
 
         // When + Then
-        when(customerDeterminationUtility.determineCustomerForTransaction(new CustomerLookupDetail(transactionDto.customerId(), transactionDto.customerExternalRef(), transactionDto.customerSource())))
-                .thenReturn(Mono.just(customer));
+//        when(transactionEnrichmentService.determineCustomerForTransaction(new CustomerLookupDetail(transactionDto.customerId(), transactionDto.customerExternalRef(), transactionDto.customerSource())))
+//                .thenReturn(Mono.just(customer));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionFacade.saveTransaction(mappedTransaction)).thenReturn(Mono.empty());
         when(transactionFacade.update(externalId, source, mappedTransaction, transaction)).thenReturn(Mono.just(updatedTransaction));
@@ -4388,7 +4388,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
-        when(customerDeterminationUtility.determineCustomerForTransaction(new CustomerLookupDetail(givenTransactionDto.customerId(), givenTransactionDto.customerExternalRef(), givenTransactionDto.customerSource()))).thenReturn(Mono.just(customer));
+        //when(transactionEnrichmentService.determineCustomerForTransaction(new CustomerLookupDetail(givenTransactionDto.customerId(), givenTransactionDto.customerExternalRef(), givenTransactionDto.customerSource()))).thenReturn(Mono.just(customer));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));

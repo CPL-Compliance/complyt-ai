@@ -1,12 +1,11 @@
 package com.complyt.v1.handlers;
 
 import com.complyt.business.pagination.PaginationConstants;
-import com.complyt.domain.customer.CustomerLookupDetail;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.security.permissions.transaction.TransactionCreatePermission;
 import com.complyt.security.permissions.transaction.TransactionDeletePermission;
 import com.complyt.security.permissions.transaction.TransactionReadPermission;
-import com.complyt.services.CustomerDeterminationUtility;
+import com.complyt.services.TransactionEnrichmentService;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.transaction.TransactionMapper;
@@ -40,7 +39,7 @@ public class TransactionHandler {
     TransactionFacade transactionFacade;
 
     @NonNull
-    CustomerDeterminationUtility customerDeterminationUtility;
+    TransactionEnrichmentService transactionEnrichmentService;
 
     @NonNull
     ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler;
@@ -150,13 +149,7 @@ public class TransactionHandler {
                 .then(transactionDtoValidationHandler.handle(serverRequest)
                         .flatMap(transactionDto -> ContextLogger.observeCtx("--> Body: " + transactionDto, log::info)
                                 .thenReturn(transactionDto))
-                        .flatMap(transactionDto -> customerDeterminationUtility
-                                .determineCustomerForTransaction( new CustomerLookupDetail(
-                                        transactionDto.customerId(),
-                                        transactionDto.customerExternalRef(),
-                                        transactionDto.customerSource())
-                                )
-                                .map(customer -> TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto).setCustomer(customer).setCustomerId(customer.getComplytId())))
+                        .flatMap(transactionEnrichmentService::enrich)
                         .flatMap(receivedTransaction ->
                                 transactionFacade.findByExternalIdAndSource(externalId, source)
                                         .flatMap(originalTransaction -> transactionFacade.update(externalId, source, receivedTransaction, originalTransaction)

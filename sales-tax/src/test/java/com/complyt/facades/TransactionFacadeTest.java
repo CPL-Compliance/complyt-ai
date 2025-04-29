@@ -15,7 +15,7 @@ import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.security.TenantResolver;
-import com.complyt.services.CustomerDeterminationUtility;
+import com.complyt.services.TransactionEnrichmentService;
 import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
@@ -58,7 +58,7 @@ public class TransactionFacadeTest {
     CustomerService customerService;
 
     @Mock
-    CustomerDeterminationUtility customerDeterminationUtility;
+    TransactionEnrichmentService transactionEnrichmentService;
 
     @Mock
     SalesTaxService salesTaxService;
