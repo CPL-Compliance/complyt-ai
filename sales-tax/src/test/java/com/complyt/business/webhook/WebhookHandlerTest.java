@@ -4,6 +4,7 @@ import com.complyt.business.web_hook.WebhookEntityCreator;
 import com.complyt.business.web_hook.WebhookHandler;
 import com.complyt.business.web_hook.web_clients.WebhookWebClientWrapper;
 import com.complyt.domain.ClientTracking;
+import com.complyt.domain.WebhookEntityWrapper;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.services.ClientTrackingService;
 import org.junit.jupiter.api.Test;
@@ -55,7 +56,7 @@ public class WebhookHandlerTest {
 
         // When
         when(clientTrackingService.getClientTracking()).thenReturn(Mono.just(clientTracking));
-        Mono<Transaction> transactionMono = webhookHandler.handleWebhook(Transaction.class,transaction);
+        Mono<Transaction> transactionMono = webhookHandler.handleWebhook(Transaction.class, transaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
@@ -67,7 +68,26 @@ public class WebhookHandlerTest {
         ClientTracking clientTrackingToSend = clientTracking.withWebhookDetails(testUtilities.createWebhookDetails());
         // When
         when(clientTrackingService.getClientTracking()).thenReturn(Mono.just(clientTrackingToSend));
-        Mono<Transaction> transactionMono = webhookHandler.handleWebhook(Transaction.class,transaction);
+        Mono<Transaction> transactionMono = webhookHandler.handleWebhook(Transaction.class, transaction);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
+    }
+
+    @Test
+    public void handleWebhook_ShouldForwardRequest_SendsRequestToWebClientWrapper() {
+        // Given
+        ClientTracking clientTrackingToSend = clientTracking.withWebhookDetails(testUtilities.createWebhookDetails()
+                .withShouldForwardWriteOperations(true)
+                .withHost("host")
+                .withPath("path"));
+        WebhookEntityWrapper<Transaction> webhookEntityWrapper = testUtilities.createWebhookEntityWrapper();
+
+        // When
+        when(clientTrackingService.getClientTracking()).thenReturn(Mono.just(clientTrackingToSend));
+        when(webhookEntityCreator.create(Transaction.class, transaction)).thenReturn(Mono.just(webhookEntityWrapper));
+        when(webhookWebClientWrapper.sendWebhook(webhookEntityWrapper, clientTrackingToSend.getWebhookDetails().host(), clientTrackingToSend.getWebhookDetails().path())).thenReturn(Mono.just(transaction));
+        Mono<Transaction> transactionMono = webhookHandler.handleWebhook(Transaction.class, transaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
