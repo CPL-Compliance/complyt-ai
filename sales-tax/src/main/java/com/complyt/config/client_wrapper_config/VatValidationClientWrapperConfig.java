@@ -18,9 +18,9 @@ public class VatValidationClientWrapperConfig {
                                                                           @Autowired WebClientWrapperProperties vowVatValidationWebClientWrapperProperties) {
         return new VowVatValidationWebClientWrapper(
                 vowVatValidationWebClient,
-                vowVatValidationWebClientWrapperProperties.getScheme(),
-                vowVatValidationWebClientWrapperProperties.getHost(),
-                vowVatValidationWebClientWrapperProperties.getPath()
+                vowVatValidationWebClientWrapperProperties.scheme(),
+                vowVatValidationWebClientWrapperProperties.host(),
+                vowVatValidationWebClientWrapperProperties.path()
         );
     }
 
