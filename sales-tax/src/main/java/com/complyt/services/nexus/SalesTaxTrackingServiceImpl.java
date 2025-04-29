@@ -202,7 +202,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
 
-    public Mono<SalesTaxTracking> updateAppliedDateIfIsPhysicalNexusEstablished(SalesTaxTracking salesTaxTracking) {
+    public Mono<SalesTaxTracking> updateAppliedDateIfIsPhysicalNexusEstablished(@NonNull SalesTaxTracking salesTaxTracking) {
         return Mono.just(nexusDateApplyDateInitializer.init(salesTaxTracking));
     }
 

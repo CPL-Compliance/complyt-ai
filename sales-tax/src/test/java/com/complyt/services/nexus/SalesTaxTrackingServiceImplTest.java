@@ -2,6 +2,7 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
+import com.complyt.business.timestamps_injection.NexusDateApplyDateInitializer;
 import com.complyt.business.timestamps_injection.SalesTaxTrackingRegisteredDateTimestampsInjector;
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.State;
@@ -66,6 +67,9 @@ public class SalesTaxTrackingServiceImplTest {
     ComplytIdHandler<SalesTaxTracking> complytIdHandler;
 
     @Mock
+    NexusDateApplyDateInitializer nexusDateApplyDateInitializer;
+
+    @Mock
     NexusService nexusService;
 
     SalesTaxTracking salesTaxTracking;
@@ -75,6 +79,7 @@ public class SalesTaxTrackingServiceImplTest {
     UnitTestUtilities testUtilities;
 
     Transaction transaction;
+
 
     private NexusStateRule nexusStateRule;
 
@@ -706,9 +711,13 @@ public class SalesTaxTrackingServiceImplTest {
     }
 
     @Test
-    void updateAppliedDateIfIsPhysicalEconomicEnabled_EstablishedFalse_ReturnsSalesTaxTracking() {
+    void updateAppliedDate_EconomicFalse_PhysicalFalse_ReturnsSalesTaxTracking() {
         // Given
         salesTaxTracking = salesTaxTracking.withPhysicalNexusTracker(salesTaxTracking.getPhysicalNexusTracker().withEstablished(false));
+
+        //When
+        when(nexusDateApplyDateInitializer.init(salesTaxTracking)).thenReturn(salesTaxTracking);
+
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.updateAppliedDateIfIsPhysicalNexusEstablished(salesTaxTracking);
 
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
