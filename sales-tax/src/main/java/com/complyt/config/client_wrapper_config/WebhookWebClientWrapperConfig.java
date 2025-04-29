@@ -16,9 +16,9 @@ public class WebhookWebClientWrapperConfig<T extends ComplytIdProperty> {
                                                                         @Autowired WebClientWrapperProperties webhookWebClientWrapperProperties) {
         return new WebhookWebClientWrapper<>(
                 webhookWebClient,
-                webhookWebClientWrapperProperties.scheme(),
-                webhookWebClientWrapperProperties.host(),
-                webhookWebClientWrapperProperties.path());
+                webhookWebClientWrapperProperties.getScheme(),
+                webhookWebClientWrapperProperties.getHost(),
+                webhookWebClientWrapperProperties.getPath());
     }
 
 }

@@ -77,22 +77,22 @@ public class VowVatVatlidationWebClientWrapperTest {
 
         // initializing vowVatValidationWebClientWrapper
         {
-            when(vowVatValidationWebClientWrapperProperties.scheme()).thenReturn("scheme");
-            when(vowVatValidationWebClientWrapperProperties.host()).thenReturn("host");
-            when(vowVatValidationWebClientWrapperProperties.path()).thenReturn("path");
+            when(vowVatValidationWebClientWrapperProperties.getScheme()).thenReturn("scheme");
+            when(vowVatValidationWebClientWrapperProperties.getHost()).thenReturn("host");
+            when(vowVatValidationWebClientWrapperProperties.getPath()).thenReturn("path");
 
             vowVatValidationWebClientWrapper = new VowVatValidationWebClientWrapper(webClient,
-                    vowVatValidationWebClientWrapperProperties.scheme(),
-                    vowVatValidationWebClientWrapperProperties.host(),
-                    vowVatValidationWebClientWrapperProperties.path());
+                    vowVatValidationWebClientWrapperProperties.getScheme(),
+                    vowVatValidationWebClientWrapperProperties.getHost(),
+                    vowVatValidationWebClientWrapperProperties.getPath());
         }
 
         // initializing anotherVowVatValidationWebClientWrapper
         {
             anotherVowVatValidationWebClientWrapper = new VowVatValidationWebClientWrapper(webClient,
-                    vowVatValidationWebClientWrapperProperties.scheme(),
-                    vowVatValidationWebClientWrapperProperties.host(),
-                    vowVatValidationWebClientWrapperProperties.path());
+                    vowVatValidationWebClientWrapperProperties.getScheme(),
+                    vowVatValidationWebClientWrapperProperties.getHost(),
+                    vowVatValidationWebClientWrapperProperties.getPath());
         }
     }
 
