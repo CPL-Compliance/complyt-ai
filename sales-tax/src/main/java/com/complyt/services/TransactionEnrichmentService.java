@@ -1,7 +1,6 @@
 package com.complyt.services;
 
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerLookupDetail;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.utils.StringChecker;
 import com.complyt.v1.exceptions.types.CustomerNotFoundApiException;
@@ -21,23 +20,21 @@ public class TransactionEnrichmentService {
 
     public Mono<Transaction> enrich(final TransactionDto transactionDto) {
         return
-                determineCustomerForTransaction(new CustomerLookupDetail(
+                determineCustomerForTransaction(
                         transactionDto.customerId(),
                         transactionDto.customerExternalRef(),
-                        transactionDto.customerSource())
+                        transactionDto.customerSource()
                 )
                         .map(customer -> mapTransactionWithCustomerDetails(transactionDto, customer));
     }
 
-    private Mono<Customer> determineCustomerForTransaction(final CustomerLookupDetail customerLookupDetail) {
+    private Mono<Customer> determineCustomerForTransaction(final UUID customerId, final String customerExternalReference,
+                                                           final String customerSource) {
         Mono<Customer> customerMono = Mono.empty();
-        final String externalReference = customerLookupDetail.customerExternalReference();
-        final String source = customerLookupDetail.customerSource();
-        final UUID customerId = customerLookupDetail.customerId();
         if (customerId != null) {
             customerMono = customerService.findByComplytId(customerId);
-        } else if (StringChecker.isInputValid(externalReference, source)) {
-            customerMono = customerService.findByExternalIdAndSource(externalReference, source);
+        } else if (StringChecker.isInputValid(customerExternalReference, customerSource)) {
+            customerMono = customerService.findByExternalIdAndSource(customerExternalReference, customerSource);
         }
         return customerMono.switchIfEmpty(Mono.error(CustomerNotFoundApiException::new));
     }
