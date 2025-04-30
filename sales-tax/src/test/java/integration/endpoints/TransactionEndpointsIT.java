@@ -4,6 +4,8 @@ import com.complyt.SalesTaxApplication;
 import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.currency.CurrencySource;
+import com.complyt.domain.sales_tax.RatesMetaData;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
@@ -4506,5 +4508,172 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     System.out.println("transactionDto: " + transactionDto);
                     assertEquals(expectedSalesTax, transactionDto.salesTax());
                 });
+    }
+
+    @Order(1)
+    @Test
+    @WithMockJwt
+    public void upsertByExternalIdAndSource_FixedTypeStateLevel_ReturnsFixedTaxRate() {
+        // Given
+        String externalId = "transactionWithFixedStateLevelItem";
+
+        List<ItemDto> items = Collections.singletonList(
+                ITUtilities.stubItemDto()
+                        .withTaxCode("C6S7") // Taxable, specialTreatment & Fixed in StateLevel of 0.1
+        );
+
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withItems(items)
+                .withTaxInclusive(false);
+
+        givenTransaction = givenTransaction.withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null));
+
+
+        // When & Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+
+                    ItemDto item = transactionDto.items().get(0);
+
+                    assertEquals("FIXED", item.jurisdictionalSalesTaxRules().calculationType().name());
+                    assertEquals(BigDecimal.valueOf(0.1), item.jurisdictionalSalesTaxRules().calculationValue());
+
+                    assertEquals(BigDecimal.valueOf(0.1), item.salesTaxRates().taxRate());
+                    assertEquals(BigDecimal.valueOf(0.1), item.salesTaxRates().stateRate());
+                    assertEquals(BigDecimal.ZERO, item.salesTaxRates().cityRate());
+                    assertEquals(BigDecimal.ZERO, item.salesTaxRates().countyRate());
+                    assertEquals(BigDecimal.ZERO, item.salesTaxRates().spdRate());
+                    assertEquals(BigDecimal.ZERO, item.salesTaxRates().mtaRate());
+                    assertEquals(BigDecimal.ZERO, item.salesTaxRates().otherRate());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @WithMockJwt
+    public void upsertByExternalIdAndSource_FixedTypeStateLevelCityLevel_ReturnsFixedTaxRate() {
+        // Given
+        String externalId = "transactionWithFixedStateLevelCityLevelItem";
+
+        List<ItemDto> items = Collections.singletonList(
+                ITUtilities.stubItemDto()
+                        .withTaxCode("C6S9") // Taxable, specialTreatment & Fixed in StateLevel,CityLevel of 0.1
+        );
+
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withItems(items)
+                .withTaxInclusive(false);
+
+        givenTransaction = givenTransaction.withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null));
+
+
+        // When & Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+
+                    ItemDto item = transactionDto.items().get(0);
+
+                    assertEquals("FIXED", item.jurisdictionalSalesTaxRules().calculationType().name());
+                    assertEquals(BigDecimal.valueOf(0.1), item.jurisdictionalSalesTaxRules().calculationValue());
+                    assertEquals("FIXED", item.jurisdictionalSalesTaxRules().cities().get("Juneau").getCalculationType().name());
+                    assertEquals(BigDecimal.valueOf(0.2), item.jurisdictionalSalesTaxRules().cities().get("Juneau").getCalculationValue());
+
+                    assertEquals(BigDecimal.valueOf(0.3), item.salesTaxRates().taxRate());
+                    assertEquals(BigDecimal.valueOf(0.1), item.salesTaxRates().stateRate());
+                    assertEquals(BigDecimal.valueOf(0.2), item.salesTaxRates().cityRate());
+                    assertEquals(BigDecimal.ZERO, item.salesTaxRates().countyRate());
+                    assertEquals(BigDecimal.ZERO, item.salesTaxRates().spdRate());
+                    assertEquals(BigDecimal.ZERO, item.salesTaxRates().mtaRate());
+                    assertEquals(BigDecimal.ZERO, item.salesTaxRates().otherRate());
+                });
+    }
+
+    @Order(2)
+    @Test
+    @WithMockJwt
+    public void upsertByExternalIdAndSource_PercentageTypeStateLevel_ReturnsPercentageTaxRate() {
+        // Given
+        String externalId = "transactionWithPercentageTax";
+        BigDecimal originalTaxRate = BigDecimal.valueOf(0.0775);
+        BigDecimal percentageTaxRate = BigDecimal.valueOf(0.1); // 10% tax rate
+        BigDecimal expectedTaxPercentage = BigDecimalProcessor.removeTrailingZeros(originalTaxRate.multiply(percentageTaxRate).stripTrailingZeros());
+        BigDecimal originalItemAmount = BigDecimal.valueOf(10000);
+        BigDecimal expectedTaxAmount = BigDecimalProcessor.removeTrailingZeros(originalItemAmount.multiply(expectedTaxPercentage));
+
+
+        List<ItemDto> items = Collections.singletonList(
+                ITUtilities.stubItemDto()
+                        .withTaxCode("C6S8") // Taxable, Percentage Type, value 0.1
+        );
+
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withItems(items)
+                .withTaxInclusive(false);
+
+        givenTransaction = givenTransaction.withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null));
+
+        // When & Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertNotNull(transactionDto);
+                    assertEquals(1, transactionDto.items().size());
+
+                    ItemDto item = transactionDto.items().get(0);
+
+                    assertEquals("PERCENTAGE", item.jurisdictionalSalesTaxRules().calculationType().name());
+                    assertEquals(BigDecimal.valueOf(0.1), item.jurisdictionalSalesTaxRules().calculationValue());
+
+                    // Validate the item tax rate is the expected percentage
+                    assertMultipliedOrNull(salesTaxRatesDto.taxRate(), item.salesTaxRates().taxRate(), percentageTaxRate);
+                    assertMultipliedOrNull(salesTaxRatesDto.cityRate(), item.salesTaxRates().cityRate(), percentageTaxRate);
+                    assertMultipliedOrNull(salesTaxRatesDto.countyRate(), item.salesTaxRates().countyRate(), percentageTaxRate);
+                    assertMultipliedOrNull(salesTaxRatesDto.spdRate(), item.salesTaxRates().spdRate(), percentageTaxRate);
+                    assertMultipliedOrNull(salesTaxRatesDto.mtaRate(), item.salesTaxRates().mtaRate(), percentageTaxRate);
+                    assertMultipliedOrNull(salesTaxRatesDto.ratesMetaData().cityDistrictRate(), item.salesTaxRates().ratesMetaData().cityDistrictRate(), percentageTaxRate);
+                    assertMultipliedOrNull(salesTaxRatesDto.ratesMetaData().countyDistrictRate(), item.salesTaxRates().ratesMetaData().countyDistrictRate(), percentageTaxRate);
+                    assertMultipliedOrNull(salesTaxRatesDto.ratesMetaData().specialDistrictRate(), item.salesTaxRates().ratesMetaData().specialDistrictRate(), percentageTaxRate);
+
+                    // Validate that transaction SalesTax matches
+                    assertEquals(expectedTaxAmount, transactionDto.salesTax().amount());
+
+                });
+    }
+
+    private void assertMultipliedOrNull(BigDecimal original, BigDecimal actual, BigDecimal multiplier) {
+        if (original != null) {
+            assertEquals(original.multiply(multiplier).stripTrailingZeros(), actual);
+        } else {
+            assertNull(actual);
+        }
     }
 }

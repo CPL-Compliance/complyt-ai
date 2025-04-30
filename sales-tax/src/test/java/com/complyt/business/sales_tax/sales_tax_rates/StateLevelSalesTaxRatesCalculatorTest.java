@@ -80,10 +80,17 @@ public class StateLevelSalesTaxRatesCalculatorTest {
     void calculateSalesTaxRate_FixedCalculation_ReturnsModifiedTaxRate() {
         // Given
         BigDecimal fixedStateRateValue = new BigDecimal("0.1");
-        BigDecimal calculatedTaxRateValue = salesTaxRates.taxRate().subtract(salesTaxRates.stateRate()).add(fixedStateRateValue);
+
         SalesTaxRates expectedSalesTaxRate = salesTaxRates
                 .withStateRate(fixedStateRateValue)
-                .withTaxRate(calculatedTaxRateValue);
+                .withCountyRate(BigDecimal.ZERO)
+                .withCityRate(BigDecimal.ZERO)
+                .withMtaRate(BigDecimal.ZERO)
+                .withSpdRate(BigDecimal.ZERO)
+                .withOtherRate(BigDecimal.ZERO)
+                .withRatesMetaData(new RatesMetaData(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO))
+                .withTaxRate(fixedStateRateValue);
+
         JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules
                 .withCalculationType(CalculationType.FIXED)
                 .withSpecialTreatment(true)
@@ -100,10 +107,31 @@ public class StateLevelSalesTaxRatesCalculatorTest {
     void getRateByRules_CalculationTypeSetToPercentage_OverridesStateRate() {
         // Given
         JurisdictionalSalesTaxRules percentageCalculationTypeRule = jurisdictionalSalesTaxRules
-                .withCalculationType(CalculationType.PERCENTAGE)
+                .withCalculationType(CalculationType.PERCENTAGE) // value=0.05
                 .withSpecialTreatment(true);
-        BigDecimal calculatedRate = percentageCalculationTypeRule.getCalculationValue().multiply(salesTaxRates.taxRate());
-        SalesTaxRates expectedSalesTaxRate = salesTaxRates.withTaxRate(calculatedRate);
+
+        BigDecimal calculatedTaxRate = percentageCalculationTypeRule.getCalculationValue().multiply(salesTaxRates.taxRate()).stripTrailingZeros();
+        BigDecimal calculatedRate = percentageCalculationTypeRule.getCalculationValue().multiply(salesTaxRates.stateRate()).stripTrailingZeros();
+        SalesTaxRates expectedSalesTaxRate = salesTaxRates.withStateRate(calculatedRate).withCityRate(calculatedRate).withCountyRate(calculatedRate).withTaxRate(calculatedTaxRate);
+
+        // When + Then
+        SalesTaxRates returnedRate = stateLevelSalesTaxRatesCalculator.calculate(percentageCalculationTypeRule, salesTaxRates);
+        Assertions.assertEquals(expectedSalesTaxRate, returnedRate);
+    }
+
+    @Test
+    void getRateByRules_CalculationTypeSetToPercentage_RatesMetaDataNotNull_OverridesStateRate() {
+        // Given
+        RatesMetaData ratesMetaDataOriginal = new RatesMetaData(BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO);
+        RatesMetaData ratesMetaDataPercentage = ratesMetaDataOriginal.withCityDistrictRate(BigDecimal.valueOf(0.5));
+        salesTaxRates = salesTaxRates.withRatesMetaData(ratesMetaDataOriginal);
+        JurisdictionalSalesTaxRules percentageCalculationTypeRule = jurisdictionalSalesTaxRules
+                .withCalculationType(CalculationType.PERCENTAGE) // value=0.05
+                .withSpecialTreatment(true);
+
+        BigDecimal calculatedTaxRate = percentageCalculationTypeRule.getCalculationValue().multiply(salesTaxRates.taxRate()).stripTrailingZeros();
+        BigDecimal calculatedRate = percentageCalculationTypeRule.getCalculationValue().multiply(salesTaxRates.stateRate()).stripTrailingZeros();
+        SalesTaxRates expectedSalesTaxRate = salesTaxRates.withStateRate(calculatedRate).withCityRate(calculatedRate).withCountyRate(calculatedRate).withRatesMetaData(ratesMetaDataPercentage).withTaxRate(calculatedTaxRate);
 
         // When + Then
         SalesTaxRates returnedRate = stateLevelSalesTaxRatesCalculator.calculate(percentageCalculationTypeRule, salesTaxRates);
