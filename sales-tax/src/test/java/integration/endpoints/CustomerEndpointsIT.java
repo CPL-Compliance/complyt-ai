@@ -26,9 +26,9 @@ import testUtils.integration_test.WithMockJwt;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -373,6 +373,28 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .expectStatus().isOk();
     }
 
+    @Order(3)
+    @Test
+    @WithMockJwt
+    public void upsertByExternalIdAndSource_withCustomerTypeNull_Exists_usesTheOriginalCustomerType_Returns200() {
+        // Given
+        String externalId = "1001";
+        CustomerDto customerDto = ITUtilities.stubCustomerDto(externalId);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf()).put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(customerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(CustomerDto::customerType, equalTo(CustomerTypeDto.RETAIL));
+    }
+
     @Override
     @WithMockJwt
     public void upsertByExternalIdAndSource_PathVariableError_Returns400() {
@@ -480,16 +502,12 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
     @Order(2)
     @Test
-    @Override
     @WithMockJwt
-    public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError() {
+    public void upsertByExternalIdAndSource_WithNullCustomerType_ReturnedCustomerShouldBeOfTypeRetail_Returns201Created() {
         // Given
         String externalId = "1003";
         CustomerDto customerDto = ITUtilities.stubCustomerDto(externalId)
                 .withCustomerType(null).withName(null);
-        Set<String> expectedErrors = Set.of(
-                "customerType " + DtoErrorMessages.NOT_NULL_ERROR
-        );
 
         // Then
         webTestClient
@@ -501,16 +519,9 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .bodyValue(customerDto)
                 .exchange()
 
-                .expectStatus().isBadRequest()
-                .expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .expectStatus().isCreated()
+                .expectBody(CustomerDto.class)
+                .value(CustomerDto::customerType, equalTo(CustomerTypeDto.RETAIL));
     }
 
     @Order(0)

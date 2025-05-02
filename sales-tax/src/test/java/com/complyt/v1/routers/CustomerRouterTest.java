@@ -131,8 +131,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                DtoErrorMessages.SOURCE_FORMAT_ERROR,
-                "customerType " + DtoErrorMessages.NOT_NULL_ERROR));
+                DtoErrorMessages.SOURCE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -798,13 +797,17 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
-    @Override
     @Test
     @WithMockJwt
-    public void upsert_NullCustomerType_Returns400ValidationError() {
+    public void upsert_NullCustomerType_Returns201Created() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
+        CustomerDto customerDtoWithNullCustomerType = customerDto.withCustomerType(null);
+
+        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDtoWithNullCustomerType);
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
+        when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
 
         // When + Then
         webTestClient
@@ -813,14 +816,11 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(customerDto.withCustomerType(null))
+                .bodyValue(customerDtoWithNullCustomerType)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[customerType may not be null]", message);
-                });
+                //customerDto has a RETAIL customerType, we expect it to default to that when passing a nullCustomerType
+                .expectStatus().isCreated().equals(customerDto);
     }
 
     @Test

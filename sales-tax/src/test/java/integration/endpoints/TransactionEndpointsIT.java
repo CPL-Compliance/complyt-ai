@@ -4,8 +4,6 @@ import com.complyt.SalesTaxApplication;
 import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.currency.CurrencySource;
-import com.complyt.domain.sales_tax.RatesMetaData;
-import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
@@ -2286,7 +2284,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Order(2)
     @Test
-    @Override
     @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError() {
         // Given
