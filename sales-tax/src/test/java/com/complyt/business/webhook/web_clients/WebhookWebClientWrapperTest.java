@@ -60,16 +60,32 @@ public class WebhookWebClientWrapperTest {
 
     @Test
     void sendWebhook_SendsWebhook() {
-        // Given
-
-        // When
+        // Given + When
         when(webClient.post()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(any(URI.class))).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.header(anyString(), anyString())).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.body(any(Object.class), eq(WebhookEntityWrapper.class))).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(Transaction.class)).thenReturn(Mono.just(webhookEntityWrapper.object()));
+        when(responseSpec.bodyToMono(webhookEntityWrapper.webhookClass())).thenReturn(Mono.just(webhookEntityWrapper.object()));
+
+        Mono<Transaction> transactionMono = webhookWebClientWrapper.sendWebhook(webhookEntityWrapper, "host", "path");
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(webhookEntityWrapper.object()).verifyComplete();
+    }
+
+    @Test
+    void sendWebhook_ErrorReturned_RequestFails() {
+
+        // Given + When
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(any(URI.class))).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.header(anyString(), anyString())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.body(any(Object.class), eq(WebhookEntityWrapper.class))).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(webhookEntityWrapper.webhookClass())).thenReturn(Mono.error(new RuntimeException("Webhook call failed")));
 
         Mono<Transaction> transactionMono = webhookWebClientWrapper.sendWebhook(webhookEntityWrapper, "host", "path");
 
