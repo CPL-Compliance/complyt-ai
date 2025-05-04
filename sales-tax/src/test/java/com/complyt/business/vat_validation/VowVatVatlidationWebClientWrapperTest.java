@@ -54,7 +54,7 @@ public class VowVatVatlidationWebClientWrapperTest {
     private WebClient.RequestHeadersSpec requestHeadersSpec;
 
 
-     static MockedStatic mockedStatic;
+    static MockedStatic mockedStatic;
 
     @BeforeAll
     static void beforeAll() {
@@ -173,10 +173,9 @@ public class VowVatVatlidationWebClientWrapperTest {
 
         // Then
         StepVerifier.create(validatedVatMono).expectErrorMatches(throwable ->
-            throwable instanceof RuntimeException
-                && throwable.getMessage().equals("5 Retries Exhausted")
+                throwable instanceof RuntimeException
+                        && throwable.getMessage().equals("5 Retries Exhausted")
         ).verify();
-//        StepVerifier.create(validatedVatMono).expectNext(validatedVat).verifyComplete();
 
     }
 }

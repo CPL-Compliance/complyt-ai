@@ -37,7 +37,7 @@ public class WebhookWebClientWrapper<T extends ComplytIdProperty> extends WebCli
                         .uri(uri)
                         .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(Mono.just(webhookEntityWrapper), WebhookEntityWrapper.class)
+                        .body(webhookEntityWrapper, WebhookEntityWrapper.class)
                         .retrieve()
                         .bodyToMono(webhookEntityWrapper.webhookClass())
                         .onErrorResume(err -> ContextLogger.observeCtx(
