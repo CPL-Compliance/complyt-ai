@@ -18,23 +18,7 @@ class NexusTest {
     private Nexus nexus;
     private LocalDateTime nexusDate;
 
-     static MockedStatic mockedStatic;
 
-    @BeforeAll
-    static void beforeAll() {
-        try {
-            mockedStatic = mockStatic(TenantResolver.class);
-        } catch (Exception e) {
-            // Log the error or fail the test setup
-            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    @AfterAll
-    static void afterAll() {
-        mockedStatic.close();
-    }
 
     @BeforeEach
     void setup() {

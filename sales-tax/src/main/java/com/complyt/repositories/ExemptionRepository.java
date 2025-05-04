@@ -31,10 +31,10 @@ public class ExemptionRepository {
     CountryAndStateCriteriaBuilder countryQueryBuilder;
 
     @NonNull
-    private TenantResolver tenantResolver;
+    
 
     public Mono<Exemption> findFullyExempted(@NonNull UUID customerId, @NonNull String country, String state, @NonNull LocalDateTime createdDate) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)
                                     .and("customerId").is(customerId))
@@ -51,7 +51,7 @@ public class ExemptionRepository {
     }
 
     public Mono<Exemption> save(@NonNull final Exemption exemption) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Exemption exemptionWithTenantId = exemption.withTenantId(tenantId);
 
@@ -62,7 +62,7 @@ public class ExemptionRepository {
 
     @Deprecated
     public Mono<Exemption> findById(@NonNull final String id) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id)
                             .and("tenantId").is(tenantId));
@@ -73,7 +73,7 @@ public class ExemptionRepository {
     }
 
     public Mono<Exemption> findByComplytId(@NonNull final UUID complytId) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("complytId").is(complytId)
                             .and("tenantId").is(tenantId));
@@ -85,7 +85,7 @@ public class ExemptionRepository {
 
     public Flux<Exemption> findAll(int page, int size) {
         int calculatedOffset = (page - 1) * size;
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId))
                             .skip(calculatedOffset).limit(size);

@@ -6,6 +6,9 @@ import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import io.complyt.apigateway.security.TenantResolver;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import reactor.core.publisher.Mono;
@@ -14,6 +17,9 @@ import reactor.test.StepVerifier;
 import java.util.logging.Logger;
 
 import static org.mockito.Mockito.*;
+
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 class ContextLoggerTest {
 

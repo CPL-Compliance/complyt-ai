@@ -31,10 +31,10 @@ public class NexusStateRuleRepository {
     CountryAndStateCriteriaBuilder countryQueryBuilder;
 
     @NonNull
-    private TenantResolver tenantResolver;
+    
 
     public Mono<NexusStateRule> findById(@NonNull String id) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     return ContextLogger.observeCtx("Searching for nexus state rule with ID " + id, tenantId, log::info)
                             .then(reactiveMongoTemplate.findById(id, NexusStateRule.class));
@@ -51,7 +51,7 @@ public class NexusStateRuleRepository {
 
         String stateInfoIfStateExists = state != null ? " and in state " + state : "";
 
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     return ContextLogger.observeCtx("Searching for nexus state rule with country " + country + stateInfoIfStateExists, tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, NexusStateRule.class));
@@ -69,7 +69,7 @@ public class NexusStateRuleRepository {
 
         String stateInfoIfStateExists = state != null ? " and in state " + state : "";
 
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     return ContextLogger.observeCtx("Searching for nexus state rule with country " + country + stateInfoIfStateExists, tenantId, log::info)
                             .then(reactiveMongoTemplate.aggregate(aggregation, NexusStateRule.class).next());
@@ -77,7 +77,7 @@ public class NexusStateRuleRepository {
     }
 
     public Mono<NexusStateRule> save(@NonNull NexusStateRule nexusStateRule) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     return ContextLogger.observeCtx("Saving nexus state rule: " + nexusStateRule, tenantId, log::info)
                             .then(reactiveMongoTemplate.save(nexusStateRule));
@@ -85,7 +85,7 @@ public class NexusStateRuleRepository {
     }
 
     public Flux<NexusStateRule> findAll() {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> ContextLogger.observeCtx("Searching for all nexus state rule documents", tenantId, log::info))
                 .thenMany(reactiveMongoTemplate.findAll(NexusStateRule.class));
     }

@@ -24,6 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.BaseTestClass;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
@@ -41,7 +42,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-public class ExemptionRepositoryTest implements FindFullyExemptedTestTemplate { //todo: make note - this is usa only
+public class ExemptionRepositoryTest extends BaseTestClass implements FindFullyExemptedTestTemplate { //todo: make note - this is usa only
 
     @InjectMocks
     ExemptionRepository exemptionRepository;
@@ -57,23 +58,7 @@ public class ExemptionRepositoryTest implements FindFullyExemptedTestTemplate { 
     Query queryFindFullyExempted;
     Criteria countryQueryBuilderCriteria;
 
-     static MockedStatic mockedStatic;
 
-    @BeforeAll
-    static void beforeAll() {
-        try {
-            mockedStatic = mockStatic(TenantResolver.class);
-        } catch (Exception e) {
-            // Log the error or fail the test setup
-            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    @AfterAll
-    static void afterAll() {
-        mockedStatic.close();
-    }
 
     @BeforeEach
     void setUp() {

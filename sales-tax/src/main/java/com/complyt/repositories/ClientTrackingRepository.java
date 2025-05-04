@@ -24,10 +24,10 @@ public class ClientTrackingRepository {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     @NonNull
-    private TenantResolver tenantResolver;
+    
 
     public Mono<ClientTracking> findClient() {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
@@ -37,7 +37,7 @@ public class ClientTrackingRepository {
     }
 
     public Mono<ClientTracking> findById(@NonNull String id) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
 
@@ -47,7 +47,7 @@ public class ClientTrackingRepository {
     }
 
     public Mono<ClientTracking> save(@NonNull ClientTracking clientTracking) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     ClientTracking clientTrackingWithTenantId = clientTracking.withTenantId(tenantId);
 
@@ -57,7 +57,7 @@ public class ClientTrackingRepository {
     }
 
     public Mono<ClientTracking> saveWithoutTenant(@NonNull ClientTracking clientTracking) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     return ContextLogger.observeCtx("Saving client tracking " + clientTracking, tenantId, log::info)
                             .then(reactiveMongoTemplate.save(clientTracking));

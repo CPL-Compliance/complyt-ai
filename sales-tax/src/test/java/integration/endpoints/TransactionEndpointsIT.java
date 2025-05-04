@@ -4,8 +4,6 @@ import com.complyt.SalesTaxApplication;
 import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.currency.CurrencySource;
-import com.complyt.domain.sales_tax.RatesMetaData;
-import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
@@ -36,7 +34,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import testUtils.integration_test.ITUtilities;
-import testUtils.integration_test.WithMockJwt;
+import testUtils.annotations.WithMockJwt;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
