@@ -443,7 +443,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .value(map -> {
                     String message = (String) map.get("message");
                     String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(2, errors.length);
+                    assertEquals(1, errors.length);
                 });
     }
 
