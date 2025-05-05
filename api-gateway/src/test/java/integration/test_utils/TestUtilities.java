@@ -192,7 +192,7 @@ public class TestUtilities {
                 complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
                 externalId,
                 isValidated ? "\"source\": 1," : "",
-                "\"customerType\": "+null);
+                "\"customerType\": "+null +",");
     }
 
     public static String unvalidatedTransactionJsonExample(String externalId, String customerId, String createdDate, String currency) {
