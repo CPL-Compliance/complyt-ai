@@ -68,7 +68,7 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(description = FieldsDescriptions.IS_REFUND_LINKED_INFO) Boolean isRefundLinked,
                              @PositiveOrZero(message =
                                      "refundLinkedPercentage " + NumericErrorMessages.NOT_NEGATIVE_ERROR) @DecimalMax(value = "1.0", message = "refundLinkedPercentage" + NumericErrorMessages.DECIMAL_MAX_1_ERROR) BigDecimal refundLinkedPercentage,
-                             @Schema(description = FieldsDescriptions.CUSTOMER_EXTERNAL_REFERENCE)     @JsonInclude(JsonInclude.Include.NON_NULL) String customerExternalRef,
-                             @Schema(description = FieldsDescriptions.CUSTOMER_SOURCE)     @JsonInclude(JsonInclude.Include.NON_NULL) String customerSource)
+                             @Schema(description = FieldsDescriptions.CUSTOMER_EXTERNAL_ID) String customerExternalId,
+                             @Schema(description = FieldsDescriptions.CUSTOMER_SOURCE) String customerSource)
         implements SourceCheckable, ExternalIdCheckable {
 }

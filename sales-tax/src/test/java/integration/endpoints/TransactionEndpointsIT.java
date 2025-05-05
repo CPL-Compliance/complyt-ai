@@ -4,8 +4,6 @@ import com.complyt.SalesTaxApplication;
 import com.complyt.business.pagination.PaginationConstants;
 import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.currency.CurrencySource;
-import com.complyt.domain.sales_tax.RatesMetaData;
-import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
@@ -1126,7 +1124,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, null)
                 .withItems(items)
                 .withTaxInclusive(true)
-                .withCustomerExternalRef("1586")
+                .withCustomerExternalId("1586")
                 .withCustomerSource("1");
         ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, null, null, null, "80001", true, null); // zip code belongs to New York
         givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
@@ -1216,7 +1214,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, null)
                 .withItems(items)
                 .withTaxInclusive(true)
-                .withCustomerExternalRef(customerExternalSource)
+                .withCustomerExternalId(customerExternalSource)
                 .withCustomerSource(customerSource);
         ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, null, null, null, "38603", true, null); // zip code belongs to New York
         givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
@@ -1310,7 +1308,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, null)
                 .withItems(items)
                 .withTaxInclusive(true)
-                .withCustomerExternalRef(customerExternalSource)
+                .withCustomerExternalId(customerExternalSource)
                 .withCustomerSource(customerSource);
         ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "CA", null, null, "", "", "12345", false, null); // zip code belongs to New York
         givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
@@ -2309,13 +2307,13 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @WithMockJwt
-    public void upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerExternalRefAndSource_Exists_Returns200() {
+    public void upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerExternalIdAndSource_Exists_Returns200() {
         //Given
         String externalId = "10004";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, null)
                 .withShippingAddress(referenceAddress)
                 .withCustomerSource(customerSource)
-                .withCustomerExternalRef(customerExternalSource);
+                .withCustomerExternalId(customerExternalSource);
 
         // Then
         webTestClient
@@ -2333,13 +2331,13 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @WithMockJwt
-    public void upsertByExternalIdAndSourceAndCustomerComplytIdAndWithCustomerExternalRefAndSource_Exists_Returns200() {
+    public void upsertByExternalIdAndSourceAndCustomerComplytIdAndWithCustomerExternalIdAndSource_Exists_Returns200() {
         //Given
         String externalId = "10004";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(referenceAddress)
                 .withCustomerSource(customerSource)
-                .withCustomerExternalRef(customerExternalSource);
+                .withCustomerExternalId(customerExternalSource);
 
         // Then
         webTestClient
@@ -2357,13 +2355,13 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @WithMockJwt
-    public void upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerLookupWithCustomerExternalRefAndSource_DoesNotExist_Returns201() {
+    public void upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerLookupWithCustomerExternalIdAndSource_DoesNotExist_Returns201() {
         //Given
-        String externalId = "upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerLookupWithCustomerExternalRefAndSource_DoesNotExist_Returns201";
+        String externalId = "upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerLookupWithCustomerExternalIdAndSource_DoesNotExist_Returns201";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, null)
                 .withShippingAddress(referenceAddress)
                 .withCustomerSource(customerSource)
-                .withCustomerExternalRef(customerExternalSource);
+                .withCustomerExternalId(customerExternalSource);
 
         // Then
         webTestClient
@@ -2381,13 +2379,13 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @WithMockJwt
-    public void upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerExternalRefNullAndSource_Exists_Returns400() {
+    public void upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerExternalIdNullAndSource_Exists_Returns400() {
         //Given
         String externalId = "10004";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, null)
                 .withShippingAddress(referenceAddress)
                 .withCustomerSource(customerSource)
-                .withCustomerExternalRef(null);
+                .withCustomerExternalId(null);
 
         // Then
         webTestClient
@@ -2407,13 +2405,13 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(3)
     @Test
     @WithMockJwt
-    public void upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerExternalRefAndSourceNull_Exists_Returns400() {
+    public void upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerExternalIdAndSourceNull_Exists_Returns400() {
         //Given
         String externalId = "10004";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, null)
                 .withShippingAddress(referenceAddress)
                 .withCustomerSource(null)
-                .withCustomerExternalRef(customerSource);
+                .withCustomerExternalId(customerSource);
 
         // Then
         webTestClient

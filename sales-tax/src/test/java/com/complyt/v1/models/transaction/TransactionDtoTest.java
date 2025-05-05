@@ -77,7 +77,7 @@ class TransactionDtoTest {
                 ", subsidiary=" + transactionDto.subsidiary() +
                 ", isRefundLinked=" + transactionDto.isRefundLinked() +
                 ", refundLinkedPercentage=" + transactionDto.refundLinkedPercentage() +
-                ", customerExternalRef=" + transactionDto.customerExternalRef() +
+                ", customerExternalId=" + transactionDto.customerExternalId() +
                 ", customerSource=" + transactionDto.customerSource() +"]";
 
         // When

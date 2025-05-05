@@ -53,37 +53,37 @@ class TransactionEnrichmentServiceTest {
     }
 
     @Test
-    void whenDeterminingCustomer_AndComplytCustomerIDAndExternalReferenceAndCustomerSourceNull_returnError() {
+    void whenDeterminingCustomer_AndComplytCustomerIDAndExternalCustomerIdAndCustomerSourceNull_returnError() {
         Mono<Transaction> result = transactionEnrichmentService.enrich(transactionDto
-                .withCustomerId(null).withCustomerSource(null).withCustomerExternalRef(null));
+                .withCustomerId(null).withCustomerSource(null).withCustomerExternalId(null));
 
         StepVerifier.create(result).expectError(CustomerNotFoundApiException.class).verify();
     }
 
     @Test
-    void whenDeterminingCustomer_AndComplytCustomerIDAndExternalReferenceAreNull_returnError() {
+    void whenDeterminingCustomer_AndComplytCustomerIDAndExternalCustomerIdAreNull_returnError() {
         Mono<Transaction> result = transactionEnrichmentService.enrich(transactionDto
-                .withCustomerId(null).withCustomerSource("source").withCustomerExternalRef(null));
+                .withCustomerId(null).withCustomerSource("source").withCustomerExternalId(null));
 
         StepVerifier.create(result).expectError(CustomerNotFoundApiException.class).verify();
     }
 
     @Test
     void whenDeterminingCustomer_AndComplytCustomerIDAndCustomerSourceAreNull_returnError() {
-        Mono<Transaction> result = transactionEnrichmentService.enrich(transactionDto.withCustomerId(null).withCustomerExternalRef("externalRef"));
+        Mono<Transaction> result = transactionEnrichmentService.enrich(transactionDto.withCustomerId(null).withCustomerExternalId("externalcustomerId"));
 
         StepVerifier.create(result).expectError(CustomerNotFoundApiException.class).verify();
     }
 
 
     @Test
-    void whenDeterminingCustomer_AndComplytCustomerIDIsNull_andCustomerExternalReferenceAndSourceValid_shouldCallFindByExternalReferenceAndSource_andReturnCustomer() {
+    void whenDeterminingCustomer_AndComplytCustomerIDIsNull_andCustomerExternalIdAndSourceValid_shouldCallFindByExternalReferenceAndSource_andReturnCustomer() {
         when(customerService.findByExternalIdAndSource(anyString(), anyString())).thenReturn(Mono.just(customer));
         when(customer.getComplytId()).thenReturn(customerComplytId);
         Transaction expected = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto)
                 .withCustomer(customer).withCustomerId(customerComplytId);
 
-        Mono<Transaction> result = transactionEnrichmentService.enrich(transactionDto.withCustomerId(null).withCustomerExternalRef("externalRef")
+        Mono<Transaction> result = transactionEnrichmentService.enrich(transactionDto.withCustomerId(null).withCustomerExternalId("externalRef")
                 .withCustomerSource("source"));
         verify(customerService).findByExternalIdAndSource(any(), any());
         StepVerifier.create(result).expectNext(expected).verifyComplete();

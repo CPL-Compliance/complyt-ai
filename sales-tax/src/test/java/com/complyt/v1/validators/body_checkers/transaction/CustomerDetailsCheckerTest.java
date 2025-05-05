@@ -29,9 +29,9 @@ class CustomerDetailsCheckerTest {
     }
 
     @Test
-    void check_customerIdIsNull_andCustomerExternalReferenceAndCustomerSourceValid_returnEmpty() {
+    void check_customerIdIsNull_andCustomerExternalIdAndCustomerSourceValid_returnEmpty() {
         when(transactionDto.customerId()).thenReturn(null);
-        when(transactionDto.customerExternalRef()).thenReturn("externalReference");
+        when(transactionDto.customerExternalId()).thenReturn("externalReference");
         when(transactionDto.customerSource()).thenReturn("source");
 
         Flux<String> result = customerDetailsChecker.check(transactionDto);
@@ -39,9 +39,9 @@ class CustomerDetailsCheckerTest {
     }
 
     @Test
-    void check_customerIdAndCustomerExternalRefAndCustomerSource_Null_returnFluxError() {
+    void check_customerIdAndCustomerExternalIdAndCustomerSource_Null_returnFluxError() {
         when(transactionDto.customerId()).thenReturn(null);
-        when(transactionDto.customerExternalRef()).thenReturn(null);
+        when(transactionDto.customerExternalId()).thenReturn(null);
         when(transactionDto.customerSource()).thenReturn(null);
 
         Flux<String> result = customerDetailsChecker.check(transactionDto);
@@ -49,9 +49,9 @@ class CustomerDetailsCheckerTest {
     }
 
     @Test
-    void check_customerIdAndCustomerExternalRef_Null_returnFluxError() {
+    void check_customerIdAndCustomerExternalId_Null_returnFluxError() {
         when(transactionDto.customerId()).thenReturn(null);
-        when(transactionDto.customerExternalRef()).thenReturn(null);
+        when(transactionDto.customerExternalId()).thenReturn(null);
         when(transactionDto.customerSource()).thenReturn("randomSource");
 
         Flux<String> result = customerDetailsChecker.check(transactionDto);
@@ -62,7 +62,7 @@ class CustomerDetailsCheckerTest {
     @Test
     void check_customerIdAndCustomerSource_Null_returnFluxError() {
         when(transactionDto.customerId()).thenReturn(null);
-        when(transactionDto.customerExternalRef()).thenReturn("randomExternalReference");
+        when(transactionDto.customerExternalId()).thenReturn("randomExternalReference");
         when(transactionDto.customerSource()).thenReturn(null);
 
         Flux<String> result = customerDetailsChecker.check(transactionDto);

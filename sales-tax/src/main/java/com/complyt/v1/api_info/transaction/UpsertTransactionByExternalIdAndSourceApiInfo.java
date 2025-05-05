@@ -140,7 +140,7 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                    "isPartial": false
                },
                "customerId": "9f8ee193-1a71-42b4-801d-ee1d8a161fbe",
-               "customerExternalRef": "1233465",
+               "customerExternalId": "1233465",
                "customerSource": 2
                "externalTimestamps": {
                    "createdDate":  "2023-02-05T12:24:43.193Z",

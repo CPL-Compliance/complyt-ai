@@ -2846,7 +2846,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Test
     @WithMockJwt
-    public void upsert_NullCustomerIdAndNullCustomerExternalReferenceAndNullCustomerSource_Returns400() {
+    public void upsert_NullCustomerIdAndNullCustomerExternalIdAndNullCustomerSource_Returns400() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();

@@ -10,7 +10,7 @@ public class CustomerDetailsChecker implements DtoBodyChecker<TransactionDto> {
     @Override
     public Flux<String> check(TransactionDto transactionDto) {
         return transactionDto.customerId() != null ||
-                StringChecker.isInputValid(transactionDto.customerExternalRef(),
+                StringChecker.isInputValid(transactionDto.customerExternalId(),
                         transactionDto.customerSource()) ? Flux.empty() : Flux.just(DtoErrorMessages.CUSTOMER_MISSING_ID_OR_EXTERNAL_REFERENCE_AND_SOURCE);
     }
 }
