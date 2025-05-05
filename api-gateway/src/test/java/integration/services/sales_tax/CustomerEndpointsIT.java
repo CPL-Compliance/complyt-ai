@@ -308,6 +308,27 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
     @Order(3)
     @Test
+    public void upsertByExternalIdAndSource_WithNullCustomerType_DoesNotExist_Returns201() {
+        // Given
+        String externalId = "upsertByExternalIdAndSource_WithNullCustomerType_DoesNotExist_Returns201";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.customerJsonExampleWithNoCustomerType(externalId, null,true))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Order(3)
+    @Test
     @Override
     public void upsertByExternalIdAndSource_PathVariableInvalid_Returns400() {
         // Given
