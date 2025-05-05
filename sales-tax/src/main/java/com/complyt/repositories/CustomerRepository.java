@@ -30,10 +30,10 @@ public class CustomerRepository {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     @NonNull
-    private TenantResolver tenantResolver;
+    
 
     public Flux<Customer> findByName(@NonNull String name) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("name").regex("^" + name, "i")
                             .and("tenantId").is(tenantId));
@@ -44,7 +44,7 @@ public class CustomerRepository {
     }
 
     public Mono<Customer> findOneByName(@NonNull String name) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("name").is("^" + name)
                             .and("tenantId").is(tenantId));
@@ -60,7 +60,7 @@ public class CustomerRepository {
         String sortByProperty = CustomerPaginationUtil.customerSortByFields.contains(sortBy) ? sortBy : PaginationConstants.DEFAULT_CUSTOMER_SORT_BY;
         Sort.Direction sortDirection = Sort.Direction.fromString(sortOrder);
 
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Criteria criteria = criteriaFromFilterMap != null ? Criteria.where("tenantId").is(tenantId).andOperator(criteriaFromFilterMap) : Criteria.where("tenantId").is(tenantId);
 
@@ -73,7 +73,7 @@ public class CustomerRepository {
     }
 
     public Flux<Customer> findAllBySource(String source) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)
                             .and("source").is(source));
@@ -84,7 +84,7 @@ public class CustomerRepository {
     }
 
     public Mono<Customer> save(@NonNull Customer customer) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Customer customerWithTenantId = customer.withTenantId(tenantId);
                     return ContextLogger.observeCtx("Saving Customer " + customerWithTenantId.toString(), tenantId, log::info)
@@ -93,7 +93,7 @@ public class CustomerRepository {
     }
 
     public Mono<Customer> findById(String id) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
 
@@ -103,7 +103,7 @@ public class CustomerRepository {
     }
 
     public Mono<Customer> findByExternalIdAndSource(String externalId, String source) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("externalId").is(externalId)
                             .and("source").is(source)
@@ -116,7 +116,7 @@ public class CustomerRepository {
     }
 
     public Mono<Customer> findByComplytId(UUID complytId) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("complytId").is(complytId)
                             .and("tenantId").is(tenantId));
@@ -128,7 +128,7 @@ public class CustomerRepository {
     }
 
     public Mono<Customer> findByComplytIdProjection(UUID complytId) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("complytId").is(complytId)
                             .and("tenantId").is(tenantId));
@@ -148,7 +148,7 @@ public class CustomerRepository {
 
 
     public Mono<Customer> findById(ObjectId id) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id)
                             .and("tenantId").is(tenantId));

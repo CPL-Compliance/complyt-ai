@@ -36,6 +36,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.TestUtilities;
+import testUtils.annotations.WithMockJwt;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -66,22 +67,14 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
     @Mock
     StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper;
 
-    @MockBean
-    TenantResolver tenantResolver;
-
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax_rates"));
     }
 
-    @BeforeEach
-    void setup() {
-        Mockito.when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-    }
-
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findAddress_InternalRateFound_DateBeforeMaxEffectiveDate_Return200() {
         // Given
         AddressDto stubInternalRatesDto = TestUtilities.createStubInternalTaxAddressDto();
@@ -116,7 +109,7 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findAddress_InternalRateFound_DateBeforeMaxEffectiveDateAndDetailedTrue_Return200() {
         // Given
         AddressDto stubInternalRatesDto = TestUtilities.createStubInternalTaxAddressDto();
@@ -152,7 +145,7 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findAddress_InternalRateFound_DateAfterMaxEffectiveDate_Return200() {
         // Given
         AddressDto stubInternalRatesDto = TestUtilities.createStubInternalTaxAddressDto();
@@ -189,7 +182,7 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findAddress_InternalRateNotFound_ExternalRateFoundInDB_Return200() {
         // Given
         AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withState("Hawaii").withZip("99501");
@@ -224,7 +217,7 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findAddress_InternalRateNotFound_ExternalRateClientWrapper_Return200() {
         // Given
         AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withState("West Virginia").withZip("24740-9669").withStreet("751-2696 205 E Benson Blvd");
@@ -259,7 +252,7 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findAddress_EffectiveDateNull_Returns200() {
         // Given
         AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withState("West Virginia").withZip("24740-9669").withStreet("751-2696 205 E Benson Blvd");
@@ -290,7 +283,7 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void update_newInternalRate_Return200() {
         InternalSalesTaxRatesDto internalSalesTaxRatesDto = TestUtilities.createInternalSalesTaxRatesDto();
 
@@ -311,7 +304,7 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void update_InsertNewInternalRate_StatusWrong_Return400() {
         InternalSalesTaxRatesDto internalSalesTaxRatesDto = TestUtilities.createInternalSalesTaxRatesDto();
 
@@ -332,7 +325,7 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
     @Order(2)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void update_updateInternalRate_Return200() {
         String testOldMtaName = "test";
         InternalSalesTaxRatesDto internalSalesTaxRatesDto = TestUtilities.createInternalSalesTaxRatesDto();
@@ -383,7 +376,7 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void update_updateInternalRate_NotFound_Return404() {
         InternalSalesTaxRatesDto internalSalesTaxRatesDto = TestUtilities.createInternalSalesTaxRatesDto();
         InternalSalesTaxRatesDto updatedInternalRatesDto = internalSalesTaxRatesDto.withAddress(internalSalesTaxRatesDto.address().withZip("11111")); // this zip not in db
@@ -405,7 +398,7 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
     @Order(3)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void update_ArchiveInternalRate_Return200() {
         InternalSalesTaxRatesDto internalSalesTaxRatesDto = TestUtilities.createInternalSalesTaxRatesDto();
 

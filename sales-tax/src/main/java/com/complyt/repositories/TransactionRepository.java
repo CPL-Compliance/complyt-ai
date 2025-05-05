@@ -32,14 +32,11 @@ public class TransactionRepository {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     @NonNull
-    private TenantResolver tenantResolver;
-
-    @NonNull
     private TypedAggregationBuilder<Transaction> transactionTypedAggregationBuilder;
 
 
     public Mono<Transaction> save(@NonNull Transaction transaction) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Transaction transactionWithTenantId = transaction.setTenantId(tenantId);
 
@@ -50,7 +47,7 @@ public class TransactionRepository {
 
     @Deprecated
     public Mono<Transaction> findById(@NonNull String transactionId) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(transactionId)
                             .and("tenantId").is(tenantId));
@@ -62,7 +59,7 @@ public class TransactionRepository {
     }
 
     public Mono<Transaction> findByExternalIdAndSource(String externalId, String source) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(TransactionRepositoryCommonStagesBuilder
                             .tenantIdExternalIdAndSourceExactCriteria(tenantId, externalId, source));
@@ -74,7 +71,7 @@ public class TransactionRepository {
     }
 
     public Mono<Transaction> findByExternalIdAndSourceProjection(String externalId, String source) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     TypedAggregation<Transaction> aggregation = Aggregation.newAggregation(Transaction.class,
                             Aggregation.match(TransactionRepositoryCommonStagesBuilder
@@ -95,7 +92,7 @@ public class TransactionRepository {
     }
 
     public Mono<Transaction> findByComplytId(UUID complytId) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("complytId").is(complytId)
                             .and("tenantId").is(tenantId));
@@ -112,7 +109,7 @@ public class TransactionRepository {
         String sortByProperty = TransactionPaginationUtil.transactionSortByFields.contains(sortBy) ? sortBy : PaginationConstants.DEFAULT_TRANSACTION_SORT_BY;
         Sort.Direction sortDirection = Sort.Direction.fromString(sortOrder);
 
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Criteria criteria = criteriaFromFilterMap != null ?
                             Criteria.where("tenantId").is(tenantId).andOperator(criteriaFromFilterMap) :
@@ -130,7 +127,7 @@ public class TransactionRepository {
         String sortByProperty = TransactionPaginationUtil.transactionSortByFields.contains(sortBy) ? sortBy : PaginationConstants.DEFAULT_TRANSACTION_SORT_BY;
         Sort.Direction sortDirection = Sort.Direction.fromString(sortOrder);
 
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Criteria criteria = criteriaFromFilterMap != null ?
                             Criteria.where("tenantId").is(tenantId).andOperator(criteriaFromFilterMap) :
@@ -143,7 +140,7 @@ public class TransactionRepository {
     }
 
     public Flux<Transaction> findAllBySource(String source) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)
                             .and("source").is(source));
@@ -154,7 +151,7 @@ public class TransactionRepository {
     }
 
     public Flux<Transaction> findAllByQuery(Query query) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query updatedQuery = query.addCriteria(Criteria.where("tenantId").is(tenantId))
                             .with(Sort.by(Sort.Direction.ASC, "externalTimestamps.createdDate"));

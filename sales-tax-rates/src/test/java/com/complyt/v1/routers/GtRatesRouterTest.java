@@ -24,6 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.TestUtilities;
+import testUtils.annotations.WithMockJwt;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,7 +52,7 @@ public class GtRatesRouterTest {
     private ComplytGtRatesFacade complytGtRatesFacade;
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_ComplytGtRatesFound_Returns200() {
         // Given
         GtAddress gtAddress = TestUtilities.createCanadaGtAddress();
@@ -78,7 +79,7 @@ public class GtRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_BlankCountryPassed_Returns400() {
         // Given
         GtAddress gtAddress = TestUtilities.createCanadaGtAddress().withCountry("");
@@ -101,7 +102,7 @@ public class GtRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_NullCountryPassed_Returns400() {
         // Given
         GtAddress gtAddress = TestUtilities.createCanadaGtAddress();
@@ -123,7 +124,7 @@ public class GtRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_OverSizeCountryPassed_Returns400() {
         // Given
         GtAddress gtAddress = TestUtilities.createCanadaGtAddress()
@@ -147,7 +148,7 @@ public class GtRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_OverSizeRegionPassed_Returns400() {
         // Given
         GtAddress gtAddress = TestUtilities.createCanadaGtAddress()

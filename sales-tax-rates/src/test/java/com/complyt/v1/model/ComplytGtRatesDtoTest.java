@@ -1,4 +1,4 @@
-package com.example.complyt.v1.model.gt;
+package com.complyt.v1.model;
 
 import com.complyt.v1.model.gt.ComplytGtRatesDto;
 import com.complyt.v1.model.gt.GtAddressDto;

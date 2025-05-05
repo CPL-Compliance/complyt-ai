@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.BaseTestClass;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
@@ -35,7 +36,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-public class TransactionSalesTaxRatesHandlerTest {
+public class TransactionSalesTaxRatesHandlerTest extends BaseTestClass {
 
     @InjectMocks
     private TransactionSalesTaxRatesHandler transactionSalesTaxRatesHandler;
@@ -49,23 +50,7 @@ public class TransactionSalesTaxRatesHandlerTest {
     UnitTestUtilities testUtilities;
     Address address;
 
-     static MockedStatic mockedStatic;
-
-    @BeforeAll
-    static void beforeAll() {
-        try {
-            mockedStatic = mockStatic(TenantResolver.class);
-        } catch (Exception e) {
-            // Log the error or fail the test setup
-            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    @AfterAll
-    static void afterAll() {
-        mockedStatic.close();
-    }
+   
 
     @BeforeEach
     void setup() {

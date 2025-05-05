@@ -32,7 +32,9 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import test_utils.BaseTestClass;
 import test_utils.TestUtilities;
+import test_utils.annotations.WithMockJwt;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -69,14 +71,9 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("address_validation"));
     }
 
-    @BeforeEach
-    void setup() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-    }
-
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAddress_AddressFound_Returns200() {
         // Given
         AddressDto addressDto = new AddressDto(
@@ -106,7 +103,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAddress_AddressByStubClientWrapper_Returns200() {
         // Given
         AddressDto addressDto = new AddressDto(
@@ -145,7 +142,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAddress_AddressByStubClientWrapper_DifferentState_Returns400() {
         // Given
         AddressDto addressDto = new AddressDto(
@@ -182,7 +179,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAddress_AddressByOutsource_ScoreNotValid_Returns400() {
         // Given
         AddressDto addressDto = new AddressDto(
@@ -218,7 +215,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
 
     @Order(2)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAddress_AddressByOutsource_AddressNotFoundAndCachedAddressHasNoStreetWithBadScore_Returns200() {
         // Given
         AddressDto addressDto = new AddressDto(
@@ -261,7 +258,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAddress_AddressNotInUS_Returns200() {
         // Given
         AddressDto addressDto = new AddressDto(
@@ -295,7 +292,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAddress_AddressNotInUS_RegionNotEmpty_Returns200() {
         // Given
         AddressDto addressDto = new AddressDto(
@@ -330,7 +327,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void resolve_AddressNotInUS_CountryNotMatch_Returns400() {
         // Given
         AddressDto addressDto = new AddressDto(
@@ -360,7 +357,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAddress_AddressNotInUS_CountryNull_Returns400() {
         // When + Then
         webTestClient
@@ -376,7 +373,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAddress_ValidateAddress_Returns200() {
         // Given
         AddressDto addressDto = new AddressDto(
@@ -407,7 +404,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void resolve_ValidateAddress_StateMismatch_Returns400() {
         // Given
         AddressDto addressDto = new AddressDto(

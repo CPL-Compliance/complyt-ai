@@ -42,6 +42,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import reactor.core.publisher.Mono;
 import testUtils.TestUtilities;
+import testUtils.annotations.WithMockJwt;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -84,7 +85,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void putSalesTaxRatesByAddress_CommonRatesFound_Returns200() {
         // Given
         InternalSalesTaxRatesDto internalSalesTaxRatesDto = TestUtilities.createInternalSalesTaxRatesDto();
@@ -111,7 +112,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void putSalesTaxRatesByAddress_CommonRatesNotFound_Returns200() {
         // Given
         InternalSalesTaxRatesDto internalSalesTaxRatesDto = TestUtilities.createInternalSalesTaxRatesDto();
@@ -135,7 +136,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_CommonRatesFound_Returns200() {
         // Given
         AddressWithDateDto addressWithDateDto = TestUtilities.createAddressWithDateDtoInCalifornia("2011-11-01T00:00:00");
@@ -170,7 +171,7 @@ public class ComplytSalesTaxRatesRouterTest {
 
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_AddressWithSalesTaxRatesNotFound_Throws404() {
         // Given
         AddressWithDateDto addressWithDateDto = TestUtilities.createAddressWithDateDtoInCalifornia("2011-11-01T00:00:00");
@@ -197,7 +198,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_AddressWithBlankDate_Throws400BadRequest() {
         // Given
         AddressWithDateDto addressWithDateDto = TestUtilities.createAddressWithDateDtoInCalifornia("");
@@ -226,7 +227,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_AddressWithNullDate_Throws400BadRequest() {
         // Given
         AddressWithDateDto addressWithDateDto = TestUtilities.createAddressWithDateDtoInCalifornia("2011-11-01T00:00:00");
@@ -253,7 +254,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_AddressWithBlankCity_Throws400BadRequest() {
         // Given
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia().withCity("");
@@ -284,7 +285,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_AddressWithNullCity_Throws400BadRequest() {
         // Given
         AddressWithDateDto addressWithDateDto = TestUtilities.createAddressWithDateDtoInCalifornia("2011-11-01T00:00:00");
@@ -312,7 +313,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_AddressWithBlankState_Throws400BadRequest() {
         // Given
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia().withState("");
@@ -343,7 +344,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_AddressWithNullState_Throws400BadRequest() {
         // Given
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia().withState("");
@@ -372,7 +373,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_AddressWithBlankStreet_Throws400BadRequest() {
         // Given
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia().withStreet("");
@@ -403,7 +404,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_AddressWithNullStreet_Throws400BadRequest() {
         // Given
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia().withStreet("");
@@ -432,7 +433,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_AddressWithBlankZip_Throws400BadRequest() {
         // Given
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia().withZip("");
@@ -463,7 +464,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_AddressWithNullZip_Throws400BadRequest() {
         // Given
         AddressWithDateDto addressWithDateDto = TestUtilities.createAddressWithDateDtoInCalifornia("2011-11-01T00:00:00");
@@ -491,7 +492,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_AddressWithBlankCountry_Throws400BadRequest() {
         // Given
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia().withCountry("");
@@ -521,7 +522,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_AddressWithNullCountry_Throws400BadRequest() {
         // Given
         AddressWithDateDto addressWithDateDto = TestUtilities.createAddressWithDateDtoInCalifornia("2011-11-01T00:00:00");
@@ -548,7 +549,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_InternalServerError_Returns500() {
         // Given
         AddressWithDateDto addressWithDateDto = TestUtilities.createAddressWithDateDtoInCalifornia("2011-11-01T00:00:00");
@@ -575,7 +576,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAny_InvalidUrl_Returns404() {
 
         webTestClient
@@ -598,7 +599,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_LengthGreaterThen50country_Returns400ValidationError() {
         // Given
         String countryWithLength51 = TestUtilities.stringWithLength(51);
@@ -629,7 +630,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_LengthGreaterThen100City_Returns400ValidationError() {
         // Given
         String cityWithLength51 = TestUtilities.stringWithLength(101);
@@ -661,7 +662,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_LengthGreaterThen100State_Returns400ValidationError() {
         // Given
         String stateWithLength101 = TestUtilities.stringWithLength(101);
@@ -692,7 +693,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_LengthGreaterThen100County_Returns400ValidationError() {
         // Given
         String countyWithLength101 = TestUtilities.stringWithLength(101);
@@ -725,7 +726,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_LengthGreaterThen200Street_Returns400ValidationError() {
         // Given
         String streetWithLength201 = TestUtilities.stringWithLength(201);
@@ -757,7 +758,7 @@ public class ComplytSalesTaxRatesRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_LengthGreaterThen20Zip_Returns400ValidationError() {
         // Given
         String zipWithLength21 = TestUtilities.stringWithLength(21);
