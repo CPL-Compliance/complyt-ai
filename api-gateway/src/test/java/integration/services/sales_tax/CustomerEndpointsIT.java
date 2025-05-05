@@ -324,7 +324,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isCreated();
     }
 
     @Order(3)
