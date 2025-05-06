@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import test_utils.BaseTestClass;
 import test_utils.unit_tests.TestUtilities;
 
 import java.util.Optional;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class ValidationHandlerTest {
+class ValidationHandlerTest extends BaseTestClass {
 
     @Autowired
     SpringValidatorAdapter springValidatorAdapter;

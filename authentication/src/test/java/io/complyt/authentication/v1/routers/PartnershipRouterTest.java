@@ -26,6 +26,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import test_utils.annotations.WithMockJwt;
 import test_utils.unit_tests.TestUtilities;
 
 import java.util.HashMap;
@@ -62,7 +63,7 @@ class PartnershipRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAllReferrals_Exists_Returns200() {
         // Given
         Map<String, Referral> referrals = new HashMap<>();
@@ -89,7 +90,7 @@ class PartnershipRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAllReferrals_DoesntExists_Returns401() {
         // When
         when(partnershipFacade.getPartnership()).thenReturn(Mono.empty());
@@ -107,7 +108,7 @@ class PartnershipRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAllReferrals_DoesntExists_Returns4201() {
         // When
         when(partnershipFacade.getPartnership()).thenReturn(Mono.error(new ReferralsNotFoundApiException()));
@@ -125,7 +126,7 @@ class PartnershipRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertReferral_newReferral_Returns200() {
         // Given
         Map<String, Referral> referrals = new HashMap<>();
@@ -153,7 +154,7 @@ class PartnershipRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertReferral_newReferralWithContentTypeJson_Returns200() {
         // Given
         Map<String, Referral> referrals = new HashMap<>();
@@ -207,7 +208,7 @@ class PartnershipRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertReferral_PartnerDoesntExist_Returns401() {
         // When
         when(partnershipFacade.upsertReferralClient(referral)).thenReturn(Mono.empty());
@@ -226,7 +227,7 @@ class PartnershipRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void upsertReferral_PartnerDoesntExist_Returns404() {
         // When
         when(partnershipFacade.upsertReferralClient(referral)).thenReturn(Mono.error(new PartnerNotFoundApiException()));
@@ -245,7 +246,7 @@ class PartnershipRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void deleteReferral_newReferral_Returns200() {
         // Given
         Map<String, Referral> referrals = new HashMap<>();
@@ -273,7 +274,7 @@ class PartnershipRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void deleteReferral_PartnerDoesntExistReturnMonoEmpty_Returns404() {
         // When
         when(partnershipFacade.markReferralAsCancelled(referral.getTenantId())).thenReturn(Mono.empty());
@@ -292,7 +293,7 @@ class PartnershipRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void deleteReferral_PartnerDoesntExistReturnException_Returns404() {
         // When
         when(partnershipFacade.markReferralAsCancelled(referral.getTenantId())).thenReturn(Mono.error(new SpecificReferralNotFoundApiException()));
@@ -311,7 +312,7 @@ class PartnershipRouterTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void deleteReferral_sentWithoutQueryParam_Returns404() {
         when(partnershipFacade.markReferralAsCancelled("Invalid tenantId")).thenReturn(Mono.error(new SpecificReferralNotFoundApiException()));
 

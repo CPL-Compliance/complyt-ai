@@ -10,11 +10,9 @@ import io.complyt.authentication.v1.exceptions.types.SpecificReferralNotFoundApi
 import io.complyt.authentication.v1.models.PartnershipDto;
 import io.complyt.authentication.v1.models.ReferralDto;
 import io.complyt.authentication.v1.routers.PartnershipRouter;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -29,10 +27,12 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import test_utils.annotations.WithMockJwt;
 import test_utils.integration_tests.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 @ExtendWith(SpringExtension.class)
@@ -42,6 +42,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureWebTestClient
 public class PartnershipEndpointsIT extends TestContainersInitializerIT {
+
     @Autowired
     private WebTestClient webTestClient;
 
@@ -60,7 +61,7 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getPartnership_partnershipExistsWithReferrals_Returns200() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
 
@@ -83,9 +84,8 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt(tenantId = "it_tenant_empty")
     public void getPartnership_partnershipExistsWithEmptyReferrals_Returns200() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant_empty"));
 
         webTestClient
                 .mutateWith(csrf())
@@ -105,9 +105,8 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt(tenantId = "it_tenant_not_exists")
     public void getPartnership_partnershipDoesntExists_Returns404() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant_not_exists"));
 
         webTestClient
                 .mutateWith(csrf())
@@ -123,10 +122,9 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
 
     @Order(2)
     @Test
-    @WithMockUser
+    @WithMockJwt(tenantId = "it_tenant_empty")
     public void upsertReferral_partnershipExistsAndValidReferrals_Returns200() {
         ReferralDto referralDto = TestUtilities.createReferralDto();
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant_empty"));
 
         webTestClient
                 .mutateWith(csrf())
@@ -151,10 +149,9 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
 
     @Order(3)
     @Test
-    @WithMockUser
+    @WithMockJwt(tenantId = "it_tenant_empty")
     public void upsertReferral_partnershipExistsAndReferralsExists_Returns200() {
         ReferralDto referralDto = TestUtilities.createReferralDto();
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant_empty"));
 
         webTestClient
                 .mutateWith(csrf())
@@ -177,10 +174,9 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
 
     @Order(4)
     @Test
-    @WithMockUser
+    @WithMockJwt(tenantId = "it_tenant_empty")
     public void upsertReferral_partnershipExistsAndValidReferralsWithoutStatusAndTimestamp_Returns200() {
         ReferralDto referralDto = TestUtilities.createReferralDto().withTenantId("different referral tenantId").withPartnershipStatus(null).withTimestamps(null);
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant_empty"));
 
         webTestClient
                 .mutateWith(csrf())
@@ -198,10 +194,9 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
 
     @Order(5)
     @Test
-    @WithMockUser
+    @WithMockJwt(tenantId = "it_tenant_empty")
     public void upsertReferral_partnershipExistsAndInvalidReferralsWithoutName_Returns401() {
         ReferralDto referralDto = TestUtilities.createReferralDto().withName(null);
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant_empty"));
 
         webTestClient
                 .mutateWith(csrf())
@@ -218,10 +213,9 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
 
     @Order(5)
     @Test
-    @WithMockUser
+    @WithMockJwt(tenantId = "it_tenant_empty")
     public void upsertReferral_partnershipExistsAndInvalidReferralsWithoutTenantId_Returns401() {
         ReferralDto referralDto = TestUtilities.createReferralDto().withTenantId(null);
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant_empty"));
 
         webTestClient
                 .mutateWith(csrf())
@@ -238,10 +232,9 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
 
     @Order(5)
     @Test
-    @WithMockUser
+    @WithMockJwt(tenantId = "it_tenant_empty")
     public void deleteReferral_partnershipAndReferralsExists_Returns200() {
         ReferralDto referralDto = TestUtilities.createReferralDto();
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant_empty"));
 
         webTestClient
                 .mutateWith(csrf())
@@ -262,10 +255,9 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
 
     @Order(5)
     @Test
-    @WithMockUser
+    @WithMockJwt(tenantId = "it_tenant_empty")
     public void deleteReferral_partnershipExistsButReferralNotExists_Returns404() {
         ReferralDto referralDto = TestUtilities.createReferralDto().withTenantId("Not existing tenantId");
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant_empty"));
 
         webTestClient
                 .mutateWith(csrf())
@@ -282,10 +274,9 @@ public class PartnershipEndpointsIT extends TestContainersInitializerIT {
 
     @Order(5)
     @Test
-    @WithMockUser
+    @WithMockJwt(tenantId = "it_tenant_Not_Exists")
     public void deleteReferral_partnershipNotExists_Returns200() {
         ReferralDto referralDto = TestUtilities.createReferralDto();
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant_Not_Exists"));
 
         webTestClient
                 .mutateWith(csrf())

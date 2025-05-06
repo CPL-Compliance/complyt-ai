@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import test_utils.annotations.WithMockJwt;
 import test_utils.unit_tests.templates.GetRouterTestMonoTemplate;
 import test_utils.unit_tests.templates.GetRouterTestSecurityTemplate;
 
@@ -43,7 +44,7 @@ class SecretKeyRouterTest implements GetRouterTestMonoTemplate, GetRouterTestSec
     AesSecretKeyService aesSecretKeyService;
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Override
     public void get_Exists_Returns200() {
         // Given
@@ -84,7 +85,7 @@ class SecretKeyRouterTest implements GetRouterTestMonoTemplate, GetRouterTestSec
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Override
     public void get_InternalServerError_Returns500() {
         // When
