@@ -10,12 +10,11 @@ import reactor.core.publisher.Mono;
 @Component
 @Generated
 public class TenantResolver {
-    public Mono<String> resolve() {
+    public static Mono<String> resolve() {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> {
                     if (securityContext.getAuthentication() instanceof AbstractAuthenticationToken) {
                         AbstractOAuth2TokenAuthenticationToken token = (AbstractOAuth2TokenAuthenticationToken) securityContext.getAuthentication();
-
                         return (String) token.getTokenAttributes().get("tenant_id");
                     }
 

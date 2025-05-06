@@ -16,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.BaseTestClass;
 import testUtils.TestUtilities;
 
 import java.io.IOException;
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-class ComplytFileServiceImpTest {
+class ComplytFileServiceImpTest extends BaseTestClass {
 
     @InjectMocks
     ComplytFileServiceImpl complytFileService;
