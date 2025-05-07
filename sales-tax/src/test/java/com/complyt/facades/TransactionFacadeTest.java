@@ -17,7 +17,7 @@ import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.security.TenantResolver;
 import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
-import com.complyt.services.TransactionEnrichmentService;
+import com.complyt.business.transaction.TransactionDtoProcessor;
 import com.complyt.services.TransactionService;
 import com.complyt.services.nexus.NexusService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
@@ -58,7 +58,7 @@ public class TransactionFacadeTest extends BaseTestClass {
     CustomerService customerService;
 
     @Mock
-    TransactionEnrichmentService transactionEnrichmentService;
+    TransactionDtoProcessor transactionDtoProcessor;
 
     @Mock
     SalesTaxService salesTaxService;

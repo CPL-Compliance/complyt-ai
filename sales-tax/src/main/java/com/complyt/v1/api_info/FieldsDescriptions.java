@@ -78,7 +78,7 @@ public interface FieldsDescriptions {
 
     String CURRENCY = "The currency of the transaction. not mandatory";
 
-    String CUSTOMER_EXTERNAL_ID = "(Optional) External non-Complyt Reference of the customer";
+    String CUSTOMER_EXTERNAL_ID = "(Optional) External non-Complyt customer ID";
 
     String CUSTOMER_SOURCE = "(Optional) Source of the customer";
 

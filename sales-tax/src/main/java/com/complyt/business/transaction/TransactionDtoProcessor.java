@@ -1,7 +1,8 @@
-package com.complyt.services;
+package com.complyt.business.transaction;
 
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.transaction.Transaction;
+import com.complyt.services.CustomerService;
 import com.complyt.utils.StringChecker;
 import com.complyt.v1.exceptions.types.CustomerNotFoundApiException;
 import com.complyt.v1.mappers.transaction.TransactionMapper;
@@ -14,11 +15,11 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class TransactionEnrichmentService {
+public class TransactionDtoProcessor {
 
     final CustomerService customerService;
 
-    public Mono<Transaction> enrich(final TransactionDto transactionDto) {
+    public Mono<Transaction> process(final TransactionDto transactionDto) {
         return
                 determineCustomerForTransaction(
                         transactionDto.customerId(),

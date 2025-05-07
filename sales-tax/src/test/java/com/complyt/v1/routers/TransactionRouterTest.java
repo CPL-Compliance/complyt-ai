@@ -1,14 +1,13 @@
 package com.complyt.v1.routers;
 
 import com.complyt.business.pagination.PaginationConstants;
+import com.complyt.business.transaction.TransactionDtoProcessor;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
-import com.complyt.security.TenantResolver;
-import com.complyt.services.TransactionEnrichmentService;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
@@ -52,7 +51,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -78,7 +76,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @MockBean
     private TransactionFacade transactionFacade;
     @MockBean
-    private TransactionEnrichmentService transactionEnrichmentService;
+    private TransactionDtoProcessor transactionDtoProcessor;
     @MockBean
     Patcher<TransactionDto> transactionPatcher;
     @Autowired
@@ -734,7 +732,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithShippingFeeWithRules);
 
         // When + Then
-        when(transactionEnrichmentService.enrich(transactionDtoWithShippingFee)).thenReturn(Mono.just(transactionWithShippingFee));
+        when(transactionDtoProcessor.process(transactionDtoWithShippingFee)).thenReturn(Mono.just(transactionWithShippingFee));
         when(transactionFacade.findByExternalIdAndSource(transactionDtoWithShippingFee.externalId(), source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(transactionWithShippingFee)).thenReturn(Mono.just(transactionWithShippingFeeWithRules));
 
@@ -771,7 +769,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithItems);
 
         // When + Then
-        when(transactionEnrichmentService.enrich(transactionDtoToSend)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(transactionDtoToSend)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.findByExternalIdAndSource(transactionDtoToSend.externalId(), source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(enrichedTransaction)).thenReturn(Mono.just(transactionWithItems));
 
@@ -808,7 +806,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithItems);
 
         // When + Then
-        when(transactionEnrichmentService.enrich(transactionDtoToSend)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(transactionDtoToSend)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.findByExternalIdAndSource(transactionDtoToSend.externalId(), source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(enrichedTransaction)).thenReturn(Mono.just(transactionWithItems));
 
@@ -877,7 +875,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto transactionDtoToSend = transactionDto.withCurrency(null);
 
         // When + Then
-        when(transactionEnrichmentService.enrich(transactionDtoToSend)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(transactionDtoToSend)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(enrichedTransaction)).thenReturn(Mono.just(transaction));
         TransactionDto expectedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transaction);
@@ -904,7 +902,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
 
         // When + Then
-        when(transactionEnrichmentService.enrich(transactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(transactionDto)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(enrichedTransaction)).thenReturn(Mono.just(transaction));
         TransactionDto expectedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transaction);
@@ -1013,7 +1011,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // When
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transactionWithDifferentComplytId));
         when(transactionFacade.update(externalId, source, enrichedTransaction, transactionWithDifferentComplytId)).thenReturn(Mono.error(new ConflictedDataApiException()));
-        when(transactionEnrichmentService.enrich(transactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(transactionDto)).thenReturn(Mono.just(enrichedTransaction));
         // Then
         webTestClient
                 .mutateWith(csrf())
@@ -1037,7 +1035,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
 
         // When
-        when(transactionEnrichmentService.enrich(transactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(transactionDto)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(any())).thenReturn(Mono.error(new ConflictedDataApiException()));
         // Then
@@ -1308,7 +1306,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(transactionDto)).thenReturn(Mono.just(mappedTransaction));
+        when(transactionDtoProcessor.process(transactionDto)).thenReturn(Mono.just(mappedTransaction));
         when(transactionFacade.update(externalId, source, mappedTransaction, transaction)).thenReturn(Mono.just(updatedTransaction));
 
         webTestClient
@@ -2250,7 +2248,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         // When + Then
@@ -2285,7 +2283,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionFacade.update(externalId, source, enrichedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
@@ -2322,7 +2320,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         // When + Then
@@ -2511,7 +2509,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.update(externalId, source, enrichedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -2545,7 +2543,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.update(externalId, source, enrichedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -2580,7 +2578,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionFacade.update(externalId, source, enrichedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
@@ -2890,7 +2888,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -2921,7 +2919,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(any())).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(any())).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
 
@@ -3019,7 +3017,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -3466,7 +3464,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -3500,7 +3498,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -3534,7 +3532,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -3629,7 +3627,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.update(externalId, source, enrichedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -3663,7 +3661,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.update(externalId, source, enrichedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -3697,7 +3695,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.update(externalId, source, enrichedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -3731,7 +3729,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.update(externalId, source, enrichedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -3765,7 +3763,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -3799,7 +3797,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -3954,7 +3952,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
         when(transactionFacade.update(externalId, source, enrichedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
@@ -4367,7 +4365,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionFacade.saveTransaction(transaction)).thenReturn(Mono.empty());
         when(transactionFacade.update(externalId, source, enrichedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
@@ -4403,7 +4401,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -4565,7 +4563,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -4599,7 +4597,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -4633,7 +4631,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -4667,7 +4665,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.update(externalId, source, enrichedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -4701,7 +4699,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -4735,7 +4733,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -4898,7 +4896,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -4930,7 +4928,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(receivedTransaction));
         when(transactionFacade.update(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
@@ -4961,7 +4959,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionEnrichmentService.enrich(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
+        when(transactionDtoProcessor.process(givenTransactionDto)).thenReturn(Mono.just(enrichedTransaction));
         when(transactionFacade.update(externalId, source, enrichedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient

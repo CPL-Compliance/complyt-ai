@@ -1,5 +1,6 @@
 package com.complyt.services;
 
+import com.complyt.business.transaction.TransactionDtoProcessor;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.v1.exceptions.types.CustomerNotFoundApiException;
@@ -21,13 +22,13 @@ import java.util.UUID;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class TransactionEnrichmentServiceTest {
+class TransactionDtoProcessorTest {
     @Mock
     Customer customer;
     @Mock
     CustomerService customerService;
     @InjectMocks
-    TransactionEnrichmentService transactionEnrichmentService;
+    TransactionDtoProcessor transactionDtoProcessor;
 
     Transaction transaction;
     TransactionDto transactionDto;
@@ -47,14 +48,14 @@ class TransactionEnrichmentServiceTest {
         Transaction expected = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto)
                 .withCustomer(customer).withCustomerId(customerComplytId);
 
-        Mono<Transaction> result = transactionEnrichmentService.enrich(transactionDto);
+        Mono<Transaction> result = transactionDtoProcessor.process(transactionDto);
         verify(customerService).findByComplytId(any());
         StepVerifier.create(result).expectNext(expected).verifyComplete();
     }
 
     @Test
     void whenDeterminingCustomer_AndComplytCustomerIDAndExternalCustomerIdAndCustomerSourceNull_returnError() {
-        Mono<Transaction> result = transactionEnrichmentService.enrich(transactionDto
+        Mono<Transaction> result = transactionDtoProcessor.process(transactionDto
                 .withCustomerId(null).withCustomerSource(null).withCustomerExternalId(null));
 
         StepVerifier.create(result).expectError(CustomerNotFoundApiException.class).verify();
@@ -62,7 +63,7 @@ class TransactionEnrichmentServiceTest {
 
     @Test
     void whenDeterminingCustomer_AndComplytCustomerIDAndExternalCustomerIdAreNull_returnError() {
-        Mono<Transaction> result = transactionEnrichmentService.enrich(transactionDto
+        Mono<Transaction> result = transactionDtoProcessor.process(transactionDto
                 .withCustomerId(null).withCustomerSource("source").withCustomerExternalId(null));
 
         StepVerifier.create(result).expectError(CustomerNotFoundApiException.class).verify();
@@ -70,7 +71,7 @@ class TransactionEnrichmentServiceTest {
 
     @Test
     void whenDeterminingCustomer_AndComplytCustomerIDAndCustomerSourceAreNull_returnError() {
-        Mono<Transaction> result = transactionEnrichmentService.enrich(transactionDto.withCustomerId(null).withCustomerExternalId("externalcustomerId"));
+        Mono<Transaction> result = transactionDtoProcessor.process(transactionDto.withCustomerId(null).withCustomerExternalId("externalcustomerId"));
 
         StepVerifier.create(result).expectError(CustomerNotFoundApiException.class).verify();
     }
@@ -83,7 +84,7 @@ class TransactionEnrichmentServiceTest {
         Transaction expected = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto)
                 .withCustomer(customer).withCustomerId(customerComplytId);
 
-        Mono<Transaction> result = transactionEnrichmentService.enrich(transactionDto.withCustomerId(null).withCustomerExternalId("externalRef")
+        Mono<Transaction> result = transactionDtoProcessor.process(transactionDto.withCustomerId(null).withCustomerExternalId("externalRef")
                 .withCustomerSource("source"));
         verify(customerService).findByExternalIdAndSource(any(), any());
         StepVerifier.create(result).expectNext(expected).verifyComplete();
@@ -96,7 +97,7 @@ class TransactionEnrichmentServiceTest {
         Transaction expected = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto)
                 .withCustomer(customer).withCustomerId(customerComplytId);
 
-        Mono<Transaction> result = transactionEnrichmentService.enrich(transactionDto);
+        Mono<Transaction> result = transactionDtoProcessor.process(transactionDto);
         verify(customerService).findByComplytId(any());
         StepVerifier.create(result).expectNext(expected).verifyComplete();
     }

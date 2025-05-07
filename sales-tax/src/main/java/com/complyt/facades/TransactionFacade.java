@@ -4,7 +4,7 @@ import com.complyt.domain.customer.Customer;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.transaction.Transaction;
-import com.complyt.services.TransactionEnrichmentService;
+import com.complyt.business.transaction.TransactionDtoProcessor;
 import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
@@ -46,7 +46,7 @@ public class TransactionFacade {
     private SalesTaxTrackingService salesTaxTrackingService;
 
     @NonNull
-    private final TransactionEnrichmentService transactionEnrichmentService;
+    private final TransactionDtoProcessor transactionDtoProcessor;
 
     @NonNull
     private NexusService nexusService;
