@@ -54,10 +54,6 @@ public interface TestUtilities {
         return new SalesTaxRatesData(null, TestUtilities.createAddressInCaliforniaWithCreationDate(), createMatchedAddressInCalifornia(), createCommonRates(), SalesTaxSources.FAST_SALES_TAX, null);
     }
 
-    static SalesTaxRatesData createSalesTaxRatesDataWithMetadata() {
-        return new SalesTaxRatesData(null, TestUtilities.createAddressInCaliforniaWithCreationDate(), createMatchedAddressInCalifornia(), createCommonRates(), SalesTaxSources.FAST_SALES_TAX, createStubInternalSalesTaxRatesMetaData());
-    }
-
     static AddressWithDate createAddressInCaliforniaWithCreationDate() {
         return new AddressWithDate(new Address("Fresno", "US", null, "California", "7498 N Remington Ave", "93711-5508", false),
                 LocalDateTime.now());
@@ -462,14 +458,8 @@ public interface TestUtilities {
                         .append("maxEffectiveDate", new Date())
                         .append("county", new Date())
                         .append("mta", new Date()))
-                .append("internalSalesTaxRatesMetaData", new Document("FIPS_STATE", "02")
-                        .append("FIPS_COUNTY", "020")
-                        .append("FIPS_CITY", "03000")
-                        .append("FIPS_GEOCODE", "0202003000")
-                        .append("COUNTY_TAXABLE_MAX", "N")
-                        .append("CITY_TAXABLE_MAX", "N")
-                        .append("TAX_SHIPPING_ALONE", "Y")
-                        .append("TAX_SHIPPING_AND_HANDLING_TOGETHER", "Y"))
+                .append("internalSalesTaxRatesMetaData", new Document("mtaName", "02")
+                        .append("fipsCity", "020"))
                 .append("_class", "com.complyt.domain.internal_rates.InternalTaxRatesData")
                 .append("createdDate", LocalDateTime.now());
     }
@@ -520,50 +510,35 @@ public interface TestUtilities {
                 "countyTaxableMax",           // countyTaxableMax (new field, value identical to name)
                 "countyTaxOverMax",           // countyTaxOverMax (new field, value identical to name)
                 "cityTaxableMax",             // cityTaxableMax (new field, value identical to name)
-                "cityTaxOverMax"               // cityTaxOverMax (new field, value identical to name)
+                "cityTaxOverMax",               // cityTaxOverMax (new field, value identical to name),
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO // null othersRate
+
         );
     }
 
-    static InternalSalesTaxRatesMetaDataDto createStubInternalSalesTaxRatesMetaDataDto() {
-        return new InternalSalesTaxRatesMetaDataDto(
-                "MTA",                        // recordType
-                "SPD",                        // stateAbbrev
-                "Other1",                     // stateUseTax
-                "Other2",                     // countyUseTax
-                "Other3",                     // cityUseTax
-                "mtaUseTax",                  // mtaUseTax (new field, value identical to name)
-                "spdUseTax",                  // spdUseTax (new field, value identical to name)
-                "other1UseTax",               // other1UseTax (new field, value identical to name)
-                "other2UseTax",               // other2UseTax (new field, value identical to name)
-                "other3UseTax",               // other3UseTax (new field, value identical to name)
-                "other4UseTax",               // other4UseTax (new field, value identical to name)
-                "44444",                      // totalUseTax
-                "06",                         // countyRptCode
-                "037",                        // cityRptCode
-                "mtaName",                    // mtaName (new field, value identical to name)
-                "0603744000",                 // mtaNumber
-                "spdName",                    // spdName (new field, value identical to name)
-                "100000",                     // spdNumber
-                "other1Name",                 // other1Name (new field, value identical to name)
-                "2%",                         // other1Number
-                "other2Name",                 // other2Name (new field, value identical to name)
-                "50000",                      // other2Number
-                "other3Name",                 // other3Name (new field, value identical to name)
-                "1%",                         // other3Number
-                "other4Name",                 // other4Name (new field, value identical to name)
-                "Yes",                        // other4Number
-                "taxShippingAlone",           // taxShippingAlone (new field, value identical to name)
-                "taxShippingAndHandlingTogether", // taxShippingAndHandlingTogether (new field, value identical to name)
-                "06",                         // fipsState
-                "037",                        // fipsCounty
-                "44000",                      // fipsCity
-                "0603744000",                 // fipsGeocode
-                "countyTaxCollectedBy",       // countyTaxCollectedBy (new field, value identical to name)
-                "cityTaxCollectedBy",         // cityTaxCollectedBy (new field, value identical to name)
-                "countyTaxableMax",           // countyTaxableMax (new field, value identical to name)
-                "countyTaxOverMax",           // countyTaxOverMax (new field, value identical to name)
-                "cityTaxableMax",             // cityTaxableMax (new field, value identical to name)
-                "cityTaxOverMax"               // cityTaxOverMax (new field, value identical to name)
+    static FilingMetaData createStubFilingMetaDataDto() {
+        return new FilingMetaData(
+                null,                        // cityName
+                "Fresno",                    // countyName
+                BigDecimal.ZERO,                        // other1Rate
+                BigDecimal.ZERO,                        // other2Rate
+                BigDecimal.ZERO,                        // other3Rate
+                BigDecimal.ZERO,                        // other4Rate
+                "06",                        // countyRptCode
+                "037",                       // cityRptCode
+                "mtaName",                   // mtaName
+                "0603744000",                // mtaNumber
+                "spdName",                   // spdName
+                "100000",                    // spdNumber
+                "other1Name",               // other1Name
+                "2%",                        // other1Number
+                "other2Name",               // other2Name
+                "50000",                     // other2Number
+                "other3Name",               // other3Name
+                "1%",                        // other3Number
+                "other4Name",               // other4Name
+                "Yes",                       // other4Number
+                "037"                        // fipsCounty
         );
     }
 

@@ -97,7 +97,7 @@ public class SalesTaxServiceImplTest {
         Customer marketPlaceCustomer = customer.withCustomerType(CustomerType.MARKETPLACE);
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //todo: note gst is null
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null, null); //todo: note gst is null
 
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
@@ -132,7 +132,7 @@ public class SalesTaxServiceImplTest {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //todo: note gst is null
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null, null); //todo: note gst is null
 
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
@@ -155,7 +155,7 @@ public class SalesTaxServiceImplTest {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //todo: note gst is null
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null, null); //todo: note gst is null
 
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
@@ -178,7 +178,7 @@ public class SalesTaxServiceImplTest {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //todo: note gst is null
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null, null); //todo: note gst is null
 
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
@@ -202,7 +202,7 @@ public class SalesTaxServiceImplTest {
         SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //todo: note gst is null
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null, null); //todo: note gst is null
 
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
@@ -224,7 +224,7 @@ public class SalesTaxServiceImplTest {
         // Given
         SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         String externalIdOfTheInvoice = "some random id";
-        SalesTax salesTax = new SalesTax(null, BigDecimal.valueOf(500), BigDecimal.valueOf(0.08), testUtilities.createSalesTaxRates(), null);
+        SalesTax salesTax = new SalesTax(null, BigDecimal.valueOf(500), BigDecimal.valueOf(0.08), testUtilities.createSalesTaxRates(), null, null);
         Transaction refund = transaction.withIsRefundLinked(true).withCreatedFrom(externalIdOfTheInvoice).withTransactionType(TransactionType.REFUND);
         Transaction invoice = transaction.withTransactionType(TransactionType.INVOICE).withExternalId(externalIdOfTheInvoice)
                 .withSalesTax(salesTax);

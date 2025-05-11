@@ -6,6 +6,7 @@ import com.complyt.business.tax.sales_tax.sales_tax_rates.TransactionSalesTaxRat
 import com.complyt.business.transaction.data_injector.TransactionMatchedAddressInjector;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
+import com.complyt.domain.sales_tax.FilingMetaData;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.transaction.Item;
@@ -77,8 +78,9 @@ public class ComplytSalesTaxRatesTransactionInjector implements RatesTransaction
         BigDecimal salesTaxAmount = salesTaxAggregator.aggregate(taxables, transaction.getIsTaxInclusive());
         SalesTaxRates salesTaxRates = complytSalesTaxRates.salesTaxRates();
         UUID complytId = complytSalesTaxRates.complytId();
+        FilingMetaData filingMetaData = complytSalesTaxRates.filingMetaData();
 
-        SalesTax salesTax = new SalesTax(complytId, salesTaxAmount, salesTaxRates.taxRate(), salesTaxRates, null);
+        SalesTax salesTax = new SalesTax(complytId, salesTaxAmount, salesTaxRates.taxRate(), salesTaxRates, null, filingMetaData);
         BigDecimal finalAmount = transaction.getIsTaxInclusive() ?
                 transaction.getFinalTransactionAmount() :
                 transaction.getFinalTransactionAmount().add(salesTaxAmount);

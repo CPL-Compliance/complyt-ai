@@ -4,6 +4,7 @@ import com.complyt.domain.common_rates.CommonRates;
 import com.complyt.domain.common_rates.CommonSalesTaxRates;
 import com.complyt.domain.internal_rates.InternalRates;
 import com.complyt.domain.internal_rates.InternalSalesTaxRates;
+import com.complyt.domain.internal_rates.InternalSalesTaxRatesMetaData;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -22,7 +23,7 @@ public interface InternalRatesToCommonRatesMapper {
     @Mapping(target = "salesTaxRates", source = "salesTaxRates", qualifiedByName = "mapSalesTaxRatesWithOtherSum")
     @Mapping(target = "address", source = "address")
     @Mapping(target = "source", expression = "java(SalesTaxSources.FAST_SALES_TAX)")
-    @Mapping(target = "ratesMetaData", source = "internalSalesTaxRatesMetaData")
+    @Mapping(target = "ratesMetaData", expression = "java(enrichMetaData(internalSalesTaxRates))")
     CommonSalesTaxRates map(InternalSalesTaxRates internalSalesTaxRates);
 
     // Custom method to map InternalRates to CommonRates and calculate the sum of other1-4
@@ -61,4 +62,22 @@ public interface InternalRatesToCommonRatesMapper {
         }
         return total;
     }
+
+    /**
+     * Enriches InternalSalesTaxRatesMetaData by injecting other1–4 rate values into it.
+     */
+    default InternalSalesTaxRatesMetaData enrichMetaData(InternalSalesTaxRates internal) {
+        if (internal == null || internal.getInternalSalesTaxRatesMetaData() == null || internal.getSalesTaxRates() == null)
+            return null;
+
+        InternalSalesTaxRatesMetaData meta = internal.getInternalSalesTaxRatesMetaData();
+        InternalRates rates = internal.getSalesTaxRates();
+
+        return meta
+                .withOther1Rate(rates.getOther1Rate())
+                .withOther2Rate(rates.getOther2Rate())
+                .withOther3Rate(rates.getOther3Rate())
+                .withOther4Rate(rates.getOther4Rate());
+    }
+
 }

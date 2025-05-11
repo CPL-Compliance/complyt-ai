@@ -16,7 +16,8 @@ public interface SalesTaxRatesServiceProxy {
             @RequestParam(name = "county") String county, @RequestParam(name = "city") String city,
             @RequestParam(name = "street") String street, @RequestParam(name = "zip") String zip,
             @RequestParam(name = "isPartial") boolean isPartial,
-            @RequestParam(name="effectiveDate") String transactionDate
+            @RequestParam(name="effectiveDate") String transactionDate,
+            @RequestParam(name = "detailed") boolean detailed
             );
 
     @GetMapping("/v1/gt_rates")

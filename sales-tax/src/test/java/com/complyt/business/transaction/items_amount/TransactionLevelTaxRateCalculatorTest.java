@@ -47,7 +47,7 @@ public class TransactionLevelTaxRateCalculatorTest {
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(new ObjectId().toString())
-                .withSalesTax(new SalesTax(null, BigDecimal.valueOf(10), BigDecimal.valueOf(0.01), null, null));
+                .withSalesTax(new SalesTax(null, BigDecimal.valueOf(10), BigDecimal.valueOf(0.01), null, null, null));
     }
 
     @Test
