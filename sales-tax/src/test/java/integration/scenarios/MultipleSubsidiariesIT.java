@@ -3,7 +3,9 @@ package integration.scenarios;
 import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.SalesTaxTrackingDto;
+import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
 import com.complyt.v1.models.transaction.ItemDto;
+import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.ShippingAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
@@ -43,7 +45,7 @@ public class MultipleSubsidiariesIT extends TestContainersInitializerIT implemen
     private WebTestClient webTestClient;
 
     // Given
-    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Ammon", "US", null, "ID", "1875 South 25th East", "", "83406", false, null);
+    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Ammon", "US", null, "ID", "1875 South 25th East", "", "83406", false, new MatchedAddressDataDto(new MandatoryAddressDto("Ammon", "US", null, "ID", "1875 South 25th East", "", "83406", false), null));
     private final UUID customerId = UUID.fromString("49755739-892a-4807-882c-68b0e209a980"); // complytId of an existing customer in the database
     private final String source = "1";
 

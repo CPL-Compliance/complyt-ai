@@ -12,6 +12,7 @@ import com.complyt.v1.config.error_messages.NumericErrorMessages;
 import com.complyt.v1.exceptions.types.TaxCodeNotValidException;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
 import com.complyt.v1.models.matched_address.ScoringDto;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.models.tax.global_tax.GtRatesDto;
@@ -62,7 +63,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     // Given
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
-    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, null);
+    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, new MatchedAddressDataDto(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false), null));
     private final String source = "1";
     private final SalesTaxRatesDto salesTaxRatesDto = ITUtilities.createSalesTaxRatesDto();
     private SalesTaxDto expectedSt;
@@ -89,7 +90,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_CustomerIsExemptByStateAndDate_ReturnsNonTaxableTransaction() {
         String externalId = "nonExistingTransactionID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("fresno", "US", null, "PA", "st", "", "12345", false, null))
+                .withShippingAddress(new ShippingAddressDto("fresno", "US", null, "PA", "st", "", "12345", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "", "12345", false), null)))
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
         // Then
@@ -140,7 +142,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_UsaShippingAddressWithEurCurrency_ReturnsTransactionWithExchangeRateInfo() {
         String externalId = "newNonExistingTransactionWithEurCurrency";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, null))
+                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, new MatchedAddressDataDto(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false), null)))
                 .withCurrency("EUR");
         ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(11076.1), BigDecimal.valueOf(858.39775), BigDecimal.valueOf(11934.49775), "EUR", "USD", BigDecimal.valueOf(1.10761), CurrencySource.COMPLYT, false, LocalDateTime.parse(givenTransaction.externalTimestamps().createdDate()));
 
@@ -172,7 +174,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "newNonExistingTransactionWithEuroCurrency";
 
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, null))
+                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, new MatchedAddressDataDto(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false), null)))
                 .withCurrency("EURO");
         ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(11076.1), BigDecimal.valueOf(858.39775), BigDecimal.valueOf(11934.49775), "EUR", "USD", BigDecimal.valueOf(1.10761), CurrencySource.COMPLYT, false, LocalDateTime.parse(givenTransaction.externalTimestamps().createdDate()));
 
@@ -203,7 +205,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "newNonExistingFutureTransactionWithEurCurrency";
 
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, null))
+                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false), null)))
                 .withCurrency("EUR")
                 .withExternalTimestamps(new TimestampsDto(LocalDateTime.now().plusDays(1).toString(), LocalDateTime.now().plusDays(1).toString()));
         ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(11076.1), BigDecimal.valueOf(858.39775), BigDecimal.valueOf(11934.49775), "EUR", "USD", BigDecimal.valueOf(1.10761), CurrencySource.COMPLYT, true, LocalDate.now().atStartOfDay());
@@ -235,7 +238,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "newNonExistingTransactionWithEurCurrencyAndRefRate";
 
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, null))
+                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, new MatchedAddressDataDto(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false), null)))
                 .withCurrency("EUR")
                 .withRefRate(BigDecimal.valueOf(2));
         ExchangeRateInfoDto exchangeRateInfoDto = ITUtilities.createExchangeRateInfoDto(BigDecimal.valueOf(20000), BigDecimal.valueOf(1550), BigDecimal.valueOf(21550), "EUR", "USD", BigDecimal.valueOf(2), CurrencySource.CLIENT, false, LocalDateTime.parse(givenTransaction.externalTimestamps().createdDate()));
@@ -268,7 +271,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "newNonExistingTransactionWithUsdCurrency";
 
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, null))
+                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, new MatchedAddressDataDto(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false), null)))
                 .withCurrency("USD");
 
         // Then
@@ -298,7 +301,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "newNonExistingTransactionWithUsDollarCurrency";
 
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, null))
+                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, new MatchedAddressDataDto(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false), null)))
                 .withCurrency("US Dollar");
 
         // Then
@@ -328,7 +331,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "newNonExistingTransactionWithNullCurrency";
 
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, null))
+                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false), null)))
                 .withCurrency(null);
 
         // Then
@@ -357,7 +361,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_UsaShippingAddressWithNullCurrencyAndRefRate_ReturnsTransactionWithoutExchangeRateInfo() {
         String externalId = "newNonExistingTransactionWithNullCurrencyAndRefRate";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, null))
+                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false), null)))
                 .withCurrency(null)
                 .withRefRate(BigDecimal.valueOf(2));
 
@@ -421,7 +426,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withTaxInclusive(true);
 
-        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salestaxtracking is approved and physical
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada").withMatchedAddressData(new MatchedAddressDataDto(new MandatoryAddressDto("Arvada", "US", null, "CO", null, null, "80001", true), null))); //salesTaxTracking is approved and physical
 
         SalesTaxDto expectedSalesTax = expectedSt.withAmount(new BigDecimal("719.257541"));
 
@@ -457,7 +462,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withTaxInclusive(true);
 
-        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState(" CO ").withCity("Arvada")); //salestaxtracking is approved and physical
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState(" CO ").withCity("Arvada")
+                .withMatchedAddressData(new MatchedAddressDataDto(new MandatoryAddressDto("Arvada", "US", null, " CO ", null, "", "85034", false), null))); //salesTaxTracking is approved and physical
 
         SalesTaxDto expectedSalesTax = expectedSt.withAmount(new BigDecimal("719.257541"));
 
@@ -494,7 +500,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = transactionDto
                 .withItems(transactionDto.items().stream().map(itemDto -> itemDto.withTaxCode("Non-existing TaxCode")).collect(Collectors.toList()));
 
-        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salestaxtracking is approved and physical
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salesTaxTracking is approved and physical
 
         // Then
         webTestClient
@@ -522,7 +528,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withTaxInclusive(true)
                 .withTransactionType(TransactionTypeDto.TAXABLE_REFUND);
 
-        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")); //salestaxtracking is approved and physical
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO").withCity("Arvada")
+                .withMatchedAddressData(new MatchedAddressDataDto(new MandatoryAddressDto("Arvada", "US", null, "CO", "3400 E Sky Harbor Blvd", "", "85034", false), null))); // salesTaxTracking is approved and physical
 
 
         SalesTaxDto expectedSalesTax = expectedSt.withAmount(new BigDecimal("719.257541"))
@@ -561,7 +568,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withTaxInclusive(true)
                 .withTransactionType(TransactionTypeDto.TAXABLE_REFUND);
 
-        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("DE").withCity("Dover")); //salestaxtracking is approved and physical
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("DE").withCity("Dover")
+                .withMatchedAddressData(new MatchedAddressDataDto(new MandatoryAddressDto("Dover", "US", null, "DE", "3400 E Sky Harbor Blvd", "", "85034", false), null))); //salesTaxTracking is approved and physical
 
         // Then
         webTestClient
@@ -590,7 +598,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withTaxInclusive(true)
                 .withTransactionType(TransactionTypeDto.TAXABLE_REFUND);
 
-        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("DE").withCity("Dover")); // salestaxtracking is approved and physical
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("DE").withCity("Dover")
+                .withMatchedAddressData(new MatchedAddressDataDto(new MandatoryAddressDto("Dover", "US", null, "DE", "3400 E Sky Harbor Blvd", "", "85034", false), null))); // salestaxtracking is approved and physical
 
         // Get initial Sales Tax Tracking information
         TransactionDto finalGivenTransaction = givenTransaction;
@@ -675,7 +684,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String country = "USA";
         String externalId = "newTransactionID";
         BigDecimal itemTotalPrice = BigDecimal.valueOf(10000);
-        ShippingAddressDto shippingAddress = new ShippingAddressDto(null, country, null, state, null, null, "11111", true, null);
+        ShippingAddressDto shippingAddress = new ShippingAddressDto(null, country, null, state, null, null, "11111", true, new MatchedAddressDataDto(new MandatoryAddressDto(null, country, null, state, null, null, "11111", true), null));
         SalesTaxRatesDto salesTaxRatesDto = ITUtilities.createSalesTaxRatesDto(BigDecimal.valueOf(0.1));
         TransactionDto originalTransaction = ITUtilities.stubTransactionDto(externalId, customerId);
         ItemDto itemDto = originalTransaction.items().get(0).withSalesTaxRates(salesTaxRatesDto);
@@ -729,7 +738,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String country = "USA";
         String externalId = "newTransactionID"; // already in DB
         BigDecimal passedItemPrice = BigDecimal.valueOf(200);
-        ShippingAddressDto shippingAddress = new ShippingAddressDto(null, country, null, state, null, null, "11111", true, null);
+        ShippingAddressDto shippingAddress = new ShippingAddressDto(null, country, null, state, null, null, "11111", true, new MatchedAddressDataDto(new MandatoryAddressDto(null, country, null, state, null, null, "11111", true), null));
         SalesTaxRatesDto salesTaxRatesDto = ITUtilities.createSalesTaxRatesDto(BigDecimal.valueOf(0.1));
         ItemDto itemDto = ITUtilities.stubItemDto().withUnitPrice(passedItemPrice).withTotalPrice(passedItemPrice).withSalesTaxRates(salesTaxRatesDto);
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId, itemDto)
@@ -772,7 +781,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_UsaShippingAddressPassedNexus_Returns200AddressWithCityCounty() {
         String externalId = "newNonExistingTransactionForCityCounty";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, null));
+                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, new MatchedAddressDataDto(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false), null)));
 
         // Then
         webTestClient
@@ -801,7 +810,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "newNonExistingTransactionForCityCounty";
 
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, null));
+                .withShippingAddress(new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, new MatchedAddressDataDto(new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false), null)));
 
         // Then
         webTestClient
@@ -832,7 +841,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withTaxInclusive(true)
                 .withTransactionType(TransactionTypeDto.TAXABLE_REFUND);
 
-        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("DE").withCity("Dover").withCounty(null)); //salestaxtracking is approved and physical
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("DE").withCity("Dover").withCounty(null).withMatchedAddressData(givenTransaction.shippingAddress().matchedAddressData().withAddress(givenTransaction.shippingAddress().matchedAddressData().address().withState("DE").withCity("Dover").withCounty(null)))); //salesTaxTracking is approved and physical
 
         // Then
         webTestClient
@@ -863,7 +872,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withTaxInclusive(true)
                 .withTransactionType(TransactionTypeDto.TAXABLE_REFUND);
 
-        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("DE").withCity("Dover").withCounty(null)); //salestaxtracking is approved and physical
+        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("DE").withCity("Dover").withCounty(null)
+                .withMatchedAddressData(new MatchedAddressDataDto(new MandatoryAddressDto("Dover", "US", null, "DE", "", "", "12345", false), null))); //salesTaxTracking is approved and physical
 
         // Then
         webTestClient
@@ -894,7 +904,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withTaxInclusive(true);
 
         givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("CO")
-                .withCountry("US")); //salestaxtracking is approved and physical
+                .withCountry("US")
+                .withMatchedAddressData(new MatchedAddressDataDto(new MandatoryAddressDto("Arvada", "US", null, "CO", null, null, "80001", true), null))); //salesTaxTracking is approved and physical
 
         SalesTaxDto expectedSalesTax = expectedSt.withAmount(new BigDecimal("719.257541"));
 
@@ -913,7 +924,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(transactionDto -> {
                     assertEquals(expectedSalesTax, transactionDto.salesTax());
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().regions());
-                    assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
                     assertTrue(transactionDto.isTaxInclusive());
                     assertEquals(0, transactionDto.finalTransactionAmount().compareTo(new BigDecimal("10000")));
                     assertEquals("USA", transactionDto.shippingAddress().country());
@@ -928,7 +938,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "newNonExistingTransactionWithPartialAddressWithoutState";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withTaxInclusive(true);
-        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, null, null, null, "80001", true, null); // zip code belongs to New York
+        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, null, null, null, "80001", true,
+                new MatchedAddressDataDto(new MandatoryAddressDto(null, "US", null, null, null, null, "80001", true), null)); // zip code belongs to New York
         givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
 
         // Then
@@ -956,7 +967,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "newNonExistingTransactionWithPartialAddressAndBlankState";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withTaxInclusive(true);
-        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, "", null, null, "80001", true, null); // zip code belongs to New York
+        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, "", null, null, "80001", true, new MatchedAddressDataDto(new MandatoryAddressDto(null, "US", null, "", null, null, "80001", true), null)); // zip code belongs to New York
         givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
 
         // Then
@@ -984,7 +995,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "newNonExistingUsaCountryTransactionWithTaxInclusive";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withTaxInclusive(true);
-        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, null, null, null, "80001", true, null); // zip code belongs to New York
+        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, null, null, null, "80001", true, new MatchedAddressDataDto(new MandatoryAddressDto(null, "US", null, null, null, null, "80001", true), null)); // zip code belongs to New York
         givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
 
         // Then
@@ -1029,7 +1040,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withItems(items)
                 .withTaxInclusive(false);
-        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, null, null, null, "80001", true, null); // zip code belongs to New York
+        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, null, null, null, "80001", true,
+                new MatchedAddressDataDto(new MandatoryAddressDto(null, "US", null, null, null, null, "80001", true), null)); // zip code belongs to New York
         givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
 
         // Then
@@ -1076,7 +1088,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withItems(items)
                 .withTaxInclusive(true);
-        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, null, null, null, "80001", true, null); // zip code belongs to New York
+        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, null, null, null, "80001", true,
+                new MatchedAddressDataDto(new MandatoryAddressDto(null, "US", null, null, null, null, "80001", true), null)); // zip code belongs to New York
         givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
 
         // Then
@@ -1121,7 +1134,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withItems(items)
                 .withTaxInclusive(true);
-        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, null, null, null, "38603", true, null); // zip code belongs to New York
+        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, null, null, null, "38603", true, new MatchedAddressDataDto(new MandatoryAddressDto(null, "US", null, null, null, null, "38603", true), null)); // zip code belongs to New York
         givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
 
         // Then
@@ -1443,7 +1456,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_CustomerIsNotExemptByStateAndDate_ReturnsTaxableTransaction() {
         String externalId = "anotherNonExistingTransactionID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("fresno", "US", null, "PA", "st", "", "12345", false, null))
+                .withShippingAddress(new ShippingAddressDto("fresno", "US", null, "PA", "st", "", "12345", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "", "12345", false), null)))
                 .withExternalTimestamps(new TimestampsDto("2024-01-02", "2025-01-02"));
 
         // Then
@@ -1473,7 +1487,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_CustomerIsNotExemptBecauseExemptionIsCancelled_ReturnsTaxableTransaction() {
         String externalId = "ThirdNonExistingIdForExemptionChecks";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null))
+                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null)))
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
         // Then
@@ -1506,7 +1521,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndPartiallyExemption_Exempt() {
         String externalId = "nonExistingTransactionID_A";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("fresno", "US", null, "PA", "st", "", "12345", false, null))
+                .withShippingAddress(new ShippingAddressDto("fresno", "US", null, "PA", "st", "", "12345", false, new MatchedAddressDataDto(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "", "12345", false), null)))
                 .withExternalTimestamps(new TimestampsDto("2025-12-02", "2025-12-02"));
 
         // Then
@@ -1538,7 +1553,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_CustomerIsPartiallyExempt_NotExempted() {
         String externalId = "nonExistingTransactionID_B";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("fresno", "US", null, "PA", "st", "", "12345", false, null))
+                .withShippingAddress(new ShippingAddressDto("fresno", "US", null, "PA", "st", "", "12345", false, new MatchedAddressDataDto(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "", "12345", false), null)))
                 .withExternalTimestamps(new TimestampsDto("2026-02-01", "2026-02-01"));
 
         // Then
@@ -1570,7 +1585,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_CustomerIsNotNoExempt_NoExempted() {
         String externalId = "nonExistingTransactionID_C";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("fresno", "US", null, "PA", "st", "", "12345", false, null))
+                .withShippingAddress(new ShippingAddressDto("fresno", "US", null, "PA", "st", "", "12345", false, new MatchedAddressDataDto(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "", "12345", false), null)))
                 .withExternalTimestamps(new TimestampsDto("2026-05-02", "2026-05-02"));
 
         // Then
@@ -1602,7 +1617,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_NotActiveExemptionAndFullyExempt_Exempted() {
         String externalId = "nonExistingTransactionID_D";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("fresno", "US", null, "PA", "st", "", "12345", false, null))
+                .withShippingAddress(new ShippingAddressDto("fresno", "US", null, "PA", "st", "", "12345", false, new MatchedAddressDataDto(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "", "12345", false), null)))
                 .withExternalTimestamps(new TimestampsDto("2027-12-02", "2027-12-02"));
 
         // Then
@@ -1634,7 +1649,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_NotActiveExemption_NoExempted() {
         String externalId = "nonExistingTransactionID_E";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("fresno", "US", null, "PA", "st", "", "12345", false, null))
+                .withShippingAddress(new ShippingAddressDto("fresno", "US", null, "PA", "st", "", "12345", false, new MatchedAddressDataDto(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "", "12345", false), null)))
                 .withExternalTimestamps(new TimestampsDto("2027-01-02", "2027-01-02"));
 
         // Then
@@ -2374,8 +2389,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         // Then
         webTestClient
                 .mutateWith(csrf())
-
-
                 .delete()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -2588,7 +2601,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto(),
                         ITUtilities.stubItemDto().withUnitPrice(BigDecimal.valueOf(-100)).withTotalPrice(BigDecimal.valueOf(-100)))
-                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null))
+                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null)))
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
         // Then
@@ -2615,7 +2629,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "NonExistingIdTransactionWithShipping";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto())
-                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null))
+                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null)))
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
@@ -2647,7 +2662,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "NonExistingIdTransactionWithManualSalesTax";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withManualSalesTax(true).withManualSalesTaxRate(new BigDecimal("0.2")))
-                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null))
+                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null)))
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
@@ -2681,7 +2697,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "NonExistingIdTransactionWithNoDiscount";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto())
-                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null))
+                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null)))
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
@@ -2712,8 +2729,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "NonExistingIdTransactionOneItemHaveDiscount";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withDiscount(BigDecimal.valueOf(500)))
-                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null))
-                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null))).withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
         // Then
@@ -2744,7 +2761,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withDiscount(BigDecimal.valueOf(500)),
                         ITUtilities.stubItemDto().withDiscount(BigDecimal.valueOf(700)))
-                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null))
+                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null)))
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
@@ -2776,7 +2794,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withDiscount(BigDecimal.valueOf(500)),
                         ITUtilities.stubItemDto().withUnitPrice(BigDecimal.valueOf(-800)).withTotalPrice(BigDecimal.valueOf(-800)))
-                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null))
+                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null)))
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
@@ -2807,7 +2826,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "NonExistingIdTransactionUnitPriceQuantityNull";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withQuantity(null).withUnitPrice(null))
-                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null))
+                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null)))
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
@@ -2838,8 +2858,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "NonExistingIdTransactionItemUnitPriceAndQuantityNotNullAndTotalNull";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withTotalPrice(null))
-                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null))
-                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null))).withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
         // Then
@@ -2869,7 +2889,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withTotalPrice(BigDecimal.valueOf(500))
                                 .withDiscount(BigDecimal.valueOf(500)))
-                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null))
+                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null)))
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
@@ -2904,8 +2925,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                                 .withQuantity(BigDecimal.ONE)
                                 .withUnitPrice(BigDecimal.valueOf(500))
                                 .withDiscount(BigDecimal.valueOf(500)))
-                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null))
-                .withShippingFee(ITUtilities.stubShippingFeeDto())
+                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null))).withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
         // Then
@@ -3502,7 +3523,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         // Given + When
         String invoiceExternalId = "4123658121";
 
-
         // Then
         webTestClient
                 .get()
@@ -3859,7 +3879,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(
                         externalId, customerId,
                         ITUtilities.stubItemDto().withTaxCode("PCforTestingTaxability"))
-                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", null, "99801", false, null))
+                .withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", null, "99801", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", null, "99801", false), null)))
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
@@ -3890,7 +3911,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(
                         externalId, customerId,
                         ITUtilities.stubItemDto().withTaxCode("PCforTestingTaxability"))
-                .withShippingAddress(new ShippingAddressDto("Acampo", "US", null, "Arkansas", "2285 Trout St", null, "99801", false, null))
+                .withShippingAddress(new ShippingAddressDto("Acampo", "US", null, "Arkansas", "2285 Trout St", null, "99801", false, new MatchedAddressDataDto(new MandatoryAddressDto("Acampo", "US", null, "Arkansas", "2285 Trout St", null, "99801", false), null)))
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
@@ -3919,7 +3940,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(
                         externalId, customerId,
                         ITUtilities.stubItemDto().withTaxCode("PCforTestingTaxability"))
-                .withShippingAddress(new ShippingAddressDto("Acampo", "US", null, "California", "2285 Trout St", null, "99801", false, null))
+                .withShippingAddress(new ShippingAddressDto("Acampo", "US", null, "California", "2285 Trout St", null, "99801", false,
+                        new MatchedAddressDataDto(new MandatoryAddressDto("Acampo", "US", null, "California", "2285 Trout St", null, "99801", false), null)))
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
@@ -3950,7 +3972,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(
                         externalId, customerId,
                         ITUtilities.stubItemDto().withTaxCode("PCforTestingTaxability"))
-                .withShippingAddress(new ShippingAddressDto("Acampo", "US", null, "Texas", "2285 Trout St", null, "99801", false, null))
+                .withShippingAddress(new ShippingAddressDto("Acampo", "US", null, "Texas", "2285 Trout St", null, "99801", false, new MatchedAddressDataDto(new MandatoryAddressDto("Acampo", "US", null, "Texas", "2285 Trout St", null, "99801", false), null)))
                 .withShippingFee(ITUtilities.stubShippingFeeDto())
                 .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
 
@@ -4011,7 +4033,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void upsertByExternalIdAndSource_CustomerIsFullyExemptAndUsaTransactionWithoutManualSalesTax_ReturnsTransactionWithoutSalesTax() {
         String externalId = "CustomerIsFullyExemptAndUsaTransactionWithoutManualSalesTax_ID";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDtoWithThreeItems(externalId, customerId)
-                .withShippingAddress(new ShippingAddressDto("city", "US", null, "PA", "st", "", "16028", false, null))
+                .withShippingAddress(new ShippingAddressDto("city", "US", null, "PA", "st", "", "16028", false, new MatchedAddressDataDto(new MandatoryAddressDto("city", "US", null, "PA", "st", "", "16028", false), null)))
                 .withExternalTimestamps(new TimestampsDto("2025-01-26", "2025-01-26"));
 
         // Then
@@ -4046,7 +4068,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         }};
 
         givenTransaction = givenTransaction.withItems(itemsDto)
-                .withShippingAddress(new ShippingAddressDto("city", "US", null, "PA", "st", "", "16028", false, null))
+                .withShippingAddress(new ShippingAddressDto("city", "US", null, "PA", "st", "", "16028", false, new MatchedAddressDataDto(new MandatoryAddressDto("city", "US", null, "PA", "st", "", "16028", false), null)))
                 .withExternalTimestamps(new TimestampsDto("2025-01-26", "2025-01-26"));
 
         // Then
@@ -4081,7 +4103,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         List<ItemDto> itemsDto = givenTransaction.items().stream().map(itemDto -> itemDto.withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1))).toList();
 
         givenTransaction = givenTransaction.withItems(itemsDto)
-                .withShippingAddress(new ShippingAddressDto("city", "US", null, "PA", "st", "", "16028", false, null))
+                .withShippingAddress(new ShippingAddressDto("city", "US", null, "PA", "st", "", "16028", false, new MatchedAddressDataDto(new MandatoryAddressDto("city", "US", null, "PA", "st", "", "16028", false), null)))
                 .withExternalTimestamps(new TimestampsDto("2025-01-26", "2025-01-26"));
 
         // Then
@@ -4257,7 +4279,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withItems(items)
                 .withTaxInclusive(false);
 
-        givenTransaction = givenTransaction.withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null));
+        givenTransaction = givenTransaction.withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false,
+                new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null)));
 
 
         // When & Then
@@ -4305,7 +4328,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withItems(items)
                 .withTaxInclusive(false);
 
-        givenTransaction = givenTransaction.withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null));
+        givenTransaction = givenTransaction.withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false,
+                new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null)));
 
 
         // When & Then
@@ -4361,7 +4385,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .withItems(items)
                 .withTaxInclusive(false);
 
-        givenTransaction = givenTransaction.withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, null));
+        givenTransaction = givenTransaction.withShippingAddress(new ShippingAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false, new MatchedAddressDataDto(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "", "99801", false), null)));
 
         // When & Then
         webTestClient

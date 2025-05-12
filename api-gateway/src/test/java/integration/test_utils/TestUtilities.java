@@ -208,7 +208,27 @@ public class TestUtilities {
                                 "state": "%s",
                                 "street": "10 5th Ave",
                                 "zip": "90210",
-                                "isPartial": false
+                                "isPartial": false,
+                                "matchedAddressData": {
+                                      "address": {
+                                        "city": "city",
+                                        "country": "%s",
+                                        "state": "%s",
+                                        "county": "county",
+                                        "zip": "90210"
+                                      },
+                                      "scoring": {
+                                        "matchLevel": "VERY_GOOD",
+                                        "score": 0.7,
+                                        "fieldScore": {
+                                          "countryMatch": "EXACT",
+                                          "stateMatch": "EXACT",
+                                          "cityMatch": "EXACT",
+                                          "zipMatch": "EXACT",
+                                          "streetMatch": "GOOD"
+                                        }
+                                      }
+                                 }
                             },
                             "customerId": "%s",
                             "transactionStatus": "ACTIVE",
@@ -230,6 +250,8 @@ public class TestUtilities {
                 complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
                 externalId,
                 isValidated ? "\"source\": \"1\"," : "",
+                country,
+                state,
                 country,
                 state,
                 customerId,
@@ -321,7 +343,27 @@ public class TestUtilities {
                                 "state": "%s",
                                 "street": "10 5th Ave",
                                 "zip": "90210",
-                                "isPartial": "false"
+                                "isPartial": "false",
+                                "matchedAddressData": {
+                                      "address": {
+                                        "city": "Los Angeles",
+                                        "country": "US",
+                                        "state": "%s",
+                                        "county": "county",
+                                        "zip": "90210"
+                                      },
+                                      "scoring": {
+                                        "matchLevel": "VERY_GOOD",
+                                        "score": 0.7,
+                                        "fieldScore": {
+                                          "countryMatch": "EXACT",
+                                          "stateMatch": "EXACT",
+                                          "cityMatch": "EXACT",
+                                          "zipMatch": "EXACT",
+                                          "streetMatch": "GOOD"
+                                        }
+                                      }
+                                }
                             },
                             "customerId": "%s",
                             "transactionStatus": "ACTIVE",
@@ -341,6 +383,7 @@ public class TestUtilities {
                 complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
                 externalId,
                 isValidated ? "\"source\": \"1\"," : "",
+                state != null ? state : "CA",
                 state != null ? state : "CA",
                 customerId,
                 isValidated ? "\"transactionType\": \"INVOICE\"," : ""
@@ -381,7 +424,27 @@ public class TestUtilities {
                                 "state": "%s",
                                 "street": "10 5th Ave",
                                 "zip": "90210",
-                                "isPartial": "false"
+                                "isPartial": "false",
+                                "matchedAddressData": {
+                                      "address": {
+                                        "city": "Los Angeles",
+                                        "country": "US",
+                                        "state": "%s",
+                                        "county": "county",
+                                        "zip": "90210"
+                                      },
+                                      "scoring": {
+                                        "matchLevel": "VERY_GOOD",
+                                        "score": 0.7,
+                                        "fieldScore": {
+                                          "countryMatch": "EXACT",
+                                          "stateMatch": "EXACT",
+                                          "cityMatch": "EXACT",
+                                          "zipMatch": "EXACT",
+                                          "streetMatch": "GOOD"
+                                        }
+                                      }
+                                 }
                             },
                             "customerId": "%s",
                             "transactionStatus": "ACTIVE",
@@ -401,6 +464,7 @@ public class TestUtilities {
                 complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
                 externalId,
                 isValidated ? "\"source\": \"1\"," : "",
+                state != null ? state : "CA",
                 state != null ? state : "CA",
                 customerId,
                 isValidated ? "\"transactionType\": \"INVOICE\"," : ""
@@ -443,7 +507,27 @@ public class TestUtilities {
                                 "street": "10 5th Ave",
                                 "zip": "%s",
                                 "region": "%s",
-                                "isPartial": "false"
+                                "isPartial": "false",
+                                 "matchedAddressData": {
+                                      "address": {
+                                        "city": "city",
+                                        "country": "%s",
+                                        "state": "%s",
+                                        "county": "county",
+                                        "zip": "%s"
+                                      },
+                                      "scoring": {
+                                        "matchLevel": "VERY_GOOD",
+                                        "score": 0.7,
+                                        "fieldScore": {
+                                          "countryMatch": "EXACT",
+                                          "stateMatch": "EXACT",
+                                          "cityMatch": "EXACT",
+                                          "zipMatch": "EXACT",
+                                          "streetMatch": "GOOD"
+                                        }
+                                      }
+                                 }
                             },
                             "customerId": "%s",
                             "transactionStatus": "ACTIVE",
@@ -471,6 +555,9 @@ public class TestUtilities {
                 state != null ? state : "CA",
                 zip != null ? zip : "90210",
                 region,
+                country,
+                state != null ? state : "CA",
+                zip != null ? zip : "90210",
                 customerId,
                 createdDate,
                 isValidated ? "\"transactionType\": \"INVOICE\"," : "",
@@ -711,29 +798,29 @@ public class TestUtilities {
         StringBuilder supportedReferralsBuilder = new StringBuilder();
 
         for (int i = 0; i < 3; i++) {
-            String id = "tenantId #" + i+1;
+            String id = "tenantId #" + i + 1;
             supportedReferralsBuilder.append(String.format("""
-                {
-                    "tenantId": "%s",
-                    "name": "some name #%d",
-                    "partnershipStatus": "ACTIVE",
-                    "timestamps": {
-                        "createdDate": "2025-03-12T08:37:09.333",
-                        "updatedDate": "2025-03-12T08:52:28.639"
-                    }
-                }%s
-                """, id, i + 1, i < 2 ? "," : ""));
+                    {
+                        "tenantId": "%s",
+                        "name": "some name #%d",
+                        "partnershipStatus": "ACTIVE",
+                        "timestamps": {
+                            "createdDate": "2025-03-12T08:37:09.333",
+                            "updatedDate": "2025-03-12T08:52:28.639"
+                        }
+                    }%s
+                    """, id, i + 1, i < 2 ? "," : ""));
         }
 
         return String.format("""
-            {
-                "tenantId": "%s",
-                "supportedReferrals": [
-                    %s
-                ],
-                "partnerName": "%s"
-            }
-            """, tenantId, supportedReferralsBuilder.toString(), partnerName);
+                {
+                    "tenantId": "%s",
+                    "supportedReferrals": [
+                        %s
+                    ],
+                    "partnerName": "%s"
+                }
+                """, tenantId, supportedReferralsBuilder.toString(), partnerName);
     }
 
     public static String referralJsonExample(String tenantId, String referralName) {

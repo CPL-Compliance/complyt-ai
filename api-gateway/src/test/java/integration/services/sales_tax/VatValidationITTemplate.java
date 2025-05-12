@@ -1,6 +1,6 @@
 package integration.services.sales_tax;
 
-public interface VatValidatationITTemplate {
+public interface VatValidationITTemplate {
     // cases
     void upsert_ValidateExitingVatDetails_Return200();
     void upsert_ValidateExitingVatDetailsCountryCodeIsFullCountryNameAndCodeExistsInVatNumber_Return200();

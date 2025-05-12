@@ -6,6 +6,8 @@ import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
+import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.ShippingAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.transaction.TransactionTypeDto;
@@ -58,7 +60,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
     private WebTestClient webTestClient;
 
     private final LocalDateTime referenceDate = LocalDateTime.parse("2020-10-01T07:00:00");
-    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Cape Elizabeth", "US", null, "ME", "12 Captain Strout Cir", "", "04107", false, null);
+    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Cape Elizabeth", "US", null, "ME", "12 Captain Strout Cir", "", "04107", false, new MatchedAddressDataDto(new MandatoryAddressDto("Cape Elizabeth", "US", null, "ME", "12 Captain Strout Cir", "", "04107", false), null));
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private final String source = "1";
 

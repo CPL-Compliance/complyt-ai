@@ -5,6 +5,7 @@ import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.*;
+import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
 import com.complyt.v1.models.matched_address.ScoringDto;
 import com.complyt.v1.models.matched_address.enums.FieldMatchType;
 import com.complyt.v1.models.matched_address.enums.FieldsMatchScore;
@@ -48,7 +49,7 @@ public interface ITUtilities {
     static TransactionDto stubTransactionDto(String externalId, UUID customerId, ItemDto... items) {
         return new TransactionDto(null, externalId, "1", "INVUS1000",
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
-                false, null, new ShippingAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false, null),
+                false, null, new ShippingAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false, new MatchedAddressDataDto(new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false), null)),
                 customerId, null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(localDateTime, localDateTime),
                 TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED,
                 "USD", null, null, null, false, null);
@@ -57,7 +58,7 @@ public interface ITUtilities {
     static TransactionDto stubTransactionDtoWithThreeItems(String externalId, UUID customerId, ItemDto... items) {
         return new TransactionDto(null, externalId, "1", "INVUS1000",
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDtoWithDiscount(BigDecimal.valueOf(500), BigDecimal.ZERO), stubItemDtoWithDiscount(BigDecimal.valueOf(1000), BigDecimal.ZERO), stubItemDtoWithDiscount(BigDecimal.valueOf(10000), BigDecimal.ZERO)} : items),
-                false, null, new ShippingAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false, null),
+                false, null, new ShippingAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false, new MatchedAddressDataDto(new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "", "95220", false), null)),
                 customerId, null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
                 TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED,
                 "USD", null, null, null, false, null);
@@ -141,12 +142,13 @@ public interface ITUtilities {
     }
 
     static SalesTaxRatesDto createSalesTaxRatesDto(BigDecimal taxRate) {
-        return new SalesTaxRatesDto(new BigDecimal("0.0"), new BigDecimal("0.0"), new BigDecimal("0.0"),null, null, null, null, taxRate, new BigDecimal("0.0"));
+        return new SalesTaxRatesDto(new BigDecimal("0.0"), new BigDecimal("0.0"), new BigDecimal("0.0"), null, null, null, null, taxRate, new BigDecimal("0.0"));
     }
 
     static ScoringDto createScoringDto() {
         return new ScoringDto(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT));
     }
+
     static ClientTrackingDto stubClientTrackingDto() {
         String localDate = "2024-01-01T00:00";
         TimestampsDto internalTimestamps = new TimestampsDto(localDate, localDate);
@@ -504,7 +506,7 @@ public interface ITUtilities {
     }
 
     static ShippingAddressDto createAddressDtoInKensas() {
-        return new ShippingAddressDto("Kensas City", "USA", null, "KS", "101st Main st", null, "66106", false,null);
+        return new ShippingAddressDto("Kensas City", "USA", null, "KS", "101st Main st", null, "66106", false, new MatchedAddressDataDto(new MandatoryAddressDto("Kensas City", "USA", null, "KS", "101st Main st", null, "66106", false), null));
     }
 
     static ExemptionDto createExemptionDto() {

@@ -932,6 +932,16 @@ public class UnitTestUtilities {
         return new ShippingAddress("City", "Country", "County", "CA", "Street","region", "Zip", false, null);
     }
 
+    public ShippingAddress createShippingAddressWithMatchedAddress() {
+        return new ShippingAddress("City", "Country", "County", "CA", "Street","region", "Zip", false,
+                new MatchedAddressData(new MandatoryAddress("City", "Country", "County", "CA", "Street","region", "Zip", false), null));
+    }
+
+    public ShippingAddress createUSAShippingAddressWithMatchedAddress() {
+        return new ShippingAddress("California", "US", "County", "CA", "Street","region", "Zip", false,
+                new MatchedAddressData(new MandatoryAddress("California", "US", "County", "CA", "Street","region", "Zip", false), null));
+    }
+
     public MandatoryAddressDto createMandatoryAddressDto() {
         return new MandatoryAddressDto("City", "Country", "County", "CA", "Street", "region", "Zip", false);
     }

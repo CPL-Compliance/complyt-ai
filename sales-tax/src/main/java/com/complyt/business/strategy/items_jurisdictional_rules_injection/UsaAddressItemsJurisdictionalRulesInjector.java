@@ -34,7 +34,8 @@ public class UsaAddressItemsJurisdictionalRulesInjector implements ItemsJurisdic
                     throw new StateNotFoundInJurisdictionalTaxRulesApiException();
                 }
 
-                String city = transaction.getShippingAddress().city();
+                String matchedCity = transaction.getShippingAddress().matchedAddressData().address().city();
+                String city = CityAligner.getCityValue(matchedCity);
                 rules = extractCityIfExists(rules, city);
 
                 Item itemWithRules = item.withJurisdictionalSalesTaxRules(rules);
