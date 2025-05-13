@@ -36,6 +36,7 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest extends BaseTestClas
     Transaction transaction;
 
 
+
     @BeforeEach
     void setUp() {
         usaAddressItemsJurisdictionalRulesInjector = new UsaAddressItemsJurisdictionalRulesInjector();
@@ -49,13 +50,12 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest extends BaseTestClas
     @Test
     void inject_InjectsDataToTransaction_ReturnsModifiedTransaction() {
         // Given
-        Transaction transactionNoRules = transaction.withShippingAddress(testUtilities.createShippingAddressWithMatchedAddress())
-                .withItems(
-                        new ArrayList<>() {{
-                            add(transaction.getItems().get(0).withJurisdictionalSalesTaxRules(null));
-                            add(transaction.getItems().get(1).withJurisdictionalSalesTaxRules(null));
-                        }}
-                );
+        Transaction transactionNoRules = transaction.withItems(
+                new ArrayList<>() {{
+                    add(transaction.getItems().get(0).withJurisdictionalSalesTaxRules(null));
+                    add(transaction.getItems().get(1).withJurisdictionalSalesTaxRules(null));
+                }}
+        );
 
         Map<String, ProductClassification> classifications = testUtilities.createUsaClassificationsMap(
                 transaction.getItems().get(0).getJurisdictionalSalesTaxRules(),
@@ -74,13 +74,12 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest extends BaseTestClas
     @Test
     void inject_InjectsDataToTransactionWithNotTaxableItem_ReturnsModifiedTransaction() {
         // Given
-        Transaction transactionNoRules = transaction.withShippingAddress(testUtilities.createShippingAddressWithMatchedAddress())
-                .withItems(
-                        new ArrayList<>() {{
-                            add(transaction.getItems().get(0).withJurisdictionalTaxRules(null));
-                            add(transaction.getItems().get(1).withJurisdictionalTaxRules(null));
-                        }}
-                );
+        Transaction transactionNoRules = transaction.withItems(
+                new ArrayList<>() {{
+                    add(transaction.getItems().get(0).withJurisdictionalTaxRules(null));
+                    add(transaction.getItems().get(1).withJurisdictionalTaxRules(null));
+                }}
+        );
         Map<String, ProductClassification> classifications = testUtilities.createUsaClassificationsMap(
                 transaction.getItems().get(0).getJurisdictionalSalesTaxRules().withTaxable(false),
                 transaction.getItems().get(1).getJurisdictionalSalesTaxRules()

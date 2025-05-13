@@ -8,8 +8,10 @@ import com.complyt.domain.nexus.TransactionNexusSummary;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
-import com.complyt.v1.models.transaction.*;
+import com.complyt.v1.models.transaction.ItemDto;
+import com.complyt.v1.models.transaction.ShippingAddressDto;
+import com.complyt.v1.models.transaction.TransactionDto;
+import com.complyt.v1.models.transaction.TransactionStatusDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
@@ -60,7 +62,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
 
     // Given
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
-    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Grand Rapids", "US", null, "MI", "417 Michigan St NE", "", "49503", false, new MatchedAddressDataDto(new MandatoryAddressDto("Grand Rapids", "US", null, "MI", "417 Michigan St NE", "", "49503", false), null));
+    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Grand Rapids", "US", null, "MI", "417 Michigan St NE", "", "49503", false, null);
     private final String source = "1";
     private final String usaCountry = "USA";
     private UUID transactionUUID;
@@ -74,7 +76,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
     // Successfully upserting salesTaxTracking for Arizona
     @Order(0)
     @Test
-    @WithMockJwt
+@WithMockJwt
     public void salesTaxTracking_upsertByCountryAndState_UsaCountryDoesntExists_Returns201() {
         // Given
         StateDto stateDto = new StateDto("MI", "26", "Michigan");
@@ -107,7 +109,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
     // Making sure that the transaction is added to transactionNexusSummaries in the corresponding salesTaxTracking
     @Order(1)
     @Test
-    @WithMockJwt
+@WithMockJwt
     public void transaction_upsertByExternalIdAndSource_ActiveUsaTransaction_InSalesTaxTrackingAndReturns201() {
         String externalId = "newNonExistingTransactionIDUsaAbbreviationForThisScenario";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -146,7 +148,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
     // Making sure that the transaction is saved to the DB but not added to transactionNexusSummaries
     @Order(2)
     @Test
-    @WithMockJwt
+@WithMockJwt
     public void transaction_upsertByExternalIdAndSource_CancelledUsaTransaction_NotInSalesTaxTrackingAndReturns204() {
         String externalId = "newNonExistingTransactionIDUsaAbbreviationForThisScenario1";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -251,7 +253,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
     // then Successfully deletes the transaction and making sure it hadn't been deleted from the transactionNexusSummaries in SalesTaxTracking and the nexus is still true
     @Order(5)
     @Test
-    @WithMockJwt
+@WithMockJwt
     public void transaction_deleteTransaction_ActiveUsaTransactionPassesNexus_InSalesTaxTrackingAndReturns204() {
         String externalId = "newNonExistingTransactionIDUsaAbbreviationForThisScenario3";
         List<ItemDto> items = List.of(ITUtilities.stubItemDto().withTotalPrice(new BigDecimal("1000000")));

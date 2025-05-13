@@ -4,8 +4,6 @@ import com.complyt.SalesTaxApplication;
 import com.complyt.domain.State;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.matched_address.MatchedAddressDataDto;
-import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.ShippingAddressDto;
 import com.complyt.v1.models.transaction.ShippingFeeDto;
 import com.complyt.v1.models.transaction.TransactionDto;
@@ -54,7 +52,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
     @Autowired
     private WebTestClient webTestClient;
 
-    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Indianapolis", "US", null, "IN", "705 Riley Hospital Dr", "", "46202", false, new MatchedAddressDataDto(new MandatoryAddressDto("Indianapolis", "US", null, "IN", "705 Riley Hospital Dr", "", "46202", false), null));
+    private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Indianapolis", "US", null, "IN", "705 Riley Hospital Dr", "", "46202", false, null);
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private final String source = "1";
 

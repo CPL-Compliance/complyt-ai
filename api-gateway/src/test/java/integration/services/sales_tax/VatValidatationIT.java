@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class VatValidationIT extends TestContainersInitializerIT implements VatValidationITTemplate {
+public class VatValidatationIT extends TestContainersInitializerIT implements VatValidatationITTemplate {
 
     @Order(0)
     @Test
