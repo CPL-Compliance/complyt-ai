@@ -52,9 +52,9 @@ public class CustomerServiceImpl implements CustomerService {
     public Mono<Customer> injectDataToNewCustomer(Customer customer) {
         if (customer.getCustomerType() == null){
             //we default to RETAIL for customer if the type is not specified
-            customer = customer.withCustomerType(CustomerType.RETAIL);
+            customer = customer.setCustomerType(CustomerType.RETAIL);
         }
-        customer = customer.withCustomerStatus(CustomerStatus.ACTIVE);
+        customer = customer.setCustomerStatus(CustomerStatus.ACTIVE);
         return Mono.just(customer)
                 .map(complytIdHandler::insertComplytIdToNew)
                 .map(internalTimestampsHandler::insertTimestampsToNew);
