@@ -3,6 +3,7 @@ package integration.scenarios;
 import com.complyt.SalesTaxApplication;
 import com.complyt.business.tax.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.customer.CustomerDto;
@@ -215,7 +216,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                                 .exchange()
                                 .expectStatus().isNotFound()
                                 .expectBody(LinkedHashMap.class)
-                                .value(map -> assertEquals(map.get("message"), "Customer specified in the object was not found.")));
+                                .value(map -> assertEquals(GenericErrorMessages.CUSTOMER_NOT_FOUND, map.get("message"))));
 
     }
 
