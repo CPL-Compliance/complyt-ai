@@ -34,6 +34,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.BaseTestClass;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
@@ -48,7 +49,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-public class TransactionFacadeTest {
+public class TransactionFacadeTest extends BaseTestClass {
 
     @InjectMocks
     TransactionFacade transactionFacade;
@@ -75,23 +76,7 @@ public class TransactionFacadeTest {
 
     String source;
 
-    static MockedStatic mockedStatic;
-
-    @BeforeAll
-    static void beforeAll() {
-        try {
-            mockedStatic = mockStatic(TenantResolver.class);
-        } catch (Exception e) {
-            // Log the error or fail the test setup
-            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    @AfterAll
-    static void afterAll() {
-        mockedStatic.close();
-    }
+  
 
     @BeforeEach
     void setUp() {
@@ -136,7 +121,7 @@ public class TransactionFacadeTest {
 
     private SalesTax createSalesTax() {
         SalesTaxRates salesTaxRates = testUtilities.createSalesTaxRates();
-        return new SalesTax(null, new BigDecimal(1000), salesTaxRates.taxRate(), salesTaxRates, null);
+        return new SalesTax(null, new BigDecimal(1000), salesTaxRates.taxRate(), salesTaxRates, null, null);
     } //todo: note gst is null
 
     @Test
@@ -497,7 +482,7 @@ public class TransactionFacadeTest {
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished(UUID.randomUUID().toString());
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
         SalesTax salesTax = new SalesTax(null, new BigDecimal(100), BigDecimal.ZERO,
-                new SalesTaxRates(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO), null);
+                new SalesTaxRates(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO), null, null);
         //todo: note gst is null, taxrate is zero
         Transaction modifiedTransaction = createTransactionWithProductClassificationAndComplytId()
                 .withShippingAddress(newShippingAddress)

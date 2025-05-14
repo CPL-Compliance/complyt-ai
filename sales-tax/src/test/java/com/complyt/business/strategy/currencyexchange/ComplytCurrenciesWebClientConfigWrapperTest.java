@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.BaseTestClass;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-class ComplytCurrenciesWebClientConfigWrapperTest {
+class ComplytCurrenciesWebClientConfigWrapperTest extends BaseTestClass {
 
     @InjectMocks
     ComplytCurrenciesWebClientWrapper complytCurrenciesWebClientWrapper;
@@ -53,23 +54,7 @@ class ComplytCurrenciesWebClientConfigWrapperTest {
 
     UnitTestUtilities unitTestUtilities;
 
-     static MockedStatic mockedStatic;
-
-    @BeforeAll
-    static void beforeAll() {
-        try {
-            mockedStatic = mockStatic(TenantResolver.class);
-        } catch (Exception e) {
-            // Log the error or fail the test setup
-            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    @AfterAll
-    static void afterAll() {
-        mockedStatic.close();
-    }
+   
 
     @BeforeEach
     void setUp() {

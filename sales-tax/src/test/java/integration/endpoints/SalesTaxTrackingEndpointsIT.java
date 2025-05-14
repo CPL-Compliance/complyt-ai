@@ -10,6 +10,7 @@ import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.models.transaction.TransactionDto;
+import com.complyt.v1.models.transaction.TransactionStatusDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
@@ -26,7 +27,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import testUtils.integration_test.ITUtilities;
-import testUtils.integration_test.WithMockJwt;
+import testUtils.annotations.WithMockJwt;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -749,11 +750,12 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     @WithMockJwt
     public void getByStateAbbreviation_DoesntExists_Returns404() {
+        String nonExistState = "IA";
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
-                        .queryParam("state", newState.abbreviation())
+                        .queryParam("state", nonExistState)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -892,11 +894,12 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     @WithMockJwt
     public void getByStateName_DoesntExists_Returns404() {
+        String NonExitsName = "Iowa";
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL)
                         .queryParam("country", usaCountry)
-                        .queryParam("state", newState.name())
+                        .queryParam("state", NonExitsName)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1647,6 +1650,72 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                     assertTrue(resultSalesTaxTrackingDto.economicNexusTracker().established());
                     // Shouldn't Be physical, should be  matching the economicNexus date
                     assertEquals(resultSalesTaxTrackingDto.economicNexusTracker().establishedDate(), resultSalesTaxTrackingDto.appliedDate(), "appliedDate should match the economicEstablishedDate");
+                });
+    }
+
+    @Order(0)
+    @Test
+    @WithMockJwt
+    public void refreshByState_WithCancelledTransaction_ShouldDoNothing() {
+        // Given
+        String state = "AL";
+
+        // Setup SalesTaxTracking with economicNexus false
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", new StateDto("AL", "11", "Alabama"));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL)
+                        .queryParam("state", state)
+                        .queryParam("country", usaCountry)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .exchange();
+
+        // Upsert CANCELLED transaction
+        String externalId = "cancelledTransaction123";
+
+        TransactionDto cancelledTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withTaxInclusive(true)
+                .withTransactionStatus(TransactionStatusDto.CANCELLED); // CANCELLED
+
+        cancelledTransaction = cancelledTransaction.withShippingAddress(cancelledTransaction.shippingAddress().withState("AL"))
+                .withItems(List.of(cancelledTransaction.items().get(0).withTotalPrice(BigDecimal.valueOf(1000000))))
+                .withExternalTimestamps(cancelledTransaction.externalTimestamps().withCreatedDate(LocalDateTime.now().toString()));  // Should passedNexus
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/" + externalId)
+                        .build())
+                .bodyValue(cancelledTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        // When: Refresh is triggered
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh")
+                        .queryParam("country", usaCountry)
+                        .queryParam("state", state)
+                        .queryParam("date", LocalDate.now())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(result -> {
+                    System.out.println("RESULT");
+                    System.out.println(salesTaxTrackingDto);
+                    assertFalse(result.economicNexusTracker().established(), "Economic nexus should remain false");
+                    assertNull(result.nexusCalculationSummaries().get(LocalDate.now()), "No summary should be added for cancelled transaction");
                 });
     }
 }

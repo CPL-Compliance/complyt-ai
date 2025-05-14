@@ -30,6 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import test_utils.TestUtilities;
+import test_utils.annotations.WithMockJwt;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -71,7 +72,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void getAny_InvalidUrl_Returns404() {
         webTestClient
@@ -83,7 +84,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_Exists_Returns200() {
         // Given
@@ -127,7 +128,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void get_NotFound_Returns400() {
         // Given
         Address givenAddress = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
@@ -153,7 +154,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_InternalServerError_Returns500() {
         // Given
@@ -179,7 +180,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_NullHandler_ThrowsNullPointerException() {
         // Given
@@ -195,7 +196,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
         assertEquals("validAddressHandler " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE, exception.getMessage());
     }
 
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void resolve_NullHandler_ThrowsNullPointerException() {
         // Given
@@ -213,7 +214,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
 
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_NullCity_Returns400FailedValidation() {
         // Given
@@ -243,7 +244,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_NullCountry_Returns400FailedValidation() {
         // Given
@@ -272,7 +273,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_NullState_Returns400FailedValidation() {
 
@@ -295,7 +296,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_NullStreet_Returns400FailedValidation() {
         // Given
@@ -325,7 +326,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_NullZip_Returns400FailedValidation() {
         // Given
@@ -353,7 +354,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_BlankZip_Returns400FailedValidation() {
         // Given
@@ -382,7 +383,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_BlankCountry_Returns400FailedValidation() {
         // Given
@@ -412,7 +413,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_BlankStreet_Returns400FailedValidation() {
         // Given
@@ -443,7 +444,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_BlankCity_Returns400FailedValidation() {
         // Given
@@ -474,7 +475,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_BlankState_Returns400FailedValidation() {
         // Then
@@ -497,7 +498,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_ZipMoreThan20Char_Returns400FailedValidation() {
         // Given
@@ -526,7 +527,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_CountryMoreThan50Char_Returns400FailedValidation() {
         // Given
@@ -555,7 +556,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_StreetMoreThan200Char_Returns400FailedValidation() {
         // Given
@@ -584,7 +585,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_StateMoreThan100Char_Returns400FailedValidation() {
         // Given
@@ -615,7 +616,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_CityMoreThan100Char_Returns400FailedValidation() {
         // Given
@@ -644,7 +645,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void get_partialAddressWithMinimumParams_Returns200() {
         // Given
@@ -672,7 +673,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
                 .isEqualTo(expectedValidatedAddressDto);
     }
 
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void resolve_ValidAddress_ReturnsResolvedAddress() {
         // Given
@@ -702,7 +703,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
                 .isEqualTo(expectedCachedAddressDataDto);
     }
 
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void resolve_InvalidAddress_ReturnsBadRequest() {
         // Given
@@ -729,7 +730,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
                 .value(map -> assertEquals(GenericErrorMessages.ADDRESS_NOT_VALID, map.get("message")));
     }
 
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void resolve_ExceptionInFacade_ReturnsServerError() {
         // Given
@@ -754,7 +755,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
                 .expectStatus().is5xxServerError();
     }
 
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void resolve_MissingParameters_ReturnsValidationError() {
         // Then
@@ -775,7 +776,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
                         Set.of("Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR)));
     }
 
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void resolve_PartialAddressWithMinimumParams_Returns200() {
         // Given
@@ -804,7 +805,7 @@ class ValidAddressHandlerTest implements ValidAddressHandlerTestTemplate {
                 .isEqualTo(expectedCachedAddressDataDto);
     }
 
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void validate_CountryNonUS_Returns200() {
         // Given

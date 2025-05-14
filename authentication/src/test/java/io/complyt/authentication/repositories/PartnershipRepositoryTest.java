@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import test_utils.BaseTestClass;
 import test_utils.unit_tests.TestUtilities;
 
 import java.util.HashMap;
@@ -32,7 +33,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class PartnershipRepositoryTest {
+class PartnershipRepositoryTest extends BaseTestClass {
 
     @InjectMocks
     PartnershipRepository partnershipRepository;

@@ -9,10 +9,9 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Slf4j
-@Component
 @Generated
 public class TenantResolver {
-    public Mono<String> resolve() {
+    public static Mono<String> resolve() {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> {
                     if (securityContext.getAuthentication() instanceof AbstractAuthenticationToken) {

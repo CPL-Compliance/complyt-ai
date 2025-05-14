@@ -13,5 +13,5 @@ import java.util.UUID;
 @With
 @Schema(name = "SalesTaxRatesData")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record SalesTaxRatesDataDto(UUID complytId, AddressWithDate requestAddress, MatchedAddressData matchedAddressData, SalesTaxRatesDto salesTaxRates, InternalSalesTaxRatesMetaDataDto ratesMetaData) {
+public record SalesTaxRatesDataDto(UUID complytId, AddressWithDate requestAddress, MatchedAddressData matchedAddressData, SalesTaxRatesDto salesTaxRates, FilingMetaDataDto filingMetaData) {
 }

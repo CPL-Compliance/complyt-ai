@@ -28,11 +28,8 @@ public class PartnershipRepository {
     @NonNull
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    @NonNull
-    TenantResolver tenantResolver;
-
     public Mono<Partnership> findPartnership() {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
@@ -49,7 +46,7 @@ public class PartnershipRepository {
     }
 
     public Mono<Partnership> saveReferral(final @NonNull Referral referral) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
                     String dynamicMapKey = "supportedReferrals." + referral.getTenantId();
@@ -61,7 +58,7 @@ public class PartnershipRepository {
     }
 
     public Mono<Partnership> updateReferral(final @NonNull Referral referral) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     String referralTenantId = referral.getTenantId();
 

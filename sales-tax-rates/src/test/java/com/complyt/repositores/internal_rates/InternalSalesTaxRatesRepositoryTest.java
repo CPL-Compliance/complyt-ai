@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.BaseTestClass;
 import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
@@ -31,9 +32,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 
 @ExtendWith(MockitoExtension.class)
-class InternalSalesTaxRatesRepositoryTest {
-    @Mock
-    TenantResolver tenantResolver;
+class InternalSalesTaxRatesRepositoryTest extends BaseTestClass {
 
     @Mock
     private ReactiveMongoTemplate reactiveMongoTemplate;
@@ -74,7 +73,7 @@ class InternalSalesTaxRatesRepositoryTest {
     @Test
     void testFind_WithValidAddressWithDate() {
         // Arrange
-        when(tenantResolver.resolve()).thenReturn(Mono.just("12345"));
+        when(TenantResolver.resolve()).thenReturn(Mono.just("12345"));
         when(internalRatesAddressQueryBuilder.build(addressWithDate.getAddress())).thenReturn(query);
         when(reactiveMongoTemplate.findOne(query, InternalSalesTaxRates.class, collectionName))
                 .thenReturn(Mono.just(internalSalesTaxRates));
@@ -94,7 +93,7 @@ class InternalSalesTaxRatesRepositoryTest {
         when(internalRatesAddressQueryBuilder.build(addressWithDate.getAddress())).thenReturn(query);
         when(reactiveMongoTemplate.findOne(query, InternalSalesTaxRates.class, collectionName))
                 .thenReturn(Mono.empty());
-        when(tenantResolver.resolve()).thenReturn(Mono.just("12345"));
+        when(TenantResolver.resolve()).thenReturn(Mono.just("12345"));
 
         // Act
         Mono<InternalSalesTaxRates> result = repository.find(addressWithDate);

@@ -51,7 +51,7 @@ public class GtRatesTransactionInjector implements RatesTransactionInjector<Pair
                             }
 
                             BigDecimal salesTaxAmount = salesTaxAggregator.aggregate(taxables, transaction.getIsTaxInclusive());
-                            SalesTax salesTax = new SalesTax(null, salesTaxAmount, gtRates.taxRate(), null, gtRates);
+                            SalesTax salesTax = new SalesTax(null, salesTaxAmount, gtRates.taxRate(), null, gtRates, null);
 
                             BigDecimal finalAmount = transaction.getIsTaxInclusive() ?
                                     transaction.getFinalTransactionAmount() :

@@ -9,7 +9,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class TenantResolverTest {
 //
 //    @Autowired
-//    TenantResolver tenantResolver;
+//    TenantResolver TenantResolver;
 //
 //    @MockBean
 //    SecurityContext securityContext;
@@ -28,7 +28,7 @@ class TenantResolverTest {
 //        when(securityContext.getAuthentication()).thenReturn(jwtAuthenticationToken);
 //        SecurityContextHolder.setContext(securityContext);
 //
-//        Mono<String> tenantMono = tenantResolver.resolve();
+//        Mono<String> tenantMono = TenantResolver.resolve();
 //
 //        // Then
 //        StepVerifier.create(tenantMono).expectNext("tenant").verifyComplete();

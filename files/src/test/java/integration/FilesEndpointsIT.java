@@ -18,6 +18,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import testUtils.TestUtilities;
+import testUtils.annotations.WithMockJwt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
@@ -43,7 +44,7 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getFile_Exists_Returns200() {
         webTestClient
                 .mutateWith(defaultTenantMutator)
@@ -60,7 +61,7 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getFile_DoesntExists_Returns404() {
         webTestClient
                 .mutateWith(differentTenantMutator)

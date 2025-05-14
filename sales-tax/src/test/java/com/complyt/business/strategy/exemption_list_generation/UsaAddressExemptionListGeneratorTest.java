@@ -12,6 +12,7 @@ import org.mockito.MockedStatic;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.BaseTestClass;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
@@ -22,7 +23,7 @@ import java.util.UUID;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-public class UsaAddressExemptionListGeneratorTest {
+public class UsaAddressExemptionListGeneratorTest extends BaseTestClass {
 
     UsaAddressExemptionListGenerator usaAddressExemptionListGenerator;
 
@@ -30,23 +31,7 @@ public class UsaAddressExemptionListGeneratorTest {
 
     ExemptionWrapper exemptionWrapper;
 
-     static MockedStatic mockedStatic;
-
-    @BeforeAll
-    static void beforeAll() {
-        try {
-            mockedStatic = mockStatic(TenantResolver.class);
-        } catch (Exception e) {
-            // Log the error or fail the test setup
-            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    @AfterAll
-    static void afterAll() {
-        mockedStatic.close();
-    }
+   
 
     @BeforeEach
     void setUp() {

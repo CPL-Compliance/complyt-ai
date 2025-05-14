@@ -2,7 +2,9 @@ package com.complyt.domain.mappers;
 
 import com.complyt.domain.common_rates.CommonRates;
 import com.complyt.domain.common_rates.CommonSalesTaxRates;
+import com.complyt.domain.internal_rates.InternalRates;
 import com.complyt.domain.internal_rates.InternalSalesTaxRates;
+import com.complyt.domain.internal_rates.InternalSalesTaxRatesMetaData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,4 +64,48 @@ class InternalRatesToCommonRatesMapperTest {
         assertEquals(BigDecimal.ONE, total);
     }
 
+    @Test
+    void enrichMetaData_nullInternal_ReturnsNull() {
+        assertNull(InternalRatesToCommonRatesMapper.INSTANCE.enrichMetaData(null));
+    }
+
+    @Test
+    void enrichMetaData_nullMetaData_ReturnsNull() {
+        InternalSalesTaxRates input = internalSalesTaxRates
+                .withInternalSalesTaxRatesMetaData(null);
+        assertNull(InternalRatesToCommonRatesMapper.INSTANCE.enrichMetaData(input));
+    }
+
+    @Test
+    void enrichMetaData_nullSalesTaxRates_ReturnsMetaWithNullRates() {
+        InternalSalesTaxRatesMetaData meta = TestUtilities.createStubInternalSalesTaxRatesMetaData();
+        InternalSalesTaxRates input = internalSalesTaxRates
+                .withInternalSalesTaxRatesMetaData(meta)
+                .withSalesTaxRates(null);
+
+        InternalSalesTaxRatesMetaData enriched = InternalRatesToCommonRatesMapper.INSTANCE.enrichMetaData(input);
+
+        assertNull(enriched);
+    }
+
+    @Test
+    void enrichMetaData_withValidRates_ReturnsMetaWithRates() {
+        InternalSalesTaxRatesMetaData meta = TestUtilities.createStubInternalSalesTaxRatesMetaData();
+        InternalRates rates = TestUtilities.createInternalRates(LocalDateTime.now())
+                .withOther1Rate(null)
+                .withOther2Rate(BigDecimal.valueOf(2.2))
+                .withOther3Rate(BigDecimal.valueOf(3.3))
+                .withOther4Rate(null);
+
+        InternalSalesTaxRates input = internalSalesTaxRates
+                .withInternalSalesTaxRatesMetaData(meta)
+                .withSalesTaxRates(rates);
+
+        InternalSalesTaxRatesMetaData enriched = InternalRatesToCommonRatesMapper.INSTANCE.enrichMetaData(input);
+
+        assertNull(enriched.getOther1Rate());
+        assertEquals(BigDecimal.valueOf(2.2), enriched.getOther2Rate());
+        assertEquals(BigDecimal.valueOf(3.3), enriched.getOther3Rate());
+        assertNull(enriched.getOther4Rate());
+    }
 }

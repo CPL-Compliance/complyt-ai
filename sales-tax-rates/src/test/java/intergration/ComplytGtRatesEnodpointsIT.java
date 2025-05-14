@@ -24,6 +24,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import testUtils.TestUtilities;
+import testUtils.annotations.WithMockJwt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -50,7 +51,7 @@ public class ComplytGtRatesEnodpointsIT extends MongoContainerInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_FindsGtAddressWithCountryAndRegion_ReturnsComplytGtRates() {
         // Given
         GtAddressDto canadaGtAddress = TestUtilities.createCanadaGtAddressDto();
@@ -76,7 +77,7 @@ public class ComplytGtRatesEnodpointsIT extends MongoContainerInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_FindsGtAddressWithOnlyCountry_ReturnsComplytGtRates() {
         // Given
         GtAddressDto armeniaGtAddress = TestUtilities.createArmeniaGtAddressDto();
@@ -101,7 +102,7 @@ public class ComplytGtRatesEnodpointsIT extends MongoContainerInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_FindsGtAddressWithCountryAndExsitingMispellRegion_ReturnsComplytGtRates() {
         // Given
         GtAddressDto canadaGtAddress = TestUtilities.createCanadaGtAddressDto();
@@ -127,7 +128,7 @@ public class ComplytGtRatesEnodpointsIT extends MongoContainerInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void findByAddress_FindsGtAddressWithCountryAndNotExistingMisspellRegion_ReturnsComplytGtRatesOnlyOfCountry() {
         // Given
         GtAddressDto canadaGtAddress = TestUtilities.createCanadaGtAddressDto();

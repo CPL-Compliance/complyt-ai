@@ -8,5 +8,5 @@ import java.util.UUID;
 
 @With
 @JsonInclude(JsonInclude.Include.NON_NULL) // Excludes null fields in JSON response
-public record ComplytSalesTaxRates(UUID complytId, MatchedAddressData matchedAddressData, SalesTaxRates salesTaxRates) implements ComplytInternalRates {
+public record ComplytSalesTaxRates(UUID complytId, MatchedAddressData matchedAddressData, SalesTaxRates salesTaxRates, FilingMetaData filingMetaData) implements ComplytInternalRates {
 }

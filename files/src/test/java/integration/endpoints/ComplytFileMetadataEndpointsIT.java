@@ -17,6 +17,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import testUtils.TestUtilities;
+import testUtils.annotations.WithMockJwt;
 
 import java.util.Map;
 import java.util.UUID;
@@ -42,7 +43,7 @@ public class ComplytFileMetadataEndpointsIT extends TestContainersInitializerIT 
     @Override
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void deleteByComplytId_ValidMetdata_Returns200() {
         ComplytFileMetadata complytFileMetadata = new ComplytFileMetadata(
                 UUID.fromString("fff38e2b-1fdd-4b43-ac7d-0058ecde600b"),

@@ -71,7 +71,7 @@ class InternalSalesTaxRatesFacadeTest {
 
     @Test
     void validateAddress_RatesReturnedFromInternalService_ReturnsRatesWithMetadata() {
-        salesTaxRatesData = salesTaxRatesData.withComplytId(commonSalesTaxRates.complytId()).withRequestAddress(addressWithDate).withRatesMetaData(TestUtilities.createStubInternalSalesTaxRatesMetaData());
+        salesTaxRatesData = salesTaxRatesData.withComplytId(commonSalesTaxRates.complytId()).withRequestAddress(addressWithDate).withFilingMetaData(TestUtilities.createStubFilingMetaDataDto());
         commonSalesTaxRates = TestUtilities.createExternalCommonSalesTaxRatesWithMetadata().withComplytId(commonSalesTaxRates.complytId());
 
         // When

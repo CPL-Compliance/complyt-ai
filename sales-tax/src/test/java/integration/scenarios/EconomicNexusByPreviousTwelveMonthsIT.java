@@ -25,7 +25,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import testUtils.integration_test.ITUtilities;
-import testUtils.integration_test.WithMockJwt;
+import testUtils.annotations.WithMockJwt;
 import testUtils.integration_test.templates.economic_nexus.EconomicNexusByAmountOrCountITTemplate;
 
 import java.math.BigDecimal;
@@ -389,7 +389,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
                 .value(salesTaxTracking -> {
 
                     SalesTaxTrackingDto withPhysicalTrue = salesTaxTracking.withPhysicalNexusTracker(
-                            salesTaxTracking.physicalNexusTracker().withEstablished(true))
+                                    salesTaxTracking.physicalNexusTracker().withEstablished(true))
                             .withEconomicNexusTracker(salesTaxTracking.economicNexusTracker().withEstablished(false));
 
                     // Update SalesTaxTracking with physical nexus = true

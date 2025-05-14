@@ -6,7 +6,6 @@ import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
-import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
@@ -24,12 +23,9 @@ import com.complyt.v1.models.tax.sales_tax.SalesTaxDto;
 import com.complyt.v1.models.tax.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
 import com.complyt.v1.validators.Patcher;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -41,7 +37,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import testUtils.integration_test.WithMockJwt;
+import testUtils.annotations.WithMockJwt;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
@@ -83,23 +79,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     private WebTestClient webTestClient;
 
 
-    static MockedStatic mockedStatic;
-
-    @BeforeAll
-    static void beforeAll() {
-        try {
-            mockedStatic = mockStatic(TenantResolver.class);
-        } catch (Exception e) {
-            // Log the error or fail the test setup
-            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    @AfterAll
-    static void afterAll() {
-        mockedStatic.close();
-    }
+  
 
     @BeforeEach
     void setUp() {
