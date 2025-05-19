@@ -2284,7 +2284,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Order(2)
     @Test
-    @Override
     @WithMockJwt
     public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError() {
         // Given

@@ -308,6 +308,27 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
     @Order(3)
     @Test
+    public void upsertByExternalIdAndSource_WithNullCustomerType_DoesNotExist_Returns201() {
+        // Given
+        String externalId = "upsertByExternalIdAndSource_WithNullCustomerType_DoesNotExist_Returns201";
+
+        // Then
+        WEB_TEST_CLIENT
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(TestUtilities.customerJsonExampleWithNoCustomerType(externalId, null,true))
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isCreated();
+    }
+
+    @Order(3)
+    @Test
     @Override
     public void upsertByExternalIdAndSource_PathVariableInvalid_Returns400() {
         // Given
@@ -443,7 +464,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .value(map -> {
                     String message = (String) map.get("message");
                     String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(2, errors.length);
+                    assertEquals(1, errors.length);
                 });
     }
 

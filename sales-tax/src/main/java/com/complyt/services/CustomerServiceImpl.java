@@ -4,6 +4,7 @@ import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerStatus;
+import com.complyt.domain.customer.CustomerType;
 import com.complyt.repositories.CustomerRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -49,10 +50,14 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Mono<Customer> injectDataToNewCustomer(Customer customer) {
+        if (customer.getCustomerType() == null){
+            //we default to RETAIL for customer if the type is not specified
+            customer = customer.setCustomerType(CustomerType.RETAIL);
+        }
+        customer = customer.setCustomerStatus(CustomerStatus.ACTIVE);
         return Mono.just(customer)
                 .map(complytIdHandler::insertComplytIdToNew)
-                .map(internalTimestampsHandler::insertTimestampsToNew)
-                .map(customerWithInjectedData -> customerWithInjectedData.withCustomerStatus(CustomerStatus.ACTIVE));
+                .map(internalTimestampsHandler::insertTimestampsToNew);
     }
 
     @Override
@@ -66,7 +71,14 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Mono<Customer> injectDataToExistingCustomer(Customer newCustomer, Customer originalCustomer) {
-        return Mono.just(newCustomer).map(customer -> internalTimestampsHandler.insertTimestampsToExisting(customer, originalCustomer));
+        return Mono.just(newCustomer)
+                .map(customer -> internalTimestampsHandler.insertTimestampsToExisting(customer, originalCustomer))
+                .map(customer -> {
+                    if (customer.getCustomerType() == null){
+                        customer = customer.withCustomerType(originalCustomer.getCustomerType());
+                    }
+                    return customer;
+                });
     }
 
     @Override

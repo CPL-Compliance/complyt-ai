@@ -3,6 +3,7 @@ package com.complyt.services;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.CustomerRepository;
 import org.bson.types.ObjectId;
@@ -24,7 +25,6 @@ import testUtils.unit_test.UnitTestUtilities;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -84,14 +84,33 @@ class CustomerServiceImplTest {
             LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate();
             LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate();
 
-            return Objects.equals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear()) &&
-                    Objects.equals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue()) &&
-                    Objects.equals(expectedUpdatedDateTime.getDayOfYear(), actualUpdatedDateTime.getDayOfYear()) &&
-                    Objects.equals(expectedUpdatedDateTime.getHour(), actualUpdatedDateTime.getHour()) &&
-                    Objects.equals(expectedCreatedDateTime.getYear(), actualCreatedDateTime.getYear()) &&
-                    Objects.equals(expectedCreatedDateTime.getMonthValue(), actualCreatedDateTime.getMonthValue()) &&
-                    Objects.equals(expectedCreatedDateTime.getDayOfYear(), actualCreatedDateTime.getDayOfYear()) &&
-                    Objects.equals(expectedCreatedDateTime.getHour(), actualCreatedDateTime.getHour());
+            return expectedCreatedDateTime.isEqual(actualCreatedDateTime) && expectedUpdatedDateTime.isEqual(actualUpdatedDateTime);
+        }).expectComplete().verify();
+    }
+
+    @Test
+    void injectDataToExistingCustomer_withNoCustomerType_InjectsDataToExistingCustomer_ReturnsCustomerWithExistingCustomerType() {
+        // Given
+        Customer newCustomer = customer.withName("NewName");
+        LocalDateTime now = LocalDateTime.now();
+        Timestamps internalTimestamps = new Timestamps(customer.getInternalTimestamps().getCreatedDate(), now);
+        Customer customerWithUpdatedDates = newCustomer.withInternalTimestamps(internalTimestamps);
+        Customer customerWithUpdatedDatesAndNoCustomerType = customerWithUpdatedDates.withCustomerType(null);
+
+        // When
+        when(internalTimestampsInjector.insertTimestampsToExisting(newCustomer, customer)).thenReturn(customerWithUpdatedDatesAndNoCustomerType);
+        Mono<Customer> customerMono = customerServiceImpl.injectDataToExistingCustomer(newCustomer, customer);
+
+        // Then
+        LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getCreatedDate().withNano(0);
+        LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getUpdatedDate().withNano(0);
+
+        StepVerifier.create(customerMono).expectNextMatches(actualCustomer -> {
+            LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate().withNano(0);
+            LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate().withNano(0);
+
+            return expectedCreatedDateTime.isEqual(actualCreatedDateTime) && expectedUpdatedDateTime.isEqual(actualUpdatedDateTime)
+                    && actualCustomer.getCustomerType().equals(customer.getCustomerType());
         }).expectComplete().verify();
     }
 
@@ -104,6 +123,9 @@ class CustomerServiceImplTest {
         Customer customerWithUpdatedDates = customer.withComplytId(complytId).withInternalTimestamps(internalTimestamps);
 
         // when
+        when(customerComplytIdHandler.insertComplytIdToNew(customer)).thenReturn(customer.withComplytId(complytId));
+        when(internalTimestampsInjector.insertTimestampsToNew(customer.withComplytId(complytId))).thenReturn(customerWithUpdatedDates);
+
         Mono<Customer> actualCustomerMono = customerServiceImpl.injectDataToNewCustomer(customer);
 
         // Then
@@ -114,16 +136,42 @@ class CustomerServiceImplTest {
             LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate();
             LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate();
 
-            Assertions.assertEquals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear());
-            Assertions.assertEquals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue());
-            Assertions.assertEquals(expectedUpdatedDateTime.getDayOfYear(), actualUpdatedDateTime.getDayOfYear());
-            Assertions.assertEquals(expectedUpdatedDateTime.getHour(), actualUpdatedDateTime.getHour());
-            Assertions.assertEquals(expectedCreatedDateTime.getYear(), actualCreatedDateTime.getYear());
-            Assertions.assertEquals(expectedCreatedDateTime.getMonthValue(), actualCreatedDateTime.getMonthValue());
-            Assertions.assertEquals(expectedCreatedDateTime.getDayOfYear(), actualCreatedDateTime.getDayOfYear());
-            Assertions.assertEquals(expectedCreatedDateTime.getHour(), actualCreatedDateTime.getHour());
+            Assertions.assertTrue(expectedUpdatedDateTime.isEqual(actualUpdatedDateTime));
+            Assertions.assertTrue(expectedCreatedDateTime.isEqual(actualCreatedDateTime));
             assertEquals(customerWithUpdatedDates.getComplytId(), actualCustomer.getComplytId());
-        });
+        }).verifyComplete();
+    }
+
+    @Test
+    void injectDataToNewCustomer_withNoCustomerType_InjectsDataToNewCustomer_defaultsCustomerTypeToRetail_ReturnsCustomer() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+        LocalDateTime now = LocalDateTime.now();
+        Timestamps internalTimestamps = new Timestamps(now, now);
+        Customer customerWithUpdatedDates = customer.withComplytId(complytId).withInternalTimestamps(internalTimestamps);
+        Customer customerWithNoCustomerType = customer.withCustomerType(null);
+        Customer customerWithDeterminedCustomerType = customerWithNoCustomerType.withCustomerType(CustomerType.RETAIL);
+
+        // when
+        when(customerComplytIdHandler.insertComplytIdToNew(customerWithDeterminedCustomerType)).thenReturn(customerWithDeterminedCustomerType);
+        when(internalTimestampsInjector.insertTimestampsToNew(customerWithDeterminedCustomerType)).thenReturn(customerWithDeterminedCustomerType.withComplytId(complytId));
+
+
+        Mono<Customer> actualCustomerMono = customerServiceImpl.injectDataToNewCustomer(customerWithNoCustomerType);
+
+        // Then
+        StepVerifier.create(actualCustomerMono).assertNext(actualCustomer -> {
+            LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getCreatedDate().withNano(0);
+            LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getUpdatedDate().withNano(0);
+
+            LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate().withNano(0);
+            LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate().withNano(0);
+
+            Assertions.assertTrue(expectedUpdatedDateTime.isEqual(actualUpdatedDateTime));
+            Assertions.assertTrue(expectedCreatedDateTime.isEqual(actualCreatedDateTime));
+            assertEquals(customerWithUpdatedDates.getComplytId(), actualCustomer.getComplytId());
+            assertEquals(CustomerType.RETAIL, actualCustomer.getCustomerType());
+        }).verifyComplete();
     }
 
     @Test

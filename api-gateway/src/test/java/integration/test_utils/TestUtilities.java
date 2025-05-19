@@ -163,6 +163,38 @@ public class TestUtilities {
                 isValidated ? "\"customerType\": \"RETAIL\"," : "");
     }
 
+    public static String customerJsonExampleWithNoCustomerType(String externalId, String complytId, boolean isValidated) {
+        return String.format("""
+                        {
+                            %s
+                            "externalId": "%s",
+                            %s
+                            "name": "Complyt",
+                            "address": {
+                                "city": "Sacramento",
+                                "country": "US",
+                                "county": null,
+                                "state": "CA",
+                                "street": "944 W. Wintergreen St.",
+                                "zip": "95823"
+                            },
+                            "email": "shtak@dope.com",
+                            %s
+                            "internalTimestamps": {
+                                "createdDate": "2023-01-10T17:40:44.357",
+                                "updatedDate": "2023-01-11T17:10:21.275"
+                            },
+                            "externalTimestamps": {
+                                "createdDate": "2022-10-19T07:00:00",
+                                "updatedDate": "2022-10-19T09:07:54.585"
+                            }
+                        }""",
+                complytId != null ? "\"complytId\": \"" + complytId + "\"," : "",
+                externalId,
+                isValidated ? "\"source\": 1," : "",
+                "\"customerType\": "+null +",");
+    }
+
     public static String unvalidatedTransactionJsonExample(String externalId, String customerId, String createdDate, String currency) {
         return transactionJsonExample(externalId, customerId, null, false, null, "US", createdDate, currency, null);
     }

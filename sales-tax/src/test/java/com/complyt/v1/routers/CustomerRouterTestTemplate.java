@@ -43,7 +43,4 @@ public interface CustomerRouterTestTemplate extends
 
     void upsert_LengthGreaterThen200StreetInAddress_Returns400ValidationError();
 
-    // Validation::CustomerType
-    void upsert_NullCustomerType_Returns400ValidationError();
-
 }
