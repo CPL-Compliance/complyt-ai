@@ -55,12 +55,11 @@
         <testcontainers.version>1.17.6</testcontainers.version>
         <taxjar.version>5.0.3</taxjar.version>
         <mongodb-driver.version>4.11.0</mongodb-driver.version>
-
         <spring-security.version>6.1.9</spring-security.version>
-
-
         <testcontainers-keycloak.version>2.5.0</testcontainers-keycloak.version>
+        <snakeyaml.version>2.4</snakeyaml.version>
         <!-- Dependencies -->
+
         <!-- Plugins -->
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <spring-boot-maven-plugin.version>2.6.6</spring-boot-maven-plugin.version>
