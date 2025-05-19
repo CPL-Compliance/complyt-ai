@@ -56,7 +56,7 @@
         <taxjar.version>5.0.3</taxjar.version>
         <mongodb-driver.version>4.11.0</mongodb-driver.version>
 
-        <spring-security.version>6.1.9</spring-security.version>
+        <spring-security.version>6.3.4</spring-security.version>
 
 
         <testcontainers-keycloak.version>2.5.0</testcontainers-keycloak.version>
