@@ -57,7 +57,7 @@
         <mongodb-driver.version>4.11.0</mongodb-driver.version>
 
         <spring-security.version>6.1.9</spring-security.version>
-        <tomcat.version>11.0.6</tomcat.version>
+        <tomcat.version>10.1.41</tomcat.version>
         <testcontainers-keycloak.version>2.5.0</testcontainers-keycloak.version>
         <!-- Dependencies -->
         <!-- Plugins -->
