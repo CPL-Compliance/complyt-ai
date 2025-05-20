@@ -114,7 +114,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends TestContainersInitializerIT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.COMPLYT_SALES_TAX_RATES_BASE_URL)
-                        .queryParam("status","NEW")
+                        .queryParam("status", "NEW")
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN_COMPLYT_ADMIN);
@@ -138,7 +138,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends TestContainersInitializerIT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.COMPLYT_SALES_TAX_RATES_BASE_URL)
-                        .queryParam("status",errorStatus)
+                        .queryParam("status", errorStatus)
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN_COMPLYT_ADMIN);
@@ -161,7 +161,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends TestContainersInitializerIT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.COMPLYT_SALES_TAX_RATES_BASE_URL)
-                        .queryParam("status","ARCHIVE")
+                        .queryParam("status", "ARCHIVE")
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN_COMPLYT_ADMIN);
@@ -189,7 +189,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends TestContainersInitializerIT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.COMPLYT_SALES_TAX_RATES_BASE_URL)
-                        .queryParam("status","UPDATE")
+                        .queryParam("status", "UPDATE")
                         .queryParam("detailed", "true")
                         .build())
                 .headers(headers -> {
@@ -213,7 +213,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends TestContainersInitializerIT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.COMPLYT_SALES_TAX_RATES_BASE_URL)
-                        .queryParam("status","UPDATE")
+                        .queryParam("status", "UPDATE")
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN_COMPLYT_ADMIN);
@@ -234,7 +234,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends TestContainersInitializerIT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.COMPLYT_SALES_TAX_RATES_BASE_URL)
-                        .queryParam("status","ARCHIVE")
+                        .queryParam("status", "ARCHIVE")
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN_COMPLYT_ADMIN);
@@ -243,5 +243,35 @@ public class ComplytSalesTaxRatesEndpointsIT extends TestContainersInitializerIT
                 .bodyValue(TestUtilities.createInternalSalesTaxRatesJson("updated-field-Test", zipNotFound))
                 .exchange()
                 .expectStatus().isNotFound();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    public void findByAddress_CachedAddressByQueryDetailedTrue_Returns200() {
+        // Date after the maxEffectiveDate field
+        WEB_TEST_CLIENT
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.COMPLYT_SALES_TAX_RATES_BASE_URL)
+                        .queryParam("country", addressCached.get("country"))
+                        .queryParam("state", addressCached.get("state"))
+                        .queryParam("city", addressCached.get("city"))
+                        .queryParam("street", addressCached.get("street"))
+                        .queryParam("zip", addressCached.get("zip"))
+                        .queryParam("effectiveDate", requestedTime)
+                        .queryParam("detailed", true)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.matchedAddressData.address.state").isEqualTo("Alaska")
+                .jsonPath("$.matchedAddressData.scoring.score").isEqualTo("1.0")
+                .jsonPath("$.salesTaxRates.taxRate").isEqualTo(0.3f)
+                .jsonPath("$.filingMetaData.fipsCounty").isEqualTo("020");
     }
 }

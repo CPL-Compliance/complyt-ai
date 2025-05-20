@@ -15,13 +15,14 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.BaseTestClass;
 import testUtils.TestUtilities;
 
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-class FileRepositoryTest {
+class FileRepositoryTest extends BaseTestClass {
     @InjectMocks
     FileRepository fileRepository;
 

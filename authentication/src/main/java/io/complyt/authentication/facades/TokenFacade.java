@@ -33,8 +33,6 @@ public class TokenFacade {
     @NonNull
     AuthorizationService authorizationService;
 
-    @NonNull
-    TenantResolver tenantResolver;
 
     public Mono<Token> getToken(final @NonNull ApiKey apiKey) {
         return tokenService.findByApiKeyAndDecrypt(apiKey)
@@ -47,7 +45,7 @@ public class TokenFacade {
     }
 
     public Mono<Token> getTokenForPartnerByTenantId(final @NonNull String requestedTenantId) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(partnerTenantId -> partnershipService.findSupportedTenantsForPartnerByTenantId(partnerTenantId)
                         .flatMap(supportedTenantIds -> supportedTenantIds.contains(requestedTenantId) ?
                                 credentialsService.getApiKeyByTenantId(requestedTenantId)

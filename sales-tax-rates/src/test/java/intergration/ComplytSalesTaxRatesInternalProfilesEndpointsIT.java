@@ -103,7 +103,7 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
                 .value(salesTaxRatesDataDto -> {
                     assertEquals(matchedAddressData, salesTaxRatesDataDto.matchedAddressData());
                     assertEquals(stubInternalTaxSalesTaxRates, salesTaxRatesDataDto.salesTaxRates());
-                    assertNull(salesTaxRatesDataDto.ratesMetaData());
+                    assertNull(salesTaxRatesDataDto.filingMetaData());
                 });
     }
 
@@ -139,7 +139,7 @@ public class ComplytSalesTaxRatesInternalProfilesEndpointsIT extends MongoContai
                 .value(salesTaxRatesDataDto -> {
                     assertEquals(matchedAddressData, salesTaxRatesDataDto.matchedAddressData());
                     assertEquals(stubInternalTaxSalesTaxRates, salesTaxRatesDataDto.salesTaxRates());
-                    assertNotNull(salesTaxRatesDataDto.ratesMetaData());
+                    assertNotNull(salesTaxRatesDataDto.filingMetaData());
                 });
     }
 

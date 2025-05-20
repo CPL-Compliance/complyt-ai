@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import test_utils.BaseTestClass;
 import test_utils.unit_tests.TestUtilities;
 
 import java.util.List;
@@ -33,7 +34,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-class TokenFacadeTest {
+class TokenFacadeTest extends BaseTestClass {
     @InjectMocks
     TokenFacade tokenFacade;
 

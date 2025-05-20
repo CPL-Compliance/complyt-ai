@@ -32,6 +32,7 @@ public class NexusTransactionsSearchQueryBuilder {
                                 , Criteria.where("shippingAddress.state").is(nexusStateRule.state().getName())))) :
                 timeFrameQuery.addCriteria(countrySearchCriteria(nexusStateRule.country()));
         timeFrameQuery.addCriteria(Criteria.where("subsidiary").is(subsidiary));
+        timeFrameQuery.addCriteria(Criteria.where("transactionStatus").is("ACTIVE"));
 
         return timeFrameQuery;
     }

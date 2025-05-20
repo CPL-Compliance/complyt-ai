@@ -1,1 +1,1 @@
-{"options":{"validationLevel":"off","validationAction":"warn"},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"e3d788e5a590416797b4e8aa72ba1e10","collectionName":"utah","type":"collection"}
+{"options":{"validationLevel":"off","validationAction":"warn"},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"47c024faf28c4e91b8559df71eddb487","collectionName":"utah","type":"collection"}

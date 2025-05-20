@@ -29,6 +29,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import testUtils.TestUtilities;
+import testUtils.annotations.WithMockJwt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -78,7 +79,7 @@ public class FileRouterTest implements FileRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void get_Exists_Returns200() {
         // Given
         File file = TestUtilities.createFile();
@@ -100,7 +101,7 @@ public class FileRouterTest implements FileRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void getAny_InvalidUrl_Returns404() {
         // Given
         File file = TestUtilities.createFile();
@@ -119,7 +120,7 @@ public class FileRouterTest implements FileRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void get_DoesntExist_Returns404() {
         // When
         when(fileService.find()).thenReturn(Mono.empty());
@@ -152,7 +153,7 @@ public class FileRouterTest implements FileRouterTestTemplate {
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void get_InternalServerError_Returns500() {
         // When
         when(fileService.find()).thenThrow(RuntimeException.class);
@@ -167,7 +168,7 @@ public class FileRouterTest implements FileRouterTestTemplate {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getAllFiles_Exists_Returns200() {
         // Given
         ComplytFile complytFile = TestUtilities.createComplytFile();
@@ -187,7 +188,7 @@ public class FileRouterTest implements FileRouterTestTemplate {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getSignedLink_Exists_Returns200() {
         // Given
         ComplytFile complytFile = TestUtilities.createComplytFile();

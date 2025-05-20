@@ -49,7 +49,8 @@ public class SalesTaxTest {
                 ", taxRate=0.4]" +
                 ", gtRates=GtRates[countryRate=0.1" +
                 ", regionRate=0.1" +
-                ", taxRate=0.2]]";
+                ", taxRate=0.2]," +
+                " filingMetaData=null]";
 
         // When
         String actualString = salesTax.toString();

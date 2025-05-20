@@ -45,7 +45,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
 
     String effectiveDate;
 
-   
+
 
     @BeforeEach
     void setUp() {
@@ -65,7 +65,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
         // When
         when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(),
                 address.city(), address.street(), address.zip(),
-                address.isPartial(),transactionCreatedDateTime.toString())).thenReturn(Mono.just(complytInternalSalesTaxRatesDto));
+                address.isPartial(),transactionCreatedDateTime.toString(), true)).thenReturn(Mono.just(complytInternalSalesTaxRatesDto));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address, transactionCreatedDateTime);
 
@@ -79,7 +79,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
         ShippingAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
 
         // When
-        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial(), effectiveDate))
+        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial(), effectiveDate, true))
                 .thenReturn(Mono.error(testUtilities.create404NodFoundFeignException()));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address, transactionCreatedDateTime);
@@ -94,7 +94,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
         ShippingAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
 
         // When
-        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial(), effectiveDate))
+        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial(), effectiveDate, true))
                 .thenReturn(Mono.error(testUtilities.create404NodFoundFeignException()));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address, transactionCreatedDateTime);
@@ -111,7 +111,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
         // When
         when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(),
                 address.city(), address.street(), address.zip(),
-                address.isPartial(),transactionCreatedDateTime.toString())).thenReturn(Mono.error(new ComplytSalesTaxRatesException()));
+                address.isPartial(),transactionCreatedDateTime.toString(), true)).thenReturn(Mono.error(new ComplytSalesTaxRatesException()));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address, transactionCreatedDateTime);
 
@@ -131,7 +131,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
 
         // When
         when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(),
-                address.street(), address.zip(), address.isPartial(), effectiveDate))
+                address.street(), address.zip(), address.isPartial(), effectiveDate, true))
                 .thenReturn(Mono.error(notFoundException));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address, transactionCreatedDateTime);
@@ -141,7 +141,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
                 .expectError(ObjectNotFoundApiException.class)
                 .verify();
 
-        verify(salesTaxRatesServiceProxy, times(1)).findByAddress(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(), anyString());
+        verify(salesTaxRatesServiceProxy, times(1)).findByAddress(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(), anyString(), anyBoolean());
     }
 
     @Test
@@ -151,7 +151,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
 
         // When
         when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(),
-                address.street(), address.zip(), address.isPartial(), effectiveDate))
+                address.street(), address.zip(), address.isPartial(), effectiveDate, true))
                 .thenReturn(Mono.error(UnitTestUtilities.create400BadRequestFeignException()));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address, transactionCreatedDateTime);
@@ -163,6 +163,6 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
                 )
                 .verify();
 
-        verify(salesTaxRatesServiceProxy, times(1)).findByAddress(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(), anyString());
+        verify(salesTaxRatesServiceProxy, times(1)).findByAddress(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(), anyString(), anyBoolean());
     }
 }

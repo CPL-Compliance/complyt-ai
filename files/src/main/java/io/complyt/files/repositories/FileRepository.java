@@ -22,11 +22,8 @@ public class FileRepository {
     @NonNull
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    @NonNull
-    TenantResolver tenantResolver;
-
     public Mono<File> find() {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 

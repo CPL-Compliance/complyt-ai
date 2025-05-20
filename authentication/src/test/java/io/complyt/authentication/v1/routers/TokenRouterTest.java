@@ -26,6 +26,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import test_utils.annotations.WithMockJwt;
 import test_utils.unit_tests.TestUtilities;
 import test_utils.unit_tests.templates.PostOkRouterMonoTest;
 import test_utils.unit_tests.templates.PostRouterTestSecurityTemplate;
@@ -65,7 +66,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void post_Exists_Returns200() {
         // Given
         ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
@@ -91,7 +92,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void post_DoesntExist_Returns401() {
         // Given
         ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
@@ -114,7 +115,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void post_ResourceDoesntExist_Returns404() {
         // Given
         ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
@@ -138,7 +139,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void post_InternalServerError_Returns500() {
         // Given
         ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
@@ -177,7 +178,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
 
     @Override
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void post_UnsupportedMediaType_Returns415() {
 
         // Given + When + Then
@@ -215,7 +216,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Override
     public void post_missingCsrfToken_return403() {
         // Given
@@ -234,7 +235,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void post_invalidApiKeyFormat_return400() {
         ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.invalidApiKeyClientIdStr, TestUtilities.invalidApiKeyClientSecretStr);
 
@@ -252,7 +253,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void post_apiKeyClientIdValueIsMissing_Returns400() {
         ApiKeyDto apiKeyDto = new ApiKeyDto("", "3572db2e-486b-480a-995b-2e4d2b9104fa");
 
@@ -269,7 +270,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void post_apiKeyClientSecretValueIsMissing_Returns400() {
         ApiKeyDto apiKeyDto = new ApiKeyDto("3572db2e-486b-480a-995b-2e4d2b9104fa", "");
 
@@ -287,7 +288,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
 
     @Test
 //    @Override
-    @WithMockUser
+    @WithMockJwt
     public void getTokenForPartner_Exists_Returns200() {
         // Given
         String requestedTenantId = TestUtilities.tenantId;
@@ -312,7 +313,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
 
     @Test
 //    @Override
-    @WithMockUser
+    @WithMockJwt
     public void getTokenForPartner_DoesntExist_Returns401() {
         // Given
         String requestedTenantId = TestUtilities.tenantId;
@@ -335,7 +336,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
 
     @Test
 //    @Override
-    @WithMockUser
+    @WithMockJwt
     public void getTokenForPartner_InternalServerError_Returns500() {
         // Given
         String requestedTenantId = TestUtilities.tenantId;
@@ -358,7 +359,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
 
     @Test
 //    @Override
-    @WithMockUser
+    @WithMockJwt
     public void getTokenForPartner_ReferralsNotFoundApiException_Returns400() {
         // Given
         String requestedTenantId = TestUtilities.tenantId;
@@ -395,7 +396,7 @@ class TokenRouterTest implements PostOkRouterMonoTest, PostRouterTestSecurityTem
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getTokenForPartner_invalidTenantId_return404() {
         String requestedTenantId = "Invalid Tenant Id";
 

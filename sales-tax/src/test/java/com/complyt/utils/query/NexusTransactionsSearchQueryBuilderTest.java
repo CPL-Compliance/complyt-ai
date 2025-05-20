@@ -87,7 +87,8 @@ public class NexusTransactionsSearchQueryBuilderTest {
         );
 
         query.addCriteria(new Criteria().andOperator(usaAbbreviationsCriteria, stateCriteria));
-        return query.addCriteria(Criteria.where("subsidiary").is(null));
+        query.addCriteria(Criteria.where("subsidiary").is(null));
+        return query.addCriteria(Criteria.where("transactionStatus").is("ACTIVE"));
     }
 
     private Query createExpectedQueryInANonUsa(LocalDateTime start, LocalDateTime end, NexusStateRule nexusStateRule) {
@@ -95,7 +96,8 @@ public class NexusTransactionsSearchQueryBuilderTest {
                 .gte(start).lte(end));
 
         return query.addCriteria(nonUsaAbbreviationCriteria(nexusStateRule.country().toUpperCase()))
-                .addCriteria(Criteria.where("subsidiary").is(null));
+                .addCriteria(Criteria.where("subsidiary").is(null))
+                .addCriteria(Criteria.where("transactionStatus").is("ACTIVE"));
     }
 
     private Query createQueryToSend(LocalDateTime start, LocalDateTime end) {

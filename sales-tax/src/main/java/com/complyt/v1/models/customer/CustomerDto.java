@@ -28,7 +28,7 @@ public record CustomerDto(
         @Schema(description = FieldsDescriptions.NAME_OF_CUSTOMER) @Size(min = 0, max = 256, message = "name " + StringErrorMessages.MAX_256_ERROR) String name,
         @Schema(ref = "addressOfCustomer") @Valid OptionalAddressDto address,
         @Schema(description = FieldsDescriptions.EMAIL) @Email String email,
-        @NotNull(message = "customerType " + DtoErrorMessages.NOT_NULL_ERROR) CustomerTypeDto customerType,
+        CustomerTypeDto customerType,
         @Schema(ref = "internalTimestamps") @Valid TimestampsDto internalTimestamps,
         @Schema(ref = "externalTimestamps") @Valid @NotNull(message = "externalTimestamps " + DtoErrorMessages.NOT_NULL_ERROR) TimestampsDto externalTimestamps,
         @Size(max = 200, message = "comment " + StringErrorMessages.MAX_200_ERROR) String comment,

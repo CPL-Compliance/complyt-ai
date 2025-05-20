@@ -65,7 +65,7 @@ public class GtRatesTransactionInjectorTest extends BaseTestClass {
         // Given
         GtRates gtRates = testUtilities.createGtRates();
         ComplytGtRates complytGtRates = testUtilities.createComplytGtRates();
-        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), gtRates.taxRate(), null, gtRates); //note gst is null
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), gtRates.taxRate(), null, gtRates, null); //note gst is null
 
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withGtRates(gtRates));
@@ -89,7 +89,7 @@ public class GtRatesTransactionInjectorTest extends BaseTestClass {
         // Given
         GtRates gtRates = testUtilities.createGtRates();
         ComplytGtRates complytGtRates = testUtilities.createComplytGtRates();
-        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), gtRates.taxRate(), null, gtRates);
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), gtRates.taxRate(), null, gtRates, null);
         Transaction transactionToSend = transaction.withIsTaxInclusive(true);
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transactionToSend.getItems().get(0).withGtRates(gtRates));
@@ -137,7 +137,7 @@ public class GtRatesTransactionInjectorTest extends BaseTestClass {
         // Given
         GtRates gtRates = testUtilities.createGtRates();
         ComplytGtRates complytGtRates = testUtilities.createComplytGtRates();
-        SalesTax salesTax = new SalesTax(null, new BigDecimal(800), gtRates.taxRate(), null, gtRates); //note gst is null
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(800), gtRates.taxRate(), null, gtRates, null); //note gst is null
 
         List<Item> manualTaxableItems = new ArrayList<>() {{
             add(transaction.getItems().get(1).withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1)));
@@ -168,7 +168,7 @@ public class GtRatesTransactionInjectorTest extends BaseTestClass {
         // Given
         GtRates gtRates = testUtilities.createGtRates();
         ComplytGtRates complytGtRates = testUtilities.createComplytGtRates();
-        SalesTax salesTax = new SalesTax(null, new BigDecimal(1600), gtRates.taxRate(), null, gtRates); //note gst is null
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(1600), gtRates.taxRate(), null, gtRates, null); //note gst is null
 
         List<Item> manualTaxableItems = new ArrayList<>() {{
             add(transaction.getItems().get(0).withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1)));

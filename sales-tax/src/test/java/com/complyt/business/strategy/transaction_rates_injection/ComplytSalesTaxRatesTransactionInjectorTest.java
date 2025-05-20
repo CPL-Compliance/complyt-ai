@@ -6,6 +6,7 @@ import com.complyt.business.tax.sales_tax.sales_tax_rates.TransactionSalesTaxRat
 import com.complyt.business.transaction.data_injector.TransactionMatchedAddressInjector;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
+import com.complyt.domain.sales_tax.FilingMetaData;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.transaction.*;
@@ -57,7 +58,6 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
     MatchedAddressData matchedAddressData;
 
 
-
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(
@@ -72,7 +72,8 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null); //note gt is null
+        FilingMetaData filingMetaData = UnitTestUtilities.createFilingMetaData();
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null, filingMetaData); //note gt is null
 
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
@@ -101,7 +102,8 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null);
+        FilingMetaData filingMetaData = UnitTestUtilities.createFilingMetaData();
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null, filingMetaData);
         Transaction transactionToSend = transaction.withIsTaxInclusive(true);
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transactionToSend.getItems().get(0).withSalesTaxRates(salesTaxRates));
@@ -155,7 +157,8 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(null, new BigDecimal(800), salesTaxRates.taxRate(), salesTaxRates, null); //note gt is null
+        FilingMetaData filingMetaData = UnitTestUtilities.createFilingMetaData();
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(800), salesTaxRates.taxRate(), salesTaxRates, null, filingMetaData); //note gt is null
 
         List<Item> manualTaxableItems = new ArrayList<>() {{
             add(transaction.getItems().get(1).withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1)));
@@ -189,7 +192,8 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(null, new BigDecimal(1600), salesTaxRates.taxRate(), salesTaxRates, null); //note gt is null
+        FilingMetaData filingMetaData = UnitTestUtilities.createFilingMetaData();
+        SalesTax salesTax = new SalesTax(null, new BigDecimal(1600), salesTaxRates.taxRate(), salesTaxRates, null, filingMetaData); //note gt is null
 
         List<Item> manualTaxableItems = new ArrayList<>() {{
             add(transaction.getItems().get(0).withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1)));

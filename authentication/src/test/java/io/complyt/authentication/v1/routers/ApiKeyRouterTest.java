@@ -28,6 +28,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import test_utils.annotations.WithMockJwt;
 import test_utils.unit_tests.TestUtilities;
 import test_utils.unit_tests.templates.DeleteRouterTestMonoTemplate;
 import test_utils.unit_tests.templates.PostCreatedRouterMonoTest;
@@ -70,7 +71,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Override
     public void post_Exists_Returns201() {
         // Given
@@ -96,7 +97,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Override
     public void post_ExistsAndMediaTypeJson_Returns201() {
         // Given
@@ -124,7 +125,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void post_DoesntExist_Returns401() {
         // When
         when(apiKeyFacade.saveNewCredentials(credentials)).thenReturn(Mono.empty());
@@ -144,7 +145,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void post_InternalServerError_Returns500() {
         // When
         when(apiKeyFacade.saveNewCredentials(credentials)).thenThrow(OperationFailedException.class);
@@ -178,7 +179,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     }
 
     @Override
-    @WithMockUser
+    @WithMockJwt
     @Test
     public void post_UnsupportedMediaType_Returns415() {
         webTestClient
@@ -211,7 +212,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Override
     public void post_missingCsrfToken_return403() {
         webTestClient
@@ -225,7 +226,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Override
     public void delete_SentAsFormURLEncoded_Exists_Returns204() {
         // Given
@@ -250,7 +251,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Override
     public void delete_SentAsJson_Exists_Returns204() {
         // Given
@@ -275,7 +276,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void delete_DoesntExist_Returns204() {
         // When
         when(apiKeyFacade.markAsCancelled(apiKey)).thenReturn(Mono.empty());
@@ -297,7 +298,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void delete_DoesntExistAndNoContentType_Returns415() {
         // When
         when(apiKeyFacade.markAsCancelled(apiKey)).thenReturn(Mono.empty());
@@ -318,7 +319,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void delete_ContentTypeIsJson_Returns204() {
         when(apiKeyFacade.markAsCancelled(apiKey)).thenReturn(Mono.empty());
 
@@ -336,7 +337,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void delete_InternalServerError_ReturnInternalServerError() {
         // When
         when(apiKeyFacade.markAsCancelled(apiKey)).thenThrow(OperationFailedException.class);
@@ -358,7 +359,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void delete_NullHandler_ThrowsNullPointerException() {
         // Given
         ApiKeyRouter apiKeyRouter = new ApiKeyRouter();
@@ -374,7 +375,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void rotate_NullHandler_ThrowsNullPointerException() {
         // Given
         ApiKeyRouter apiKeyRouter = new ApiKeyRouter();
@@ -389,7 +390,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Override
     public void rotate_SentAsURLEncoded_Exists_return201() {
         // When
@@ -415,7 +416,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Override
     public void rotate_SentAsJson_Exists_return201() {
         // When
@@ -442,7 +443,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void rotate_DoesntExists_return401() {
         // When
         String body = "clientId=" + apiKeyDto.clientId() +
@@ -466,7 +467,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void rotate_InternalServerError_Returns500() {
         // When
         String body = "clientId=" + apiKeyDto.clientId() +
@@ -490,7 +491,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
 
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void rotate_UnsupportedMediaType_Returns415() {
         // When
         when(apiKeyFacade.rotateCredentials(apiKey)).thenThrow(OperationFailedException.class);
@@ -531,7 +532,7 @@ class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecur
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     @Override
     public void delete_missingCsrfToken_return403() {
         // When

@@ -19,6 +19,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import test_utils.annotations.WithMockJwt;
 import test_utils.unit_tests.TestUtilities;
 
 import java.util.LinkedHashMap;
@@ -42,7 +43,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void post_Exists_Returns201() {
         CredentialsDto credentialsDto = TestUtilities.createCredentialsDto();
 
@@ -61,7 +62,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void post_UnsupportedMediaType_Returns415() {
 
         webTestClient
@@ -79,7 +80,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void delete_SentAsFormURLEncoded_Exists_Returns204() {
         ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
 
@@ -101,7 +102,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void delete_SentAsJson_Exists_Returns204() {
         ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
 
@@ -119,7 +120,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void delete_SentAsFormURLEncoded_HasContentTypeHeaderButNoApiKeyProvided_Returns415() {
         String expectedMassage = "401 Unauthorized";
 
@@ -140,7 +141,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void delete_SentAsFormURLEncoded_NoContentTypeHeaderButValidApiKeyProvided_Returns415() {
         ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
 
@@ -161,7 +162,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void delete_SentAsJson_HasContentTypeHeaderButNoApiKeyProvided_Returns415() {
         String expectedMassage = "401 Unauthorized";
 
@@ -182,7 +183,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void delete_SentAsJson_NoContentTypeHeaderButValidApiKeyProvided_Returns204() {
         ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
 
@@ -200,7 +201,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void rotate_SentAsFormURLEncoded_Exists_Returns201() {
         String body = "clientId=d9cc4e03-96d7-4f6b-8189-23d51936d491" +
                 "&clientSecret=310e4c1d-0fa5-4b72-b860-31a73f068aa9";
@@ -221,7 +222,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void rotate_SentAsJson_Exists_Returns201() {
         String complytClientId = "ca71c285-5e09-449a-94c3-b46eb7345ce8";
         String complytSecret = "6f0bc65e-5a8e-4aaa-83ff-76d8ec81db23";
@@ -243,7 +244,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void rotate_SentAsFormURLEncoded_HasContentTypeHeaderButNoApiKeyProvided_Returns415() {
         String expectedMassage = "401 Unauthorized";
 
@@ -264,7 +265,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void rotate_SentAsFormURLEncoded_NoContentTypeHeaderButValidApiKeyProvided_Returns415() {
         ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
 
@@ -285,7 +286,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void rotate_SentAsJson_HasContentTypeHeaderButNoApiKeyProvided_Returns415() {
         String expectedMassage = "401 Unauthorized";
 
