@@ -61,6 +61,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     private WebTestClient webTestClient;
 
     // Given
+    private final String customerExternalSource = "1586";
+    private final String customerSource = "1";
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private final ShippingAddressDto referenceAddress = new ShippingAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "", "85034", false, null);
     private final String source = "1";
@@ -1103,6 +1105,54 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Order(1)
     @Test
+    @WithMockJwt
+    public void upsertByExternalIdAndSourceAndNoCustomerComplytId_UsaCountryTransactionWithTaxInclusiveAndNewItems_Returns201() {
+        String externalId = "newNonExistingUsaCountryTransactionWithTaxInclusiveAndNewItemsLookingUpCustomerUsingExternalRefAndSource";
+        BigDecimal firstItemAmount = BigDecimal.valueOf(5000);
+        BigDecimal firstItemWithoutTax = BigDecimalProcessor.removeTrailingZeros(firstItemAmount.divide(BigDecimal.ONE.add(BigDecimal.valueOf(0.0775)), 6, RoundingMode.HALF_UP));
+        BigDecimal secondItemAmount = BigDecimal.valueOf(10000);
+        BigDecimal thirdItemAmount = BigDecimal.valueOf(1000);
+        BigDecimal thirdItemWithoutTax = BigDecimalProcessor.removeTrailingZeros(thirdItemAmount.divide(BigDecimal.ONE.add(BigDecimal.valueOf(0.0775)), 6, RoundingMode.HALF_UP));
+        BigDecimal expectedTaxableAmount = firstItemWithoutTax.add(thirdItemWithoutTax);
+        BigDecimal expectedTangibleAmount = secondItemAmount.add(thirdItemWithoutTax);
+        BigDecimal expectedTotalAmount = firstItemWithoutTax.add(secondItemAmount).add(thirdItemWithoutTax);
+        List<ItemDto> items = Arrays.asList(
+                ITUtilities.stubItemDto().withTaxCode("C2S1").withTotalPrice(firstItemAmount).withUnitPrice(firstItemAmount), // TAXABLE & INTANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C3S1").withTotalPrice(secondItemAmount).withUnitPrice(secondItemAmount), // NOT_TAXABLE & TANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C4S1").withTotalPrice(thirdItemAmount).withUnitPrice(thirdItemAmount) // TAXABLE & TANGIBLE
+        );
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, null)
+                .withItems(items)
+                .withTaxInclusive(true)
+                .withCustomerExternalId("1586")
+                .withCustomerSource("1");
+        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, null, null, null, "80001", true, null); // zip code belongs to New York
+        givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    BigDecimal amountWithSalesTax = BigDecimalProcessor.removeTrailingZeros(expectedTotalAmount.add(transactionDto.salesTax().amount()));
+
+                    assertEquals(expectedTaxableAmount, transactionDto.taxableItemsAmount());
+                    assertEquals(expectedTangibleAmount, transactionDto.tangibleItemsAmount());
+                    assertEquals(expectedTotalAmount, transactionDto.totalItemsAmount());
+                    assertEquals(amountWithSalesTax, transactionDto.finalTransactionAmount());
+                });
+    }
+
+    @Order(1)
+    @Test
     @Override
     @WithMockJwt
     public void upsertByExternalIdAndSource_UsaCountryTransactionWithTaxInclusiveAndNewItemsAndNoNexus_Returns201() {
@@ -1147,10 +1197,55 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Order(1)
     @Test
+    @WithMockJwt
+    public void upsertByExternalIdAndSourceAndNoCustomerComplytId_UsaCountryTransactionWithTaxInclusiveAndNewItemsAndNoNexus_Returns201() {
+        String externalId = "newNonExistingUsaCountryTransactionWithTaxInclusiveAndNewItemsAndNoNexusLookingUpCustomerUsingExternalRefAndSource";
+        BigDecimal firstItemAmount = BigDecimal.valueOf(5000);
+        BigDecimal secondItemAmount = BigDecimal.valueOf(10000);
+        BigDecimal thirdItemAmount = BigDecimal.valueOf(1000);
+        BigDecimal expectedTaxableAmount = firstItemAmount.add(thirdItemAmount);
+        BigDecimal expectedTangibleAmount = secondItemAmount.add(thirdItemAmount);
+        BigDecimal expectedTotalAmount = firstItemAmount.add(secondItemAmount).add(thirdItemAmount);
+        List<ItemDto> items = Arrays.asList(
+                ITUtilities.stubItemDto().withTaxCode("C5S1").withTotalPrice(firstItemAmount).withUnitPrice(firstItemAmount), // TAXABLE & INTANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C8S1").withTotalPrice(secondItemAmount).withUnitPrice(secondItemAmount), // NOT_TAXABLE & TANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C3S1").withTotalPrice(thirdItemAmount).withUnitPrice(thirdItemAmount) // TAXABLE & TANGIBLE
+        );
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, null)
+                .withItems(items)
+                .withTaxInclusive(true)
+                .withCustomerExternalId(customerExternalSource)
+                .withCustomerSource(customerSource);
+        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "US", null, null, null, null, "38603", true, null); // zip code belongs to New York
+        givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertNull(transactionDto.salesTax());
+                    assertEquals(expectedTaxableAmount, transactionDto.taxableItemsAmount());
+                    assertEquals(expectedTangibleAmount, transactionDto.tangibleItemsAmount());
+                    assertEquals(expectedTotalAmount, transactionDto.totalItemsAmount());
+                    assertEquals(expectedTotalAmount, transactionDto.finalTransactionAmount());
+                });
+    }
+
+    @Order(1)
+    @Test
     @Override
     @WithMockJwt
     public void upsertByExternalIdAndSource_NonUsaCountryTransactionWithTaxInclusiveAndNewItems_Returns201() {
-        String externalId = "newNonExistingNonUsaCountryTransactionWithTaxInclusiveAndNewItems";
+        String externalId = "newNonExistingNonUsaCountryTransactionWithTaxInclusiveAndNewItemsLookingUpCustomerUsingExternalRefAndSource";
         BigDecimal firstItemAmount = BigDecimal.valueOf(5000);
         BigDecimal firstItemWithoutTax = BigDecimalProcessor.removeTrailingZeros(firstItemAmount.divide(BigDecimal.ONE.add(BigDecimal.valueOf(0.14975)), 6, RoundingMode.HALF_UP));
         BigDecimal secondItemAmount = BigDecimal.valueOf(10000);
@@ -1167,6 +1262,54 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withItems(items)
                 .withTaxInclusive(true);
+        ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "CA", null, null, "", "", "12345", false, null); // zip code belongs to New York
+        givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    BigDecimal amountWithOutSalesTax = BigDecimalProcessor.removeTrailingZeros(expectedTotalAmount.add(transactionDto.salesTax().amount()));
+
+                    assertEquals(expectedTaxableAmount, transactionDto.taxableItemsAmount());
+                    assertEquals(expectedTangibleAmount, transactionDto.tangibleItemsAmount());
+                    assertEquals(expectedTotalAmount, transactionDto.totalItemsAmount());
+                    assertEquals(amountWithOutSalesTax, transactionDto.finalTransactionAmount());
+                });
+    }
+
+    @Order(1)
+    @Test
+    @WithMockJwt
+    public void upsertByExternalIdAndSourceAndNoCustomerComplytId_NonUsaCountryTransactionWithTaxInclusiveAndNewItems_Returns201() {
+        String externalId = "newNonExistingNonUsaCountryTransactionWithTaxInclusiveAndNewItems";
+        BigDecimal firstItemAmount = BigDecimal.valueOf(5000);
+        BigDecimal firstItemWithoutTax = BigDecimalProcessor.removeTrailingZeros(firstItemAmount.divide(BigDecimal.ONE.add(BigDecimal.valueOf(0.14975)), 6, RoundingMode.HALF_UP));
+        BigDecimal secondItemAmount = BigDecimal.valueOf(10000);
+        BigDecimal thirdItemAmount = BigDecimal.valueOf(1000);
+        BigDecimal thirdItemWithoutTax = BigDecimalProcessor.removeTrailingZeros(thirdItemAmount.divide(BigDecimal.ONE.add(BigDecimal.valueOf(0.14975)), 6, RoundingMode.HALF_UP));
+        BigDecimal expectedTaxableAmount = firstItemWithoutTax.add(thirdItemWithoutTax);
+        BigDecimal expectedTangibleAmount = secondItemAmount.add(thirdItemWithoutTax);
+        BigDecimal expectedTotalAmount = firstItemWithoutTax.add(secondItemAmount).add(thirdItemWithoutTax);
+        List<ItemDto> items = Arrays.asList(
+                ITUtilities.stubItemDto().withTaxCode("C6S1").withTotalPrice(firstItemAmount).withUnitPrice(firstItemAmount), // TAXABLE & INTANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C4S1").withTotalPrice(secondItemAmount).withUnitPrice(secondItemAmount), // NOT_TAXABLE & TANGIBLE
+                ITUtilities.stubItemDto().withTaxCode("C3S1").withTotalPrice(thirdItemAmount).withUnitPrice(thirdItemAmount) // TAXABLE & TANGIBLE
+        );
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, null)
+                .withItems(items)
+                .withTaxInclusive(true)
+                .withCustomerExternalId(customerExternalSource)
+                .withCustomerSource(customerSource);
         ShippingAddressDto partialShippingAddress = new ShippingAddressDto(null, "CA", null, null, "", "", "12345", false, null); // zip code belongs to New York
         givenTransaction = givenTransaction.withShippingAddress(partialShippingAddress);
 
@@ -2159,6 +2302,130 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk();
+    }
+
+    @Order(3)
+    @Test
+    @WithMockJwt
+    public void upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerExternalIdAndSource_Exists_Returns200() {
+        //Given
+        String externalId = "10004";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, null)
+                .withShippingAddress(referenceAddress)
+                .withCustomerSource(customerSource)
+                .withCustomerExternalId(customerExternalSource);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Order(3)
+    @Test
+    @WithMockJwt
+    public void upsertByExternalIdAndSourceAndCustomerComplytIdAndWithCustomerExternalIdAndSource_Exists_Returns200() {
+        //Given
+        String externalId = "10004";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(referenceAddress)
+                .withCustomerSource(customerSource)
+                .withCustomerExternalId(customerExternalSource);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Order(3)
+    @Test
+    @WithMockJwt
+    public void upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerLookupWithCustomerExternalIdAndSource_DoesNotExist_Returns201() {
+        //Given
+        String externalId = "upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerLookupWithCustomerExternalIdAndSource_DoesNotExist_Returns201";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, null)
+                .withShippingAddress(referenceAddress)
+                .withCustomerSource(customerSource)
+                .withCustomerExternalId(customerExternalSource);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated();
+    }
+
+    @Order(3)
+    @Test
+    @WithMockJwt
+    public void upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerExternalIdNullAndSource_Exists_Returns400() {
+        //Given
+        String externalId = "10004";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, null)
+                .withShippingAddress(referenceAddress)
+                .withCustomerSource(customerSource)
+                .withCustomerExternalId(null);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals("["+DtoErrorMessages.CUSTOMER_MISSING_ID_OR_EXTERNAL_REFERENCE_AND_SOURCE+"]", map.get("message")));
+    }
+
+    @Order(3)
+    @Test
+    @WithMockJwt
+    public void upsertByExternalIdAndSourceAndCustomerComplytIdNullWithCustomerExternalIdAndSourceNull_Exists_Returns400() {
+        //Given
+        String externalId = "10004";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, null)
+                .withShippingAddress(referenceAddress)
+                .withCustomerSource(null)
+                .withCustomerExternalId(customerSource);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals("["+DtoErrorMessages.CUSTOMER_MISSING_ID_OR_EXTERNAL_REFERENCE_AND_SOURCE+"]", map.get("message")));
     }
 
 
