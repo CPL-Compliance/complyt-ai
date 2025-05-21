@@ -25,6 +25,7 @@ public class WebhookEntityWrapperTest {
     void toString_SameStrings_Equal() {
         String referenceString = "WebhookEntityWrapper[id=" + webhookEntityWrapper.id() +
                 ", timestamp=" + webhookEntityWrapper.timestamp() +
+                ", action=" + webhookEntityWrapper.action() +
                 ", webhookClass=" + webhookEntityWrapper.webhookClass() +
                 ", object=" + webhookEntityWrapper.object() + "]";
 

@@ -33,16 +33,6 @@ public class SalesTaxTrackingFacade {
     @NonNull
     private TransactionService transactionService;
 
-    public Mono<SalesTaxTracking> findByCountryAndState(@NonNull String country, String state, String subsidiary) {
-        return salesTaxTrackingService.findByCountryStateAndSubsidiary(country, state, subsidiary)
-                .flatMap(recalculateCurrentNexusSummaryIfNeeded());
-    }
-
-    public Mono<SalesTaxTracking> findByComplytId(@NonNull UUID complytId) {
-        return salesTaxTrackingService.findByComplytId(complytId)
-                .flatMap(recalculateCurrentNexusSummaryIfNeeded());
-    }
-
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull SalesTaxTracking originalSalesTaxTracking) {
         return salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, originalSalesTaxTracking)
                 .flatMap(salesTaxTrackingService::addClientAndStateDetails)
@@ -57,7 +47,17 @@ public class SalesTaxTrackingFacade {
         return salesTaxTrackingService.checkSalesTaxTrackingNotHavingComplytId(salesTaxTracking)
                 .flatMap(salesTaxTrackingService::injectDataToNewSalesTaxTracking)
                 .flatMap(salesTaxTrackingService::updateAppliedDateIfIsPhysicalNexusEstablished)
-                .flatMap(salesTaxTrackingService::save)
+                .flatMap(salesTaxTrackingService::createAndSave)
+                .flatMap(recalculateCurrentNexusSummaryIfNeeded());
+    }
+
+    public Mono<SalesTaxTracking> findByCountryAndState(@NonNull String country, String state, String subsidiary) {
+        return salesTaxTrackingService.findByCountryStateAndSubsidiary(country, state, subsidiary)
+                .flatMap(recalculateCurrentNexusSummaryIfNeeded());
+    }
+
+    public Mono<SalesTaxTracking> findByComplytId(@NonNull UUID complytId) {
+        return salesTaxTrackingService.findByComplytId(complytId)
                 .flatMap(recalculateCurrentNexusSummaryIfNeeded());
     }
 

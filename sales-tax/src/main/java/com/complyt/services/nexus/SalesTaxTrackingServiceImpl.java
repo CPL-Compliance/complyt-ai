@@ -5,6 +5,7 @@ import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.SalesTaxTrackingPhysicalNexusDateApplierInjector;
 import com.complyt.business.timestamps_injection.SalesTaxTrackingRegisteredDateTimestampsInjector;
 import com.complyt.business.web_hook.WebhookHandler;
+import com.complyt.domain.audit.Action;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.RegisteredType;
@@ -60,7 +61,12 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
-        return upsertWithoutNexusSummaryIfNeeded(salesTaxTracking);
+        return upsertWithoutNexusSummaryIfNeeded(salesTaxTracking, Action.UPDATE);
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> createAndSave(@NonNull SalesTaxTracking salesTaxTracking) {
+        return upsertWithoutNexusSummaryIfNeeded(salesTaxTracking, Action.CREATE);
     }
 
     @Override
@@ -71,13 +77,13 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     @Override
-    public Mono<SalesTaxTracking> upsertWithoutNexusSummaryIfNeeded(@NonNull SalesTaxTracking salesTaxTracking) {
+    public Mono<SalesTaxTracking> upsertWithoutNexusSummaryIfNeeded(@NonNull SalesTaxTracking salesTaxTracking, Action action) {
         return Mono.just(salesTaxTracking.getNexusStateRule().timeFrame().equals(TimeFrame.PREVIOUS_TWELVE_MONTHS)
                         ? salesTaxTracking.withNexusCalculationSummaries(Map.of())
                         : salesTaxTracking)
                 .flatMap(salesTaxTrackingRepository::save)
-                .flatMap(savedSalesTaxTracking -> webhookHandler.handleWebhook(SalesTaxTracking.class, savedSalesTaxTracking)
-                .map(upsertedSalesTaxTracking -> upsertedSalesTaxTracking.withNexusCalculationSummaries(salesTaxTracking.getNexusCalculationSummaries())));
+                .flatMap(savedSalesTaxTracking -> webhookHandler.handleWebhook(SalesTaxTracking.class, savedSalesTaxTracking, savedSalesTaxTracking.getClientTracking().getWebhookDetails(), action))
+                .map(upsertedSalesTaxTracking -> upsertedSalesTaxTracking.withNexusCalculationSummaries(salesTaxTracking.getNexusCalculationSummaries()));
     }
 
     @Override
@@ -98,7 +104,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                 .switchIfEmpty(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(salesTaxTracking.getCountry(), state, null))
                 .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with country " + salesTaxTracking.getCountry())))
                 .flatMap(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
-                .flatMap(this::upsertWithoutNexusSummaryIfNeeded);
+                .flatMap(updatedSalesTaxTracking -> upsertWithoutNexusSummaryIfNeeded(updatedSalesTaxTracking, Action.UPDATE));
     }
 
     private Function<SalesTaxTracking, Mono<SalesTaxTracking>> createFunctionUpdateSalesTaxTracking(SalesTaxTracking salesTaxTracking) {

@@ -2,6 +2,7 @@ package com.complyt.business.webhook;
 
 import com.complyt.business.web_hook.WebhookEntityCreator;
 import com.complyt.domain.WebhookEntityWrapper;
+import com.complyt.domain.audit.Action;
 import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +29,7 @@ public class WebhookEntityCreatorTest {
     @Test
     public void create_CreatesWebhookEntityWrapper_ReturnsWebhookEntityWrapper() {
         // Given + When
-        Mono<WebhookEntityWrapper<Transaction>> webhookEntityWrapper = webhookEntityCreator.create(Transaction.class, transaction);
+        Mono<WebhookEntityWrapper<Transaction>> webhookEntityWrapper = webhookEntityCreator.create(Transaction.class, transaction, Action.CREATE);
 
         StepVerifier.create(webhookEntityWrapper)
                 .assertNext(result -> {

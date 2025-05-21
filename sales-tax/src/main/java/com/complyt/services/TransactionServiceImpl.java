@@ -8,9 +8,11 @@ import com.complyt.business.timestamps_injection.InternalTimestampsInjector;
 import com.complyt.business.transaction.*;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.business.web_hook.WebhookHandler;
+import com.complyt.domain.audit.Action;
 import com.complyt.domain.currency.CurrencyExchangeRateObject;
 import com.complyt.domain.currency.CurrencySource;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.transaction.ExchangeRateInfo;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionStatus;
@@ -88,10 +90,23 @@ public class TransactionServiceImpl implements TransactionService {
     private WebhookHandler<Transaction> webhookHandler;
 
     @Override
-    public Mono<Transaction> save(Transaction transaction) {
-        return transactionRepository.save(transaction)
-                .flatMap(savedTransaction -> webhookHandler.handleWebhook(Transaction.class, transaction)
+    public Mono<Transaction> save(@NonNull Transaction transaction, SalesTaxTracking salesTaxTracking) {
+        return save(transaction)
+                .flatMap(savedTransaction -> webhookHandler.handleWebhook(Transaction.class, transaction, salesTaxTracking.getClientTracking().getWebhookDetails(), Action.CREATE)
                         .thenReturn(savedTransaction));
+    }
+
+    @Override
+    public Mono<Transaction> save(Transaction transaction) {
+        return transactionRepository.save(transaction);
+    }
+
+    public Mono<Transaction> update(@NonNull final String externalId, @NonNull String source, @NonNull final Transaction transaction, SalesTaxTracking salesTaxTracking) {
+        return transactionRepository.findByExternalIdAndSource(externalId, source)
+                .switchIfEmpty(Mono.error(new NotFoundException("No Transaction with externalId: " + externalId + ", in source: " + source)))
+                .map(createFunctionUpdateTransaction(transaction))
+                .flatMap(transactionRepository::save)
+                .flatMap(updatedTransaction -> webhookHandler.handleWebhook(Transaction.class, updatedTransaction, salesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE));
     }
 
     @Override
@@ -112,14 +127,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Transaction> findByComplytId(@NonNull UUID complytId) {
         return transactionRepository.findByComplytId(complytId);
-    }
-
-    public Mono<Transaction> update(@NonNull final String externalId, @NonNull String source, @NonNull final Transaction transaction) {
-        return transactionRepository.findByExternalIdAndSource(externalId, source)
-                .switchIfEmpty(Mono.error(new NotFoundException("No Transaction with externalId: " + externalId + ", in source: " + source)))
-                .map(createFunctionUpdateTransaction(transaction))
-                .flatMap(transactionRepository::save)
-                .flatMap(updatedTransaction -> webhookHandler.handleWebhook(Transaction.class, updatedTransaction));
     }
 
     @Override
@@ -201,7 +208,7 @@ public class TransactionServiceImpl implements TransactionService {
                         .setTransactionStatus(TransactionStatus.CANCELLED)
                         .setCustomer(null))
                 .flatMap(transactionRepository::save)
-                .flatMap(updatedTransaction -> webhookHandler.handleWebhook(Transaction.class, updatedTransaction));
+                .flatMap(updatedTransaction -> webhookHandler.handleWebhook(Transaction.class, updatedTransaction, null, Action.DELETE));
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.complyt.business.tax.sales_tax.models.ComplytInternalSalesTaxRatesDto
 import com.complyt.business.tax.sales_tax.models.InternalSalesTaxRatesDto;
 import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.domain.*;
+import com.complyt.domain.audit.Action;
 import com.complyt.domain.currency.CurrencyExchangeRateObject;
 import com.complyt.domain.currency.CurrencySource;
 import com.complyt.domain.customer.Customer;
@@ -1162,6 +1163,7 @@ public class UnitTestUtilities {
         return new WebhookEntityWrapper<>(
                 UUID.randomUUID(),
                 LocalDateTime.now(),
+                Action.CREATE,
                 Transaction.class,
                 createTransaction(UUID.randomUUID().toString())
         );

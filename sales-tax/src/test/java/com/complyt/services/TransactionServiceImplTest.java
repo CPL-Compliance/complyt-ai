@@ -9,10 +9,12 @@ import com.complyt.business.transaction.DiscountCalculator;
 import com.complyt.business.transaction.MatchedAddressProvider;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.business.web_hook.WebhookHandler;
+import com.complyt.domain.audit.Action;
 import com.complyt.domain.currency.CurrencyExchangeRateObject;
 import com.complyt.domain.currency.CurrencySource;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
@@ -105,6 +107,8 @@ class TransactionServiceImplTest {
     @Mock
     WebhookHandler<Transaction> webhookHandler;
 
+    SalesTaxTracking salesTaxTracking;
+
     SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo;
     Transaction transaction;
     Customer customer;
@@ -139,6 +143,7 @@ class TransactionServiceImplTest {
         customer = testUtilities.createCustomer(transaction.getId());
         source = testUtilities.getUnifiedSource();
         salesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(testUtilities.createSalesTaxTracking(UUID.randomUUID().toString()), false);
+        salesTaxTracking = testUtilities.createSalesTaxTracking(UUID.randomUUID().toString());
     }
 
     private Transaction createTransactionWithProductClassificationData(Transaction wantedTransaction) {
@@ -159,8 +164,8 @@ class TransactionServiceImplTest {
 
         // When
         when(transactionRepository.save(transaction)).thenReturn(Mono.just(transaction));
-        when(webhookHandler.handleWebhook(Transaction.class, transaction)).thenReturn(Mono.just(transaction));
-        Mono<Transaction> transactionMono = transactionService.save(transaction);
+        when(webhookHandler.handleWebhook(Transaction.class, transaction, salesTaxTracking.getClientTracking().getWebhookDetails(), Action.CREATE)).thenReturn(Mono.just(transaction));
+        Mono<Transaction> transactionMono = transactionService.save(transaction, salesTaxTracking);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
@@ -291,7 +296,7 @@ class TransactionServiceImplTest {
         Transaction transaction = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(externalID, source, transaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(externalID, source, transaction, salesTaxTracking));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
@@ -303,10 +308,10 @@ class TransactionServiceImplTest {
         String externalID = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(externalID, source, transaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(externalID, source, transaction, salesTaxTracking));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+        assertEquals("externalId is marked non-null but is null", nullPointerException.getMessage());
     }
 
 
@@ -318,8 +323,8 @@ class TransactionServiceImplTest {
         // When
         when(transactionRepository.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionRepository.save(transaction.withCustomer(null))).thenReturn(Mono.just(transaction));
-        when(webhookHandler.handleWebhook(Transaction.class, transaction)).thenReturn(Mono.just(transaction));
-        Mono<Transaction> transactionMono = transactionService.update(externalId, source, transaction);
+        when(webhookHandler.handleWebhook(Transaction.class, transaction, salesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(transaction));
+        Mono<Transaction> transactionMono = transactionService.update(externalId, source, transaction, salesTaxTracking);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
@@ -331,7 +336,7 @@ class TransactionServiceImplTest {
         transaction = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update("", source, transaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update("", source, transaction, null));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
@@ -343,7 +348,7 @@ class TransactionServiceImplTest {
         String nullSource = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(transaction.getExternalId(), nullSource, transaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(transaction.getExternalId(), nullSource, transaction, salesTaxTracking));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "source is marked non-null but is null");
@@ -357,7 +362,7 @@ class TransactionServiceImplTest {
         // When
         when(transactionRepository.findByExternalIdAndSource(transaction.getExternalId(), source)).thenReturn(Mono.just(transaction));
         when(transactionRepository.save(cancelledTransaction)).thenReturn(Mono.just(cancelledTransaction));
-        when(webhookHandler.handleWebhook(Transaction.class, cancelledTransaction)).thenReturn(Mono.just(cancelledTransaction));
+        when(webhookHandler.handleWebhook(Transaction.class, cancelledTransaction, null, Action.DELETE)).thenReturn(Mono.just(cancelledTransaction));
         Mono<Transaction> transactionMono = transactionService.markAsCancelled(transaction.getExternalId(), source);
 
         // Then
@@ -463,7 +468,7 @@ class TransactionServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionService.update(externalId, source, nullTransaction);
+            transactionService.update(externalId, source, nullTransaction, salesTaxTracking);
         });
 
         // Then

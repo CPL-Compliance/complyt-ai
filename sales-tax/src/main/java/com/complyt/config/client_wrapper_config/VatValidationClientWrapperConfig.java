@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class VatValidationClientWrapperConfig {
+
     @Profile({"vowVatValidation"})
     @Bean("vatValidationWebClientWrapper")
     public VatValidationWebClientWrapper vowVatValidationWebClientWrapper(@Autowired WebClient vowVatValidationWebClient,
