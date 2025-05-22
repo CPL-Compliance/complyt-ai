@@ -346,7 +346,7 @@ public class SalesTaxTrackingServiceImplTest {
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+        assertEquals("salesTaxTracking is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
