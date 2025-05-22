@@ -1,9 +1,12 @@
 package com.complyt.business.web_hook;
 
+import com.complyt.annotations.Generated;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 
+@Generated
 public class HmaacGenerator {
 
     public static String generateHmacSHA256(String secretKey, String message) {
