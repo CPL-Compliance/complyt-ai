@@ -44,29 +44,28 @@ public class TransactionFacade {
     @Qualifier("salesTaxTrackingServiceImpl")
     private SalesTaxTrackingService salesTaxTrackingService;
 
-
     @NonNull
     private NexusService nexusService;
 
     public Mono<Transaction> saveTransaction(Transaction transaction) {
-        final Customer customer = transaction.getCustomer();
         return transactionService.checkTransactionNotHavingComplytId(transaction)
-                .flatMap(transactionNoComplytId -> transactionService.injectDataToNewTransaction(transactionNoComplytId)
-                        .flatMap(transactionWithData -> findSalesTaxTrackingByTransaction(transactionWithData)
-                .flatMap(salesTaxTracking -> nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)
-                        .flatMap(salesTaxTrackingWithNexusInfo -> transactionService.injectDataBySalesTaxTracking(transactionWithData, salesTaxTrackingWithNexusInfo)
-                                .flatMap(transactionWithInjectedDate -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
-                                        handleSalesTaxCalculationAndSave(transactionWithInjectedDate, salesTaxTrackingWithNexusInfo, customer)
-                                                .flatMap(returnedTransaction -> salesTaxTrackingService.handleSalesTaxEnforcement(returnedTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
-                                                        .thenReturn(returnedTransaction)) :
-                                        transactionService.calculateTotalAmounts(transactionWithInjectedDate)
-                                                .flatMap(transactionService::injectExchangeRateIfNeeded)
-                                                .flatMap(returnedTransaction -> transactionService.isTransactionWithStatusCancelled(transactionWithInjectedDate) ?
-                                                        transactionService.save(returnedTransaction.setCustomer(null))
-                                                                .map(savedTransaction -> savedTransaction.setCustomer(customer)) :
-                                                        saveAndHandleNexusTrackingCalculation(returnedTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking())))
-                                .map(savedTransaction -> savedTransaction.setCustomer(customer))
-                                .flatMap(savedTransactionWithCustomer -> transactionService.isTransactionWithStatusCancelled(savedTransactionWithCustomer) ? Mono.empty() : Mono.just(savedTransactionWithCustomer))))));
+                .flatMap(transactionNoComplytId -> getCustomerByTransaction(transaction)
+                        .flatMap(customer -> transactionService.injectDataToNewTransaction(transactionNoComplytId)
+                                .flatMap(transactionWithData -> findSalesTaxTrackingByTransaction(transactionWithData)
+                                        .flatMap(salesTaxTracking -> nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)
+                                                .flatMap(salesTaxTrackingWithNexusInfo -> transactionService.injectDataBySalesTaxTracking(transactionWithData, salesTaxTrackingWithNexusInfo)
+                                                        .flatMap(transactionWithInjectedDate -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
+                                                                handleSalesTaxCalculationAndSave(transactionWithInjectedDate, salesTaxTrackingWithNexusInfo, customer)
+                                                                        .flatMap(returnedTransaction -> salesTaxTrackingService.handleSalesTaxEnforcement(returnedTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
+                                                                                .thenReturn(returnedTransaction)) :
+                                                                transactionService.calculateTotalAmounts(transactionWithInjectedDate)
+                                                                        .flatMap(transactionService::injectExchangeRateIfNeeded)
+                                                                        .flatMap(returnedTransaction -> transactionService.isTransactionWithStatusCancelled(transactionWithInjectedDate) ?
+                                                                                transactionService.save(returnedTransaction.setCustomer(null))
+                                                                                        .map(savedTransaction -> savedTransaction.setCustomer(customer)) :
+                                                                                saveAndHandleNexusTrackingCalculation(returnedTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking())))
+                                                        .map(savedTransaction -> savedTransaction.setCustomer(customer))
+                                                        .flatMap(savedTransactionWithCustomer -> transactionService.isTransactionWithStatusCancelled(savedTransactionWithCustomer) ? Mono.empty() : Mono.just(savedTransactionWithCustomer)))))));
     }
 
 
@@ -80,33 +79,33 @@ public class TransactionFacade {
     private Mono<Transaction> saveAndHandleNexusTrackingCalculation(Transaction transaction, SalesTaxTracking salesTaxTracking) {
         Customer transactionCustomer = transaction.getCustomer();
 
-        return transactionService.save(transaction)
+        return transactionService.save(transaction.setCustomer(null))
                 .map(savedTransaction -> savedTransaction.setCustomer(transactionCustomer))
                 .flatMap(savedTransaction -> salesTaxTrackingService.handleSalesTaxEnforcement(savedTransaction, salesTaxTracking)
                         .thenReturn(savedTransaction));
     }
 
     public Mono<Transaction> update(@NonNull String externalId, @NonNull String source, @NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
-        final Customer customer = modifiedTransaction.getCustomer();
         return transactionService.checkComplytIdOfModifiedEqualsToOriginal(modifiedTransaction, originalTransaction)
-                .flatMap(checkedModifiedTransaction -> transactionService.injectDataToExistingTransaction(checkedModifiedTransaction, originalTransaction)
-                        .flatMap(transactionWithData -> findSalesTaxTrackingByTransaction(transactionWithData)
-                                .flatMap(salesTaxTracking -> nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)
-                                        .flatMap(salesTaxTrackingWithNexusInfo -> transactionService.injectDataBySalesTaxTracking(transactionWithData, salesTaxTrackingWithNexusInfo)
-                                                .flatMap(transactionWithInjectedDate -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
-        handleSalesTaxCalculationAndUpdate(externalId, source, transactionWithInjectedDate, salesTaxTrackingWithNexusInfo, customer)
-                .flatMap(returnedTransaction -> salesTaxTrackingService.handleSalesTaxEnforcement(returnedTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
-                        .thenReturn(returnedTransaction)) :
-        transactionService.calculateTotalAmounts(transactionWithInjectedDate)
-                .flatMap(transactionService::injectExchangeRateIfNeeded)
-                .flatMap(returnedTransaction -> transactionService.isTransactionWithStatusCancelled(transactionWithInjectedDate) ?
-                        updateAndRemoveTransactionFromNexusTrackingCalculationIfNeeded(externalId, source, returnedTransaction, originalTransaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()) :
-                        updateAndHandleNexusTrackingCalculation(externalId, source, returnedTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking()))
-                .map(receivedTransaction -> receivedTransaction.setCustomer(customer))
-                .flatMap(receivedTransactionWithCustomer -> (transactionService.shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary(receivedTransactionWithCustomer, originalTransaction) ?
-                        removeTransactionFromNexusTracking(originalTransaction) :
-                        Mono.just(receivedTransactionWithCustomer))
-                        .then(transactionService.isTransactionWithStatusCancelled(receivedTransactionWithCustomer) ? Mono.empty() : Mono.just(receivedTransactionWithCustomer))))))));
+                .flatMap(checkedModifiedTransaction -> getCustomerByTransaction(modifiedTransaction)
+                        .flatMap(customer -> transactionService.injectDataToExistingTransaction(checkedModifiedTransaction, originalTransaction)
+                                .flatMap(transactionWithData -> findSalesTaxTrackingByTransaction(transactionWithData)
+                                        .flatMap(salesTaxTracking -> nexusService.salesTaxTrackingWithNexusIndication(salesTaxTracking)
+                                                .flatMap(salesTaxTrackingWithNexusInfo -> transactionService.injectDataBySalesTaxTracking(transactionWithData, salesTaxTrackingWithNexusInfo)
+                                                        .flatMap(transactionWithInjectedDate -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
+                                                                handleSalesTaxCalculationAndUpdate(externalId, source, transactionWithInjectedDate, salesTaxTrackingWithNexusInfo, customer)
+                                                                        .flatMap(returnedTransaction -> salesTaxTrackingService.handleSalesTaxEnforcement(returnedTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
+                                                                                .thenReturn(returnedTransaction)) :
+                                                                transactionService.calculateTotalAmounts(transactionWithInjectedDate)
+                                                                        .flatMap(transactionService::injectExchangeRateIfNeeded)
+                                                                        .flatMap(returnedTransaction -> transactionService.isTransactionWithStatusCancelled(transactionWithInjectedDate) ?
+                                                                                updateAndRemoveTransactionFromNexusTrackingCalculationIfNeeded(externalId, source, returnedTransaction, originalTransaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()) :
+                                                                                updateAndHandleNexusTrackingCalculation(externalId, source, returnedTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking()))
+                                                                        .map(receivedTransaction -> receivedTransaction.setCustomer(customer))
+                                                                        .flatMap(receivedTransactionWithCustomer -> (transactionService.shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary(receivedTransactionWithCustomer, originalTransaction) ?
+                                                                                removeTransactionFromNexusTracking(originalTransaction) :
+                                                                                Mono.just(receivedTransactionWithCustomer))
+                                                                                .then(transactionService.isTransactionWithStatusCancelled(receivedTransactionWithCustomer) ? Mono.empty() : Mono.just(receivedTransactionWithCustomer)))))))));
     }
 
     private Mono<Transaction> handleSalesTaxCalculationAndUpdate(String externalId, String source, Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo, Customer customer) {
