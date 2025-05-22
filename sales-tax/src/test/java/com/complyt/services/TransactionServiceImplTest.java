@@ -176,6 +176,34 @@ class TransactionServiceImplTest {
     }
 
     @Test
+    void save_NullTransactionPassed_ThrowsException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.save(nullTransaction, salesTaxTracking);
+        });
+
+        // Then
+        assertEquals("transaction is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void save_NullSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.save(transaction, null);
+        });
+
+        // Then
+        assertEquals("salesTaxTracking is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
     void findByExternalIdAndSourceProjection_TransactionFound_ReturnsTransaction() {
         // Given
         String id = UUID.randomUUID().toString();

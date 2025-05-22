@@ -90,7 +90,7 @@ public class TransactionServiceImpl implements TransactionService {
     private WebhookHandler<Transaction> webhookHandler;
 
     @Override
-    public Mono<Transaction> save(@NonNull Transaction transaction, SalesTaxTracking salesTaxTracking) {
+    public Mono<Transaction> save(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
         return save(transaction)
                 .flatMap(savedTransaction -> webhookHandler.handleWebhook(Transaction.class, transaction, salesTaxTracking.getClientTracking().getWebhookDetails(), Action.CREATE)
                         .thenReturn(savedTransaction));
