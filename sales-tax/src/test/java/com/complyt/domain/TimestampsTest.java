@@ -16,8 +16,6 @@ import static org.mockito.Mockito.mockStatic;
 class TimestampsTest {
     private Timestamps timestamps;
 
-   
-
     @BeforeEach
     void setup() {
         LocalDateTime createdDateTimestamp = LocalDateTime.of(2002, 2, 2, 2, 2, 2);
