@@ -18,6 +18,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import test_utils.annotations.WithMockJwt;
 import test_utils.integration_tests.TestUtilities;
 
 import java.time.LocalDateTime;
@@ -46,7 +47,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void post_jsonTypeApiKeyNotExists_Returns401() {
         ApiKeyDto apiKeyDto = new ApiKeyDto("e2019b6f-a8c1-415c-b8b0-3fd6725c9a67", "e25f4d90-1051-44f7-89fb-4c6097af7747");
 
@@ -68,7 +69,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
 
     @Order(2)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void post_urlEncodedTypeApiKeyNotExists_Returns401() {
         String urlEncodedApiKey = "clientId=e2019b6f-a8c1-415c-b8b0-3fd6725c9a67&clientSecret=e25f4d90-1051-44f7-89fb-4c6097af7747";
 
@@ -90,7 +91,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
 
     @Order(3)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void post_jsonTypeApiKeyExistsButDoesntHaveToken_ReturnsAccessTokenWithExpirationDateTimeLessThenNowPlusExpiresIn() {
         ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.apiKeyClientId, TestUtilities.apiKeyClientSecret);
 
@@ -114,7 +115,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
 
     @Order(4)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void post_urlEncodedTypeApiKeyExistsButDoesntHaveToken_ReturnsAccessTokenWithExpirationDateTimeLessThenNowPlusExpiresIn() {
         String urlEncodedApiKey = "clientId=" + TestUtilities.apiKeyClientId + "&clientSecret=" +
                 TestUtilities.apiKeyClientSecret;
@@ -139,7 +140,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
 
     @Order(4)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void postApiKey_UnsupportedMediaType_Returns415() {
 
         webTestClient
@@ -158,7 +159,7 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @WithMockJwt
     public void getTokenForPartner_TenantIdMissing_Returns403() {
 
         webTestClient

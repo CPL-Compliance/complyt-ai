@@ -23,9 +23,6 @@ import java.time.LocalDateTime;
 public class InternalSalesTaxRatesRepository {
 
     @NonNull
-    TenantResolver tenantResolver;
-
-    @NonNull
     ReactiveMongoTemplate reactiveMongoTemplate;
 
     @NonNull
@@ -35,7 +32,7 @@ public class InternalSalesTaxRatesRepository {
         Query query = internalRatesAddressQueryBuilder.build(addressWithDate.getAddress());
         String state = addressWithDate.getAddress().state();
 
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> ContextLogger.observeCtx("finding rate of tenantId " + tenantId + " with address" + addressWithDate + " using query:" + query, log::info)
                 .then(reactiveMongoTemplate.findOne(query, InternalSalesTaxRates.class, getCollectionName(state))));
     }

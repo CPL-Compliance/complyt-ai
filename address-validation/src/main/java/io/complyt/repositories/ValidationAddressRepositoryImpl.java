@@ -18,8 +18,6 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @Slf4j
 public class ValidationAddressRepositoryImpl {
-    @NonNull
-    TenantResolver tenantResolver;
 
     @NonNull
     private ReactiveMongoTemplate reactiveMongoTemplate;
@@ -30,7 +28,7 @@ public class ValidationAddressRepositoryImpl {
     public Mono<ValidatedAddress> saveAddress(@NonNull ValidatedAddress address) {
         String collection = CollectionNameResolver.resolve(address.getRequestAddress());
 
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> ContextLogger.observeCtx("--> saving validated address of tenantId " + tenantId + ": " + address, log::info)
                 .then(reactiveMongoTemplate.save(address, collection)));
     }
@@ -39,7 +37,7 @@ public class ValidationAddressRepositoryImpl {
         Query query = addressQueryBuilder.build(address);
         String collection = CollectionNameResolver.resolve(address);
 
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> ContextLogger.observeCtx("--> find validated address of tenantId " + tenantId + ": " + address + " with query: " + query, log::info)
                 .then(reactiveMongoTemplate.findOne(query, ValidatedAddress.class, collection)));
 

@@ -1,4 +1,4 @@
-package testUtils.integration_test;
+package testUtils.annotations;
 
 import org.springframework.security.test.context.support.WithSecurityContext;
 

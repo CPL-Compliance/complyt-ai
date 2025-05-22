@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import test_utils.BaseTestClass;
 import test_utils.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,7 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ValidationAddressRepositoryImplTest {
+public class ValidationAddressRepositoryImplTest extends BaseTestClass {
 
     @InjectMocks
     private ValidationAddressRepositoryImpl validationAddressRepository;

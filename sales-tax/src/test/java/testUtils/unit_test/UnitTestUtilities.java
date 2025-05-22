@@ -17,6 +17,7 @@ import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
+import com.complyt.domain.sales_tax.FilingMetaData;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.*;
@@ -147,7 +148,34 @@ public class UnitTestUtilities {
     public static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
         MatchedAddressData address = createMatchedAddressData();
         SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
-        return new ComplytSalesTaxRates(null, address, salesTaxRates);
+        FilingMetaData filingMetaData = createFilingMetaData();
+        return new ComplytSalesTaxRates(null, address, salesTaxRates, filingMetaData);
+    }
+
+    public static FilingMetaData createFilingMetaData() {
+        return new FilingMetaData(
+                null,                        // cityName
+                "Fresno",                    // countyName
+                null,                        // other1Rate
+                null,                        // other2Rate
+                null,                        // other3Rate
+                null,                        // other4Rate
+                "06",                        // countyRptCode
+                "037",                       // cityRptCode
+                "mtaName",                   // mtaName
+                "0603744000",                // mtaNumber
+                "spdName",                   // spdName
+                "100000",                    // spdNumber
+                "other1Name",               // other1Name
+                "2%",                        // other1Number
+                "other2Name",               // other2Name
+                "50000",                     // other2Number
+                "other3Name",               // other3Name
+                "1%",                        // other3Number
+                "other4Name",               // other4Name
+                "Yes",                       // other4Number
+                "037"                        // fipsCounty
+        );
     }
 
     public static ComplytSalesTaxRatesDto createCaliforniaComplytSalesTaxRatesDto() {
@@ -400,7 +428,7 @@ public class UnitTestUtilities {
                 createCustomerDto(customerIdOtherDomains.toString()), null,
                 TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE,
                 shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, null, null, null, null, false, null);
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TransactionFilingStatusDto.NOT_FILED, null, null, null, null, false, null, null, null);
     }
 
     public List<Item> createItems(boolean withJurisdictionalSalesTaxRules, boolean withJurisdictionalGtTaxRules, boolean withTangibleCategory) {
@@ -510,11 +538,11 @@ public class UnitTestUtilities {
     }
 
     public SalesTax createSalesTaxWithAllFields() {
-        return new SalesTax(null, BigDecimal.ZERO, BigDecimal.ZERO, createSalesTaxRates(), createGtRates());
+        return new SalesTax(null, BigDecimal.ZERO, BigDecimal.ZERO, createSalesTaxRates(), createGtRates(), null);
     }
 
     public SalesTax createSalesTaxWithAmount(BigDecimal amount) {
-        return new SalesTax(null, amount, BigDecimal.ZERO, createSalesTaxRates(), createGtRates());
+        return new SalesTax(null, amount, BigDecimal.ZERO, createSalesTaxRates(), createGtRates(), null);
     }
 
     public SalesTaxDto createSalesTaxDtoWithAllFields() {

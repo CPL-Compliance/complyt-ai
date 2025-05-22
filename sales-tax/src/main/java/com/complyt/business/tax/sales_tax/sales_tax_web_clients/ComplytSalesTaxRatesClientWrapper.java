@@ -36,7 +36,7 @@ public class ComplytSalesTaxRatesClientWrapper implements SalesTaxRatesWebClient
     @Override
     public Mono<ComplytSalesTaxRates> findByAddress(String state, String country, String county, String city,
                                                     String street, String zip, String region, boolean isPartial, LocalDateTime transactionDate) {
-        return salesTaxRatesServiceProxy.findByAddress(state, country, county, city, street, zip, isPartial, transactionDate.toString())
+        return salesTaxRatesServiceProxy.findByAddress(state, country, county, city, street, zip, isPartial, transactionDate.toString(), true)
                 .retryWhen(Retry.backoff(5, Duration.ofMillis(10))
                         .filter(throwable -> !(throwable instanceof FeignException.NotFound || throwable instanceof FeignException.BadRequest))  // Retry only for recoverable exceptions
                         .onRetryExhaustedThrow(

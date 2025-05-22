@@ -96,7 +96,8 @@ public class ValidatorConfig {
                                 new ItemHaveEitherTotalOrUnitPriceAndQuantityChecker(),
                                 new ItemsAlignmentChecker(),
                                 new NegativeItemsNotHavingDiscountChecker(),
-                                new CurrencyChecker()
+                                new CurrencyChecker(),
+                                new CustomerDetailsChecker()
                         )).entityDtoFluxFunction()),
                 new CustomBodyExtractorEmpty<>(),
                 pathVariableChecker,

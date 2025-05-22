@@ -20,6 +20,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import testUtils.annotations.WithMockJwt;
 
 import java.util.Map;
 import java.util.UUID;
@@ -32,22 +33,14 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = FilesApplication.class)
 @AutoConfigureWebTestClient
 public class ComplytFileEndpointsIT extends TestContainersInitializerIT implements ComplytFileEndpointsITTemplate {
-
-    @MockBean
-    TenantResolver tenantResolver;
+    
     @Autowired
     private WebTestClient webTestClient;
-
-
-    @BeforeEach
-    void setup() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-    }
 
     @Order(1)
     @Test
     @Override
-    @WithMockUser
+    @WithMockJwt
     public void saveOneFile_Exists_Returns201() {
         ComplytFileMetadata complytFileMetadataToSave = new ComplytFileMetadata(
                 UUID.fromString("fff38e2b-1fdd-4b43-ac7d-0058ecde600b"),

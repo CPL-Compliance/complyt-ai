@@ -20,6 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.BaseTestClass;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-public class ClientTrackingRepositoryTest {
+public class ClientTrackingRepositoryTest extends BaseTestClass {
 
     @InjectMocks
     ClientTrackingRepository clientTrackingRepository;
@@ -47,24 +48,6 @@ public class ClientTrackingRepositoryTest {
     ClientTracking clientTracking;
     String name;
     String tenantId;
-
-     static MockedStatic mockedStatic;
-
-    @BeforeAll
-    static void beforeAll() {
-        try {
-            mockedStatic = mockStatic(TenantResolver.class);
-        } catch (Exception e) {
-            // Log the error or fail the test setup
-            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    @AfterAll
-    static void afterAll() {
-        mockedStatic.close();
-    }
 
     @BeforeEach
     void setUp() {

@@ -98,6 +98,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Mono<Transaction> save(Transaction transaction) {
+        transaction.setCustomer(null);
         return transactionRepository.save(transaction);
     }
 

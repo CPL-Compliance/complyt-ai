@@ -1,8 +1,11 @@
 package com.complyt.domain.internal_rates;
 
 import lombok.Value;
+import lombok.With;
+import java.math.BigDecimal;
 
 @Value
+@With
 public class InternalSalesTaxRatesMetaData {
     String recordType;
     String stateAbbrev;
@@ -42,4 +45,8 @@ public class InternalSalesTaxRatesMetaData {
     String countyTaxOverMax;
     String cityTaxableMax;
     String cityTaxOverMax;
+    BigDecimal other1Rate;
+    BigDecimal other2Rate;
+    BigDecimal other3Rate;
+    BigDecimal other4Rate;
 }

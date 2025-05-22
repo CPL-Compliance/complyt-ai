@@ -5,31 +5,32 @@ import com.complyt.domain.properties.InternalTimestampsProperty;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.Address;
 import lombok.*;
+import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.UUID;
 
-@Getter
-@EqualsAndHashCode
 @AllArgsConstructor
-@ToString
 @Document(collection = "customer")
 @With
+@Data
+@Accessors(chain = true)
 public class Customer implements ComplytIdProperty, InternalTimestampsProperty {
-    private final UUID complytId;
-    @Id
-    private final String id;
-    private final String externalId;
-    private final String source;
-    private final String name;
-    private final Address address;
-    private final String tenantId;
-    private final String email;
-    private final CustomerType customerType;
-    private final Timestamps internalTimestamps;
-    private final Timestamps externalTimestamps;
-    private final String comment;
-    private final CustomerStatus customerStatus;
+  private UUID complytId;
+  @Id
+  private String id;
+  private String externalId;
+  private String source;
+  private String name;
+  private Address address;
+  private String tenantId;
+  private String email;
+  private CustomerType customerType;
+  private Timestamps internalTimestamps;
+  private Timestamps externalTimestamps;
+  private String comment;
+  private CustomerStatus customerStatus;
+
 
 }

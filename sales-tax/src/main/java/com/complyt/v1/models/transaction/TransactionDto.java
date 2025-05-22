@@ -26,25 +26,37 @@ import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
 @Schema(name = "transaction", description = FieldsDescriptions.TRANSACTION)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID + "transaction") UUID complytId,
-                             @Schema(description = FieldsDescriptions.EXTERNAL_ID) @NotNull(message = "externalId " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "externalId " + StringErrorMessages.MINMAX_256_ERROR) String externalId,
-                             @Schema(description = FieldsDescriptions.SOURCE) @NotNull(message = "source " + DtoErrorMessages.NOT_NULL_ERROR) @Pattern(regexp = "^(?:[1-9]|1[0-5])$", message = DtoErrorMessages.SOURCE_FORMAT_ERROR) String source,
-                             @Schema(description = FieldsDescriptions.DOCUMENT_NAME) @Size(max = 50, message = "documentName " + StringErrorMessages.MAX_50_ERROR) String documentName,
-                             @ArraySchema(schema = @Schema(description = FieldsDescriptions.ITEM)) @NotEmpty(message = "items" + DtoErrorMessages.LIST_NOT_EMPTY_ERROR) @NotNull(message = "items " + DtoErrorMessages.NOT_NULL_ERROR) List<@Valid ItemDto> items,
+                             @Schema(description = FieldsDescriptions.EXTERNAL_ID) @NotNull(message =
+                                     "externalId " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256,
+                                     message = "externalId " + StringErrorMessages.MINMAX_256_ERROR) String externalId,
+                             @Schema(description = FieldsDescriptions.SOURCE) @NotNull(message =
+                                     "source " + DtoErrorMessages.NOT_NULL_ERROR) @Pattern(regexp = "^(?:[1-9]|1[0-5" +
+                                     "])$", message = DtoErrorMessages.SOURCE_FORMAT_ERROR) String source,
+                             @Schema(description = FieldsDescriptions.DOCUMENT_NAME) @Size(max = 50, message =
+                                     "documentName " + StringErrorMessages.MAX_50_ERROR) String documentName,
+                             @ArraySchema(schema = @Schema(description = FieldsDescriptions.ITEM)) @NotEmpty(message
+                                     = "items" + DtoErrorMessages.LIST_NOT_EMPTY_ERROR) @NotNull(message =
+                                     "items " + DtoErrorMessages.NOT_NULL_ERROR) List<@Valid ItemDto> items,
                              @Schema(description = FieldsDescriptions.IS_TAX_INCLUSIVE) boolean isTaxInclusive,
                              @Schema(ref = "billingAddress") @Valid OptionalAddressDto billingAddress,
-                             @Schema(ref = "shippingAddress") @Valid @NotNull(message = "shippingAddress " + DtoErrorMessages.NOT_NULL_ERROR) ShippingAddressDto shippingAddress,
-                             @Schema(description = FieldsDescriptions.CUSTOMER_ID + "transaction") @NotNull(message = "customerId " + DtoErrorMessages.NOT_NULL_ERROR) UUID customerId,
+                             @Schema(ref = "shippingAddress") @Valid @NotNull(message =
+                                     "shippingAddress " + DtoErrorMessages.NOT_NULL_ERROR) ShippingAddressDto shippingAddress,
+                             @Schema(description = FieldsDescriptions.CUSTOMER_ID + "transaction")  UUID customerId,
                              @Valid CustomerDto customer,
                              @Valid SalesTaxDto salesTax,
-                             @Schema(description = FieldsDescriptions.TRANSACTION_STATUS) @NotNull(message = "transactionStatus " + DtoErrorMessages.NOT_NULL_ERROR) TransactionStatusDto transactionStatus,
+                             @Schema(description = FieldsDescriptions.TRANSACTION_STATUS) @NotNull(message =
+                                     "transactionStatus " + DtoErrorMessages.NOT_NULL_ERROR) TransactionStatusDto transactionStatus,
                              @Schema(ref = "internalTimestamps") @Valid TimestampsDto internalTimestamps,
-                             @Schema(ref = "externalTimestamps") @Valid @NotNull(message = "externalTimestamps " + DtoErrorMessages.NOT_NULL_ERROR) TimestampsDto externalTimestamps,
+                             @Schema(ref = "externalTimestamps") @Valid @NotNull(message =
+                                     "externalTimestamps " + DtoErrorMessages.NOT_NULL_ERROR) TimestampsDto externalTimestamps,
                              @NotNull(message = "transactionType " + DtoErrorMessages.NOT_NULL_ERROR) TransactionTypeDto transactionType,
                              @Schema(description = FieldsDescriptions.SHIPPING_FEE) @Valid ShippingFeeDto shippingFee,
-                             @Schema(description = FieldsDescriptions.CREATED_FROM) @Size(max = 256, message = "createdFrom " + StringErrorMessages.MAX_256_ERROR) String createdFrom,
+                             @Schema(description = FieldsDescriptions.CREATED_FROM) @Size(max = 256, message =
+                                     "createdFrom " + StringErrorMessages.MAX_256_ERROR) String createdFrom,
                              @Schema(description = FieldsDescriptions.TAXABLE_ITEMS_AMOUNT) BigDecimal taxableItemsAmount,
                              @Schema(description = FieldsDescriptions.TANGIBLE_ITEMS_AMOUNT) BigDecimal tangibleItemsAmount,
-                             @Schema(description = FieldsDescriptions.TOTAL_ITEMS_AMOUNT, requiredMode = Schema.RequiredMode.NOT_REQUIRED, accessMode = READ_ONLY) BigDecimal totalItemsAmount,
+                             @Schema(description = FieldsDescriptions.TOTAL_ITEMS_AMOUNT, requiredMode =
+                                     Schema.RequiredMode.NOT_REQUIRED, accessMode = READ_ONLY) BigDecimal totalItemsAmount,
                              @Schema(description = FieldsDescriptions.TOTAL_DISCOUNT) BigDecimal totalDiscount,
                              @Schema(description = FieldsDescriptions.TRANSACTION_LEVEL_DISCOUNT) @PositiveOrZero(message = "Transaction.transactionLevelDiscount " + NumericErrorMessages.MUST_BE_POSITIVE_ERROR) BigDecimal transactionLevelDiscount,
                              @Schema(description = FieldsDescriptions.FINAL_TRANSACTION_AMOUNT) BigDecimal finalTransactionAmount,
@@ -54,6 +66,9 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(description = FieldsDescriptions.EXCHANGE_RATE_INFO) ExchangeRateInfoDto exchangeRateInfo,
                              @Schema(description = FieldsDescriptions.SUBSIDIARY_INFO) String subsidiary,
                              @Schema(description = FieldsDescriptions.IS_REFUND_LINKED_INFO) Boolean isRefundLinked,
-                             @PositiveOrZero(message = "refundLinkedPercentage " + NumericErrorMessages.NOT_NEGATIVE_ERROR) @DecimalMax(value = "1.0", message = "refundLinkedPercentage" + NumericErrorMessages.DECIMAL_MAX_1_ERROR) BigDecimal refundLinkedPercentage)
+                             @PositiveOrZero(message =
+                                     "refundLinkedPercentage " + NumericErrorMessages.NOT_NEGATIVE_ERROR) @DecimalMax(value = "1.0", message = "refundLinkedPercentage" + NumericErrorMessages.DECIMAL_MAX_1_ERROR) BigDecimal refundLinkedPercentage,
+                             @Schema(description = FieldsDescriptions.CUSTOMER_EXTERNAL_ID) String customerExternalId,
+                             @Schema(description = FieldsDescriptions.CUSTOMER_SOURCE) String customerSource)
         implements SourceCheckable, ExternalIdCheckable {
 }

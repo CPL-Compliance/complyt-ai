@@ -24,23 +24,7 @@ public class SalesTaxTest {
         return new SalesTaxRates(null, new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null, null, null, null, new BigDecimal("0.5"));
     }
 
-     static MockedStatic mockedStatic;
-
-    @BeforeAll
-    static void beforeAll() {
-        try {
-            mockedStatic = mockStatic(TenantResolver.class);
-        } catch (Exception e) {
-            // Log the error or fail the test setup
-            System.err.println("Failed to mock TenantResolver: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    @AfterAll
-    static void afterAll() {
-        mockedStatic.close();
-    }
+   
 
     @BeforeEach
     void setup() {
@@ -65,7 +49,8 @@ public class SalesTaxTest {
                 ", taxRate=0.4]" +
                 ", gtRates=GtRates[countryRate=0.1" +
                 ", regionRate=0.1" +
-                ", taxRate=0.2]]";
+                ", taxRate=0.2]," +
+                " filingMetaData=null]";
 
         // When
         String actualString = salesTax.toString();

@@ -135,7 +135,7 @@ public interface TransactionRouterTestTemplate extends
     //Validation::CustomerId
     void upsert_CustomerIdFailedToParse_Returns400();
 
-    void upsert_NullCustomerId_Returns400();
+    void upsert_NullCustomerIdAndNullCustomerExternalIdAndNullCustomerSource_Returns400();
 
     // Validation::Customer
     void upsert_InvalidCustomer_Returns400();

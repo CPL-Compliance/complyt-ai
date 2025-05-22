@@ -3,6 +3,7 @@ package integration.scenarios;
 import com.complyt.SalesTaxApplication;
 import com.complyt.business.tax.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.customer.CustomerDto;
@@ -11,10 +12,7 @@ import com.complyt.v1.routers.CustomerRouter;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -24,7 +22,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import testUtils.integration_test.ITUtilities;
-import testUtils.integration_test.WithMockJwt;
+import testUtils.annotations.WithMockJwt;
 
 import java.time.Duration;
 import java.util.LinkedHashMap;
@@ -216,9 +214,9 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                                 .accept(MediaType.APPLICATION_JSON)
                                 .bodyValue(transactionDto)
                                 .exchange()
-                                .expectStatus().isBadRequest()
+                                .expectStatus().isNotFound()
                                 .expectBody(LinkedHashMap.class)
-                                .value(map -> assertEquals(map.get("message"), "[" + DtoErrorMessages.COMPLYT_ID_IN_A_NEW_RECORD_ERROR + "]")));
+                                .value(map -> assertEquals(GenericErrorMessages.CUSTOMER_NOT_FOUND, map.get("message"))));
 
     }
 

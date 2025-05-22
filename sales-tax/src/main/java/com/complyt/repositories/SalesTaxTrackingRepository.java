@@ -31,16 +31,13 @@ public class SalesTaxTrackingRepository {
     ReactiveMongoTemplate reactiveMongoTemplate;
 
     @NonNull
-    TenantResolver tenantResolver;
-
-    @NonNull
     SalesTaxTrackingUpdateQueryBuilder updateQueryBuilder;
 
     @NonNull
     CountryAndStateCriteriaBuilder countryQueryBuilder;
 
     public Mono<SalesTaxTracking> findByCountryStateAndSubsidiary(@NonNull String country, String state, String subsidiary) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Criteria addressSearchCriteria = countryQueryBuilder.build(country, state);
                     Criteria baseCriteria = Criteria.where("tenantId").is(tenantId).andOperator(addressSearchCriteria);
@@ -57,7 +54,7 @@ public class SalesTaxTrackingRepository {
     }
 
     public Mono<SalesTaxTracking> findByComplytId(@NonNull UUID complytId) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("complytId").is(complytId).and("tenantId").is(tenantId));
 
@@ -68,13 +65,13 @@ public class SalesTaxTrackingRepository {
     }
 
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> ContextLogger.observeCtx("Saving sales tax tracking: " + salesTaxTracking, tenantId, log::info)
                         .then(reactiveMongoTemplate.save(salesTaxTracking.withTenantId(tenantId))));
     }
 
     public Mono<SalesTaxTracking> findById(String id) {
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
 
@@ -86,7 +83,7 @@ public class SalesTaxTrackingRepository {
 
     public Flux<SalesTaxTracking> findAll(int page, int size) {
         int calculatedOffset = (page - 1) * size;
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)).skip(calculatedOffset).limit(size);
                     return ContextLogger.observeCtx("Searching for all sales tax tracking with tenant ID " + tenantId + " with page " + page + " and size " + size, tenantId, log::info)
@@ -98,7 +95,7 @@ public class SalesTaxTrackingRepository {
         Query query = new Query(Criteria.where("_id").is(salesTaxTracking.getId()));
         Update update = updateQueryBuilder.build(salesTaxTracking);
 
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> ContextLogger.observeCtx("Updating sales tax tracking Fields: " + update + ", With Query: " + query, tenantId, log::info)
                         .then(reactiveMongoTemplate.findAndModify(query, update, SalesTaxTracking.class))
                         .then(Mono.just(salesTaxTracking.withTenantId(tenantId))));
@@ -115,7 +112,7 @@ public class SalesTaxTrackingRepository {
         update.set("appliedDate", salesTaxTracking.getAppliedDate());
         update.set("establishedBy", salesTaxTracking.getSubsidiary());
 
-        return tenantResolver.resolve()
+        return TenantResolver.resolve()
                 .flatMap(tenantId -> ContextLogger.observeCtx("Updating sales tax tracking Fields: " + update + ", With Query: " + query, tenantId, log::info)
                         .then(reactiveMongoTemplate.updateMulti(query, update, SalesTaxTracking.class)));
 

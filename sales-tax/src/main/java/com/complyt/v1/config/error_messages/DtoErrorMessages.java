@@ -69,4 +69,6 @@ public interface DtoErrorMessages {
     String INVALID_DETAILED_TRANSACTION_PARAMETER = "should be one of the following true/false";
 
     String ITEMS_MISSING_TOTAL_OR_QUANTITY_AND_UNITPRICE = "All items should have either total price OR quantity and unitPrice";
+
+    String CUSTOMER_MISSING_ID_OR_EXTERNAL_REFERENCE_AND_SOURCE = "ERR-DTO-SALES_TAX-001: Either a customerID OR customerExternalId and customerSource should be provided.";
 }
