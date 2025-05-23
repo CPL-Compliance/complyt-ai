@@ -119,6 +119,25 @@ public class TransactionHandler {
     }
 
     @TransactionReadPermission
+    public Mono<ServerResponse> getAllTransactionsByCustomerId(ServerRequest serverRequest) {
+        String customerId = serverRequest.pathVariable("customerId");
+        String logStr = String.format("-Request Received; Method -> %s, Path -> %s", serverRequest.method(),
+                serverRequest.path());
+
+        Flux<TransactionDto> transactionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
+                .thenMany(transactionDtoValidationHandler.validatePathVariable("customerId",customerId))
+                .thenMany(Flux.defer(() -> transactionFacade.getAllByCustomerId(customerId))
+                        .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
+                        .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto,
+                                log::info).thenReturn(transactionDto)))
+                .switchIfEmpty(ContextLogger.observeCtx("Failed to get transactions by customerId " + customerId, log::error)
+                        .then(Mono.error(new ObjectNotFoundApiException())));
+
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoFlux,
+                TransactionDto.class);
+    }
+
+    @TransactionReadPermission
     public Mono<ServerResponse> getByComplytId(ServerRequest serverRequest) {
         String complytIdAsString = serverRequest.pathVariable("complytId");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(),

@@ -30,6 +30,8 @@ public interface DtoErrorMessages {
 
     String COMPLYT_ID_FORMAT_ERROR = "complyt ID has to be in UUID format";
 
+    String CUSTOMER_COMPLYT_ID_FORMAT_ERROR = "ERR-DTO-SALES_TAX-002: customer complyt ID has to be in UUID format";
+
     String SOURCE_FORMAT_ERROR = "source has to be in range 1-15";
 
     String PAGE_FORMAT_ERROR = "Page number must be a non-negative integer.";

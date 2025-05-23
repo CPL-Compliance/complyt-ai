@@ -4,7 +4,6 @@ import com.complyt.domain.customer.Customer;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.transaction.Transaction;
-import com.complyt.business.transaction.TransactionDtoProcessor;
 import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
@@ -44,9 +43,6 @@ public class TransactionFacade {
     @NonNull
     @Qualifier("salesTaxTrackingServiceImpl")
     private SalesTaxTrackingService salesTaxTrackingService;
-
-    @NonNull
-    private final TransactionDtoProcessor transactionDtoProcessor;
 
     @NonNull
     private NexusService nexusService;
@@ -168,6 +164,12 @@ public class TransactionFacade {
 
     public Flux<Transaction> getAllBySource(String source) {
         return transactionService.findAllBySource(source)
+                .flatMap(transaction -> getCustomerByTransaction(transaction)
+                        .map(transaction::setCustomer));
+    }
+
+    public Flux<Transaction> getAllByCustomerId(String customerId) {
+        return transactionService.findAllByCustomerId(customerId)
                 .flatMap(transaction -> getCustomerByTransaction(transaction)
                         .map(transaction::setCustomer));
     }
