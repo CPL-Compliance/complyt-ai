@@ -21,6 +21,7 @@ import com.complyt.business.transaction.TransactionDtoProcessor;
 import com.complyt.services.TransactionService;
 import com.complyt.services.nexus.NexusService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
+import com.complyt.v1.exceptions.types.CustomerNotFoundApiException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -895,6 +896,60 @@ public class TransactionFacadeTest extends BaseTestClass {
 
         // Then
         StepVerifier.create(returnedTransactions).expectNextCount(2).verifyComplete();
+    }
+
+    @Test
+    void getAllTransactionsWithCustomerId_TransactionsExists_ReturnsAllTransactionsFound() {
+        // Given
+        String customerUUID = UUID.randomUUID().toString();
+        Transaction secondTransaction = transaction
+                .withComplytId(UUID.randomUUID())
+                .withExternalId(UUID.randomUUID().toString());
+        List<Transaction> allTransactionsInSource = new ArrayList<>();
+        allTransactionsInSource.add(transaction);
+        allTransactionsInSource.add(secondTransaction);
+
+        // When
+        when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
+        when(transactionService.findAllByCustomerId(customerUUID)).thenReturn(Flux.fromIterable(allTransactionsInSource));
+        Flux<Transaction> returnedTransactions = transactionFacade.getAllByCustomerId(customerUUID);
+
+        // Then
+        StepVerifier.create(returnedTransactions).expectNextCount(2).verifyComplete();
+    }
+
+    @Test
+    void getAllTransactionsWithCustomerId_TransactionsFound_CustomerNotFound_ExpectCustomerNotFoundException() {
+        // Given
+        String customerUUID = UUID.randomUUID().toString();
+        Transaction secondTransaction = transaction
+                .withComplytId(UUID.randomUUID())
+                .withExternalId(UUID.randomUUID().toString());
+        List<Transaction> allTransactionsInSource = new ArrayList<>();
+        allTransactionsInSource.add(transaction);
+        allTransactionsInSource.add(secondTransaction);
+
+        // When
+        when(customerService.findByComplytId(any())).thenReturn(Mono.empty());
+        when(transactionService.findAllByCustomerId(customerUUID)).thenReturn(Flux.fromIterable(allTransactionsInSource));
+        Flux<Transaction> returnedTransactions = transactionFacade.getAllByCustomerId(customerUUID);
+
+        // Then
+        StepVerifier.create(returnedTransactions).expectError(CustomerNotFoundApiException.class).verify();
+    }
+
+
+    @Test
+    void getAllTransactionsWithCustomerId_NoTransactionsFound_ReturnsEmptyList() {
+        // Given
+        String customerUUID = UUID.randomUUID().toString();
+
+        // When
+        when(transactionService.findAllByCustomerId(customerUUID)).thenReturn(Flux.fromIterable(Collections.emptyList()));
+        Flux<Transaction> returnedTransactions = transactionFacade.getAllByCustomerId(customerUUID);
+
+        // Then
+        StepVerifier.create(returnedTransactions).expectNextCount(0).verifyComplete();
     }
 
     @Test

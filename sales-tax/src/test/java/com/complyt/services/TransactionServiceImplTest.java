@@ -20,17 +20,13 @@ import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.*;
 import com.complyt.repositories.GeoRecordRepository;
 import com.complyt.repositories.TransactionRepository;
-import com.complyt.security.TenantResolver;
 import com.complyt.v1.exceptions.types.ZipCodeNotFoundApiException;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -50,7 +46,6 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -830,6 +825,29 @@ class TransactionServiceImplTest {
 
         // When
         StepVerifier.create(transactionFlux).expectNext(transaction, secondsTransaction).verifyComplete();
+    }
+
+    @Test
+    void findAllByCustomer_2TransactionsExist_Returns2Transactions() {
+        // Given
+        var customerId = UUID.randomUUID().toString();
+        Transaction secondsTransaction = testUtilities.createTransaction(new ObjectId().toString());
+
+        // Then
+        when(transactionRepository.findAllByCustomerId(UUID.fromString(customerId))).thenReturn(Flux.just(transaction, secondsTransaction));
+        Flux<Transaction> transactionFlux = transactionService.findAllByCustomerId(customerId);
+
+        // When
+        StepVerifier.create(transactionFlux).expectNext(transaction, secondsTransaction).verifyComplete();
+    }
+
+    @Test
+    void findAllByCustomer_customerIdNotInUUIDFormat_ReturnsIllegalArgumentException() {
+        // Given
+        var customerId = "junk";
+        assertThrows(IllegalArgumentException.class, () -> {
+            transactionService.findAllByCustomerId(customerId); // Exception is thrown here
+        });
     }
 
     @Test

@@ -1983,6 +1983,49 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Order(2)
     @Test
+    @WithMockJwt
+    public void getAllByCustomerId_Exists_Returns200() {
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/customer/" + customerId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> assertEquals(58, list.size()));
+    }
+
+    @Order(2)
+    @Test
+    @WithMockJwt
+    public void getAllByCustomerId_None_ReturnsEmptyList200() {
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/customer/" + "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f1")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> assertEquals(list.size(), 0));
+    }
+
+    @Order(2)
+    @Test
+    @WithMockJwt
+    public void getAllByCustomerId_PathVariableInvalid_Returns400() {
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/customer/3d3")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Order(2)
+    @Test
     @Override
     @WithMockJwt
     public void getAll_Exists_Returns200() {

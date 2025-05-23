@@ -125,14 +125,13 @@ public class TransactionHandler {
                 serverRequest.path());
 
         Flux<TransactionDto> transactionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
-                .thenMany(transactionDtoValidationHandler.validatePathVariable("customerId",customerId))
-                .thenMany(Flux.defer(() -> transactionFacade.getAllByCustomerId(customerId))
+                .thenMany(transactionDtoValidationHandler.handle(serverRequest))
+                .switchIfEmpty(Flux.defer(() -> transactionFacade.getAllByCustomerId(customerId))
                         .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
-                        .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto,
-                                log::info).thenReturn(transactionDto)))
-                .switchIfEmpty(ContextLogger.observeCtx("Failed to get transactions by customerId " + customerId, log::error)
-                        .then(Mono.error(new ObjectNotFoundApiException())));
-
+                        .flatMap(transactionDto ->
+                                ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info)
+                                        .thenReturn(transactionDto)
+                        ));
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoFlux,
                 TransactionDto.class);
     }
