@@ -26,6 +26,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -61,6 +62,21 @@ public class CustomerHandler {
         Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(customerDtoValidationHandler.handle(serverRequest))
                 .switchIfEmpty(Flux.defer(() -> customerFacade.getAll(Integer.parseInt(page), Integer.parseInt(size), filterMap, sortOrder, sortBy)
+                        .map(CustomerMapper.INSTANCE::customerToCustomerDto)
+                        .flatMapSequential(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto))));
+
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoFlux, CustomerDto.class);
+    }
+
+    @CustomerReadPermission
+    public Mono<ServerResponse> getCustomers(ServerRequest serverRequest) {
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        Optional<String> email = serverRequest.queryParam("email");
+        Optional<String> source = serverRequest.queryParam("source");
+
+        Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info)
+                .thenMany(customerDtoValidationHandler.handle(serverRequest))
+                .switchIfEmpty(Flux.defer(() -> customerFacade.findCustomers(email, source)
                         .map(CustomerMapper.INSTANCE::customerToCustomerDto)
                         .flatMapSequential(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info).thenReturn(customerDto))));
 

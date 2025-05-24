@@ -23,15 +23,15 @@ public class CustomerRouter {
         return RouterFunctions.route(putCustomerRoute, customerHandler::upsert);
     }
 
-    @Bean
-    @GetAllCustomersApiInfo
-    public RouterFunction<ServerResponse> getAllCustomersRouterFunction(@NonNull final CustomerHandler customerHandler) {
-        RequestPredicate putCustomerRoute = RequestPredicates
-                .GET(BASE_URL)
-                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
-
-        return RouterFunctions.route(putCustomerRoute, customerHandler::getAll);
-    }
+//    @Bean
+//    @GetAllCustomersApiInfo
+//    public RouterFunction<ServerResponse> getAllCustomersRouterFunction(@NonNull final CustomerHandler customerHandler) {
+//        RequestPredicate putCustomerRoute = RequestPredicates
+//                .GET(BASE_URL)
+//                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+//
+//        return RouterFunctions.route(putCustomerRoute, customerHandler::getAll);
+//    }
 
     @Bean
     @GetAllCustomersBySourceApiInfo
@@ -41,6 +41,17 @@ public class CustomerRouter {
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(putCustomerRoute, customerHandler::getAllBySource);
+    }
+
+    @Bean
+    //todo annotation
+    @GetAllCustomersBySourceApiInfo
+    public RouterFunction<ServerResponse> getAllCustomersBy(@NonNull final CustomerHandler customerHandler) {
+        RequestPredicate putCustomerRoute = RequestPredicates
+                .GET(BASE_URL)
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(putCustomerRoute, customerHandler::getCustomers);
     }
 
     @Bean

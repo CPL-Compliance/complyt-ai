@@ -18,8 +18,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 @Slf4j
@@ -79,6 +78,24 @@ public class CustomerRepository {
                             .and("source").is(source));
 
                     return ContextLogger.observeCtx("Searching for customers with source " + source + " and tenant ID " + tenantId, tenantId, log::info)
+                            .thenMany(reactiveMongoTemplate.find(query, Customer.class));
+                });
+    }
+
+    public Flux<Customer> findByFilters(Optional<String> email, Optional<String> source) {
+        List<Criteria> criteria = new ArrayList<>();
+
+        email.ifPresent(e -> criteria.add(Criteria.where("email").is(e)));
+        source.ifPresent(s -> criteria.add(Criteria.where("source").is(s)));
+
+
+        return TenantResolver.resolve()
+                .flatMapMany(tenantId -> {
+                    criteria.add(Criteria.where("tenantId").is(tenantId));
+
+                    Query query = new Query().addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[0])));
+
+                    return ContextLogger.observeCtx("Searching for customers with criteria " + criteria + " and tenant ID " + tenantId, tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Customer.class));
                 });
     }
