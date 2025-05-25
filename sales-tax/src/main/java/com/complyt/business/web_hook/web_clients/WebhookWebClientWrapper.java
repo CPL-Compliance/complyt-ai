@@ -50,7 +50,6 @@ public class WebhookWebClientWrapper<T extends ComplytIdProperty> extends WebCli
             return ContextLogger.observeCtx("Failed to create Hmaac.  Error: " + e.getMessage(), log::error)
                     .thenReturn(webhookEntityWrapper.object());
         }
-
         return ContextLogger.observeCtx("Sending webhook entity: " + webhookEntityWrapper, log::info)
                 .then(webClient
                         .post()
