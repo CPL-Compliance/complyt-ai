@@ -20,8 +20,7 @@ import java.util.List;
 public class HereAddressChecker {
 
     public Mono<CachedAddressData> validateCountryAndStateMatch(@NonNull CachedAddressData data, @NonNull Address requestAddress) {
-        boolean isCountryMismatch = data.scoring().fieldScore().countryMatch().equals(FieldMatchType.NO_MATCH);
-        boolean isUSA = CountryIsUsaChecker.isCountryUsa(requestAddress.country());
+        boolean isCountryMismatch = !isCountryMatch(data);
 
         // Check Country match
         if (isCountryMismatch) {
@@ -29,15 +28,28 @@ public class HereAddressChecker {
         }
 
         // Check State match in USA
-        FieldMatchType isStateMismatch = data.scoring().fieldScore().stateMatch();
-        if (isUSA && isStateMismatch != null && isStateMismatch.equals(FieldMatchType.NO_MATCH)) {
+        boolean isStateMismatch = !isStateMatch(data, requestAddress);
+        if (isStateMismatch) {
             return Mono.error(new ObjectNotValidException(String.format(GenericErrorMessages.STATE_CODE_MISMATCH, requestAddress.state(), data.address().state())));
         }
         // Valid
         return Mono.just(data);
     }
 
-    public Mono<List<CachedAddressData>> filterValidAddresses(List<CachedAddressData> cachedAddresses) {
+    private boolean isCountryMatch(CachedAddressData data) {
+        return data.scoring().fieldScore().countryMatch() != FieldMatchType.NO_MATCH;
+    }
+
+    private boolean isStateMatch(CachedAddressData data, Address requestAddress) {
+        return !CountryIsUsaChecker.isCountryUsa(requestAddress.country()) ||
+                data.scoring().fieldScore().stateMatch() != FieldMatchType.NO_MATCH;
+    }
+
+    public boolean isCountryAndStateMatch(@NonNull CachedAddressData data, @NonNull Address requestAddress) {
+        return isCountryMatch(data) && isStateMatch(data, requestAddress);
+    }
+
+        public Mono<List<CachedAddressData>> filterValidAddresses(List<CachedAddressData> cachedAddresses) {
         return Flux.fromIterable(cachedAddresses)
                 .filter(this::isValidAddress)
                 .doOnNext(data -> log.info("--> here address is valid:{}", data))
