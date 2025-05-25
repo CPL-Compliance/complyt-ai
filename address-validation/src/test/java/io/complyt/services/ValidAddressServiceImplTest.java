@@ -21,6 +21,7 @@ import reactor.test.StepVerifier;
 import test_utils.TestUtilities;
 
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -70,17 +71,39 @@ class ValidAddressServiceImplTest {
     }
 
     @Test
-    void validateAddress_AddressNotFoundInRepository_FindsAndSavesNewAddress() {
+    void validateAddress_AddressNotFoundInRepository_ValidAddress_FindsAndSavesNewAddress() {
         Address alignedAddress = address.withCountry(UsaAbbreviations.DEFAULT_COUNTRY);
         when(validationAddressRepositoryImpl.findAddress(address)).thenReturn(Mono.empty());
         when(addressAligner.alignForOutsource(address)).thenReturn(alignedAddress);
         when(hereAddressValidationClientWrapper.validateAddress(alignedAddress)).thenReturn(Mono.just(hereAddressData));
         when(hereAddressChecker.filterValidAddresses(List.of(cachedAddressData))).thenReturn(Mono.just(List.of(cachedAddressData)));
+        when(hereAddressChecker.isCountryAndStateMatch(cachedAddressData, address)).thenReturn(true);
         when(validationAddressRepositoryImpl.saveAddress(any())).thenReturn(Mono.just(validatedAddress));
         when(addressAligner.alignGlobalAddress(address)).thenReturn(address);
 
         StepVerifier.create(validAddressService.validateAddress(address))
                 .expectNext(validatedAddress)
+                .verifyComplete();
+    }
+
+    @Test
+    void validateAddress_AddressNotFoundInRepository_NotValid_NotSavingToDB() {
+        Address alignedAddress = address.withCountry(UsaAbbreviations.DEFAULT_COUNTRY);
+        when(validationAddressRepositoryImpl.findAddress(address)).thenReturn(Mono.empty());
+        when(addressAligner.alignForOutsource(address)).thenReturn(alignedAddress);
+        when(hereAddressValidationClientWrapper.validateAddress(alignedAddress)).thenReturn(Mono.just(hereAddressData));
+        when(hereAddressChecker.filterValidAddresses(List.of(cachedAddressData))).thenReturn(Mono.just(List.of(cachedAddressData)));
+        when(hereAddressChecker.isCountryAndStateMatch(cachedAddressData, address)).thenReturn(false);
+        when(addressAligner.alignGlobalAddress(address)).thenReturn(address);
+
+        ValidatedAddress expectedAddress = new ValidatedAddress(null, List.of(cachedAddressData), address, LocalDateTime.now());
+
+        StepVerifier.create(validAddressService.validateAddress(address))
+                .expectNextMatches(actual ->
+                        actual.getId() == null &&
+                                actual.getMatchedAddresses().equals(expectedAddress.getMatchedAddresses()) &&
+                                actual.getRequestAddress().equals(expectedAddress.getRequestAddress())
+                )
                 .verifyComplete();
     }
 
@@ -95,7 +118,7 @@ class ValidAddressServiceImplTest {
     }
 
     @Test
-    void validateAddress_AddressNotFoundAndCachedAddressHasNoStreetWithBadScore_ReturnsUpdatedAddressWithGoodScore() {
+    void validateAddress_AddressNotFoundAndCachedAddressHasNoStreetWithBadScore_ValidAddress_ReturnsUpdatedAddressWithGoodScore() {
         // Given
         double badScore = 0.1;
         Address alignedAddress = address.withCountry(UsaAbbreviations.DEFAULT_COUNTRY);
@@ -112,6 +135,7 @@ class ValidAddressServiceImplTest {
         when(addressAligner.alignForOutsource(address)).thenReturn(alignedAddress);
         when(hereAddressValidationClientWrapper.validateAddress(alignedAddress)).thenReturn(Mono.just(hereAddressDataNoStreetBadScore));
         when(hereAddressChecker.filterValidAddresses(List.of(cachedAddressDataNoStreetBadScore))).thenReturn(Mono.empty());
+        when(hereAddressChecker.isCountryAndStateMatch(cachedAddressDataNoStreetGoodScore, address)).thenReturn(true);
         when(addressAligner.alignForOutsource(address.withStreet(null))).thenReturn(alignedAddress.withStreet(null));
         when(hereAddressValidationClientWrapper.validateAddress(alignedAddressWithNoStreet)).thenReturn(Mono.just(hereAddressDataNoStreetGoodScore));
         when(hereAddressChecker.filterValidAddresses(List.of(cachedAddressDataNoStreetGoodScore))).thenReturn(Mono.just(List.of(cachedAddressDataNoStreetGoodScore)));
