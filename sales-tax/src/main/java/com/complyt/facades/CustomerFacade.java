@@ -1,7 +1,7 @@
 package com.complyt.facades;
 
 import com.complyt.domain.customer.Customer;
-import com.complyt.services.CustomerServiceImpl;
+import com.complyt.services.CustomerService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -10,7 +10,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -19,7 +18,7 @@ public class CustomerFacade {
 
     @Qualifier("customerServiceImpl")
     @NonNull
-    private CustomerServiceImpl customerService;
+    private CustomerService customerService;
 
     public Mono<Customer> saveCustomer(@NonNull Customer customer) {
         return customerService.checkCustomerNotHavingComplytId(customer)
@@ -48,11 +47,6 @@ public class CustomerFacade {
     public Flux<Customer> getAll(int page, int size, Map<String, String> filterMap, String sortOrder, String sortBy) {
         return customerService.findAll(page, size, filterMap, sortOrder, sortBy);
     }
-
-    public Flux<Customer> findCustomers(Optional<String> email, Optional<String> source) {
-        return customerService.findCustomers(email, source);
-    }
-
 
     public Flux<Customer> getAllBySource(String source) {
         return customerService.findAllBySource(source);
