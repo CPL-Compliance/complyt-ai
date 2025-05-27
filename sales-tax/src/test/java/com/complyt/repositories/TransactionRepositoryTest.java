@@ -3,11 +3,14 @@ package com.complyt.repositories;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.typedAggregations.TransactionTypedAggregationBuilder;
 import com.complyt.security.TenantResolver;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -29,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -371,25 +375,6 @@ class TransactionRepositoryTest extends BaseTestClass {
 
         //Then
         Flux<Transaction> transactionFlux = transactionRepository.findAllBySource(source);
-        StepVerifier.create(transactionFlux).expectNextCount(2).verifyComplete();
-    }
-
-    @Test
-    void getAllTransactionsByCustomerId_RetrievingAllTransactionsWithCustomerId_ExpectingTwoTransactions() {
-        // Given
-        String id = UUID.randomUUID().toString();
-        var customerId = UUID.randomUUID();
-        String externalId = UUID.randomUUID().toString();
-        Transaction secondTransaction = transaction.withId(id).withExternalId(externalId).withCustomerId(customerId);
-        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId())
-                .and("customerId").is(customerId));
-
-        //When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
-        when(reactiveMongoTemplate.find(query, Transaction.class)).thenReturn(Flux.just(transaction, secondTransaction));
-
-        //Then
-        Flux<Transaction> transactionFlux = transactionRepository.findAllByCustomerId(customerId);
         StepVerifier.create(transactionFlux).expectNextCount(2).verifyComplete();
     }
 

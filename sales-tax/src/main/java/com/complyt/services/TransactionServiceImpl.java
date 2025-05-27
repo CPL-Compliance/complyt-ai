@@ -216,8 +216,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public Flux<Transaction> findAllByCustomerId(@NonNull final String customerId) {
-        final UUID customerUUID = UUID.fromString(customerId);
-        return transactionRepository.findAllByCustomerId(customerUUID);
+        return transactionRepository.findAllByCustomerId(customerId);
     }
 
     private Function<Transaction, Transaction> createFunctionUpdateTransaction(final Transaction transaction) {

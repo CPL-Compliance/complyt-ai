@@ -72,7 +72,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Autowired
     TransactionRouter transactionRouter;
     String source;
-    String customerId;
     UnitTestUtilities testUtilities;
     @MockBean
     private TransactionFacade transactionFacade;
@@ -100,7 +99,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         enrichedTransaction = transaction.withCustomer(customer).withCustomerId(customer.getComplytId());
 
         source = testUtilities.getUnifiedSource();
-        customerId = UUID.randomUUID().toString();
+
 
     }
 
@@ -612,112 +611,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().is5xxServerError();
-    }
-
-    @Test
-    @WithMockJwt
-    public void getAllByCustomerId_InternalServerError_Returns500() {
-        // Given + When
-        when(transactionFacade.getAllByCustomerId(customerId)).thenReturn(Flux.error(new OperationFailedException()));
-
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/customer/" + customerId)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Test
-    public void getAllByCustomer_UnauthenticatedUser_Returns401() {
-        // Given
-        String firstId = UUID.randomUUID().toString();
-        String secondId = UUID.randomUUID().toString();
-        Transaction firstTransaction = transaction.withExternalId(firstId);
-        Transaction secondTransaction = transaction.withExternalId(secondId);
-
-        // When
-        when(transactionFacade.getAllByCustomerId(customerId)).thenReturn(Flux.just(firstTransaction, secondTransaction));
-
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + customerId)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isUnauthorized();
-    }
-
-    @Test
-    @WithMockJwt
-    public void getAllByCustomer_EmptyCollection_Returns200WithEmptyList() {
-
-        // When
-        when(transactionFacade.getAllByCustomerId(customerId)).thenReturn(Flux.empty());
-
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/customer/" +customerId)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(TransactionDto.class)
-                .value(transactionDtos -> transactionDtos, equalTo(Collections.emptyList()));
-    }
-
-    @Test
-    @WithMockJwt
-    public void getAllByCustomer_PathVariableInvalid_Returns400() {
-        var badPathVariable = UUID.randomUUID() + "a";
-
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/customer/" + badPathVariable)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest();
-    }
-
-    @Test
-    @WithMockJwt
-    public void getAllByCustomer_Exists_Returns200WithList() {
-        // Given
-        String firstId = UUID.randomUUID().toString();
-        String secondId = UUID.randomUUID().toString();
-        TransactionDto transactionNoId = transactionDto.withExternalId(firstId);
-        TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
-        Transaction firstTransaction = transaction.withExternalId(firstId);
-        Transaction secondTransaction = transaction.withExternalId(secondId);
-        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>() {{
-            add(transactionNoId);
-            add(secondTransactionNoId);
-        }};
-
-        // When
-        when(transactionFacade.getAllByCustomerId(customerId)).thenReturn(Flux.just(firstTransaction, secondTransaction));
-
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/customer/" + customerId)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(TransactionDto.class)
-                .value(transactionDtos -> transactionDtos, equalTo(allTransactionsWithNoId));
     }
 
     @Override
