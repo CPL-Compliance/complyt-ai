@@ -1516,13 +1516,13 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Override
     @WithMockJwt
     public void upsertByState_WithPhysicalTrueAndEconomicNexusInFuture_ShouldUpdateAppliedDate() {
-        LocalDateTime appliedDate = LocalDateTime.now().minusYears(5);
         LocalDateTime physicalEstablishedDate = LocalDateTime.now();
 
         PhysicalNexusTrackerDto physicalNexusTrackerDto = new PhysicalNexusTrackerDto(true, physicalEstablishedDate);
 
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", new StateDto("AL", "11", "Alabama"))
-                .withPhysicalNexusTracker(physicalNexusTrackerDto);
+                .withPhysicalNexusTracker(physicalNexusTrackerDto)
+                .withAppliedDate(physicalEstablishedDate);
 
         // put Physical True SalesTaxTracking
         webTestClient
