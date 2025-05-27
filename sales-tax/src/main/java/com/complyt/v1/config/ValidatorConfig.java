@@ -54,6 +54,7 @@ public class ValidatorConfig {
             "country", ParamCheckerFunctions.COUNTRY_CHECK,
             "sortOrder", ParamCheckerFunctions.SORT_ORDER_CHECK,
             "detailed", ParamCheckerFunctions.DETAILED_TRANSACTION_OBJECT_CHECK,
+            "customerId", ParamCheckerFunctions.CUSTOMERID_UUID_CHECK,
 
             // vat validation
             "countryCode", ParamCheckerFunctions.VAT_VALIDATION_COUNTRY_CODE_CHECK,
