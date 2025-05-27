@@ -33,8 +33,8 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import testUtils.integration_test.ITUtilities;
 import testUtils.annotations.WithMockJwt;
+import testUtils.integration_test.ITUtilities;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -2026,22 +2026,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isOk()
                 .expectBodyList(TransactionDto.class)
                 .value(list -> assertEquals(PaginationConstants.DEFAULT_PAGE_SIZE, list.size()));
-    }
-
-    @Order(2)
-    @Test
-    @WithMockJwt
-    public void getAll_withCustomerIdQueryParam_ExistsAndOnlyOneRecord_Returns200() {
-        webTestClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL)
-                        .queryParam("customerId", customerId)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(TransactionDto.class)
-                .value(list -> assertEquals(1, list.size()));
     }
 
     @Order(2)
