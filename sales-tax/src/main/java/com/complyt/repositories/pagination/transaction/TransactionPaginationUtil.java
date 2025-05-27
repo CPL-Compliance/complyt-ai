@@ -17,8 +17,11 @@ public interface TransactionPaginationUtil {
             "transactionType", Boolean.TRUE,
             "shippingAddress.country", Boolean.TRUE,
             "shippingAddress.state", Boolean.TRUE,
-            "shippingAddress.city", Boolean.TRUE
+            "shippingAddress.city", Boolean.TRUE,
+            "customerId", Boolean.FALSE
     );
+
+    List<String> uuidFormatFilters = List.of("customerId");
 
     List<String> transactionSortByFields = List.of(
             "externalId",
