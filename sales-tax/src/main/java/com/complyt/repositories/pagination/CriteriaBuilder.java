@@ -25,7 +25,6 @@ public interface CriteriaBuilder {
                 .map(entry -> {
                     boolean isRegex = Boolean.TRUE.equals(filterKeys.get(entry.getKey()));
                     if (TransactionPaginationUtil.uuidFormatFilters.contains(entry.getKey())){
-                        //todo uuid validation, moet prolly gebeur voor hierdie
                         return Criteria.where(entry.getKey()).is(UUID.fromString(entry.getValue()));
                     }
                     if (isRegex) {

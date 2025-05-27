@@ -2014,6 +2014,70 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Order(2)
     @Test
+    @WithMockJwt
+    public void getAll_withCustomerIdQueryParam_Exists_Returns200() {
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("customerId", UUID.fromString("9ff0912a-2d60-4e8a-a6ba-1a9e7385338e"))
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> assertEquals(PaginationConstants.DEFAULT_PAGE_SIZE, list.size()));
+    }
+
+    @Order(2)
+    @Test
+    @WithMockJwt
+    public void getAll_withCustomerIdQueryParam_ExistsAndOnlyOneRecord_Returns200() {
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("customerId", customerId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> assertEquals(1, list.size()));
+    }
+
+    @Order(2)
+    @Test
+    @WithMockJwt
+    public void getAll_withCustomerIdQueryParam_doesNotExist_Returns200WithEmptyResponse() {
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("customerId", UUID.randomUUID())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> assertEquals(0, list.size()));
+    }
+
+    @Order(2)
+    @Test
+    @WithMockJwt
+    public void getAll_customerIdParamInvalid_Returns400() {
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("customerId", "null")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(error -> assertEquals("["+DtoErrorMessages.CUSTOMER_COMPLYT_ID_FORMAT_ERROR +"]", error.get("message")));
+    }
+
+    @Order(2)
+    @Test
     @Override
     @WithMockJwt(tenantId = "different_tenant")
     public void getByAll_DoesntExists_Returns200EmptyList() {
