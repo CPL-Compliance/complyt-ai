@@ -1,12 +1,13 @@
 package integration;
 
 import io.complyt.AddressValidationApplication;
+import io.complyt.business.address.CollectionNameResolver;
 import io.complyt.business.webclients.addressvalidations.HereStubAddressValidationWebClientWrapper;
 import io.complyt.config.web_clients.WebClientWrapperProperties;
 import io.complyt.domain.Address;
+import io.complyt.domain.ValidatedAddress;
 import io.complyt.domain.enums.FieldMatchType;
 import io.complyt.domain.enums.FieldsMatchScore;
-import io.complyt.domain.enums.MatchLevelType;
 import io.complyt.domain.here.HereAddress;
 import io.complyt.domain.here.HereAddressData;
 import io.complyt.domain.here.HereFieldScore;
@@ -26,20 +27,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-import test_utils.BaseTestClass;
 import test_utils.TestUtilities;
 import test_utils.annotations.WithMockJwt;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.List;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -180,6 +179,48 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
     @Order(1)
     @Test
     @WithMockJwt
+    public void validate_AddressByStubClientWrapper_DifferentState_NotSavingToDB_Returns200() {
+        // Given
+        long countBefore = reactiveMongoTemplate.findAll(ValidatedAddress.class, "texas").count().block();
+
+        AddressDto addressDto = new AddressDto(
+                "Oxenfurt", "USA", "Gustfields", "TX",
+                "Oxenfurt Academy", "11221", null, false);
+        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto, TestUtilities.getScoringDto());
+
+        Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
+
+        HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
+                .withAddress(new HereAddress(null, null, address.country(), null, "Other State", address.county(), address.city(), address.street(), address.zip()))
+                .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0).withFieldScore(new HereFieldScore(1, 0, 0, null, 1)))));
+
+
+        // When
+        when(stubHereAddressValidationWebClientWrapper.validateAddress(any())).thenReturn(Mono.just(hereAddressData));
+
+        // Then
+        webTestClient
+                .mutate().responseTimeout(Duration.ofSeconds(20)).build()
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(AddressRouter.BASE_URL + "/validate")
+                        .queryParam("state", addressDto.state())
+                        .queryParam("zip", addressDto.zip())
+                        .queryParam("city", addressDto.city())
+                        .queryParam("street", addressDto.street())
+                        .queryParam("country", addressDto.country())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk();
+
+        long countAfter = reactiveMongoTemplate.findAll(ValidatedAddress.class, "texas").count().block();
+        assertEquals(countBefore, countAfter); // Should not save in the DB cause invalid
+    }
+
+    @Order(1)
+    @Test
+    @WithMockJwt
     public void getAddress_AddressByOutsource_ScoreNotValid_Returns400() {
         // Given
         AddressDto addressDto = new AddressDto(
@@ -259,7 +300,9 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
     @Order(1)
     @Test
     @WithMockJwt
-    public void getAddress_AddressNotInUS_Returns200() {
+    public void validate_AddressNotInUS_NotCached_Valid_Returns200() {
+        long countBefore = reactiveMongoTemplate.findAll(ValidatedAddress.class, CollectionNameResolver.GLOBAL_ADDRESSES_COLLECTION).count().block();
+
         // Given
         AddressDto addressDto = new AddressDto(
                 null, "Israel", null, null,
@@ -288,6 +331,10 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 .expectStatus().isOk()
                 .expectBody(ValidatedAddressDto.class)
                 .value(receivedAddressDto -> assertEquals(expectedAddress, receivedAddressDto));
+
+        long countAfter = reactiveMongoTemplate.findAll(ValidatedAddress.class, CollectionNameResolver.GLOBAL_ADDRESSES_COLLECTION).count().block();
+        assertEquals(countBefore+1, countAfter); // Should save the address
+
     }
 
     @Order(1)
@@ -374,7 +421,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
     @Order(1)
     @Test
     @WithMockJwt
-    public void getAddress_ValidateAddress_Returns200() {
+    public void getAddress_ValidateAddress_AddressCached_Returns200() {
         // Given
         AddressDto addressDto = new AddressDto(
                 "New York", "United States", null, "New York",
@@ -410,11 +457,8 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         AddressDto addressDto = new AddressDto(
                 "New York", "United States", null, "New York",
                 "164 Mulberry St", "12345", null, false);
-        FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, null);
-        CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withCounty("New York").withIsPartial(null), TestUtilities.getScoringDto().withFieldScore(fieldsMatchScore));
-
         HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
-                .withAddress(new HereAddress(null, null, addressDto.country(), null, addressDto.region(), addressDto.county(), addressDto.city(), addressDto.street(), addressDto.zip()))
+                .withAddress(new HereAddress(null, null, addressDto.country(), null, addressDto.region(), "county", addressDto.city(), addressDto.street(), addressDto.zip()))
                 .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0).withFieldScore(TestUtilities.getHereScoring().fieldScore().withState(0)))));
 
 
@@ -434,6 +478,8 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest();
+                .expectStatus().isBadRequest()
+                .expectBody(String.class)
+                .value(body -> assertTrue(body.contains("ERR-ADDR-002")));
     }
 }

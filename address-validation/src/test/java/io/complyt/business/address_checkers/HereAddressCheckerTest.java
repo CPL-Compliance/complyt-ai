@@ -176,6 +176,38 @@ class HereAddressCheckerTest {
     }
 
     @Test
+    public void validateCountryAndStateMatch_NullData_ThrowsNullPointerException() {
+        // Act & Assert
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            hereAddressChecker.isCountryAndStateMatch(cachedAddressData, null);
+        });
+
+        // Assert
+        assertEquals("requestAddress is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    public void validateCountryAndStateMatch_NullAddress_ThrowsNullPointerException() {
+        // Act & Assert
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            hereAddressChecker.isCountryAndStateMatch(null, address);
+        });
+
+        // Assert
+        assertEquals("data is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    public void validateCountryAndStateMatch_Valid_ThrowsNullPointerException() {
+        // When
+        cachedAddressData = cachedAddressData.withAddress(TestUtilities.getAddress().withCountry("Canada").withCounty(null));
+        boolean result = hereAddressChecker.isCountryAndStateMatch(cachedAddressData, address);
+
+        // Then
+        assertTrue(result);
+    }
+
+    @Test
     public void resolveAddress_NullAddress_ThrowsNullPointerException() {
         // Act & Assert
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
