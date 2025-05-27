@@ -15,7 +15,9 @@ public interface CustomerPaginationUtil {
             "customerType", Boolean.TRUE,
             "address.country", Boolean.TRUE,
             "address.state", Boolean.TRUE,
-            "address.city", Boolean.TRUE
+            "address.city", Boolean.TRUE,
+            "email", Boolean.TRUE,
+            "source", Boolean.FALSE
     );
     List<String> customerSortByFields = List.of(
             "externalId",
