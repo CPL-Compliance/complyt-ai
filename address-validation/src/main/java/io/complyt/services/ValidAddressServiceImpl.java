@@ -43,8 +43,19 @@ public class ValidAddressServiceImpl implements ValidAddressService {
         Address alignedAddress = addressAligner.alignGlobalAddress(address);
         return findByAddress(alignedAddress)
                 .switchIfEmpty(Mono.defer(() -> fetchAndValidateAddress(alignedAddress)
-                        .flatMap(addressData -> setBeforeSave(addressData, alignedAddress))
-                        .flatMap(this::saveAddress)));
+                        .flatMap(addressData -> saveAddressIfNeeded(addressData, alignedAddress))));
+    }
+
+    // If there's a mismatch in the validate endpoint, the corrected (validated) address is returned to the client.
+    // In contrast, the resolve endpoint returns an error in case of a mismatch.
+    public Mono<ValidatedAddress> saveAddressIfNeeded(List<CachedAddressData> addressData, Address address) {
+
+        return setBeforeSave(addressData, address)
+                .flatMap(validatedAddress -> resolveBestMatchAddress(addressData)
+                        .flatMap(bestMatchedAddress -> hereAddressChecker.isCountryAndStateMatch(bestMatchedAddress, address)
+                                ? saveAddress(validatedAddress)
+                                : Mono.just(validatedAddress)));
+
     }
 
     @Override

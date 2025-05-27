@@ -174,6 +174,81 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
     @Order(2)
     @Test
+    @WithMockJwt
+    public void getAll_byEmailQueryParam_Exists_Returns200() {
+        String page = "1";
+        String size = "5";
+        // Then
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("email", "captain@dope.com")
+                        .queryParam("page", page)
+                        .queryParam("size", size)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list ->
+                        assertEquals(2, list.size()));
+    }
+
+    @Order(2)
+    @Test
+    @WithMockJwt
+    public void getAll_byEmailAndSourceQueryParam_Exists_Returns200() {
+        // Then
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("email","captain@dope.com")
+                        .queryParam("source", "1")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list ->
+                        assertEquals(2, list.size()));
+    }
+
+    @Order(2)
+    @Test
+    @WithMockJwt
+    public void getAll_byEmailAndSourceQueryParam_DoesNotExist_Returns200WithEmptyList() {
+        // Then
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL).query("email=captain@dope.com&source=100000")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list ->
+                        assertTrue(list.isEmpty()));
+    }
+
+    @Order(2)
+    @Test
+    @WithMockJwt
+    public void getAll_byEmailQueryParam_DoesNotExist_Returns200WithEmptyBody() {
+        // Then
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL).query("email=somethingRandomThatShouldntExist@dope.com")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list ->
+                        assertTrue(list.isEmpty()));
+    }
+
+    @Order(2)
+    @Test
     @Override
     @WithMockJwt
     public void getAll_QueryParamInvalid_Returns400() {
