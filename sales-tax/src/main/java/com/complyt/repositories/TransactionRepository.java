@@ -150,17 +150,6 @@ public class TransactionRepository {
                 });
     }
 
-    public Flux<Transaction> findAllByCustomerId(String customerId) {
-        return TenantResolver.resolve()
-                .flatMapMany(tenantId -> {
-                    Query query = Query.query(Criteria.where("tenantId").is(tenantId)
-                            .and("customerId").is(UUID.fromString(customerId)));
-
-                    return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId + " and customerId " + customerId, tenantId, log::info)
-                            .thenMany(reactiveMongoTemplate.find(query, Transaction.class));
-                });
-    }
-
     public Flux<Transaction> findAllByQuery(Query query) {
         return TenantResolver.resolve()
                 .flatMapMany(tenantId -> {

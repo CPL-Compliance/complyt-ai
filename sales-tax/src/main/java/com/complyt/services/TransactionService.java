@@ -22,8 +22,6 @@ public interface TransactionService extends CrudService<Transaction, String> {
 
     Flux<Transaction> findAllBySource(@NonNull final String source);
 
-    Flux<Transaction> findAllByCustomerId(@NonNull final String customerId);
-
     Mono<Transaction> update(@NonNull final String externalId, @NonNull String source, @NonNull final Transaction transaction);
 
     Mono<Transaction> markAsCancelled(@NonNull final String externalId, @NonNull final String source);

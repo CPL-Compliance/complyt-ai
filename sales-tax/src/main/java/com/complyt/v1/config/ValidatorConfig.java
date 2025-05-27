@@ -44,8 +44,7 @@ public class ValidatorConfig {
             "state", ParamCheckerFunctions.STATE_CHECK,
             "country", ParamCheckerFunctions.COUNTRY_CHECK,
             "tenantId", ParamCheckerFunctions.TENANT_ID_CHECK,
-            "name", ParamCheckerFunctions.NAME_CHECK,
-            "customerId", ParamCheckerFunctions.CUSTOMERID_UUID_CHECK));
+            "name", ParamCheckerFunctions.NAME_CHECK));
 
     ParameterChecksProvider queryParamChecker = new ParameterChecksProvider(Map.of(
             "page", ParamCheckerFunctions.PAGE_CHECK,

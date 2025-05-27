@@ -73,16 +73,6 @@ public class TransactionRouter {
         return RouterFunctions.route(deleteTransactionRoute, transactionHandler::delete);
     }
 
-    @Bean
-    @GetAllTransactionByCustomerId
-    public RouterFunction<ServerResponse> getAllTransactionsByCustomerIdRouterFunction(@NonNull final TransactionHandler transactionHandler){
-        final RequestPredicate getAllTransactionsByCustomerIdRoute = RequestPredicates
-                .GET(BASE_URL + "/customer/{customerId}")
-                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
-
-        return RouterFunctions.route(getAllTransactionsByCustomerIdRoute, transactionHandler::getAllTransactionsByCustomerId);
-    }
-
 //    @Bean
 //    @PatchTransactionByComplytIdApiInfo
 //    public RouterFunction<ServerResponse> patchTransactionRouterFunction(@NonNull final TransactionHandler transactionHandler) {
