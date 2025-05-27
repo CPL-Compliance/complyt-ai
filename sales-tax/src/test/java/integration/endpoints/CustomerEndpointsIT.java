@@ -176,10 +176,15 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Test
     @WithMockJwt
     public void getAll_byEmailQueryParam_Exists_Returns200() {
+        String page = "1";
+        String size = "5";
         // Then
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL).query("email=captain@dope.com")
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("email", "captain@dope.com")
+                        .queryParam("page", page)
+                        .queryParam("size", size)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -196,7 +201,9 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
         // Then
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL).query("email=captain@dope.com&source=1")
+                        .path(CustomerRouter.BASE_URL)
+                        .queryParam("email","captain@dope.com")
+                        .queryParam("source", "1")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
