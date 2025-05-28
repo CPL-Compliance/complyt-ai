@@ -2,9 +2,8 @@ package com.complyt.business.timestamps_injection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.complyt.business.nexus.ISalesTaxTrackingDateDeterminer;
+import com.complyt.business.nexus.SalesTaxTrackingDateDeterminer;
 import com.complyt.domain.nexus.SalesTaxTracking;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,7 +22,7 @@ import static org.mockito.Mockito.when;
 class NexusDateApplyDateInitializerTest {
 
     @Mock
-    ISalesTaxTrackingDateDeterminer dateDeterminer;
+    SalesTaxTrackingDateDeterminer dateDeterminer;
 
     @InjectMocks
     NexusDateApplyDateInitializer dateInitializer;

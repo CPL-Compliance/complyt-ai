@@ -18,9 +18,9 @@ import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class ISalesTaxTrackingDateDeterminerTest {
+class SalesTaxTrackingDateDeterminerTest {
     @InjectMocks
-    ISalesTaxTrackingDateDeterminer salesTaxTrackingDateDeterminer;
+    SalesTaxTrackingDateDeterminer salesTaxTrackingDateDeterminer;
 
     @Mock
     ApplicationDateCreator applicationDateCreator;
