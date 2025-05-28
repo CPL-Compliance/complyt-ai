@@ -1207,7 +1207,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .value(returnedSalesTaxTrackingDto -> {
                     assertFalse(returnedSalesTaxTrackingDto.physicalNexusTracker().established());
                     assertEquals(returnedSalesTaxTrackingDto.physicalNexusTracker().establishedDate(), date);
-                    assertEquals(returnedSalesTaxTrackingDto.appliedDate(), date);
+                    assertEquals(returnedSalesTaxTrackingDto.appliedDate(), EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE);
                 });
     }
 
