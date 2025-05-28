@@ -2047,6 +2047,22 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @WithMockJwt
+    public void getAll_withRandomQueryParam_ignores_Returns200() {
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .queryParam("random", UUID.randomUUID())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(list -> assertEquals(25, list.size()));
+    }
+
+    @Order(2)
+    @Test
+    @WithMockJwt
     public void getAll_customerIdParamInvalid_Returns400() {
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
