@@ -156,7 +156,6 @@ class CustomerServiceImplTest {
         when(customerComplytIdHandler.insertComplytIdToNew(customerWithDeterminedCustomerType)).thenReturn(customerWithDeterminedCustomerType);
         when(internalTimestampsInjector.insertTimestampsToNew(customerWithDeterminedCustomerType)).thenReturn(customerWithDeterminedCustomerType.withComplytId(complytId));
 
-
         Mono<Customer> actualCustomerMono = customerServiceImpl.injectDataToNewCustomer(customerWithNoCustomerType);
 
         // Then
