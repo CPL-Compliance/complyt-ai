@@ -1478,7 +1478,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     @WithMockJwt
-    public void upsertByState_WithPastAppliedDateAndPhysicalTrue_ShouldNotUpdateAppliedDate() {
+    public void upsertByState_WithPastAppliedDateAndPhysicalTrue_ShouldUpdateAppliedDate() {
         LocalDateTime appliedDate = LocalDateTime.now().minusYears(2).minusMonths(2);
         LocalDateTime physicalEstablishedDate = LocalDateTime.now().plusDays(1);
 
@@ -1486,7 +1486,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", new StateDto("AL", "11", "AL"))
                 .withPhysicalNexusTracker(physicalNexusTrackerDto)
-                .withAppliedDate(appliedDate); // Not default in the past, should NOT be updated
+                .withAppliedDate(appliedDate); // Should update to physical date
 
         // Then
         webTestClient
@@ -1507,7 +1507,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
                     LocalDateTime physicalEstablishedDateResult = resultSalesTaxTrackingDto.physicalNexusTracker().establishedDate();
                     assertEquals(physicalEstablishedDate, physicalEstablishedDateResult);
-                    assertEquals(appliedDate, resultSalesTaxTrackingDto.appliedDate(), "AppliedDate shouldn't be changed");
+                    assertEquals(physicalEstablishedDate, resultSalesTaxTrackingDto.appliedDate(), "AppliedDate should be changed");
                 });
     }
 
