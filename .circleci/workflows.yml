@@ -157,10 +157,6 @@ jobs:
       - attach_workspace:
           at: .
 
-      - persist_to_workspace:
-          root: ./<<parameters.service_directory>>
-          paths:
-            - bash.env
 
       - add_ssh_keys:
           fingerprints:
@@ -173,6 +169,11 @@ jobs:
             image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
             export IMAGE_TAG=$image_tag
             env >> bash.env
+
+      - persist_to_workspace:
+          root: ./<<parameters.service_directory>>
+          paths:
+            - bash.env
 
       - run:
           name: Release
