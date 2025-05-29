@@ -194,6 +194,26 @@ jobs:
             - surefire-test-service
             - site
 
+      - aws-cli/setup:
+          aws_access_key_id: AWS_ACCESS_KEY_ID
+          region: AWS_DEFAULT_REGION
+          aws_secret_access_key: AWS_SECRET_ACCESS_KEY
+
+      - run:
+          name: Build and push docker image to ecr
+          command: |
+            env
+            cd <<parameters.service_directory>>
+            export DOCKERFILE_PATH="target/dockerfile/Dockerfile"
+            export SEARCH_PATTERN="ADD maven/"
+            export REPLACE_PATTERN="ADD target/"
+            SERVICE_NAME=$(basename "<<parameters.service_directory>>")
+            export IMAGE_TAG="096643436058.dkr.ecr.us-east-1.amazonaws.com/complyt/$SERVICE_NAME:$IMAGE_TAG"
+            sed -i "s|$SEARCH_PATTERN|$REPLACE_PATTERN|g" "$DOCKERFILE_PATH"
+            docker build -f "$DOCKERFILE_PATH" -t "$IMAGE_TAG" .
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 096643436058.dkr.ecr.us-east-1.amazonaws.com
+            docker push "$IMAGE_TAG"
+
   send-test-coverage-reports:
     parameters:
       service_directory:
