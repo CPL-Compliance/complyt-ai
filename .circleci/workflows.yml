@@ -157,6 +157,11 @@ jobs:
       - attach_workspace:
           at: .
 
+      - persist_to_workspace:
+          root: ./<<parameters.service_directory>>
+          paths:
+            - bash.env
+
       - add_ssh_keys:
           fingerprints:
             - "8d:a9:53:20:ea:7a:b2:1d:e5:d8:af:d4:fc:e0:81:16"
@@ -172,6 +177,7 @@ jobs:
       - run:
           name: Release
           command: |
+            cat workspace/bash.env >> $BASH_ENV
             env
             cd <<parameters.service_directory>>
             PROJECT_VERSION=$(./mvnw -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
@@ -180,11 +186,8 @@ jobs:
             ./mvnw --settings ../.circleci/settings.xml clean release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
             ./mvnw --settings ../.circleci/settings.xml release:perform
             bash ../.circleci/git_commands.sh <<parameters.service_directory>> "$PROJECT_VERSION"
-
-      - persist_to_workspace:
-          root: ./<<parameters.service_directory>>
-          paths:
-            - bash.env
+            env >> bash.env
+      
 
       - persist_to_workspace:
           root: <<parameters.service_directory>>/target
@@ -202,6 +205,7 @@ jobs:
       - run:
           name: Build and push docker image to ecr
           command: |
+            cat workspace/bash.env >> $BASH_ENV
             env
             cd <<parameters.service_directory>>
             export DOCKERFILE_PATH="target/dockerfile/Dockerfile"
@@ -213,6 +217,7 @@ jobs:
             docker build -f "$DOCKERFILE_PATH" -t "$IMAGE_TAG" .
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 096643436058.dkr.ecr.us-east-1.amazonaws.com
             docker push "$IMAGE_TAG"
+            env >> bash.env
 
   send-test-coverage-reports:
     parameters:
