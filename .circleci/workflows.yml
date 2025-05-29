@@ -157,7 +157,6 @@ jobs:
       - attach_workspace:
           at: .
 
-
       - add_ssh_keys:
           fingerprints:
             - "8d:a9:53:20:ea:7a:b2:1d:e5:d8:af:d4:fc:e0:81:16"
@@ -178,7 +177,7 @@ jobs:
       - run:
           name: Release
           command: |
-            cat workspace/bash.env >> $BASH_ENV
+            cat <<parameters.service_directory>>/bash.env >> $BASH_ENV
             env
             cd <<parameters.service_directory>>
             PROJECT_VERSION=$(./mvnw -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
@@ -206,7 +205,7 @@ jobs:
       - run:
           name: Build and push docker image to ecr
           command: |
-            cat workspace/bash.env >> $BASH_ENV
+            cat <<parameters.service_directory>>/bash.env >> $BASH_ENV
             env
             cd <<parameters.service_directory>>
             export DOCKERFILE_PATH="target/dockerfile/Dockerfile"
@@ -264,7 +263,7 @@ jobs:
           aws_access_key_id: AWS_ACCESS_KEY_ID
           region: AWS_DEFAULT_REGION
           aws_secret_access_key: AWS_SECRET_ACCESS_KEY
-      
+
       ## Deploy to production cluster
       - aws-ecs/update_service:
           cluster: "prod-1"
