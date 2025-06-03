@@ -192,7 +192,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     public Mono<SalesTaxTracking> injectRegisteredDateToSalesTaxTracking(@NonNull SalesTaxTracking salesTaxTracking) {
         return Mono.just(salesTaxTracking)
                 .map(SalesTaxTrackingRegisteredDateTimestampsInjector::new)
-                .map(SalesTaxTrackingRegisteredDateTimestampsInjector::init);
+                .map(SalesTaxTrackingRegisteredDateTimestampsInjector::inject);
     }
 
     @Override

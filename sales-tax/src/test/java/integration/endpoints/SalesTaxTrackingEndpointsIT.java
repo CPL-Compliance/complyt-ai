@@ -1577,12 +1577,12 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                     assertTrue(resultSalesTaxTrackingDto.economicNexusTracker().established());
 
                     LocalDateTime physicalEstablishedDateResult = resultSalesTaxTrackingDto.physicalNexusTracker().establishedDate();
-//                    assertEquals(physicalEstablishedDate.toLocalDate(), physicalEstablishedDateResult.toLocalDate());
+                    assertEquals(physicalEstablishedDate.toLocalDate(), physicalEstablishedDateResult.toLocalDate());
                     assertEquals(salesTaxTrackingDto.appliedDate().toLocalDate(), physicalEstablishedDate.toLocalDate(), "AppliedDate should be changed"); // Economic Didn't update the appliedDate
                 });
     }
 
-    @Order(8)
+    @Order(9)
     @Test
     @Override
     @WithMockJwt

@@ -21,14 +21,11 @@ import com.complyt.repositories.SalesTaxTrackingRepository;
 import com.complyt.security.TenantResolver;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
@@ -427,7 +424,7 @@ public class SalesTaxTrackingServiceImplTest {
     void injectRegisteredDateToSalesTaxTracking_notNullSalesTaxTracking_ReturnsSalesTaxTrackingWithData() {
         //Given
         SalesTaxTrackingRegisteredDateTimestampsInjector injector = new SalesTaxTrackingRegisteredDateTimestampsInjector(salesTaxTracking);
-        SalesTaxTracking salesTaxTrackingWithUpdatedDate = injector.init();
+        SalesTaxTracking salesTaxTrackingWithUpdatedDate = injector.inject();
 
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.injectRegisteredDateToSalesTaxTracking(salesTaxTracking);
 
