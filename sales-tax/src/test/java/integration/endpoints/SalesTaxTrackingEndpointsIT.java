@@ -1511,7 +1511,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 });
     }
 
-    @Order(8)
+    @Order(6)
     @Test
     @Override
     @WithMockJwt
