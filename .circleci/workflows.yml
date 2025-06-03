@@ -169,9 +169,15 @@ jobs:
             export IMAGE_TAG=$image_tag
             env >> bash.env
 
+      - persist_to_workspace:
+          root: ./<<parameters.service_directory>>
+          paths:
+            - bash.env
+
       - run:
           name: Release
           command: |
+            cat <<parameters.service_directory>>/bash.env >> $BASH_ENV
             env
             cd <<parameters.service_directory>>
             PROJECT_VERSION=$(./mvnw -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
@@ -180,11 +186,8 @@ jobs:
             ./mvnw --settings ../.circleci/settings.xml clean release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
             ./mvnw --settings ../.circleci/settings.xml release:perform
             bash ../.circleci/git_commands.sh <<parameters.service_directory>> "$PROJECT_VERSION"
-
-      - persist_to_workspace:
-          root: ./<<parameters.service_directory>>
-          paths:
-            - bash.env
+            env >> bash.env
+      
 
       - persist_to_workspace:
           root: <<parameters.service_directory>>/target
@@ -193,6 +196,28 @@ jobs:
             - failsafe-test-service
             - surefire-test-service
             - site
+
+      - aws-cli/setup:
+          aws_access_key_id: AWS_ACCESS_KEY_ID
+          region: AWS_DEFAULT_REGION
+          aws_secret_access_key: AWS_SECRET_ACCESS_KEY
+
+      - run:
+          name: Build and push docker image to ecr
+          command: |
+            cat <<parameters.service_directory>>/bash.env >> $BASH_ENV
+            env
+            cd <<parameters.service_directory>>
+            export DOCKERFILE_PATH="target/dockerfile/Dockerfile"
+            export SEARCH_PATTERN="ADD maven/"
+            export REPLACE_PATTERN="ADD target/"
+            SERVICE_NAME=$(basename "<<parameters.service_directory>>")
+            export IMAGE_TAG="096643436058.dkr.ecr.us-east-1.amazonaws.com/complyt/$SERVICE_NAME:$IMAGE_TAG"
+            sed -i "s|$SEARCH_PATTERN|$REPLACE_PATTERN|g" "$DOCKERFILE_PATH"
+            docker build -f "$DOCKERFILE_PATH" -t "$IMAGE_TAG" .
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 096643436058.dkr.ecr.us-east-1.amazonaws.com
+            docker push "$IMAGE_TAG"
+            env >> bash.env
 
   send-test-coverage-reports:
     parameters:
@@ -238,7 +263,7 @@ jobs:
           aws_access_key_id: AWS_ACCESS_KEY_ID
           region: AWS_DEFAULT_REGION
           aws_secret_access_key: AWS_SECRET_ACCESS_KEY
-      
+
       ## Deploy to production cluster
       - aws-ecs/update_service:
           cluster: "prod-1"
