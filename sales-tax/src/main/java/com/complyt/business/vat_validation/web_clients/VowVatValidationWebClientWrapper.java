@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
@@ -20,15 +19,6 @@ public class VowVatValidationWebClientWrapper extends WebClientWrapperBase imple
         super(webClient, scheme, host, path);
     }
 
-    protected URI buildUri() {
-        return UriComponentsBuilder.newInstance()
-                .scheme(scheme)
-                .host(host)
-                .path(path)
-                .build()
-                .toUri();
-    }
-
     @Override
     public Mono<ValidatedVat> validate(String countryCode, String vatNumber) {
         return validate(new VatDetailsToValidate(countryCode, vatNumber));
@@ -36,7 +26,7 @@ public class VowVatValidationWebClientWrapper extends WebClientWrapperBase imple
 
     @Override
     public Mono<ValidatedVat> validate(VatDetailsToValidate vatDetailsToValidate) {
-        URI uri = buildUri();
+        URI uri = buildUri(this.scheme, this.host, this.path);
         return webClient
                 .post()
                 .uri(uri)

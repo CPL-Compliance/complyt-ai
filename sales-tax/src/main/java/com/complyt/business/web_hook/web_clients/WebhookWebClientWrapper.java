@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -28,18 +27,9 @@ public class WebhookWebClientWrapper<T extends ComplytIdProperty> extends WebCli
         this.secretKey = secretKey;
     }
 
-    private URI buildUri(String host, String path) {
-        return UriComponentsBuilder.newInstance()
-                .scheme(scheme)
-                .host(host)
-                .path(path)
-                .build()
-                .toUri();
-    }
-
     @Override
     public Mono<T> sendWebhook(WebhookEntityWrapper<T> webhookEntityWrapper, String host, String path) {
-        URI uri = buildUri(host, path);
+        URI uri = buildUri(this.scheme, host, path);
         String hmaac;
         try {
             ObjectMapper objectMapper = new ObjectMapper()
@@ -65,5 +55,90 @@ public class WebhookWebClientWrapper<T extends ComplytIdProperty> extends WebCli
                                 .thenReturn(webhookEntityWrapper.object()))
                         .thenReturn(webhookEntityWrapper.object()));
     }
+
+//    @Override
+//    public Mono<T> sendWebhook(WebhookEntityWrapper<T> webhookEntityWrapper, String host, String path) {
+//        URI uri = buildUri(this.scheme, host, path);
+//        String hmaac;
+//        try {
+//            ObjectMapper objectMapper = new ObjectMapper()
+//                    .registerModule(new JavaTimeModule())
+//                    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+//            hmaac = HmaacGenerator.generateHmacSHA256(secretKey, objectMapper.writeValueAsString(webhookEntityWrapper));
+//        } catch (Exception e) {
+//            return ContextLogger.observeCtx("Failed to create Hmaac.  Error: " + e.getMessage(), log::error)
+//                    .thenReturn(webhookEntityWrapper.object());
+//        }
+//        return ContextLogger.observeCtx("Sending webhook entity: " + webhookEntityWrapper, log::info)
+//                .then(webClient
+//                        .post()
+//                        .uri(uri)
+//                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+//                        .header("X-Signature", hmaac)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .bodyValue(webhookEntityWrapper)
+//                        .retrieve()
+//                        .bodyToMono(webhookEntityWrapper.webhookClass())
+//                        .retryWhen(Retry.backoff(5, Duration.ofSeconds(1))
+//                                .maxBackoff(Duration.ofSeconds(10))
+//                                .jitter(0.2)
+//                                .filter(throwable -> {
+//                                    log.warn("Retrying webhook due to error: {}", throwable.getMessage());
+//                                    return true; // You can filter only specific exceptions
+//                                }))
+//                        .doOnNext(res -> log.info("Sent webhook entity: '{}'", webhookEntityWrapper))
+//                        .doOnError(err -> log.error("Webhook failed after retries: {}", err.getMessage()))
+//                        .onErrorResume(err -> {
+//                            log.error("Giving up on webhook for entity: {}", webhookEntityWrapper);
+//                            return Mono.empty();
+//                        })
+//                        .thenReturn(webhookEntityWrapper.object()));
+//    }
+
+//    @Override
+//    public Mono<T> sendWebhook(WebhookEntityWrapper<T> webhookEntityWrapper, String host, String path) {
+//
+//        Mono.defer(() -> {
+//                    URI uri = buildUri(this.scheme, host, path);
+//                    String hmaac;
+//                    try {
+//                        ObjectMapper objectMapper = new ObjectMapper()
+//                                .registerModule(new JavaTimeModule())
+//                                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+//                        String json = objectMapper.writeValueAsString(webhookEntityWrapper);
+//                        hmaac = HmaacGenerator.generateHmacSHA256(secretKey, json);
+//                        log.info("JSON: '{}' , hmaac: '{}'", json, hmaac);
+//                    } catch (Exception e) {
+//                        return ContextLogger.observeCtx("Failed to create Hmaac.  Error: " + e.getMessage(), log::error)
+//                                .thenReturn(webhookEntityWrapper.object());
+//                    }
+//
+//                    return webClient.post()
+//                            .uri(uri)
+//                            .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+//                            .header("X-Signature", hmaac)
+//                            .contentType(MediaType.APPLICATION_JSON)
+//                            .bodyValue(webhookEntityWrapper)
+//                            .retrieve()
+//                            .bodyToMono(webhookEntityWrapper.webhookClass())
+//                            .retryWhen(Retry.backoff(5, Duration.ofSeconds(1))
+//                                    .maxBackoff(Duration.ofSeconds(10))
+//                                    .jitter(0.2)
+//                                    .filter(throwable -> {
+//                                        log.warn("Retrying webhook due to error: {}", throwable.getMessage());
+//                                        return true; // You can filter only specific exceptions
+//                                    }))
+//                            .doOnNext(res -> log.info("Sent webhook entity: '{}'", webhookEntityWrapper))
+//                            .doOnError(err -> log.error("Webhook failed after retries: {}", err.getMessage()))
+//                            .onErrorResume(err -> {
+//                                log.error("Giving up on webhook for entity: {}", webhookEntityWrapper);
+//                                return Mono.empty();
+//                            });
+//                })
+//                .subscribeOn(Schedulers.boundedElastic())
+//                .subscribe();
+//
+//        return Mono.just(webhookEntityWrapper.object()); // Return immediately
+//    }
 
 }
