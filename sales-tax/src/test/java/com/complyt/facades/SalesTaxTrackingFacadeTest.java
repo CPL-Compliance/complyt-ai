@@ -8,21 +8,17 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.TransactionNexusSummary;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.transaction.Transaction;
-import com.complyt.security.TenantResolver;
 import com.complyt.services.CustomerService;
 import com.complyt.services.TransactionService;
 import com.complyt.services.nexus.NexusService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
 import com.complyt.utils.factory.DateRange;
 import com.complyt.utils.query.DateRangeStrategy;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.query.Query;
 import reactor.core.publisher.Flux;
@@ -83,7 +79,7 @@ public class SalesTaxTrackingFacadeTest {
         when(salesTaxTrackingService.injectDataToNewSalesTaxTracking(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
         when(nexusService.getNexusSummaryDate(eq(salesTaxTrackingWithId), any())).thenReturn(Mono.just(dateRange));
         when(nexusService.recalculationOfNexusSummaryIfRequired(eq(salesTaxTrackingWithId), any())).thenReturn(Mono.just(salesTaxTrackingWithId));
-        when(salesTaxTrackingService.updateAppliedDateIfIsPhysicalNexusEstablished(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
+        when(salesTaxTrackingService.updateAppliedDateByPhysicalAndEconomicNexusEstablished(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
         when(salesTaxTrackingService.save(newSalesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingWithId));
 
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.save(newSalesTaxTracking);
@@ -105,7 +101,7 @@ public class SalesTaxTrackingFacadeTest {
         when(salesTaxTrackingService.update(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingWithId));
         when(nexusService.getNexusSummaryDate(eq(salesTaxTrackingWithId), any())).thenReturn(Mono.just(dateRange));
         when(nexusService.recalculationOfNexusSummaryIfRequired(eq(salesTaxTrackingWithId), any())).thenReturn(Mono.just(salesTaxTrackingWithId));
-        when(salesTaxTrackingService.updateAppliedDateIfIsPhysicalNexusEstablished(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingService.updateAppliedDateByPhysicalAndEconomicNexusEstablished(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
 
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.update(salesTaxTracking, salesTaxTrackingWithId);
 

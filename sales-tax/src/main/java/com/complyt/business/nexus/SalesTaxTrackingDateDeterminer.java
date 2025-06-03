@@ -7,6 +7,7 @@ import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @Component
 public class SalesTaxTrackingDateDeterminer {
@@ -14,19 +15,19 @@ public class SalesTaxTrackingDateDeterminer {
     @NonNull
     ApplicationDateCreator applicationDateCreator;
 
-     public LocalDateTime getSalesTaxTrackingAppliedDate(SalesTaxTracking salesTaxTracking) {
-         LocalDateTime physicalDate = salesTaxTracking.getPhysicalNexusTracker().getEstablishedDate();
-         LocalDateTime economicNexusDate = salesTaxTracking.getEconomicNexusTracker().getEstablishedDate();
-         economicNexusDate = applicationDateCreator.create(salesTaxTracking.getNexusStateRule().timeFrame(), economicNexusDate);
+    public LocalDateTime getSalesTaxTrackingAppliedDate(SalesTaxTracking salesTaxTracking) {
+        LocalDateTime physicalDate = salesTaxTracking.getPhysicalNexusTracker().getEstablishedDate();
+        LocalDateTime economicNexusDate = salesTaxTracking.getEconomicNexusTracker().getEstablishedDate();
+        economicNexusDate = applicationDateCreator.create(salesTaxTracking.getNexusStateRule().timeFrame(), economicNexusDate);
 
-         if (salesTaxTracking.getPhysicalNexusTracker().isEstablished() && salesTaxTracking.getEconomicNexusTracker().isEstablished()){
-             return physicalDate.isBefore(economicNexusDate) ? physicalDate : economicNexusDate;
-         }
+        if (salesTaxTracking.getPhysicalNexusTracker().isEstablished() && salesTaxTracking.getEconomicNexusTracker().isEstablished()) {
+            return physicalDate.isBefore(economicNexusDate) ? physicalDate : economicNexusDate;
+        }
 
-         if( salesTaxTracking.getPhysicalNexusTracker().isEstablished()) return physicalDate;
+        if (salesTaxTracking.getPhysicalNexusTracker().isEstablished()) return physicalDate;
 
-         if ( salesTaxTracking.getEconomicNexusTracker().isEstablished()) return economicNexusDate;
+        if (salesTaxTracking.getEconomicNexusTracker().isEstablished()) return economicNexusDate;
 
-         return EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE;
-     }
+        return EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE;
+    }
 }

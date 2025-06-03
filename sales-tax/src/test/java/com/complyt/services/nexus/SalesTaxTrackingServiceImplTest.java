@@ -700,7 +700,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.updateAppliedDateIfIsPhysicalNexusEstablished(nullSalesTaxTracking);
+            salesTaxTrackingService.updateAppliedDateByPhysicalAndEconomicNexusEstablished(nullSalesTaxTracking);
         });
 
         // Then
@@ -715,7 +715,7 @@ public class SalesTaxTrackingServiceImplTest {
         //When
         when(nexusDateApplyDateInitializer.init(salesTaxTracking)).thenReturn(salesTaxTracking);
 
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.updateAppliedDateIfIsPhysicalNexusEstablished(salesTaxTracking);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.updateAppliedDateByPhysicalAndEconomicNexusEstablished(salesTaxTracking);
 
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
     }
