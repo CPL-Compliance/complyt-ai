@@ -61,7 +61,7 @@ public class TransactionFacade {
                                                         transactionService.calculateTotalAmounts(transactionWithInjectedDate)
                                                                 .flatMap(transactionService::injectExchangeRateIfNeeded)
                                                                 .flatMap(returnedTransaction -> transactionService.isTransactionWithStatusCancelled(transactionWithInjectedDate) ?
-                                                                        transactionService.save(returnedTransaction)
+                                                                        transactionService.save(returnedTransaction, salesTaxTracking)
                                                                                 .map(savedTransaction -> savedTransaction.setCustomer(customer)) :
                                                                         saveAndHandleNexusTrackingCalculation(returnedTransaction.setCustomer(customer), salesTaxTrackingWithNexusInfo.getSalesTaxTracking())))
                                                 .map(savedTransaction -> savedTransaction.setCustomer(customer))
@@ -73,13 +73,13 @@ public class TransactionFacade {
         return salesTaxService.handleSalesTaxCalculation(transaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking(), customer)
                 .flatMap(transactionService::calculateTotalAmounts)
                 .flatMap(transactionWithSalesTax -> transactionService.injectExchangeRateIfNeeded(transactionWithSalesTax))
-                .flatMap(transactionService::save);
+                .flatMap(setTransaction -> transactionService.save(setTransaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()));
     }
 
     private Mono<Transaction> saveAndHandleNexusTrackingCalculation(Transaction transaction, SalesTaxTracking salesTaxTracking) {
         Customer transactionCustomer = transaction.getCustomer();
 
-        return transactionService.save(transaction)
+        return transactionService.save(transaction, salesTaxTracking)
                 .map(savedTransaction -> savedTransaction.setCustomer(transactionCustomer))
                 .flatMap(savedTransaction -> salesTaxTrackingService.handleSalesTaxEnforcement(savedTransaction, salesTaxTracking)
                         .thenReturn(savedTransaction));

@@ -1,0 +1,27 @@
+package io.complyt.domain.sales_tax.product_classification;
+
+import io.complyt.domain.nexus.enums.TangibleCategory;
+import io.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import io.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
+import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Map;
+
+@Getter
+@AllArgsConstructor
+@EqualsAndHashCode
+@With
+@ToString
+@Document(collection = "product_classification")
+public class ProductClassification {
+    @Id
+    private String id;
+    private final String taxCode;
+    private final String description;
+    private final String title;
+    private final Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules;
+    private final Map<String, JurisdictionalTaxRules> jurisdictionalTaxRules;
+    private TangibleCategory tangibleCategory;
+}

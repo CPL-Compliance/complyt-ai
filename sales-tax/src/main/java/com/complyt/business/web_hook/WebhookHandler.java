@@ -23,7 +23,7 @@ public class WebhookHandler<T extends ComplytIdProperty> {
     private WebhookEntityCreator<T> webhookEntityCreator;
 
     public Mono<T> handleWebhook(Class<T> webhookClass, T object, WebhookDetails webhookDetails, Action action) {
-        return ContextLogger.observeCtx("In WebhookHandler after Modifications", log::info)
+        return ContextLogger.observeCtx("Checking whether webhook forwarding is required", log::info)
                 .then(shouldForwardRequest(webhookDetails)
                         .flatMap(should -> should ?
                                 webhookEntityCreator.create(webhookClass, object, action)
