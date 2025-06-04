@@ -37,5 +37,4 @@ public class WebhookHandler<T extends ComplytIdProperty> {
         return ContextLogger.observeCtx("Should forward webhook returned " + shouldForward, log::info)
                 .thenReturn(shouldForward);
     }
-
 }
