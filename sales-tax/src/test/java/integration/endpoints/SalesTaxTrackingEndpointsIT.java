@@ -384,6 +384,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                                 .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
                                 .withNexusStateRule(ITUtilities.stubBrazilNexusStateRuleDto())
                                 .withCountry(nonUsaCountry)
+                                .withAppliedDate(EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE)
                         , resultSalesTaxTrackingDto)
                 );
     }
@@ -414,6 +415,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                                 .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
                                 .withNexusStateRule(ITUtilities.stubBrazilNexusStateRuleDto())
                                 .withCountry(nonUsaCountry)
+                                .withAppliedDate(EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE)
                         , resultSalesTaxTrackingDto)
                 );
     }
@@ -933,6 +935,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                                 .withComplytId(resultSalesTaxTrackingDto.complytId())
                                 .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
                                 .withNexusStateRule(ITUtilities.stubAlabamaNexusStateRuleDto())
+                                .withAppliedDate(EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE)
                         , resultSalesTaxTrackingDto)
                 );
     }
@@ -965,6 +968,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                                 .withComment("a new comment")
                                 .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
                                 .withNexusStateRule(ITUtilities.stubAlabamaNexusStateRuleDto())
+                                .withAppliedDate(EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE)
                         ,
                         resultSalesTaxTrackingDto)
                 );
@@ -1203,7 +1207,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .value(returnedSalesTaxTrackingDto -> {
                     assertFalse(returnedSalesTaxTrackingDto.physicalNexusTracker().established());
                     assertEquals(returnedSalesTaxTrackingDto.physicalNexusTracker().establishedDate(), date);
-                    assertEquals(returnedSalesTaxTrackingDto.appliedDate(), date);
+                    assertEquals(returnedSalesTaxTrackingDto.appliedDate(), EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE);
                 });
     }
 
@@ -1474,7 +1478,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Test
     @Override
     @WithMockJwt
-    public void upsertByState_WithPastAppliedDateAndPhysicalTrue_ShouldNotUpdateAppliedDate() {
+    public void upsertByState_WithPastAppliedDateAndPhysicalTrue_ShouldUpdateAppliedDate() {
         LocalDateTime appliedDate = LocalDateTime.now().minusYears(2).minusMonths(2);
         LocalDateTime physicalEstablishedDate = LocalDateTime.now().plusDays(1);
 
@@ -1482,7 +1486,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", new StateDto("AL", "11", "AL"))
                 .withPhysicalNexusTracker(physicalNexusTrackerDto)
-                .withAppliedDate(appliedDate); // Not default in the past, should NOT be updated
+                .withAppliedDate(appliedDate); // Should update to physical date
 
         // Then
         webTestClient
@@ -1503,23 +1507,22 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
                     LocalDateTime physicalEstablishedDateResult = resultSalesTaxTrackingDto.physicalNexusTracker().establishedDate();
                     assertEquals(physicalEstablishedDate, physicalEstablishedDateResult);
-                    assertEquals(appliedDate, resultSalesTaxTrackingDto.appliedDate(), "AppliedDate shouldn't be changed");
+                    assertEquals(physicalEstablishedDate, resultSalesTaxTrackingDto.appliedDate(), "AppliedDate should be changed");
                 });
     }
 
-    @Order(8)
+    @Order(6)
     @Test
     @Override
     @WithMockJwt
-    public void upsertByState_WithPhysicalTrueAndEconomicNexusInFuture_ShouldNotUpdateAppliedDate() {
-        LocalDateTime appliedDate = LocalDateTime.now().minusYears(5);
-        LocalDateTime physicalEstablishedDate = LocalDateTime.now().plusDays(1);
+    public void upsertByState_WithPhysicalTrueAndEconomicNexusInFuture_ShouldUpdateAppliedDate() {
+        LocalDateTime physicalEstablishedDate = LocalDateTime.now().minusDays(3);
 
         PhysicalNexusTrackerDto physicalNexusTrackerDto = new PhysicalNexusTrackerDto(true, physicalEstablishedDate);
 
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", new StateDto("AL", "11", "Alabama"))
                 .withPhysicalNexusTracker(physicalNexusTrackerDto)
-                .withAppliedDate(appliedDate); // in the past of both economic, physical
+                .withAppliedDate(physicalEstablishedDate);
 
         // put Physical True SalesTaxTracking
         webTestClient
@@ -1575,11 +1578,11 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
                     LocalDateTime physicalEstablishedDateResult = resultSalesTaxTrackingDto.physicalNexusTracker().establishedDate();
                     assertEquals(physicalEstablishedDate.toLocalDate(), physicalEstablishedDateResult.toLocalDate());
-                    assertEquals(appliedDate.toLocalDate(), resultSalesTaxTrackingDto.appliedDate().toLocalDate(), "AppliedDate should not be changed"); // Economic Didn't update the appliedDate
+                    assertEquals(salesTaxTrackingDto.appliedDate().toLocalDate(), physicalEstablishedDate.toLocalDate(), "AppliedDate should be changed"); // Economic Didn't update the appliedDate
                 });
     }
 
-    @Order(8)
+    @Order(9)
     @Test
     @Override
     @WithMockJwt

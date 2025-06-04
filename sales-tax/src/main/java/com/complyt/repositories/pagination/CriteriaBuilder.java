@@ -1,10 +1,12 @@
 package com.complyt.repositories.pagination;
 
+import com.complyt.repositories.pagination.transaction.TransactionPaginationUtil;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public interface CriteriaBuilder {
 
@@ -22,6 +24,9 @@ public interface CriteriaBuilder {
                 )
                 .map(entry -> {
                     boolean isRegex = Boolean.TRUE.equals(filterKeys.get(entry.getKey()));
+                    if (TransactionPaginationUtil.uuidFormatFilters.contains(entry.getKey())){
+                        return Criteria.where(entry.getKey()).is(UUID.fromString(entry.getValue()));
+                    }
                     if (isRegex) {
                         return Criteria.where(entry.getKey()).regex(entry.getValue(), "i");
                     } else {
