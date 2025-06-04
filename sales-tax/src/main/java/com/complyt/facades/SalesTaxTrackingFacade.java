@@ -43,11 +43,12 @@ public class SalesTaxTrackingFacade {
                 .flatMap(recalculateCurrentNexusSummaryIfNeeded());
     }
 
+
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull SalesTaxTracking originalSalesTaxTracking) {
         return salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, originalSalesTaxTracking)
                 .flatMap(salesTaxTrackingService::addClientAndStateDetails)
                 .flatMap(salesTaxTrackingService::updateRegisteredDateIfIsRegisteredModified)
-                .flatMap(salesTaxTrackingService::updateAppliedDateIfIsPhysicalNexusEstablished)
+                .flatMap(salesTaxTrackingService::updateAppliedDateByPhysicalAndEconomicNexusEstablished)
                 .flatMap(salesTaxTrackingWithClientAndStateDetails -> salesTaxTrackingService.insertSummariesFromOriginal(salesTaxTrackingWithClientAndStateDetails, originalSalesTaxTracking))
                 .flatMap(salesTaxTrackingService::update)
                 .flatMap(recalculateCurrentNexusSummaryIfNeeded());
@@ -56,7 +57,7 @@ public class SalesTaxTrackingFacade {
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
         return salesTaxTrackingService.checkSalesTaxTrackingNotHavingComplytId(salesTaxTracking)
                 .flatMap(salesTaxTrackingService::injectDataToNewSalesTaxTracking)
-                .flatMap(salesTaxTrackingService::updateAppliedDateIfIsPhysicalNexusEstablished)
+                .flatMap(salesTaxTrackingService::updateAppliedDateByPhysicalAndEconomicNexusEstablished)
                 .flatMap(salesTaxTrackingService::save)
                 .flatMap(recalculateCurrentNexusSummaryIfNeeded());
     }
@@ -65,6 +66,7 @@ public class SalesTaxTrackingFacade {
         return salesTaxTrackingService.findAll(page, size, filterMap, sortOrder, sortBy)
                 .flatMapSequential(recalculateCurrentNexusSummaryIfNeeded());
     }
+
 
     private Function<SalesTaxTracking, Mono<SalesTaxTracking>> recalculateCurrentNexusSummaryIfNeeded() {
         return salesTaxTracking -> salesTaxTracking.getNexusStateRule() != null

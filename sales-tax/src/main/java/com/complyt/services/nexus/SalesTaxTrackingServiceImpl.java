@@ -3,7 +3,7 @@ package com.complyt.services.nexus;
 import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
-import com.complyt.business.timestamps_injection.SalesTaxTrackingPhysicalNexusDateApplierInjector;
+import com.complyt.business.timestamps_injection.NexusDateApplyDateInitializer;
 import com.complyt.business.timestamps_injection.SalesTaxTrackingRegisteredDateTimestampsInjector;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -54,6 +54,9 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @NonNull
     private NexusService nexusService;
+
+    @NonNull
+    NexusDateApplyDateInitializer nexusDateApplyDateInitializer;
 
     @Override
     public Mono<SalesTaxTracking> findById(@NonNull String id) {
@@ -198,16 +201,9 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                 injectRegisteredDateToSalesTaxTracking(salesTaxTracking) : Mono.just(salesTaxTracking);
     }
 
-    @Override
-    public Mono<SalesTaxTracking> updateAppliedDateIfIsPhysicalNexusEstablished(@NonNull SalesTaxTracking salesTaxTracking) {
-        return salesTaxTracking.getPhysicalNexusTracker().isEstablished() ?
-                injectAppliedDateIfIsPhysicalEconomicEnabled(salesTaxTracking) : Mono.just(salesTaxTracking);
-    }
 
-    private Mono<SalesTaxTracking> injectAppliedDateIfIsPhysicalEconomicEnabled(SalesTaxTracking salesTaxTracking) {
-        return Mono.just(salesTaxTracking)
-                .map(SalesTaxTrackingPhysicalNexusDateApplierInjector::new)
-                .map(SalesTaxTrackingPhysicalNexusDateApplierInjector::inject);
+    public Mono<SalesTaxTracking> updateAppliedDateByPhysicalAndEconomicNexusEstablished(@NonNull SalesTaxTracking salesTaxTracking) {
+        return Mono.just(nexusDateApplyDateInitializer.init(salesTaxTracking));
     }
 
     @Override

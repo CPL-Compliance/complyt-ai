@@ -38,6 +38,7 @@ import testUtils.integration_test.ITUtilities;
 import testUtils.annotations.WithMockJwt;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -101,6 +102,7 @@ public class CancelledTransactionInSalesTaxTrackingIT extends TestContainersInit
                                 .withNexusCalculationSummaries(Map.of())
                                 .withNexusStateRule(ITUtilities.stubMichiganNexusStateRuleDto())
                                 .withCountry(usaCountry.toUpperCase())
+                                .withAppliedDate(EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE)
                         , resultSalesTaxTrackingDto)
                 );
     }

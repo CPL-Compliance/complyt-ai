@@ -41,7 +41,7 @@ public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, S
 
     Mono<SalesTaxTracking> updateRegisteredDateIfIsRegisteredModified(@NonNull SalesTaxTracking salesTaxTracking);
 
-    Mono<SalesTaxTracking> updateAppliedDateIfIsPhysicalNexusEstablished(@NonNull SalesTaxTracking salesTaxTracking);
+    Mono<SalesTaxTracking> updateAppliedDateByPhysicalAndEconomicNexusEstablished(@NonNull SalesTaxTracking salesTaxTracking);
 
     Mono<SalesTaxTracking> injectRegisteredDateToSalesTaxTracking(@NonNull SalesTaxTracking salesTaxTracking);
 

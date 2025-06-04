@@ -1,26 +1,25 @@
 package com.complyt.business.timestamps_injection;
 
-import com.complyt.business.timestamps_injection.provider.NexusAppliedDateProvider;
+import com.complyt.business.nexus.SalesTaxTrackingDateDeterminer;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Slf4j
 @AllArgsConstructor
-public class SalesTaxTrackingPhysicalNexusDateApplierInjector implements TimestampsInjector<SalesTaxTracking> {
+@Component
+public class NexusDateApplyDateInitializer {
 
     @NonNull
-    private final SalesTaxTracking salesTaxTracking;
+    private SalesTaxTrackingDateDeterminer dateDeterminer;
 
-    @Override
-    public SalesTaxTracking inject() {
+    public SalesTaxTracking init(@NonNull SalesTaxTracking salesTaxTracking) {
         LocalDateTime physicalEstablishedDate = salesTaxTracking.getPhysicalNexusTracker().getEstablishedDate();
-        NexusAppliedDateProvider nexusAppliedDateProvider = new NexusAppliedDateProvider();
-
-        LocalDateTime appliedDate = nexusAppliedDateProvider.getAppliedDate(salesTaxTracking, physicalEstablishedDate);
+        LocalDateTime appliedDate = dateDeterminer.getSalesTaxTrackingAppliedDate(salesTaxTracking);
 
         log.info("Setting appliedDate based on physicalNexusTracker: appliedDate={}, physicalEstablishedDate={}, AppliedDateUpdated={}", appliedDate, physicalEstablishedDate, !appliedDate.equals(salesTaxTracking.getAppliedDate()));
         return salesTaxTracking.setAppliedDate(appliedDate)

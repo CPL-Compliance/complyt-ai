@@ -2,6 +2,7 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
+import com.complyt.business.timestamps_injection.NexusDateApplyDateInitializer;
 import com.complyt.business.timestamps_injection.SalesTaxTrackingRegisteredDateTimestampsInjector;
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.State;
@@ -20,14 +21,11 @@ import com.complyt.repositories.SalesTaxTrackingRepository;
 import com.complyt.security.TenantResolver;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
@@ -66,6 +64,9 @@ public class SalesTaxTrackingServiceImplTest {
     ComplytIdHandler<SalesTaxTracking> complytIdHandler;
 
     @Mock
+    NexusDateApplyDateInitializer nexusDateApplyDateInitializer;
+
+    @Mock
     NexusService nexusService;
 
     SalesTaxTracking salesTaxTracking;
@@ -75,6 +76,7 @@ public class SalesTaxTrackingServiceImplTest {
     UnitTestUtilities testUtilities;
 
     Transaction transaction;
+
 
     private NexusStateRule nexusStateRule;
 
@@ -698,7 +700,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.updateAppliedDateIfIsPhysicalNexusEstablished(nullSalesTaxTracking);
+            salesTaxTrackingService.updateAppliedDateByPhysicalAndEconomicNexusEstablished(nullSalesTaxTracking);
         });
 
         // Then
@@ -706,10 +708,14 @@ public class SalesTaxTrackingServiceImplTest {
     }
 
     @Test
-    void updateAppliedDateIfIsPhysicalEconomicEnabled_EstablishedFalse_ReturnsSalesTaxTracking() {
+    void updateAppliedDate_EconomicFalse_PhysicalFalse_ReturnsSalesTaxTracking() {
         // Given
         salesTaxTracking = salesTaxTracking.withPhysicalNexusTracker(salesTaxTracking.getPhysicalNexusTracker().withEstablished(false));
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.updateAppliedDateIfIsPhysicalNexusEstablished(salesTaxTracking);
+
+        //When
+        when(nexusDateApplyDateInitializer.init(salesTaxTracking)).thenReturn(salesTaxTracking);
+
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.updateAppliedDateByPhysicalAndEconomicNexusEstablished(salesTaxTracking);
 
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
     }
