@@ -28,12 +28,12 @@ public class ComplytAddressValidationWebClientWrapper implements AddressValidati
 
     @Override
     public Mono<MatchedAddressDataDto> validateAddress(ShippingAddress address) {
-        return validateAddress(address.city(), address.country(), address.county(), address.state(), address.street(), address.zip(), address.isPartial());
+        return validateAddress(address.city(), address.country(), address.county(), address.state(), address.region(), address.street(), address.zip(), address.isPartial());
     }
 
     @Override
-    public Mono<MatchedAddressDataDto> validateAddress(String city, String country, String county, String state, String street, String zip, boolean isPartial) {
-        return addressValidationServiceProxy.validateAddress(state, country, county, city, street, zip, isPartial)
+    public Mono<MatchedAddressDataDto> validateAddress(String city, String country, String county, String state, String region, String street, String zip, Boolean isPartial) {
+        return addressValidationServiceProxy.validateAddress(state, country, county, city, region, street, zip, isPartial)
                 .retryWhen(Retry.backoff(5, Duration.ofMillis(10))
                         .filter(throwable -> !(throwable instanceof FeignException.BadRequest))
                         .onRetryExhaustedThrow(

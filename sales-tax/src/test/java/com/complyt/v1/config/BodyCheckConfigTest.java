@@ -44,7 +44,7 @@ public class BodyCheckConfigTest {
     void transactionBodyCheck_PartialAddress_ReturnsEmptyFlux() {
         // Given
         TransactionDto transactionToCheck = transactionDto.withShippingAddress
-                (transactionDto.shippingAddress().withPartial(true));
+                (transactionDto.shippingAddress().withIsPartial(true));
 
         // When + Then
         Flux<String> isValid = bodyCheckConfig.entityDtoFluxFunction().apply(transactionToCheck);

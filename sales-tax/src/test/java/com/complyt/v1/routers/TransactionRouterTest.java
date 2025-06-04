@@ -2240,7 +2240,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress()
                 .withState(null)
                 .withCountry("USA")
-                .withPartial(true);
+                .withIsPartial(true);
 
         TransactionDto givenTransactionDto = transactionDto.withShippingAddress(givenShippingAddress);
         Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto).withCustomer(customer);
@@ -2276,7 +2276,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress()
                 .withState("")
                 .withCountry("USA")
-                .withPartial(true);
+                .withIsPartial(true);
 
         TransactionDto givenTransactionDto = transactionDto.withShippingAddress(givenShippingAddress);
         Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto).withCustomer(customer);
@@ -2312,7 +2312,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress()
                 .withState("CO")
                 .withCountry("USA")
-                .withPartial(true);
+                .withIsPartial(true);
 
         TransactionDto givenTransactionDto = transactionDto.withShippingAddress(givenShippingAddress);
         Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto).withCustomer(customer);
@@ -2347,7 +2347,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         ShippingAddressDto givenShippingAddress = transactionDto.shippingAddress()
                 .withZip(null)
-                .withPartial(true);
+                .withIsPartial(true);
 
         Set<String> expectedErrors = Set.of(
                 "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.PARTIAL_ERROR_SUFFIX + " Invalid value: null",

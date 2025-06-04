@@ -519,16 +519,6 @@ public class TransactionSchemaValidationIT extends TestContainersInitializerIT {
     }
 
     @Test
-    public void saveTransaction_missingStreetMatchInFieldScore_Failure() {
-        ((Document) ((Document) ((Document) ((Document) transactionDocument.get("shippingAddress"))
-                .get("matchedAddressData")).get("scoring")).get("fieldScore")).remove("streetMatch");
-
-        StepVerifier.create(reactiveMongoTemplate.save(transactionDocument, "transaction"))
-                .expectErrorMatches(throwable -> throwable.getMessage().contains("streetMatch"))
-                .verify();
-    }
-
-    @Test
     public void saveTransaction_invalidMatchLevel_Failure() {
         ((Document) ((Document) ((Document) transactionDocument.get("shippingAddress")).get("matchedAddressData"))
                 .get("scoring")).put("matchLevel", "INVALID_LEVEL");

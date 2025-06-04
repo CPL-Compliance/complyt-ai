@@ -34,7 +34,7 @@ public class TransactionItemsJurisdictionalRulesInjector implements TransactionD
      */
     @Override
     public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications, @NonNull Transaction transaction) {
-        String stateInfoIfStateExists = transaction.getShippingAddress().state() != null ? " and in state " + transaction.getShippingAddress().state() : "";
+        String stateInfoIfStateExists = transaction.getShippingAddress().state() != null && !transaction.getShippingAddress().state().isEmpty() ? " and in state " + transaction.getShippingAddress().state() : "";
 
         String logStr = "Setting jurisdictional sales tax rules and taxable categories to transaction's items for the country: "
                 + transaction.getShippingAddress().country() + stateInfoIfStateExists + ", for the items: " + transaction.getItems();

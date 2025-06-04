@@ -60,7 +60,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
     @Override
     public Mono<Transaction> calculate(@NonNull Transaction transaction, @NonNull Boolean isExempt) {
-        return ((Mono<ComplytInternalRates>) salesTaxRatesWrapperStrategy.select(transaction).apply(transaction.getShippingAddress()))
+        return ((Mono<ComplytInternalRates>) salesTaxRatesWrapperStrategy.select(transaction.getShippingAddress().matchedAddressData().address()).apply(transaction.getExternalTimestamps().getCreatedDate()))
                 .flatMap(complytInternalRates -> (Mono<Transaction>) transactionRatesInjectionStrategy.select(transaction).apply(Pair.with(complytInternalRates, isExempt)));
     }
 

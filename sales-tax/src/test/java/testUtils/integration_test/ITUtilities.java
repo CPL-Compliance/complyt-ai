@@ -64,7 +64,7 @@ public interface ITUtilities {
     } // note isTaxInclusive is false, finalTransactionAmount is zero
 
     static TransactionDto stubTransactionDtoNonUsaCountry(String externalId, UUID customerId, ItemDto... items) {
-        ShippingAddressDto shippingAddress = new ShippingAddressDto(null, "Canada", null, null, "", "Quebec", "12345", false, null);
+        ShippingAddressDto shippingAddress = new ShippingAddressDto(null, "Canada", null, null, "", "Quebec", null, false, null);
         return stubTransactionDto(externalId, customerId, items)
                 .withShippingAddress(shippingAddress);
     }
@@ -141,12 +141,13 @@ public interface ITUtilities {
     }
 
     static SalesTaxRatesDto createSalesTaxRatesDto(BigDecimal taxRate) {
-        return new SalesTaxRatesDto(new BigDecimal("0.0"), new BigDecimal("0.0"), new BigDecimal("0.0"),null, null, null, null, taxRate, new BigDecimal("0.0"));
+        return new SalesTaxRatesDto(new BigDecimal("0.0"), new BigDecimal("0.0"), new BigDecimal("0.0"), null, null, null, null, taxRate, new BigDecimal("0.0"));
     }
 
     static ScoringDto createScoringDto() {
-        return new ScoringDto(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT));
+        return new ScoringDto(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT));
     }
+
     static ClientTrackingDto stubClientTrackingDto() {
         String localDate = "2024-01-01T00:00";
         TimestampsDto internalTimestamps = new TimestampsDto(localDate, localDate);
@@ -504,7 +505,7 @@ public interface ITUtilities {
     }
 
     static ShippingAddressDto createAddressDtoInKensas() {
-        return new ShippingAddressDto("Kensas City", "USA", null, "KS", "101st Main st", null, "66106", false,null);
+        return new ShippingAddressDto("Kensas City", "USA", null, "KS", "101st Main st", null, "66106", false, null);
     }
 
     static ExemptionDto createExemptionDto() {
