@@ -679,7 +679,7 @@ public class SalesTaxTrackingServiceImplTest {
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "checkedSalesTaxTracking is marked non-null but is null");
+        assertEquals("checkedSalesTaxTracking is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
@@ -693,7 +693,7 @@ public class SalesTaxTrackingServiceImplTest {
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "originalSalesTaxTracking is marked non-null but is null");
+        assertEquals("originalSalesTaxTracking is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
@@ -707,7 +707,7 @@ public class SalesTaxTrackingServiceImplTest {
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+        assertEquals("salesTaxTracking is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
@@ -733,7 +733,7 @@ public class SalesTaxTrackingServiceImplTest {
             salesTaxTrackingService.checkSalesTaxTrackingNotHavingComplytId(nullSalesTaxTracking);
         });
 
-        assertEquals(nullPointerException.getMessage(), "newSalesTaxTracking is marked non-null but is null");
+        assertEquals("newSalesTaxTracking is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
@@ -746,7 +746,7 @@ public class SalesTaxTrackingServiceImplTest {
             salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(nullSalesTaxTracking, salesTaxTracking);
         });
 
-        assertEquals(nullPointerException.getMessage(), "modifiedSalesTaxTracking is marked non-null but is null");
+        assertEquals("modifiedSalesTaxTracking is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
@@ -759,7 +759,7 @@ public class SalesTaxTrackingServiceImplTest {
             salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, nullSalesTaxTracking);
         });
 
-        assertEquals(nullPointerException.getMessage(), "originalSalesTaxTracking is marked non-null but is null");
+        assertEquals("originalSalesTaxTracking is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
@@ -772,7 +772,7 @@ public class SalesTaxTrackingServiceImplTest {
             salesTaxTrackingService.injectDataToNewSalesTaxTracking(nullSalesTaxTracking);
         });
 
-        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+        assertEquals("salesTaxTracking is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
@@ -785,7 +785,7 @@ public class SalesTaxTrackingServiceImplTest {
             salesTaxTrackingService.findByComplytId(nullComplytId);
         });
 
-        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
+        assertEquals("complytId is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test

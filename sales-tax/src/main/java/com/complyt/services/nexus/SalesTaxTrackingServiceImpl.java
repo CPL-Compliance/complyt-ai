@@ -68,7 +68,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     @Override
-    public Mono<SalesTaxTracking> createAndSave(@NonNull SalesTaxTracking salesTaxTracking) {
+    public Mono<SalesTaxTracking> createAndSave(SalesTaxTracking salesTaxTracking) {
         return upsertWithoutNexusSummaryIfNeeded(salesTaxTracking, Action.CREATE);
     }
 
