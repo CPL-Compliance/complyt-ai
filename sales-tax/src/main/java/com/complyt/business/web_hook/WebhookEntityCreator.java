@@ -15,7 +15,7 @@ public class WebhookEntityCreator<T extends ComplytIdProperty> {
     public Mono<WebhookEntityWrapper<T>> create(Class<T> webhookClass, T object, Action action) {
         LocalDateTime timestamp = LocalDateTime.now();
         UUID id = UUID.randomUUID();
-        WebhookEntityWrapper<T> webhookEntityWrapper = new WebhookEntityWrapper<>(id, timestamp,action, webhookClass, object);
+        WebhookEntityWrapper<T> webhookEntityWrapper = new WebhookEntityWrapper<>(id, timestamp, action, webhookClass, object);
 
         return Mono.just(webhookEntityWrapper);
     }
