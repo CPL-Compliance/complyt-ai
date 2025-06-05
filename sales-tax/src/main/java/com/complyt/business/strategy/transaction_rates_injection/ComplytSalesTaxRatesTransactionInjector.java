@@ -38,6 +38,10 @@ public class ComplytSalesTaxRatesTransactionInjector implements RatesTransaction
     @NonNull
     private SalesTaxAggregator salesTaxAggregator;
 
+    @NonNull
+    private TransactionMatchedAddressInjector transactionMatchedAddressInjector;
+
+
     @Override
     public Function<Pair<ComplytSalesTaxRates, Boolean>, Mono<Transaction>> inject(Transaction transaction) {
         return pair -> {
@@ -45,13 +49,18 @@ public class ComplytSalesTaxRatesTransactionInjector implements RatesTransaction
             Boolean isExempt = pair.getValue1();
 
             return setTransactionSalesTaxRates(transaction, complytSalesTaxRates)
-                    .map(transactionWithRates -> calculateFinalTransactionAmounts(transactionWithRates, complytSalesTaxRates, isExempt));
+                    .flatMap(transactionWithRates -> injectCityCountyData(transactionWithRates, complytSalesTaxRates))
+                    .map(transactionWithRatesAndCounty -> calculateFinalTransactionAmounts(transactionWithRatesAndCounty, complytSalesTaxRates, isExempt));
         };
     }
 
     private Mono<Transaction> setTransactionSalesTaxRates(Transaction transaction, ComplytSalesTaxRates complytSalesTaxRates) {
         SalesTaxRates salesTaxRates = complytSalesTaxRates.salesTaxRates();
         return transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates);
+    }
+
+    private Mono<Transaction> injectCityCountyData(Transaction transaction, ComplytSalesTaxRates complytSalesTaxRates) {
+        return transactionMatchedAddressInjector.inject(complytSalesTaxRates.matchedAddressData(), transaction);
     }
 
     private Transaction calculateFinalTransactionAmounts(Transaction transaction, ComplytSalesTaxRates complytSalesTaxRates, Boolean isExempt) {

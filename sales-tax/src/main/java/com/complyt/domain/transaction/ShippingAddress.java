@@ -5,15 +5,6 @@ import lombok.With;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @With
-public record ShippingAddress(
-        String city,
-        String country,
-        String county,
-        String state,
-        String street,
-        String region,
-        String zip,
-        Boolean isPartial,
-        MatchedAddressData matchedAddressData
-) implements BaseAddress {
+public record ShippingAddress(String city, String country, String county, String state, String street, String region, String zip,
+                              boolean isPartial, MatchedAddressData matchedAddressData) implements BaseAddress {
 }

@@ -4,5 +4,5 @@ import lombok.With;
 
 @With
 public record Address(String city, String country, String county, String state, String street, String zip, String region,
-                      Boolean isPartial) implements BaseAddress {
+                      boolean isPartial) implements BaseAddress {
 }

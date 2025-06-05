@@ -17,6 +17,6 @@ public record OptionalAddressDto(
         @Size(max = 200, message = "Address.street" + StringErrorMessages.MAX_200_ERROR) String street,
         @Size(max = 20, message = "Address.zip " + StringErrorMessages.MAX_20_ERROR) String region,
         @Size(max = 20, message = "Address.zip " + StringErrorMessages.MAX_20_ERROR) String zip,
-        Boolean isPartial) {
+        boolean isPartial) {
 
 }

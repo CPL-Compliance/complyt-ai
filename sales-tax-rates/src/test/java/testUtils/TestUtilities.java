@@ -54,10 +54,6 @@ public interface TestUtilities {
         return new SalesTaxRatesData(null, TestUtilities.createAddressInCaliforniaWithCreationDate(), createMatchedAddressInCalifornia(), createCommonRates(), SalesTaxSources.FAST_SALES_TAX, null);
     }
 
-    static SalesTaxRatesData createSalesTaxRatesDataWithoutScoring() {
-        return new SalesTaxRatesData(null, TestUtilities.createAddressInCaliforniaWithCreationDate(), createMatchedAddressInCalifornia().withScoring(null), createCommonRates(), SalesTaxSources.FAST_SALES_TAX, null);
-    }
-
     static AddressWithDate createAddressInCaliforniaWithCreationDate() {
         return new AddressWithDate(new Address("Fresno", "US", null, "California", "7498 N Remington Ave", "93711-5508", false),
                 LocalDateTime.now());

@@ -20,7 +20,7 @@ public record ShippingAddressDto(
         @Size(max = 200, message = "ShippingAddress.street " + StringErrorMessages.MAX_200_ERROR) String street,
         @Size(max = 100, message = "ShippingAddress.region " + StringErrorMessages.MAX_100_ERROR) String region,
         @Size(max = 20, message = "ShippingAddress.zip " + StringErrorMessages.MAX_20_ERROR) String zip,
-        @Schema(description = "whether country, city or street are necessary") Boolean isPartial,
+        @Schema(description = "whether country, city or street are necessary") boolean isPartial,
         @Valid MatchedAddressDataDto matchedAddressData
 ) implements BaseAddress {
 }

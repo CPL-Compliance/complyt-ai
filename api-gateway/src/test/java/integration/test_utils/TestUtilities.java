@@ -8,7 +8,6 @@ import org.springframework.http.client.MultipartBodyBuilder;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Objects;
 
 
 public class TestUtilities {
@@ -240,7 +239,7 @@ public class TestUtilities {
                                 "country": "%s",
                                 "state": "%s",
                                 "street": "10 5th Ave",
-                                "zip": "%s",
+                                "zip": "90210",
                                 "isPartial": false
                             },
                             "customerId": "%s",
@@ -265,7 +264,6 @@ public class TestUtilities {
                 isValidated ? "\"source\": \"1\"," : "",
                 country,
                 state,
-                !Objects.equals(country, "US") && !Objects.equals(country, "USA") ? null : "90210",
                 customerId,
                 createdDate,
                 createdDate,
@@ -476,7 +474,7 @@ public class TestUtilities {
                                 "state": "%s",
                                 "street": "10 5th Ave",
                                 "zip": "%s",
-                                %s
+                                "region": "%s",
                                 "isPartial": "false"
                             },
                             "customerId": "%s",
@@ -504,7 +502,7 @@ public class TestUtilities {
                 country,
                 state != null ? state : "CA",
                 zip != null ? zip : "90210",
-                region != null ? "\"region\": \"" + region + "\"," : "",
+                region,
                 customerId,
                 createdDate,
                 isValidated ? "\"transactionType\": \"INVOICE\"," : "",

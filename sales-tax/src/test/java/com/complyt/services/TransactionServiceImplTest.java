@@ -20,13 +20,17 @@ import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.*;
 import com.complyt.repositories.GeoRecordRepository;
 import com.complyt.repositories.TransactionRepository;
+import com.complyt.security.TenantResolver;
 import com.complyt.v1.exceptions.types.ZipCodeNotFoundApiException;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -459,11 +463,11 @@ class TransactionServiceImplTest {
         Transaction transactionWithRelativeDiscount = transactionWithItemsCalculatedTotalAndShippingFee
                 .withItems(testUtilities.setCalculatedTotalAndRelativeDiscountOnItemsList(transactionWithItemsCalculatedTotal.getItems(), BigDecimal.valueOf(0.1)));
 
-//        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithRelativeDiscount);
-//
-//        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithRelativeDiscount);
 
-        Transaction transactionWithAllInjectedData = transactionWithRelativeDiscount.withComplytId(UUID.randomUUID());
+        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+
+        Transaction transactionWithAllInjectedData = transactionWithProductClassificationAndCounty.withComplytId(UUID.randomUUID());
 
         Transaction transactionWithUpdatedDates = transactionWithAllInjectedData.withInternalTimestamps(internalTimestamps);
 
@@ -472,9 +476,9 @@ class TransactionServiceImplTest {
         when(shippingFeeCalculator.injectRecalculatedTotalAfterDiscount(transactionWithItemsCalculatedTotal)).thenReturn(Mono.just(transactionWithItemsCalculatedTotalAndShippingFee));
         when(transactionDiscountCalculator.injectRecalculatedTotalAfterDiscount(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithRelativeDiscount));
         when(shippingAddressCountryAlignmentStrategy.select(transaction)).thenReturn(transaction -> transactionWithRelativeDiscount);
-//        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithRelativeDiscount)).thenReturn(Mono.just(transactionWithProductClassification));
-//        when(finalTransactionAmountCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
-        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithRelativeDiscount)).thenReturn(transactionWithAllInjectedData);
+        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithRelativeDiscount)).thenReturn(Mono.just(transactionWithProductClassification));
+        when(finalTransactionAmountCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
+        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
         when(internalTimestampsInjector.insertTimestampsToNew(transactionWithAllInjectedData)).thenReturn(transactionWithUpdatedDates);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transaction);
@@ -511,11 +515,11 @@ class TransactionServiceImplTest {
         Transaction transactionWithItemsCalculatedTotalAndShippingFee = transactionWithItemsCalculatedTotal
                 .withShippingFee(givenShippingFee.withCalculatedTotal(givenShippingFee.getTotalPrice()));
 
-//        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee);
-//
-//        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee);
 
-        Transaction transactionWithAllInjectedData = transactionWithItemsCalculatedTotalAndShippingFee.withComplytId(UUID.randomUUID());
+        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+
+        Transaction transactionWithAllInjectedData = transactionWithProductClassificationAndCounty.withComplytId(UUID.randomUUID());
 
         Transaction transactionWithUpdatedDates = transactionWithAllInjectedData.withInternalTimestamps(internalTimestamps);
 
@@ -523,9 +527,9 @@ class TransactionServiceImplTest {
         when(itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(transaction)).thenReturn(Mono.just(transactionWithItemsCalculatedTotal));
         when(shippingFeeCalculator.injectRecalculatedTotalAfterDiscount(transactionWithItemsCalculatedTotal)).thenReturn(Mono.just(transactionWithItemsCalculatedTotalAndShippingFee));
         when(shippingAddressCountryAlignmentStrategy.select(transaction)).thenReturn(transaction -> transactionWithItemsCalculatedTotalAndShippingFee);
-//        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
-//        when(finalTransactionAmountCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
-        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(transactionWithAllInjectedData);
+        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
+        when(finalTransactionAmountCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
+        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
         when(internalTimestampsInjector.insertTimestampsToNew(transactionWithAllInjectedData)).thenReturn(transactionWithUpdatedDates);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transaction);
@@ -560,11 +564,11 @@ class TransactionServiceImplTest {
         Transaction transactionWithItemsCalculatedTotalAndShippingFee = transactionWithItemsCalculatedTotal
                 .withShippingFee(givenShippingFee.withCalculatedTotal(givenShippingFee.getTotalPrice()));
 
-//        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee);
-//
-//        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee);
 
-        Transaction transactionWithAllInjectedData = transactionWithItemsCalculatedTotalAndShippingFee.withComplytId(UUID.randomUUID());
+        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+
+        Transaction transactionWithAllInjectedData = transactionWithProductClassificationAndCounty.withComplytId(UUID.randomUUID());
 
         Transaction transactionWithUpdatedDates = transactionWithAllInjectedData.withInternalTimestamps(internalTimestamps);
 
@@ -572,9 +576,9 @@ class TransactionServiceImplTest {
         when(itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(transaction)).thenReturn(Mono.just(transactionWithItemsCalculatedTotal));
         when(shippingFeeCalculator.injectRecalculatedTotalAfterDiscount(transactionWithItemsCalculatedTotal)).thenReturn(Mono.just(transactionWithItemsCalculatedTotalAndShippingFee));
         when(shippingAddressCountryAlignmentStrategy.select(transaction)).thenReturn(transaction -> transactionWithItemsCalculatedTotalAndShippingFee);
-//        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
-//        when(finalTransactionAmountCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
-        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(transactionWithAllInjectedData);
+        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
+        when(finalTransactionAmountCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
+        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
         when(internalTimestampsInjector.insertTimestampsToNew(transactionWithAllInjectedData)).thenReturn(transactionWithUpdatedDates);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transaction);
@@ -609,10 +613,10 @@ class TransactionServiceImplTest {
 
         Transaction transactionWithItemsCalculatedTotalAndShippingFee = transactionWithItemsCalculatedTotal
                 .withShippingFee(givenShippingFee.withCalculatedTotal(givenShippingFee.getTotalPrice()));
-//
-//        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee);
 
-        Transaction transactionWithAllInjectedData = transactionWithItemsCalculatedTotalAndShippingFee.withComplytId(UUID.randomUUID());
+        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee);
+
+        Transaction transactionWithAllInjectedData = transactionWithProductClassification.withComplytId(UUID.randomUUID());
 
         Transaction transactionWithUpdatedDates = transactionWithAllInjectedData.withInternalTimestamps(internalTimestamps);
 
@@ -620,9 +624,9 @@ class TransactionServiceImplTest {
         when(itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(transactionToSend)).thenReturn(Mono.just(transactionWithItemsCalculatedTotal));
         when(shippingFeeCalculator.injectRecalculatedTotalAfterDiscount(transactionWithItemsCalculatedTotal)).thenReturn(Mono.just(transactionWithItemsCalculatedTotalAndShippingFee));
         when(shippingAddressCountryAlignmentStrategy.select(transactionToSend)).thenReturn(transaction -> transactionWithItemsCalculatedTotalAndShippingFee);
-//        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
-//        when(finalTransactionAmountCollector.collect(transactionWithProductClassification)).thenReturn(transactionWithProductClassification);
-        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(transactionWithAllInjectedData);
+        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
+        when(finalTransactionAmountCollector.collect(transactionWithProductClassification)).thenReturn(transactionWithProductClassification);
+        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassification)).thenReturn(transactionWithAllInjectedData);
         when(internalTimestampsInjector.insertTimestampsToNew(transactionWithAllInjectedData)).thenReturn(transactionWithUpdatedDates);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transactionToSend);
@@ -660,19 +664,19 @@ class TransactionServiceImplTest {
         Transaction transactionWithItemsCalculatedTotalAndShippingFee = transactionWithItemsCalculatedTotal
                 .withShippingFee(givenShippingFee.withCalculatedTotal(givenShippingFee.getTotalPrice()));
 
-//        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee);
-//        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification
-//                .withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee);
+        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification
+                .withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
 
-        Transaction transactionWithUpdatedDates = transactionWithItemsCalculatedTotalAndShippingFee.withInternalTimestamps(internalTimestamps);
+        Transaction transactionWithUpdatedDates = transactionWithProductClassification.withInternalTimestamps(internalTimestamps);
 
         // When
         when(itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(newTransaction)).thenReturn(Mono.just(transactionWithItemsCalculatedTotal));
         when(shippingFeeCalculator.injectRecalculatedTotalAfterDiscount(transactionWithItemsCalculatedTotal)).thenReturn(Mono.just(transactionWithItemsCalculatedTotalAndShippingFee));
         when(shippingAddressCountryAlignmentStrategy.select(newTransaction)).thenReturn(transaction -> (Transaction) transactionWithItemsCalculatedTotalAndShippingFee);
-//        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
-//        when(finalTransactionAmountCollector.collect(any(Transaction.class))).thenReturn(transactionWithProductClassificationAndCounty);
-        when(internalTimestampsInjector.insertTimestampsToExisting(transactionWithItemsCalculatedTotalAndShippingFee, transactionWithCustomer)).thenReturn(transactionWithUpdatedDates);
+        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
+        when(finalTransactionAmountCollector.collect(any(Transaction.class))).thenReturn(transactionWithProductClassificationAndCounty);
+        when(internalTimestampsInjector.insertTimestampsToExisting(transactionWithProductClassificationAndCounty, transactionWithCustomer)).thenReturn(transactionWithUpdatedDates);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToExistingTransaction(newTransaction, transactionWithCustomer);
 
@@ -708,10 +712,11 @@ class TransactionServiceImplTest {
         Transaction transactionWithItemsCalculatedTotalAndShippingFee = transactionWithItemsCalculatedTotal
                 .withShippingFee(givenShippingFee.withCalculatedTotal(givenShippingFee.getTotalPrice()));
 
-//        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee);
-//        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee);
 
-        Transaction transactionWithAllInjectedData = transactionWithItemsCalculatedTotalAndShippingFee.withComplytId(UUID.randomUUID());
+        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+
+        Transaction transactionWithAllInjectedData = transactionWithProductClassificationAndCounty.withComplytId(UUID.randomUUID());
 
         Transaction transactionWithUpdatedDates = transactionWithAllInjectedData.withInternalTimestamps(internalTimestamps);
         GeoRecord geoRecord = new GeoRecord("1", "80001", "CO");
@@ -721,9 +726,9 @@ class TransactionServiceImplTest {
         when(itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(transactionWithPartialAddress)).thenReturn(Mono.just(transactionWithItemsCalculatedTotal));
         when(shippingFeeCalculator.injectRecalculatedTotalAfterDiscount(transactionWithItemsCalculatedTotal)).thenReturn(Mono.just(transactionWithItemsCalculatedTotalAndShippingFee));
         when(shippingAddressCountryAlignmentStrategy.select(transactionWithPartialAddress)).thenReturn(transaction -> (Transaction) transactionWithItemsCalculatedTotalAndShippingFee);
-//        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
-//        when(finalTransactionAmountCollector.collect(any(Transaction.class))).thenReturn(transactionWithProductClassificationAndCounty);
-        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(transactionWithAllInjectedData);
+        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
+        when(finalTransactionAmountCollector.collect(any(Transaction.class))).thenReturn(transactionWithProductClassificationAndCounty);
+        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
         when(internalTimestampsInjector.insertTimestampsToNew(transactionWithAllInjectedData)).thenReturn(transactionWithUpdatedDates);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transactionWithPartialAddress);
@@ -761,7 +766,11 @@ class TransactionServiceImplTest {
         Transaction transactionWithItemsCalculatedTotalAndShippingFee = transactionWithItemsCalculatedTotal
                 .withShippingFee(givenShippingFee.withCalculatedTotal(givenShippingFee.getTotalPrice()));
 
-        Transaction transactionWithAllInjectedData = transactionWithItemsCalculatedTotalAndShippingFee.withComplytId(UUID.randomUUID());
+        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee);
+
+        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+
+        Transaction transactionWithAllInjectedData = transactionWithProductClassificationAndCounty.withComplytId(UUID.randomUUID());
 
         Transaction transactionWithUpdatedDates = transactionWithAllInjectedData.withInternalTimestamps(internalTimestamps);
         GeoRecord geoRecord = new GeoRecord("1", "80001", "CO");
@@ -771,7 +780,9 @@ class TransactionServiceImplTest {
         when(itemsDiscountCalculator.injectRecalculatedTotalAfterDiscount(transactionWithPartialAddress)).thenReturn(Mono.just(transactionWithItemsCalculatedTotal));
         when(shippingFeeCalculator.injectRecalculatedTotalAfterDiscount(transactionWithItemsCalculatedTotal)).thenReturn(Mono.just(transactionWithItemsCalculatedTotalAndShippingFee));
         when(shippingAddressCountryAlignmentStrategy.select(transactionWithPartialAddress)).thenReturn(transaction -> (Transaction) transactionWithItemsCalculatedTotalAndShippingFee);
-        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(transactionWithAllInjectedData);
+        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithItemsCalculatedTotalAndShippingFee)).thenReturn(Mono.just(transactionWithProductClassification));
+        when(finalTransactionAmountCollector.collect(any(Transaction.class))).thenReturn(transactionWithProductClassificationAndCounty);
+        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
         when(internalTimestampsInjector.insertTimestampsToNew(transactionWithAllInjectedData)).thenReturn(transactionWithUpdatedDates);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transactionWithPartialAddress);
@@ -806,28 +817,6 @@ class TransactionServiceImplTest {
 
         // Then
         StepVerifier.create(transactionMono).expectError(ZipCodeNotFoundApiException.class);
-    }
-
-    @Test
-    void injectProductClassification_InjectsProductClassificationToTransaction_ReturnsTransaction() {
-        // Given
-        Transaction transactionWithProductClassification = createTransactionWithProductClassificationData(transaction);
-        BigDecimal finalAmount = transactionWithProductClassification.getItems().stream().map(Item::getCalculatedTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
-        Transaction transactionWithProductClassificationAndFinalTransactionAmount = transactionWithProductClassification.withFinalTransactionAmount(finalAmount);
-
-        // When
-        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)).thenReturn(Mono.just(transactionWithProductClassification));
-        when(finalTransactionAmountCollector.collect(transactionWithProductClassification)).thenReturn(transactionWithProductClassificationAndFinalTransactionAmount);
-
-        Mono<Transaction> transactionMono = transactionService.injectProductClassificationAndFinalTransactionAmount(transaction);
-
-        // Then
-        StepVerifier.create(transactionMono).expectNextMatches(transaction -> {
-            return transaction.getItems().get(0).getTaxableCategory() != null &&
-                    transaction.getItems().get(0).getTangibleCategory() != null &&
-                    transaction.getItems().get(0).getJurisdictionalSalesTaxRules() != null &&
-                    Objects.equals(transaction.getFinalTransactionAmount(), finalAmount);
-        }).expectComplete().verify();
     }
 
     @Test
@@ -1050,7 +1039,7 @@ class TransactionServiceImplTest {
     void shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary_transactionsWithDifferentShippingAddress_ReturnsTrue() {
         // Given
         ShippingAddress newYorkAddress = testUtilities.createAddressInNewYork();
-        ShippingAddress californiaAddress = testUtilities.createShippingAddressInCalifornia1();
+        ShippingAddress californiaAddress = testUtilities.createShippingAddressInCalifornia();
         Transaction newYorkTransaction = transaction.withShippingAddress(newYorkAddress);
         Transaction californiaTransaction = transaction.withShippingAddress(californiaAddress);
 
@@ -1274,7 +1263,7 @@ class TransactionServiceImplTest {
                 .thenReturn(Mono.just(transaction));
 
 
-        Mono<Transaction> resultMono = transactionService.injectSubsidiaryAndMatchedAddress(transaction, salesTaxTrackingWithNexusInfo);
+        Mono<Transaction> resultMono = transactionService.injectDataBySalesTaxTracking(transaction, salesTaxTrackingWithNexusInfo);
 
         // Then
         StepVerifier.create(resultMono)
@@ -1291,7 +1280,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataBySalesTaxTracking_TransactionNull_ReturnsError() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionService.injectSubsidiaryAndMatchedAddress(null, salesTaxTrackingWithNexusInfo);
+            transactionService.injectDataBySalesTaxTracking(null, salesTaxTrackingWithNexusInfo);
         });
 
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
@@ -1300,7 +1289,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataBySalesTaxTracking_SalesTaxTrackingWithNexusIndicationNull_ReturnsError() {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionService.injectSubsidiaryAndMatchedAddress(transaction, null);
+            transactionService.injectDataBySalesTaxTracking(transaction, null);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxTrackingWithNexusInfo is marked non-null but is null");
@@ -1416,19 +1405,6 @@ class TransactionServiceImplTest {
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             transactionService.injectExchangeRateIfNeeded(nullTransaction);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
-    }
-
-    @Test
-    void injectProductClassification_nullTransactionPassed_ThrowsNullPointerException() {
-        // Given
-        Transaction nullTransaction = null;
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionService.injectProductClassificationAndFinalTransactionAmount(nullTransaction);
         });
 
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");

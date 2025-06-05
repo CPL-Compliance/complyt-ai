@@ -1,7 +1,6 @@
 package com.complyt.business.tax.gt.gt_tax_web_client;
 
 import com.complyt.business.exceptions.ComplytSalesTaxRatesException;
-import com.complyt.domain.transaction.MandatoryAddress;
 import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.tax.ComplytGtRates;
 import com.complyt.domain.transaction.tax.GtAddress;
@@ -55,7 +54,7 @@ public class GtWebClientWrapperTest extends BaseTestClass {
         // Given
         ComplytGtRates complytGtRates = testUtilities.createComplytGtRates();
         ComplytGtRatesDto complytGtRatesDto = ComplytGtRatesMapper.INSTANCE.complytGtRatesToComplytGtRatesDto(complytGtRates);
-        MandatoryAddress addressAsGtAddress = new MandatoryAddress(null, gtAddress.country(), null, null, null, null, gtAddress.region(), false);
+        ShippingAddress addressAsGtAddress = new ShippingAddress(null, gtAddress.country(), null, null, null, null, gtAddress.region(), false, null);
 
         // When
         when(salesTaxRatesServiceProxy.findGtByAddress(addressAsGtAddress.country(), addressAsGtAddress.region())).thenReturn(Mono.just(complytGtRatesDto));

@@ -44,13 +44,12 @@ public class ComplytSalesTaxRatesHandler {
     @SalesTaxRatesReadPermission
     public Mono<ServerResponse> getSalesTaxRatesByAddress(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
-        boolean detailed = Boolean.parseBoolean(serverRequest.queryParam("detailed").orElse(String.valueOf(false)));
-        boolean shouldValidateAddress = Boolean.parseBoolean(serverRequest.queryParam("shouldValidateAddress").orElse(String.valueOf(true)));
+        boolean detailed = Boolean.parseBoolean(serverRequest.queryParam("detailed").orElse("false"));
 
         Mono<SalesTaxRatesDataDto> commonSalesTaxRatesDto = ContextLogger.observeCtx(logStr, log::info)
                 .then(addressDtoValidationHandler.validate(serverRequest))
                 .map(AddressWithDateMapper.INSTANCE::addressWithDateDtoToAddressDate)
-                .flatMap(addressDate -> complytSalesTaxRatesFacade.validateAddress(addressDate, detailed, shouldValidateAddress))
+                .flatMap(addressDate -> complytSalesTaxRatesFacade.validateAddress(addressDate, detailed))
                 .map(SalesTaxRatesDataMapper.INSTANCE::salesTaxRatesDataTosalesTaxRatesDataDto)
                 .flatMap(commonSalesTaxRates -> ContextLogger.observeCtx("<-- Returned Body: " + commonSalesTaxRates, log::info)
                         .thenReturn(commonSalesTaxRates))

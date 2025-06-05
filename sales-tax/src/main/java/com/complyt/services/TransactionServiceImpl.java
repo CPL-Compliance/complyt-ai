@@ -135,7 +135,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Mono<Transaction> injectSubsidiaryAndMatchedAddress(@NonNull Transaction transaction, @NonNull SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {
+    public Mono<Transaction> injectDataBySalesTaxTracking(@NonNull Transaction transaction, @NonNull SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {
         return Mono.just(transaction.setSubsidiary(salesTaxTrackingWithNexusInfo.getSalesTaxTracking().getSubsidiary()))
                 .flatMap(transactionWithAmounts -> matchedAddressProvider.provide(transactionWithAmounts, salesTaxTrackingWithNexusInfo));
     }
@@ -144,12 +144,10 @@ public class TransactionServiceImpl implements TransactionService {
         return injectStateIfMissingInPartialAddress(transaction)
                 .flatMap(this::recalculateTotalItemsPrice)
                 .map(transactionWithCalculatedItems ->
-                        (Transaction) shippingAddressAlignmentStrategy.select(transaction).apply(transactionWithCalculatedItems));
-    }
-
-    public Mono<Transaction> injectProductClassificationAndFinalTransactionAmount(@NonNull Transaction transaction) {
-        return productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transaction)
-                                .map(finalTransactionAmountCollector::collect);
+                        (Transaction) shippingAddressAlignmentStrategy.select(transaction).apply(transactionWithCalculatedItems))
+                .flatMap(transactionWithCalculatedItemsAndShippingAddress ->
+                        productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transactionWithCalculatedItemsAndShippingAddress)
+                                .map(finalTransactionAmountCollector::collect));
     }
 
     // Apply the discounts on items
