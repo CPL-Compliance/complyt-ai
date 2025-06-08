@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AddressValidationApplyChecker {
 
+    @Deprecated
     public boolean shouldValidateAddress(@NonNull Transaction transaction, @NonNull SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {
         SalesTaxApplyCheck salesTaxApplyCheck = new SalesTaxApplyCheck(transaction);
         boolean isHasNexus = salesTaxTrackingWithNexusInfo.isHasNexus();

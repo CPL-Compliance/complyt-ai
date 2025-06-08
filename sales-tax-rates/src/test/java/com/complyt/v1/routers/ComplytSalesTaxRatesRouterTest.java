@@ -146,7 +146,7 @@ public class ComplytSalesTaxRatesRouterTest {
         SalesTaxRatesDataDto salesTaxRatesDataDto = new SalesTaxRatesDataDto(null, addressWithDate, TestUtilities.createMatchedAddressInCalifornia(), salesTaxRatesDto, null);
 
         // When
-        when(internalSalesTaxRatesFacade.validateAddress(addressWithDate, false)).thenReturn(Mono.just(salesTaxRatesData));
+        when(internalSalesTaxRatesFacade.validateAddress(addressWithDate, false, true)).thenReturn(Mono.just(salesTaxRatesData));
 
         // Then
         webTestClient
@@ -178,7 +178,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressWithDate addressWithDate = AddressWithDateMapper.INSTANCE.addressWithDateDtoToAddressDate(addressWithDateDto);
 
         // When
-        when(internalSalesTaxRatesFacade.validateAddress(addressWithDate, false)).thenReturn(Mono.empty());
+        when(internalSalesTaxRatesFacade.validateAddress(addressWithDate, false, true)).thenReturn(Mono.empty());
 
         // Then
         webTestClient
@@ -556,7 +556,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressWithDate addressWithDate = TestUtilities.createAddressWithDateInCalifornia(LocalDateTime.now());
 
         // When
-        when(internalSalesTaxRatesFacade.validateAddress(addressWithDate, false)).thenThrow(RuntimeException.class);
+        when(internalSalesTaxRatesFacade.validateAddress(addressWithDate, false, true)).thenThrow(RuntimeException.class);
 
         // Then
         webTestClient

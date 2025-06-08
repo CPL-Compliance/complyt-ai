@@ -53,6 +53,7 @@ class InternalSalesTaxRatesFacadeTest {
         internalSalesTaxRates = TestUtilities.createInternalSalesTaxRates(LocalDateTime.now());
         salesTaxRatesData = TestUtilities.createSalesTaxRatesData();
     }
+
     @Test
     void validateAddress_RatesReturnedFromInternalService_ReturnsRates() {
         salesTaxRatesData = salesTaxRatesData.withComplytId(commonSalesTaxRates.complytId()).withRequestAddress(addressWithDate);
@@ -61,7 +62,22 @@ class InternalSalesTaxRatesFacadeTest {
         when(addressValidationService.validate(addressWithDate.getAddress())).thenReturn(Mono.just(salesTaxRatesData.matchedAddressData()));
         when(internalSalesTaxRatesService.findByAddress(addressWithDate)).thenReturn(Mono.just(commonSalesTaxRates));
 
-        Mono<SalesTaxRatesData> commonSalesTaxRatesMono = internalSalesTaxRatesFacade.validateAddress(addressWithDate, false);
+        Mono<SalesTaxRatesData> commonSalesTaxRatesMono = internalSalesTaxRatesFacade.validateAddress(addressWithDate, false, true);
+
+        // Then
+        StepVerifier.create(commonSalesTaxRatesMono)
+                .expectNext(salesTaxRatesData)
+                .verifyComplete();
+    }
+
+    @Test
+    void validateAddress_ValidAddressAndRatesReturnedFromInternalService_ReturnsRates() {
+        salesTaxRatesData = TestUtilities.createSalesTaxRatesDataWithoutScoring().withComplytId(commonSalesTaxRates.complytId()).withRequestAddress(addressWithDate);
+
+        // When
+        when(internalSalesTaxRatesService.findByAddress(addressWithDate)).thenReturn(Mono.just(commonSalesTaxRates));
+
+        Mono<SalesTaxRatesData> commonSalesTaxRatesMono = internalSalesTaxRatesFacade.validateAddress(addressWithDate, false, false);
 
         // Then
         StepVerifier.create(commonSalesTaxRatesMono)
@@ -78,7 +94,7 @@ class InternalSalesTaxRatesFacadeTest {
         when(addressValidationService.validate(addressWithDate.getAddress())).thenReturn(Mono.just(salesTaxRatesData.matchedAddressData()));
         when(internalSalesTaxRatesService.findByAddress(addressWithDate)).thenReturn(Mono.just(commonSalesTaxRates));
 
-        Mono<SalesTaxRatesData> commonSalesTaxRatesMono = internalSalesTaxRatesFacade.validateAddress(addressWithDate, true);
+        Mono<SalesTaxRatesData> commonSalesTaxRatesMono = internalSalesTaxRatesFacade.validateAddress(addressWithDate, true, true);
 
         // Then
         StepVerifier.create(commonSalesTaxRatesMono)
@@ -107,7 +123,7 @@ class InternalSalesTaxRatesFacadeTest {
         AddressWithDate nullAddressWithDate = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> internalSalesTaxRatesFacade.validateAddress(nullAddressWithDate, false));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> internalSalesTaxRatesFacade.validateAddress(nullAddressWithDate, false, true));
 
         assertEquals("addressWithDate is marked non-null but is null", nullPointerException.getMessage());
     }

@@ -39,7 +39,13 @@ import java.lang.annotation.Target;
                                         name = "region",
                                         description = "Address region",
                                         examples = @ExampleObject(value = GetGtRatesByAddressApiInfo.regionExample,
-                                                name = GetGtRatesByAddressApiInfo.regionExample))
+                                                name = GetGtRatesByAddressApiInfo.regionExample)),
+                                @Parameter(in = ParameterIn.QUERY,
+                                        name = "shouldValidateAddress",
+                                        description = "Indication to validate the sent address",
+                                        schema = @Schema(type = "boolean"),
+                                        examples = @ExampleObject(value = GetGtRatesByAddressApiInfo.shouldValidateAddress,
+                                                name = GetGtRatesByAddressApiInfo.shouldValidateAddress))
                         },
                         tags = "sales_tax_rates",
                         responses = {
@@ -79,6 +85,7 @@ import java.lang.annotation.Target;
 public @interface GetGtRatesByAddressApiInfo {
     String countryExample = "Canada";
     String regionExample = "Quebec";
+    String shouldValidateAddress = "true";
 
     String complytSalesTaxRatesExample = """
             {

@@ -22,14 +22,9 @@ public class MatchedAddressProvider implements SalesTaxDataProvider<Transaction,
     @NonNull
     private TransactionMatchedAddressInjector transactionMatchedAddressInjector;
 
-    @NonNull
-    private AddressValidationApplyChecker addressValidationApplyChecker;
-
     @Override
     public Mono<Transaction> provide(Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {
-        return addressValidationApplyChecker.shouldValidateAddress(transaction, salesTaxTrackingWithNexusInfo) ?
-                addressFetcher.fetch(transaction.getShippingAddress())
-                        .flatMap(cityCountyWrapper -> transactionMatchedAddressInjector.inject(cityCountyWrapper, transaction)) :
-                Mono.just(transaction);
+                return addressFetcher.fetch(transaction.getShippingAddress())
+                        .flatMap(cityCountyWrapper -> transactionMatchedAddressInjector.inject(cityCountyWrapper, transaction));
     }
 }
