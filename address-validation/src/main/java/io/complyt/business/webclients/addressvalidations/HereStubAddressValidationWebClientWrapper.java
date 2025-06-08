@@ -5,14 +5,12 @@ import io.complyt.domain.Address;
 import io.complyt.domain.AddressData;
 import io.complyt.domain.here.*;
 import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Generated
 @EqualsAndHashCode
@@ -26,9 +24,7 @@ public class HereStubAddressValidationWebClientWrapper extends AddressValidation
         double hereScoring = address.zip().equals("00000") ? 0.1 : 0.9; // For getting both errors
 
         return Mono.fromCallable(() -> new HereAddressData(List.of(new HereAddressItem("", "", "", "",
-                Objects.equals(address.country(), "Canada") ?
-                        new HereAddress("Address", "CA", "Canada", "Canada", "Ontario", "Ontario", "Strathroy", "2994 Scotchmere Dr", "N7G 1J6") :
-                        new HereAddress("Address", "USA", "US", "USA", "CA", "Los Angeles", "Beverly Hills", "1008 Elden Way", "90210"),
+                new HereAddress("Address", "USA", "US", "USA", "CA", "Los Angeles", "Beverly Hills", "1008 Elden Way", "90210"),
                 new HerePosition(12345, 12345), new HereMapView(0.5, 0.5, 0.5, 0.5),
                 new HereScoring(hereScoring, new HereFieldScore(1, 1, 1, List.of(1.0), 1))))));
     }

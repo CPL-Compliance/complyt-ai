@@ -188,7 +188,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate, externalId, customerId, null, true, "USA", null, "90210", null, false, null, "0", item))
+                .bodyValue(TestUtilities.transactionWithCustomItems(createdDate, externalId, customerId, null, true, "USA", null, "90210", "", false, null, "0", item))
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -506,7 +506,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", null, "", "", false, null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", "", "", "", false, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -532,7 +532,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", null, "", "Quebec", false, null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", "", "", "Quebec", false, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -558,7 +558,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", null, "", "", true, null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", "", "", "", true, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -587,7 +587,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Ukraine", null, "", "", true, null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Ukraine", "", "", "", true, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -609,7 +609,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", null, null, "QUEBEK", true, null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", "", "", "QUEBEK", true, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -637,7 +637,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "USA", "PA", null, null, true, null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "USA", "PA", null, "", true, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -760,7 +760,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", null, null, "not_existing", true, null, item))
+                .bodyValue(TestUtilities.transactionJsonExample(createdDate, externalId, customerId, "Canada", "", "", "not_existing", true, null, item))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -772,9 +772,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertNotNull(transaction.get("salesTax"));
                     assertNull(((LinkedHashMap) transaction.get("salesTax")).get("salesTaxRates"));
                     assertNotNull(((LinkedHashMap) transaction.get("salesTax")).get("gtRates"));
-                    assertEquals(0.0975, ((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("gtRates")).get("regionRate"));
-                    assertEquals(0.05, ((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("gtRates")).get("countryRate"));
-                    assertEquals(0.14975, ((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("gtRates")).get("taxRate"));
+                    assertNull(((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("gtRates")).get("regionRate"));
+                    assertEquals(((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("gtRates")).get("countryRate"), 0.05);
+                    assertEquals(((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("gtRates")).get("taxRate"), 0.05);
                 });
     }
 
@@ -2375,7 +2375,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isOk()
                 .expectBody(LinkedHashMap.class)
                 .value(transaction -> {
-                    assertEquals(expectedRate, ((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("salesTaxRates")).get("taxRate"));
+                    assertEquals(((LinkedHashMap) ((LinkedHashMap) transaction.get("salesTax")).get("salesTaxRates")).get("taxRate"), expectedRate);
                     assertNotNull(
                             ((LinkedHashMap) ((LinkedHashMap) ((LinkedHashMap) transaction.get("shippingAddress"))
                                     .get("matchedAddressData"))

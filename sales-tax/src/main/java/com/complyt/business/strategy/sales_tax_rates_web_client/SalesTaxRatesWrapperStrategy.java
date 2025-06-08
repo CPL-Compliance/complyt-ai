@@ -1,21 +1,21 @@
 package com.complyt.business.strategy.sales_tax_rates_web_client;
 
-import com.complyt.business.strategy.FunctionSelectorByAddressStrategy;
+import com.complyt.business.strategy.FunctionSelectorByTransactionAddressStrategy;
 import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
-import com.complyt.domain.transaction.MandatoryAddress;
+import com.complyt.domain.transaction.ShippingAddress;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.tax.ComplytGtRates;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
 import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-public class SalesTaxRatesWrapperStrategy extends FunctionSelectorByAddressStrategy {
+public class SalesTaxRatesWrapperStrategy extends FunctionSelectorByTransactionAddressStrategy {
 
     @NonNull
     SalesTaxRatesWebClientWrapper<ComplytSalesTaxRates> salesTaxWebClientWrapper;
@@ -24,12 +24,12 @@ public class SalesTaxRatesWrapperStrategy extends FunctionSelectorByAddressStrat
     SalesTaxRatesWebClientWrapper<ComplytGtRates> gtWebClientWrapper;
 
     @Override
-    protected Function<LocalDateTime, Mono<ComplytSalesTaxRates>> getFunctionForUsaOption(MandatoryAddress address) {
-        return dateTime -> salesTaxWebClientWrapper.findByAddress(address, dateTime);
+    protected Function<ShippingAddress, Mono<ComplytSalesTaxRates>> getFunctionForUsaOption(Transaction transaction) {
+        return address -> salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress(), transaction.getExternalTimestamps().getCreatedDate());
     }
 
     @Override
-    protected Function<LocalDateTime, Mono<ComplytGtRates>> getFunctionForNonUsaOption(MandatoryAddress address) {
-        return dateTime -> gtWebClientWrapper.findByAddress(address, dateTime);
+    protected Function<ShippingAddress, Mono<ComplytGtRates>> getFunctionForNonUsaOption(Transaction transaction) {
+        return address -> gtWebClientWrapper.findByAddress(transaction.getShippingAddress(), transaction.getExternalTimestamps().getCreatedDate());
     }
 }

@@ -110,24 +110,6 @@ class TransactionItemsJurisdictionalRulesInjectorTest extends BaseTestClass {
         StepVerifier.create(result).expectNext(expectedTransaction).verifyComplete();
     }
 
-    @Test
-    public void testInject_withValidDataAndBlankState_shouldInjectClassificationCorrectly() {
-        // Given
-        Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Transaction transactionToSend = transaction.withShippingAddress(transaction.getShippingAddress().withState(""));
-        List<Item> itemsWithJurisdictionalRules = testUtilities.createItems(true, false, false);
-        Transaction expectedTransaction = transactionToSend.withItems(itemsWithJurisdictionalRules);
-
-        // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
-
-        when(itemsJurisdictionalRulesInjectionStrategy.select(transactionToSend)).thenReturn(transaction -> itemsWithJurisdictionalRules);
-        Mono<Transaction> result = transactionItemsJurisdictionalRulesInjector.inject(classifications, transactionToSend);
-
-        // Then
-        StepVerifier.create(result).expectNext(expectedTransaction).verifyComplete();
-    }
-
 
     @Test
     void inject_NullTransactionPassed_ThrowsNullPointerException() {

@@ -1,1 +1,1 @@
-{"options":{"validationLevel":"off","validationAction":"warn"},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"3be048bb47f54333a0823771be980aa7","collectionName":"hawaii","type":"collection"}
+{"options":{"validationLevel":"off","validationAction":"warn"},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"0a0d06a2da534bdd8e8e68305c39f80e","collectionName":"hawaii","type":"collection"}

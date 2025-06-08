@@ -3,14 +3,17 @@ package com.complyt.business.strategy.sales_tax_rates_web_client;
 import com.complyt.business.tax.gt.gt_tax_web_client.GtWebClientWrapper;
 import com.complyt.business.tax.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
-import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.tax.ComplytGtRates;
+import com.complyt.security.TenantResolver;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -19,6 +22,7 @@ import testUtils.unit_test.UnitTestUtilities;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +37,9 @@ public class SalesTaxRatesWrapperStrategyTest {
     Transaction transaction;
     UnitTestUtilities testUtilities;
 
+
+
+
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
@@ -43,30 +50,27 @@ public class SalesTaxRatesWrapperStrategyTest {
     @Test
     void select_TransactionAddressCountryIsUsa_RunsUsaFunction() {
         // Given
-        ShippingAddress usaShippingAddress = testUtilities.createUsaShippingAddressWithMatchedAddress();
         ComplytSalesTaxRates expectedComplytSalesTaxRates = testUtilities.createCaliforniaComplytSalesTaxRates();
-        Transaction givenTransaction = transaction.withShippingAddress(usaShippingAddress);
 
         // When
-        when(salesTaxWebClientWrapper.findByAddress(givenTransaction.getShippingAddress().matchedAddressData().address(), givenTransaction.getExternalTimestamps().getCreatedDate()))
+        when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress(), transaction.getExternalTimestamps().getCreatedDate()))
                 .thenReturn(Mono.just(testUtilities.createCaliforniaComplytSalesTaxRates()));
         // Then
-        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = (Mono<ComplytSalesTaxRates>) salesTaxRatesWrapperStrategy.select(givenTransaction.getShippingAddress().matchedAddressData().address()).apply(givenTransaction.getExternalTimestamps().getCreatedDate());
+        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = (Mono<ComplytSalesTaxRates>) salesTaxRatesWrapperStrategy.select(transaction).apply(transaction.getShippingAddress());
         StepVerifier.create(complytSalesTaxRatesMono).equals(expectedComplytSalesTaxRates);
     }
 
     @Test
     void select_TransactionAddressCountryIsNotUsa_RunsNonUsaFunction() {
         // Given
-        ShippingAddress nonUsaShippingAddress = testUtilities.createNonUsaShippingAddressWithMatchedAddress();
         ComplytGtRates expectedComplytGtRates = testUtilities.createComplytGtRates();
-        Transaction givenTransaction = transaction.withShippingAddress(nonUsaShippingAddress);
+        Transaction givenTransaction = transaction.withShippingAddress(transaction.getShippingAddress().withCountry("Canada"));
 
         // When
-        when(gtWebClientWrapper.findByAddress(givenTransaction.getShippingAddress().matchedAddressData().address(), transaction.getExternalTimestamps().getCreatedDate()))
+        when(gtWebClientWrapper.findByAddress(givenTransaction.getShippingAddress(), transaction.getExternalTimestamps().getCreatedDate()))
                 .thenReturn(Mono.just(testUtilities.createComplytGtRates()));
         // Then
-        Mono<ComplytGtRates> complytSalesTaxRatesMono = (Mono<ComplytGtRates>) salesTaxRatesWrapperStrategy.select(givenTransaction.getShippingAddress().matchedAddressData().address()).apply(givenTransaction.getExternalTimestamps().getCreatedDate());
+        Mono<ComplytGtRates> complytSalesTaxRatesMono = (Mono<ComplytGtRates>) salesTaxRatesWrapperStrategy.select(givenTransaction).apply(givenTransaction.getShippingAddress());
         StepVerifier.create(complytSalesTaxRatesMono).equals(expectedComplytGtRates);
     }
 }

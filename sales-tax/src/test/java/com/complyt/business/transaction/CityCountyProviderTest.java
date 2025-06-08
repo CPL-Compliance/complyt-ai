@@ -38,6 +38,9 @@ public class CityCountyProviderTest {
     @Mock
     TransactionMatchedAddressInjector transactionCityCountyInjector;
 
+    @Mock
+    AddressValidationApplyChecker addressValidationApplyChecker;
+
     UnitTestUtilities testUtilities;
     SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo;
     Transaction transaction;
@@ -56,6 +59,7 @@ public class CityCountyProviderTest {
     @Test
     void provide_GetsAddressAndInjectsIt_ReturnsTransaction() {
         // When
+        when(addressValidationApplyChecker.shouldValidateAddress(transaction, salesTaxTrackingWithNexusInfo)).thenReturn(true);
         when(addressFetcher.fetch(transaction.getShippingAddress())).thenReturn(Mono.just(matchedAddressData));
         when(transactionCityCountyInjector.inject(matchedAddressData, transaction)).thenReturn(Mono.just(transaction));
         Mono<Transaction> transactionMono = cityCountyProvider.provide(transaction, salesTaxTrackingWithNexusInfo);
@@ -63,4 +67,16 @@ public class CityCountyProviderTest {
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
     }
+
+    @Test
+    void provide_ShouldNotValidateAddress_ReturnsOriginalTransaction() {
+        // Mock shouldValidateAddress to return false
+        when(addressValidationApplyChecker.shouldValidateAddress(transaction, salesTaxTrackingWithNexusInfo)).thenReturn(false);
+
+        // Test the provide method
+        StepVerifier.create(cityCountyProvider.provide(transaction, salesTaxTrackingWithNexusInfo))
+                .expectNext(transaction)
+                .verifyComplete();
+    }
+
 }

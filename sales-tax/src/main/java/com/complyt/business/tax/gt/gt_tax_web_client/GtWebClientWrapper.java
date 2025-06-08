@@ -3,8 +3,6 @@ package com.complyt.business.tax.gt.gt_tax_web_client;
 import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.exceptions.ComplytSalesTaxRatesException;
 import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
-import com.complyt.domain.transaction.Address;
-import com.complyt.domain.transaction.MandatoryAddress;
 import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.tax.ComplytGtRates;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
@@ -50,7 +48,7 @@ public class GtWebClientWrapper implements SalesTaxRatesWebClientWrapper<Complyt
     }
 
     @Override
-    public Mono<ComplytGtRates> findByAddress(MandatoryAddress address, LocalDateTime transactionDate) {
+    public Mono<ComplytGtRates> findByAddress(ShippingAddress address, LocalDateTime transactionDate) {
         return findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.region(), address.isPartial(), transactionDate);
     }
 }

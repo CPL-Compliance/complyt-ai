@@ -66,13 +66,6 @@ import java.lang.annotation.Target;
                                         schema = @Schema(type = "boolean"),
                                         examples = @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.detailed,
                                                 name = GetSalesTaxRatesByAddressApiInfo.detailed)),
-                                @Parameter(in = ParameterIn.QUERY,
-                                        name = "shouldValidateAddress",
-                                        description = "Indication to validate the sent address",
-                                        schema = @Schema(type = "boolean"),
-                                        examples = @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.shouldValidateAddress,
-                                                name = GetSalesTaxRatesByAddressApiInfo.shouldValidateAddress))
-
 
                         },
                         tags = "sales_tax_rates",
@@ -119,7 +112,6 @@ public @interface GetSalesTaxRatesByAddressApiInfo {
     String zipExample = "10011";
 
     String detailed = "true";
-    String shouldValidateAddress = "true";
 
 
     String complytSalesTaxRatesExample = """

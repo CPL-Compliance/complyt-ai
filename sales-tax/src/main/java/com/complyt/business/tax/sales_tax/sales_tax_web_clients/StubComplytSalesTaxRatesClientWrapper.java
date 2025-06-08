@@ -6,7 +6,10 @@ import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.FilingMetaData;
 import com.complyt.domain.sales_tax.RatesMetaData;
 import com.complyt.domain.sales_tax.SalesTaxRates;
-import com.complyt.domain.transaction.*;
+import com.complyt.domain.transaction.MandatoryAddress;
+import com.complyt.domain.transaction.MatchedAddressData;
+import com.complyt.domain.transaction.Scoring;
+import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.v1.models.matched_address.enums.FieldMatchType;
 import com.complyt.v1.models.matched_address.enums.FieldsMatchScore;
 import com.complyt.v1.models.matched_address.enums.MatchLevelType;
@@ -24,15 +27,8 @@ public class StubComplytSalesTaxRatesClientWrapper implements SalesTaxRatesWebCl
     @Override
     public Mono<ComplytSalesTaxRates> findByAddress(String state, String country, String county, String city, String street, String zip, String region, boolean isPartial, LocalDateTime transactionDate) {
         MandatoryAddress address = new MandatoryAddress(
-                city != null ? city : "",
-                country != null ? country : "",
-                county != null ? county : "",
-                state != null ? state : "",
-                street != null ? street : "",
-                region != null ? region : "",
-                zip != null ? zip : "",
-                isPartial);
-        Scoring scoring = new Scoring(MatchLevelType.EXCELLENT, 0.95, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT));
+                "Juneau", "USA", "San Joaquin", "Alaska", "2285 Trout St", "", "99801", null);
+        Scoring scoring = new Scoring(MatchLevelType.EXCELLENT, 0.95, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT));
         MatchedAddressData matchedAddressData = new MatchedAddressData(address, scoring);
 
         SalesTaxRates salesTaxRates = new SalesTaxRates(
@@ -80,7 +76,7 @@ public class StubComplytSalesTaxRatesClientWrapper implements SalesTaxRatesWebCl
     }
 
     @Override
-    public Mono<ComplytSalesTaxRates> findByAddress(@NonNull MandatoryAddress address, LocalDateTime transactionDate) {
+    public Mono<ComplytSalesTaxRates> findByAddress(@NonNull ShippingAddress address, LocalDateTime transactionDate) {
         return findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.region(), address.isPartial(), transactionDate);
     }
 

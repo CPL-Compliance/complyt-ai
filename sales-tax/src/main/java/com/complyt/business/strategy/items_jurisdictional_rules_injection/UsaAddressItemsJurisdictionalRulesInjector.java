@@ -4,7 +4,8 @@ import com.complyt.business.strategy.UsaAddressCityExtractor;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
-import com.complyt.domain.transaction.*;
+import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.StateNotFoundInJurisdictionalTaxRulesApiException;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 @Component
@@ -34,13 +34,7 @@ public class UsaAddressItemsJurisdictionalRulesInjector implements ItemsJurisdic
                     throw new StateNotFoundInJurisdictionalTaxRulesApiException();
                 }
 
-                String matchedAddressCity = Optional.ofNullable(transaction.getShippingAddress())
-                        .map(ShippingAddress::matchedAddressData)
-                        .map(MatchedAddressData::address)
-                        .map(MandatoryAddress::city)
-                        .orElse(null);
-
-                String city = CityAligner.getCityValue(matchedAddressCity);
+                String city = transaction.getShippingAddress().city();
                 rules = extractCityIfExists(rules, city);
 
                 Item itemWithRules = item.withJurisdictionalSalesTaxRules(rules);

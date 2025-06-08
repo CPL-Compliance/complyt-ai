@@ -79,7 +79,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 "New York", "United States", "New York", "New York",
                 "164 Mulberry St", "10014", null, false);
         FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, null);
-        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(true), TestUtilities.getScoringDto().withFieldScore(fieldsMatchScore));
+        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(null), TestUtilities.getScoringDto().withFieldScore(fieldsMatchScore));
 
         // When + Then
         webTestClient
@@ -108,7 +108,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         AddressDto addressDto = new AddressDto(
                 "Oxenfurt", "USA", "Gustfields", "NY",
                 "Oxenfurt Academy", "11221", null, false);
-        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(true), TestUtilities.getScoringDto());
+        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(null), TestUtilities.getScoringDto());
 
         Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
 
@@ -272,7 +272,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         HereAddressData hereAddressDataNoStreetGoodScore = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
                 .withAddress(new HereAddress(null, null, address.country(), null, address.state(), address.county(), address.city(), null, address.zip()))
                 .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0))));
-        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(true), TestUtilities.getScoringDto());
+        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(null), TestUtilities.getScoringDto());
 
         // When
         when(stubHereAddressValidationWebClientWrapper.validateAddress(address)).thenReturn(Mono.just(hereAddressDataNoStreetBadScore));
@@ -308,7 +308,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 null, "Israel", null, null,
                 null, "10014", null, false);
         ScoringDto scoringDto = TestUtilities.getScoringGlobalDto();
-        CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withIsPartial(true), scoringDto);
+        CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withIsPartial(null), scoringDto);
         ValidatedAddressDto expectedAddress = new ValidatedAddressDto(List.of(cachedAddressDataDto), addressDto);
 
         HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
@@ -346,7 +346,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 null, "Canada", null, null,
                 null, "10015", "Quebec", false);
         ScoringDto scoringDto = TestUtilities.getScoringGlobalDto();
-        CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withIsPartial(true), scoringDto);
+        CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withIsPartial(null), scoringDto);
         ValidatedAddressDto expectedAddress = new ValidatedAddressDto(List.of(cachedAddressDataDto), addressDto);
 
         HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
@@ -427,7 +427,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 "New York", "United States", null, "New York",
                 "164 Mulberry St", "10014", null, false);
         FieldsMatchScore fieldsMatchScore = new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, null);
-        CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withCounty("New York").withIsPartial(true), TestUtilities.getScoringDto().withFieldScore(fieldsMatchScore));
+        CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withCounty("New York").withIsPartial(null), TestUtilities.getScoringDto().withFieldScore(fieldsMatchScore));
         ValidatedAddressDto expectedAddress = new ValidatedAddressDto(List.of(cachedAddressDataDto), addressDto);
 
         // When + Then

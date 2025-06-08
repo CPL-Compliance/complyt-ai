@@ -2,7 +2,7 @@ package com.complyt.business.tax.gt.gt_tax_web_client;
 
 import com.complyt.annotations.Generated;
 import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
-import com.complyt.domain.transaction.MandatoryAddress;
+import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.tax.ComplytGtRates;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.EqualsAndHashCode;
@@ -25,7 +25,7 @@ public class StubGtWebClientWrapper implements SalesTaxRatesWebClientWrapper<Com
     }
 
     @Override
-    public Mono<ComplytGtRates> findByAddress(@NonNull MandatoryAddress address, LocalDateTime transactionDate) {
+    public Mono<ComplytGtRates> findByAddress(@NonNull ShippingAddress address, LocalDateTime transactionDate) {
         return Mono.fromCallable(() -> {
             String json = "{\"gtAddress\": {\"country\": \"CANADA\",\"region\": \"Quebec\"},\"gtRates\": {\"taxRate\": \"0.14975\",\"countryRate\": \"0.05\",\"regionRate\": \"0.0975\"}}";
             ObjectMapper objectMapper = new ObjectMapper();

@@ -41,7 +41,7 @@ public class NonUsaAddressItemsJurisdictionalRulesInjectorTest extends BaseTestC
     void setUp() {
         nonUsaAddressItemsJurisdictionalRulesInjector = new NonUsaAddressItemsJurisdictionalRulesInjector();
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        ShippingAddress nonUsaAddress = testUtilities.createNonUsaShippingAddressWithMatchedAddress();
+        ShippingAddress nonUsaAddress = testUtilities.createNonUsaShippingAddress();
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString())
                 .withShippingAddress(nonUsaAddress)
                 .withItems(testUtilities.createItems(false, true, true));
@@ -146,4 +146,3 @@ public class NonUsaAddressItemsJurisdictionalRulesInjectorTest extends BaseTestC
     }
 
 }
-

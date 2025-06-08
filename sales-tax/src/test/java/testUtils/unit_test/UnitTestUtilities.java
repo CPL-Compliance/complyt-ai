@@ -89,12 +89,8 @@ public class UnitTestUtilities {
         return new ShippingAddressDto("Fresno", "US", "county", "CA", "7498 N Remington Ave", "", "93711-5508", false, null);
     }
 
-    public static ShippingAddress createShippingAddressInCalifornia1() {
+    public static ShippingAddress createShippingAddressInCalifornia() {
         return new ShippingAddress("Fresno", "US", "county", "CA", "7498 N Remington Ave", "", "93711-5508", false, null);
-    }
-
-    public static MandatoryAddress createShippingAddressInCalifornia() {
-        return new MandatoryAddress("Fresno", "US", "county", "CA", "7498 N Remington Ave", "", "93711-5508", false);
     }
 
     public static MatchedAddressData createMatchedAddressData() {
@@ -103,7 +99,7 @@ public class UnitTestUtilities {
     }
 
     public static Scoring createScoring() {
-        return new Scoring(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT));
+        return new Scoring(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT));
     }
 
         public static SalesTaxRates createCaliforniaSalesTaxRates() {
@@ -941,7 +937,7 @@ public class UnitTestUtilities {
     }
 
     public MatchedAddressDataDto createMatchedAddressDto() {
-        return new MatchedAddressDataDto(createMandatoryAddressDto(), new ScoringDto(MatchLevelType.EXCELLENT, 0.9,new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT)));
+        return new MatchedAddressDataDto(createMandatoryAddressDto(), new ScoringDto(MatchLevelType.EXCELLENT, 0.9,new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT)));
     }
 
     public Address createUsaAddress() {
@@ -1063,22 +1059,6 @@ public class UnitTestUtilities {
 
     public ShippingAddress createNonUsaShippingAddress() {
         return new ShippingAddress(null, "ARM", null, null, null, null,"12345", false, null);
-    }
-
-    public ShippingAddress createNonUsaShippingAddressWithMatchedAddress() {
-        return new ShippingAddress(null, "ARM", null, null, null, null,"12345", false, createNonUsaMatchedAddress());
-    }
-
-    public ShippingAddress createUsaShippingAddressWithMatchedAddress() {
-        return new ShippingAddress(null, "USA", null, "California", null, null,"12345", false, createUsaMatchedAddress());
-    }
-
-    public MatchedAddressData createNonUsaMatchedAddress() {
-        return new MatchedAddressData(new MandatoryAddress(null, "ARM", null, null, null, null,"12345", false) , null);
-    }
-
-    public MatchedAddressData createUsaMatchedAddress() {
-        return new MatchedAddressData(new MandatoryAddress(null, "USA", null, "California", null, null,"12345", false) , null);
     }
 
     public Map<String, ProductClassification> createMapTaxCodesToClassifications() {

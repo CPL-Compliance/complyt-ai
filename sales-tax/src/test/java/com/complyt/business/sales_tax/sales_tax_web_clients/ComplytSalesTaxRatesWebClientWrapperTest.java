@@ -4,7 +4,6 @@ import com.complyt.business.exceptions.ComplytSalesTaxRatesException;
 import com.complyt.business.tax.sales_tax.models.ComplytInternalSalesTaxRatesDto;
 import com.complyt.business.tax.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
-import com.complyt.domain.transaction.MandatoryAddress;
 import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
 import com.complyt.security.TenantResolver;
@@ -59,14 +58,14 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
     @Test
     void findByAddress_validAddress_ReturnsSalesTaxData() {
         // Given
-        MandatoryAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
+        ShippingAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
         ComplytInternalSalesTaxRatesDto complytInternalSalesTaxRatesDto = UnitTestUtilities.createComplytInternalSalesTaxRatesDto();
         ComplytSalesTaxRates expextedComplytSalesTaxRates = ComplytSalesTaxRatesMapper.INSTANCE.complytSalesTaxRatesDtoToComplytSalesTaxRates(complytInternalSalesTaxRatesDto);
 
         // When
         when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(),
                 address.city(), address.street(), address.zip(),
-                address.isPartial(),transactionCreatedDateTime.toString(), true, false)).thenReturn(Mono.just(complytInternalSalesTaxRatesDto));
+                address.isPartial(),transactionCreatedDateTime.toString(), true)).thenReturn(Mono.just(complytInternalSalesTaxRatesDto));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address, transactionCreatedDateTime);
 
@@ -77,10 +76,10 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
     @Test
     void findByAddress_invalidAddress_ReturnsObjectNotFoundApiException() {
         // Given
-        MandatoryAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
+        ShippingAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
 
         // When
-        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial(), effectiveDate, true, false))
+        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial(), effectiveDate, true))
                 .thenReturn(Mono.error(testUtilities.create404NodFoundFeignException()));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address, transactionCreatedDateTime);
@@ -92,10 +91,10 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
     @Test
     void findByAddress_Returns404InternalError_ReturnsObjectNotFoundApiException() {
         // Given
-        MandatoryAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
+        ShippingAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
 
         // When
-        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial(), effectiveDate, true, false))
+        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial(), effectiveDate, true))
                 .thenReturn(Mono.error(testUtilities.create404NodFoundFeignException()));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address, transactionCreatedDateTime);
@@ -107,12 +106,12 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
     @Test
     void findByAddress_RatesServiceIsUnavailable_is5RetriesExhausted() {
         // Given
-        MandatoryAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
+        ShippingAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
 
         // When
         when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(),
                 address.city(), address.street(), address.zip(),
-                address.isPartial(),transactionCreatedDateTime.toString(), true, false)).thenReturn(Mono.error(new ComplytSalesTaxRatesException()));
+                address.isPartial(),transactionCreatedDateTime.toString(), true)).thenReturn(Mono.error(new ComplytSalesTaxRatesException()));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address, transactionCreatedDateTime);
 
@@ -127,12 +126,12 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
     @Test
     void findByAddress_NotFoundException_NoRetryOccurs() {
         // Given
-        MandatoryAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
+        ShippingAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
         FeignException.NotFound notFoundException = testUtilities.create404NodFoundFeignException();
 
         // When
         when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(),
-                address.street(), address.zip(), address.isPartial(), effectiveDate, true, false))
+                address.street(), address.zip(), address.isPartial(), effectiveDate, true))
                 .thenReturn(Mono.error(notFoundException));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address, transactionCreatedDateTime);
@@ -142,17 +141,17 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
                 .expectError(ObjectNotFoundApiException.class)
                 .verify();
 
-        verify(salesTaxRatesServiceProxy, times(1)).findByAddress(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(), anyString(), anyBoolean(), anyBoolean());
+        verify(salesTaxRatesServiceProxy, times(1)).findByAddress(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(), anyString(), anyBoolean());
     }
 
     @Test
     void findByAddress_BadRequestException_ThrowsObjectNotValidApiException() {
         // Given
-        MandatoryAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
+        ShippingAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
 
         // When
         when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(),
-                address.street(), address.zip(), address.isPartial(), effectiveDate, true, false))
+                address.street(), address.zip(), address.isPartial(), effectiveDate, true))
                 .thenReturn(Mono.error(UnitTestUtilities.create400BadRequestFeignException()));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address, transactionCreatedDateTime);
@@ -164,6 +163,6 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
                 )
                 .verify();
 
-        verify(salesTaxRatesServiceProxy, times(1)).findByAddress(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(), anyString(), anyBoolean(), anyBoolean());
+        verify(salesTaxRatesServiceProxy, times(1)).findByAddress(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(), anyString(), anyBoolean());
     }
 }

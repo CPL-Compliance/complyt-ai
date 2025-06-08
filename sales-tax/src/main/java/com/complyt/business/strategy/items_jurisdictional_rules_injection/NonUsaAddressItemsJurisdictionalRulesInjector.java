@@ -4,7 +4,8 @@ import com.complyt.business.strategy.NonUsaAddressRegionExtractor;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
-import com.complyt.domain.transaction.*;
+import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.CountryNotFoundInJurisdictionalTaxRulesApiException;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 @Component
@@ -34,13 +34,8 @@ public class NonUsaAddressItemsJurisdictionalRulesInjector implements ItemsJuris
                     throw new CountryNotFoundInJurisdictionalTaxRulesApiException();
                 }
 
-                String matchedAddressRegion = Optional.ofNullable(transaction.getShippingAddress())
-                        .map(ShippingAddress::matchedAddressData)
-                        .map(MatchedAddressData::address)
-                        .map(MandatoryAddress::region)
-                        .orElse(null);
-
-                rules = extractRegionIfExists(rules, matchedAddressRegion);
+                String region = transaction.getShippingAddress().region();
+                rules = extractRegionIfExists(rules, region);
 
                 Item itemWithRules = item.withJurisdictionalTaxRules(rules);
 
