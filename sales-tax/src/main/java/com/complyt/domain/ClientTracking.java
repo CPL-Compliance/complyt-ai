@@ -22,4 +22,6 @@ public class ClientTracking implements InternalTimestampsProperty {
     private final String name;
     private final Timestamps internalTimestamps;
     private final List<String> subsidiaries;
+    private final WebhookDetails webhookDetails;
+
 }

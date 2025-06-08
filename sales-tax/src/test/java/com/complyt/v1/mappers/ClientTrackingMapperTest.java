@@ -42,7 +42,7 @@ class ClientTrackingMapperTest {
         ClientTracking actualClientTracking = ClientTrackingMapper.INSTANCE.clientTrackingDtoTenantToClientTracking(givenClientTrackingDtoTenant);
 
         // Then
-        assertEquals(actualClientTracking, clientTracking);
+        assertEquals(clientTracking, actualClientTracking);
     }
 
     @Test

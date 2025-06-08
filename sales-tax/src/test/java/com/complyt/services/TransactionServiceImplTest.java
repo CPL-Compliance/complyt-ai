@@ -8,10 +8,13 @@ import com.complyt.business.transaction.BigDecimalProcessor;
 import com.complyt.business.transaction.DiscountCalculator;
 import com.complyt.business.transaction.MatchedAddressProvider;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
+import com.complyt.business.web_hook.WebhookHandler;
+import com.complyt.domain.audit.Action;
 import com.complyt.domain.currency.CurrencyExchangeRateObject;
 import com.complyt.domain.currency.CurrencySource;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
@@ -20,18 +23,13 @@ import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.transaction.*;
 import com.complyt.repositories.GeoRecordRepository;
 import com.complyt.repositories.TransactionRepository;
-import com.complyt.security.TenantResolver;
 import com.complyt.v1.exceptions.types.ZipCodeNotFoundApiException;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -50,7 +48,6 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -101,6 +98,11 @@ class TransactionServiceImplTest {
     @Mock
     InternalTimestampsInjector<Transaction> internalTimestampsInjector;
 
+    @Mock
+    WebhookHandler<Transaction> webhookHandler;
+
+    SalesTaxTracking salesTaxTracking;
+
     SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo;
     Transaction transaction;
     Customer customer;
@@ -110,15 +112,14 @@ class TransactionServiceImplTest {
     Timestamps internalTimestamps = new Timestamps(now, now);
 
 
-
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         customer = testUtilities.createCustomer(transaction.getId());
         source = testUtilities.getUnifiedSource();
         salesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(testUtilities.createSalesTaxTracking(UUID.randomUUID().toString()), false);
+        salesTaxTracking = testUtilities.createSalesTaxTracking(UUID.randomUUID().toString());
     }
 
     private Transaction createTransactionWithProductClassificationData(Transaction wantedTransaction) {
@@ -139,7 +140,8 @@ class TransactionServiceImplTest {
 
         // When
         when(transactionRepository.save(transaction)).thenReturn(Mono.just(transaction));
-        Mono<Transaction> transactionMono = transactionService.save(transaction);
+        when(webhookHandler.handleWebhook(Transaction.class, transaction, salesTaxTracking.getClientTracking().getWebhookDetails(), Action.CREATE)).thenReturn(Mono.just(transaction));
+        Mono<Transaction> transactionMono = transactionService.save(transaction, salesTaxTracking);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
@@ -171,6 +173,34 @@ class TransactionServiceImplTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+    }
+
+    @Test
+    void save_NullTransactionPassed_ThrowsException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.save(nullTransaction, salesTaxTracking);
+        });
+
+        // Then
+        assertEquals("transaction is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void save_NullSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.save(transaction, null);
+        });
+
+        // Then
+        assertEquals("salesTaxTracking is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
@@ -270,7 +300,7 @@ class TransactionServiceImplTest {
         Transaction transaction = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(externalID, source, transaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(externalID, source, transaction, salesTaxTracking));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
@@ -282,10 +312,10 @@ class TransactionServiceImplTest {
         String externalID = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(externalID, source, transaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(externalID, source, transaction, salesTaxTracking));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+        assertEquals("externalId is marked non-null but is null", nullPointerException.getMessage());
     }
 
 
@@ -297,8 +327,8 @@ class TransactionServiceImplTest {
         // When
         when(transactionRepository.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionRepository.save(transaction.withCustomer(null))).thenReturn(Mono.just(transaction));
-
-        Mono<Transaction> transactionMono = transactionService.update(externalId, source, transaction);
+        when(webhookHandler.handleWebhook(Transaction.class, transaction, salesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(transaction));
+        Mono<Transaction> transactionMono = transactionService.update(externalId, source, transaction, salesTaxTracking);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
@@ -310,7 +340,7 @@ class TransactionServiceImplTest {
         transaction = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update("", source, transaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update("", source, transaction, null));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
@@ -322,7 +352,7 @@ class TransactionServiceImplTest {
         String nullSource = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(transaction.getExternalId(), nullSource, transaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(transaction.getExternalId(), nullSource, transaction, salesTaxTracking));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "source is marked non-null but is null");
@@ -336,7 +366,7 @@ class TransactionServiceImplTest {
         // When
         when(transactionRepository.findByExternalIdAndSource(transaction.getExternalId(), source)).thenReturn(Mono.just(transaction));
         when(transactionRepository.save(cancelledTransaction)).thenReturn(Mono.just(cancelledTransaction));
-
+        when(webhookHandler.handleWebhook(Transaction.class, cancelledTransaction, null, Action.DELETE)).thenReturn(Mono.just(cancelledTransaction));
         Mono<Transaction> transactionMono = transactionService.markAsCancelled(transaction.getExternalId(), source);
 
         // Then
@@ -442,7 +472,7 @@ class TransactionServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionService.update(externalId, source, nullTransaction);
+            transactionService.update(externalId, source, nullTransaction, salesTaxTracking);
         });
 
         // Then
@@ -702,7 +732,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndNullState_ReturnsTransaction() {
         // Given
-        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, null, null, null,"80001", true, null);
+        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, null, null, null, "80001", true, null);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         ShippingFee givenShippingFee = transactionWithPartialAddress.getShippingFee();
@@ -756,7 +786,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndBlankState_ReturnsTransaction() {
         // Given
-        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, "",null, null,"80001",true, null);
+        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, "", null, null, "80001", true, null);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         ShippingFee givenShippingFee = transactionWithPartialAddress.getShippingFee();
@@ -810,7 +840,7 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToTransaction_InjectsDataToNewTransactionWithPartialAddressAndInvalidZipCode_ReturnsAnError() {
         // Given
-        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, null, null, null,"InvalidZipCode", true, null);
+        ShippingAddress partialShippingAddress = new ShippingAddress(null, "US", null, null, null, null, "InvalidZipCode", true, null);
         Transaction transactionWithPartialAddress = transaction.withShippingAddress(partialShippingAddress);
 
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transactionWithPartialAddress);

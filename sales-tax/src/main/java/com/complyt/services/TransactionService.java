@@ -1,6 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.services.crud.CrudService;
 import lombok.NonNull;
@@ -22,7 +23,7 @@ public interface TransactionService extends CrudService<Transaction, String> {
 
     Flux<Transaction> findAllBySource(@NonNull final String source);
 
-    Mono<Transaction> update(@NonNull final String externalId, @NonNull String source, @NonNull final Transaction transaction);
+    Mono<Transaction> update(@NonNull final String externalId, @NonNull String source, @NonNull final Transaction transaction, SalesTaxTracking salesTaxTracking);
 
     Mono<Transaction> markAsCancelled(@NonNull final String externalId, @NonNull final String source);
 
@@ -33,6 +34,8 @@ public interface TransactionService extends CrudService<Transaction, String> {
     Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction);
 
     Mono<Transaction> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction);
+
+    Mono<Transaction> save(@NonNull Transaction transaction, SalesTaxTracking salesTaxTracking);
 
     Mono<Transaction> checkTransactionNotHavingComplytId(@NonNull final Transaction newTransaction);
 

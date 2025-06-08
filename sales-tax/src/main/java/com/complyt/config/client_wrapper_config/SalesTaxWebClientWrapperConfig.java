@@ -1,4 +1,4 @@
-package com.complyt.config;
+package com.complyt.config.client_wrapper_config;
 
 import com.complyt.business.tax.SalesTaxRatesWebClientWrapper;
 import com.complyt.business.tax.gt.gt_tax_web_client.GtWebClientWrapper;

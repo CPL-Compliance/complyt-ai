@@ -6,3 +6,5 @@ spring:
   data:
     mongodb:
       uuid-representation: standard
+
+hmaac-secret-key: 123

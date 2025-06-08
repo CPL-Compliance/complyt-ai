@@ -2,19 +2,14 @@ package com.complyt.domain.client_tracking;
 
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.Nexus;
-import com.complyt.security.TenantResolver;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mockStatic;
 
 class ClientTrackingTest {
 
@@ -23,20 +18,19 @@ class ClientTrackingTest {
     private ClientTracking clientTracking;
     private LocalDateTime nexusDate;
 
-   
-
     @BeforeEach
     void setup() {
         id = UUID.randomUUID().toString();
         tenantId = UUID.randomUUID().toString();
         nexusDate = LocalDateTime.now();
-        clientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name", null, null);
+        clientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name", null, null,
+                null);
     }
 
     @Test
     void Equals_sameClientTracking_ReturnsTrue() {
         // Given
-        ClientTracking givenClientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name", null, null);
+        ClientTracking givenClientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name", null, null, null);
 
         // When
         boolean isEquals = clientTracking.equals(givenClientTracking);
@@ -54,6 +48,7 @@ class ClientTrackingTest {
                 ", name=" + clientTracking.getName() +
                 ", internalTimestamps=" + clientTracking.getInternalTimestamps() +
                 ", subsidiaries=" + clientTracking.getSubsidiaries() +
+                ", webhookDetails=" + clientTracking.getWebhookDetails() +
                 ")";
 
         // When

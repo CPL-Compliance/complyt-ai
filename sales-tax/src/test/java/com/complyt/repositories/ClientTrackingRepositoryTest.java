@@ -57,7 +57,8 @@ public class ClientTrackingRepositoryTest extends BaseTestClass {
     }
 
     private ClientTracking createClientTracking() {
-        return new ClientTracking(tenantId, UUID.randomUUID().toString(), new Nexus(null), "name",null, null);
+        return new ClientTracking(tenantId, UUID.randomUUID().toString(), new Nexus(null), "name",null, null,
+                null);
     }
 
     @Test
