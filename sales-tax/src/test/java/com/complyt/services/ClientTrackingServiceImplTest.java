@@ -5,15 +5,11 @@ import com.complyt.domain.ClientTracking;
 import com.complyt.domain.Nexus;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.ClientTrackingRepository;
-import com.complyt.security.TenantResolver;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
@@ -25,7 +21,6 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -44,12 +39,11 @@ class ClientTrackingServiceImplTest {
     private ClientTracking clientTracking;
 
 
-
     @BeforeEach
     void setUp() {
         Nexus nexus = new Nexus(null);
         Timestamps internalTimestamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
-        clientTracking = new ClientTracking(UUID.randomUUID().toString(), UUID.randomUUID().toString(), nexus, "name", internalTimestamps, null);
+        clientTracking = new ClientTracking(UUID.randomUUID().toString(), UUID.randomUUID().toString(), nexus, "name", internalTimestamps, null, null);
     }
 
     @Test
@@ -133,7 +127,7 @@ class ClientTrackingServiceImplTest {
         // Given
         ClientTracking anotherClientTracking = clientTracking.withName("changedName");
         LocalDateTime now = LocalDateTime.now();
-        Timestamps internalTimestamps = new Timestamps(clientTracking.getInternalTimestamps().getCreatedDate(),now);
+        Timestamps internalTimestamps = new Timestamps(clientTracking.getInternalTimestamps().getCreatedDate(), now);
         ClientTracking clientTrackingWithUpdatedDates = clientTracking.withInternalTimestamps(internalTimestamps);
 
         // Then
@@ -155,7 +149,7 @@ class ClientTrackingServiceImplTest {
     void injectDataToNewClientTracking_InjectsData_ReturnsInjectedClientTracking() {
         // Given
         LocalDateTime now = LocalDateTime.now();
-        Timestamps internalTimestamps = new Timestamps(clientTracking.getInternalTimestamps().getCreatedDate(),now);
+        Timestamps internalTimestamps = new Timestamps(clientTracking.getInternalTimestamps().getCreatedDate(), now);
         ClientTracking clientTrackingWithUpdatedDates = clientTracking.withInternalTimestamps(internalTimestamps);
 
 

@@ -43,6 +43,8 @@ spring.config.import: vault://
 
 auth0.audience: ${audience}
 
+hmaac.secretKey: ${hmaac-secret-key}
+
 # This property sets the issuer URI
 # for the application to interact with the Resource Server for authentication and authorization purposes
 spring.security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}

@@ -3,6 +3,7 @@ package com.complyt.config;
 import com.complyt.business.strategy.currencyExchange.ComplytCurrenciesWebClientWrapper;
 import com.complyt.business.strategy.currencyExchange.CurrenciesWebClientWrapper;
 import com.complyt.business.strategy.currencyExchange.StubCurrenciesWebClientWrapper;
+import com.complyt.config.client_wrapper_config.CurrenciesWebClientWrapperConfig;
 import com.complyt.security.TenantResolver;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

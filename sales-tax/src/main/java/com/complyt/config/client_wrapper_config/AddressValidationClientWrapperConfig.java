@@ -1,4 +1,4 @@
-package com.complyt.config;
+package com.complyt.config.client_wrapper_config;
 
 
 import com.complyt.business.address_validation.AddressValidationWebClientWrapper;

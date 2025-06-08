@@ -1,29 +1,27 @@
 package com.complyt.services.nexus;
 
-import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.domain.audit.Action;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.services.crud.CrudService;
 import lombok.NonNull;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
-
 
 public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, String> {
 
     Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking);
 
-    Mono<SalesTaxTracking> upsertWithoutNexusSummaryIfNeeded(@NonNull SalesTaxTracking salesTaxTracking);
+    Mono<SalesTaxTracking> createAndSave(@NonNull SalesTaxTracking salesTaxTracking);
+
+    Mono<SalesTaxTracking> upsertWithoutNexusSummaryIfNeeded(@NonNull SalesTaxTracking salesTaxTracking, Action action);
 
     Mono<SalesTaxTracking> addClientAndStateDetails(@NonNull SalesTaxTracking salesTaxTracking);
 
     Mono<SalesTaxTracking> findByCountryStateAndSubsidiary(@NonNull String country, String state, String subsidiaryId);
 
     Mono<SalesTaxTracking> findByComplytId(@NonNull UUID complytId);
-
-    Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull NexusStateRule stateRule, @NonNull LocalDateTime referenceDate);
 
     Mono<SalesTaxTracking> injectDataToNewSalesTaxTracking(@NonNull SalesTaxTracking SalesTaxTracking);
 
@@ -46,4 +44,5 @@ public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, S
     Mono<SalesTaxTracking> injectRegisteredDateToSalesTaxTracking(@NonNull SalesTaxTracking salesTaxTracking);
 
     Mono<SalesTaxTracking> handleSalesTaxEnforcement(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking);
+
 }

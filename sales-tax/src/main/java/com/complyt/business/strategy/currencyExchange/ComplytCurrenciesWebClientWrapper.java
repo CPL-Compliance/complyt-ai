@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Slf4j
 @AllArgsConstructor
 @EqualsAndHashCode
-public class ComplytCurrenciesWebClientWrapper implements CurrenciesWebClientWrapper{
+public class ComplytCurrenciesWebClientWrapper implements CurrenciesWebClientWrapper {
 
     @NonNull
     private WebClient webClient;
@@ -26,15 +26,15 @@ public class ComplytCurrenciesWebClientWrapper implements CurrenciesWebClientWra
 
         return ContextLogger.observeCtx("Searching exchange rate for currency " + currency + " in date " + date, log::info)
                 .then(webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .queryParam("currency", currency)
-                        .queryParam("date", date).build())
-                .header("Content-Type", "application/json")
-                .retrieve()
-                .bodyToMono(CurrencyExchangeRateObject.class)
-                .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
-                        .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
-                                new RuntimeException(retrySignal.totalRetries() + " Retries Exhausted")))));
+                        .uri(uriBuilder -> uriBuilder
+                                .queryParam("currency", currency)
+                                .queryParam("date", date).build())
+                        .header("Content-Type", "application/json")
+                        .retrieve()
+                        .bodyToMono(CurrencyExchangeRateObject.class)
+                        .retryWhen(Retry.backoff(5, Duration.ofMillis(50))
+                                .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) ->
+                                        new RuntimeException(retrySignal.totalRetries() + " Retries Exhausted")))));
     }
 }
 

@@ -12,7 +12,7 @@ class CustomerTypeTest {
         CustomerType customerType = CustomerType.RETAIL;
 
         // Then
-        assertEquals(CustomerType.valueOf("RETAIL"), customerType);
+        assertEquals(customerType, CustomerType.valueOf("RETAIL"));
     }
 
     @Test
@@ -21,7 +21,7 @@ class CustomerTypeTest {
         CustomerType customerType = CustomerType.MARKETPLACE;
 
         // Then
-        assertEquals(CustomerType.valueOf("MARKETPLACE"), customerType);
+        assertEquals(customerType, CustomerType.valueOf("MARKETPLACE"));
     }
 
     @Test
@@ -30,7 +30,7 @@ class CustomerTypeTest {
         CustomerType customerType = CustomerType.RESELLER;
 
         // Then
-        assertEquals(CustomerType.valueOf("RESELLER"), customerType);
+        assertEquals(customerType, CustomerType.valueOf("RESELLER"));
     }
 
     @Test
@@ -39,6 +39,6 @@ class CustomerTypeTest {
         CustomerType customerType = CustomerType.RETAIL_EXEMPT;
 
         // Then
-        assertEquals(CustomerType.valueOf("RETAIL_EXEMPT"), customerType);
+        assertEquals(customerType, CustomerType.valueOf("RETAIL_EXEMPT"));
     }
 }

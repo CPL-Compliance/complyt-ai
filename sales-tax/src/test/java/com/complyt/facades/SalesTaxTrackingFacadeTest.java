@@ -80,7 +80,7 @@ public class SalesTaxTrackingFacadeTest {
         when(nexusService.getNexusSummaryDate(eq(salesTaxTrackingWithId), any())).thenReturn(Mono.just(dateRange));
         when(nexusService.recalculationOfNexusSummaryIfRequired(eq(salesTaxTrackingWithId), any())).thenReturn(Mono.just(salesTaxTrackingWithId));
         when(salesTaxTrackingService.updateAppliedDateByPhysicalAndEconomicNexusEstablished(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
-        when(salesTaxTrackingService.save(newSalesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingWithId));
+        when(salesTaxTrackingService.createAndSave(newSalesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingWithId));
 
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.save(newSalesTaxTracking);
 
@@ -216,6 +216,7 @@ public class SalesTaxTrackingFacadeTest {
         when(nexusService.getNexusSummaryDate(eq(salesTaxTracking), any())).thenReturn(Mono.just(dateRange));
         when(nexusService.recalculationOfNexusSummaryIfRequired(eq(salesTaxTracking), any())).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingService.findByComplytId(complytId)).thenReturn(Mono.just(salesTaxTracking));
+
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.findByComplytId(complytId);
 
         // Then

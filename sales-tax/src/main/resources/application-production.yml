@@ -70,3 +70,5 @@ logging:
     reactor:
       netty:
         http: INFO
+
+hmaac.secretKey: ${hmaac-secret-key}

@@ -2,6 +2,7 @@ package com.complyt.config;
 
 import com.complyt.business.vat_validation.web_clients.VatValidationWebClientWrapper;
 import com.complyt.business.vat_validation.web_clients.VowVatValidationWebClientWrapper;
+import com.complyt.config.client_wrapper_config.VatValidationClientWrapperConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
