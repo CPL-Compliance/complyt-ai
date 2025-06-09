@@ -23,18 +23,17 @@ public class WebhookHandler<T extends ComplytIdProperty> {
     private WebhookEntityCreator<T> webhookEntityCreator;
 
     public Mono<T> handleWebhook(Class<T> webhookClass, T object, WebhookDetails webhookDetails, Action action) {
-        return ContextLogger.observeCtx("Checking whether webhook forwarding is required", log::info)
-                .then(shouldForwardRequest(webhookDetails)
-                        .flatMap(should -> should ?
-                                webhookEntityCreator.create(webhookClass, object, action)
-                                        .flatMap(webhookEntityWrapper ->
-                                                webhookWebClientWrapper.sendWebhook(webhookEntityWrapper, webhookDetails.host(), webhookDetails.path())) : Mono.empty())
-                        .thenReturn(object));
+        return shouldForwardRequest(webhookDetails)
+                .flatMap(should -> should ?
+                        webhookEntityCreator.create(webhookClass, object, action)
+                                .flatMap(webhookEntityWrapper ->
+                                        webhookWebClientWrapper.sendWebhook(webhookEntityWrapper, webhookDetails.host(), webhookDetails.path())) : Mono.empty())
+                .thenReturn(object);
     }
 
     private Mono<Boolean> shouldForwardRequest(WebhookDetails webhookDetails) {
         Boolean shouldForward = webhookDetails != null && webhookDetails.shouldForwardWriteOperations();
-        return ContextLogger.observeCtx("Should forward webhook returned " + shouldForward, log::info)
+        return ContextLogger.observeCtx("Checking whether webhook forwarding is required returned " + shouldForward, log::info)
                 .thenReturn(shouldForward);
     }
 }
