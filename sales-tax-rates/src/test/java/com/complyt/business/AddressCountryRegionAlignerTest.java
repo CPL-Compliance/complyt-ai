@@ -11,10 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-public class AddressRegionAlignerTest {
+public class AddressCountryRegionAlignerTest {
 
     @InjectMocks
-    AddressRegionAligner addressRegionAligner;
+    AddressCountryRegionAligner qddressCountryRegionAligner;
 
     @Test
     void align_NullGtAddressPassed_ThrowsException() {
@@ -23,7 +23,7 @@ public class AddressRegionAlignerTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            addressRegionAligner.align(gtAddress);
+            qddressCountryRegionAligner.align(gtAddress);
         });
 
         assertEquals(nullPointerException.getMessage(), "gtAddress " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
@@ -35,7 +35,7 @@ public class AddressRegionAlignerTest {
         GtAddress gtAddress = TestUtilities.createCanadaGtAddress().withRegion("Quebec");
 
         // When
-        GtAddress alignedGtAddress = addressRegionAligner.align(gtAddress);
+        GtAddress alignedGtAddress = qddressCountryRegionAligner.align(gtAddress);
 
         // Then
         assertEquals(gtAddress, alignedGtAddress);
@@ -47,7 +47,7 @@ public class AddressRegionAlignerTest {
         GtAddress gtAddress = TestUtilities.createCanadaGtAddress().withRegion("qUEBEC");
 
         // When
-        GtAddress alignedGtAddress = addressRegionAligner.align(gtAddress);
+        GtAddress alignedGtAddress = qddressCountryRegionAligner.align(gtAddress);
 
         // Then
         assertEquals(gtAddress.withRegion("Quebec"), alignedGtAddress);
@@ -59,7 +59,7 @@ public class AddressRegionAlignerTest {
         GtAddress gtAddress = TestUtilities.createCanadaGtAddress().withRegion("Quebecq");
 
         // When
-        GtAddress alignedGtAddress = addressRegionAligner.align(gtAddress);
+        GtAddress alignedGtAddress = qddressCountryRegionAligner.align(gtAddress);
 
         // Then
         assertEquals(gtAddress.withRegion("Quebec"), alignedGtAddress);
@@ -71,7 +71,7 @@ public class AddressRegionAlignerTest {
         GtAddress gtAddress = TestUtilities.createCanadaGtAddress().withRegion("Quebecccccccc");
 
         // When
-        GtAddress alignedGtAddress = addressRegionAligner.align(gtAddress);
+        GtAddress alignedGtAddress = qddressCountryRegionAligner.align(gtAddress);
 
         // Then
         assertEquals(gtAddress.withRegion(null), alignedGtAddress);
@@ -83,7 +83,7 @@ public class AddressRegionAlignerTest {
         GtAddress gtAddress = TestUtilities.createCanadaGtAddress().withRegion(null);
 
         // When
-        GtAddress alignedGtAddress = addressRegionAligner.align(gtAddress);
+        GtAddress alignedGtAddress = qddressCountryRegionAligner.align(gtAddress);
 
         // Then
         assertEquals(gtAddress, alignedGtAddress);

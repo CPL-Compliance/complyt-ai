@@ -36,6 +36,7 @@ public class ComplytGtRatesHandler {
     @GtRatesReadPermission
     public Mono<ServerResponse> getGtRatesByAddress(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        boolean shouldValidateAddress = Boolean.parseBoolean(serverRequest.queryParam("shouldValidateAddress").orElse(String.valueOf(true))); // At this point we do not validate the address that was sent from a client outside the API
 
         Mono<ComplytGtRatesDto> complytGtRatesDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(gtAddressDtoValidationHandler.validate(serverRequest))

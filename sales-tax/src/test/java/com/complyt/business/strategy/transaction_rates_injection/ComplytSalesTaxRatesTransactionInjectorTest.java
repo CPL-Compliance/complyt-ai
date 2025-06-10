@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
@@ -80,21 +81,17 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
         }};
         Collection<Taxable> taxables = new ArrayList<>(transaction.getItems());
         Transaction transactionWithRates = transaction.withItems(itemsWithRates);
-        CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(complytSalesTaxRates.matchedAddressData().address().city(), complytSalesTaxRates.matchedAddressData().address().county());
-        MandatoryAddress mandatoryAddressWithCityCounty = matchedAddressData.address().withCounty(cityCountyWrapper.county()).withCity(cityCountyWrapper.city());
-        Transaction transactionWithRatesAndCityCounty = transactionWithRates.withShippingAddress(transactionWithRates.getShippingAddress().withMatchedAddressData(matchedAddressData.withAddress(mandatoryAddressWithCityCounty)));
-        Transaction transactionWithRatesAndSalesTaxAndCityCounty = transactionWithRatesAndCityCounty.withSalesTax(salesTax).withFinalTransactionAmount(BigDecimal.valueOf(10));
+        Transaction transactionWithRatesAndSalesTax = transactionWithRates.withSalesTax(salesTax).withFinalTransactionAmount(BigDecimal.valueOf(10));
 
 
         // When
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)).thenReturn(Mono.just(transactionWithRates));
-        when(taxableCollectionBuilder.build(transactionWithRatesAndCityCounty)).thenReturn(taxables);
+        when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxables);
         when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
-        when(transactionCityCountyInjector.inject(matchedAddressData, transactionWithRates)).thenReturn(Mono.just(transactionWithRatesAndCityCounty));
         Mono<Transaction> transactionMono = complytSalesTaxRatesTransactionInjector.inject(transaction).apply((Pair.with(complytSalesTaxRates, false)));
 
         // Then
-        StepVerifier.create(transactionMono).expectNext(transactionWithRatesAndSalesTaxAndCityCounty).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transactionWithRatesAndSalesTax).verifyComplete();
     }
 
     @Test
@@ -109,16 +106,14 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
             add(transactionToSend.getItems().get(0).withSalesTaxRates(salesTaxRates));
         }};
         Collection<Taxable> taxables = new ArrayList<>(transactionToSend.getItems());
-        CityCountyWrapper cityCountyWrapper = new CityCountyWrapper(complytSalesTaxRates.matchedAddressData().address().city(), complytSalesTaxRates.matchedAddressData().address().county());
         Transaction transactionWithRates = transactionToSend.withItems(itemsWithRates);
-        Transaction transactionWithRatesAndCityCounty = transactionWithRates.withShippingAddress(transactionWithRates.getShippingAddress().withCounty(cityCountyWrapper.county()).withCity(cityCountyWrapper.city()));
-        Transaction transactionWithRatesAndSalesTax = transactionWithRatesAndCityCounty.withSalesTax(salesTax);
+        Transaction transactionWithRatesAndSalesTax = transactionWithRates.withSalesTax(salesTax);
 
         // When
         when(transactionSalesTaxRatesHandler.setRates(transactionToSend, salesTaxRates)).thenReturn(Mono.just(transactionWithRates));
-        when(taxableCollectionBuilder.build(transactionWithRatesAndCityCounty)).thenReturn(taxables);
+        when(taxableCollectionBuilder.build(any(Transaction.class))).thenReturn(taxables);
         when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
-        when(transactionCityCountyInjector.inject(matchedAddressData, transactionWithRates)).thenReturn(Mono.just(transactionWithRatesAndCityCounty));
+
         Mono<Transaction> transactionMono = complytSalesTaxRatesTransactionInjector.inject(transactionToSend).apply(Pair.with(complytSalesTaxRates, false));
 
         // Then
@@ -144,7 +139,6 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
         when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRatesAndCityCounty)).thenReturn(taxables);
-        when(transactionCityCountyInjector.inject(matchedAddressData, transactionWithRates)).thenReturn(Mono.just(transactionWithRatesAndCityCounty));
 
         Mono<Transaction> transactionMono = complytSalesTaxRatesTransactionInjector.inject(transaction).apply(Pair.with(complytSalesTaxRates, true));
 
@@ -180,7 +174,6 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRatesAndCityCounty)).thenReturn(taxables);
         when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
-        when(transactionCityCountyInjector.inject(matchedAddressData, transactionWithRates)).thenReturn(Mono.just(transactionWithRatesAndCityCounty));
         Mono<Transaction> transactionMono = complytSalesTaxRatesTransactionInjector.inject(transaction).apply(Pair.with(complytSalesTaxRates, true));
 
         // Then
@@ -216,7 +209,6 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRatesAndCityCounty)).thenReturn(taxables);
         when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
-        when(transactionCityCountyInjector.inject(matchedAddressData, transactionWithRates)).thenReturn(Mono.just(transactionWithRatesAndCityCounty));
 
         Mono<Transaction> transactionMono = complytSalesTaxRatesTransactionInjector.inject(transaction).apply(Pair.with(complytSalesTaxRates, true));
 
@@ -224,3 +216,4 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
         StepVerifier.create(transactionMono).expectNext(transactionWithRatesAndSalesTaxAndCityCounty).verifyComplete();
     }
 }
+

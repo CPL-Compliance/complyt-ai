@@ -6,6 +6,6 @@ import reactor.core.publisher.Mono;
 public interface AddressValidationWebClientWrapper<T> {
     Mono<T> validateAddress(ShippingAddress address);
 
-    Mono<T> validateAddress(String city, String country, String county, String state, String street, String zip,
+    Mono<T> validateAddress(String city, String country, String county, String state, String region, String street, String zip,
                             boolean isPartial);
 }

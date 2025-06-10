@@ -1,21 +1,16 @@
 package com.complyt.domain.mappers;
 
-import com.complyt.domain.Address;
 import com.complyt.domain.AddressWithDate;
 import com.complyt.domain.common_rates.CommonAddress;
-import com.complyt.domain.common_rates.CommonRates;
 import com.complyt.domain.common_rates.CommonSalesTaxRates;
 import com.complyt.domain.SalesTaxRatesData;
 import com.complyt.domain.internal_rates.FilingMetaData;
-import com.complyt.domain.internal_rates.InternalSalesTaxRates;
 import com.complyt.domain.internal_rates.InternalSalesTaxRatesMetaData;
 import com.complyt.domain.matched_address.MatchedAddressData;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
-
-import java.sql.Array;
 
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
 public interface CommonSalesTaxRatesToSalesTaxRatesMapper {
@@ -70,5 +65,4 @@ public interface CommonSalesTaxRatesToSalesTaxRatesMapper {
                 metaData.getFipsCounty()
         );
     }
-
 }

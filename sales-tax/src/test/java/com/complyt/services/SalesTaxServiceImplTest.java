@@ -11,6 +11,7 @@ import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionType;
 import com.complyt.security.TenantResolver;
@@ -67,6 +68,8 @@ public class SalesTaxServiceImplTest {
     String salesTaxTrackingId;
     UnitTestUtilities testUtilities;
 
+    ShippingAddress californiaShippingAddress;
+
 
 
     @BeforeEach
@@ -75,6 +78,7 @@ public class SalesTaxServiceImplTest {
         salesTaxTrackingId = UUID.randomUUID().toString();
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         customer = testUtilities.createCustomer(UUID.randomUUID().toString());
+        californiaShippingAddress = testUtilities.createUsaShippingAddressWithMatchedAddress();
     }
 
     @Test
@@ -93,6 +97,7 @@ public class SalesTaxServiceImplTest {
     @Test
     void handleSalesTaxCalculation_CustomerIsOfMarketPlaceType_ReturnsSameTransaction() {
         // Given
+        transaction = transaction.withShippingAddress(californiaShippingAddress);
         SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         Customer marketPlaceCustomer = customer.withCustomerType(CustomerType.MARKETPLACE);
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
@@ -106,7 +111,7 @@ public class SalesTaxServiceImplTest {
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
-        when(salesTaxRatesWrapperStrategy.select(transaction)).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
+        when(salesTaxRatesWrapperStrategy.select(transaction.getShippingAddress().matchedAddressData().address())).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
         when(transactionRatesInjectionStrategy.select(transaction)).thenReturn(transaction -> Mono.just(transactionWithSalesTax));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, marketPlaceCustomer);
 
@@ -130,6 +135,7 @@ public class SalesTaxServiceImplTest {
     @Test
     void handleSalesTaxCalculation_SalesTaxCalculated_TransactionModified() {
         // Given
+        transaction = transaction.withShippingAddress(californiaShippingAddress);
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
         SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null, null); //todo: note gst is null
@@ -142,7 +148,7 @@ public class SalesTaxServiceImplTest {
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
-        when(salesTaxRatesWrapperStrategy.select(transaction)).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
+        when(salesTaxRatesWrapperStrategy.select(transaction.getShippingAddress().matchedAddressData().address())).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
         when(transactionRatesInjectionStrategy.select(transaction)).thenReturn(transaction -> Mono.just(transactionWithSalesTax));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, customer);
 
@@ -153,6 +159,7 @@ public class SalesTaxServiceImplTest {
     @Test
     void handleSalesTaxCalculation_TransactionWithSalesTaxWithOutAmount_TransactionModified() {
         // Given
+        transaction = transaction.withShippingAddress(californiaShippingAddress);
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
         SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null, null); //todo: note gst is null
@@ -165,7 +172,7 @@ public class SalesTaxServiceImplTest {
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
-        when(salesTaxRatesWrapperStrategy.select(transaction)).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
+        when(salesTaxRatesWrapperStrategy.select(transaction.getShippingAddress().matchedAddressData().address())).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
         when(transactionRatesInjectionStrategy.select(transaction)).thenReturn(transaction -> Mono.just(transactionWithSalesTaxWithOutAmount));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, customer);
 
@@ -176,6 +183,7 @@ public class SalesTaxServiceImplTest {
     @Test
     void handleSalesTaxCalculation_SalesTaxDataIsUnincorporated_SalesTaxCalculatedAndTransactionModified() {
         // Given
+        transaction = transaction.withShippingAddress(californiaShippingAddress);
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
         SalesTax salesTax = new SalesTax(null, new BigDecimal(10), salesTaxRates.taxRate(), salesTaxRates, null, null); //todo: note gst is null
@@ -188,7 +196,7 @@ public class SalesTaxServiceImplTest {
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
-        when(salesTaxRatesWrapperStrategy.select(transaction)).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
+        when(salesTaxRatesWrapperStrategy.select(transaction.getShippingAddress().matchedAddressData().address())).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
         when(transactionRatesInjectionStrategy.select(transaction)).thenReturn(transaction -> Mono.just(transactionWithSalesTax));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, customer);
 
@@ -199,6 +207,7 @@ public class SalesTaxServiceImplTest {
     @Test
     void handleSalesTaxCalculation_CustomerIsFullyExemptedInState_ReturnsTransactionWithOutSalesTax() {
         // Given
+        transaction = transaction.withShippingAddress(californiaShippingAddress);
         SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
@@ -211,7 +220,7 @@ public class SalesTaxServiceImplTest {
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(true));
-        when(salesTaxRatesWrapperStrategy.select(transaction)).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
+        when(salesTaxRatesWrapperStrategy.select(transaction.getShippingAddress().matchedAddressData().address())).thenReturn(transaction -> Mono.just((ComplytInternalRates) complytSalesTaxRates));
         when(transactionRatesInjectionStrategy.select(transaction)).thenReturn(transaction -> Mono.just(transactionWithSalesTax));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, customer);
 

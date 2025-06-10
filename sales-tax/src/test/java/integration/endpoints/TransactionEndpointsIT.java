@@ -791,7 +791,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(transactionDto -> {
                     assertNotNull(transactionDto.salesTax(), "salesTax should not null");
                     assertNotNull(transactionDto.shippingAddress().matchedAddressData().address().county(), "county is missing");
-                    assertEquals(scoringDto.withScore(0.95), transactionDto.shippingAddress().matchedAddressData().scoring());
+                    assertEquals(scoringDto.withScore(0.9), transactionDto.shippingAddress().matchedAddressData().scoring());
                 });
     }
 
@@ -820,7 +820,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(transactionDto -> {
                     assertNotNull(transactionDto.salesTax().salesTaxRates(), "salesTaxRates isn't null");
                     assertNotNull(transactionDto.shippingAddress().matchedAddressData().address().county(), "county is missing");
-                    assertEquals(scoringDto.withScore(0.95), transactionDto.shippingAddress().matchedAddressData().scoring());
+                    assertEquals(scoringDto.withScore(0.9), transactionDto.shippingAddress().matchedAddressData().scoring());
                 });
     }
 

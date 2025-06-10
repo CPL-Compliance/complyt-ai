@@ -9,6 +9,6 @@ import lombok.NonNull;
 import reactor.core.publisher.Mono;
 
 public interface SalesTaxRatesFacade <T extends TaxRates> {
-    Mono<SalesTaxRatesData> validateAddress(@NonNull AddressWithDate address, Boolean detailed);
+    Mono<SalesTaxRatesData> validateAddress(@NonNull AddressWithDate address, Boolean detailed, Boolean shouldValidateAddress);
     Mono<InternalSalesTaxRates> updateRate(@NonNull InternalSalesTaxRates internalRates, @NonNull RatesStatus status);
 }

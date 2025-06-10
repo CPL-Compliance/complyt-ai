@@ -146,6 +146,7 @@ public interface CountryStandardizedMap {
             put("BRUNEI", "Brunei");
             put("BN", "Brunei");
             put("BRN", "Brunei");
+            put("BRUNEI DARUSSALAM", "Brunei");
 
             // Bulgaria
             put("BULGARIA", "Bulgaria");
@@ -183,6 +184,7 @@ public interface CountryStandardizedMap {
             put("CAPE VERDE", "Cape Verde");
             put("CV", "Cape Verde");
             put("CPV", "Cape Verde");
+            put("CABO VERDE", "Cape Verde");
 
             // Central African Republic
             put("CENTRAL AFRICAN REPUBLIC", "Central African Republic");
@@ -246,6 +248,7 @@ public interface CountryStandardizedMap {
             put("CZECH REPUBLIC", "Czechia");
             put("CZECHIA", "Czechia");
             put("CZ", "Czechia");
+            put("CZECHIA", "Czechia");
             put("CZE", "Czechia");
             put("ČESKÁ REPUBLIKA", "Czechia");
 
@@ -970,6 +973,7 @@ public interface CountryStandardizedMap {
             put("TR", "Turkey");
             put("TUR", "Turkey");
             put("TÜRKIYE", "Turkey");
+            put("TURKIYE", "Turkey");
 
             // Turkmenistan
             put("TURKMENISTAN", "Turkmenistan");

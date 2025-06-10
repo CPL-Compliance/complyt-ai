@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.AddressRegionAligner;
+import com.complyt.business.AddressCountryRegionAligner;
 import com.complyt.domain.gt.ComplytGtRates;
 import com.complyt.domain.gt.GtAddress;
 import com.complyt.repositories.gt_rates.ComplytGtRatesRepository;
@@ -17,9 +17,9 @@ public class ComplytGtRatesService {
     ComplytGtRatesRepository complytGtRatesRepository;
 
     @NonNull
-    AddressRegionAligner addressRegionAligner;
+    AddressCountryRegionAligner addressCountryRegionAligner;
 
     public Mono<ComplytGtRates> findByAddress(@NonNull GtAddress gtAddress) {
-        return complytGtRatesRepository.findByAddress(addressRegionAligner.align(gtAddress));
+        return complytGtRatesRepository.findByAddress(addressCountryRegionAligner.align(gtAddress));
     }
 }
