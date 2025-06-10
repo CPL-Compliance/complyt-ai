@@ -38,7 +38,6 @@ class ClientTrackingServiceImplTest {
 
     private ClientTracking clientTracking;
 
-
     @BeforeEach
     void setUp() {
         Nexus nexus = new Nexus(null);
