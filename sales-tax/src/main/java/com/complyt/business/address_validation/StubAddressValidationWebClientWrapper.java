@@ -17,15 +17,21 @@ public class StubAddressValidationWebClientWrapper implements AddressValidationW
     @Override
     public Mono<MatchedAddressDataDto> validateAddress(ShippingAddress address) {
         return validateAddress(address.city(), address.country(), address.county(),
-                address.state(), address.street(), address.zip(), address.isPartial());
+                address.state(), address.region(), address.street(), address.zip(), address.isPartial());
     }
 
     @Override
-    public Mono<MatchedAddressDataDto> validateAddress(String city, String country, String county, String state, String street, String zip, boolean isPartial) {
-        MandatoryAddressDto address = new MandatoryAddressDto("Acampo", "USA", "San Joaquin",
-                "California", "7498 N Remington Ave",
-                null, "95220", false);
-        ScoringDto scoringDto = new ScoringDto(MatchLevelType.EXCELLENT, 0.9, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT));
+    public Mono<MatchedAddressDataDto> validateAddress(String city, String country, String county, String state, String region, String street, String zip, boolean isPartial) {
+        MandatoryAddressDto address = new MandatoryAddressDto(
+                city != null ? city : "",
+                country != null ? country : "",
+                county != null ? county : "",
+                state != null ? state : "",
+                street != null ? street : "",
+                region != null ? region : "",
+                zip != null ? zip : "",
+                isPartial);
+        ScoringDto scoringDto = new ScoringDto(MatchLevelType.EXCELLENT, 0.9, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT));
         MatchedAddressDataDto matchedAddressDataDto = new MatchedAddressDataDto(address, scoringDto);
         return Mono.just(matchedAddressDataDto);
     }

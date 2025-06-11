@@ -7,6 +7,7 @@ import com.complyt.domain.SalesTaxRatesData;
 import com.complyt.domain.enums.RatesStatus;
 import com.complyt.domain.internal_rates.InternalSalesTaxRates;
 import com.complyt.domain.mappers.CommonSalesTaxRatesToSalesTaxRatesMapper;
+import com.complyt.domain.matched_address.MatchedAddressData;
 import com.complyt.services.AddressValidationService;
 import com.complyt.services.SalesTaxRatesService;
 import com.complyt.utils.ContextLogger;
@@ -34,10 +35,10 @@ public class InternalSalesTaxRatesFacade implements SalesTaxRatesFacade<Internal
 
 
     @Override
-    public Mono<SalesTaxRatesData> validateAddress(@NonNull AddressWithDate addressWithDate, Boolean detailed) {
-        return addressValidationService.validate(addressWithDate.getAddress())
-                .flatMap(matchedAddress -> findByAddress(addressWithDate.withAddress(matchedAddress.address()))
-                        .map(salesTaxRates -> CommonSalesTaxRatesToSalesTaxRatesMapper.INSTANCE.map(addressWithDate, matchedAddress, salesTaxRates, detailed)));
+    public Mono<SalesTaxRatesData> validateAddress(@NonNull AddressWithDate addressWithDate, Boolean detailed, Boolean shouldValidateAddress) {
+            return getMatchedAddressIfShouldValidateAddress(addressWithDate, shouldValidateAddress)
+                    .flatMap(matchedAddress -> findByAddress(addressWithDate.withAddress(matchedAddress.address()))
+                            .map(salesTaxRates -> CommonSalesTaxRatesToSalesTaxRatesMapper.INSTANCE.map(addressWithDate, matchedAddress, salesTaxRates, detailed)));
     }
 
     public Mono<InternalSalesTaxRates> save(@NonNull InternalSalesTaxRates internalSalesTaxRates) {
@@ -51,7 +52,15 @@ public class InternalSalesTaxRatesFacade implements SalesTaxRatesFacade<Internal
                                 .then(externalSalesTaxRatesService.findByAddress(addressWithDate))));
     }
 
-    public Mono<InternalSalesTaxRates> updateRate(@NonNull InternalSalesTaxRates internalRates, @NonNull RatesStatus status) {
+    public Mono<InternalSalesTaxRates> updateRate(@NonNull InternalSalesTaxRates
+                                                          internalRates, @NonNull RatesStatus status) {
         return internalSalesTaxRatesService.updateRate(internalRates, status);
     }
+
+    public Mono<MatchedAddressData> getMatchedAddressIfShouldValidateAddress(AddressWithDate addressWithDate, Boolean shouldValidateAddress) {
+        return Boolean.TRUE.equals(shouldValidateAddress)
+                ? addressValidationService.validate(addressWithDate.getAddress())
+                : Mono.just(new MatchedAddressData(addressWithDate.getAddress(), null));
+    }
+
 }

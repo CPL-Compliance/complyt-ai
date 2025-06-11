@@ -766,6 +766,7 @@ public interface SupportedNonUsCountries {
         put("RUSSIAN FEDERATION", "Russian federation");
         put("RU", "Russian federation");
         put("RUS", "Russian federation");
+        put("RUSSIA", "Russian federation");
 
         put("RWANDA", "Rwanda");
         put("RW", "Rwanda");

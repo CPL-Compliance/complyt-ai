@@ -54,7 +54,7 @@ public class AddressValidationEndpointsIT extends TestContainersInitializerIT im
     @Override
     public void getAddress_ValidButNotCached_Returns200() {
         // Here Stub Address
-        String expectedAddress = "{address={city=Beverly Hills, country=US, county=Los Angeles, state=CA, street=1008 Elden Way, zip=90210}, " +
+        String expectedAddress = "{address={city=Beverly Hills, country=US, county=Los Angeles, state=CA, street=1008 Elden Way, zip=90210, isPartial=true}, " +
                 "scoring={matchLevel=EXCELLENT, score=0.9, fieldScore={countryMatch=EXACT, stateMatch=EXACT, cityMatch=EXACT, streetMatch=EXACT, zipMatch=EXACT}}}";
 
         WEB_TEST_CLIENT

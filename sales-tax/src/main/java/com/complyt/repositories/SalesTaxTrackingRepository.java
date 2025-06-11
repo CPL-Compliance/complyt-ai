@@ -45,7 +45,7 @@ public class SalesTaxTrackingRepository {
                     Query query = Query.query(Criteria.where("subsidiary").is(subsidiary).andOperator(baseCriteria));
 
                     StringBuilder stringBuilder = new StringBuilder("Searching for sales tax tracking with country " + country);
-                    stringBuilder = state != null ? stringBuilder.append(" and with state " + state) : stringBuilder;
+                    stringBuilder = state != null && !state.isEmpty() ? stringBuilder.append(" and with state " + state) : stringBuilder;
                     stringBuilder.append(" and tenant ID " + tenantId + ", " + "and subsidiary: " + subsidiary);
 
                     return ContextLogger.observeCtx(stringBuilder.toString(), tenantId, log::info)
