@@ -1,5 +1,6 @@
 package com.complyt.business.web_hook;
 
+import com.complyt.business.message_queue.rabbit_mq.Producer;
 import com.complyt.business.web_hook.web_clients.WebClientWrapper;
 import com.complyt.domain.WebhookDetails;
 import com.complyt.domain.audit.Action;
@@ -16,8 +17,11 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class WebhookHandler<T extends ComplytIdProperty> {
 
+//    @NonNull
+//    private WebClientWrapper<T> webhookWebClientWrapper;
+
     @NonNull
-    private WebClientWrapper<T> webhookWebClientWrapper;
+    Producer<T> producer;
 
     @NonNull
     private WebhookEntityCreator<T> webhookEntityCreator;
@@ -25,9 +29,9 @@ public class WebhookHandler<T extends ComplytIdProperty> {
     public Mono<T> handleWebhook(Class<T> webhookClass, T object, WebhookDetails webhookDetails, Action action) {
         return shouldForwardRequest(webhookDetails)
                 .flatMap(should -> should ?
-                        webhookEntityCreator.create(webhookClass, object, action)
-                                .flatMap(webhookEntityWrapper ->
-                                        webhookWebClientWrapper.sendWebhook(webhookEntityWrapper, webhookDetails.host(), webhookDetails.path())) : Mono.empty())
+                        webhookEntityCreator.create(webhookClass.getSimpleName(), object, action)
+                                .flatMap(webhookEntityWrapper -> producer.sendMessage(webhookEntityWrapper)
+                                        /*webhookWebClientWrapper.sendWebhook(webhookEntityWrapper, webhookDetails.host(), webhookDetails.path())*/) : Mono.empty())
                 .thenReturn(object);
     }
 

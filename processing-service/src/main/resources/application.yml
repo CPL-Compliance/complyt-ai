@@ -1,0 +1,9 @@
+rabbitmq:
+  queue:
+    name: javaguides
+
+spring.rabbitmq.host: chimpanzee.rmq.cloudamqp.com
+spring.rabbitmq.port: 5672
+spring.rabbitmq.username: rspxwtbp
+spring.rabbitmq.password: j7MhlwmXhF9pqGnyp5GBITnyLEs_Nn9X
+spring.rabbitmq.virtual-host: rspxwtbp

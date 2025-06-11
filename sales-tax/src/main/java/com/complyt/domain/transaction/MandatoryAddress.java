@@ -1,21 +1,10 @@
 package com.complyt.domain.transaction;
 
-import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.With;
 
 @With
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record MandatoryAddress(
-        @Size(max = 100, message = "Address.city " + StringErrorMessages.MAX_100_ERROR) String city,
-        @NotBlank(message = "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR) @Size(max = 50, message = "Address.country " + StringErrorMessages.MAX_50_ERROR) String country,
-        @Size(max = 100, message = "Address.county " + StringErrorMessages.MAX_100_ERROR) String county,
-        @Size(max = 100, message = "Address.state " + StringErrorMessages.MAX_100_ERROR) String state,
-        @Size(max = 200, message = "Address.street " + StringErrorMessages.MAX_200_ERROR) String street,
-        @Size(max = 50, message = "Address.region " + StringErrorMessages.MAX_20_ERROR) String region,
-        @Size(max = 20, message = "Address.zip " + StringErrorMessages.MAX_20_ERROR) String zip,
-        @Schema(description = "whether country, city or street are necessary") Boolean isPartial) {
+public record MandatoryAddress(String city, String country, String county, String state, String street, String region,
+                               String zip, Boolean isPartial) {
 }

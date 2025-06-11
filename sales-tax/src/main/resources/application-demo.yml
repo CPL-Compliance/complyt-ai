@@ -1,5 +1,6 @@
 eureka:
   client:
+    enabled: false
     serviceUrl:
       defaultZone: ${discovery-service-uri}
     should-unregister-on-shutdown: true
@@ -45,6 +46,24 @@ auth0.audience: ${audience}
 
 hmaac.secretKey: ${hmaac-secret-key}
 
+rabbitmq:
+  exchange:
+    name: javaguides_exchange
+  routing:
+    key: javaguides_routing_key
+  queue:
+    name: javaguides
+
+#rabbitmq_queue_name: "javaguides"
+#rabbitmq_exchange_name: "javaguides_exchange"
+#rabbitmq_routing_key: "javaguides_routing_key"
+
+spring.rabbitmq.host: chimpanzee.rmq.cloudamqp.com
+spring.rabbitmq.port: 5672
+spring.rabbitmq.username: rspxwtbp
+spring.rabbitmq.password: j7MhlwmXhF9pqGnyp5GBITnyLEs_Nn9X
+spring.rabbitmq.virtual-host: rspxwtbp
+
 # This property sets the issuer URI
 # for the application to interact with the Resource Server for authentication and authorization purposes
 spring.security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
@@ -73,3 +92,4 @@ management:
     web:
       exposure:
         include: "*"
+

@@ -25,6 +25,7 @@
         <module>files</module>
         <module>authentication</module>
         <module>api-gateway</module>
+        <module>processing-service</module>
     </modules>
 
     <name>Complyt</name>

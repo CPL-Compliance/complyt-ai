@@ -48,27 +48,31 @@ public class WebhookWebClientWrapper<T extends ComplytIdProperty> extends WebCli
                                 .thenReturn(webhookEntityWrapper.object());
                     }
 
-                    return webClient.post()
-                            .uri(uri)
-                            .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                            .header("X-Signature", hmaac)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(webhookEntityWrapper)
-                            .retrieve()
-                            .bodyToMono(webhookEntityWrapper.webhookClass())
-                            .retryWhen(Retry.backoff(5, Duration.ofSeconds(1))
-                                    .maxBackoff(Duration.ofSeconds(10)) // Cap the maximum backoff time at 10 seconds
-                                    .jitter(0.2) // Add 20% random jitter to avoid retry spikes (thundering herd)
-                                    .filter(throwable -> {
-                                        log.warn("Retrying webhook due to error: {}", throwable.getMessage());
-                                        return true; // Retry on all errors
-                                    }))
-                            .doOnNext(res -> log.info("Sent webhook entity: '{}'", webhookEntityWrapper)) // Log success if a response is received
-                            .doOnError(err -> log.error("Webhook failed after retries: {}", err.getMessage())) // Log the final failure if all retries are exhausted
-                            .onErrorResume(err -> { // Handle failure by falling back to a safe, non-breaking path
-                                log.error("Giving up on webhook for entity: {}", webhookEntityWrapper);
-                                return Mono.empty();
-                            });
+                    try {
+                        return webClient.post()
+                                .uri(uri)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .header("X-Signature", hmaac)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(webhookEntityWrapper)
+                                .retrieve()
+                                .bodyToMono(Class.forName(webhookEntityWrapper.webhookClass()))
+                                .retryWhen(Retry.backoff(5, Duration.ofSeconds(1))
+                                        .maxBackoff(Duration.ofSeconds(10)) // Cap the maximum backoff time at 10 seconds
+                                        .jitter(0.2) // Add 20% random jitter to avoid retry spikes (thundering herd)
+                                        .filter(throwable -> {
+                                            log.warn("Retrying webhook due to error: {}", throwable.getMessage());
+                                            return true; // Retry on all errors
+                                        }))
+                                .doOnNext(res -> log.info("Sent webhook entity: '{}'", webhookEntityWrapper)) // Log success if a response is received
+                                .doOnError(err -> log.error("Webhook failed after retries: {}", err.getMessage())) // Log the final failure if all retries are exhausted
+                                .onErrorResume(err -> { // Handle failure by falling back to a safe, non-breaking path
+                                    log.error("Giving up on webhook for entity: {}", webhookEntityWrapper);
+                                    return Mono.empty();
+                                });
+                    } catch (ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
                 })
                 .subscribeOn(Schedulers.boundedElastic()) // Run the whole chain on a boundedElastic thread (suitable for I/O)
                 .subscribe(); // Trigger the entire reactive chain (no execution happens without this)
