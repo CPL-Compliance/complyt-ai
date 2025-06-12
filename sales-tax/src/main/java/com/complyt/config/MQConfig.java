@@ -15,9 +15,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MQConfig {
 
-    @Value("${rabbitmq.queue.name}")
-    private String queue;
-
     @Value("${rabbitmq.exchange.name}")
     private String exchange;
 
@@ -25,21 +22,8 @@ public class MQConfig {
     private String routingKey;
 
     @Bean
-    public Queue queue() {
-        return new Queue(queue);
-    }
-
-    @Bean
     public TopicExchange exchange() {
         return new TopicExchange(exchange);
-    }
-
-    @Bean
-    public Binding binding() {
-        return BindingBuilder
-                .bind(queue())
-                .to(exchange())
-                .with(routingKey);
     }
 
     public MessageConverter converter() {
@@ -47,10 +31,10 @@ public class MQConfig {
                 .registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         return new Jackson2JsonMessageConverter(objectMapper);
-//        return new Jackson2JsonMessageConverter();
     }
 
-    @Bean(name = "rabbitTemplate")
+    //    @Bean(name = "rabbitTemplate")
+    @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(converter());

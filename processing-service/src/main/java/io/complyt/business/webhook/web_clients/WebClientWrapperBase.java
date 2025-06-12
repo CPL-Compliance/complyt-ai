@@ -1,4 +1,4 @@
-package com.complyt.business.web_hook.web_clients;
+package io.complyt.business.webhook.web_clients;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.reactive.function.client.WebClient;

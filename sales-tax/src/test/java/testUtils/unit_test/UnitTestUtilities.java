@@ -1212,7 +1212,7 @@ public class UnitTestUtilities {
                 UUID.randomUUID(),
                 LocalDateTime.now(),
                 Action.CREATE,
-                Transaction.class,
+                Transaction.class.getSimpleName(),
                 createTransaction(UUID.randomUUID().toString())
         );
     }

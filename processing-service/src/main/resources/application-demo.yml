@@ -1,5 +1,6 @@
 eureka:
   client:
+    enabled: false
     serviceUrl:
       defaultZone: ${discovery-service-uri}
     should-unregister-on-shutdown: true
@@ -14,7 +15,7 @@ eureka:
 # https://cloud.spring.io/spring-cloud-vault/reference/html/
 spring.cloud.vault:
   enabled: true
-  application-name: sales-tax-service${ecs_cluster_name:}
+  application-name: processing-service${ecs_cluster_name:}
   host: ${VAULT_HOST}
   port: 8200
   scheme: https
@@ -34,28 +35,28 @@ spring.cloud.vault:
   kv:
     enabled: true
     default-context:
-  database:
-    enabled: true
-    role: ${VAULT_DB_ROLE}
-    backend: database
 
 spring.config.import: vault://
 
-auth0.audience: ${audience}
+#auth0.audience: ${audience}
 
-#hmaac.secretKey: ${hmaac-secret-key}
+hmaac.secretKey: ${hmaac-secret-key}
 
-rabbitmq:
-  exchange:
-    name: javaguides_exchange
-  routing:
-    key: javaguides_routing_key
-  queue:
-    name: javaguides
+#rabbitmq:
+#  exchange:
+#    name: javaguides_exchange
+#  routing:
+#    key: javaguides_routing_key
+#  queue:
+#    name: javaguides
 
 #rabbitmq_queue_name: "javaguides"
 #rabbitmq_exchange_name: "javaguides_exchange"
 #rabbitmq_routing_key: "javaguides_routing_key"
+
+rabbitmq:
+  queue:
+    name: javaguides
 
 spring.rabbitmq.host: chimpanzee.rmq.cloudamqp.com
 spring.rabbitmq.port: 5672
@@ -65,15 +66,7 @@ spring.rabbitmq.virtual-host: rspxwtbp
 
 # This property sets the issuer URI
 # for the application to interact with the Resource Server for authentication and authorization purposes
-spring.security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
-currency-conversion-service-url: ${currency-conversion-service-url}
-
-
-spring:
-  data:
-    mongodb:
-      uri: ${mongo-uri}
-      database: ${db-name}
+#spring.security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
 
 logging:
   level:

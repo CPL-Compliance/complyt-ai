@@ -1,6 +1,6 @@
-package com.complyt.business.web_hook;
+package io.complyt.business.webhook.web_clients;
 
-import com.complyt.annotations.Generated;
+import io.complyt.annotations.Generated;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

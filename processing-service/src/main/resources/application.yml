@@ -1,9 +1,24 @@
-rabbitmq:
-  queue:
-    name: javaguides
+spring.application.name: sales-tax
+server.port: ${PORT:9840}
 
-spring.rabbitmq.host: chimpanzee.rmq.cloudamqp.com
-spring.rabbitmq.port: 5672
-spring.rabbitmq.username: rspxwtbp
-spring.rabbitmq.password: j7MhlwmXhF9pqGnyp5GBITnyLEs_Nn9X
-spring.rabbitmq.virtual-host: rspxwtbp
+spring.profiles.active:
+  #  - @activeEnv@
+  - demo
+
+# Eureka HealthCheck
+# Make sure that a microservice will not be listed 'UP' in eureka before it passes the healthcheck.
+# Will mark it as 'UP' after it's ready to serve requests.
+eureka:
+  client:
+    healthcheck:
+      enabled: true
+
+# There is no need to check the vault health in runtime - we use fast-fail so the service will not start if vault is unavailable.
+management:
+  health:
+    vault:
+      enabled: false
+
+# Observability
+management.metrics.distribution.percentiles-histogram.http.server.requests: true
+management.tracing.sampling.probability: 1.0

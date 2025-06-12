@@ -1,6 +1,6 @@
 package com.complyt.business.vat_validation.web_clients;
 
-import com.complyt.business.web_hook.web_clients.WebClientWrapperBase;
+import com.complyt.business.web_clients.WebClientWrapperBase;
 import com.complyt.domain.ValidatedVat;
 import com.complyt.domain.VatDetailsToValidate;
 import lombok.EqualsAndHashCode;

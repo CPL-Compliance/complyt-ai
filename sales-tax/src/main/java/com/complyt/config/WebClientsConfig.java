@@ -40,15 +40,5 @@ public class WebClientsConfig {
                 .build();
     }
 
-    @Bean(name = "webhookWebClient")
-    public WebClient webhookWebClient(WebClient.Builder webClientBuilder) {
-        return webClientBuilder.clientConnector(
-                        new ReactorClientHttpConnector(
-                                HttpClient.create()
-                                        .wiretap("reactor.netty.client.HttpClient",
-                                                LogLevel.DEBUG,
-                                                AdvancedByteBufFormat.TEXTUAL)))
-                .build();
-    }
 }
 

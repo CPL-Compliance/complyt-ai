@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public record FieldsMatchScore(
         FieldMatchType countryMatch,
         FieldMatchType stateMatch,
+        FieldMatchType regionMatch,
         FieldMatchType cityMatch,
         FieldMatchType streetMatch,
         FieldMatchType zipMatch

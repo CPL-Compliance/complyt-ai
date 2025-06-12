@@ -29,12 +29,12 @@ public class WebhookEntityCreatorTest {
     @Test
     public void create_CreatesWebhookEntityWrapper_ReturnsWebhookEntityWrapper() {
         // Given + When
-        Mono<WebhookEntityWrapper<Transaction>> webhookEntityWrapper = webhookEntityCreator.create(Transaction.class, transaction, Action.CREATE);
+        Mono<WebhookEntityWrapper<Transaction>> webhookEntityWrapper = webhookEntityCreator.create(Transaction.class.getSimpleName(), transaction, Action.CREATE);
 
         StepVerifier.create(webhookEntityWrapper)
                 .assertNext(result -> {
                     assert result != null;
-                    assert result.webhookClass().equals(Transaction.class);
+                    assert result.webhookClass().equals("Transaction");
                     assert result.object().equals(transaction);
                 })
                 .verifyComplete();

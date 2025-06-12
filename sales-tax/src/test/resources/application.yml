@@ -7,4 +7,10 @@ spring:
     mongodb:
       uuid-representation: standard
 
-hmaac-secret-key: 123
+rabbitmq:
+  exchange:
+    name: javaguides_exchange
+  routing:
+    key: javaguides_routing_key
+
+#hmaac-secret-key: 123

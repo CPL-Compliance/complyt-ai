@@ -24,14 +24,4 @@ public class WebClientWrapperPropertiesConfig {
         return WebClientWrapperProperties.WebClientWrapperPropertiesStub();
     }
 
-    @Bean("webhookWebClientWrapperProperties")
-    public WebClientWrapperProperties webhookWebClientWrapperProperties() {
-        return WebClientWrapperProperties
-                .builder()
-                .scheme("https")
-                .host("")
-                .path("")
-                .build();
-    }
-
 }

@@ -1,8 +1,8 @@
 package com.complyt.business.webhook;
 
+import com.complyt.business.message_queue.rabbit_mq.Producer;
 import com.complyt.business.web_hook.WebhookEntityCreator;
 import com.complyt.business.web_hook.WebhookHandler;
-import com.complyt.business.web_hook.web_clients.WebhookWebClientWrapper;
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.WebhookEntityWrapper;
 import com.complyt.domain.audit.Action;
@@ -29,7 +29,7 @@ public class WebhookHandlerTest {
     WebhookHandler<Transaction> webhookHandler;
 
     @Mock
-    WebhookWebClientWrapper<Transaction> webhookWebClientWrapper;
+    Producer<Transaction> producer;
 
     @Mock
     WebhookEntityCreator<Transaction> webhookEntityCreator;
@@ -78,8 +78,8 @@ public class WebhookHandlerTest {
         WebhookEntityWrapper<Transaction> webhookEntityWrapper = testUtilities.createWebhookEntityWrapper();
 
         // When
-        when(webhookEntityCreator.create(Transaction.class, transaction, Action.CREATE)).thenReturn(Mono.just(webhookEntityWrapper));
-        when(webhookWebClientWrapper.sendWebhook(webhookEntityWrapper, clientTrackingToSend.getWebhookDetails().host(), clientTrackingToSend.getWebhookDetails().path())).thenReturn(Mono.just(transaction));
+        when(webhookEntityCreator.create(webhookEntityWrapper.webhookClass(), transaction, Action.CREATE)).thenReturn(Mono.just(webhookEntityWrapper));
+        when(producer.sendMessage(webhookEntityWrapper)).thenReturn(Mono.just(webhookEntityWrapper));
         Mono<Transaction> transactionMono = webhookHandler.handleWebhook(Transaction.class, transaction, clientTrackingToSend.getWebhookDetails(), Action.CREATE);
 
         // Then
