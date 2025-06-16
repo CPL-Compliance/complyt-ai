@@ -213,10 +213,12 @@ jobs:
             export REPLACE_PATTERN="ADD target/"
             SERVICE_NAME=$(basename "<<parameters.service_directory>>")
             export IMAGE_TAG="096643436058.dkr.ecr.us-east-1.amazonaws.com/complyt/$SERVICE_NAME:$IMAGE_TAG"
+            export LATEST_IMAGE_TAG="096643436058.dkr.ecr.us-east-1.amazonaws.com/complyt/$SERVICE_NAME:latest"
             sed -i "s|$SEARCH_PATTERN|$REPLACE_PATTERN|g" "$DOCKERFILE_PATH"
-            docker build -f "$DOCKERFILE_PATH" -t "$IMAGE_TAG" .
+            docker build -f "$DOCKERFILE_PATH" -t "$IMAGE_TAG" -t  .
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 096643436058.dkr.ecr.us-east-1.amazonaws.com
             docker push "$IMAGE_TAG"
+            docker push "$LATEST_IMAGE_TAG"
             env >> bash.env
 
   send-test-coverage-reports:
