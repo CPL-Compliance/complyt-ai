@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOGS_FOLDER" value="./logs"/>
+    <property name="LOGS_FILENAME" value="processing-service"/>
+    <springProperty scope="context" name="processing-service" source="spring.application.name"/>
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+            <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                <prettyPrint>false</prettyPrint>
+            </jsonFormatter>
+            <appendLineSeparator>true</appendLineSeparator>
+            <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
+        </layout>
+    </appender>
+    <root level="info">
+        <appender-ref ref="Console"/>
+    </root>
+</configuration>

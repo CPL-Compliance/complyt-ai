@@ -943,7 +943,7 @@ public class UnitTestUtilities {
     }
 
     public MatchedAddressDataDto createMatchedAddressDto() {
-        return new MatchedAddressDataDto(createMandatoryAddressDto(), new ScoringDto(MatchLevelType.EXCELLENT, 0.9,new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT)));
+        return new MatchedAddressDataDto(createMandatoryAddressDto(), new ScoringDto(MatchLevelType.EXCELLENT, 0.9, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT)));
     }
 
     public Address createUsaAddress() {
@@ -1068,19 +1068,19 @@ public class UnitTestUtilities {
     }
 
     public ShippingAddress createNonUsaShippingAddressWithMatchedAddress() {
-        return new ShippingAddress(null, "ARM", null, null, null, null,"12345", false, createNonUsaMatchedAddress());
+        return new ShippingAddress(null, "ARM", null, null, null, null, "12345", false, createNonUsaMatchedAddress());
     }
 
     public ShippingAddress createUsaShippingAddressWithMatchedAddress() {
-        return new ShippingAddress(null, "USA", null, "California", null, null,"12345", false, createUsaMatchedAddress());
+        return new ShippingAddress(null, "USA", null, "California", null, null, "12345", false, createUsaMatchedAddress());
     }
 
     public MatchedAddressData createNonUsaMatchedAddress() {
-        return new MatchedAddressData(new MandatoryAddress(null, "ARM", null, null, null, null,"12345", false) , null);
+        return new MatchedAddressData(new MandatoryAddress(null, "ARM", null, null, null, null, "12345", false), null);
     }
 
     public MatchedAddressData createUsaMatchedAddress() {
-        return new MatchedAddressData(new MandatoryAddress(null, "USA", null, "California", null, null,"12345", false) , null);
+        return new MatchedAddressData(new MandatoryAddress(null, "USA", null, "California", null, null, "12345", false), null);
     }
 
     public Map<String, ProductClassification> createMapTaxCodesToClassifications() {
@@ -1213,7 +1213,9 @@ public class UnitTestUtilities {
                 LocalDateTime.now(),
                 Action.CREATE,
                 Transaction.class.getSimpleName(),
-                createTransaction(UUID.randomUUID().toString())
+                createTransaction(UUID.randomUUID().toString()),
+                "host",
+                "path"
         );
     }
 

@@ -52,6 +52,9 @@ parameters:
   run-api-gateway-verify-workflow:
     type: boolean
     default: false
+  run-processing-service-verify-workflow:
+    type: boolean
+    default: false
 
 jobs:
   package-dependency:
@@ -566,3 +569,31 @@ workflows:
           requires:
             - release
           service_name: "authentication"
+
+  processing-service-workflow:
+    when: << pipeline.parameters.run-processing-service-workflow >>
+    jobs:
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "processing-service"
+
+      - release:
+          filters:
+            branches:
+              only:
+                - main
+          service_directory: "processing-service"
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - release
+          service_directory: "processing-service"
+
+      - update-ecs-service:
+          requires:
+            - release
+          service_name: "processing-service"

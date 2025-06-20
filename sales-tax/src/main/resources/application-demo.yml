@@ -43,31 +43,20 @@ spring.config.import: vault://
 
 auth0.audience: ${audience}
 
-#hmaac.secretKey: ${hmaac-secret-key}
+rabbitmq.queue.name: ${rabbitmq-queue-name}
+rabbitmq.exchange.name: ${rabbitmq-exchange-name}
+rabbitmq.routing.key: ${rabbitmq-routing-key}
 
-rabbitmq:
-  exchange:
-    name: javaguides_exchange
-  routing:
-    key: javaguides_routing_key
-  queue:
-    name: javaguides
-
-#rabbitmq_queue_name: "javaguides"
-#rabbitmq_exchange_name: "javaguides_exchange"
-#rabbitmq_routing_key: "javaguides_routing_key"
-
-spring.rabbitmq.host: chimpanzee.rmq.cloudamqp.com
+spring.rabbitmq.host: ${rabbitmq-host}
 spring.rabbitmq.port: 5672
-spring.rabbitmq.username: rspxwtbp
-spring.rabbitmq.password: j7MhlwmXhF9pqGnyp5GBITnyLEs_Nn9X
-spring.rabbitmq.virtual-host: rspxwtbp
+spring.rabbitmq.username: ${rabbitmq-username}
+spring.rabbitmq.password: ${rabbitmq-password}
+spring.rabbitmq.virtual-host: ${rabbitmq-virtual-host}
 
 # This property sets the issuer URI
 # for the application to interact with the Resource Server for authentication and authorization purposes
 spring.security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
 currency-conversion-service-url: ${currency-conversion-service-url}
-
 
 spring:
   data:

@@ -21,11 +21,6 @@ public class MQConfig {
     @Value("${rabbitmq.routing.key}")
     private String routingKey;
 
-    @Bean
-    public TopicExchange exchange() {
-        return new TopicExchange(exchange);
-    }
-
     public MessageConverter converter() {
         ObjectMapper objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
@@ -33,7 +28,6 @@ public class MQConfig {
         return new Jackson2JsonMessageConverter(objectMapper);
     }
 
-    //    @Bean(name = "rabbitTemplate")
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);

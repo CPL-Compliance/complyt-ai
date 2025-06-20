@@ -3,7 +3,6 @@ package io.complyt.domain.transaction;
 import com.fasterxml.jackson.annotation.*;
 import io.complyt.domain.customer.Customer;
 import io.complyt.domain.properties.ComplytIdProperty;
-import io.complyt.domain.properties.InternalTimestampsProperty;
 import io.complyt.domain.sales_tax.SalesTax;
 import io.complyt.domain.timestamps.Timestamps;
 import lombok.*;
@@ -31,8 +30,8 @@ public class Transaction implements ComplytIdProperty {
     SalesTax salesTax;
     TransactionStatus transactionStatus;
     String tenantId;
-//    Timestamps internalTimestamps;
-//    Timestamps externalTimestamps;
+    Timestamps internalTimestamps;
+    Timestamps externalTimestamps;
     TransactionType transactionType;
 //    ShippingFee shippingFee;
     String createdFrom;
@@ -66,8 +65,8 @@ public class Transaction implements ComplytIdProperty {
             @JsonProperty("salesTax") SalesTax salesTax,
             @JsonProperty("transactionStatus") TransactionStatus transactionStatus,
             @JsonProperty("tenantId") String tenantId,
-//            @JsonProperty("internalTimestamps") Timestamps internalTimestamps,
-//            @JsonProperty("externalTimestamps") Timestamps externalTimestamps,
+            @JsonProperty("internalTimestamps") Timestamps internalTimestamps,
+            @JsonProperty("externalTimestamps") Timestamps externalTimestamps,
             @JsonProperty("transactionType") TransactionType transactionType,
 //            @JsonProperty("shippingFee") ShippingFee shippingFee,
             @JsonProperty("createdFrom") String createdFrom,
@@ -99,8 +98,8 @@ public class Transaction implements ComplytIdProperty {
         this.salesTax = salesTax;
         this.transactionStatus = transactionStatus;
         this.tenantId = tenantId;
-//        this.internalTimestamps = internalTimestamps;
-//        this.externalTimestamps = externalTimestamps;
+        this.internalTimestamps = internalTimestamps;
+        this.externalTimestamps = externalTimestamps;
         this.transactionType = transactionType;
 //        this.shippingFee = shippingFee;
         this.createdFrom = createdFrom;

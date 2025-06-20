@@ -1,7 +1,6 @@
 package io.complyt;
 
 import io.complyt.annotations.Generated;
-import io.complyt.domain.transaction.Transaction;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

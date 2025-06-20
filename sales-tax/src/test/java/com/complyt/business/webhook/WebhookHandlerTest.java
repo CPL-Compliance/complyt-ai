@@ -78,7 +78,7 @@ public class WebhookHandlerTest {
         WebhookEntityWrapper<Transaction> webhookEntityWrapper = testUtilities.createWebhookEntityWrapper();
 
         // When
-        when(webhookEntityCreator.create(webhookEntityWrapper.webhookClass(), transaction, Action.CREATE)).thenReturn(Mono.just(webhookEntityWrapper));
+        when(webhookEntityCreator.create(webhookEntityWrapper.webhookClass(), transaction, Action.CREATE, "host", "path")).thenReturn(Mono.just(webhookEntityWrapper));
         when(producer.sendMessage(webhookEntityWrapper)).thenReturn(Mono.just(webhookEntityWrapper));
         Mono<Transaction> transactionMono = webhookHandler.handleWebhook(Transaction.class, transaction, clientTrackingToSend.getWebhookDetails(), Action.CREATE);
 

@@ -26,8 +26,7 @@ public class WebhookHandler<T extends ComplytIdProperty> {
         return shouldForwardRequest(webhookDetails)
                 .flatMap(should -> should ?
                         webhookEntityCreator.create(webhookClass.getSimpleName(), object, action, webhookDetails.host(), webhookDetails.path())
-                                .flatMap(webhookEntityWrapper -> producer.sendMessage(webhookEntityWrapper)
-                                        /*webhookWebClientWrapper.sendWebhook(webhookEntityWrapper, webhookDetails.host(), webhookDetails.path())*/) : Mono.empty())
+                                .flatMap(webhookEntityWrapper -> producer.sendMessage(webhookEntityWrapper)) : Mono.empty())
                 .thenReturn(object);
     }
 

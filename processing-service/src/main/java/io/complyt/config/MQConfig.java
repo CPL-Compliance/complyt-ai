@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MQConfig {
 
-    @Value("${rabbitmq.queue.name}")
+    @Value("${rabbitmq-queue-name}")
     private String queue;
 
     @Bean

@@ -1,9 +1,8 @@
-spring.application.name: sales-tax
+spring.application.name: processing-service
 server.port: ${PORT:9840}
 
 spring.profiles.active:
-  #  - @activeEnv@
-  - demo
+  - @activeEnv@
 
 # Eureka HealthCheck
 # Make sure that a microservice will not be listed 'UP' in eureka before it passes the healthcheck.
