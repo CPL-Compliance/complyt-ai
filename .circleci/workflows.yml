@@ -52,7 +52,7 @@ parameters:
   run-api-gateway-verify-workflow:
     type: boolean
     default: false
-  run-processing-service-verify-workflow:
+  run-processing-service-workflow:
     type: boolean
     default: false
 
@@ -190,7 +190,7 @@ jobs:
             ./mvnw --settings ../.circleci/settings.xml release:perform
             bash ../.circleci/git_commands.sh <<parameters.service_directory>> "$PROJECT_VERSION"
             env >> bash.env
-      
+
 
       - persist_to_workspace:
           root: <<parameters.service_directory>>/target
