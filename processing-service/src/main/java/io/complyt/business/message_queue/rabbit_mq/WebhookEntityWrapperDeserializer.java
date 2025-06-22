@@ -30,7 +30,7 @@ public class WebhookEntityWrapperDeserializer<T extends ComplytIdProperty> exten
 
         UUID id = UUID.fromString(root.get("id").asText());
         LocalDateTime timestamp = LocalDateTime.parse(root.get("timestamp").asText());
-        String action = root.get("action").asText(); // optional: map to enum
+        Action action = Action.valueOf(root.get("action").asText());
         String webhookClass = root.get("webhookClass").asText();
         JsonNode objectNode = root.get("object");
         String host = root.get("host").asText();
@@ -43,6 +43,6 @@ public class WebhookEntityWrapperDeserializer<T extends ComplytIdProperty> exten
 
         ComplytIdProperty object = codec.treeToValue(objectNode, clazz);
 
-        return new WebhookEntityWrapper<>(id, timestamp, String.valueOf(Action.valueOf(action)), webhookClass, (T) object, host, path);
+        return new WebhookEntityWrapper<>(id, timestamp, action, webhookClass, (T) object, host, path);
     }
 }

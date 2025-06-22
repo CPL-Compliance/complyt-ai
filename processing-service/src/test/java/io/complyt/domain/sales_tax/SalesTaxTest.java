@@ -1,0 +1,69 @@
+package io.complyt.domain.sales_tax;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import testUtils.unit_test.UnitTestUtilities;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class SalesTaxTest {
+    private SalesTax salesTax;
+    private UnitTestUtilities testUtilities;
+
+    private SalesTaxRates createSalesTaxRates() {
+        return new SalesTaxRates(null, new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null, null, null, null, new BigDecimal("0.5"));
+    }
+
+   
+
+    @BeforeEach
+    void setup() {
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        salesTax = testUtilities.createSalesTaxWithAllFields();
+    }
+
+    @Test
+    void toString_ReturnsString() {
+        // Given
+        String expectedString = "SalesTax[complytId=null" +
+                ", amount=0" +
+                ", rate=0" +
+                ", salesTaxRates=SalesTaxRates[stateRate=0.1" +
+                ", countyRate=0.1" +
+                ", cityRate=0.1" +
+                ", combinedDistrictRate=0" +
+                ", ratesMetaData=null" +
+                ", mtaRate=0" +
+                ", spdRate=0" +
+                ", otherRate=0" +
+                ", taxRate=0.4]" +
+                ", gtRates=GtRates[countryRate=0.1" +
+                ", regionRate=0.1" +
+                ", taxRate=0.2]," +
+                " filingMetaData=null]";
+
+        // When
+        String actualString = salesTax.toString();
+
+        // Then
+        assertEquals(expectedString, actualString);
+    }
+
+    @Test
+    void Equals_SameSalesTax_ReturnsTrue() {
+        // Given
+        SalesTax givenSalesTax = testUtilities.createSalesTaxWithAllFields().withAmount(BigDecimal.ZERO);
+
+        // When
+        boolean isEquals = salesTax.equals(givenSalesTax);
+
+        // Then
+        assertTrue(isEquals);
+    }
+
+}

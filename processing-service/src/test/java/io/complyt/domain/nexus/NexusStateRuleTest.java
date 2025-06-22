@@ -1,0 +1,91 @@
+package io.complyt.domain.nexus;
+
+import io.complyt.domain.State;
+import io.complyt.domain.customer.CustomerType;
+import io.complyt.domain.nexus.enums.Definition;
+import io.complyt.domain.nexus.enums.TangibleCategory;
+import io.complyt.domain.nexus.enums.TaxableCategory;
+import io.complyt.domain.nexus.enums.TimeFrame;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@ExtendWith(MockitoExtension.class)
+class NexusStateRuleTest {
+
+    private NexusStateRule nexusStateRule;
+
+    private String id;
+
+
+
+    @BeforeEach
+    void setup() {
+        id = UUID.randomUUID().toString();
+        nexusStateRule = createNexusStateRule();
+    }
+
+    private NexusStateRule createNexusStateRule() {
+        String country = "USA";
+        State state = new State("CA", "02", "California");
+        List<TaxableCategory> taxableCategories = new ArrayList<>() {{
+            add(TaxableCategory.TAXABLE);
+        }};
+
+        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
+            add(TangibleCategory.TANGIBLE);
+        }};
+
+        List<CustomerType> customerTypes = new ArrayList<>() {{
+            add(CustomerType.RETAIL);
+        }};
+
+        NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(1000), 2, Definition.AMOUNT_OR_COUNT);
+
+        return new NexusStateRule(id, true, country, state, taxableCategories, tangibleCategories, customerTypes,
+                TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold, null);
+    }
+
+    @Test
+    void toString_ReturnString() {
+        // Given
+        String expectedString = "NexusStateRule[id=" + nexusStateRule.id() +
+                ", enforcesSalesTax=" + nexusStateRule.enforcesSalesTax() +
+                ", country=" + nexusStateRule.country() +
+                ", state=" + nexusStateRule.state() +
+                ", taxableCategories=" + nexusStateRule.taxableCategories() +
+                ", tangibleCategories=" + nexusStateRule.tangibleCategories() +
+                ", customerTypes=" + nexusStateRule.customerTypes() +
+                ", timeFrame=" + nexusStateRule.timeFrame() +
+                ", nexusThreshold=" + nexusStateRule.nexusThreshold() +
+                ", appliedDate=" + nexusStateRule.appliedDate() + "]";
+
+        // When
+        String actualString = nexusStateRule.toString();
+
+        // Then
+        assertEquals(expectedString, actualString);
+    }
+
+    @Test
+    void Equals_SameNexusStateRule_ReturnTrue() {
+        // Given
+        NexusStateRule givenNexusStateRule = createNexusStateRule();
+
+        // When
+        boolean isEquals = nexusStateRule.equals(givenNexusStateRule);
+
+        // Then
+        assertTrue(isEquals);
+    }
+
+}

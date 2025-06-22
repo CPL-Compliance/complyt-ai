@@ -1,6 +1,8 @@
 package com.complyt.domain.transaction;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.lang.reflect.Field;
@@ -22,8 +24,6 @@ public class TransactionTest {
         Field[] fields = Transaction.class.getDeclaredFields();
         Assertions.assertEquals(32, fields.length);
     }
-
-
 
     @BeforeEach
     void setup() {

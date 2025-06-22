@@ -81,4 +81,27 @@ public class Item implements Taxable, Discountable {
         this.tangibleCategory = tangibleCategory;
         this.taxableCategory = taxableCategory;
     }
+
+    public final BigDecimal getTotalPrice() {
+        return this.totalPrice != null ?
+                this.totalPrice :
+                this.getUnitPrice().multiply(this.getQuantity());
+    }
+
+    public final BigDecimal getCalculatedTotal() {
+        return calculatedTotal == null ? BigDecimal.ZERO :
+                calculatedTotal;
+    }
+
+    public final BigDecimal getManualSalesTaxRate() {
+        return manualSalesTaxRate != null ? manualSalesTaxRate : BigDecimal.ZERO;
+    }
+
+    public final BigDecimal getQuantity() {
+        return quantity != null ? quantity : BigDecimal.ZERO;
+    }
+
+    public final BigDecimal getUnitPrice() {
+        return unitPrice != null ? unitPrice : BigDecimal.ZERO;
+    }
 }

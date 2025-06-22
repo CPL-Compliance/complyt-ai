@@ -13,6 +13,7 @@ import java.util.UUID;
 
 @Data
 @With
+@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Transaction implements ComplytIdProperty {
 

@@ -1,6 +1,6 @@
-package io.complyt.domain;
+package io.complyt.domain.transaction;
 
-import io.complyt.domain.transaction.Transaction;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 public class TransactionTest {
 
     UnitTestUtilities testUtilities;
@@ -20,11 +19,11 @@ public class TransactionTest {
     private String transactionId;
 
     @Test
-    public void testingAmountOfPropertiesInTransaction() {
+    void testingAmountOfPropertiesInTransaction() {
         /* In case there is a new property added, If its of type Taxable - handle rates and amount calculation for it */
         Field[] fields = Transaction.class.getDeclaredFields();
-        assertEquals(31, fields.length);
-        //        assertEquals(32, fields.length);
+        Assertions.assertEquals(31, fields.length);
+        //        Assertions.assertEquals(32, fields.length);
     }
 
     @BeforeEach

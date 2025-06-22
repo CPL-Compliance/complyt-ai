@@ -57,4 +57,20 @@ public class ShippingFee implements Taxable {
         this.tangibleCategory = tangibleCategory;
         this.calculatedTotal = calculatedTotal;
     }
+
+    public final BigDecimal getTotalPrice() {
+        return totalPrice != null ?
+                totalPrice :
+                BigDecimal.ZERO;
+    }
+
+    public final BigDecimal getCalculatedTotal() {
+        return calculatedTotal == null ? BigDecimal.ZERO :
+                calculatedTotal;
+    }
+
+    public final BigDecimal getManualSalesTaxRate() {
+        return manualSalesTaxRate != null ? manualSalesTaxRate : BigDecimal.ZERO;
+    }
+
 }
