@@ -105,6 +105,7 @@ public class AddressValidationEndpointsIT extends TestContainersInitializerIT im
                 });
     }
 
+
     @Test
     @Order(0)
     public void validate_ValidAndInCache_Returns200() {
@@ -133,5 +134,4 @@ public class AddressValidationEndpointsIT extends TestContainersInitializerIT im
                     assertNotNull(addressDto);
                 });
     }
-    
 }

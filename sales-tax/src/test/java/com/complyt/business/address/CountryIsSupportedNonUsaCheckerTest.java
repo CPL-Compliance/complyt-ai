@@ -67,5 +67,4 @@ public class CountryIsSupportedNonUsaCheckerTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "country is marked non-null but is null");
     }
-
 }
