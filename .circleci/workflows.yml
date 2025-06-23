@@ -49,10 +49,10 @@ parameters:
   run-authentication-workflow:
     type: boolean
     default: false
-  run-api-gateway-verify-workflow:
+  run-processing-service-workflow:
     type: boolean
     default: false
-  run-processing-service-workflow:
+  run-api-gateway-verify-workflow:
     type: boolean
     default: false
 
