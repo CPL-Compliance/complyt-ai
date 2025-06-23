@@ -38,6 +38,7 @@ import testUtils.integration_test.ITUtilities;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -412,6 +413,32 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     assertNull(transactionDto.items().get(0).jurisdictionalSalesTaxRules().cities());
                     assertEquals(shippingGtRates, transactionDto.shippingFee().gtRates());
                 });
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockJwt
+    public void upsertByExternalIdAndSource_NonUsaCountryAndCountryNotInTaxCodeDocument_Returns500() {
+        String externalId = "newNonUsaWithShippingExistingTransactionID-CanadaNotInTaxCodeNKTC";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDtoNonUsaCountry(externalId, customerId)
+                .withShippingFee(ITUtilities.stubShippingFeeDto());
+        List<ItemDto> newItems = givenTransaction.items().stream().map(itemDto -> itemDto.withTaxCode("NKTC")).toList();
+
+        givenTransaction = givenTransaction.withItems(newItems);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .mutate().responseTimeout(Duration.ofMinutes(20)).build()
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Order(1)

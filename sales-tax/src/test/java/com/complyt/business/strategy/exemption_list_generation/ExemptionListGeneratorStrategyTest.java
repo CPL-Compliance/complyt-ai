@@ -47,7 +47,7 @@ public class ExemptionListGeneratorStrategyTest extends BaseTestClass {
         List<Exemption> expectedExemptions = testUtilities.createExemptionsListFromWrapper(exemptionWrapper);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
 
         // Then
@@ -62,7 +62,7 @@ public class ExemptionListGeneratorStrategyTest extends BaseTestClass {
         List<Exemption> expectedExemptions = testUtilities.createNonUsaExemptionsListFromWrapper(exemptionWrapper);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         // Then
         Flux<Exemption> actualFlux = (Flux<Exemption>) exemptionListGeneratorStrategy.select(exemptionWrapper).apply(exemptionWrapper);

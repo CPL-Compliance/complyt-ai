@@ -1,6 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.business.address.CountryIsUsaChecker;
+import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.strategy.StrategySelector;
 import com.complyt.business.strategy.currencyExchange.CurrenciesWebClientWrapper;
@@ -20,6 +21,7 @@ import com.complyt.repositories.GeoRecordRepository;
 import com.complyt.repositories.TransactionRepository;
 import com.complyt.v1.exceptions.types.CurrencyNotFoundApiException;
 import com.complyt.v1.exceptions.types.ZipCodeNotFoundApiException;
+import com.complyt.v1.validators.body_checkers.StateExistsChecker;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -149,9 +151,13 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Mono<Transaction> injectSubsidiaryAndMatchedAddress(@NonNull Transaction transaction, @NonNull SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {
-        return Mono.just(transaction.setSubsidiary(salesTaxTrackingWithNexusInfo.getSalesTaxTracking().getSubsidiary()))
-                .flatMap(transactionWithAmounts -> matchedAddressProvider.provide(transactionWithAmounts, salesTaxTrackingWithNexusInfo));
+    public Mono<Transaction> injectSubsidiaryToTransaction(@NonNull Transaction transaction, @NonNull SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {
+        return Mono.just(transaction.setSubsidiary(salesTaxTrackingWithNexusInfo.getSalesTaxTracking().getSubsidiary()));
+    }
+
+    @Override
+    public Mono<Transaction> injectMatchedAddressToTransaction(@NonNull Transaction transaction) {
+        return matchedAddressProvider.provide(transaction);
     }
 
     private Mono<Transaction> injectCommonDataToTransaction(Transaction transaction) {
@@ -250,8 +256,12 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public Boolean shouldRemoveTransactionFromOriginalNexusTrackingDueToChangeInCountryStateOrSubsidiary(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction) {
-        return !Objects.equals(modifiedTransaction.getShippingAddress().country(), originalTransaction.getShippingAddress().country()) ||
-                !Objects.equals(modifiedTransaction.getShippingAddress().state(), originalTransaction.getShippingAddress().state()) ||
+        String newTransactionCountry = CountryToStandardizedCountry.standardize(modifiedTransaction.getShippingAddress().matchedAddressData().address().country());
+        String oldTransactionCountry = CountryToStandardizedCountry.standardize(originalTransaction.getShippingAddress().matchedAddressData().address().country());
+        String newTransactionState = StateExistsChecker.check(modifiedTransaction.getShippingAddress().matchedAddressData().address().state());
+        String oldTransactionState = StateExistsChecker.check(originalTransaction.getShippingAddress().matchedAddressData().address().state());
+        return !Objects.equals(newTransactionCountry, oldTransactionCountry) ||
+                !Objects.equals(newTransactionState, oldTransactionState) ||
                 !Objects.equals(modifiedTransaction.getSubsidiary(), originalTransaction.getSubsidiary());
     }
 

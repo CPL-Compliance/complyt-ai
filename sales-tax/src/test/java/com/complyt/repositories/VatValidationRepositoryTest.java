@@ -61,7 +61,7 @@ class VatValidationRepositoryTest extends BaseTestClass {
                 .and("vatNumber").is(vatDetailsToValidate.getVatNumber()));
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
         when(reactiveMongoTemplate.findOne(query, ValidatedVat.class)).thenReturn(Mono.just(validatedVat));
 
         Mono<ValidatedVat> resultValidatedVat = vatValidationRepository.find(vatDetailsToValidate);

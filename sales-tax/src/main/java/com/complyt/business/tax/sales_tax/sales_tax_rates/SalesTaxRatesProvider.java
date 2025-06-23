@@ -31,8 +31,8 @@ public class SalesTaxRatesProvider {
     public SalesTaxRates provide(@NonNull JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, @NonNull SalesTaxRates originalSalesTaxRate, @NonNull ShippingAddress address) {
         SalesTaxRates calculatedRates = stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRules, originalSalesTaxRate);
 
-        if (jurisdictionalSalesTaxRules.getCities() != null && jurisdictionalSalesTaxRules.getCities().containsKey(address.city())) {
-            TaxRules citySalesTaxRules = jurisdictionalSalesTaxRules.getCities().get(address.city());
+        if (jurisdictionalSalesTaxRules.getCities() != null && jurisdictionalSalesTaxRules.getCities().containsKey(address.matchedAddressData().address().city())) {
+            TaxRules citySalesTaxRules = jurisdictionalSalesTaxRules.getCities().get(address.matchedAddressData().address().city());
             calculatedRates = cityLevelSalesTaxRatesCalculator.calculate(citySalesTaxRules, calculatedRates.withCityRate(originalSalesTaxRate.cityRate()));
         }
         log.debug("Rates returned after calculation: " + calculatedRates);

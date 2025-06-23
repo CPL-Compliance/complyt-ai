@@ -125,6 +125,11 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
+        MandatoryAddress mandatoryAddress = testUtilities.createMandatoryAddress();
+        MatchedAddressData matchedAddressData = testUtilities.createMatchedAddressByMandatoryAddress(mandatoryAddress);
+        ShippingAddress newShippingAddressWithMatchedAddress = transaction.getShippingAddress().withMatchedAddressData(matchedAddressData);
+        transaction = transaction.withShippingAddress(newShippingAddressWithMatchedAddress);
+
 
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
@@ -136,7 +141,6 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
 
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRatesAndCityCounty)).thenReturn(taxables);
 
@@ -153,6 +157,11 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
         FilingMetaData filingMetaData = UnitTestUtilities.createFilingMetaData();
         SalesTax salesTax = new SalesTax(null, new BigDecimal(800), salesTaxRates.taxRate(), salesTaxRates, null, filingMetaData); //note gt is null
+        MandatoryAddress mandatoryAddress = testUtilities.createMandatoryAddress();
+        MatchedAddressData matchedAddressData = testUtilities.createMatchedAddressByMandatoryAddress(mandatoryAddress);
+        ShippingAddress newShippingAddressWithMatchedAddress = transaction.getShippingAddress().withMatchedAddressData(matchedAddressData);
+        transaction = transaction.withShippingAddress(newShippingAddressWithMatchedAddress);
+
 
         List<Item> manualTaxableItems = new ArrayList<>() {{
             add(transaction.getItems().get(1).withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1)));
@@ -170,7 +179,6 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
 
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRatesAndCityCounty)).thenReturn(taxables);
         when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());
@@ -187,6 +195,11 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
         FilingMetaData filingMetaData = UnitTestUtilities.createFilingMetaData();
         SalesTax salesTax = new SalesTax(null, new BigDecimal(1600), salesTaxRates.taxRate(), salesTaxRates, null, filingMetaData); //note gt is null
+        MandatoryAddress mandatoryAddress = testUtilities.createMandatoryAddress();
+        MatchedAddressData matchedAddressData = testUtilities.createMatchedAddressByMandatoryAddress(mandatoryAddress);
+        ShippingAddress newShippingAddressWithMatchedAddress = transaction.getShippingAddress().withMatchedAddressData(matchedAddressData);
+        transaction = transaction.withShippingAddress(newShippingAddressWithMatchedAddress);
+
 
         List<Item> manualTaxableItems = new ArrayList<>() {{
             add(transaction.getItems().get(0).withManualSalesTax(true).withManualSalesTaxRate(BigDecimal.valueOf(0.1)));
@@ -205,7 +218,6 @@ public class ComplytSalesTaxRatesTransactionInjectorTest extends BaseTestClass {
 
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)).thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRatesAndCityCounty)).thenReturn(taxables);
         when(salesTaxAggregator.aggregate((List<Taxable>) taxables, transactionWithRates.getIsTaxInclusive())).thenReturn(salesTax.amount());

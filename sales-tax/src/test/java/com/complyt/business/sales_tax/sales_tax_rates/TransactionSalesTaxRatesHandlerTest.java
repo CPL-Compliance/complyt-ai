@@ -70,7 +70,7 @@ public class TransactionSalesTaxRatesHandlerTest extends BaseTestClass {
         Transaction expectedTransaction = transaction.withItems(modifiedItems);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRates, transaction.getShippingAddress())).thenReturn(modifiedItems);
         Mono<Transaction> actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates);
@@ -93,7 +93,7 @@ public class TransactionSalesTaxRatesHandlerTest extends BaseTestClass {
         Transaction expectedTransaction = transaction.withItems(modifiedItems).withShippingFee(shippingFeeWithRates);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRates, transaction.getShippingAddress())).thenReturn(modifiedItems);
         when(shippingFeeSalesTaxRatesProvider.setSalesTaxRates(shippingFee, salesTaxRates, transaction.getShippingAddress())).thenReturn(shippingFeeWithRates);

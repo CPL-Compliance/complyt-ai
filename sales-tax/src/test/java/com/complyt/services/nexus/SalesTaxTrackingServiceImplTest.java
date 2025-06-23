@@ -318,7 +318,7 @@ public class SalesTaxTrackingServiceImplTest {
         String subsidiary = newSalesTaxTracking.getSubsidiary();
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
         when(nexusStateRuleRepository.findMostRecentByCountryAndState(country, state)).thenReturn(Mono.just(nexusStateRule));
         when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
         when(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiary)).thenReturn(Mono.just(salesTaxTracking));
@@ -527,7 +527,7 @@ public class SalesTaxTrackingServiceImplTest {
         SalesTaxTracking salesTaxTrackingToSend = salesTaxTracking.withState(null);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
         when(nexusStateRuleRepository.findMostRecentByCountryAndState(salesTaxTrackingToSend.getCountry(), null)).thenReturn(Mono.just(nexusStateRule));

@@ -581,7 +581,6 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "ThirdNonExistingIdForExemptionChecks";
         String item = TestUtilities.customItem(null, BigDecimal.valueOf(1000), BigDecimal.valueOf(1), null);
 
-
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
@@ -2301,7 +2300,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, null, true, null, "Il", createdDate, null, null))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId, null, true, null, "Israel", createdDate, null, null))
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);

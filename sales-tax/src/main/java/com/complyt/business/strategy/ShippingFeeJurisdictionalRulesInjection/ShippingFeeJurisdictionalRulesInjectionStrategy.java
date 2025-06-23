@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 public class ShippingFeeJurisdictionalRulesInjectionStrategy extends FunctionSelectorByTransactionAddressStrategy {
 
     @NonNull

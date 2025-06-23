@@ -86,6 +86,7 @@ public interface TransactionEndpointsITTemplate extends
 
     void upsertByExternalIdAndSource_UsaTransactionWithNonExistingTaxCode_Returns400BadRequest();
 
+    void upsertByExternalIdAndSource_NonUsaCountryAndCountryNotInTaxCodeDocument_Returns500();
 
     void upsertByExternalIdAndSource_UsaCountryTaxInclusiveTransactionTypeTaxableRefund_Returns200();
 

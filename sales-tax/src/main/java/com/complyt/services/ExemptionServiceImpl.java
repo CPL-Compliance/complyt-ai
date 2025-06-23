@@ -10,6 +10,7 @@ import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.ExemptionRepository;
 import com.complyt.utils.observability.ContextLogger;
+import com.complyt.v1.validators.body_checkers.StateExistsChecker;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,10 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @Override
     public Mono<Exemption> findFullyExempted(@NonNull final Transaction transaction) {
-        return exemptionRepository.findFullyExempted(transaction.getCustomerId(), transaction.getShippingAddress().country(), transaction.getShippingAddress().state(), transaction.getExternalTimestamps().getCreatedDate());
+        String country = CountryToStandardizedCountry.standardize(transaction.getShippingAddress().matchedAddressData().address().country());
+        String state = StateExistsChecker.check(transaction.getShippingAddress().matchedAddressData().address().state());
+
+        return exemptionRepository.findFullyExempted(transaction.getCustomerId(), country, state, transaction.getExternalTimestamps().getCreatedDate());
     }
 
     @Override
@@ -135,5 +139,4 @@ public class ExemptionServiceImpl implements ExemptionService {
                         newExemption.getExemptionStatus(), null
                 );
     }
-
 }

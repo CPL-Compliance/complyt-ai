@@ -10,6 +10,9 @@ import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.domain.customer.exemption.Status;
 import com.complyt.domain.timestamps.Timestamps;
+import com.complyt.domain.transaction.MandatoryAddress;
+import com.complyt.domain.transaction.MatchedAddressData;
+import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.repositories.ExemptionRepository;
 import com.complyt.security.TenantResolver;
@@ -160,11 +163,14 @@ public class ExemptionServiceImplTest extends BaseTestClass {
     @Test
     void isFullyExempted_CustomerHasFullyExemptionInState_ReturnsTrue() {
         // Given
+        MandatoryAddress mandatoryAddress = testUtilities.createMandatoryAddress().withCountry("USA").withState("California");
+        MatchedAddressData matchedAddressData = testUtilities.createMatchedAddressByMandatoryAddress(mandatoryAddress);
+        ShippingAddress newShippingAddressWithMatchedAddress = transaction.getShippingAddress().withMatchedAddressData(matchedAddressData);
+        transaction = transaction.withShippingAddress(newShippingAddressWithMatchedAddress);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(exemptionRepository.findFullyExempted(transaction.getCustomerId(),
-                transaction.getShippingAddress().country(), transaction.getShippingAddress().state(),
+                transaction.getShippingAddress().matchedAddressData().address().country(), transaction.getShippingAddress().matchedAddressData().address().state(),
                 transaction.getExternalTimestamps().getCreatedDate())).thenReturn(Mono.just(exemption));
         Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
 
@@ -175,11 +181,14 @@ public class ExemptionServiceImplTest extends BaseTestClass {
     @Test
     void isFullyExempted_CustomerDoesNotHaveExemptionInState_ReturnsTrue() {
         // Given
+        MandatoryAddress mandatoryAddress = testUtilities.createMandatoryAddress().withCountry("USA").withState("California");
+        MatchedAddressData matchedAddressData = testUtilities.createMatchedAddressByMandatoryAddress(mandatoryAddress);
+        ShippingAddress newShippingAddressWithMatchedAddress = transaction.getShippingAddress().withMatchedAddressData(matchedAddressData);
+        transaction = transaction.withShippingAddress(newShippingAddressWithMatchedAddress);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(exemptionRepository.findFullyExempted(transaction.getCustomerId(),
-                transaction.getShippingAddress().country(), transaction.getShippingAddress().state(),
+                transaction.getShippingAddress().country(), transaction.getShippingAddress().matchedAddressData().address().state(),
                 transaction.getExternalTimestamps().getCreatedDate())).thenReturn(Mono.empty());
         Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
 
@@ -194,7 +203,6 @@ public class ExemptionServiceImplTest extends BaseTestClass {
         Exemption cancelledExemption = exemption.withExemptionStatus(ExemptionStatus.CANCELLED);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
         when(exemptionRepository.findByComplytId(id)).thenReturn(Mono.just(exemption));
         when(exemptionRepository.save(cancelledExemption)).thenReturn(Mono.just(cancelledExemption));
         Mono<Exemption> deleteResultMono = exemptionService.markAsCancelled(id);

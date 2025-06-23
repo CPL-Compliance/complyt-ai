@@ -108,14 +108,13 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         AddressDto addressDto = new AddressDto(
                 "Oxenfurt", "USA", "Gustfields", "NY",
                 "Oxenfurt Academy", "11221", null, false);
-        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(true), TestUtilities.getScoringDto());
+        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(false), TestUtilities.getScoringDto());
 
         Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
 
         HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
                 .withAddress(new HereAddress(null, null, address.country(), null, address.state(), address.county(), address.city(), address.street(), address.zip()))
                 .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0))));
-
 
         // When
         when(stubHereAddressValidationWebClientWrapper.validateAddress(any())).thenReturn(Mono.just(hereAddressData));
@@ -272,7 +271,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         HereAddressData hereAddressDataNoStreetGoodScore = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
                 .withAddress(new HereAddress(null, null, address.country(), null, address.state(), address.county(), address.city(), null, address.zip()))
                 .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0))));
-        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(true), TestUtilities.getScoringDto());
+        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(false), TestUtilities.getScoringDto());
 
         // When
         when(stubHereAddressValidationWebClientWrapper.validateAddress(address)).thenReturn(Mono.just(hereAddressDataNoStreetBadScore));
@@ -346,7 +345,7 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 null, "Canada", null, null,
                 null, "10015", "Quebec", false);
         ScoringDto scoringDto = TestUtilities.getScoringGlobalDto();
-        CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withIsPartial(true), scoringDto);
+        CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withIsPartial(false), scoringDto);
         ValidatedAddressDto expectedAddress = new ValidatedAddressDto(List.of(cachedAddressDataDto), addressDto);
 
         HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()

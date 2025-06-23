@@ -132,7 +132,7 @@ public class ExemptionFacadeTest extends BaseTestClass {
         Exemption expectedExemption = newExemption.withCustomer(customer);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
         when(exemptionService.update(newExemption, exemption, id)).thenReturn(Mono.just(newExemption));
         when(customerService.findByComplytIdProjection(newExemption.getCustomerId())).thenReturn(Mono.just(customer));
         when(exemptionService.findByComplytId(id)).thenReturn(Mono.just(exemption));
@@ -150,7 +150,7 @@ public class ExemptionFacadeTest extends BaseTestClass {
         UUID idThatDoesNotExist = UUID.randomUUID();
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(exemptionService.findByComplytId(idThatDoesNotExist)).thenReturn(Mono.empty());
         Mono<Exemption> exemptionMono = exemptionFacade.update(newExemption, idThatDoesNotExist);

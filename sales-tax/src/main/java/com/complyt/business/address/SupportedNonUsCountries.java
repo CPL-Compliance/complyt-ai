@@ -225,6 +225,7 @@ public interface SupportedNonUsCountries {
         put("CONGO, DEMOCRATIC REPUBLIC OF THE", "Congo, democratic republic of the");
         put("CD", "Congo, democratic republic of the");
         put("COD", "Congo, democratic republic of the");
+        put("DEMOCRATIC REPUBLIC OF THE CONGO", "Congo, democratic republic of the");
 
         put("CONGO", "Congo");
         put("CG", "Congo");
@@ -241,6 +242,7 @@ public interface SupportedNonUsCountries {
         put("CÔTE D'IVOIRE", "Côte d'ivoire");
         put("CI", "Côte d'ivoire");
         put("CIV", "Côte d'ivoire");
+        put("COTE D'IVOIRE", "Côte d'ivoire");
 
         put("CROATIA", "Croatia");
         put("HR", "Croatia");
@@ -253,6 +255,7 @@ public interface SupportedNonUsCountries {
         put("CURAÇAO", "Curaçao");
         put("CW", "Curaçao");
         put("CUW", "Curaçao");
+        put("CURACAO", "Curaçao");
 
         put("CYPRUS", "Cyprus");
         put("CY", "Cyprus");
@@ -431,6 +434,7 @@ public interface SupportedNonUsCountries {
         put("HONG KONG", "Hong kong");
         put("HK", "Hong kong");
         put("HKG", "Hong kong");
+        put("HONG KONG SAR", "Hong kong");
 
         put("HUNGARY", "Hungary");
         put("HU", "Hungary");
@@ -552,6 +556,8 @@ public interface SupportedNonUsCountries {
         put("MACAO", "Macao");
         put("MO", "Macao");
         put("MAC", "Macao");
+        put("MACAO SAR", "Macao");
+        put("MACAU SAR", "Macao");
 
         put("MADAGASCAR", "Madagascar");
         put("MG", "Madagascar");
@@ -659,6 +665,7 @@ public interface SupportedNonUsCountries {
         put("NETHERLANDS", "Netherlands");
         put("NL", "Netherlands");
         put("NLD", "Netherlands");
+        put("THE NETHERLANDS", "Netherlands");
 
         put("NEW CALEDONIA", "New caledonia");
         put("NC", "New caledonia");
@@ -775,14 +782,17 @@ public interface SupportedNonUsCountries {
         put("RÉUNION", "Réunion");
         put("RE", "Réunion");
         put("REU", "Réunion");
+        put("REUNION", "Réunion");
 
         put("SAINT BARTHÉLEMY", "Saint barthélemy");
         put("BL", "Saint barthélemy");
         put("BLM", "Saint barthélemy");
+        put("SAINT BARTHELEMY", "Saint barthélemy");
 
         put("SAINT HELENA, ASCENSION AND TRISTAN DA CUNHA", "Saint helena, ascension and tristan da cunha");
         put("SH", "Saint helena, ascension and tristan da cunha");
         put("SHN", "Saint helena, ascension and tristan da cunha");
+        put("ST HELENA, ASCENSION, AND T. CUNHA", "Saint helena, ascension and tristan da cunha");
 
         put("SAINT KITTS AND NEVIS", "Saint kitts and nevis");
         put("ST KITTS AND NEVIS", "Saint kitts and nevis");
@@ -863,6 +873,7 @@ public interface SupportedNonUsCountries {
         put("SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS", "South georgia and the south sandwich islands");
         put("GS", "South georgia and the south sandwich islands");
         put("SGS", "South georgia and the south sandwich islands");
+        put("SOUTH GEORGIA AND S. SANDWICH IS.", "South georgia and the south sandwich islands");
 
         put("SOUTH SUDAN", "South sudan");
         put("SS", "South sudan");
@@ -900,10 +911,12 @@ public interface SupportedNonUsCountries {
         put("ST MARTIN", "St Martin");
         put("SAINT MARTIN", "St Martin");
         put("MF", "St Martin");
+        put("SINT MAARTEN", "St Martin");
 
         put("SYRIAN ARAB REPUBLIC", "Syrian arab republic");
         put("SY", "Syrian arab republic");
         put("SYR", "Syrian arab republic");
+        put("SYRIA", "Syrian arab republic");
 
         put("TAJIKISTAN", "Tajikistan");
         put("TJ", "Tajikistan");
@@ -912,6 +925,7 @@ public interface SupportedNonUsCountries {
         put("TANZANIA, UNITED REPUBLIC OF", "Tanzania, united republic of");
         put("TZ", "Tanzania, united republic of");
         put("TZA", "Tanzania, united republic of");
+        put("TANZANIA", "Tanzania, united republic of");
 
         put("THAILAND", "Thailand");
         put("TH", "Thailand");
@@ -945,6 +959,7 @@ public interface SupportedNonUsCountries {
         put("TURKEY", "Turkey");
         put("TR", "Turkey");
         put("TUR", "Turkey");
+        put("TURKIYE", "Turkey");
 
         put("TURKMENISTAN", "Turkmenistan");
         put("TM", "Turkmenistan");

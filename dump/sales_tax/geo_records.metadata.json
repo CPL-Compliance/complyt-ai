@@ -1,1 +1,1 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"zip":{"$numberInt":"-1"}},"name":"zip_-1"}],"uuid":"6c1b095fa4f24382b42f84cdf707982c","collectionName":"geo_records","type":"collection"}
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"zip":{"$numberInt":"-1"}},"name":"zip_-1"}],"uuid":"ce46af86d22344c5a29f011213be563f","collectionName":"geo_records","type":"collection"}

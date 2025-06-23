@@ -69,7 +69,7 @@ class TransactionItemsTangibleCategoryInjectorTest extends BaseTestClass {
         Transaction expectedTransaction = transaction.withItems(testUtilities.createItems(false, false, true));
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         Mono<Transaction> transactionMono = transactionItemsTangibleCategoryInjector.inject(classifications, transaction);
 

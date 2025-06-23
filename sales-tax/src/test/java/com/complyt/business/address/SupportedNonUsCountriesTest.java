@@ -982,7 +982,7 @@ public class SupportedNonUsCountriesTest {
 
     @Test
     void countriesMapCount() {
-        Assertions.assertEquals(776, SupportedNonUsCountries.nonUsaCountriesAbbreviations.size());
+        Assertions.assertEquals(790, SupportedNonUsCountries.nonUsaCountriesAbbreviations.size());
     }
     
 }

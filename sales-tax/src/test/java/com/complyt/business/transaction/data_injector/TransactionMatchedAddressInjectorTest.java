@@ -51,7 +51,7 @@ class TransactionMatchedAddressInjectorTest extends BaseTestClass {
         Transaction expectedTransaction = transaction.withShippingAddress(modifiedAddress);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         Mono<Transaction> actualTransactionMono = transactionMatchedAddressInjector.inject(matchedAddressData, transaction);
 

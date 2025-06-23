@@ -4,8 +4,7 @@ import com.complyt.business.strategy.StrategySelector;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
-import com.complyt.domain.transaction.Item;
-import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.*;
 import com.complyt.security.TenantResolver;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -83,8 +82,6 @@ class TransactionItemsJurisdictionalRulesInjectorTest extends BaseTestClass {
         Transaction expectedTransaction = transaction.withItems(itemsWithJurisdictionalRules);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
-
         when(itemsJurisdictionalRulesInjectionStrategy.select(transaction)).thenReturn(transaction -> itemsWithJurisdictionalRules);
         Mono<Transaction> result = transactionItemsJurisdictionalRulesInjector.inject(classifications, transaction);
 
@@ -93,41 +90,61 @@ class TransactionItemsJurisdictionalRulesInjectorTest extends BaseTestClass {
     }
 
     @Test
-    public void testInject_withValidDataAndNullState_shouldInjectClassificationCorrectly() {
+    public void testInject_withValidDataButTransactionWithValidState_shouldInjectClassificationCorrectly() {
         // Given
+        MandatoryAddress mandatoryAddress = testUtilities.createMandatoryAddress();
+        MatchedAddressData matchedAddressData = testUtilities.createMatchedAddressByMandatoryAddress(mandatoryAddress);
+        ShippingAddress newShippingAddressWithMatchedAddress = transaction.getShippingAddress().withMatchedAddressData(matchedAddressData);
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Transaction transactionToSend = transaction.withShippingAddress(transaction.getShippingAddress().withState(null));
         List<Item> itemsWithJurisdictionalRules = testUtilities.createItems(true, false, false);
-        Transaction expectedTransaction = transactionToSend.withItems(itemsWithJurisdictionalRules);
+        transaction = transaction.withShippingAddress(newShippingAddressWithMatchedAddress);
+        Transaction expectedTransaction = transaction.withItems(itemsWithJurisdictionalRules);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
-
-        when(itemsJurisdictionalRulesInjectionStrategy.select(transactionToSend)).thenReturn(transaction -> itemsWithJurisdictionalRules);
-        Mono<Transaction> result = transactionItemsJurisdictionalRulesInjector.inject(classifications, transactionToSend);
+        when(itemsJurisdictionalRulesInjectionStrategy.select(transaction)).thenReturn(transaction -> itemsWithJurisdictionalRules);
+        Mono<Transaction> result = transactionItemsJurisdictionalRulesInjector.inject(classifications, transaction);
 
         // Then
         StepVerifier.create(result).expectNext(expectedTransaction).verifyComplete();
     }
 
     @Test
-    public void testInject_withValidDataAndBlankState_shouldInjectClassificationCorrectly() {
+    public void testInject_withValidDataButTransactionWithNullState_shouldInjectClassificationCorrectly() {
         // Given
+        MandatoryAddress mandatoryAddress = testUtilities.createMandatoryAddress().withState(null);
+        MatchedAddressData matchedAddressData = testUtilities.createMatchedAddressByMandatoryAddress(mandatoryAddress);
+        ShippingAddress newShippingAddressWithMatchedAddress = transaction.getShippingAddress().withMatchedAddressData(matchedAddressData);
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Transaction transactionToSend = transaction.withShippingAddress(transaction.getShippingAddress().withState(""));
         List<Item> itemsWithJurisdictionalRules = testUtilities.createItems(true, false, false);
-        Transaction expectedTransaction = transactionToSend.withItems(itemsWithJurisdictionalRules);
+        transaction = transaction.withShippingAddress(newShippingAddressWithMatchedAddress);
+        Transaction expectedTransaction = transaction.withItems(itemsWithJurisdictionalRules);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
-
-        when(itemsJurisdictionalRulesInjectionStrategy.select(transactionToSend)).thenReturn(transaction -> itemsWithJurisdictionalRules);
-        Mono<Transaction> result = transactionItemsJurisdictionalRulesInjector.inject(classifications, transactionToSend);
+        when(itemsJurisdictionalRulesInjectionStrategy.select(transaction)).thenReturn(transaction -> itemsWithJurisdictionalRules);
+        Mono<Transaction> result = transactionItemsJurisdictionalRulesInjector.inject(classifications, transaction);
 
         // Then
         StepVerifier.create(result).expectNext(expectedTransaction).verifyComplete();
     }
 
+    @Test
+    public void testInject_withValidDataButTransactionWithBlankState_shouldInjectClassificationCorrectly() {
+        // Given
+        MandatoryAddress mandatoryAddress = testUtilities.createMandatoryAddress().withState("");
+        MatchedAddressData matchedAddressData = testUtilities.createMatchedAddressByMandatoryAddress(mandatoryAddress);
+        ShippingAddress newShippingAddressWithMatchedAddress = transaction.getShippingAddress().withMatchedAddressData(matchedAddressData);
+        Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
+        List<Item> itemsWithJurisdictionalRules = testUtilities.createItems(true, false, false);
+        transaction = transaction.withShippingAddress(newShippingAddressWithMatchedAddress);
+        Transaction expectedTransaction = transaction.withItems(itemsWithJurisdictionalRules);
+
+        // When
+        when(itemsJurisdictionalRulesInjectionStrategy.select(transaction)).thenReturn(transaction -> itemsWithJurisdictionalRules);
+        Mono<Transaction> result = transactionItemsJurisdictionalRulesInjector.inject(classifications, transaction);
+
+        // Then
+        StepVerifier.create(result).expectNext(expectedTransaction).verifyComplete();
+    }
 
     @Test
     void inject_NullTransactionPassed_ThrowsNullPointerException() {
@@ -143,6 +160,4 @@ class TransactionItemsJurisdictionalRulesInjectorTest extends BaseTestClass {
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
     }
-
-
 }

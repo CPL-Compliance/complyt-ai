@@ -40,8 +40,8 @@ public class GtRatesTransactionInjector implements RatesTransactionInjector<Pair
                         .map(transactionWithRates -> {
                             Boolean isExempt = pair.getValue1();
                             if (isExempt) {
-                                ContextLogger.observeCtx("Customer with ID " + transactionWithRates.getCustomerId() + " is exempt in " + transactionWithRates.getShippingAddress().country(), log::debug);
-                                ContextLogger.observeCtx("Removing salesTaxRate object from the items in transaction with externalId " + transactionWithRates.getExternalId(), log::debug);
+                                log.debug("Customer with ID " + transactionWithRates.getCustomerId() + " is exempt in " + transactionWithRates.getShippingAddress().matchedAddressData().address().country());
+                                log.debug("Removing salesTaxRate object from the items in transaction with externalId " + transactionWithRates.getExternalId());
                                 handleItemsIfExempt(transactionWithRates);
                             }
 

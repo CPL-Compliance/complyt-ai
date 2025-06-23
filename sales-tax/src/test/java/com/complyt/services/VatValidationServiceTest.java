@@ -66,7 +66,7 @@ public class VatValidationServiceTest extends BaseTestClass {
         ValidatedVat expectedValidatedVat = validatedVat.withVatNumber(validatedVat.getVatNumber()); // creates a copy
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(vatValidationRepository.find(vatDetailsToValidate)).thenReturn(Mono.just(validatedVat));
 
@@ -82,7 +82,7 @@ public class VatValidationServiceTest extends BaseTestClass {
         vatDetailsToValidate = testUtilities.createVatDetailsToValidate().withVatNumber("differentNumber");
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(vatValidationRepository.find(vatDetailsToValidate)).thenReturn(Mono.empty());
 
@@ -115,7 +115,7 @@ public class VatValidationServiceTest extends BaseTestClass {
 
         when(internalTimestampsInjector.insertTimestampsToNew(validatedVat)).thenReturn(validatedVatWithTimestamps);
         when(vatValidationRepository.save(validatedVatWithTimestamps)).thenReturn(Mono.just(validatedVatWithTimestamps));
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
 
         // Then
@@ -142,7 +142,7 @@ public class VatValidationServiceTest extends BaseTestClass {
                 .withValid(false).withInternalTimestamps(timestamps);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(vatValidationWebClientWrapper.validate(inputVatDetailsAfterAlignment))
                 .thenReturn(Mono.just(notValidatedVat));
@@ -180,7 +180,7 @@ public class VatValidationServiceTest extends BaseTestClass {
                 .setVatNumber(vatDetailsToValidate.getVatNumber());
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(vatValidationWebClientWrapper.validate(vatDetailsToValidateAfterAlignment))
                 .thenReturn(Mono.just(nullPropertiesVat));
@@ -198,7 +198,7 @@ public class VatValidationServiceTest extends BaseTestClass {
         VatDetailsToValidate inputVatDetails = vatDetailsToValidate;
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(vatValidationWebClientWrapper.validate(vatDetailsToValidate))
                 .thenReturn(Mono.error(new RuntimeException("5 Retries Exhausted")));
@@ -234,7 +234,7 @@ public class VatValidationServiceTest extends BaseTestClass {
                 .withName(null);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(vatValidationWebClientWrapper.validate(inputVatDetailsAfterAlignment))
                 .thenReturn(Mono.just(nullPropertiesVat));
@@ -272,7 +272,7 @@ public class VatValidationServiceTest extends BaseTestClass {
         VatDetailsToValidate inputVatDetailsAfterAlignment = inputVatDetails.withCountryCode(inputVatDetails.getCountryCode().toUpperCase());
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(vatValidationWebClientWrapper.validate(inputVatDetailsAfterAlignment))
                 .thenReturn(Mono.just(nullPropertiesVat));
