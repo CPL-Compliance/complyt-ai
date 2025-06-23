@@ -284,58 +284,58 @@
                         <autoVersionSubmodules>false</autoVersionSubmodules>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>io.fabric8</groupId>
-                    <artifactId>docker-maven-plugin</artifactId>
-                    <version>0.40.1</version>
-                    <configuration>
-                        <!--For Linux users us the tag below-->
-                        <!--<dockerHost>http://127.0.0.1:2375</dockerHost>-->
-                        <dockerHost>unix:///var/run/docker.sock</dockerHost>
-                        <verbose>true</verbose>
-                        <images>
-                            <!--Complyt Application Container-->
-                            <image>
-                                <name>${docker.image.prefix}/${docker.image.name}</name>
-                                <alias>complyt</alias>
-                                <build>
-                                    <dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>
-                                    <!--copies artifact to docker build directory in target-->
-                                    <assembly>
-                                        <descriptorRef>artifact</descriptorRef>
-                                    </assembly>
-                                    <!-- the 'latest' tag is generated automatically -->
-                                    <tags>
-                                        <tag>
-                                            ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
-                                        </tag>
-                                    </tags>
-                                </build>
-                            </image>
-                            <image>
-                                <name>${docker.image.prefix}/demo:${docker.image.name}-latest</name>
-                                <alias>complyt</alias>
-                                <build>
-                                    <dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>
-                                    <!--copies artifact to docker build directory in target-->
-                                    <assembly>
-                                        <descriptorRef>artifact</descriptorRef>
-                                    </assembly>
-                                </build>
-                            </image>
-                        </images>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>build-and-push-to-container-registry</id>
-                            <phase>deploy</phase>
-                            <goals>
-                                <goal>build</goal>
-                                <goal>push</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
+<!--                <plugin>-->
+<!--                    <groupId>io.fabric8</groupId>-->
+<!--                    <artifactId>docker-maven-plugin</artifactId>-->
+<!--                    <version>0.40.1</version>-->
+<!--                    <configuration>-->
+<!--                        &lt;!&ndash;For Linux users us the tag below&ndash;&gt;-->
+<!--                        &lt;!&ndash;<dockerHost>http://127.0.0.1:2375</dockerHost>&ndash;&gt;-->
+<!--                        <dockerHost>unix:///var/run/docker.sock</dockerHost>-->
+<!--                        <verbose>true</verbose>-->
+<!--                        <images>-->
+<!--                            &lt;!&ndash;Complyt Application Container&ndash;&gt;-->
+<!--                            <image>-->
+<!--                                <name>${docker.image.prefix}/${docker.image.name}</name>-->
+<!--                                <alias>complyt</alias>-->
+<!--                                <build>-->
+<!--                                    <dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>-->
+<!--                                    &lt;!&ndash;copies artifact to docker build directory in target&ndash;&gt;-->
+<!--                                    <assembly>-->
+<!--                                        <descriptorRef>artifact</descriptorRef>-->
+<!--                                    </assembly>-->
+<!--                                    &lt;!&ndash; the 'latest' tag is generated automatically &ndash;&gt;-->
+<!--                                    <tags>-->
+<!--                                        <tag>-->
+<!--                                            ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}-->
+<!--                                        </tag>-->
+<!--                                    </tags>-->
+<!--                                </build>-->
+<!--                            </image>-->
+<!--                            <image>-->
+<!--                                <name>${docker.image.prefix}/demo:${docker.image.name}-latest</name>-->
+<!--                                <alias>complyt</alias>-->
+<!--                                <build>-->
+<!--                                    <dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>-->
+<!--                                    &lt;!&ndash;copies artifact to docker build directory in target&ndash;&gt;-->
+<!--                                    <assembly>-->
+<!--                                        <descriptorRef>artifact</descriptorRef>-->
+<!--                                    </assembly>-->
+<!--                                </build>-->
+<!--                            </image>-->
+<!--                        </images>-->
+<!--                    </configuration>-->
+<!--                    <executions>-->
+<!--                        <execution>-->
+<!--                            <id>build-and-push-to-container-registry</id>-->
+<!--                            <phase>deploy</phase>-->
+<!--                            <goals>-->
+<!--                                <goal>build</goal>-->
+<!--                                <goal>push</goal>-->
+<!--                            </goals>-->
+<!--                        </execution>-->
+<!--                    </executions>-->
+<!--                </plugin>-->
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
