@@ -133,4 +133,5 @@ public class AddressValidationEndpointsIT extends TestContainersInitializerIT im
                     assertNotNull(addressDto);
                 });
     }
+    
 }

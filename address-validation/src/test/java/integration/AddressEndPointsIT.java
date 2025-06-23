@@ -116,7 +116,6 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
                 .withAddress(new HereAddress(null, null, address.country(), null, address.state(), address.county(), address.city(), address.street(), address.zip()))
                 .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0))));
 
-
         // When
         when(stubHereAddressValidationWebClientWrapper.validateAddress(any())).thenReturn(Mono.just(hereAddressData));
 

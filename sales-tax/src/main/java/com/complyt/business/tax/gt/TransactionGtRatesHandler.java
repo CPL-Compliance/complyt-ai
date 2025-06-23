@@ -49,5 +49,4 @@ public class TransactionGtRatesHandler {
         return ContextLogger.observeCtx("Set Gt Rates to Transaction", log::info)
                 .then(Mono.just(transaction.withItems(itemsWithRates)));
     }
-
 }
