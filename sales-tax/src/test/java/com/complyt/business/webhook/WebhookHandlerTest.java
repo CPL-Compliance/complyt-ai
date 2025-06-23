@@ -1,6 +1,6 @@
 package com.complyt.business.webhook;
 
-import com.complyt.business.message_queue.rabbit_mq.Producer;
+import com.complyt.business.message_queue.rabbit_mq.WebhookEntityWrapperMQProducer;
 import com.complyt.business.web_hook.WebhookEntityCreator;
 import com.complyt.business.web_hook.WebhookHandler;
 import com.complyt.domain.ClientTracking;
@@ -29,7 +29,7 @@ public class WebhookHandlerTest {
     WebhookHandler<Transaction> webhookHandler;
 
     @Mock
-    Producer<Transaction> producer;
+    WebhookEntityWrapperMQProducer<Transaction> webhookEntityWrapperMQProducer;
 
     @Mock
     WebhookEntityCreator<Transaction> webhookEntityCreator;
@@ -79,7 +79,7 @@ public class WebhookHandlerTest {
 
         // When
         when(webhookEntityCreator.create(webhookEntityWrapper.webhookClass(), transaction, Action.CREATE, "host", "path")).thenReturn(Mono.just(webhookEntityWrapper));
-        when(producer.sendMessage(webhookEntityWrapper)).thenReturn(Mono.just(webhookEntityWrapper));
+        when(webhookEntityWrapperMQProducer.sendMessage(webhookEntityWrapper)).thenReturn(Mono.just(webhookEntityWrapper));
         Mono<Transaction> transactionMono = webhookHandler.handleWebhook(Transaction.class, transaction, clientTrackingToSend.getWebhookDetails(), Action.CREATE);
 
         // Then

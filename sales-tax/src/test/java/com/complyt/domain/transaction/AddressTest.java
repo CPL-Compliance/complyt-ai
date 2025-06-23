@@ -1,14 +1,9 @@
 package com.complyt.domain.transaction;
 
-import com.complyt.security.TenantResolver;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mockStatic;
 
 class AddressTest {
     private final String city = "City";

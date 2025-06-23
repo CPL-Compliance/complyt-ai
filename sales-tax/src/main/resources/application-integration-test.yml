@@ -16,9 +16,25 @@ logging:
     root: info
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: null
   cloud:
     vault:
       enabled: false
   data:
     mongodb:
       database: sales_tax
+
+  rabbitmq:
+    listener:
+      simple:
+        auto-startup: false
+    template:
+      enabled: false
+
+spring.autoconfigure.exclude:
+  - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+
