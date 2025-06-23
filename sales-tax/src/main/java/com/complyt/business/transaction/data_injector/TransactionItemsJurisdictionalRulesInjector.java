@@ -2,8 +2,7 @@ package com.complyt.business.transaction.data_injector;
 
 import com.complyt.business.strategy.StrategySelector;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
-import com.complyt.domain.transaction.Item;
-import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.*;
 import com.complyt.utils.observability.ContextLogger;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,6 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @EqualsAndHashCode
@@ -34,10 +34,22 @@ public class TransactionItemsJurisdictionalRulesInjector implements TransactionD
      */
     @Override
     public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications, @NonNull Transaction transaction) {
-        String stateInfoIfStateExists = transaction.getShippingAddress().state() != null && !transaction.getShippingAddress().state().isEmpty() ? " and in state " + transaction.getShippingAddress().state() : "";
+        String state = Optional.ofNullable(transaction.getShippingAddress())
+                .map(ShippingAddress::matchedAddressData)
+                .map(MatchedAddressData::address)
+                .map(MandatoryAddress::state)
+                .orElse(null);
+
+        String country = Optional.ofNullable(transaction.getShippingAddress())
+                .map(ShippingAddress::matchedAddressData)
+                .map(MatchedAddressData::address)
+                .map(MandatoryAddress::country)
+                .orElse(null);
+
+        String stateInfoIfStateExists = state != null && !state.isEmpty() ? " and in state " + state : "";
 
         String logStr = "Setting jurisdictional sales tax rules and taxable categories to transaction's items for the country: "
-                + transaction.getShippingAddress().country() + stateInfoIfStateExists + ", for the items: " + transaction.getItems();
+                + country + stateInfoIfStateExists + ", for the items: " + transaction.getItems();
 
         return ContextLogger.observeCtx(logStr, log::info)
                 .then(Mono.just((List<Item>) itemsJurisdictionalRulesInjectionStrategy.select(transaction).apply(mapTaxCodesToClassifications)))

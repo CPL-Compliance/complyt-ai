@@ -136,7 +136,7 @@ class NexusServiceTest extends BaseTestClass {
                 .withEconomicNexusTracker(salesTaxTrackingAfterCalculation.getEconomicNexusTracker().withEstablished(true).withEstablishedDate(referenceDate));
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
         when(nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusCalculator.subtractTransactionFromNexusSummary(transaction.getComplytId(), salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusCalculator.addTransactionToNexusSummary(transaction, salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTrackingAfterCalculation));
@@ -168,7 +168,7 @@ class NexusServiceTest extends BaseTestClass {
                 .withEconomicNexusTracker(salesTaxTrackingAfterCalculation.getEconomicNexusTracker().withEstablished(true).withEstablishedDate(referenceDate));
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
         when(nexusCalculator.subtractTransactionFromNexusSummary(transaction.getComplytId(), givenSalesTaxTracking, summaryDate)).thenReturn(Mono.just(givenSalesTaxTracking));
         when(nexusCalculator.addTransactionToNexusSummary(transaction, givenSalesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTrackingAfterCalculation));
         when(nexusChecker.passedThreshold(salesTaxTrackingAfterCalculation, summaryDate)).thenReturn(true);
@@ -248,7 +248,7 @@ class NexusServiceTest extends BaseTestClass {
                 .withAppliedDate(referenceDate);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusCalculator.subtractTransactionFromNexusSummary(complytId, salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
@@ -699,7 +699,7 @@ class NexusServiceTest extends BaseTestClass {
         LocalDateTime resDate = nexusProvider.getAppliedDate(salesTaxTracking, appliedDate);
         SalesTaxTracking expectedSalesTaxTracking = salesTaxTracking.withEconomicNexusTracker(new EconomicNexusTracker(true, transaction.getExternalTimestamps().getCreatedDate())).withAppliedDate(resDate);
 
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(nexusCalculator.initNexusCalculationSummaryByDateRange(salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusCalculator.addTransactionToNexusSummary(transaction, salesTaxTracking, summaryDateTransaction)).thenReturn(Mono.just(salesTaxTracking));

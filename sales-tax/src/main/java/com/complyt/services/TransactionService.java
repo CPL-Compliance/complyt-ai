@@ -51,5 +51,9 @@ public interface TransactionService extends CrudService<Transaction, String> {
 
     Mono<Transaction> calculateTotalAmounts(Transaction transaction);
 
-    Mono<Transaction> injectSubsidiaryAndMatchedAddress(Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo);
+    Mono<Transaction> injectSubsidiaryToTransaction(Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo);
+
+    Mono<Transaction> injectMatchedAddressToTransaction(Transaction transaction);
+
+
 }

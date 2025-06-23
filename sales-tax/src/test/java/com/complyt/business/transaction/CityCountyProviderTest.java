@@ -58,7 +58,7 @@ public class CityCountyProviderTest {
         // When
         when(addressFetcher.fetch(transaction.getShippingAddress())).thenReturn(Mono.just(matchedAddressData));
         when(transactionCityCountyInjector.inject(matchedAddressData, transaction)).thenReturn(Mono.just(transaction));
-        Mono<Transaction> transactionMono = cityCountyProvider.provide(transaction, salesTaxTrackingWithNexusInfo);
+        Mono<Transaction> transactionMono = cityCountyProvider.provide(transaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();

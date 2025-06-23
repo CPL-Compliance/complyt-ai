@@ -2,16 +2,12 @@ package com.complyt.business.strategy.items_jurisdictional_rules_injection;
 
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
-import com.complyt.domain.transaction.Item;
-import com.complyt.domain.transaction.ShippingAddress;
-import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.*;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.exceptions.types.StateNotFoundInJurisdictionalTaxRulesApiException;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import com.complyt.v1.exceptions.types.StateNotValidatedApiException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import reactor.core.publisher.Mono;
 import testUtils.BaseTestClass;
 import testUtils.unit_test.UnitTestUtilities;
@@ -24,7 +20,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 public class UsaAddressItemsJurisdictionalRulesInjectorTest extends BaseTestClass {
@@ -41,7 +36,7 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest extends BaseTestClas
     void setUp() {
         usaAddressItemsJurisdictionalRulesInjector = new UsaAddressItemsJurisdictionalRulesInjector();
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        ShippingAddress usaAddress = testUtilities.createUsaShippingAddress();
+        ShippingAddress usaAddress = testUtilities.createUsaShippingAddressWithFullMatchedAddress();
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString())
                 .withShippingAddress(usaAddress)
                 .withItems(testUtilities.createItems(true, false, true));
@@ -63,7 +58,7 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest extends BaseTestClas
         );
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         List<Item> actualItems = usaAddressItemsJurisdictionalRulesInjector.inject(transactionNoRules).apply(classifications);
 
@@ -91,7 +86,7 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest extends BaseTestClas
         }};
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         List<Item> actualItems = usaAddressItemsJurisdictionalRulesInjector.inject(transactionNoRules).apply(classifications);
 
@@ -102,7 +97,9 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest extends BaseTestClas
     @Test
     void inject_TransactionWithUnsupportedState_ThrowsAnError() {
         // Given
-        ShippingAddress shippingAddress = testUtilities.createShippingAddress().withState("Upsupported State");
+        MandatoryAddress mandatoryAddress = transaction.getShippingAddress().matchedAddressData().address().withState("Upsupported State");
+        MatchedAddressData matchedAddressData = transaction.getShippingAddress().matchedAddressData().withAddress(mandatoryAddress);
+        ShippingAddress shippingAddress = testUtilities.createShippingAddress().withMatchedAddressData(matchedAddressData);
         Transaction transactionNoRules = transaction.withShippingAddress(shippingAddress).withItems(
                 new ArrayList<>() {{
                     add(transaction.getItems().get(0).withJurisdictionalSalesTaxRules(null));
@@ -116,10 +113,88 @@ public class UsaAddressItemsJurisdictionalRulesInjectorTest extends BaseTestClas
         );
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         // Then
         assertThrows(StateNotFoundInJurisdictionalTaxRulesApiException.class, () ->
+                usaAddressItemsJurisdictionalRulesInjector.inject(transactionNoRules).apply(classifications)
+        );
+    }
+
+    @Test
+    void inject_TransactionWithMatchedAddressNull_ThrowsAnError() {
+        // Given
+        ShippingAddress shippingAddress = testUtilities.createShippingAddress().withMatchedAddressData(null);
+        Transaction transactionNoRules = transaction.withShippingAddress(shippingAddress).withItems(
+                new ArrayList<>() {{
+                    add(transaction.getItems().get(0).withJurisdictionalSalesTaxRules(null));
+                    add(transaction.getItems().get(1).withJurisdictionalSalesTaxRules(null));
+                }}
+        );
+
+        Map<String, ProductClassification> classifications = testUtilities.createUsaClassificationsMap(
+                transaction.getItems().get(0).getJurisdictionalSalesTaxRules(),
+                transaction.getItems().get(1).getJurisdictionalSalesTaxRules()
+        );
+
+        // When
+        
+
+        // Then
+        assertThrows(StateNotValidatedApiException.class, () ->
+                usaAddressItemsJurisdictionalRulesInjector.inject(transactionNoRules).apply(classifications)
+        );
+    }
+
+    @Test
+    void inject_TransactionWithMandatoryAddressNull_ThrowsAnError() {
+        // Given
+        MatchedAddressData matchedAddressWithNullMandatoryAddress = transaction.getShippingAddress().matchedAddressData().withAddress(null);
+        ShippingAddress shippingAddress = testUtilities.createShippingAddress().withMatchedAddressData(matchedAddressWithNullMandatoryAddress);
+        Transaction transactionNoRules = transaction.withShippingAddress(shippingAddress).withItems(
+                new ArrayList<>() {{
+                    add(transaction.getItems().get(0).withJurisdictionalSalesTaxRules(null));
+                    add(transaction.getItems().get(1).withJurisdictionalSalesTaxRules(null));
+                }}
+        );
+
+        Map<String, ProductClassification> classifications = testUtilities.createUsaClassificationsMap(
+                transaction.getItems().get(0).getJurisdictionalSalesTaxRules(),
+                transaction.getItems().get(1).getJurisdictionalSalesTaxRules()
+        );
+
+        // When
+        
+
+        // Then
+        assertThrows(StateNotValidatedApiException.class, () ->
+                usaAddressItemsJurisdictionalRulesInjector.inject(transactionNoRules).apply(classifications)
+        );
+    }
+
+    @Test
+    void inject_TransactionWithStateNull_ThrowsAnError() {
+        // Given
+        MandatoryAddress mandatoryAddress = transaction.getShippingAddress().matchedAddressData().address().withState(null);
+        MatchedAddressData matchedAddressWithNullMandatoryAddress = transaction.getShippingAddress().matchedAddressData().withAddress(mandatoryAddress);
+        ShippingAddress shippingAddress = testUtilities.createShippingAddress().withMatchedAddressData(matchedAddressWithNullMandatoryAddress);
+        Transaction transactionNoRules = transaction.withShippingAddress(shippingAddress).withItems(
+                new ArrayList<>() {{
+                    add(transaction.getItems().get(0).withJurisdictionalSalesTaxRules(null));
+                    add(transaction.getItems().get(1).withJurisdictionalSalesTaxRules(null));
+                }}
+        );
+
+        Map<String, ProductClassification> classifications = testUtilities.createUsaClassificationsMap(
+                transaction.getItems().get(0).getJurisdictionalSalesTaxRules(),
+                transaction.getItems().get(1).getJurisdictionalSalesTaxRules()
+        );
+
+        // When
+        
+
+        // Then
+        assertThrows(StateNotValidatedApiException.class, () ->
                 usaAddressItemsJurisdictionalRulesInjector.inject(transactionNoRules).apply(classifications)
         );
     }

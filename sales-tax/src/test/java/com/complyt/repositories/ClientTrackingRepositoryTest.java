@@ -152,7 +152,7 @@ public class ClientTrackingRepositoryTest extends BaseTestClass {
         Query query = new Query(Criteria.where("name").regex("^" + Pattern.quote(name) + "$", "i"));
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(reactiveMongoTemplate.find(query, ClientTracking.class)).thenReturn(Flux.fromIterable(clientTrackingList));
 

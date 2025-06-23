@@ -56,8 +56,8 @@ public class ComplytSalesTaxRatesTransactionInjector implements RatesTransaction
 
     private Transaction calculateFinalTransactionAmounts(Transaction transaction, ComplytSalesTaxRates complytSalesTaxRates, Boolean isExempt) {
         if (isExempt) {
-            ContextLogger.observeCtx("Customer with ID " + transaction.getCustomerId() + " is exempt in " + transaction.getShippingAddress().state(), log::debug);
-            ContextLogger.observeCtx("Removing salesTaxRate object from the items in transaction with externalId " + transaction.getExternalId(), log::debug);
+            log.debug("Customer with ID " + transaction.getCustomerId() + " is exempt in " + transaction.getShippingAddress().matchedAddressData().address().state());
+            log.debug("Removing salesTaxRate object from the items in transaction with externalId " + transaction.getExternalId());
             handleItemsIfExempt(transaction);
         }
 

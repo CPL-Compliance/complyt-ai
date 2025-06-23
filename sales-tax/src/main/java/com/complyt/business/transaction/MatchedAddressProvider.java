@@ -1,9 +1,7 @@
 package com.complyt.business.transaction;
 
-import com.complyt.business.transaction.data_checker.AddressValidationApplyChecker;
 import com.complyt.business.transaction.data_fetcher.MatchedAddressFetcher;
 import com.complyt.business.transaction.data_injector.TransactionMatchedAddressInjector;
-import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.transaction.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -14,7 +12,7 @@ import reactor.core.publisher.Mono;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class MatchedAddressProvider implements SalesTaxDataProvider<Transaction, SalesTaxTrackingWithNexusInfo> {
+public class MatchedAddressProvider implements SalesTaxDataProvider<Transaction> {
 
     @NonNull
     private MatchedAddressFetcher addressFetcher;
@@ -23,7 +21,7 @@ public class MatchedAddressProvider implements SalesTaxDataProvider<Transaction,
     private TransactionMatchedAddressInjector transactionMatchedAddressInjector;
 
     @Override
-    public Mono<Transaction> provide(Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {
+    public Mono<Transaction> provide(Transaction transaction) {
                 return addressFetcher.fetch(transaction.getShippingAddress())
                         .flatMap(cityCountyWrapper -> transactionMatchedAddressInjector.inject(cityCountyWrapper, transaction));
     }

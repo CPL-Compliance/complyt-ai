@@ -1,5 +1,6 @@
 package com.complyt.business.strategy.items_jurisdictional_rules_injection;
 
+import com.complyt.business.address.CountryToStandardizedCountry;
 import com.complyt.business.strategy.NonUsaAddressRegionExtractor;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalTaxRules;
@@ -7,6 +8,7 @@ import com.complyt.domain.sales_tax.product_classification.ProductClassification
 import com.complyt.domain.transaction.*;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.CountryNotFoundInJurisdictionalTaxRulesApiException;
+import com.complyt.v1.exceptions.types.CountryNotValidatedApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -22,15 +24,27 @@ public class NonUsaAddressItemsJurisdictionalRulesInjector implements ItemsJuris
     @Override
     public Function<Map<String, ProductClassification>, List<Item>> inject(Transaction transaction) {
         return mapTaxCodesToClassifications -> {
-            String jurisdiction = transaction.getShippingAddress().country();
+            String jurisdiction = Optional.ofNullable(transaction.getShippingAddress())
+                    .map(ShippingAddress::matchedAddressData)
+                    .map(MatchedAddressData::address)
+                    .map(MandatoryAddress::country)
+                    .orElse(null);
+
+            if(jurisdiction == null){
+                log.error("Country provided or in the matchedAddress was not found in the nonUsaCountriesAbbreviations or is 'null'");
+                throw new CountryNotValidatedApiException();
+            }
+
+            String alignedMatchedAddressJurisdiction = CountryToStandardizedCountry.standardize(jurisdiction);
+
             List<Item> modifiedItems = new ArrayList<>();
 
             for (Item item : transaction.getItems()) {
                 ProductClassification classification = mapTaxCodesToClassifications.get(item.getTaxCode());
-                JurisdictionalTaxRules rules = classification.getJurisdictionalTaxRules().get(jurisdiction);
+                JurisdictionalTaxRules rules = classification.getJurisdictionalTaxRules().get(alignedMatchedAddressJurisdiction);
 
                 if (rules == null) {
-                    ContextLogger.observeCtx("Country provided was not found in the jurisdictional tax rule", log::error);
+                    log.error("Country provided was not found in the jurisdictional tax rule");
                     throw new CountryNotFoundInJurisdictionalTaxRulesApiException();
                 }
 

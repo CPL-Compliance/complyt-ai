@@ -151,7 +151,7 @@ class TransactionDiscountCalculatorTest extends BaseTestClass  {
         Transaction transactionWithExcessiveDiscount = transaction.withTransactionLevelDiscount(BigDecimal.valueOf(10000000)); // Ensures the discount is larger than the total amount
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         Mono<Transaction> actualTransactionMono = transactionDiscountCalculator.injectRecalculatedTotalAfterDiscount(transactionWithExcessiveDiscount);
 

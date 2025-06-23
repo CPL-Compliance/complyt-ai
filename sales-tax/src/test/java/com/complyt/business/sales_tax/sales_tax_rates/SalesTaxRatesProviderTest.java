@@ -55,7 +55,7 @@ class SalesTaxRatesProviderTest {
         jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
         salesTaxRates = testUtilities.createSalesTaxRates();
         salesTaxRatesProvider = new SalesTaxRatesProvider(stateLevelSalesTaxRatesCalculator, cityLevelSalesTaxRatesCalculator);
-        address = testUtilities.createShippingAddress();
+        address = testUtilities.createUsaShippingAddressWithMatchedAddress();
     }
 
     @Test

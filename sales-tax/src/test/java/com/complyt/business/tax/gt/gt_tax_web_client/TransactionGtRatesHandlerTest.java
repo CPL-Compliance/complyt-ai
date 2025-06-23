@@ -1,9 +1,7 @@
 package com.complyt.business.tax.gt.gt_tax_web_client;
 
 import com.complyt.business.tax.gt.*;
-import com.complyt.domain.transaction.Item;
-import com.complyt.domain.transaction.ShippingFee;
-import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.*;
 import com.complyt.domain.transaction.tax.GtRates;
 import com.complyt.security.TenantResolver;
 import org.junit.jupiter.api.AfterAll;
@@ -32,7 +30,6 @@ public class TransactionGtRatesHandlerTest extends BaseTestClass {
     UnitTestUtilities testUtilities;
 
 
-
     @BeforeEach
     void setUp() {
         GtRatesProvider gtRatesProvider = new GtRatesProvider(new CountryLevelGtRatesCalculator(), new RegionLevelGtRatesCalculator());
@@ -47,6 +44,9 @@ public class TransactionGtRatesHandlerTest extends BaseTestClass {
     void setRates_SetsRatesToTransactionWithNoShippingFee_ReturnsModifiedTransaction() {
         // Given
         Transaction transaction = testUtilities.createTransaction(null).withShippingFee(null).withItems(testUtilities.createItems(false, true, true));
+        MandatoryAddress mandatoryAddress = testUtilities.createMandatoryAddress();
+        MatchedAddressData matchedAddressData = testUtilities.createMatchedAddressByMandatoryAddress(mandatoryAddress);
+        transaction = transaction.setShippingAddress(transaction.getShippingAddress().withMatchedAddressData(matchedAddressData));
         GtRates gtRates = testUtilities.createGtRates();
         Item firstItemWithRates = transaction.getItems().get(0).withGtRates(gtRates);
         Item secondItemWithRates = transaction.getItems().get(1).withGtRates(gtRates);
@@ -57,7 +57,7 @@ public class TransactionGtRatesHandlerTest extends BaseTestClass {
         Transaction expectedTransaction = transaction.withItems(modifiedItems);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         Mono<Transaction> actualTransaction = transactionGtRatesHandler.setRates(transaction, gtRates);
 
@@ -69,7 +69,11 @@ public class TransactionGtRatesHandlerTest extends BaseTestClass {
     void setRates_SetsRatesToTransactionWithNoShippingFeeAndNullRegion_ReturnsModifiedTransaction() {
         // Given
         Transaction transaction = testUtilities.createTransaction(null).withShippingFee(null).withItems(testUtilities.createItems(false, true, true));
+        MandatoryAddress mandatoryAddress = testUtilities.createMandatoryAddress().withRegion(null);
+        MatchedAddressData matchedAddressData = testUtilities.createMatchedAddressByMandatoryAddress(mandatoryAddress);
+        transaction = transaction.setShippingAddress(transaction.getShippingAddress().withMatchedAddressData(matchedAddressData));
         Transaction transactionToSend = transaction.withShippingAddress(transaction.getShippingAddress().withRegion(null));
+
         GtRates gtRates = testUtilities.createGtRates();
         Item firstItemWithRates = transaction.getItems().get(0).withGtRates(gtRates);
         Item secondItemWithRates = transaction.getItems().get(1).withGtRates(gtRates);
@@ -80,7 +84,7 @@ public class TransactionGtRatesHandlerTest extends BaseTestClass {
         Transaction expectedTransaction = transactionToSend.withItems(modifiedItems);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         Mono<Transaction> actualTransaction = transactionGtRatesHandler.setRates(transactionToSend, gtRates);
 
@@ -95,6 +99,9 @@ public class TransactionGtRatesHandlerTest extends BaseTestClass {
         List<Item> items = testUtilities.createItems(false, true, true);
 
         Transaction transaction = testUtilities.createTransaction(null).withShippingFee(shippingFee).withItems(items);
+        MandatoryAddress mandatoryAddress = testUtilities.createMandatoryAddress();
+        MatchedAddressData matchedAddressData = testUtilities.createMatchedAddressByMandatoryAddress(mandatoryAddress);
+        transaction = transaction.setShippingAddress(transaction.getShippingAddress().withMatchedAddressData(matchedAddressData));
 
         GtRates gtRates = testUtilities.createGtRates();
         Item firstItemWithRates = transaction.getItems().get(0).withGtRates(gtRates);
@@ -109,7 +116,7 @@ public class TransactionGtRatesHandlerTest extends BaseTestClass {
         Transaction expectedTransaction = transaction.withItems(modifiedItems).withShippingFee(shippingFeeWithRates);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         Mono<Transaction> actualTransaction = transactionGtRatesHandler.setRates(transaction, gtRates);
 

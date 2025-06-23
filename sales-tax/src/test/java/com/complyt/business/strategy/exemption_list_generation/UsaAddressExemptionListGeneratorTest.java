@@ -63,7 +63,7 @@ public class UsaAddressExemptionListGeneratorTest extends BaseTestClass {
         // Given
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         Flux<Exemption> exemptionFlux = usaAddressExemptionListGenerator.generate(exemptionWrapper).apply(exemptionWrapper);
 

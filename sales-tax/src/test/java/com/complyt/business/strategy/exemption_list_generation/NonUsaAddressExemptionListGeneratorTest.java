@@ -50,7 +50,7 @@ public class NonUsaAddressExemptionListGeneratorTest extends BaseTestClass {
         }};
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         Flux<Exemption> exemptionFlux = nonUsaAddressExemptionListGenerator.generate(exemptionWrapper).apply(exemptionWrapper);
 
@@ -63,7 +63,7 @@ public class NonUsaAddressExemptionListGeneratorTest extends BaseTestClass {
         // Given
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         Flux<Exemption> exemptionFlux = nonUsaAddressExemptionListGenerator.generate(exemptionWrapper).apply(exemptionWrapper);
 

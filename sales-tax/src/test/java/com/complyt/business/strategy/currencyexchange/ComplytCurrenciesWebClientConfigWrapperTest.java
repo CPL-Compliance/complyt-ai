@@ -69,7 +69,7 @@ class ComplytCurrenciesWebClientConfigWrapperTest extends BaseTestClass {
         CurrencyExchangeRateObject currencyExchangeRateResponse = unitTestUtilities.createCurrencyExchangeRateObject(currency, date, BigDecimal.ONE);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(webClient.get()).thenReturn(requestHeadersUriSpecMock);
         when(requestHeadersUriSpecMock.uri(any(Function.class))).thenReturn(requestHeadersSpecMock);
@@ -92,7 +92,7 @@ class ComplytCurrenciesWebClientConfigWrapperTest extends BaseTestClass {
         LocalDateTime date = LocalDateTime.now();
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(webClient.get()).thenReturn(requestHeadersUriSpecMock);
         when(requestHeadersUriSpecMock.uri(any(Function.class))).thenReturn(requestHeadersSpecMock);
@@ -118,7 +118,7 @@ class ComplytCurrenciesWebClientConfigWrapperTest extends BaseTestClass {
         CurrencyExchangeRateObject currencyExchangeRateResponse = unitTestUtilities.createCurrencyExchangeRateObject(currency, date, BigDecimal.ONE);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(webClient.get()).thenReturn(requestHeadersUriSpecMock);
         when(requestHeadersUriSpecMock.uri(uriFunctionCaptor.capture())).thenReturn(requestHeadersSpecMock);

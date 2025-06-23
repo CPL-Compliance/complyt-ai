@@ -5,21 +5,16 @@ import com.complyt.business.tax.sales_tax.models.ComplytInternalSalesTaxRatesDto
 import com.complyt.business.tax.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.transaction.MandatoryAddress;
-import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
-import com.complyt.security.TenantResolver;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
 import feign.FeignException;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -59,7 +54,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
     @Test
     void findByAddress_validAddress_ReturnsSalesTaxData() {
         // Given
-        MandatoryAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
+        MandatoryAddress address = UnitTestUtilities.createMandatoryAddressInCalifornia();
         ComplytInternalSalesTaxRatesDto complytInternalSalesTaxRatesDto = UnitTestUtilities.createComplytInternalSalesTaxRatesDto();
         ComplytSalesTaxRates expextedComplytSalesTaxRates = ComplytSalesTaxRatesMapper.INSTANCE.complytSalesTaxRatesDtoToComplytSalesTaxRates(complytInternalSalesTaxRatesDto);
 
@@ -77,7 +72,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
     @Test
     void findByAddress_invalidAddress_ReturnsObjectNotFoundApiException() {
         // Given
-        MandatoryAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
+        MandatoryAddress address = UnitTestUtilities.createMandatoryAddressInCalifornia();
 
         // When
         when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial(), effectiveDate, true, false))
@@ -92,7 +87,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
     @Test
     void findByAddress_Returns404InternalError_ReturnsObjectNotFoundApiException() {
         // Given
-        MandatoryAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
+        MandatoryAddress address = UnitTestUtilities.createMandatoryAddressInCalifornia();
 
         // When
         when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial(), effectiveDate, true, false))
@@ -107,7 +102,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
     @Test
     void findByAddress_RatesServiceIsUnavailable_is5RetriesExhausted() {
         // Given
-        MandatoryAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
+        MandatoryAddress address = UnitTestUtilities.createMandatoryAddressInCalifornia();
 
         // When
         when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(),
@@ -127,7 +122,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
     @Test
     void findByAddress_NotFoundException_NoRetryOccurs() {
         // Given
-        MandatoryAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
+        MandatoryAddress address = UnitTestUtilities.createMandatoryAddressInCalifornia();
         FeignException.NotFound notFoundException = testUtilities.create404NodFoundFeignException();
 
         // When
@@ -148,7 +143,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
     @Test
     void findByAddress_BadRequestException_ThrowsObjectNotValidApiException() {
         // Given
-        MandatoryAddress address = UnitTestUtilities.createShippingAddressInCalifornia();
+        MandatoryAddress address = UnitTestUtilities.createMandatoryAddressInCalifornia();
 
         // When
         when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(),

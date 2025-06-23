@@ -2,10 +2,10 @@ package com.complyt.business.strategy.items_jurisdictional_rules_injection;
 
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.ShippingAddress;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.security.TenantResolver;
 import org.junit.jupiter.api.*;
-import org.mockito.MockedStatic;
 import reactor.core.publisher.Mono;
 import testUtils.BaseTestClass;
 import testUtils.unit_test.UnitTestUtilities;
@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 public class ItemsJurisdictionalRulesInjectionStrategyTest extends BaseTestClass {
@@ -32,7 +31,7 @@ public class ItemsJurisdictionalRulesInjectionStrategyTest extends BaseTestClass
 
     @BeforeEach
     void setUp() {
-        itemsJurisdictionalRulesInjectionStrategy = new ItemsJurisdictionalRulesInjectionStrategy(new UsaAddressItemsJurisdictionalRulesInjector(), new UsaAddressItemsJurisdictionalRulesInjector());
+        itemsJurisdictionalRulesInjectionStrategy = new ItemsJurisdictionalRulesInjectionStrategy(new UsaAddressItemsJurisdictionalRulesInjector(), new NonUsaAddressItemsJurisdictionalRulesInjector());
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
     }
@@ -46,8 +45,11 @@ public class ItemsJurisdictionalRulesInjectionStrategyTest extends BaseTestClass
             add(transaction.getItems().get(1).withJurisdictionalSalesTaxRules(testUtilities.createJurisdictionalSalesTaxRules()));
         }};
 
+        ShippingAddress shippingAddress = testUtilities.createUsaShippingAddressWithFullMatchedAddress();
+        transaction = transaction.withShippingAddress(shippingAddress);
+
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
 
         // Then
@@ -63,11 +65,12 @@ public class ItemsJurisdictionalRulesInjectionStrategyTest extends BaseTestClass
             add(transaction.getItems().get(0).withJurisdictionalTaxRules(testUtilities.createJurisdictionalTaxRules()));
             add(transaction.getItems().get(1).withJurisdictionalTaxRules(testUtilities.createJurisdictionalTaxRules()));
         }};
-        Transaction transactionToSend = transaction.withShippingAddress(transaction.getShippingAddress().withCountry("Arm"))
+        ShippingAddress nonUsShippingAddress = testUtilities.createNonUsaShippingAddressWithMatchedAddress();
+        Transaction transactionToSend = transaction.withShippingAddress(nonUsShippingAddress)
                 .withItems(expectedItems);
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
 
         // Then

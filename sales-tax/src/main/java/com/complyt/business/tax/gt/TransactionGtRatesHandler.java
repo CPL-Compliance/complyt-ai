@@ -1,8 +1,6 @@
 package com.complyt.business.tax.gt;
 
-import com.complyt.domain.transaction.Item;
-import com.complyt.domain.transaction.ShippingFee;
-import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.*;
 import com.complyt.domain.transaction.tax.GtAddress;
 import com.complyt.domain.transaction.tax.GtRates;
 import com.complyt.utils.observability.ContextLogger;
@@ -13,6 +11,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -26,13 +25,24 @@ public class TransactionGtRatesHandler {
     private TaxableGtRatesProvider<ShippingFee> shippingFeeGtRatesProvider;
 
     public Mono<Transaction> setRates(@NonNull Transaction transaction, @NonNull GtRates gtRates) {
-        String region = transaction.getShippingAddress().region() != null ? transaction.getShippingAddress().region() : "";
+        String region = Optional.ofNullable(transaction.getShippingAddress())
+                .map(ShippingAddress::matchedAddressData)
+                .map(MatchedAddressData::address)
+                .map(MandatoryAddress::region)
+                .orElse("");
+
+        String country = Optional.ofNullable(transaction.getShippingAddress())
+                .map(ShippingAddress::matchedAddressData)
+                .map(MatchedAddressData::address)
+                .map(MandatoryAddress::country)
+                .orElse(null);
+
         List<Item> itemsWithRates = itemsGtRatesProvider.setGtRates(transaction.getItems(), gtRates,
-                new GtAddress(transaction.getShippingAddress().country(), region));
+                new GtAddress(country, region));
 
         if (transaction.getShippingFee() != null) {
             ShippingFee shippingFeeWithRates = shippingFeeGtRatesProvider.setGtRates(transaction.getShippingFee(), gtRates,
-                    new GtAddress(transaction.getShippingAddress().country(), region));
+                    new GtAddress(country, region));
             transaction = transaction.withShippingFee(shippingFeeWithRates);
         }
 

@@ -86,15 +86,28 @@ public class UnitTestUtilities {
         return new ShippingAddress("New York City", "US", "county", "NY", "160 Broadway", "", "10038", false, null);
     }
 
+    public static ShippingAddress createShippingAddressInNewYorkWithMatchedAddress() {
+        return new ShippingAddress("New York City", "US", "county", "NY", "160 Broadway", "", "10038", false, createMatchedAddressData().withAddress(createMandatoryAddressInNewYork()));
+    }
+
+    public static MandatoryAddress createMandatoryAddressInNewYork() {
+        return new MandatoryAddress("New York City", "US", "county", "NY", "160 Broadway", "", "10038", false);
+    }
+
+
     public static ShippingAddressDto createAddressDtoInCalifornia() {
         return new ShippingAddressDto("Fresno", "US", "county", "CA", "7498 N Remington Ave", "", "93711-5508", false, null);
     }
 
-    public static ShippingAddress createShippingAddressInCalifornia1() {
+    public static ShippingAddress createShippingAddressInCalifornia() {
         return new ShippingAddress("Fresno", "US", "county", "CA", "7498 N Remington Ave", "", "93711-5508", false, null);
     }
 
-    public static MandatoryAddress createShippingAddressInCalifornia() {
+    public static ShippingAddress createShippingAddressInCaliforniaWithMatchedAddress() {
+        return new ShippingAddress("Fresno", "US", "county", "CA", "7498 N Remington Ave", "", "93711-5508", false, createMatchedAddressData().withAddress(createMandatoryAddressInCalifornia()));
+    }
+
+    public static MandatoryAddress createMandatoryAddressInCalifornia() {
         return new MandatoryAddress("Fresno", "US", "county", "CA", "7498 N Remington Ave", "", "93711-5508", false);
     }
 
@@ -942,8 +955,16 @@ public class UnitTestUtilities {
         return new MandatoryAddressDto("City", "Country", "County", "CA", "Street", "region", "Zip", false);
     }
 
+    public MandatoryAddress createMandatoryAddress() {
+        return new MandatoryAddress("City", "Country", "County", "CA", "Street", "region", "Zip", false);
+    }
+
     public MatchedAddressDataDto createMatchedAddressDto() {
         return new MatchedAddressDataDto(createMandatoryAddressDto(), new ScoringDto(MatchLevelType.EXCELLENT, 0.9,new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT)));
+    }
+
+    public MatchedAddressData createMatchedAddressByMandatoryAddress(MandatoryAddress addressData) {
+        return new MatchedAddressData(addressData, new Scoring(MatchLevelType.EXCELLENT, 0.9,new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT)));
     }
 
     public Address createUsaAddress() {
@@ -1004,10 +1025,10 @@ public class UnitTestUtilities {
 
     public Map<String, ProductClassification> createUsaClassificationsMap(JurisdictionalSalesTaxRules firstRule, JurisdictionalSalesTaxRules secondRule) {
         Map<String, JurisdictionalSalesTaxRules> firstRulesMap = new HashMap<>() {{
-            put(firstRule.getAbbreviation(), firstRule);
+            put(firstRule.getName(), firstRule);
         }};
         Map<String, JurisdictionalSalesTaxRules> secondRulesMap = new HashMap<>() {{
-            put(secondRule.getAbbreviation(), secondRule);
+            put(secondRule.getName(), secondRule);
         }};
         ProductClassification productClassification1 = new ProductClassification("id", "C1S1", "description", "title", firstRulesMap, null, TangibleCategory.TANGIBLE);
         ProductClassification productClassification2 = new ProductClassification("id", "C3S1", "description", "title", secondRulesMap, null, TangibleCategory.TANGIBLE);
@@ -1020,10 +1041,10 @@ public class UnitTestUtilities {
 
     public Map<String, ProductClassification> createNonUsaClassificationsMap(JurisdictionalTaxRules firstRule, JurisdictionalTaxRules secondRule) {
         Map<String, JurisdictionalTaxRules> firstRulesMap = new HashMap<>() {{
-            put(firstRule.getAbbreviation(), firstRule);
+            put(firstRule.getName(), firstRule);
         }};
         Map<String, JurisdictionalTaxRules> secondRulesMap = new HashMap<>() {{
-            put(secondRule.getAbbreviation(), secondRule);
+            put(secondRule.getName(), secondRule);
         }};
 
         ProductClassification productClassification1 = new ProductClassification("id", "C1S1", "description", "title", null, firstRulesMap, TangibleCategory.TANGIBLE);
@@ -1037,7 +1058,7 @@ public class UnitTestUtilities {
 
     public Map<String, ProductClassification> createNonUsaShippingFeeClassificationsMap(JurisdictionalTaxRules jurisdictionalTaxRules) {
         Map<String, JurisdictionalTaxRules> ruleMap = new HashMap<>() {{
-            put(jurisdictionalTaxRules.getAbbreviation(), jurisdictionalTaxRules);
+            put(jurisdictionalTaxRules.getName(), jurisdictionalTaxRules);
         }};
 
         ProductClassification productClassification = new ProductClassification("id", "C6S1", "description", "title", null, ruleMap, TangibleCategory.TANGIBLE);
@@ -1049,7 +1070,7 @@ public class UnitTestUtilities {
 
     public Map<String, ProductClassification> createUsaShippingFeeClassificationsMap(JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules) {
         Map<String, JurisdictionalSalesTaxRules> ruleMap = new HashMap<>() {{
-            put(jurisdictionalSalesTaxRules.getAbbreviation(), jurisdictionalSalesTaxRules);
+            put(jurisdictionalSalesTaxRules.getName(), jurisdictionalSalesTaxRules);
         }};
 
         ProductClassification productClassification = new ProductClassification("id", "C6S1", "description", "title", ruleMap, null, TangibleCategory.TANGIBLE);
@@ -1071,8 +1092,25 @@ public class UnitTestUtilities {
         return new ShippingAddress(null, "ARM", null, null, null, null,"12345", false, createNonUsaMatchedAddress());
     }
 
+    public ShippingAddress createNonUsaShippingAddressWithMatchedAddressForClassification() {
+        return new ShippingAddress(null, "Arm", null, null, null, null,"12345", false, createNonUsaMatchedAddressForClassification());
+    }
+
     public ShippingAddress createUsaShippingAddressWithMatchedAddress() {
         return new ShippingAddress(null, "USA", null, "California", null, null,"12345", false, createUsaMatchedAddress());
+    }
+
+    public ShippingAddress createUsaShippingAddressWithFullMatchedAddress() {
+        MandatoryAddress mandatoryAddress = new MandatoryAddress("Fresno", "USA", "County", "CA", "7498 Ave", "region", "55591", false);
+        return new ShippingAddress("Fresno", "USA", "County", "CA", "7498 Ave", "region", "55591", false, createMatchedAddressByMandatoryAddress(mandatoryAddress));
+    }
+
+    public ShippingAddress createUsaShippingAddressWithMatchedAddressAsAbbreviation() {
+        return new ShippingAddress(null, "USA", null, "CA", null, null,"12345", false, createUsaMatchedAddressAsAbbreviation());
+    }
+
+    public MatchedAddressData createNonUsaMatchedAddressForClassification() {
+        return new MatchedAddressData(new MandatoryAddress(null, "Arm", null, null, null, null,"12345", false) , null);
     }
 
     public MatchedAddressData createNonUsaMatchedAddress() {
@@ -1083,25 +1121,29 @@ public class UnitTestUtilities {
         return new MatchedAddressData(new MandatoryAddress(null, "USA", null, "California", null, null,"12345", false) , null);
     }
 
+    public MatchedAddressData createUsaMatchedAddressAsAbbreviation() {
+        return new MatchedAddressData(new MandatoryAddress(null, "USA", null, "CA", null, null,"12345", false) , null);
+    }
+
     public Map<String, ProductClassification> createMapTaxCodesToClassifications() {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
         JurisdictionalTaxRules jurisdictionalTaxRules = createJurisdictionalTaxRules();
         Map<String, JurisdictionalSalesTaxRules> item1JurisdictionalSalesTaxRulesMap = new HashMap<>() {{
-            put("CA", jurisdictionalSalesTaxRules);
+            put("California", jurisdictionalSalesTaxRules);
         }};
 
         Map<String, JurisdictionalTaxRules> item1JurisdictionalTaxRulesMap = new HashMap<>() {{
-            put("ARM", jurisdictionalTaxRules);
+            put("Armenia", jurisdictionalTaxRules);
         }};
 
         ProductClassification item1ProductClassification = new ProductClassification(UUID.randomUUID().toString()
                 , "C1S1", "item", "title", item1JurisdictionalSalesTaxRulesMap, item1JurisdictionalTaxRulesMap, TangibleCategory.TANGIBLE);
         Map<String, JurisdictionalSalesTaxRules> item2JurisdictionalSalesTaxRulesMap = new HashMap<>() {{
-            put("CA", jurisdictionalSalesTaxRules);
+            put("California", jurisdictionalSalesTaxRules);
         }};
 
         Map<String, JurisdictionalTaxRules> item2JurisdictionalTaxRulesMap = new HashMap<>() {{
-            put("ARM", jurisdictionalTaxRules);
+            put("Armenia", jurisdictionalTaxRules);
         }};
 
         ProductClassification item2ProductClassification = new ProductClassification(UUID.randomUUID().toString()

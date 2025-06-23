@@ -344,7 +344,7 @@ public class VatValidationRouterTest implements VatValidationRouterTestTemplate 
                 "vatNumber parameter " + GenericErrorMessages.MIN_1_MAX_20_ERROR));
 
 
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+
 
         // When + Then
         webTestClient

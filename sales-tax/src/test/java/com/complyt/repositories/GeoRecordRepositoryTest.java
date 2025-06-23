@@ -59,7 +59,7 @@ class GeoRecordRepositoryTest extends BaseTestClass {
         GeoRecord geoRecord = new GeoRecord("1", "Zip", "CA");
 
         // When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
 
         when(reactiveMongoTemplate.findOne(query, GeoRecord.class)).thenReturn(Mono.just(geoRecord));
 

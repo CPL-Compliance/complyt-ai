@@ -85,7 +85,7 @@ public class GtWebClientWrapperTest extends BaseTestClass {
     @Test
     void findByAddress_invalidAddress_ReturnsObjectNotFoundApiException() {
         // Given + When
-        when(TenantResolver.resolve()).thenReturn(Mono.empty());
+        
         when(salesTaxRatesServiceProxy.findGtByAddress(gtAddress.country(), gtAddress.region()))
                 .thenReturn(Mono.error(testUtilities.create404NodFoundFeignException()));
 
