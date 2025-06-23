@@ -17,7 +17,6 @@ class AddressTest {
     private Address referenceAddress;
 
 
-
     @BeforeEach
     void setUp() {
         address = new Address("City", "Country", "County", "State", "Street", "ZIP", "Region", false);
@@ -89,7 +88,7 @@ class AddressTest {
         String newCity = "New City";
         referenceAddress = address.withCity(newCity);
 
-        assertEquals(referenceAddress.city(), newCity);
+        assertEquals(newCity, referenceAddress.city());
     }
 
     @Test
@@ -97,7 +96,7 @@ class AddressTest {
         String newCountry = "New Country";
         referenceAddress = address.withCountry(newCountry);
 
-        assertEquals(referenceAddress.country(), newCountry);
+        assertEquals(newCountry, referenceAddress.country());
     }
 
     @Test
@@ -105,7 +104,7 @@ class AddressTest {
         String newCounty = "New County";
         referenceAddress = address.withCounty(newCounty);
 
-        assertEquals(referenceAddress.county(), newCounty);
+        assertEquals(newCounty, referenceAddress.county());
     }
 
     @Test

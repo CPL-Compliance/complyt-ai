@@ -16,8 +16,6 @@ class CustomerTest {
 
     UnitTestUtilities testUtilities;
 
-   
-
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
