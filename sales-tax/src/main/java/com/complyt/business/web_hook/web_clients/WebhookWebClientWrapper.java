@@ -32,7 +32,6 @@ public class WebhookWebClientWrapper<T extends ComplytIdProperty> extends WebCli
 
     @Override
     public Mono<T> sendWebhook(WebhookEntityWrapper<T> webhookEntityWrapper, String host, String path) {
-
         Mono.defer(() -> {
                     URI uri = buildUri(this.scheme, host, path);
                     String hmaac;
@@ -42,9 +41,8 @@ public class WebhookWebClientWrapper<T extends ComplytIdProperty> extends WebCli
                                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
                         String json = objectMapper.writeValueAsString(webhookEntityWrapper);
                         hmaac = HmaacGenerator.generateHmacSHA256(secretKey, json);
-                        log.info("JSON: '{}' , hmaac: '{}'", json, hmaac);
                     } catch (Exception e) {
-                        return ContextLogger.observeCtx("Failed to create Hmaac.  Error: " + e.getMessage(), log::error)
+                        return ContextLogger.observeCtx("Failed to create Hmaac. Error: " + e.getMessage(), log::error)
                                 .thenReturn(webhookEntityWrapper.object());
                     }
 
@@ -57,23 +55,19 @@ public class WebhookWebClientWrapper<T extends ComplytIdProperty> extends WebCli
                             .retrieve()
                             .bodyToMono(webhookEntityWrapper.webhookClass())
                             .retryWhen(Retry.backoff(5, Duration.ofSeconds(1))
-                                    .maxBackoff(Duration.ofSeconds(10)) // Cap the maximum backoff time at 10 seconds
-                                    .jitter(0.2) // Add 20% random jitter to avoid retry spikes (thundering herd)
-                                    .filter(throwable -> {
-                                        log.warn("Retrying webhook due to error: {}", throwable.getMessage());
-                                        return true; // Retry on all errors
-                                    }))
-                            .doOnNext(res -> log.info("Sent webhook entity: '{}'", webhookEntityWrapper)) // Log success if a response is received
-                            .doOnError(err -> log.error("Webhook failed after retries: {}", err.getMessage())) // Log the final failure if all retries are exhausted
-                            .onErrorResume(err -> { // Handle failure by falling back to a safe, non-breaking path
-                                log.error("Giving up on webhook for entity: {}", webhookEntityWrapper);
-                                return Mono.empty();
-                            });
+                                    .maxBackoff(Duration.ofSeconds(10))
+                                    .jitter(0.2)
+                                    .filter(throwable -> true))
+                            .doOnNext(res -> ContextLogger.observeCtx("Sent webhook entity: '" + webhookEntityWrapper + "'", log::info))
+                            .doOnError(err -> ContextLogger.observeCtx("Webhook failed after retries: " + err.getMessage(), log::error))
+                            .onErrorResume(err -> ContextLogger.observeCtx("Giving up on webhook for entity: " + webhookEntityWrapper, log::error)
+                                    .then(Mono.empty()));
                 })
-                .subscribeOn(Schedulers.boundedElastic()) // Run the whole chain on a boundedElastic thread (suitable for I/O)
-                .subscribe(); // Trigger the entire reactive chain (no execution happens without this)
-        
-        return Mono.just(webhookEntityWrapper.object()); // Return immediately
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe();
+
+        return Mono.just(webhookEntityWrapper.object());
     }
+
 
 }
