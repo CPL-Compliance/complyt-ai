@@ -41,7 +41,6 @@ public class WebhookWebClientWrapper<T extends ComplytIdProperty> extends WebCli
                                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
                         String json = objectMapper.writeValueAsString(webhookEntityWrapper);
                         hmaac = HmaacGenerator.generateHmacSHA256(secretKey, json);
-                        ContextLogger.observeCtx("JSON: '" + json + "' , hmaac: '" + hmaac + "'", log::info);
                     } catch (Exception e) {
                         return ContextLogger.observeCtx("Failed to create Hmaac. Error: " + e.getMessage(), log::error)
                                 .thenReturn(webhookEntityWrapper.object());
@@ -58,16 +57,11 @@ public class WebhookWebClientWrapper<T extends ComplytIdProperty> extends WebCli
                             .retryWhen(Retry.backoff(5, Duration.ofSeconds(1))
                                     .maxBackoff(Duration.ofSeconds(10))
                                     .jitter(0.2)
-                                    .filter(throwable -> {
-                                        ContextLogger.observeCtx("Retrying webhook due to error: " + throwable.getMessage(), log::warn);
-                                        return true;
-                                    }))
+                                    .filter(throwable -> true))
                             .doOnNext(res -> ContextLogger.observeCtx("Sent webhook entity: '" + webhookEntityWrapper + "'", log::info))
                             .doOnError(err -> ContextLogger.observeCtx("Webhook failed after retries: " + err.getMessage(), log::error))
-                            .onErrorResume(err -> {
-                                ContextLogger.observeCtx("Giving up on webhook for entity: " + webhookEntityWrapper, log::error);
-                                return Mono.empty();
-                            });
+                            .onErrorResume(err -> ContextLogger.observeCtx("Giving up on webhook for entity: " + webhookEntityWrapper, log::error)
+                                    .then(Mono.empty()));
                 })
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe();
