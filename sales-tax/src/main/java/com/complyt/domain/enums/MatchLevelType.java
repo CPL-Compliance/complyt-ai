@@ -1,5 +1,6 @@
 package com.complyt.domain.enums;
 
+import com.complyt.annotations.Generated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,6 +18,7 @@ public enum MatchLevelType {
     private final double max; // Maximum value of the range (exclusive)
     private final String label; // Client-friendly label
 
+    @Generated
     public static MatchLevelType fromScore(double score) {
         for (MatchLevelType category : values()) {
             if (score >= category.min && score <= category.max) {
