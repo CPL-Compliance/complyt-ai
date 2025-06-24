@@ -1,5 +1,6 @@
 package io.complyt.v1.validators.address_body_checks;
 
+import io.complyt.domain.Address;
 import io.complyt.v1.config.error_messages.DtoErrorMessages;
 import io.complyt.v1.models.AddressDto;
 import org.junit.jupiter.api.BeforeEach;
