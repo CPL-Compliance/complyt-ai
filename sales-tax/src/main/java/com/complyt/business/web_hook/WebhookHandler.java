@@ -1,7 +1,6 @@
 package com.complyt.business.web_hook;
 
 import com.complyt.business.message_queue.rabbit_mq.MQProducer;
-import com.complyt.business.message_queue.rabbit_mq.WebhookEntityWrapperMQProducer;
 import com.complyt.domain.WebhookDetails;
 import com.complyt.domain.audit.Action;
 import com.complyt.domain.properties.ComplytIdProperty;
@@ -18,7 +17,7 @@ import reactor.core.publisher.Mono;
 public class WebhookHandler<T extends ComplytIdProperty> {
 
     @NonNull
-    MQProducer<T> webhookEntityWrapperMQProducer;
+    private MQProducer<T> mqProducer;
 
     @NonNull
     private WebhookEntityCreator<T> webhookEntityCreator;
@@ -27,7 +26,7 @@ public class WebhookHandler<T extends ComplytIdProperty> {
         return shouldForwardRequest(webhookDetails)
                 .flatMap(should -> should ?
                         webhookEntityCreator.create(webhookClass.getSimpleName(), object, action, webhookDetails.host(), webhookDetails.path())
-                                .flatMap(webhookEntityWrapper -> webhookEntityWrapperMQProducer.sendMessage(webhookEntityWrapper)) : Mono.empty())
+                                .flatMap(webhookEntityWrapper -> mqProducer.sendMessage(webhookEntityWrapper)) : Mono.empty())
                 .thenReturn(object);
     }
 

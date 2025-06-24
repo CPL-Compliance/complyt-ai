@@ -26,20 +26,6 @@ spring.cloud.vault:
 
 spring.config.import: vault://
 
-hmaac.secretKey: ${hmaac-secret-key}
-
-rabbitmq.queue.name: ${rabbitmq-queue-name}
-
-spring.rabbitmq.host: ${rabbitmq-host}
-spring.rabbitmq.port: 5672
-spring.rabbitmq.username: ${rabbitmq-username}
-spring.rabbitmq.password: ${rabbitmq-password}
-spring.rabbitmq.virtual-host: ${rabbitmq-virtual-host}
-
-# This property sets the issuer URI
-# for the application to interact with the Resource Server for authentication and authorization purposes
-#spring.security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
-
 logging:
   level:
     root: INFO
@@ -57,3 +43,12 @@ management:
       exposure:
         include: "*"
 
+hmaac.secretKey: ${hmaac-secret-key}
+
+rabbitmq.queue.name: ${rabbitmq-queue-name}
+
+spring.rabbitmq.port: 5672
+spring.rabbitmq.host: ${rabbitmq-host}
+spring.rabbitmq.username: ${rabbitmq-username}
+spring.rabbitmq.password: ${rabbitmq-password}
+spring.rabbitmq.virtual-host: ${rabbitmq-virtual-host}

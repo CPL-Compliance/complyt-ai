@@ -41,8 +41,8 @@ hmaac.secretKey: ${hmaac-secret-key}
 
 rabbitmq.queue.name: ${rabbitmq-queue-name}
 
-spring.rabbitmq.host: ${rabbitmq-host}
 spring.rabbitmq.port: 5672
+spring.rabbitmq.host: ${rabbitmq-host}
 spring.rabbitmq.username: ${rabbitmq-username}
 spring.rabbitmq.password: ${rabbitmq-password}
 spring.rabbitmq.virtual-host: ${rabbitmq-virtual-host}

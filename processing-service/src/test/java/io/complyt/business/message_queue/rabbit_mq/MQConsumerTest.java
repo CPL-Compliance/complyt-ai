@@ -19,10 +19,10 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
-public class ConsumerTest {
+public class MQConsumerTest {
 
     @InjectMocks
-    Consumer consumer;
+    MQConsumer mqConsumer;
 
     @Mock
     WebhookWebClientWrapper<Transaction> webhookWebClientWrapper;
@@ -39,7 +39,7 @@ public class ConsumerTest {
     @Test
     public void consume_consumes() {
         when(webhookWebClientWrapper.sendWebhook(webhookEntityWrapper)).thenReturn(Mono.just(webhookEntityWrapper));
-        Mono<WebhookEntityWrapper<Transaction>> expectedWebhookEntityWrapperMono = consumer.consume(webhookEntityWrapper);
+        Mono<WebhookEntityWrapper<Transaction>> expectedWebhookEntityWrapperMono = mqConsumer.consume(webhookEntityWrapper);
         StepVerifier.create(expectedWebhookEntityWrapperMono).expectNext(webhookEntityWrapper);
     }
 

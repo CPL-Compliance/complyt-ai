@@ -13,14 +13,14 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class Consumer<T extends ComplytIdProperty> {
+public class MQConsumer<T extends ComplytIdProperty> {
 
     @NonNull
     WebClientWrapper<T> webhookWebClientWrapper;
 
     @RabbitListener(queues = "${rabbitmq-queue-name}", containerFactory = "rabbitListenerContainerFactory")
     public Mono<Void> consume(WebhookEntityWrapper<T> wrapper) {
-        log.info("Message Received: " + wrapper);
+        log.info("Message Received: {}", wrapper);
 
         return webhookWebClientWrapper
                 .sendWebhook(wrapper)
