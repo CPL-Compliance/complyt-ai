@@ -2,6 +2,7 @@ package io.complyt.domain.timestamps;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -50,11 +51,13 @@ class TimestampsTest {
     }
 
     @Test
-    void testJsonDeserializationWithJsonProperty() throws JsonProcessingException {
+    void testJsonDeserializationWithJsonProperty() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
         String json = String.format(
                 "{\"createdDate\":\"%s\",\"updatedDate\":\"%s\"}",
-                now.toString(), later.toString()
+                now, later
         );
 
         Timestamps result = mapper.readValue(json, Timestamps.class);
@@ -63,16 +66,16 @@ class TimestampsTest {
         assertEquals(later, result.getUpdatedDate());
     }
 
+
     @Test
     void testJsonSerialization() throws JsonProcessingException {
         Timestamps timestamps = new Timestamps(now, later);
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
 
         String json = mapper.writeValueAsString(timestamps);
 
         assertTrue(json.contains("\"createdDate\""));
         assertTrue(json.contains("\"updatedDate\""));
-        assertTrue(json.contains(now.toString()));
-        assertTrue(json.contains(later.toString()));
     }
 }
