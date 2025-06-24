@@ -3,6 +3,7 @@ package io.complyt.business.webhook.web_clients;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.complyt.annotations.Generated;
 import io.complyt.domain.WebhookEntityWrapper;
 import io.complyt.domain.properties.ComplytIdProperty;
 import io.complyt.utils.observability.ContextLogger;
@@ -16,6 +17,7 @@ import reactor.util.retry.Retry;
 import java.net.URI;
 import java.time.Duration;
 
+@Generated
 @Slf4j
 public class WebhookWebClientWrapper<T extends ComplytIdProperty> extends WebClientWrapperBase implements WebClientWrapper<T> {
 
