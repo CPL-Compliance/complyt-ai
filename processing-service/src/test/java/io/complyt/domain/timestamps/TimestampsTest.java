@@ -2,7 +2,6 @@ package io.complyt.domain.timestamps;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -12,28 +11,28 @@ import static org.junit.jupiter.api.Assertions.*;
 class TimestampsTest {
 
     private final LocalDateTime now = LocalDateTime.now();
-    private final LocalDateTime earlier = now.minusDays(1);
+    private final LocalDateTime later = now.plusHours(1);
 
     @Test
     void testConstructorAndGetters() {
-        Timestamps timestamps = new Timestamps(earlier, now);
+        Timestamps timestamps = new Timestamps(now, later);
 
-        assertEquals(earlier, timestamps.getCreatedDate());
-        assertEquals(now, timestamps.getUpdatedDate());
+        assertEquals(now, timestamps.getCreatedDate());
+        assertEquals(later, timestamps.getUpdatedDate());
     }
 
     @Test
     void testEqualsAndHashCode() {
-        Timestamps t1 = new Timestamps(earlier, now);
-        Timestamps t2 = new Timestamps(earlier, now);
+        Timestamps ts1 = new Timestamps(now, later);
+        Timestamps ts2 = new Timestamps(now, later);
 
-        assertEquals(t1, t2);
-        assertEquals(t1.hashCode(), t2.hashCode());
+        assertEquals(ts1, ts2);
+        assertEquals(ts1.hashCode(), ts2.hashCode());
     }
 
     @Test
     void testToString() {
-        Timestamps timestamps = new Timestamps(earlier, now);
+        Timestamps timestamps = new Timestamps(now, later);
         String str = timestamps.toString();
 
         assertTrue(str.contains("createdDate"));
@@ -41,23 +40,39 @@ class TimestampsTest {
     }
 
     @Test
-    void testWithMethod() {
-        Timestamps original = new Timestamps(earlier, now);
-        LocalDateTime newDate = now.plusDays(1);
-        Timestamps modified = original.withUpdatedDate(newDate);
+    void testWithMethods() {
+        Timestamps original = new Timestamps(now, later);
+        Timestamps modified = original.withUpdatedDate(now);
 
+        assertEquals(now, modified.getUpdatedDate());
         assertEquals(original.getCreatedDate(), modified.getCreatedDate());
-        assertEquals(newDate, modified.getUpdatedDate());
+        assertNotEquals(original, modified);
     }
 
     @Test
-    void testJsonSerializationAndDeserialization() throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    void testJsonDeserializationWithJsonProperty() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        String json = String.format(
+                "{\"createdDate\":\"%s\",\"updatedDate\":\"%s\"}",
+                now.toString(), later.toString()
+        );
 
-        Timestamps timestamps = new Timestamps(earlier, now);
+        Timestamps result = mapper.readValue(json, Timestamps.class);
+
+        assertEquals(now, result.getCreatedDate());
+        assertEquals(later, result.getUpdatedDate());
+    }
+
+    @Test
+    void testJsonSerialization() throws JsonProcessingException {
+        Timestamps timestamps = new Timestamps(now, later);
+        ObjectMapper mapper = new ObjectMapper();
+
         String json = mapper.writeValueAsString(timestamps);
-        Timestamps deserialized = mapper.readValue(json, Timestamps.class);
 
-        assertEquals(timestamps, deserialized);
+        assertTrue(json.contains("\"createdDate\""));
+        assertTrue(json.contains("\"updatedDate\""));
+        assertTrue(json.contains(now.toString()));
+        assertTrue(json.contains(later.toString()));
     }
 }
