@@ -47,4 +47,24 @@ class MatchLevelTypeTest {
         assertEquals(MatchLevelType.POOR, MatchLevelType.fromScore(0.1));
         assertEquals(MatchLevelType.VERY_POOR, MatchLevelType.fromScore(0.0));
     }
+
+    @Test
+    void testExactBoundaries() {
+        assertEquals(MatchLevelType.VERY_POOR, MatchLevelType.fromScore(0.0));
+        assertEquals(MatchLevelType.POOR, MatchLevelType.fromScore(0.1));
+        assertEquals(MatchLevelType.POOR, MatchLevelType.fromScore(0.599));
+        assertEquals(MatchLevelType.FAIR, MatchLevelType.fromScore(0.6)); // potential conflict
+        assertEquals(MatchLevelType.GOOD, MatchLevelType.fromScore(0.7)); // potential conflict
+        assertEquals(MatchLevelType.VERY_GOOD, MatchLevelType.fromScore(0.8)); // potential conflict
+        assertEquals(MatchLevelType.EXCELLENT, MatchLevelType.fromScore(0.9)); // conflict with VERY_GOOD
+        assertEquals(MatchLevelType.EXCELLENT, MatchLevelType.fromScore(1.0));
+    }
+
+    @Test
+    void testOverlappingCondition() {
+        // This test is expected to fail if the original implementation includes `score <= category.max`
+        MatchLevelType result = MatchLevelType.fromScore(0.9);
+        assertEquals(MatchLevelType.EXCELLENT, result); // May fail if VERY_GOOD captures 0.9 first
+    }
+
 }
