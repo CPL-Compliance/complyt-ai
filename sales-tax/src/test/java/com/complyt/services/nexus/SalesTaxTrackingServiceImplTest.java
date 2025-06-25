@@ -20,7 +20,6 @@ import com.complyt.domain.transaction.TransactionType;
 import com.complyt.repositories.ClientTrackingRepository;
 import com.complyt.repositories.NexusStateRuleRepository;
 import com.complyt.repositories.SalesTaxTrackingRepository;
-import com.complyt.security.TenantResolver;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
