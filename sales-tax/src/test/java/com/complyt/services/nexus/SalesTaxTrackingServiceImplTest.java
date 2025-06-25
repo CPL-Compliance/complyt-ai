@@ -160,7 +160,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         when(salesTaxTrackingRepository.save(salesTaxTrackingWithNoSummary)).thenReturn(Mono.just(savedSalesTaxTracking));
-        when(webhookHandler.handleWebhook(SalesTaxTracking.class, savedSalesTaxTracking, savedSalesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(savedSalesTaxTracking));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, savedSalesTaxTracking.withTransactionNexusSummaries(null), savedSalesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(savedSalesTaxTracking));
         Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.save(givenSalesTaxTracking);
 
         // Then
@@ -179,7 +179,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         when(salesTaxTrackingRepository.save(givenSalesTaxTracking)).thenReturn(Mono.just(savedSalesTaxTracking));
-        when(webhookHandler.handleWebhook(SalesTaxTracking.class, savedSalesTaxTracking, savedSalesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(savedSalesTaxTracking));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, savedSalesTaxTracking.withTransactionNexusSummaries(null), savedSalesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(savedSalesTaxTracking));
         Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.save(givenSalesTaxTracking);
 
         // Then
@@ -277,7 +277,7 @@ public class SalesTaxTrackingServiceImplTest {
         when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
         when(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiary)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingRepository.save(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
-        when(webhookHandler.handleWebhook(SalesTaxTracking.class, newSalesTaxTracking, newSalesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(newSalesTaxTracking));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, newSalesTaxTracking.withTransactionNexusSummaries(null), newSalesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(newSalesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(newSalesTaxTracking);
 
         // Then
@@ -299,7 +299,7 @@ public class SalesTaxTrackingServiceImplTest {
         when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
         when(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiary)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingRepository.save(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
-        when(webhookHandler.handleWebhook(SalesTaxTracking.class, newSalesTaxTracking, newSalesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(newSalesTaxTracking));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, newSalesTaxTracking.withTransactionNexusSummaries(null), newSalesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(newSalesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(newSalesTaxTracking);
 
         // Then
@@ -322,7 +322,7 @@ public class SalesTaxTrackingServiceImplTest {
         when(clientTrackingRepository.findClient()).thenReturn(Mono.just(clientTracking));
         when(salesTaxTrackingRepository.findByCountryStateAndSubsidiary(country, state, subsidiary)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingRepository.save(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
-        when(webhookHandler.handleWebhook(SalesTaxTracking.class, newSalesTaxTracking, newSalesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(newSalesTaxTracking));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, newSalesTaxTracking.withTransactionNexusSummaries(null), newSalesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(newSalesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(newSalesTaxTracking);
 
         // Then
@@ -618,7 +618,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         when(salesTaxTrackingRepository.save(salesTaxTrackingWithEconomicNexusNotEstablished)).thenReturn(Mono.just(salesTaxTrackingWithEconomicNexusNotEstablished));
-        when(webhookHandler.handleWebhook(SalesTaxTracking.class, salesTaxTrackingWithEconomicNexusNotEstablished, salesTaxTrackingWithEconomicNexusNotEstablished.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(salesTaxTrackingWithEconomicNexusNotEstablished));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, salesTaxTrackingWithEconomicNexusNotEstablished.withTransactionNexusSummaries(null), salesTaxTrackingWithEconomicNexusNotEstablished.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(salesTaxTrackingWithEconomicNexusNotEstablished));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTrackingWithEconomicNexusNotEstablished);
 
         // Then
@@ -834,7 +834,7 @@ public class SalesTaxTrackingServiceImplTest {
         // When
         when(nexusService.upsertToNexusTracking(transaction, salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingRepository.save(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
-        when(webhookHandler.handleWebhook(SalesTaxTracking.class, salesTaxTracking, salesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(salesTaxTracking));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, salesTaxTracking.withTransactionNexusSummaries(null), salesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(salesTaxTracking));
 
         Mono<SalesTaxTracking> result = salesTaxTrackingService.handleSalesTaxEnforcement(transaction, salesTaxTracking);
 

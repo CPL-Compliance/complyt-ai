@@ -22,7 +22,6 @@ class ItemTest {
 
     private UnitTestUtilities testUtilities;
 
-   
 
     @BeforeEach
     void setUp() {
@@ -42,7 +41,7 @@ class ItemTest {
     @Test
     void Equals_sameItem_ReturnsTrue() {
         // Given
-        Item givenItem = item.withDescription(item.getDescription());
+        Item givenItem = item.withDescription(item.description());
 
         // When
         boolean isEquals = item.equals(givenItem);
@@ -54,23 +53,23 @@ class ItemTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "Item(unitPrice=" + item.getUnitPrice() +
+        String expectedString = "Item[unitPrice=" + item.getUnitPrice() +
                 ", quantity=" + item.getQuantity() +
                 ", totalPrice=" + item.getTotalPrice() +
-                ", calculatedTotal=" + item.getCalculatedTotal() +
-                ", description=" + item.getDescription() +
-                ", name=" + item.getName() +
-                ", taxCode=" + item.getTaxCode() +
-                ", jurisdictionalSalesTaxRules=" + item.getJurisdictionalSalesTaxRules() +
-                ", jurisdictionalTaxRules=" + item.getJurisdictionalTaxRules() +
-                ", salesTaxRates=" + item.getSalesTaxRates() +
-                ", gtRates=" + item.getGtRates() +
-                ", manualSalesTax=" + item.isManualSalesTax() +
+                ", calculatedTotal=" + item.calculatedTotal() +
+                ", description=" + item.description() +
+                ", name=" + item.name() +
+                ", taxCode=" + item.taxCode() +
+                ", jurisdictionalSalesTaxRules=" + item.jurisdictionalSalesTaxRules() +
+                ", jurisdictionalTaxRules=" + item.jurisdictionalTaxRules() +
+                ", salesTaxRates=" + item.salesTaxRates() +
+                ", gtRates=" + item.gtRates() +
+                ", manualSalesTax=" + item.manualSalesTax() +
                 ", manualSalesTaxRate=" + item.getManualSalesTaxRate() +
-                ", discount=" + item.getDiscount() +
-                ", relativeTransactionDiscount=" + item.getRelativeTransactionDiscount() +
-                ", tangibleCategory=" + item.getTangibleCategory() +
-                ", taxableCategory=" + item.getTaxableCategory() + ")";
+                ", discount=" + item.discount() +
+                ", relativeTransactionDiscount=" + item.relativeTransactionDiscount() +
+                ", tangibleCategory=" + item.tangibleCategory() +
+                ", taxableCategory=" + item.taxableCategory() + "]";
 
         // When
         String actualString = item.toString();

@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TransactionTest {
 
@@ -20,10 +21,9 @@ public class TransactionTest {
 
     @Test
     void testingAmountOfPropertiesInTransaction() {
-        /* In case there is a new property added, If its of type Taxable - handle rates and amount calculation for it */
+        /* In case there is a new property added, If it's of type Taxable - handle rates and amount calculation for it */
         Field[] fields = Transaction.class.getDeclaredFields();
-        Assertions.assertEquals(31, fields.length);
-        //        Assertions.assertEquals(32, fields.length);
+        Assertions.assertEquals(32, fields.length);
     }
 
     @BeforeEach
@@ -37,39 +37,39 @@ public class TransactionTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "Transaction(complytId=" + transaction.getComplytId() +
-                ", id=" + transaction.getId() +
-                ", externalId=" + transaction.getExternalId() +
-                ", source=" + transaction.getSource() +
-                ", documentName=" + transaction.getDocumentName() +
-                ", items=" + transaction.getItems() +
-                ", isTaxInclusive=" + transaction.getIsTaxInclusive() +
-                ", billingAddress=" + transaction.getBillingAddress() +
-                ", shippingAddress=" + transaction.getShippingAddress() +
-                ", customerId=" + transaction.getCustomerId() +
-                ", customer=" + transaction.getCustomer() +
-                ", salesTax=" + transaction.getSalesTax() +
-                ", transactionStatus=" + transaction.getTransactionStatus() +
-                ", tenantId=" + transaction.getTenantId() +
-                ", internalTimestamps=" + transaction.getInternalTimestamps() +
-                ", externalTimestamps=" + transaction.getExternalTimestamps() +
-                ", transactionType=" + transaction.getTransactionType() +
-//                ", shippingFee=" + transaction.getShippingFee() +
-                ", createdFrom=" + transaction.getCreatedFrom() +
-                ", taxableItemsAmount=" + transaction.getTaxableItemsAmount() +
-                ", tangibleItemsAmount=" + transaction.getTangibleItemsAmount() +
-                ", totalItemsAmount=" + transaction.getTotalItemsAmount() +
-                ", finalTransactionAmount=" + transaction.getFinalTransactionAmount() +
-                ", totalDiscount=" + transaction.getTotalDiscount() +
-                ", transactionLevelDiscount=" + transaction.getTransactionLevelDiscount() +
-                ", transactionFilingStatus=" + transaction.getTransactionFilingStatus() +
-                ", currency=" + transaction.getCurrency() +
-                ", refRate=" + transaction.getRefRate() +
-                ", exchangeRateInfo=" + transaction.getExchangeRateInfo() +
-                ", subsidiary=" + transaction.getSubsidiary() +
-                ", isRefundLinked=" + transaction.getIsRefundLinked() +
-                ", refundLinkedPercentage=" + transaction.getRefundLinkedPercentage() +
-                ")";
+        String expectedString = "Transaction[complytId=" + transaction.complytId() +
+                ", id=" + transaction.id() +
+                ", externalId=" + transaction.externalId() +
+                ", source=" + transaction.source() +
+                ", documentName=" + transaction.documentName() +
+                ", items=" + transaction.items() +
+                ", isTaxInclusive=" + transaction.isTaxInclusive() +
+                ", billingAddress=" + transaction.billingAddress() +
+                ", shippingAddress=" + transaction.shippingAddress() +
+                ", customerId=" + transaction.customerId() +
+                ", customer=" + transaction.customer() +
+                ", salesTax=" + transaction.salesTax() +
+                ", transactionStatus=" + transaction.transactionStatus() +
+                ", tenantId=" + transaction.tenantId() +
+                ", internalTimestamps=" + transaction.internalTimestamps() +
+                ", externalTimestamps=" + transaction.externalTimestamps() +
+                ", transactionType=" + transaction.transactionType() +
+                ", shippingFee=" + transaction.shippingFee() +
+                ", createdFrom=" + transaction.createdFrom() +
+                ", taxableItemsAmount=" + transaction.taxableItemsAmount() +
+                ", tangibleItemsAmount=" + transaction.tangibleItemsAmount() +
+                ", totalItemsAmount=" + transaction.totalItemsAmount() +
+                ", finalTransactionAmount=" + transaction.finalTransactionAmount() +
+                ", totalDiscount=" + transaction.totalDiscount() +
+                ", transactionLevelDiscount=" + transaction.transactionLevelDiscount() +
+                ", transactionFilingStatus=" + transaction.transactionFilingStatus() +
+                ", currency=" + transaction.currency() +
+                ", refRate=" + transaction.refRate() +
+                ", exchangeRateInfo=" + transaction.exchangeRateInfo() +
+                ", subsidiary=" + transaction.subsidiary() +
+                ", isRefundLinked=" + transaction.isRefundLinked() +
+                ", refundLinkedPercentage=" + transaction.refundLinkedPercentage() +
+                "]";
 
         // When
         String actualString = transaction.toString();
@@ -83,9 +83,9 @@ public class TransactionTest {
         // Given
         String differentId = UUID.randomUUID().toString();
         Transaction expectedTransaction = testUtilities.createTransaction(differentId)
-                .withComplytId(transaction.getComplytId())
-                .withExternalId(transaction.getExternalId())
-                .withCustomer(transaction.getCustomer());
+                .withComplytId(transaction.complytId())
+                .withExternalId(transaction.externalId())
+                .withCustomer(transaction.customer());
 
         // When
         Transaction actualTransaction = transaction.withId(differentId);
@@ -101,34 +101,34 @@ public class TransactionTest {
 
         // When
         Transaction actualTransaction = transactionBuilder
-                .complytId(transaction.getComplytId())
+                .complytId(transaction.complytId())
                 .id(transactionId)
-                .externalId(transaction.getExternalId())
-                .source(transaction.getSource())
-                .documentName(transaction.getDocumentName())
-                .items(transaction.getItems())
-                .isTaxInclusive(transaction.getIsTaxInclusive())
-                .billingAddress(transaction.getBillingAddress())
-                .shippingAddress(transaction.getShippingAddress())
-                .customerId(transaction.getCustomerId())
-                .customer(transaction.getCustomer())
-                .salesTax(transaction.getSalesTax())
-                .transactionStatus(transaction.getTransactionStatus())
-                .tenantId(transaction.getTenantId())
-                .internalTimestamps(transaction.getInternalTimestamps())
-                .externalTimestamps(transaction.getExternalTimestamps())
-                .transactionType(transaction.getTransactionType())
-//                .shippingFee(transaction.getShippingFee())
-                .tangibleItemsAmount(transaction.getTangibleItemsAmount())
-                .taxableItemsAmount(transaction.getTaxableItemsAmount())
-                .totalItemsAmount(transaction.getTotalItemsAmount())
-                .transactionFilingStatus(transaction.getTransactionFilingStatus())
-                .finalTransactionAmount(transaction.getFinalTransactionAmount())
-                .totalDiscount(transaction.getTotalDiscount())
-                .transactionLevelDiscount(transaction.getTransactionLevelDiscount())
-                .currency(transaction.getCurrency())
-                .subsidiary(transaction.getSubsidiary())
-                .isRefundLinked(transaction.getIsRefundLinked())
+                .externalId(transaction.externalId())
+                .source(transaction.source())
+                .documentName(transaction.documentName())
+                .items(transaction.items())
+                .isTaxInclusive(transaction.isTaxInclusive())
+                .billingAddress(transaction.billingAddress())
+                .shippingAddress(transaction.shippingAddress())
+                .customerId(transaction.customerId())
+                .customer(transaction.customer())
+                .salesTax(transaction.salesTax())
+                .transactionStatus(transaction.transactionStatus())
+                .tenantId(transaction.tenantId())
+                .internalTimestamps(transaction.internalTimestamps())
+                .externalTimestamps(transaction.externalTimestamps())
+                .transactionType(transaction.transactionType())
+                .shippingFee(transaction.shippingFee())
+                .tangibleItemsAmount(transaction.tangibleItemsAmount())
+                .taxableItemsAmount(transaction.taxableItemsAmount())
+                .totalItemsAmount(transaction.totalItemsAmount())
+                .transactionFilingStatus(transaction.transactionFilingStatus())
+                .finalTransactionAmount(transaction.finalTransactionAmount())
+                .totalDiscount(transaction.totalDiscount())
+                .transactionLevelDiscount(transaction.transactionLevelDiscount())
+                .currency(transaction.currency())
+                .subsidiary(transaction.subsidiary())
+                .isRefundLinked(transaction.isRefundLinked())
                 .build();
 
         // Then

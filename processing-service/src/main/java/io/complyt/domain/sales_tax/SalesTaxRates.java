@@ -6,7 +6,6 @@ import lombok.With;
 
 import java.math.BigDecimal;
 
-@With
 @JsonInclude(JsonInclude.Include.NON_NULL) // Excludes null fields in JSON response
 public record SalesTaxRates(BigDecimal stateRate, BigDecimal countyRate, BigDecimal cityRate,
                             BigDecimal combinedDistrictRate, RatesMetaData ratesMetaData,

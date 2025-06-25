@@ -68,15 +68,15 @@ public class JurisdictionalTaxRulesTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "JurisdictionalTaxRules(name=" + jurisdictionalTaxRules.getName() +
-                ", abbreviation=" + jurisdictionalTaxRules.getAbbreviation() +
-                ", taxable=" + jurisdictionalTaxRules.isTaxable() +
-                ", specialTreatment=" + jurisdictionalTaxRules.isSpecialTreatment() +
-                ", calculationType=" + jurisdictionalTaxRules.getCalculationType() +
-                ", description=" + jurisdictionalTaxRules.getDescription() +
-                ", calculationValue=" + jurisdictionalTaxRules.getCalculationValue() +
-                ", regions=" + jurisdictionalTaxRules.getRegions() +
-                ")";
+        String expectedString = "JurisdictionalTaxRules[name=" + jurisdictionalTaxRules.name() +
+                ", abbreviation=" + jurisdictionalTaxRules.abbreviation() +
+                ", taxable=" + jurisdictionalTaxRules.taxable() +
+                ", specialTreatment=" + jurisdictionalTaxRules.specialTreatment() +
+                ", calculationType=" + jurisdictionalTaxRules.calculationType() +
+                ", description=" + jurisdictionalTaxRules.description() +
+                ", calculationValue=" + jurisdictionalTaxRules.calculationValue() +
+                ", regions=" + jurisdictionalTaxRules.regions() +
+                "]";
 
         // When
         String actualString = jurisdictionalTaxRules.toString();
@@ -104,7 +104,7 @@ public class JurisdictionalTaxRulesTest {
         JurisdictionalTaxRules jurisdictionalTaxRulesWithNullManualTaxRate = jurisdictionalTaxRules.withCalculationValue(null);
 
         // When
-        BigDecimal actualTotalPrice = jurisdictionalTaxRulesWithNullManualTaxRate.getCalculationValue();
+        BigDecimal actualTotalPrice = jurisdictionalTaxRulesWithNullManualTaxRate.calculationValue();
 
         // Then
         assertEquals(BigDecimal.ZERO, actualTotalPrice);
@@ -116,7 +116,7 @@ public class JurisdictionalTaxRulesTest {
         JurisdictionalTaxRules jurisdictionalTaxRulesWithManualTaxRateOf10 = jurisdictionalTaxRules.withCalculationValue(new BigDecimal("10"));
 
         // When
-        BigDecimal actualTotalPrice = jurisdictionalTaxRulesWithManualTaxRateOf10.getCalculationValue();
+        BigDecimal actualTotalPrice = jurisdictionalTaxRulesWithManualTaxRateOf10.calculationValue();
 
         // Then
         assertEquals(new BigDecimal("10"), actualTotalPrice);

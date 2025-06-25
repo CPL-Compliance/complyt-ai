@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 
 public interface TaxRules {
 
-    boolean isTaxable();
+    boolean taxable();
 
-    boolean isSpecialTreatment();
+    boolean specialTreatment();
 
-    CalculationType getCalculationType();
+    CalculationType calculationType();
 
-    BigDecimal getCalculationValue();
+    BigDecimal calculationValue();
 
 }

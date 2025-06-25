@@ -19,8 +19,8 @@ class TimestampsTest {
     void testConstructorAndGetters() {
         Timestamps timestamps = new Timestamps(now, later);
 
-        assertEquals(now, timestamps.getCreatedDate());
-        assertEquals(later, timestamps.getUpdatedDate());
+        assertEquals(now, timestamps.createdDate());
+        assertEquals(later, timestamps.updatedDate());
     }
 
     @Test
@@ -46,8 +46,8 @@ class TimestampsTest {
         Timestamps original = new Timestamps(now, later);
         Timestamps modified = original.withUpdatedDate(now);
 
-        assertEquals(now, modified.getUpdatedDate());
-        assertEquals(original.getCreatedDate(), modified.getCreatedDate());
+        assertEquals(now, modified.updatedDate());
+        assertEquals(original.createdDate(), modified.createdDate());
         assertNotEquals(original, modified);
     }
 
@@ -63,8 +63,8 @@ class TimestampsTest {
 
         Timestamps result = mapper.readValue(json, Timestamps.class);
 
-        assertEquals(now, result.getCreatedDate());
-        assertEquals(later, result.getUpdatedDate());
+        assertEquals(now, result.createdDate());
+        assertEquals(later, result.updatedDate());
     }
 
 

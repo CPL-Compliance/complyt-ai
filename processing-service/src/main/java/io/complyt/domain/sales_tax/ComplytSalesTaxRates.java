@@ -6,7 +6,7 @@ import lombok.With;
 
 import java.util.UUID;
 
-@With
 @JsonInclude(JsonInclude.Include.NON_NULL) // Excludes null fields in JSON response
+@With
 public record ComplytSalesTaxRates(UUID complytId, MatchedAddressData matchedAddressData, SalesTaxRates salesTaxRates, FilingMetaData filingMetaData) implements ComplytInternalRates {
 }

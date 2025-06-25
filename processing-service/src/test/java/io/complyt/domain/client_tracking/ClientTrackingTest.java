@@ -23,8 +23,7 @@ class ClientTrackingTest {
         id = UUID.randomUUID().toString();
         tenantId = UUID.randomUUID().toString();
         nexusDate = LocalDateTime.now();
-        clientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name", null, null,
-                null);
+        clientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name", null, null, null);
     }
 
     @Test
@@ -42,14 +41,14 @@ class ClientTrackingTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "ClientTracking(id=" + clientTracking.getId() +
-                ", tenantId=" + clientTracking.getTenantId() +
-                ", nexus=" + clientTracking.getNexus() +
-                ", name=" + clientTracking.getName() +
-                ", internalTimestamps=" + clientTracking.getInternalTimestamps() +
-                ", subsidiaries=" + clientTracking.getSubsidiaries() +
-                ", webhookDetails=" + clientTracking.getWebhookDetails() +
-                ")";
+        String expectedString = "ClientTracking[id=" + clientTracking.id() +
+                ", tenantId=" + clientTracking.tenantId() +
+                ", nexus=" + clientTracking.nexus() +
+                ", name=" + clientTracking.name() +
+                ", internalTimestamps=" + clientTracking.internalTimestamps() +
+                ", subsidiaries=" + clientTracking.subsidiaries() +
+                ", webhookDetails=" + clientTracking.webhookDetails() +
+                "]";
 
         // When
         String actualString = clientTracking.toString();

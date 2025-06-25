@@ -12,45 +12,40 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SalesTaxTrackingTest {
+
     UnitTestUtilities testUtilities;
     private SalesTaxTracking salesTaxTracking;
-//    private String id;
-//    private ObjectId tenantId;
-//    private LocalDateTime localDateTime;
-
-
 
     @BeforeEach
     void setup() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-//        id DateTime = LocalDateTime.now();
         salesTaxTracking = testUtilities.createSalesTaxTracking(new ObjectId().toString());
     }
 
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "SalesTaxTracking(complytId=" + salesTaxTracking.getComplytId() +
-                ", id=" + salesTaxTracking.getId() +
-                ", country=" + salesTaxTracking.getCountry() +
-                ", state=" + salesTaxTracking.getState() +
-                ", tenantId=" + salesTaxTracking.getTenantId() +
-                ", comment=" + salesTaxTracking.getComment() +
-                ", enforcesSalesTax=" + salesTaxTracking.isEnforcesSalesTax() +
-                ", physicalNexusTracker=" + salesTaxTracking.getPhysicalNexusTracker() +
-                ", economicNexusTracker=" + salesTaxTracking.getEconomicNexusTracker() +
-                ", nexusStateRule=" + salesTaxTracking.getNexusStateRule() +
-                ", clientTracking=" + salesTaxTracking.getClientTracking() +
-                ", nexusCalculationSummaries=" + salesTaxTracking.getNexusCalculationSummaries() +
-                ", transactionNexusSummaries=" + salesTaxTracking.getTransactionNexusSummaries() +
-                ", appliedDate=" + salesTaxTracking.getAppliedDate() +
-                ", approved=" + salesTaxTracking.isApproved() +
-                ", approvalDate=" + salesTaxTracking.getApprovalDate() +
-                ", filingFrequency=" + salesTaxTracking.getFilingFrequency() +
-                ", registered=" + salesTaxTracking.getRegistered() +
-                ", registrationDate=" + salesTaxTracking.getRegistrationDate() +
-                ", subsidiary=" + salesTaxTracking.getSubsidiary() +
-                ", establishedBy=" + salesTaxTracking.getEstablishedBy() + ")";
+        String expectedString = "SalesTaxTracking[complytId=" + salesTaxTracking.complytId() +
+                ", id=" + salesTaxTracking.id() +
+                ", country=" + salesTaxTracking.country() +
+                ", state=" + salesTaxTracking.state() +
+                ", tenantId=" + salesTaxTracking.tenantId() +
+                ", comment=" + salesTaxTracking.comment() +
+                ", enforcesSalesTax=" + salesTaxTracking.enforcesSalesTax() +
+                ", physicalNexusTracker=" + salesTaxTracking.physicalNexusTracker() +
+                ", economicNexusTracker=" + salesTaxTracking.economicNexusTracker() +
+                ", nexusStateRule=" + salesTaxTracking.nexusStateRule() +
+                ", clientTracking=" + salesTaxTracking.clientTracking() +
+                ", nexusCalculationSummaries=" + salesTaxTracking.nexusCalculationSummaries() +
+                ", transactionNexusSummaries=" + salesTaxTracking.transactionNexusSummaries() +
+                ", appliedDate=" + salesTaxTracking.appliedDate() +
+                ", approved=" + salesTaxTracking.approved() +
+                ", approvalDate=" + salesTaxTracking.approvalDate() +
+                ", filingFrequency=" + salesTaxTracking.filingFrequency() +
+                ", registered=" + salesTaxTracking.registered() +
+                ", registrationDate=" + salesTaxTracking.registrationDate() +
+                ", subsidiary=" + salesTaxTracking.subsidiary() +
+                ", establishedBy=" + salesTaxTracking.establishedBy() + "]";
 
         // When
         String actualString = salesTaxTracking.toString();
@@ -62,10 +57,9 @@ class SalesTaxTrackingTest {
     @Test
     void Equals_SameSalesTaxTracking_ReturnsTrue() {
         // Given
-        SalesTaxTracking givenSalesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTracking.getId())
-                .withComplytId(salesTaxTracking.getComplytId());
-
-        assertEquals(salesTaxTracking, givenSalesTaxTracking);
+        SalesTaxTracking givenSalesTaxTracking = testUtilities
+                .createSalesTaxTracking(salesTaxTracking.id())
+                .withComplytId(salesTaxTracking.complytId());
 
         // When
         boolean isEquals = salesTaxTracking.equals(givenSalesTaxTracking);
@@ -73,5 +67,4 @@ class SalesTaxTrackingTest {
         // Then
         assertTrue(isEquals);
     }
-
 }

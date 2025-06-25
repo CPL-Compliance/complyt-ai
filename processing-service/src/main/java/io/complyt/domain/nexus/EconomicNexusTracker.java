@@ -1,24 +1,12 @@
 package io.complyt.domain.nexus;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.With;
+
 import java.time.LocalDateTime;
 import java.time.Month;
 
-@Data
 @With
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class EconomicNexusTracker {
-    private boolean established;
-    private LocalDateTime establishedDate;
-
-    @JsonCreator
-    public EconomicNexusTracker(@JsonProperty("established") boolean established, @JsonProperty("establishedDate") LocalDateTime establishedDate) {
-        this.established = established;
-        this.establishedDate = establishedDate;
-    }
+public record EconomicNexusTracker(boolean established, LocalDateTime establishedDate) {
 
     private static final boolean DEFAULT_ESTABLISHED = false;
     private static final int DEFAULT_YEAR_ESTABLISHED_DATE = 2000;
@@ -33,8 +21,9 @@ public class EconomicNexusTracker {
     );
 
     public static EconomicNexusTracker build() {
-        return new EconomicNexusTracker(DEFAULT_ESTABLISHED,
-                LocalDateTime.of(DEFAULT_YEAR_ESTABLISHED_DATE, DEFAULT_MONTH_ESTABLISHED_DATE, DEFAULT_DAY_ESTABLISHED_DATE, 0, 0, 0));
+        return new EconomicNexusTracker(
+                DEFAULT_ESTABLISHED,
+                DEFAULT_ESTABLISHED_DATE
+        );
     }
-
 }

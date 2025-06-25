@@ -28,8 +28,8 @@ class EconomicNexusTrackerTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "EconomicNexusTracker(established=" + economicNexusTracker.isEstablished() +
-                ", establishedDate=" + localDateTime + ")";
+        String expectedString = "EconomicNexusTracker[established=" + economicNexusTracker.established() +
+                ", establishedDate=" + localDateTime + "]";
 
         // When
         String actualString = economicNexusTracker.toString();

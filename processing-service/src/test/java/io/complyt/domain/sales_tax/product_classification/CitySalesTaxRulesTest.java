@@ -26,13 +26,13 @@ class CitySalesTaxRulesTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "SubJurisdictionalTaxRules(name=" + SubJurisdictionalTaxRules.getName() +
-                ", abbreviation=" + SubJurisdictionalTaxRules.getAbbreviation() +
-                ", taxable=" + SubJurisdictionalTaxRules.isTaxable() +
-                ", specialTreatment=" + SubJurisdictionalTaxRules.isSpecialTreatment() +
-                ", calculationType=" + SubJurisdictionalTaxRules.getCalculationType() +
-                ", description=" + SubJurisdictionalTaxRules.getDescription() +
-                ", calculationValue=" + SubJurisdictionalTaxRules.getCalculationValue() + ")";
+        String expectedString = "SubJurisdictionalTaxRules[name=" + SubJurisdictionalTaxRules.name() +
+                ", abbreviation=" + SubJurisdictionalTaxRules.abbreviation() +
+                ", taxable=" + SubJurisdictionalTaxRules.taxable() +
+                ", specialTreatment=" + SubJurisdictionalTaxRules.specialTreatment() +
+                ", calculationType=" + SubJurisdictionalTaxRules.calculationType() +
+                ", description=" + SubJurisdictionalTaxRules.description() +
+                ", calculationValue=" + SubJurisdictionalTaxRules.calculationValue() + "]";
 
         // When
         String actualString = SubJurisdictionalTaxRules.toString();

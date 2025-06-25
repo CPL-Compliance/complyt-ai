@@ -28,8 +28,8 @@ class PhysicalNexusTrackerTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "PhysicalNexusTracker(established=" + physicalNexusTracker.isEstablished() +
-                ", establishedDate=" + physicalNexusTracker.getEstablishedDate() + ")";
+        String expectedString = "PhysicalNexusTracker[established=" + physicalNexusTracker.established() +
+                ", establishedDate=" + physicalNexusTracker.establishedDate() + "]";
 
         // When
         String actualString = physicalNexusTracker.toString();

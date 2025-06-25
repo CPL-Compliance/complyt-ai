@@ -34,7 +34,8 @@ public class ShippingFeeTest {
                 .withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules)
                 .withJurisdictionalTaxRules(jurisdictionalTaxRules)
                 .withSalesTaxRates(SalesTaxRates.zeroSalesTaxRate())
-                .withGtRates(GtRates.zeroGtRates());
+                .withGtRates(GtRates.zeroGtRates())
+                .withCalculatedTotal(BigDecimal.ZERO);
     }
 
     @Test
@@ -46,7 +47,7 @@ public class ShippingFeeTest {
         BigDecimal expectedAmount = BigDecimal.ZERO;
 
         // When + Then
-        BigDecimal actualAmount = shippingFeeWithNoCalculatedTotal.getCalculatedTotal();
+        BigDecimal actualAmount = shippingFeeWithNoCalculatedTotal.calculatedTotal();
         assertEquals(expectedAmount, actualAmount);
     }
 
@@ -59,7 +60,7 @@ public class ShippingFeeTest {
         BigDecimal expectedAmount = BigDecimal.valueOf(5);
 
         // When + Then
-        BigDecimal actualAmount = shippingFeeWithCalculatedTotal.getCalculatedTotal();
+        BigDecimal actualAmount = shippingFeeWithCalculatedTotal.calculatedTotal();
         assertEquals(expectedAmount, actualAmount);
     }
 
@@ -78,17 +79,17 @@ public class ShippingFeeTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "ShippingFee(manualSalesTax=" + shippingFee.isManualSalesTax() +
-                ", manualSalesTaxRate=" + shippingFee.getManualSalesTaxRate() +
-                ", totalPrice=" + shippingFee.getTotalPrice() +
-                ", jurisdictionalSalesTaxRules=" + shippingFee.getJurisdictionalSalesTaxRules() +
-                ", jurisdictionalTaxRules=" + shippingFee.getJurisdictionalTaxRules() +
-                ", salesTaxRates=" + shippingFee.getSalesTaxRates() +
-                ", gtRates=" + shippingFee.getGtRates() +
-                ", taxCode=" + shippingFee.getTaxCode() +
-                ", taxableCategory=" + shippingFee.getTaxableCategory() +
-                ", tangibleCategory=" + shippingFee.getTangibleCategory() +
-                ", calculatedTotal=" + shippingFee.getCalculatedTotal() + ")";
+        String expectedString = "ShippingFee[manualSalesTax=" + shippingFee.manualSalesTax() +
+                ", manualSalesTaxRate=" + shippingFee.manualSalesTaxRate() +
+                ", totalPrice=" + shippingFee.totalPrice() +
+                ", jurisdictionalSalesTaxRules=" + shippingFee.jurisdictionalSalesTaxRules() +
+                ", jurisdictionalTaxRules=" + shippingFee.jurisdictionalTaxRules() +
+                ", salesTaxRates=" + shippingFee.salesTaxRates() +
+                ", gtRates=" + shippingFee.gtRates() +
+                ", taxCode=" + shippingFee.taxCode() +
+                ", taxableCategory=" + shippingFee.taxableCategory() +
+                ", tangibleCategory=" + shippingFee.tangibleCategory() +
+                ", calculatedTotal=" + shippingFee.calculatedTotal() + "]";
 
         // When
         String actualString = shippingFee.toString();
@@ -103,7 +104,7 @@ public class ShippingFeeTest {
         ShippingFee shippingFeeWithNullTotalPrice = shippingFee.withTotalPrice(null);
 
         // When
-        BigDecimal actualTotalPrice = shippingFeeWithNullTotalPrice.getTotalPrice();
+        BigDecimal actualTotalPrice = shippingFeeWithNullTotalPrice.totalPrice();
 
         // Then
         assertEquals(BigDecimal.ZERO, actualTotalPrice);
@@ -115,7 +116,7 @@ public class ShippingFeeTest {
         ShippingFee shippingFeeWithNullTotalPrice = shippingFee.withTotalPrice(new BigDecimal("10"));
 
         // When
-        BigDecimal actualTotalPrice = shippingFeeWithNullTotalPrice.getTotalPrice();
+        BigDecimal actualTotalPrice = shippingFeeWithNullTotalPrice.totalPrice();
 
         // Then
         assertEquals(new BigDecimal("10"), actualTotalPrice);
@@ -127,7 +128,7 @@ public class ShippingFeeTest {
         ShippingFee shippingFeeWithNullManualTaxRate = shippingFee.withManualSalesTaxRate(null);
 
         // When
-        BigDecimal actualTotalPrice = shippingFeeWithNullManualTaxRate.getManualSalesTaxRate();
+        BigDecimal actualTotalPrice = shippingFeeWithNullManualTaxRate.manualSalesTaxRate();
 
         // Then
         assertEquals(BigDecimal.ZERO, actualTotalPrice);
@@ -139,7 +140,7 @@ public class ShippingFeeTest {
         ShippingFee shippingFeeWithManualTaxRateOf10 = shippingFee.withManualSalesTaxRate(new BigDecimal("10"));
 
         // When
-        BigDecimal actualTotalPrice = shippingFeeWithManualTaxRateOf10.getManualSalesTaxRate();
+        BigDecimal actualTotalPrice = shippingFeeWithManualTaxRateOf10.manualSalesTaxRate();
 
         // Then
         assertEquals(new BigDecimal("10"), actualTotalPrice);

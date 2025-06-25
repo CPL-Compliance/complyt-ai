@@ -27,8 +27,8 @@ class NexusThresholdTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "NexusThreshold(amount=" + nexusThreshold.getAmount() +
-                ", count=" + nexusThreshold.getCount() + ", definition=" + nexusThreshold.getDefinition() + ")";
+        String expectedString = "NexusThreshold[amount=" + nexusThreshold.amount() +
+                ", count=" + nexusThreshold.count() + ", definition=" + nexusThreshold.definition() + "]";
 
         // When
         String actualString = nexusThreshold.toString();

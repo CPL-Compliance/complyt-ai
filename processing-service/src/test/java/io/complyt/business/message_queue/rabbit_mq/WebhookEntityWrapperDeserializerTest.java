@@ -25,8 +25,8 @@ public class WebhookEntityWrapperDeserializerTest {
               "action": "CREATE",
               "webhookClass": "Transaction",
               "object": {
-                "compl ytId": "org-xyz",
-                "id": "txn001"
+              "complytId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+              "id": "txn001"
               },
               "host": "example.com",
               "path": "/webhook"
@@ -44,7 +44,7 @@ public class WebhookEntityWrapperDeserializerTest {
         assertEquals("example.com", result.host());
         assertEquals("/webhook", result.path());
         assertNotNull(result.object());
-        assertEquals("txn001", result.object().getId());
+        assertEquals("txn001", result.object().id());
     }
 
     @Test

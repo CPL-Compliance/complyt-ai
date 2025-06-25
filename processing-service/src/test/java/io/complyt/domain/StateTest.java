@@ -32,9 +32,9 @@ class StateTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "State(abbreviation=" + state.getAbbreviation() +
-                ", code=" + state.getCode() +
-                ", name=" + state.getName() + ")";
+        String expectedString = "State[abbreviation=" + state.abbreviation() +
+                ", code=" + state.code() +
+                ", name=" + state.name() + "]";
 
         // When
         String actualString = state.toString();

@@ -20,7 +20,22 @@ class CustomerTest {
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         customer = testUtilities.createCustomer(UUID.randomUUID().toString());
-        anotherCustomer = new Customer(customer.getComplytId(), customer.getId(), customer.getExternalId(), customer.getSource(), customer.getName(), customer.getAddress(), customer.getTenantId(), customer.getEmail(), customer.getCustomerType(), customer.getInternalTimestamps(), customer.getExternalTimestamps(), "comment", customer.getCustomerStatus());
+
+        anotherCustomer = new Customer(
+                customer.complytId(),
+                customer.id(),
+                customer.externalId(),
+                customer.source(),
+                customer.name(),
+                customer.address(),
+                customer.tenantId(),
+                customer.email(),
+                customer.customerType(),
+                customer.internalTimestamps(),
+                customer.externalTimestamps(),
+                "comment",
+                customer.customerStatus()
+        );
     }
 
     @Test
@@ -36,19 +51,19 @@ class CustomerTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "Customer(complytId=" + customer.getComplytId() +
-                ", id=" + customer.getId() +
-                ", externalId=" + customer.getExternalId() +
-                ", source=" + customer.getSource() +
-                ", name=" + customer.getName() +
-                ", address=" + customer.getAddress() +
-                ", tenantId=" + customer.getTenantId() +
-                ", email=" + customer.getEmail() +
-                ", customerType=" + customer.getCustomerType() +
-                ", internalTimestamps=" + customer.getInternalTimestamps() +
-                ", externalTimestamps=" + customer.getExternalTimestamps() +
-                ", comment=" + customer.getComment() +
-                ", customerStatus=" + customer.getCustomerStatus() + ")";
+        String expectedString = "Customer[complytId=" + customer.complytId() +
+                ", id=" + customer.id() +
+                ", externalId=" + customer.externalId() +
+                ", source=" + customer.source() +
+                ", name=" + customer.name() +
+                ", address=" + customer.address() +
+                ", tenantId=" + customer.tenantId() +
+                ", email=" + customer.email() +
+                ", customerType=" + customer.customerType() +
+                ", internalTimestamps=" + customer.internalTimestamps() +
+                ", externalTimestamps=" + customer.externalTimestamps() +
+                ", comment=" + customer.comment() +
+                ", customerStatus=" + customer.customerStatus() + "]";
 
         // When
         String actualString = customer.toString();
@@ -56,5 +71,4 @@ class CustomerTest {
         // Then
         assertEquals(expectedString, actualString);
     }
-
 }
