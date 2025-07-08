@@ -28,12 +28,26 @@ public interface TestUtilities {
         return new Address("Beverly Hills", "US", null, "CA", "1008 Elden Way", "90210", null,false);
     }
 
+    static Address getGlobalAddress() {
+        return new Address("Marseille", "France", null, "FR", "80 boulevard de la Liberation", "13011", null,false);
+    }
+
     static ValidatedAddress getValidatedAddress() {
         return new ValidatedAddress(null, List.of(getCachedAddressData()), getAddress(), LocalDateTime.now());
     }
 
+    static ValidatedAddress getGlobalValidatedAddress() {
+        return new ValidatedAddress(null, List.of(getGlobalCachedAddressData()), getGlobalAddress(), LocalDateTime.now());
+    }
+
     static CachedAddressData getCachedAddressData() {
         Address address = new Address("Beverly Hills", "US", "County", "CA", "1008 Elden Way", "90210", null, null);
+        Scoring scoring = new Scoring(MatchLevelType.GOOD, 0.8, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, null));
+        return new CachedAddressData(address, scoring);
+    }
+
+    static CachedAddressData getGlobalCachedAddressData() {
+        Address address = new Address("Marseille", "France", null, "FR", "80 boulevard de la Liberation", "13011", null, null);
         Scoring scoring = new Scoring(MatchLevelType.GOOD, 0.8, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, null));
         return new CachedAddressData(address, scoring);
     }

@@ -1,5 +1,6 @@
 package io.complyt.services;
 
+import io.complyt.business.address.CountryIsUsaChecker;
 import io.complyt.business.address_aligner.AddressAligner;
 import io.complyt.business.address_checkers.HereAddressChecker;
 import io.complyt.business.webclients.addressvalidations.AddressValidationWebClientWrapper;
@@ -19,6 +20,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -77,16 +79,22 @@ public class ValidAddressServiceImpl implements ValidAddressService {
     }
 
     private Mono<List<CachedAddressData>> fetchAndValidateAddress(Address address) {
-        return findByAddressClientWrapper(address)
+        Address alignedAddress = addressAligner.alignForOutsource(address);
+        return findByAddressClientWrapper(alignedAddress)
                 .flatMap(addressData -> hereAddressChecker.filterValidAddresses(addressData)
-                        .switchIfEmpty(Mono.defer(() -> resolveStreetIfMissing(addressData, address))
-                                .flatMap(hereAddressChecker::filterValidAddresses)));
+                        .switchIfEmpty(Mono.defer(() -> resolveFallbackAddress(addressData, alignedAddress))
+                                .flatMap(hereAddressChecker::filterValidAddresses))
+                        .switchIfEmpty(Mono.defer(() -> resolveSecondFallbackAddress(addressData, alignedAddress)
+                                .flatMap(hereAddressChecker::filterValidAddresses))));
     }
 
-    private Mono<List<CachedAddressData>> findByAddressClientWrapper(Address address) {
+    Mono<List<CachedAddressData>> findByAddressClientWrapper(Address address) {
         Address alignedAddress = addressAligner.alignForOutsource(address);
-        return hereAddressValidationClientWrapper.validateAddress(alignedAddress)
-                .map(HereAddressToAddressMapper.INSTANCE::map);
+        return findByAddress(address)
+                .flatMap(validated -> Mono.just(validated.getMatchedAddresses()))
+                .flatMap(hereAddressChecker::filterValidAddresses)
+                .switchIfEmpty(Mono.defer(() -> hereAddressValidationClientWrapper.validateAddress(alignedAddress)
+                        .map(HereAddressToAddressMapper.INSTANCE::map)));
     }
 
     private Mono<ValidatedAddress> setBeforeSave(List<CachedAddressData> addressData, Address address) {
@@ -98,6 +106,39 @@ public class ValidAddressServiceImpl implements ValidAddressService {
                 .flatMap(bestMatchedAddress -> (bestMatchedAddress.address().street() == null && address.street() != null)
                         ? findByAddressClientWrapper(address.withStreet(null))
                         : Mono.just(addressData)); // By default, returns the data back
+    }
+
+    private Mono<List<CachedAddressData>> resolveCountryWithoutZip(List<CachedAddressData> addressData, Address address) {
+        return resolveBestMatchAddress(addressData)
+                .flatMap(bestMatchedAddress ->
+                        (Objects.equals(bestMatchedAddress.address().zip(), address.zip()) &&
+                                !Objects.equals(bestMatchedAddress.address().country(), address.country()))
+                                ? findByAddressClientWrapper(address.withZip(null))
+                                : Mono.just(addressData)
+                )
+                .switchIfEmpty(Mono.defer(() -> findByAddressClientWrapper(address.withZip(null))));
+    }
+
+    private Mono<List<CachedAddressData>> resolveOnlyCountry(List<CachedAddressData> addressData, Address address) {
+        return resolveBestMatchAddress(addressData)
+                .flatMap(bestMatchedAddress ->
+                        !Objects.equals(bestMatchedAddress.address().country(), address.country())
+                                ? findByAddressClientWrapper(Address.builder().country(address.country()).build())
+                                : Mono.just(addressData)
+                )
+                .switchIfEmpty(Mono.defer(() -> findByAddressClientWrapper(Address.builder().country(address.country()).build())));
+    }
+
+    Mono<List<CachedAddressData>> resolveFallbackAddress(List<CachedAddressData> addressData, Address address) {
+        return CountryIsUsaChecker.isCountryUsa(address.country()) ?
+                resolveStreetIfMissing(addressData, address) :
+                resolveCountryWithoutZip(addressData, address);
+    }
+
+    Mono<List<CachedAddressData>> resolveSecondFallbackAddress(List<CachedAddressData> addressData, Address address) {
+        return CountryIsUsaChecker.isCountryUsa(address.country()) ?
+                Mono.just(addressData) :
+                resolveOnlyCountry(addressData, address);
     }
 
     private Mono<CachedAddressData> resolveBestMatchAddress(List<CachedAddressData> addresses) {

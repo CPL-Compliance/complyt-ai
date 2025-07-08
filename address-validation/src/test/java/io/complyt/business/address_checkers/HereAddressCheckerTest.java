@@ -373,4 +373,77 @@ class HereAddressCheckerTest {
                 .expectNext(dataWithNullStateMatch)
                 .verifyComplete();
     }
+
+    @Test
+    void isCountryAndStateMatch_BothMatch_ReturnsTrue() {
+        // given
+        CachedAddressData data = cachedAddressData.withScoring(
+                cachedAddressData.scoring().withFieldScore(
+                        cachedAddressData.scoring().fieldScore()
+                                .withCountryMatch(FieldMatchType.EXACT)
+                                .withStateMatch(FieldMatchType.EXACT)
+                )
+        );
+
+        // when
+        boolean result = hereAddressChecker.isCountryAndStateMatch(data, address);
+
+        // then
+        assertTrue(result);
+    }
+
+    @Test
+    void isCountryAndStateMatch_CountryMatchStateNoMatch_ReturnsFalse() {
+        // given
+        CachedAddressData data = cachedAddressData.withScoring(
+                cachedAddressData.scoring().withFieldScore(
+                        cachedAddressData.scoring().fieldScore()
+                                .withCountryMatch(FieldMatchType.EXACT)
+                                .withStateMatch(FieldMatchType.NO_MATCH)
+                )
+        );
+
+        // when
+        boolean result = hereAddressChecker.isCountryAndStateMatch(data, address);
+
+        // then
+        assertFalse(result);
+    }
+
+    @Test
+    void isCountryAndStateMatch_CountryNoMatchStateMatch_ReturnsFalse() {
+        // given
+        CachedAddressData data = cachedAddressData.withScoring(
+                cachedAddressData.scoring().withFieldScore(
+                        cachedAddressData.scoring().fieldScore()
+                                .withCountryMatch(FieldMatchType.NO_MATCH)
+                                .withStateMatch(FieldMatchType.EXACT)
+                )
+        );
+
+        // when
+        boolean result = hereAddressChecker.isCountryAndStateMatch(data, address);
+
+        // then
+        assertFalse(result);
+    }
+
+    @Test
+    void isCountryAndStateMatch_BothNoMatch_ReturnsFalse() {
+        // given
+        CachedAddressData data = cachedAddressData.withScoring(
+                cachedAddressData.scoring().withFieldScore(
+                        cachedAddressData.scoring().fieldScore()
+                                .withCountryMatch(FieldMatchType.NO_MATCH)
+                                .withStateMatch(FieldMatchType.NO_MATCH)
+                )
+        );
+
+        // when
+        boolean result = hereAddressChecker.isCountryAndStateMatch(data, address);
+
+        // then
+        assertFalse(result);
+    }
+
 }
