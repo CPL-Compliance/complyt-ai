@@ -644,20 +644,6 @@ class ValidAddressServiceImplTest {
     }
 
     @Test
-    void resolveSecondFallbackAddress_NonUsa_ZipAndCountrySame_ShouldReturnOriginalList() {
-        Address input = globalAddress.withCountry("FR").withZip("75001");
-
-        CachedAddressData cached = globalCachedAddressData.withAddress(
-                globalCachedAddressData.address().withCountry("FR").withZip("75001")
-        );
-        List<CachedAddressData> inputList = List.of(cached);
-
-        StepVerifier.create(validAddressService.resolveSecondFallbackAddress(inputList, input))
-                .expectNext(inputList)
-                .verifyComplete();
-    }
-
-    @Test
     void resolveSecondFallbackAddress_NonUsa_CountryMismatch_ShouldCallFindByAddressClientWrapper() {
         // Given
         Address input = globalAddress.withCountry("FR"); // Requesting FR

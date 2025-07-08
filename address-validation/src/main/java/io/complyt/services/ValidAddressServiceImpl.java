@@ -1,5 +1,6 @@
 package io.complyt.services;
 
+import io.complyt.business.OutSourceThresholdToPass;
 import io.complyt.business.address.CountryIsUsaChecker;
 import io.complyt.business.address_aligner.AddressAligner;
 import io.complyt.business.address_checkers.HereAddressChecker;
@@ -119,16 +120,6 @@ public class ValidAddressServiceImpl implements ValidAddressService {
                 .switchIfEmpty(Mono.defer(() -> findByAddressClientWrapper(address.withZip(null))));
     }
 
-    private Mono<List<CachedAddressData>> resolveOnlyCountry(List<CachedAddressData> addressData, Address address) {
-        return resolveBestMatchAddress(addressData)
-                .flatMap(bestMatchedAddress ->
-                        !Objects.equals(bestMatchedAddress.address().country(), address.country())
-                                ? findByAddressClientWrapper(Address.builder().country(address.country()).build())
-                                : Mono.just(addressData)
-                )
-                .switchIfEmpty(Mono.defer(() -> findByAddressClientWrapper(Address.builder().country(address.country()).build())));
-    }
-
     Mono<List<CachedAddressData>> resolveFallbackAddress(List<CachedAddressData> addressData, Address address) {
         return CountryIsUsaChecker.isCountryUsa(address.country()) ?
                 resolveStreetIfMissing(addressData, address) :
@@ -138,7 +129,7 @@ public class ValidAddressServiceImpl implements ValidAddressService {
     Mono<List<CachedAddressData>> resolveSecondFallbackAddress(List<CachedAddressData> addressData, Address address) {
         return CountryIsUsaChecker.isCountryUsa(address.country()) ?
                 Mono.just(addressData) :
-                resolveOnlyCountry(addressData, address);
+                findByAddressClientWrapper(Address.builder().country(address.country()).build());
     }
 
     private Mono<CachedAddressData> resolveBestMatchAddress(List<CachedAddressData> addresses) {
