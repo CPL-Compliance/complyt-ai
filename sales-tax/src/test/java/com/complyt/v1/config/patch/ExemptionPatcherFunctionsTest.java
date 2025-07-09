@@ -1,17 +1,13 @@
 package com.complyt.v1.config.patch;
 
-import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.customer.exemption.*;
 import org.junit.jupiter.api.*;
-import org.mockito.MockedStatic;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.UUID;
-
-import static org.mockito.Mockito.mockStatic;
 
 public class ExemptionPatcherFunctionsTest {
     private ExemptionDto exemption;

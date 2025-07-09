@@ -12,10 +12,10 @@ import java.util.UUID;
 @Component
 public class WebhookEntityCreator<T extends ComplytIdProperty> {
 
-    public Mono<WebhookEntityWrapper<T>> create(Class<T> webhookClass, T object, Action action) {
+    public Mono<WebhookEntityWrapper<T>> create(String webhookClass, T object, Action action, String host, String path) {
         LocalDateTime timestamp = LocalDateTime.now();
         UUID id = UUID.randomUUID();
-        WebhookEntityWrapper<T> webhookEntityWrapper = new WebhookEntityWrapper<>(id, timestamp, action, webhookClass, object);
+        WebhookEntityWrapper<T> webhookEntityWrapper = new WebhookEntityWrapper<>(id, timestamp, action, webhookClass, object, host, path);
 
         return Mono.just(webhookEntityWrapper);
     }

@@ -71,4 +71,12 @@ logging:
       netty:
         http: INFO
 
-hmaac.secretKey: ${hmaac-secret-key}
+rabbitmq.queue.name: ${rabbitmq-queue-name}
+rabbitmq.exchange.name: ${rabbitmq-exchange-name}
+rabbitmq.routing.key: ${rabbitmq-routing-key}
+
+spring.rabbitmq.host: ${rabbitmq-host}
+spring.rabbitmq.port: 5672
+spring.rabbitmq.username: ${rabbitmq-username}
+spring.rabbitmq.password: ${rabbitmq-password}
+spring.rabbitmq.virtual-host: ${rabbitmq-virtual-host}

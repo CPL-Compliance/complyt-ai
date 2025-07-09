@@ -1,8 +1,8 @@
 package com.complyt.domain.transaction;
 
-import com.complyt.security.TenantResolver;
-import org.junit.jupiter.api.*;
-import org.mockito.MockedStatic;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.lang.reflect.Field;
@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mockStatic;
 
 public class TransactionTest {
 
@@ -25,8 +24,6 @@ public class TransactionTest {
         Field[] fields = Transaction.class.getDeclaredFields();
         Assertions.assertEquals(32, fields.length);
     }
-
-
 
     @BeforeEach
     void setup() {

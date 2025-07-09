@@ -27,7 +27,9 @@ public class WebhookEntityWrapperTest {
                 ", timestamp=" + webhookEntityWrapper.timestamp() +
                 ", action=" + webhookEntityWrapper.action() +
                 ", webhookClass=" + webhookEntityWrapper.webhookClass() +
-                ", object=" + webhookEntityWrapper.object() + "]";
+                ", object=" + webhookEntityWrapper.object() +
+                ", host=" + webhookEntityWrapper.host() +
+                ", path=" + webhookEntityWrapper.path() + "]";
 
         assertEquals(referenceString, webhookEntityWrapper.toString());
     }

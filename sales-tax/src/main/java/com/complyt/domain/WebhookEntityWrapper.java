@@ -10,7 +10,9 @@ public record WebhookEntityWrapper<T extends ComplytIdProperty>(
         UUID id,
         LocalDateTime timestamp,
         Action action,
-        Class<T> webhookClass,
-        T object
+        String webhookClass,
+        T object,
+        String host,
+        String path
 ) {
 }

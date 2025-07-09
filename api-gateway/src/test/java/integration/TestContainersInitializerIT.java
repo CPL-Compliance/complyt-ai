@@ -108,7 +108,7 @@ public abstract class TestContainersInitializerIT {
                 .withNetworkAliases(HOSTNAME)
                 .withCreateContainerCmdModifier(cmd -> cmd.withName("mongo_container"));
 
-        MONGO_CONTAINER.addFileSystemBind("../dump/sales_tax" , "/dump/sales_tax", BindMode.READ_ONLY);
+        MONGO_CONTAINER.addFileSystemBind("../dump/sales_tax", "/dump/sales_tax", BindMode.READ_ONLY);
         MONGO_CONTAINER.addFileSystemBind("../dump/sales_tax_rates", "/dump/sales_tax_rates", BindMode.READ_ONLY);
         MONGO_CONTAINER.addFileSystemBind("../dump/files", "/dump/files", BindMode.READ_ONLY);
         MONGO_CONTAINER.addFileSystemBind("../dump/authentication", "/dump/authentication", BindMode.READ_ONLY);
@@ -136,7 +136,6 @@ public abstract class TestContainersInitializerIT {
         //Sales Tax Container
         SALES_TAX_CONTAINER = initializeServiceContainer(SALES_TAX,
                 "java", "-Dspring.profiles.active=integration-test, complytTaxEngine, complytStubCurrency, stubVatValidation",
-                "-Dhmaac-secret-key=123",
                 mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
                 "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
         SALES_TAX_CONTAINER.start();

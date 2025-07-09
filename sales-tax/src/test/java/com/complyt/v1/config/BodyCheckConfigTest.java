@@ -1,15 +1,11 @@
 package com.complyt.v1.config;
 
-import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.body_checkers.transaction.ItemsAlignmentChecker;
 import com.complyt.v1.validators.body_checkers.transaction.TransactionDtoShippingAddressChecker;
 import com.complyt.v1.validators.body_checkers.transaction.TransactionTotalAmountChecker;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
@@ -21,7 +17,6 @@ import java.util.List;
 import static com.fasterxml.jackson.databind.jsonFormatVisitors.JsonValueFormat.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mockStatic;
 
 public class BodyCheckConfigTest {
 

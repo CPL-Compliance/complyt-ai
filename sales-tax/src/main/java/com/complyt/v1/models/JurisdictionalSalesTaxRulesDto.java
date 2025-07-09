@@ -11,6 +11,7 @@ import lombok.With;
 import java.math.BigDecimal;
 import java.util.Map;
 
+
 @Schema(name = "JurisdictionalSalesTaxRules")
 @With
 @JsonInclude(JsonInclude.Include.NON_NULL)

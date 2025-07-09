@@ -1,0 +1,23 @@
+package io.complyt.domain.sales_tax.zip_tax;
+
+import io.complyt.domain.sales_tax.SalesTaxData;
+import lombok.*;
+
+import java.util.List;
+
+@Getter
+@EqualsAndHashCode
+@ToString
+@With
+@AllArgsConstructor
+@NoArgsConstructor
+public class ZipTaxData implements SalesTaxData {
+    private String version;
+    private long rCode;
+    private List<Result> results;
+
+    @Override
+    public boolean isUnincorporated() {
+        return false;
+    }
+}

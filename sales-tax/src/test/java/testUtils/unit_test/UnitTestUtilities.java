@@ -960,7 +960,7 @@ public class UnitTestUtilities {
     }
 
     public MatchedAddressDataDto createMatchedAddressDto() {
-        return new MatchedAddressDataDto(createMandatoryAddressDto(), new ScoringDto(MatchLevelType.EXCELLENT, 0.9,new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT)));
+        return new MatchedAddressDataDto(createMandatoryAddressDto(), new ScoringDto(MatchLevelType.EXCELLENT, 0.9, new FieldsMatchScore(FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT, FieldMatchType.EXACT)));
     }
 
     public MatchedAddressData createMatchedAddressByMandatoryAddress(MandatoryAddress addressData) {
@@ -1089,7 +1089,7 @@ public class UnitTestUtilities {
     }
 
     public ShippingAddress createNonUsaShippingAddressWithMatchedAddress() {
-        return new ShippingAddress(null, "ARM", null, null, null, null,"12345", false, createNonUsaMatchedAddress());
+        return new ShippingAddress(null, "ARM", null, null, null, null, "12345", false, createNonUsaMatchedAddress());
     }
 
     public ShippingAddress createNonUsaShippingAddressWithMatchedAddressForClassification() {
@@ -1097,7 +1097,7 @@ public class UnitTestUtilities {
     }
 
     public ShippingAddress createUsaShippingAddressWithMatchedAddress() {
-        return new ShippingAddress(null, "USA", null, "California", null, null,"12345", false, createUsaMatchedAddress());
+        return new ShippingAddress(null, "USA", null, "California", null, null, "12345", false, createUsaMatchedAddress());
     }
 
     public ShippingAddress createUsaShippingAddressWithFullMatchedAddress() {
@@ -1114,11 +1114,11 @@ public class UnitTestUtilities {
     }
 
     public MatchedAddressData createNonUsaMatchedAddress() {
-        return new MatchedAddressData(new MandatoryAddress(null, "ARM", null, null, null, null,"12345", false) , null);
+        return new MatchedAddressData(new MandatoryAddress(null, "ARM", null, null, null, null, "12345", false), null);
     }
 
     public MatchedAddressData createUsaMatchedAddress() {
-        return new MatchedAddressData(new MandatoryAddress(null, "USA", null, "California", null, null,"12345", false) , null);
+        return new MatchedAddressData(new MandatoryAddress(null, "USA", null, "California", null, null, "12345", false), null);
     }
 
     public MatchedAddressData createUsaMatchedAddressAsAbbreviation() {
@@ -1254,8 +1254,10 @@ public class UnitTestUtilities {
                 UUID.randomUUID(),
                 LocalDateTime.now(),
                 Action.CREATE,
-                Transaction.class,
-                createTransaction(UUID.randomUUID().toString())
+                Transaction.class.getSimpleName(),
+                createTransaction(UUID.randomUUID().toString()),
+                "host",
+                "path"
         );
     }
 

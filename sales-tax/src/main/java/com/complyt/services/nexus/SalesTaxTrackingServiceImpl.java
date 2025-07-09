@@ -85,7 +85,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                         ? salesTaxTracking.withNexusCalculationSummaries(Map.of())
                         : salesTaxTracking)
                 .flatMap(salesTaxTrackingRepository::save)
-                .flatMap(savedSalesTaxTracking -> webhookHandler.handleWebhook(SalesTaxTracking.class, savedSalesTaxTracking, savedSalesTaxTracking.getClientTracking().getWebhookDetails(), action))
+                .flatMap(savedSalesTaxTracking -> webhookHandler.handleWebhook(SalesTaxTracking.class, savedSalesTaxTracking.withTransactionNexusSummaries(null), savedSalesTaxTracking.getClientTracking().getWebhookDetails(), action))
                 .map(upsertedSalesTaxTracking -> upsertedSalesTaxTracking.withNexusCalculationSummaries(salesTaxTracking.getNexusCalculationSummaries()));
     }
 

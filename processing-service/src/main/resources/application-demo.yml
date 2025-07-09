@@ -1,0 +1,54 @@
+# Spring Cloud Vault configuration
+# To understand what every field stands for visit
+# https://cloud.spring.io/spring-cloud-vault/reference/html/
+spring.cloud.vault:
+  enabled: true
+  application-name: processing-service${ecs_cluster_name:}
+  host: ${VAULT_HOST}
+  port: 8200
+  scheme: https
+  namespace: admin
+  fail-fast: true
+  config:
+    lifecycle:
+      enabled: true
+      min-renewal: 10s
+      expiry-threshold: 1m
+  authentication: APPROLE
+  app-role:
+    role-id: ${VAULT_ROLE_ID}
+    secret-id: ${VAULT_SECRET_ID}
+    role: ${VAULT_ROLE}
+    app-role-path: approle
+  kv:
+    enabled: true
+    default-context:
+
+spring.config.import: vault://
+
+logging:
+  level:
+    root: INFO
+    web: INFO
+    org:
+      springframework:
+        security: INFO
+    reactor:
+      netty:
+        http: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+hmaac.secretKey: ${hmaac-secret-key}
+
+rabbitmq.queue.name: ${rabbitmq-queue-name}
+
+spring.rabbitmq.port: 5672
+spring.rabbitmq.host: ${rabbitmq-host}
+spring.rabbitmq.username: ${rabbitmq-username}
+spring.rabbitmq.password: ${rabbitmq-password}
+spring.rabbitmq.virtual-host: ${rabbitmq-virtual-host}

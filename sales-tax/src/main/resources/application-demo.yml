@@ -43,13 +43,20 @@ spring.config.import: vault://
 
 auth0.audience: ${audience}
 
-hmaac.secretKey: ${hmaac-secret-key}
+rabbitmq.queue.name: ${rabbitmq-queue-name}
+rabbitmq.exchange.name: ${rabbitmq-exchange-name}
+rabbitmq.routing.key: ${rabbitmq-routing-key}
+
+spring.rabbitmq.host: ${rabbitmq-host}
+spring.rabbitmq.port: 5672
+spring.rabbitmq.username: ${rabbitmq-username}
+spring.rabbitmq.password: ${rabbitmq-password}
+spring.rabbitmq.virtual-host: ${rabbitmq-virtual-host}
 
 # This property sets the issuer URI
 # for the application to interact with the Resource Server for authentication and authorization purposes
 spring.security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
 currency-conversion-service-url: ${currency-conversion-service-url}
-
 
 spring:
   data:
@@ -73,3 +80,4 @@ management:
     web:
       exposure:
         include: "*"
+

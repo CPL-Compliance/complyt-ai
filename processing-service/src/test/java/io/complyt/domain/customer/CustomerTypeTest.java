@@ -1,0 +1,44 @@
+package io.complyt.domain.customer;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class CustomerTypeTest {
+
+    @Test
+    public void CustomerType_GetRetail_ReturnRetail() {
+        // Given + When
+        CustomerType customerType = CustomerType.RETAIL;
+
+        // Then
+        assertEquals(customerType, CustomerType.valueOf("RETAIL"));
+    }
+
+    @Test
+    public void CustomerType_GetMarketplace_ReturnMarketplace() {
+        // Given + When
+        CustomerType customerType = CustomerType.MARKETPLACE;
+
+        // Then
+        assertEquals(customerType, CustomerType.valueOf("MARKETPLACE"));
+    }
+
+    @Test
+    public void CustomerType_GetReseller_ReturnReseller() {
+        // Given + When
+        CustomerType customerType = CustomerType.RESELLER;
+
+        // Then
+        assertEquals(customerType, CustomerType.valueOf("RESELLER"));
+    }
+
+    @Test
+    public void CustomerType_GetRetail_exempt_ReturnRetail_exempt() {
+        // Given + When
+        CustomerType customerType = CustomerType.RETAIL_EXEMPT;
+
+        // Then
+        assertEquals(customerType, CustomerType.valueOf("RETAIL_EXEMPT"));
+    }
+}
