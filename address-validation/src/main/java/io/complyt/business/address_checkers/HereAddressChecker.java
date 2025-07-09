@@ -28,7 +28,7 @@ public class HereAddressChecker {
         }
 
         // Check State match in USA
-        boolean isStateMismatch = !isStateMatch(data, requestAddress);
+        boolean isStateMismatch = CountryIsUsaChecker.isCountryUsa(requestAddress.country()) && !isStateMatch(data, requestAddress);
         if (isStateMismatch) {
             return Mono.error(new ObjectNotValidException(String.format(GenericErrorMessages.STATE_CODE_MISMATCH, requestAddress.state(), data.address().state())));
         }
@@ -49,9 +49,10 @@ public class HereAddressChecker {
         return isCountryMatch(data) && isStateMatch(data, requestAddress);
     }
 
-        public Mono<List<CachedAddressData>> filterValidAddresses(List<CachedAddressData> cachedAddresses) {
+    public Mono<List<CachedAddressData>> filterValidAddresses(List<CachedAddressData> cachedAddresses) {
         return Flux.fromIterable(cachedAddresses)
                 .filter(this::isValidAddress)
+                .filter(this::isCountryMatch)
                 .doOnNext(data -> log.info("--> here address is valid:{}", data))
                 .doOnDiscard(CachedAddressData.class, data -> log.info("--> here address is not valid: {}", data))
                 .collectList()
