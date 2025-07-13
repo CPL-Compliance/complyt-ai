@@ -101,6 +101,7 @@ public class SalesTaxTrackingRepository {
                         .then(Mono.just(salesTaxTracking.withTenantId(tenantId))));
     }
 
+    @Deprecated
     public Mono<UpdateResult> updateMultipleEconomicNexuses(@NonNull SalesTaxTracking salesTaxTracking) {
         Query query = new Query(Criteria.where("tenantId").is(salesTaxTracking.getTenantId()));
         query.addCriteria(new Criteria().orOperator(Criteria.where("state.abbreviation").is(salesTaxTracking.getState().getAbbreviation()),

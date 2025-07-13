@@ -725,7 +725,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(1)
     @Test
     @Override
-    public void upsertByExternalIdAndSource_TransactionWithSubsidiaryB_Returns201AndHasSalesTax() {
+    public void upsertByExternalIdAndSource_TransactionWithSubsidiaryB_Returns201AndHasNoSalesTax() {
         String externalId = "TransactionWithSubsidiaryB";
         String item = TestUtilities.customItem(null, BigDecimal.valueOf(100), BigDecimal.valueOf(1), null);
 
@@ -743,7 +743,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .expectStatus().isCreated()
                 .expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertNotNull(map.get("salesTax"));
+                    assertNull(map.get("salesTax"));
                 });
     }
 

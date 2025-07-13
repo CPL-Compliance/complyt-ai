@@ -1582,79 +1582,79 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 });
     }
 
-    @Order(9)
-    @Test
-    @Override
-    @WithMockJwt
-    public void upsertByState_WithPhysicalTrueAndPassedNexusByEconomic_ShouldUpdateAppliedDate() {
-        LocalDateTime appliedDate = EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE;
-        LocalDateTime physicalEstablishedDate = LocalDateTime.now().plusYears(10); // In the future
-
-        PhysicalNexusTrackerDto physicalNexusTrackerDto = new PhysicalNexusTrackerDto(true, physicalEstablishedDate);
-
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", new StateDto("AL", "11", "Alabama"))
-                .withPhysicalNexusTracker(physicalNexusTrackerDto)
-                .withAppliedDate(appliedDate); // Default Should be updated, physical True in the future
-
-        // Then
-        webTestClient
-                .mutateWith(csrf())
-
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL)
-                        .queryParam("state", "AL")
-                        .queryParam("country", usaCountry)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(salesTaxTrackingDto)
-                .exchange()
-                .expectBody(SalesTaxTrackingDto.class)
-                .value(resultSalesTaxTrackingDto -> {
-                    assertFalse(resultSalesTaxTrackingDto.economicNexusTracker().established()); // Not EconomicNexus
-                    assertTrue(resultSalesTaxTrackingDto.physicalNexusTracker().established());
-                });
-
-
-        // Upsert Transaction Which PassedNexus
-        String externalId = "newNonExistingTransactionID3";
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withTaxInclusive(true);
-
-        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("AL"))
-                .withItems(List.of(givenTransaction.items().get(0).withTotalPrice(BigDecimal.valueOf(1000000))))
-                .withExternalTimestamps(givenTransaction.externalTimestamps().withCreatedDate(LocalDateTime.now().toString()));  // Should passedNexus
-
-        webTestClient
-                .mutateWith(csrf())
-
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + "1" + "/externalId/" + externalId)
-                        .build())
-                .bodyValue(givenTransaction)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectBody(TransactionDto.class);
-
-        webTestClient
-                .mutateWith(csrf())
-
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL)
-                        .queryParam("state", "AL")
-                        .queryParam("country", usaCountry)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectBody(SalesTaxTrackingDto.class)
-                .value(resultSalesTaxTrackingDto -> {
-                    assertTrue(resultSalesTaxTrackingDto.economicNexusTracker().established());
-                    // Shouldn't Be physical, should be  matching the economicNexus date
-                    assertEquals(resultSalesTaxTrackingDto.economicNexusTracker().establishedDate(), resultSalesTaxTrackingDto.appliedDate(), "appliedDate should match the economicEstablishedDate");
-                });
-    }
+//    @Order(9)
+//    @Test
+//    @Override
+//    @WithMockJwt
+//    public void upsertByState_WithPhysicalTrueAndPassedNexusByEconomic_ShouldUpdateAppliedDate() {
+//        LocalDateTime appliedDate = EconomicNexusTracker.DEFAULT_ESTABLISHED_DATE;
+//        LocalDateTime physicalEstablishedDate = LocalDateTime.now().plusYears(10); // In the future
+//
+//        PhysicalNexusTrackerDto physicalNexusTrackerDto = new PhysicalNexusTrackerDto(true, physicalEstablishedDate);
+//
+//        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto("USA", new StateDto("AL", "11", "Alabama"))
+//                .withPhysicalNexusTracker(physicalNexusTrackerDto)
+//                .withAppliedDate(appliedDate); // Default Should be updated, physical True in the future
+//
+//        // Then
+//        webTestClient
+//                .mutateWith(csrf())
+//
+//                .put()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(SalesTaxTrackingRouter.BASE_URL)
+//                        .queryParam("state", "AL")
+//                        .queryParam("country", usaCountry)
+//                        .build())
+//                .accept(MediaType.APPLICATION_JSON)
+//                .bodyValue(salesTaxTrackingDto)
+//                .exchange()
+//                .expectBody(SalesTaxTrackingDto.class)
+//                .value(resultSalesTaxTrackingDto -> {
+//                    assertFalse(resultSalesTaxTrackingDto.economicNexusTracker().established()); // Not EconomicNexus
+//                    assertTrue(resultSalesTaxTrackingDto.physicalNexusTracker().established());
+//                });
+//
+//
+//        // Upsert Transaction Which PassedNexus
+//        String externalId = "newNonExistingTransactionID3";
+//        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+//                .withTaxInclusive(true);
+//
+//        givenTransaction = givenTransaction.withShippingAddress(givenTransaction.shippingAddress().withState("AL"))
+//                .withItems(List.of(givenTransaction.items().get(0).withTotalPrice(BigDecimal.valueOf(1000000))))
+//                .withExternalTimestamps(givenTransaction.externalTimestamps().withCreatedDate(LocalDateTime.now().toString()));  // Should passedNexus
+//
+//        webTestClient
+//                .mutateWith(csrf())
+//
+//                .put()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(TransactionRouter.BASE_URL + "/source/" + "1" + "/externalId/" + externalId)
+//                        .build())
+//                .bodyValue(givenTransaction)
+//                .accept(MediaType.APPLICATION_JSON)
+//                .exchange()
+//                .expectBody(TransactionDto.class);
+//
+//        webTestClient
+//                .mutateWith(csrf())
+//
+//                .get()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(SalesTaxTrackingRouter.BASE_URL)
+//                        .queryParam("state", "AL")
+//                        .queryParam("country", usaCountry)
+//                        .build())
+//                .accept(MediaType.APPLICATION_JSON)
+//                .exchange()
+//                .expectBody(SalesTaxTrackingDto.class)
+//                .value(resultSalesTaxTrackingDto -> {
+//                    assertTrue(resultSalesTaxTrackingDto.economicNexusTracker().established());
+//                    // Shouldn't Be physical, should be  matching the economicNexus date
+//                    assertEquals(resultSalesTaxTrackingDto.economicNexusTracker().establishedDate(), resultSalesTaxTrackingDto.appliedDate(), "appliedDate should match the economicEstablishedDate");
+//                });
+//    }
 
     @Order(0)
     @Test

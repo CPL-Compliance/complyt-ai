@@ -65,7 +65,7 @@ public interface TransactionEndpointsITTemplate extends
 
     void upsertByExternalIdAndSource_TransactionWithSubsidiaryA_Returns201AndPassesNexus();
 
-    void upsertByExternalIdAndSource_TransactionWithSubsidiaryB_Returns201AndHasSalesTax();
+    void upsertByExternalIdAndSource_TransactionWithSubsidiaryB_Returns201AndHasNoSalesTax();
 
     void upsertByExternalIdAndSource_NonUsaCountryWithRegionThatDoesNotExist_Returns200TaxOfOnlyCountry();
 

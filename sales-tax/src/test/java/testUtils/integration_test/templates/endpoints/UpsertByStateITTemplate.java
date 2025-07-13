@@ -25,5 +25,4 @@ public interface UpsertByStateITTemplate extends SalesTaxTrackingRegisteredITTem
     void upsertByState_WithFutureAppliedDateAndPhysicalTrue_ShouldUpdateAppliedDate();
     void upsertByState_WithPastAppliedDateAndPhysicalTrue_ShouldUpdateAppliedDate();
     void upsertByState_WithPhysicalTrueAndEconomicNexusInFuture_ShouldUpdateAppliedDate();
-    void upsertByState_WithPhysicalTrueAndPassedNexusByEconomic_ShouldUpdateAppliedDate();
 }

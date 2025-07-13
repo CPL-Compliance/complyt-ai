@@ -108,13 +108,13 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         AddressDto addressDto = new AddressDto(
                 "Oxenfurt", "USA", "Gustfields", "NY",
                 "Oxenfurt Academy", "11221", null, false);
-        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(false), TestUtilities.getScoringDto());
+        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(false), TestUtilities.getScoringDtoWithGoodCountryMatch());
 
         Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
 
-        HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
+        HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItemWithGoodCountryScore()
                 .withAddress(new HereAddress(null, null, address.country(), null, address.state(), address.county(), address.city(), address.street(), address.zip()))
-                .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0))));
+                .withScoring(TestUtilities.getHereScoringWithGoodCountryScore().withQueryScore(1.0))));
 
         // When
         when(stubHereAddressValidationWebClientWrapper.validateAddress(any())).thenReturn(Mono.just(hereAddressData));
@@ -264,14 +264,14 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
 
         Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
         double badScore = 0.1;
-        HereAddressData hereAddressDataNoStreetBadScore = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
+        HereAddressData hereAddressDataNoStreetBadScore = new HereAddressData(List.of(TestUtilities.getHereAddressItemWithGoodCountryScore()
                 .withAddress(new HereAddress(null, null, address.country(), null, address.state(), address.county(), address.city(), null, address.zip()))
-                .withScoring(TestUtilities.getHereScoring().withQueryScore(badScore))));
+                .withScoring(TestUtilities.getHereScoringWithGoodCountryScore().withQueryScore(badScore))));
 
-        HereAddressData hereAddressDataNoStreetGoodScore = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
+        HereAddressData hereAddressDataNoStreetGoodScore = new HereAddressData(List.of(TestUtilities.getHereAddressItemWithGoodCountryScore()
                 .withAddress(new HereAddress(null, null, address.country(), null, address.state(), address.county(), address.city(), null, address.zip()))
-                .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0))));
-        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(false), TestUtilities.getScoringDto());
+                .withScoring(TestUtilities.getHereScoringWithGoodCountryScore().withQueryScore(1.0))));
+        CachedAddressDataDto expectedAddress = new CachedAddressDataDto(addressDto.withIsPartial(false), TestUtilities.getScoringDtoWithGoodCountryMatch());
 
         // When
         when(stubHereAddressValidationWebClientWrapper.validateAddress(address)).thenReturn(Mono.just(hereAddressDataNoStreetBadScore));
@@ -306,13 +306,13 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         AddressDto addressDto = new AddressDto(
                 null, "Israel", null, null,
                 null, "10014", null, false);
-        ScoringDto scoringDto = TestUtilities.getScoringGlobalDto();
+        ScoringDto scoringDto = TestUtilities.getScoringGlobalDtoWithGoodCountryMatch();
         CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withIsPartial(true), scoringDto);
         ValidatedAddressDto expectedAddress = new ValidatedAddressDto(List.of(cachedAddressDataDto), addressDto);
 
-        HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
+        HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItemWithGoodCountryScore()
                 .withAddress(new HereAddress(null, null, addressDto.country(), null, addressDto.state(), addressDto.county(), addressDto.city(), addressDto.street(), addressDto.zip()))
-                .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0))));
+                .withScoring(TestUtilities.getHereScoringWithGoodCountryScore().withQueryScore(1.0))));
 
         when(stubHereAddressValidationWebClientWrapper.validateAddress(any())).thenReturn(Mono.just(hereAddressData));
 
@@ -344,13 +344,13 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         AddressDto addressDto = new AddressDto(
                 null, "Canada", null, null,
                 null, "10015", "Quebec", false);
-        ScoringDto scoringDto = TestUtilities.getScoringGlobalDto();
+        ScoringDto scoringDto = TestUtilities.getScoringGlobalDtoWithGoodCountryMatch();
         CachedAddressDataDto cachedAddressDataDto = new CachedAddressDataDto(addressDto.withIsPartial(false), scoringDto);
         ValidatedAddressDto expectedAddress = new ValidatedAddressDto(List.of(cachedAddressDataDto), addressDto);
 
-        HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
+        HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItemWithGoodCountryScore()
                 .withAddress(new HereAddress(null, null, addressDto.country(), null, addressDto.region(), addressDto.county(), addressDto.city(), addressDto.street(), addressDto.zip()))
-                .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0))));
+                .withScoring(TestUtilities.getHereScoringWithGoodCountryScore().withQueryScore(1.0))));
 
         when(stubHereAddressValidationWebClientWrapper.validateAddress(any())).thenReturn(Mono.just(hereAddressData));
 
@@ -456,9 +456,9 @@ public class AddressEndPointsIT extends TestContainersInitializerIT {
         AddressDto addressDto = new AddressDto(
                 "New York", "United States", null, "New York",
                 "164 Mulberry St", "12345", null, false);
-        HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItem()
+        HereAddressData hereAddressData = new HereAddressData(List.of(TestUtilities.getHereAddressItemWithGoodCountryScore()
                 .withAddress(new HereAddress(null, null, addressDto.country(), null, addressDto.region(), "county", addressDto.city(), addressDto.street(), addressDto.zip()))
-                .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0).withFieldScore(TestUtilities.getHereScoring().fieldScore().withState(0)))));
+                .withScoring(TestUtilities.getHereScoring().withQueryScore(1.0).withFieldScore(TestUtilities.getHereScoringWithGoodCountryScore().fieldScore().withState(0)))));
 
 
         when(stubHereAddressValidationWebClientWrapper.validateAddress(any())).thenReturn(Mono.just(hereAddressData));

@@ -75,8 +75,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> updateEconomicNexus(SalesTaxTracking salesTaxTracking) {
         return salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking)
-                .flatMap(updatedSalesTaxTracking -> salesTaxTrackingRepository.updateMultipleEconomicNexuses(updatedSalesTaxTracking)
-                        .thenReturn(updatedSalesTaxTracking));
+                .flatMap(updatedSalesTaxTracking -> webhookHandler.handleWebhook(SalesTaxTracking.class, updatedSalesTaxTracking.withTransactionNexusSummaries(null), updatedSalesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE));
     }
 
     @Override

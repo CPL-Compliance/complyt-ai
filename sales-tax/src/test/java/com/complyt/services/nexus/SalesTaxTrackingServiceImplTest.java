@@ -189,11 +189,11 @@ public class SalesTaxTrackingServiceImplTest {
     @Test
     void updateEconomicNexus_UpdatesSalesTaxTracking_ReturnsSalesTaxTracking() {
         // Given
-        UpdateResult updateResult = UpdateResult.acknowledged(0, null, null);
 
         // When
         when(salesTaxTrackingRepository.updateEconomicNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
-        when(salesTaxTrackingRepository.updateMultipleEconomicNexuses(salesTaxTracking)).thenReturn(Mono.just(updateResult));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, salesTaxTracking.withTransactionNexusSummaries(null), salesTaxTracking.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(salesTaxTracking));
+
         Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.updateEconomicNexus(salesTaxTracking);
 
         // Then
@@ -598,12 +598,11 @@ public class SalesTaxTrackingServiceImplTest {
     void handleSalesTaxTrackingAfterTransactionCalculated_SalesTaxTrackingWithEconomicNexusEstablished_UpdatesSalesTaxTracking() {
         // Given
         EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(true, LocalDateTime.now());
-        UpdateResult updateResult = UpdateResult.acknowledged(0, null, null);
         SalesTaxTracking salesTaxTrackingWithEconomicNexusEstablished = salesTaxTracking.withEconomicNexusTracker(economicNexusTracker);
 
         // When
         when(salesTaxTrackingRepository.updateEconomicNexus(salesTaxTrackingWithEconomicNexusEstablished)).thenReturn(Mono.just(salesTaxTrackingWithEconomicNexusEstablished));
-        when(salesTaxTrackingRepository.updateMultipleEconomicNexuses(salesTaxTrackingWithEconomicNexusEstablished)).thenReturn(Mono.just(updateResult));
+        when(webhookHandler.handleWebhook(SalesTaxTracking.class, salesTaxTrackingWithEconomicNexusEstablished.withTransactionNexusSummaries(null), salesTaxTrackingWithEconomicNexusEstablished.getClientTracking().getWebhookDetails(), Action.UPDATE)).thenReturn(Mono.just(salesTaxTrackingWithEconomicNexusEstablished));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.handleSalesTaxTrackingAfterTransactionCalculated(salesTaxTrackingWithEconomicNexusEstablished);
 
         // Then

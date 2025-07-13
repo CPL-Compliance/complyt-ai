@@ -62,12 +62,24 @@ public interface TestUtilities {
         return new Scoring(MatchLevelType.POOR, 0.5f, new FieldsMatchScore(FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, null));
     }
 
+    static Scoring getGoodScoring() {
+        return new Scoring(MatchLevelType.POOR, 0.5f, new FieldsMatchScore(FieldMatchType.GOOD, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, null));
+    }
+
     static ScoringDto getScoringDto() {
         return new ScoringDto(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, null));
     }
 
+    static ScoringDto getScoringDtoWithGoodCountryMatch() {
+        return new ScoringDto(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.GOOD, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, null));
+    }
+
     static ScoringDto getScoringGlobalDto() {
         return new ScoringDto(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.PARTIAL,null, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL));
+    }
+
+    static ScoringDto getScoringGlobalDtoWithGoodCountryMatch() {
+        return new ScoringDto(MatchLevelType.EXCELLENT, 1, new FieldsMatchScore(FieldMatchType.GOOD,null, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL, FieldMatchType.PARTIAL));
     }
 
     static HereAddressData getHereAddressData() {
@@ -79,6 +91,17 @@ public interface TestUtilities {
                 new HereAddress("","USA","US",null,"CA","County","Beverly Hills", "1008 Elden Way","90210"),
                 new HerePosition(12345,12345),new HereMapView(0.5,0.5,0.5,0.5),
                 new HereScoring(0.5f,new HereFieldScore(0.5,0.5, 0.5,  List.of(0.5), 0.5)));
+    }
+
+    static HereAddressItem getHereAddressItemWithGoodCountryScore() {
+        return new HereAddressItem("","","","",
+                new HereAddress("","USA","US",null,"CA","County","Beverly Hills", "1008 Elden Way","90210"),
+                new HerePosition(12345,12345),new HereMapView(0.5,0.5,0.5,0.5),
+                new HereScoring(0.5f,new HereFieldScore(0.75,0.5, 0.5,  List.of(0.5), 0.5)));
+    }
+
+    static HereScoring getHereScoringWithGoodCountryScore() {
+        return new HereScoring(0.9f,new HereFieldScore(0.75, 0.5, 0.5, List.of(0.5), 0.5));
     }
 
     static HereScoring getHereScoring() {

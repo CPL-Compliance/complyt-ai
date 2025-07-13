@@ -67,7 +67,7 @@ class HereAddressCheckerTest {
     @Test
     void filterValidAddresses_ValidAddresses_ReturnsFilteredList() {
         // When
-        cachedAddressData = cachedAddressData.withScoring(TestUtilities.getScoring().withScore(1));
+        cachedAddressData = cachedAddressData.withScoring(TestUtilities.getGoodScoring().withScore(1));
         Mono<List<CachedAddressData>> result = hereAddressChecker.filterValidAddresses(List.of(cachedAddressData));
 
         // Then
@@ -417,6 +417,24 @@ class HereAddressCheckerTest {
                 cachedAddressData.scoring().withFieldScore(
                         cachedAddressData.scoring().fieldScore()
                                 .withCountryMatch(FieldMatchType.NO_MATCH)
+                                .withStateMatch(FieldMatchType.EXACT)
+                )
+        );
+
+        // when
+        boolean result = hereAddressChecker.isCountryAndStateMatch(data, address);
+
+        // then
+        assertFalse(result);
+    }
+
+    @Test
+    void isCountryAndStateMatch_CountryPartialMatchStateMatch_ReturnsFalse() {
+        // given
+        CachedAddressData data = cachedAddressData.withScoring(
+                cachedAddressData.scoring().withFieldScore(
+                        cachedAddressData.scoring().fieldScore()
+                                .withCountryMatch(FieldMatchType.PARTIAL)
                                 .withStateMatch(FieldMatchType.EXACT)
                 )
         );

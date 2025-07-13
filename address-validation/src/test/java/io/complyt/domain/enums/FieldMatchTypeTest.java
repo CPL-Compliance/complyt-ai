@@ -21,7 +21,7 @@ class FieldMatchTypeTest {
     @Test
     void fromScore_goodMatch_lowerBound() {
         // Given
-        double score = 0.7;
+        double score = 0.75;
 
         // When
         FieldMatchType result = FieldMatchType.fromScore(score);
@@ -29,6 +29,19 @@ class FieldMatchTypeTest {
         // Then
         assertEquals(FieldMatchType.GOOD, result);
         assertEquals("Good Match", result.getDescription());
+    }
+
+    @Test
+    void fromScore_partialMatch_middleValue() {
+        // Given
+        double score = 0.7;
+
+        // When
+        FieldMatchType result = FieldMatchType.fromScore(score);
+
+        // Then
+        assertEquals(FieldMatchType.PARTIAL, result);
+        assertEquals("Partial Match", result.getDescription());
     }
 
     @Test

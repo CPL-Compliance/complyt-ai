@@ -37,7 +37,8 @@ public class HereAddressChecker {
     }
 
     private boolean isCountryMatch(CachedAddressData data) {
-        return data.scoring().fieldScore().countryMatch() != FieldMatchType.NO_MATCH;
+        return data.scoring().fieldScore().countryMatch() != FieldMatchType.NO_MATCH
+                && data.scoring().fieldScore().countryMatch() != FieldMatchType.PARTIAL;
     }
 
     private boolean isStateMatch(CachedAddressData data, Address requestAddress) {
