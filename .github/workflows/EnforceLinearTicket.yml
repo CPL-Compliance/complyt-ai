@@ -21,7 +21,18 @@ jobs:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
         run: |
           HEAD_REF="${{ github.head_ref }}"
-          ISSUE_ID=$(echo "$HEAD_REF" | grep -oP 'com-\d+')
+          # Extract the issue number from branch name (e.g., "com-33" -> "33")
+          ISSUE_NUMBER=$(echo "$HEAD_REF" | grep -oP 'com-\d+' | grep -oP '\d+')
+          
+          # Map to the correct Linear issue ID format (THOMAS-XX for this repository)
+          if [ -n "$ISSUE_NUMBER" ]; then
+            ISSUE_ID="THOMAS-$ISSUE_NUMBER"
+          else
+            echo "No issue number found in branch name"
+            exit 1
+          fi
+          
+          echo "Extracted issue ID: $ISSUE_ID"
           RESPONSE=$(curl -s -X POST \
             https://api.linear.app/graphql \
             -H "Authorization: $LINEAR_API_KEY" \
