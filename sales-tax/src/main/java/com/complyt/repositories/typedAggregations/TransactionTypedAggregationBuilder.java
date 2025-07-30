@@ -23,7 +23,6 @@ public class TransactionTypedAggregationBuilder implements TypedAggregationBuild
         ArrayList<AggregationOperation> operations = new ArrayList<>() {{
             add(Aggregation.match(criteria));
             add(Aggregation.sort(Sort.by(sortDirection, sortByProperty)));
-            add(Aggregation.sort(Sort.by(sortDirection, sortByProperty)));
             add(Aggregation.skip(calculatedOffset));
             add(Aggregation.limit(size));
             add(TransactionRepositoryCommonStagesBuilder.customerLookupByTransactionCustomerIdAndTenant(tenantId));
